@@ -15,7 +15,7 @@ class and methods for dates. Below, you will first find the class and
 methods used for creating and dealing with dates and then the class
 used for using time series. Dynare also provides an interface to the
 X-13 ARIMA-SEATS seasonal adjustment program produced, distributed, and
-maintained by the U.S. Census Bureau (2020).
+maintained by the :cite:t:`USCensus:2020`.
 
 
 Dates
@@ -1335,7 +1335,7 @@ The dseries class
     .. dseriesmethod:: B = baxter_king_filter (A[, hf[, lf[, K]]])
                        baxter_king_filter_ (A[, hf[, lf[, K]]])
 
-        |br| Implementation of the *Baxter and King* (1999) band pass
+        |br| Implementation of the :cite:t:`Baxter:1999` band pass
         filter for ``dseries`` objects. This filter isolates business
         cycle fluctuations with a period of length ranging between
         ``hf`` (high frequency) to ``lf`` (low frequency) using a
@@ -1997,7 +1997,7 @@ The dseries class
                        hpcycle_ (A[, lambda])
 
         |br| Extracts the cycle component from a ``dseries`` ``A``
-        object using the *Hodrick and Prescott (1997)* filter and
+        object using the :cite:t:`Hodrick:1997` filter and
         returns a ``dseries`` object, ``B``. The default value for
         ``lambda``, the smoothing parameter, is ``1600``.
 
@@ -2038,7 +2038,7 @@ The dseries class
                        hptrend_ (A[, lambda])
 
         |br| Extracts the trend component from a ``dseries`` A object
-        using the *Hodrick and Prescott (1997)* filter and returns a
+        using the :cite:t:`Hodrick:1997` filter and returns a
         ``dseries`` object, ``B``. Default value for ``lambda``, the
         smoothing parameter, is ``1600``.
 
@@ -3279,7 +3279,7 @@ X-13 ARIMA-SEATS interface
 
     |br| The x13 class provides a method for each X-13 command as
     documented in the X-13 ARIMA-SEATS reference manual (``x11``,
-    ``automdl``, ``estimate``, ...). The respective options (see Chapter 7 of U.S. Census Bureau (2020))
+    ``automdl``, ``estimate``, ...). The respective options (see Chapter 7 of :cite:t:`USCensus:2020`)
     can then be passed by key/value pairs. The ``x13`` class has 22 members:
 
     :arg y: ``dseries`` object with a single variable.

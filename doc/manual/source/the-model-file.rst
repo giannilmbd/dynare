@@ -3045,14 +3045,13 @@ Finding the steady state with Dynare nonlinear solver
            ``10``
 
                 Levenberg-Marquardt mixed complementarity problem
-                (LMMCP) solver (*Kanzow and Petra (2004)*). The complementarity 
+                (LMMCP) solver :cite:p:`kanzow/petra:2004`. The complementarity 
                 conditions are specified using the perpendicular symbol, see
                 :opt:`lmmcp`. 
 
            ``11``
 
-                PATH mixed complementarity problem solver of *Ferris
-                and Munson (1999)*. The complementarity conditions are
+                PATH mixed complementarity problem solver of :cite:t:`ferris/munson:1999`. The complementarity conditions are
                 specified using the perpendicular symbol, see
                 :opt:`lmmcp`. Dynare only provides the interface for
                 using the solver. Due to licence restrictions, you have
@@ -3640,10 +3639,8 @@ resulting Jacobian is in the order of ``n`` by ``T`` and hence will be
 very large for long simulations with many variables, Dynare makes use
 of the sparse matrix capacities of MATLAB/Octave. A slower but
 potentially less memory consuming alternative (``stack_solve_algo=1``)
-is based on a Newton-type algorithm first proposed by *Laffargue
-(1990)* and *Boucekkine (1995)*, which avoids ever storing the full
-Jacobian. The details of the algorithm can be found in *Juillard
-(1996)*. The third type of algorithms makes use of block decomposition
+is based on a Newton-type algorithm first proposed by :cite:t:`Laffargue:1990` and :cite:t:`Boucekkine:1995`, which avoids ever storing the full
+Jacobian. The details of the algorithm can be found in :cite:t:`Juillard:1996`. The third type of algorithms makes use of block decomposition
 techniques (divide-and-conquer methods) that exploit the structure of
 the model. The principle is to identify recursive and simultaneous
 blocks in the model structure and use this information to aid the
@@ -3805,7 +3802,7 @@ speed-up on large models.
            ``1``
 
                Use the Laffargue-Boucekkine-Juillard (LBJ) algorithm proposed
-               in *Juillard (1996)* on top of a LU solver. It is slower
+               in :cite:t:`Juillard:1996` on top of a LU solver. It is slower
                than ``stack_solve_algo=0``, but may be less memory consuming on
                big models. Note that if the ``block`` option is used (see
                :ref:`model-decl`), a simple Newton algorithm with sparse
@@ -3846,7 +3843,7 @@ speed-up on large models.
            ``5``
 
                Use the Laffargue-Boucekkine-Juillard (LBJ) algorithm proposed
-               in *Juillard (1996)* on top of a sparse Gaussian elimination
+               in :cite:t:`Juillard:1996` on top of a sparse Gaussian elimination
                (SPE) solver. The latter takes advantage of the similarity of
                the Jacobian across periods when searching for the pivots. This
                algorithm requires the :opt:`bytecode` option. The following
@@ -4113,8 +4110,7 @@ speed-up on large models.
     .. option:: lmmcp
 
        Solves the perfect foresight model with a Levenberg-Marquardt
-       mixed complementarity problem (LMMCP) solver (*Kanzow and Petra,
-       2004*), which allows to consider inequality constraints on
+       mixed complementarity problem (LMMCP) solver :cite:t:`kanzow/petra:2004`, which allows to consider inequality constraints on
        the endogenous variables (such as a zero lower bound, henceforth ZLB, on the nominal interest
        rate or a model with irreversible investment). This option is
        equivalent to ``stack_solve_algo=7`` **and**
@@ -4950,15 +4946,14 @@ corresponding to a random draw of the shocks.
 
 The main algorithm for solving stochastic models relies on a Taylor
 approximation, up to third order, of the expectation functions (see
-*Judd (1996)*, *Collard and Juillard (2001a, 2001b)*, and
-*Schmitt-Grohé and Uríbe (2004)*). The details of the
+:cite:t:`Judd:1996`, :cite:t:`collard/juillard:2001:compecon,Collard:2001JEDC`, and
+:cite:t:`schmitt-grohe/uribe:2004`). The details of the
 Dynare implementation of the first order solution are given in
-*Villemot (2011)*. Such a solution is computed using the
+:cite:t:`Villemot:2011`. Such a solution is computed using the
 ``stoch_simul`` command.
 
 As an alternative, it is possible to compute a simulation to a
-stochastic model using the *extended path* method presented by *Fair
-and Taylor (1983)*. This method is especially useful when there are
+stochastic model using the *extended path* method presented by :cite:t:`Fair:1983`. This method is especially useful when there are
 strong nonlinearities or binding constraints. Such a solution is
 computed using the ``extended_path`` command.
 
@@ -5033,12 +5028,12 @@ Computing the stochastic solution
        Uses HP filter with :math:`\lambda =` ``DOUBLE`` before
        computing moments. If theoretical moments are requested, the
        spectrum of the model solution is filtered following the
-       approach outlined in Uhlig (2001). Default: no filter.
+       approach outlined in :cite:t:`uhlig:1999`. Default: no filter.
 
     .. option:: one_sided_hp_filter = DOUBLE
 
        Uses the one-sided HP filter with :math:`\lambda =` ``DOUBLE``
-       described in *Stock and Watson (1999)* before computing
+       described in  :cite:t:`Stock:1999` before computing
        moments. This option is only available with simulated
        moments. Default: no filter.
 
@@ -5048,7 +5043,7 @@ Computing the stochastic solution
        computing moments. If theoretical moments are requested, the
        spectrum of the model solution is filtered using an ideal
        bandpass filter. If empirical moments are requested, the
-       *Baxter and King (1999)* filter is used. Default: no filter.
+       :cite:t:`Baxter:1999` filter is used. Default: no filter.
 
     .. option:: bandpass_filter = [HIGHEST_PERIODICITY LOWEST_PERIODICITY]
 
@@ -5261,8 +5256,7 @@ Computing the stochastic solution
        Only available at ``order<3`` and without ``pruning``. In case of ``order=2``,
        Dynare provides a second-order accurate
        approximation to the true second moments based on the linear
-       terms of the second-order solution (see *Kim, Kim,
-       Schaumburg and Sims (2008)*). Note that the unconditional
+       terms of the second-order solution :cite:p:`{see}Kim:2008`. Note that the unconditional
        variance decomposition *i.e.* at horizon infinity) is
        automatically conducted if theoretical moments are requested
        and if ``nodecomposition`` is not set (see
@@ -5272,19 +5266,18 @@ Computing the stochastic solution
 
        Discard higher order terms when iteratively computing
        simulations of the solution. At second order, Dynare uses the
-       algorithm of *Kim, Kim, Schaumburg and Sims (2008)*, while at
-       third order and higher its generalization by *Andreasen,
-       Fernández-Villaverde and Rubio-Ramírez (2018)* is used.
+       algorithm of :cite:t:`Kim:2008`, while at
+       third order and higher its generalization by :cite:t:`Andreasen:2018` is used.
        When specified, theoretical moments
        are based on the pruned state space, i.e. the computation of second moments
-       uses all terms as in *Andreasen, Fernández-Villaverde and Rubio-Ramírez (2018), page 10*
+       uses all terms as in :cite:t:`Andreasen:2018`, page 10
        as opposed to simply providing a second-order accurate result based on the
-       linear solution as in *Kim, Kim, Schaumburg and Sims (2008)*.
+       linear solution as in :cite:t:`Kim:2008`.
 
     .. option:: partial_information
 
        Computes the solution of the model under partial information,
-       along the lines of *Pearlman, Currie and Levine (1986)*. Agents
+       along the lines of :cite:t:`Pearlman:1986`. Agents
        are supposed to observe only some variables of the economy. The
        set of observed variables is declared using the ``varobs``
        command. Note that if ``varobs`` is not present or contains all
@@ -5302,11 +5295,11 @@ Computing the stochastic solution
 
                 Uses the default method to compute the decision rule
                 based on the generalized Schur decomposition (see
-                *Villemot (2011)* for more information).
+                :cite:t:`Villemot:2011` for more information).
 
            ``cycle_reduction``
 
-                Uses the cycle reduction algorithm of ``Bini et al. (2002)`` to solve the
+                Uses the cycle reduction algorithm of :cite:t:`Bini:2002` to solve the
                 polynomial equation for retrieving the coefficients
                 associated to the endogenous variables in the decision
                 rule. This method is faster than the default one for
@@ -5314,7 +5307,7 @@ Computing the stochastic solution
 
            ``logarithmic_reduction``
 
-                Uses the logarithmic reduction algorithm of ``Bini et al. (2002)`` to solve the
+                Uses the logarithmic reduction algorithm of :cite:t:`Bini:2002` to solve the
                 polynomial equation for retrieving the coefficients
                 associated to the endogenous variables in the decision
                 rule. This method is in general slower than the
@@ -5633,8 +5626,7 @@ which is described below.
              extended_path (OPTIONS...);
 
     |br| Simulates a stochastic (i.e. rational expectations) model,
-    using the extended path method presented by *Fair and Taylor
-    (1983)*. Time series for the endogenous variables are generated by
+    using the extended path method presented by :cite:t:`Fair:1983`. Time series for the endogenous variables are generated by
     assuming that the agents believe that there will no more shocks in
     the following periods.
 
@@ -5664,8 +5656,7 @@ which is described below.
 
        If order is greater than ``0`` Dynare uses a gaussian
        quadrature to take into account the effects of future
-       uncertainty; this is called *stochastic* extended path, see *Adjemian
-       and Juillard (2025)*. If ``order`` :math:`=S` then the time series for
+       uncertainty; this is called *stochastic* extended path, see :cite:t:`Adjemian:2025`. If ``order`` :math:`=S` then the time series for
        the endogenous variables are generated by assuming that the
        agents believe that there will no more shocks after period
        :math:`t+S`. This is an experimental feature and can be quite
@@ -5682,8 +5673,7 @@ which is described below.
     .. option:: lmmcp
 
        Solves the perfect foresight model with a Levenberg-Marquardt
-       mixed complementarity problem (LMMCP) solver (*Kanzow and Petra
-       (2004)*), which allows to consider inequality constraints on
+       mixed complementarity problem (LMMCP) solver :cite:p:`kanzow/petra:2004`, which allows to consider inequality constraints on
        the endogenous variables (such as a ZLB on the nominal interest
        rate or a model with irreversible investment). For specifying the
        necessary complementarity conditions, see :opt:`lmmcp`.
@@ -5941,10 +5931,10 @@ Occasionally binding constraints (OCCBIN)
 =========================================
 
 Dynare allows simulating models with up to two occasionally-binding constraints by
-relying on a piecewise linear solution as in *Guerrieri and Iacoviello (2015)*.
+relying on a piecewise linear solution as in :cite:t:`Guerrieri:2015`.
 It also allows estimating such models employing either the inversion filter of
-*Cuba-Borda, Guerrieri, Iacoviello, and Zhong (2019)* or the piecewise Kalman filter of
-*Giovannini, Pfeiffer, and Ratto (2021)*. To trigger computations involving
+:cite:t:`CubaBorda:2019` or the piecewise Kalman filter of
+:cite:t:`Giovannini:2021`. To trigger computations involving
 occasionally-binding constraints requires
 
 #. defining and naming the occasionally-binding constraints using an ``occbin_constraints`` block
@@ -6245,12 +6235,12 @@ All of these elements are discussed in the following.
 
     .. option:: likelihood_inversion_filter
 
-       Employ the inversion filter of *Cuba-Borda, Guerrieri, Iacoviello, and Zhong (2019)* when estimating
+       Employ the inversion filter of :cite:t:`CubaBorda:2019` when estimating
        the model. Default: not enabled.
 
     .. option:: likelihood_piecewise_kalman_filter
 
-       Employ the piecewise Kalman filter of *Giovannini, Pfeiffer, and Ratto (2021)* when estimating
+       Employ the piecewise Kalman filter of :cite:t:`Giovannini:2021` when estimating
        the model. Note that this filter is incompatible with univariate Kalman filters, i.e. ``kalman_algo=2,4``. 
        Default: enabled.
 
@@ -6260,13 +6250,13 @@ All of these elements are discussed in the following.
 
     .. option:: smoother_inversion_filter
 
-       Employ the inversion filter of *Cuba-Borda, Guerrieri, Iacoviello, and Zhong (2019)* when running the
+       Employ the inversion filter of :cite:t:`CubaBorda:2019` when running the
        smoother. The underlying assumption is that the system starts at the steady state. In this case, the 
        inversion filter will provide the required smoother output. Default: not enabled.
 
     .. option:: smoother_piecewise_kalman_filter
 
-       Employ the piecewise Kalman filter of *Giovannini, Pfeiffer, and Ratto (2021)* when running the
+       Employ the piecewise Kalman filter of :cite:t:`Giovannini:2021` when running the
        smoother. Default: enabled.
 
     .. option:: filter_use_relaxation
@@ -6404,10 +6394,9 @@ Estimation based on likelihood
 
 Provided that you have observations on some endogenous variables, it
 is possible to use Dynare to estimate some or all parameters. Both
-maximum likelihood (as in *Ireland (2004)*) and Bayesian techniques
-(as in *Fernández-Villaverde and Rubio-Ramírez (2004)*,
-*Rabanal and Rubio-Ramirez (2003)*, *Schorfheide (2000)* or
-*Smets and Wouters (2003)*) are available. Using Bayesian methods, it
+maximum likelihood (as in :cite:t:`Ireland:2004`) and Bayesian techniques
+(as in :cite:t:`FernandezVillaverde:2004`, :cite:t:`Rabanal:2005`, :cite:t:`Schorfheide:2000` or
+:cite:t:`Smets:2003`) are available. Using Bayesian methods, it
 is possible to estimate DSGE models, VAR models, or a combination of
 the two techniques called DSGE-VAR.
 
@@ -6752,8 +6741,8 @@ observed variables.
     * Posterior mean and highest posterior density interval (shortest
       credible set) from posterior simulation
     * Convergence diagnostic table when only one MCM chain is used or
-      Metropolis-Hastings convergence graphs documented in *Pfeifer
-      (2014)* in case of multiple MCM chains
+      Metropolis-Hastings convergence graphs documented in :cite:t:`Pfeifer:2014`
+      in case of multiple MCM chains
     * Table with numerical inefficiency factors of the MCMC
     * Graphs with prior, posterior, and mode
     * Graphs of smoothed shocks, smoothed observation errors, smoothed
@@ -6816,7 +6805,7 @@ observed variables.
     The Monte Carlo Markov Chain (MCMC) diagnostics are generated by
     the estimation command if :opt:`mh_replic <mh_replic = INTEGER>`
     is larger than 2000 and if option :opt:`nodiagnostic` is not
-    used. By default, the convergence diagnostics of *Geweke (block_iter1992,1999)* is
+    used. By default, the convergence diagnostics of :cite:t:`Geweke:1992,Geweke:1999` is
     computed for each chain. It uses a chi-square test to compare the means of the
     first and last draws specified by :opt:`geweke_interval
     <geweke_interval = [DOUBLE DOUBLE]>` after discarding the burn-in
@@ -6825,23 +6814,22 @@ observed variables.
     as well as using tapering windows specified in :opt:`taper_steps
     <taper_steps = [INTEGER1 INTEGER2 ...]>`. If :opt:`mh_nblocks
     <mh_nblocks = INTEGER>` is larger than 1, the convergence
-    diagnostics of *Brooks and Gelman (1998)* are also provided. As
-    described in section 3 of *Brooks and Gelman (1998)* the
+    diagnostics of :cite:t:`Brooks:1998` are also provided. As
+    described in section 3 of :cite:t:`Brooks:1998` the
     univariate convergence diagnostics are based on comparing pooled
     and within MCMC moments (Dynare displays the second and third
     order moments, and the length of the Highest Probability Density
     interval covering 80% of the posterior distribution). Due to
     computational reasons, the multivariate convergence diagnostic
-    does not follow *Brooks and Gelman (1998)* strictly, but rather
+    does not follow :cite:t:`Brooks:1998` strictly, but rather
     applies their idea for univariate convergence diagnostics to the
     range of the posterior likelihood function instead of the
     individual parameters. The posterior kernel is used to aggregate
     the parameters into a scalar statistic whose convergence is then
-    checked using the *Brooks and Gelman (1998)* univariate
+    checked using the :cite:t:`Brooks:1998` univariate
     convergence diagnostic.
 
-    The inefficiency factors are computed as in *Giordano et
-    al.(2011)* based on Parzen windows as in e.g. *Andrews (1991)*.
+    The inefficiency factors are computed as in :cite:t:`Giordani:2011` based on Parzen windows as in e.g. :cite:t:`Andrews:1991`.
 
 
     *Options*
@@ -6940,7 +6928,7 @@ observed variables.
        Computes a log-linear approximation of the model instead of a
        linear approximation. As always in the context of estimation,
        the data must correspond to the definition of the variables
-       used in the model (see *Pfeifer (2013)* for more details on how
+       used in the model (see :cite:t:`Pfeifer:2013` for more details on how
        to correctly specify observation equations linking model
        variables and the data). If you specify the loglinear option,
        Dynare will take the logarithm of both your model variables and
@@ -7026,7 +7014,7 @@ observed variables.
                For nonstationary models: a wide prior is used with an
                initial matrix of variance of the error of forecast
                diagonal with 10 on the diagonal (follows the
-               suggestion of *Harvey and Phillips(1979)*).
+               suggestion of :cite:t:`Harvey:1979`).
 
            ``3``
 
@@ -7151,7 +7139,7 @@ observed variables.
 
        The scale to be used for drawing the initial value of the
        Metropolis-Hastings chain. Generally, the starting points
-       should be overdispersed for the *Brooks and Gelman (1998)*
+       should be overdispersed for the :cite:t:`Brooks:1998`
        convergence diagnostics to be meaningful. Default:
        ``2*mh_jscale.``
 
@@ -7176,7 +7164,7 @@ observed variables.
 
        The multiple of ``mh_jscale`` used for drawing the initial value of the
        Metropolis-Hastings chain. Generally, the starting points
-       should be overdispersed for the *Brooks and Gelman (1998)*
+       should be overdispersed for the :cite:t:`Brooks:1998`
        convergence diagnostics to be meaningful. Default:
        ``2``
 
@@ -7277,8 +7265,7 @@ observed variables.
            ``2``
 
                 Uses the continuous simulated annealing global
-                optimization algorithm described in *Corana et
-                al.(1987)* and *Goffe et al.(1994)*.
+                optimization algorithm described in :cite:t:`Corana:1987` and :cite:t:`Goffe:1994`.
 
            ``3``
 
@@ -7323,20 +7310,18 @@ observed variables.
            ``9``
 
                 Uses the CMA-ES (Covariance Matrix Adaptation
-                Evolution Strategy) algorithm of *Hansen and Kern
-                (2004)*, an evolutionary algorithm for difficult
+                Evolution Strategy) algorithm of :cite:t:`Hansen:2004`, an evolutionary algorithm for difficult
                 non-linear non-convex optimization.
 
            ``10``
 
                 Uses the ``simpsa`` algorithm, based on the
                 combination of the non-linear simplex and simulated
-                annealing algorithms as proposed by *Cardoso, Salcedo
-                and Feyo de Azevedo (1996)*.
+                annealing algorithms as proposed by :cite:t:`Cardoso:1996`.
 
            ``11``
 
-                Currently not in use. The Liu and West (2020) filter that 
+                Currently not in use. The :cite:t:`Liu:2001` filter that 
                 used to be available under this option value is now triggered with 
                 ``posterior_sampling_method='online'``.
                 
@@ -7358,8 +7343,7 @@ observed variables.
            ``101``
 
                 Uses the SolveOpt algorithm for local nonlinear
-                optimization problems proposed by *Kuntsevich and
-                Kappel (1997)*.
+                optimization problems proposed by :cite:t:`Kuntsevich:1997`.
 
            ``102``
 
@@ -7614,8 +7598,7 @@ observed variables.
                        Possible values are ``2``, ``3`` and ``5``,
                        respectively, corresponding to the two, three
                        and five points formula used to compute the
-                       gradient of the objective function (see
-                       *Abramowitz and Stegun (1964)*). Values ``13``
+                       gradient of the objective function :cite:p:`{see}Abramowitz/Stegun:1965`. Values ``13``
                        and ``15`` are more experimental. If
                        perturbations on the right and the left
                        increase the value of the objective function
@@ -7933,7 +7916,7 @@ observed variables.
 
        Triggers the estimation of a DSGE-VAR model, where the weight
        of the DSGE prior of the VAR model is calibrated to the value
-       passed (see *Del Negro and Schorfheide (2004)*). It represents
+       passed (see :cite:t:`DelNegro:2004`). It represents
        the ratio of dummy over actual observations. To assure that the
        prior is proper, the value must be bigger than :math:`(k+n)/T`,
        where :math:`k` is the number of estimated parameters,
@@ -7950,7 +7933,7 @@ observed variables.
 
        Triggers the estimation of a DSGE-VAR model, where the weight
        of the DSGE prior of the VAR model will be estimated (as in
-       *Adjemian et al.(2008)*). The prior on the weight of the DSGE
+       :cite:t:`Adjemian:2008`). The prior on the weight of the DSGE
        prior, ``dsge_prior_weight``, must be defined in the
        ``estimated_params`` section.
 
@@ -7978,15 +7961,14 @@ observed variables.
 
            ``'dime_mcmc'``
 
-               Instructs Dynare to use the Differential-Independence Mixture Ensemble ("DIME") MCMC sampler of *Boehl (2022)* instead of the standard Random-Walk Metropolis-Hastings. DIME is robust for odd shaped, multimodal, black-box distributions and shown to require significantly less likelihood evaluations than alternative samplers. Many chains run simultaneously, thereby further increasing sampling speed. The algorithm is based on a gradient-free global multi-start optimizer and does not require any posterior mode density maximization prior to MCMC sampling. DIME proposals are generated from an endogenous and adaptive proposal distribution, thereby providing close-to-optimal proposal distributions for black box target distributions without manual fine-tuning. Does not yet support ``moments_varendo``, ``bayesian_irf``, and ``smoother``. 
+               Instructs Dynare to use the Differential-Independence Mixture Ensemble ("DIME") MCMC sampler of :cite:t:`Boehl:2022` instead of the standard Random-Walk Metropolis-Hastings. DIME is robust for odd shaped, multimodal, black-box distributions and shown to require significantly less likelihood evaluations than alternative samplers. Many chains run simultaneously, thereby further increasing sampling speed. The algorithm is based on a gradient-free global multi-start optimizer and does not require any posterior mode density maximization prior to MCMC sampling. DIME proposals are generated from an endogenous and adaptive proposal distribution, thereby providing close-to-optimal proposal distributions for black box target distributions without manual fine-tuning. Does not yet support ``moments_varendo``, ``bayesian_irf``, and ``smoother``. 
 
                Note that, since DIME is using parameter transformations, setting parameter bounds is often counterproductive. The ``prior_trunc`` option is disabled and set to zero.
 
            ``'tailored_random_block_metropolis_hastings'``
 
                Instructs Dynare to use the Tailored randomized block
-               (TaRB) Metropolis-Hastings algorithm proposed by *Chib
-               and Ramamurthy (2010)* instead of the standard
+               (TaRB) Metropolis-Hastings algorithm proposed by :cite:t:`Chib:2010` instead of the standard
                Random-Walk Metropolis-Hastings. In this algorithm, at
                each iteration the estimated parameters are randomly
                assigned to different blocks. For each of these blocks
@@ -7995,7 +7977,7 @@ observed variables.
                proposal density for a Random-Walk Metropolis-Hastings
                step. If the numerical Hessian is not positive
                definite, the generalized Cholesky decomposition of
-               *Schnabel and Eskow (1990)* is used, but without
+               :cite:t:`Schnabel:1990` is used, but without
                pivoting. The TaRB-MH algorithm massively reduces the
                autocorrelation in the MH draws and thus reduces the
                number of draws required to representatively sample
@@ -8012,8 +7994,7 @@ observed variables.
 
            ``'slice'``
 
-               Instructs Dynare to use the Slice sampler of *Planas,
-               Ratto, and Rossi (2015)*. Note that ``'slice'`` is
+               Instructs Dynare to use the Slice sampler of :cite:t:`Planas:2015`. Note that ``'slice'`` is
                incompatible with ``prior_trunc=0``.
 
                Whereas one Metropolis-Hastings iteration requires one 
@@ -8029,7 +8010,7 @@ observed variables.
 
            ``'hssmc'``
 
-               Instructs Dynare to use the *Herbst and Schorfheide (2014)*
+               Instructs Dynare to use the :cite:t:`Herbst:2014`
                version of the Sequential Monte-Carlo sampler instead of the
                standard Random-Walk Metropolis-Hastings. Does not yet support
                ``moments_varendo``, ``bayesian_irf``, and ``smoother``.
@@ -8037,7 +8018,7 @@ observed variables.
            ``'dsmh'``
 
                Instructs Dynare to use the Dynamic Striated Metropolis Hastings
-               sampler proposed by *Waggoner, Wu and Zha (2016)* instead of the
+               sampler proposed by :cite:t:`Waggoner:2016` instead of the
                standard Random-Walk Metropolis-Hastings.
 
            ``'online'``
@@ -8046,7 +8027,7 @@ observed variables.
                 state variables and estimate them jointly with the
                 original state variables of the model using a
                 nonlinear filter. The algorithm implemented in Dynare
-                is described in *Liu and West (2001)*, and works with
+                is described in :cite:t:`Liu:2001`, and works with
                 ``k`` order local approximations of the model.
 
     .. option:: posterior_sampler_options = (NAME, VALUE, ...)
@@ -8137,7 +8118,7 @@ observed variables.
 
                   ``'gamma'``
 
-                  Mean stretch factor for the proposal vector. By default, it is :math:`2.38 / \sqrt{2\,\mathrm{ndim}}` as recommended by *ter Braak (2006)*
+                  Mean stretch factor for the proposal vector. By default, it is :math:`2.38 / \sqrt{2\,\mathrm{ndim}}` as recommended by :cite:t:`TerBraak:2006`
 
                   ``'sigma'``
 
@@ -8249,7 +8230,7 @@ observed variables.
 
                   ``'steps'``
 
-                  Number of weights :math:`\phi_i\in[0,1]` on the likelihood function used to define a sequence of tempered likelihoods. This parameter is denoted :math:`N_{\phi}` in *Herbst and Schorfheide (2014)*, and we have :math:`\phi_1=0` and :math:`\phi_{N_\phi}=1`. Default value is: 25.
+                  Number of weights :math:`\phi_i\in[0,1]` on the likelihood function used to define a sequence of tempered likelihoods. This parameter is denoted :math:`N_{\phi}` in :cite:t:`Herbst:2014`, and we have :math:`\phi_1=0` and :math:`\phi_{N_\phi}=1`. Default value is: 25.
 
                   ``'lambda'``
 
@@ -8400,15 +8381,13 @@ observed variables.
        Default value is ``0``. In case of missing observations of
        single or all series, Dynare treats those missing values as
        unobserved states and uses the Kalman filter to infer their
-       value (see e.g. *Durbin and Koopman (2012)*, Ch. 4.10) This
+       value (see e.g. :cite:t:`Durbin:2012`, Ch. 4.10) This
        procedure has the advantage of being capable of dealing with
        observations where the forecast error variance matrix becomes
        singular for some variable(s). If this happens, the respective
        observation enters with a weight of zero in the log-likelihood,
        i.e. this observation for the respective variable(s) is dropped
-       from the likelihood computations (for details see *Durbin and
-       Koopman (2012)*, Ch. 6.4 and 7.2.5 and *Koopman and Durbin
-       (2000)*). If the use of a multivariate Kalman filter is
+       from the likelihood computations (for details see :cite:t:`Durbin:2012`, Ch. 6.4 and 7.2.5 and :cite:t:`Koopman:2000`). If the use of a multivariate Kalman filter is
        specified and a singularity is encountered, Dynare by default
        automatically switches to the univariate Kalman filter for this
        parameter draw. This behavior can be changed via the
@@ -8416,7 +8395,7 @@ observed variables.
        <use_univariate_filters_if_singularity_is_detected = INTEGER>`
        option.
        In case of skew normally distributed shocks, the Pruned Skewed
-       Kalman filter of *Guljanov, Mutschler, and Trede (2025)* can
+       Kalman filter of :cite:t:`Guljanov:2025` can
        be used by setting ``kalman_algo=5``. This filter is currently
        not compatible with missing observations and does not switch to
        a univariate filter in case of singularity.
@@ -8424,7 +8403,7 @@ observed variables.
     .. option:: fast_kalman_filter
 
        Select the fast Kalman filter using Chandrasekhar recursions as
-       described by ``Herbst (2015)``. This setting is only used with
+       described by :cite:t:`Herbst:2015`. This setting is only used with
        ``kalman_algo=1`` or ``kalman_algo=3``. In case of using the
        diffuse Kalman filter (``kalman_algo=3/lik_init=3``), the
        observables must be stationary. This option is neither
@@ -8485,9 +8464,8 @@ observed variables.
 
     .. option:: diffuse_filter
 
-       Uses the diffuse Kalman filter (as described in *Durbin and
-       Koopman (2012)* and *Koopman and Durbin (2003)* for the
-       multivariate and *Koopman and Durbin (2000)* for the univariate
+       Uses the diffuse Kalman filter (as described in :cite:t:`Durbin:2012` and :cite:t:`Koopman:2003` for the
+       multivariate and :cite:t:`Koopman:2000` for the univariate
        filter) to estimate models with non-stationary observed
        variables. This option will also reset the ``qz_criterium`` to 
        count unit root variables towards the stable variables. Trying to estimate 
@@ -8589,8 +8567,7 @@ observed variables.
 
        Order of approximation around the deterministic steady
        state. When greater than 1, the likelihood is evaluated with a
-       particle or nonlinear filter (see *Fernández-Villaverde and
-       Rubio-Ramírez (2005)*). Default is ``1``, i.e. the likelihood
+       particle or nonlinear filter :cite:p:`{see}FernandezVillaverde:2005`. Default is ``1``, i.e. the likelihood
        of the linearized model is evaluated using a standard Kalman
        filter.
 
@@ -8709,8 +8686,7 @@ observed variables.
 
     .. option:: endogenous_prior
 
-       Use endogenous priors as in *Christiano, Trabandt and Walentin
-       (2011)*. The procedure is motivated by sequential Bayesian
+       Use endogenous priors as in :cite:t:`Christiano:2011`. The procedure is motivated by sequential Bayesian
        learning. Starting from independent initial priors on the
        parameters, specified in the ``estimated_params`` block, the
        standard deviations observed in a "pre-sample", taken to be the
@@ -8718,7 +8694,7 @@ observed variables.
        product of the initial priors and the pre-sample likelihood of
        the standard deviations of the observables is used as the new
        prior (for more information, see the technical appendix of
-       *Christiano, Trabandt and Walentin (2011)*). This procedure
+       :cite:t:`Christiano:2011`). This procedure
        helps in cases where the regular posterior estimates, which
        minimize in-sample forecast errors, result in a large
        overprediction of model variable variances (a statistic that is
@@ -8748,8 +8724,7 @@ observed variables.
 
     .. option:: taper_steps = [INTEGER1 INTEGER2 ...]
 
-       Percent tapering used for the spectral window in the *Geweke
-       (1992,1999)* convergence diagnostics (requires
+       Percent tapering used for the spectral window in the :cite:t:`Geweke:1992,Geweke:1999` convergence diagnostics (requires
        :opt:`mh_nblocks=1 <mh_nblocks = INTEGER>`). The tapering is
        used to take the serial correlation of the posterior draws into
        account. Default: ``[4 8 15]``.
@@ -8757,12 +8732,12 @@ observed variables.
     .. option:: brooks_gelman_plotrows = INTEGER
 
        Number of parameters to depict along the rows of the figures depicting
-       the *Brooks and Gelman (1998)* convergence diagnostics. Default: 3.
+       the :cite:t:`Brooks:1998` convergence diagnostics. Default: 3.
 
     .. option:: geweke_interval = [DOUBLE DOUBLE]
 
        Percentage of MCMC draws at the beginning and end of the MCMC
-       chain taken to compute the *Geweke (1992,1999)* convergence
+       chain taken to compute the :cite:t:`Geweke:1992,Geweke:1999` convergence
        diagnostics (requires :opt:`mh_nblocks=1
        <mh_nblocks = INTEGER>`) after discarding
        the first :opt:`mh_drop <mh_drop = DOUBLE>` percent of draws
@@ -8770,7 +8745,7 @@ observed variables.
 
     .. option:: raftery_lewis_diagnostics
 
-       Triggers the computation of the *Raftery and Lewis (1992)*
+       Triggers the computation of the :cite:t:`Raftery:1992`
        convergence diagnostics. The goal is deliver the number of
        draws required to estimate a particular quantile of the CDF
        ``q`` with precision ``r`` with a probability ``s``. Typically,
@@ -8789,8 +8764,8 @@ observed variables.
     .. option:: raftery_lewis_qrs = [DOUBLE DOUBLE DOUBLE]
 
        Sets the quantile of the CDF ``q`` that is estimated with
-       precision ``r`` with a probability ``s`` in the *Raftery and
-       Lewis (1992)* convergence diagnostics. Default: ``[0.025 0.005
+       precision ``r`` with a probability ``s`` in the :cite:t:`Raftery:1992`
+       convergence diagnostics. Default: ``[0.025 0.005
        0.95]``.
 
     .. option:: consider_all_endogenous
@@ -8836,23 +8811,22 @@ Non-linear filter options
 
            ``sis``
 
-               Sequential importance sampling algorithm of the *Gordon et al.  (1993)* type. This is the default value.
+               Sequential importance sampling algorithm of the :cite:t:`Gordon:1993` type. This is the default value.
 
            ``apf``
 
-               Auxiliary particle filter of the *Pitt and Shephard (1999)* type.
+               Auxiliary particle filter of the :cite:t:`Pitt:1999` type.
 
            ``gf``
 
-               Gaussian filter of the *Kotecha and Djuric (2003a)* type.
+               Gaussian filter of the :cite:t:`Kotecha:2003` type.
 
            ``gmf``
 
-               Gaussian mixture filter of the *Kotecha and Djuric (2003a)* type.
-
+               Gaussian mixture filter of the :cite:t:`Kotecha:2003:Sum` type.
            ``cpf``
 
-               Conditional particle filter of the *Ionides (2003)* type as used in, e.g., *Amisano and Tristani (2010)*.
+               Conditional particle filter of the :cite:t:`Ionides:2003` type as used in, e.g., :cite:t:`Amisano:2010`.
 
            ``nlkf``
 
@@ -8901,11 +8875,11 @@ Non-linear filter options
        
            ``unscented``
                 
-               Unscented transform as in *Julier and Uhlmann (1997)* and *Wan and van der Merwe (2001)*. This is the default.
+               Unscented transform as in :cite:t:`Julier:1997` and :cite:t:`Wan:2001`. This is the default.
 
            ``cubature``
 
-               Cubature method as in *Arasaratnam and Haykin (2009)*.
+               Cubature method as in :cite:t:`Arasaratnam:2009`.
 
            ``montecarlo``
 
@@ -8925,11 +8899,11 @@ Non-linear filter options
        
            ``amisanotristani``
 
-               Use the approach in *Amisano et al. (2010)*.  This is the default.
+               Use the approach in :cite:t:`Amisano:2010`.  This is the default.
        
            ``murrayjonesparslow`` 
            
-               Use the approach in *Murray et al. (2013)*.
+               Use the approach in :cite:t:`Murray:2013`.
 
     .. option:: nonlinear_filter_initialization = INTEGER
 
@@ -8974,15 +8948,15 @@ Non-linear filter options
 
            ``'unscented_alpha'``
 
-               Set the value for alpha for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. The parameterization follows *Wan and van der Merwe (2001)*. Value must be between 0 and 1. Default: ``1``.
+               Set the value for alpha for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. The parameterization follows :cite:t:`Wan:2001`. Value must be between 0 and 1. Default: ``1``.
 
            ``'unscented_beta'``
 
-               Set the value for beta for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. Governs the covariance approximation. The parameterization follows *Wan and van der Merwe (2001)*. Parameter needs to be  weakly bigger than 0 and should be 2 for a Gaussian distribution. Default: ``2``.
+               Set the value for beta for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. Governs the covariance approximation. The parameterization follows :cite:t:`Wan:2001`. Parameter needs to be  weakly bigger than 0 and should be 2 for a Gaussian distribution. Default: ``2``.
 
            ``'unscented_kappa'``
 
-               Set the value for kappa for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. The parameterization follows *Wan and van der Merwe (2001)*. Value must be weakly bigger than 1. Default: ``1``.
+               Set the value for kappa for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. The parameterization follows :cite:t:`Wan:2001`. Value must be weakly bigger than 1. Default: ``1``.
 
            ``'initial_state_prior_std'``
 
@@ -9059,7 +9033,7 @@ Non-linear filter options
 
                 Lower bound of a 90% HPD interval [#f4]_ for
                 observables when taking measurement error into account
-                (see e.g. *Christoffel et al. (2010*), p.17).
+                (see e.g. :cite:t:`Christoffel:2011`), p.17).
 
             ``HPDsup_ME``
 
@@ -9091,8 +9065,7 @@ Non-linear filter options
             ``density``
 
                 Non parametric estimate of the posterior density
-                following the approach outlined in *Skoeld and Roberts
-                (2003)*. First and second columns are respectively
+                following the approach outlined in :cite:t:`Skoeld:2003`. First and second columns are respectively
                 abscissa and ordinate coordinates.
 
         ``ESTIMATED_OBJECT``
@@ -9130,7 +9103,7 @@ Non-linear filter options
 
         Variable set by the ``estimation command``, if it is used with
         ``mh_replic > 0`` or ``load_mh_file`` option. Stores the
-        marginal data density based on *Geweke (1999)* Modified
+        marginal data density based on :cite:t:`Geweke:1999` Modified
         Harmonic Mean estimator.
 
 
@@ -9589,12 +9562,12 @@ Non-linear filter options
             ``PHI_tilde``
 
                 Stacked posterior DSGE-BVAR autoregressive matrices at the
-                mode (equation (28) of *Del Negro and Schorfheide (2004)*).
+                mode (equation (28) of :cite:t:`DelNegro:2004`).
 
             ``SIGMA_u_tilde``
 
                 Posterior covariance matrix of the DSGE-BVAR at the mode
-                (equation (29) of *Del Negro and Schorfheide (2004)*).
+                (equation (29) of :cite:t:`DelNegro:2004`).
 
             ``iXX``
 
@@ -9608,13 +9581,12 @@ Non-linear filter options
             ``PHI_star``
 
                 Stacked prior DSGE-BVAR autoregressive matrices at the
-                mode (equation (22) of *Del Negro and Schorfheide
-                (2004)*).
+                mode (equation (22) of :cite:t:`DelNegro:2004`).
 
             ``SIGMA_star``
 
                 Prior covariance matrix of the DSGE-BVAR at the mode
-                (equation (23) of *Del Negro and Schorfheide (2004)*).
+                (equation (23) of :cite:t:`DelNegro:2004`).
 
             ``ArtificialSampleSize``
 
@@ -9627,8 +9599,7 @@ Non-linear filter options
             ``iGXX_star``
 
                 Inverse of the theoretical prior “covariance” between
-                X and X (:math:`\Gamma_{xx}^*` in *Del Negro and
-                Schorfheide (2004)*).
+                X and X (:math:`\Gamma_{xx}^*` in :cite:t:`DelNegro:2004`).
 
 
     .. matvar:: oo_.RecursiveForecast
@@ -9835,15 +9806,14 @@ and their empirical counterparts.
 For SMM Dynare computes model moments via stochastic
 simulations based on the perturbation approximation up to any order,
 whereas for GMM model moments are computed in closed-form based on the
-pruned state-space representation of the perturbation solution up to third order.
-The implementation of SMM is inspired by *Born and Pfeifer (2014)*
-and *Ruge-Murcia (2012)*, whereas the one for GMM is adapted from
-*Andreasen, Fernández-Villaverde and Rubio-Ramírez (2018)* and *Mutschler (2018)*.
-Successful estimation heavily relies on the accuracy and efficiency of
+pruned state-space representation of the perturbation solution up to third
+order. The implementation of SMM is inspired by :cite:t:`Born:2014`
+and :cite:t:`RugeMurcia:2012`, whereas the one for GMM is adapted from
+:cite:t:`Andreasen:2018` and :cite:t:`Mutschler:2018`. Successful estimation heavily relies on the accuracy and efficiency of
 the perturbation approximation, so it is advised to tune this as much as
 possible (see :ref:`stoch-sol-simul`). The method of moments estimator is consistent
 and asymptotically normally distributed given certain regularity conditions
-(see *Duffie and Singleton (1993)* for SMM and *Hansen (1982)* for GMM).
+(see :cite:t:`Duffie:1993` for SMM and :cite:t:`Hansen:1982` for GMM).
 For instance, it is required to have at least as many moment conditions as
 estimated parameters (over-identified or just identified). Moreover, the
 Jacobian of the moments with respect to the estimated parameters needs to
@@ -9897,8 +9867,8 @@ and select model parameters that align the model's IRFs closely with their empir
 Dynare supports both Frequentist and Bayesian IRF matching approaches,
 using the same optimization and sampling techniques as those applied in likelihood-based estimation
 (sharing many options with the :ref:`estimation command <estim-comm>`).
-The Frequentist approach to this is inspired by the work of *Christiano, Eichenbaum, and Evans (2005)*,
-while the Bayesian method adapts from *Christiano, Trabandt, and Walentin (2010)*.
+The Frequentist approach to this is inspired by the work of :cite:t:`Christiano:2005`,
+while the Bayesian method adapts from :cite:t:`Christiano:2010`.
 A crucial element in IRF matching is the choice of the weighting matrix,
 which influences how the distances between model-generated and empirical IRFs are weighted in the estimation process.
 It is common practice to employ a diagonal weighting matrix,
@@ -10974,7 +10944,7 @@ Method of moments specific outputs
 
         Variable set by the ``method_of_moments`` command, if it is used with
         ``mh_replic > 0`` or ``load_mh_file`` option. Stores the
-        marginal data density based on *Geweke (1999)* Modified
+        marginal data density based on :cite:t:`Geweke:1999` Modified
         Harmonic Mean estimator.
 
     
@@ -10986,7 +10956,7 @@ Model Comparison
              model_comparison (marginal_density = ESTIMATOR) FILENAME[(DOUBLE)]...;
 
     |br| This command computes odds ratios and estimate a posterior density
-    over a collection of models (see e.g. *Koop (2003)*, Ch. 1). The
+    over a collection of models (see e.g. :cite:t:`Koop:2003`, Ch. 1). The
     priors over models can be specified as the *DOUBLE* values,
     otherwise a uniform prior over all models is assumed. In contrast
     to frequentist econometrics, the models to be compared do not need
@@ -11015,7 +10985,7 @@ Model Comparison
          Specifies the estimator for computing the marginal data
          density. *ESTIMATOR* can take one of the following two values:
          ``laplace`` for the Laplace estimator or
-         ``modifiedharmonicmean`` for the *Geweke (1999)* Modified
+         ``modifiedharmonicmean`` for the :cite:t:`Geweke:1999` Modified
          Harmonic Mean estimator. Default value: ``laplace``
 
     *Output*
@@ -12810,7 +12780,7 @@ Optimal policy under discretion
 
     |br| This command computes an approximation of the optimal policy
     under discretion. The algorithm implemented is essentially an LQ
-    solver, and is described by *Dennis (2007)*.
+    solver, and is described by :cite:t:`Dennis:2007`.
 
     You must ensure that your objective is quadratic. Regarding the model, it must
     either be linear or solved at first order with an analytical steady state provided.
@@ -13161,7 +13131,7 @@ questions:
        of a rational expectations model?
 
 The discussion of the methodologies and their application is described
-in *Ratto (2008)*.
+in :cite:t:`Ratto:2008`.
 
 With respect to the previous version of the toolbox, in order to work
 properly, the GSA toolbox no longer requires that the Dynare
@@ -13571,20 +13541,20 @@ Performing identification analysis
 
          1. Theoretical identification analysis based on
 
-            * moments as in *Iskrev (2010)*
-            * spectral density as in *Qu and Tkachenko (2012)*
-            * minimal system as in *Komunjer and Ng (2011)*
+            * moments as in :cite:t:`Iskrev:2010`
+            * spectral density as in :cite:t:`Qu:2012`
+            * minimal system as in :cite:t:`Komunjer:2011`
             * reduced-form solution and linear rational expectation model
-              as in *Ratto and Iskrev (2011)*
+              as in :cite:t:`Ratto:2011`
 
             Note that for orders 2 and 3, all identification checks are based on the pruned
-            state space system as in *Mutschler (2015)*. That is, theoretical moments and
+            state space system as in :cite:t:`Mutschler:2015`. That is, theoretical moments and
             spectrum are computed from the pruned ABCD-system, whereas the minimal system
             criteria is based on the first-order system, but augmented by the theoretical
             (pruned) mean at order 2 or 3.
 
          2. Identification strength analysis based on (theoretical or simulated) curvature of
-            moment information matrix as in *Ratto and Iskrev (2011)*
+            moment information matrix as in :cite:t:`Ratto:2011`
 
          3. Parameter checks based on nullspace and multicorrelation coefficients to
             determine which (combinations of) parameters are involved
@@ -13703,12 +13673,12 @@ Performing identification analysis
     .. option:: no_identification_moments
 
         Disables computations of identification check based on
-        Iskrev (2010)'s J, i.e. derivative of first two moments.
+        :cite:t:`Iskrev:2010`'s J, i.e. derivative of first two moments.
 
     .. option:: ar = INTEGER
 
         Number of lags of computed autocovariances/autocorrelations
-        (theoretical moments) in Iskrev (2010)'s J criteria.
+        (theoretical moments) in :cite:t:`Iskrev:2010`'s J criteria.
         Default: ``1``.
 
     .. option:: useautocorr = INTEGER
@@ -13722,13 +13692,13 @@ Performing identification analysis
     .. option:: no_identification_spectrum
 
         Disables computations of identification check based on
-        *Qu and Tkachenko (2012)*'s G, i.e. Gram matrix of derivatives of
+        :cite:t:`Qu:2012`'s G, i.e. Gram matrix of derivatives of
         first moment plus outer product of derivatives of spectral density.
 
     .. option:: grid_nbr = INTEGER
 
         Number of grid points in [-pi;pi] to approximate the integral
-        to compute Qu and Tkachenko (2012)'s G criteria.
+        to compute :cite:t:`Qu:2012`'s G criteria.
         Default: ``5000``.
 
 *Minimal State Space System Options*
@@ -13736,7 +13706,7 @@ Performing identification analysis
     .. option:: no_identification_minimal
 
         Disables computations of identification check based on
-        *Komunjer and Ng (2011)*'s D, i.e. minimal state space system
+        :cite:t:`Komunjer:2011`'s D, i.e. minimal state space system
         and observational equivalent spectral density transformations.
 
 *Misc Options*
@@ -14150,7 +14120,7 @@ Prerequisite for properly running all the identification routines, is
 the keyword ``identification``; in the Dynare model file. This keyword
 triggers the computation of analytic derivatives of the model with
 respect to estimated parameters and shocks. This is required for
-option ``morris=2``, which implements *Iskrev (2010)* identification
+option ``morris=2``, which implements :cite:t:`Iskrev:2010` identification
 analysis.
 
 For example, the placing::
@@ -14159,7 +14129,7 @@ For example, the placing::
     dynare_sensitivity(identification=1, morris=2);
 
 in the Dynare model file triggers identification analysis using
-analytic derivatives as in *Iskrev (2010)*, jointly with the mapping
+analytic derivatives as in :cite:t:`Iskrev:2010`, jointly with the mapping
 of the acceptable region.
 
 The identification analysis with derivatives can also be triggered by
@@ -14170,8 +14140,8 @@ the single command::
 This does not do the mapping of acceptable regions for the model and
 uses the standard random sampler of Dynare. Additionally, using only
 ``identification;`` adds two additional identification checks: namely,
-of *Qu and Tkachenko (2012)* based on the spectral density and of
-*Komunjer and Ng (2011)* based on the minimal state space system.
+of :cite:t:`Qu:2012` based on the spectral density and of
+:cite:t:`Komunjer:2011` based on the minimal state space system.
 It completely offsets any use of the sensitivity analysis toolbox.
 
 
@@ -14181,7 +14151,7 @@ Markov-switching SBVAR
 
 Given a list of variables, observed variables and a data file, Dynare
 can be used to solve a Markov-switching SBVAR model according to
-*Sims, Waggoner and Zha (2008)*. [#f10]_ Having done this, you can
+:cite:t:`Sims:2008`. [#f10]_ Having done this, you can
 create forecasts and compute the marginal data density, regime
 probabilities, IRFs, and variance decomposition of the model.
 
@@ -15067,9 +15037,9 @@ Heterogeneity
 
 Dynare provides tools for solving models with microeconomic heterogeneity, where a continuum of agents differs in wealth, income, or employment status. Aggregate dynamics arise from the interaction between individual decisions and the distribution of agents’ states.
 
-The implementation notably handles incomplete-markets macroeconomic models (such as HANK models) and combines elements from *Bhandari et al. (2023)* and *Auclert et al. (2021)*.
+The implementation notably handles incomplete-markets macroeconomic models (such as HANK models) and combines elements from :cite:t:`Bhandari:2023` and :cite:t:`Auclert:2021`.
 
-Examples throughout this section draw on *Krusell and Smith (1998)*, a benchmark for economies with idiosyncratic and aggregate shocks.
+Examples throughout this section draw on :cite:t:`Krusell:1998`, a benchmark for economies with idiosyncratic and aggregate shocks.
 
 Declaring Heterogeneous Agent Models
 -------------------------------------
@@ -15443,7 +15413,7 @@ Semi-structural models
 ======================
 
 Dynare provides tools for semi-structural models, in the vain of the FRB/US
-model (see *Brayton and Tinsley (1996)*), where expectations are not necessarily
+model (see :cite:t:`Brayton:1996`), where expectations are not necessarily
 model consistent but based on a VAR auxiliary model. In the following, it is
 assumed that each equation is written as ``VARIABLE = EXPRESSION`` or
 ``T(VARIABLE) = EXPRESSION`` where ``T(VARIABLE)`` stands for a transformation
@@ -15833,7 +15803,7 @@ and (*iii*) the expected changes in the target :math:`y^{\star}`:
 
       \Delta y_t = a_0(y_{t-1}^{\star}-y_{t-1}) + \sum_{i=1}^{m-1} a_i \Delta y_{t-i} + \sum_{i=0}^{\infty} d_i \Delta y^{\star}_{t+i}  +\varepsilon_t
 
-*Brayton et alii (2000)* shows how such an equation can be derived from the
+:cite:t:`Brayton:2000` shows how such an equation can be derived from the
 minimisation of a quadratic cost function penalising expected deviations from
 the target and non-smoothness of :math:`y`, where future costs are discounted
 (with discount factor :math:`\beta`). They also show that the parameters
@@ -15907,7 +15877,7 @@ simply add the exogenous variables to the PAC equation (without the weight
     :math:`(a_i)_{i=0}^{m-1}` coefficients in the PAC equation. This option is
     not mandatory, if absent Dynare understands that the expected changes of the
     target have to be computed under the MCE assumption. This is done by
-    rewriting recursively the infinite sum as shown in equation 10 of *Brayton et alii (2000)*.
+    rewriting recursively the infinite sum as shown in equation 10 of :cite:t:`Brayton:2000`.
 
     .. option:: discount = PARAMETER_NAME | DOUBLE
 
@@ -15927,9 +15897,9 @@ simply add the exogenous variables to the PAC equation (without the weight
     defining the linear combination of the companion VAR
     variables. The default value ``dd`` must be used if the target
     appears in first difference in the auxiliary model, see equation
-    (A.79) in *Brayton et alii (2000)*, while value ``dl`` must be
+    (A.79) in :cite:t:`Brayton:2000`, while value ``dl`` must be
     used if the target shows up in level in the auxiliary model,
-    equation (A.74) in *Brayton et alii (2000)*.
+    equation (A.74) in :cite:t:`Brayton:2000`.
 
     .. option:: auxname = STRING
 
@@ -16128,7 +16098,7 @@ The PAC equation, introduced in the previous section, can be estimated. This
 equation is nonlinear with respect to the estimated parameters
 :math:`(a_i)_{i=0}^{m-1}`, since the reduced form parameters (in the computation
 of the infinite sum) are nonlinear functions of the autoregressive parameters
-and the error correction parameter. *Brayton et alii (2000)* shows how to
+and the error correction parameter. :cite:t:`Brayton:2000` shows how to
 estimate the PAC equation by iterative OLS. Although this approach is
 implemented in Dynare, mainly for comparison purposes, we also propose NLS
 estimation, which is much preferable (asymptotic properties of NLS being more
