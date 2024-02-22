@@ -1,4 +1,4 @@
-function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,dr, atT, innov] = IVF_posterior(xparam1,...
+function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,dr, atT, innov, regime_history] = IVF_posterior(xparam1,...
     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,dr, atT, innov] = IVF_posterior(xparam1,...
 %     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
@@ -107,7 +107,7 @@ end
 sample_length = size(obs,1);
 filtered_errs_init = zeros(sample_length,sum(err_index));
 
-[filtered_errs, resids, Emat, stateval, info] = occbin.IVF_core(M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,err_index,filtered_errs_init,obs_list,obs);
+[filtered_errs, resids, Emat, stateval, info, regime_history] = occbin.IVF_core(M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,err_index,filtered_errs_init,obs_list,obs);
 if info(1)
     fval = Inf;
     exit_flag = 0;
