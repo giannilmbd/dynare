@@ -29,7 +29,16 @@ error_flag=0;
 if isempty(binding_indicator)
     binding_indicator = false;
 end
-% analyse violvec and isolate contiguous periods in the other regime.
+if ischar(binding_indicator)
+    % binding indicator represented as a string
+    [regime, regime_start] = str2regime(binding_indicator);
+    return
+end
+if any(binding_indicator>1)
+    % binding indicator represented a binary (int64)
+    binding_indicator = bin2indicator(binding_indicator);
+end
+% analyze binding_indicator and isolate contiguous periods in the other regime.
 regime(1) = binding_indicator(1);
 regime_index = 1;
 regime_start(1) = 1;
@@ -41,7 +50,7 @@ for i=2:length(binding_indicator)
     end
 end
 
-if (regime(1) == 1 && length(regime_start)==1)
+if (regime(1) == 1 && isscalar(regime_start))
     disp_verbose('map_regime: Binding regime was never left. nperiods needs to be increased.',debug_switch);
     error_flag=1;
 end
@@ -50,3 +59,45 @@ if (regime(end)==1)
     disp_verbose('map_regime: Constraint(s) are binding at the end of the sample. nperiods needs to be increased.',debug_switch);
     error_flag=1;
 end
+
+
+function binary_indicator = bin2indicator(A)
+% function binary_indicator = bin2indicator(A)
+% Map regime binary representation into regime indicator
+% Inputs:
+% - A                 [integer]   scalar whose bits represent regime
+%
+% Outputs:
+% - binding_indicator [integer]   [nperiods by 1] vector of regime indices
+
+binary_indicator = zeros((length(A)-1)*50+length(dec2bin(A(end)))+1,1);
+for ka=1:length(A)
+    a = dec2bin(A(ka));
+    bina = a(end:-1:1);
+    for k=1:length(bina)
+        binary_indicator(k+50*(ka-1)) = logical(str2double(bina(k)));
+    end
+end
+
+function [regime, regimestart] = str2regime(regime_string)
+% function [regime, regimestart] = str2regime(regime_string)
+% Map regime string representation into regime info
+%
+% Inputs:
+% - regime_string  [char array]   string representing regime
+%
+% Outputs:
+% - regime         [array] vector of regimes
+% - regimestart    [array] vector of periods where new regime starts
+
+if size(regime_string,1)==1
+    regimestart = str2num(regime_string(1,:));
+    regime = false(1,length(regimestart));
+    for k=length(regimestart)-1:-2:1
+        regime(1,k) = true;
+    end
+else
+    regime = logical(str2num(regime_string(1,:)));
+    regimestart = str2num(regime_string(2,:));
+end
+
