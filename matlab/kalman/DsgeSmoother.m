@@ -526,8 +526,10 @@ else
             % period ahead (so if regimestart was [1 5] it should be [1 4]
             % in out
             %         end
-            for jnk=1:nk
-                aaa(jnk,oo_.dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
+            if out.error_flag==0
+                for jnk=1:nk
+                    aaa(jnk,oo_.dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
+                end
             end
         end
         aK=aaa;
