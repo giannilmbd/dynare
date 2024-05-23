@@ -125,8 +125,8 @@ M_.H = H;
 %------------------------------------------------------------------------------
 
 warning('off', 'MATLAB:nearlySingularMatrix')
-[~, ~, ~, info, oo_.dr, M_.params] = ...
-    dynare_resolve(M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state, 'restrict');
+[oo_.dr, info, M_.params] = ...
+    resol(0,M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
 warning('on', 'MATLAB:nearlySingularMatrix')
 
 if info(1)~=0
@@ -174,6 +174,7 @@ if nargout>4
         ReducedForm.ghuu = zeros(size(restrict_variables_idx,1),n_shocks^2);
         ReducedForm.ghxu = zeros(size(restrict_variables_idx,1),n_states*n_shocks);
         ReducedForm.constant = ReducedForm.steadystate;
+%        ReducedForm.ghs2 = dr.ghs2(restrict_variables_idx,:);
     end
     ReducedForm.state_variables_steady_state = dr.ys(dr.order_var(state_variables_idx));
     ReducedForm.Q = Q;

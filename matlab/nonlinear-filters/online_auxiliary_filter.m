@@ -143,9 +143,9 @@ for t=1:sample_size
                 ghxx = ReducedForm.ghxx;
                 ghuu = ReducedForm.ghuu;
                 ghxu = ReducedForm.ghxu;
-                ghs2 = ReducedForm.ghs2;
-                if (order == 3)
+                if (order==3)
                     % Set local state space model (third order approximation).
+                    ghs2 = ReducedForm.ghs2;
                     ghxxx = ReducedForm.ghxxx;
                     ghuuu = ReducedForm.ghuuu;
                     ghxxu = ReducedForm.ghxxu;
@@ -171,7 +171,7 @@ for t=1:sample_size
             else
                 if pruning
                     yhat_ = bsxfun(@minus,StateVectors_(:,i),state_variables_steady_state_);
-                    if order == 2
+                    if order <= 2
                         tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, constant, ghxx, ghuu, ghxu, yhat_, steadystate, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
                         tmp = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations, 1), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
@@ -179,7 +179,7 @@ for t=1:sample_size
                     error('Pruning is not available for orders > 3');
                     end
                 else
-                    if order == 2
+                    if order <= 2
                         tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, constant, ghxx, ghuu, ghxu, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
                         tmp = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
@@ -192,6 +192,8 @@ for t=1:sample_size
             % Replace Gaussian density with a Student density with 3 degrees of freedom for fat tails.
             z = sum(PredictionError.*(ReducedForm.H\PredictionError), 1) ;
             tau_tilde(i) = weights(i).*(tpdf(z, 3*ones(size(z)))+1e-99) ;
+        else
+            tau_tilde(i) = 0 ;
         end
     end
     % particles selection
@@ -232,9 +234,9 @@ for t=1:sample_size
                         ghxx = ReducedForm.ghxx;
                         ghuu = ReducedForm.ghuu;
                         ghxu = ReducedForm.ghxu;
-                        ghs2 = ReducedForm.ghs2;
                         if (order == 3)
                             % Set local state space model (third order approximation).
+                            ghs2 = ReducedForm.ghs2;
                             ghxxx = ReducedForm.ghxxx;
                             ghuuu = ReducedForm.ghuuu;
                             ghxxu = ReducedForm.ghxxu;
@@ -267,7 +269,7 @@ for t=1:sample_size
                     else
                         if pruning
                             yhat_ = bsxfun(@minus,StateVectors_(:,i), state_variables_steady_state_);
-                            if order == 2
+                            if order <= 2
                                 [tmp, tmp_] = local_state_space_iteration_2(yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, yhat_, steadystate, options_.threads.local_state_space_iteration_2);
                             elseif order == 3
                                 [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
@@ -276,7 +278,7 @@ for t=1:sample_size
                             end
                             StateVectors_(:,i) = tmp_(mf0_,:);
                         else
-                            if order == 2
+                            if order <= 2
                                 tmp = local_state_space_iteration_2(yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, options_.threads.local_state_space_iteration_2);
                             elseif order == 3
                                 tmp = local_state_space_iteration_3(yhat, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
