@@ -43,7 +43,7 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
     Prior = dprior(bayestopt_, options_.prior_trunc);
 
     % Set function handle for the objective
-    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state, []);', 'funobj', func2str(TargetFun)));
+    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);', 'funobj', func2str(TargetFun)));
 
     mlogit = @(x) .95 + .1/(1 + exp(-16*x)); % Update of the scale parameter
 
