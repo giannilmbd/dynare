@@ -39,7 +39,7 @@ function [pmean, pmode, pmedian, pstdev, p025, p975, covariance] = online_auxili
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % Set seed for randn().
-options_=set_dynare_seed_local_options(options_,'default');
+options_ = set_dynare_seed_local_options(options_,'default');
 pruning = options_.particle.pruning;
 second_resample = options_.particle.resampling.status.systematic;
 variance_update = true;
@@ -86,7 +86,7 @@ for i=1:number_of_particles
     info = 12042009;
     while info
         candidate = Prior.draw();
-        [info, M_, options_, oo_] = solve_model_for_online_filter(false, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_);
+        [info, M_, options_, oo_] = solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_);
         if ~info
             xparam(:,i) = candidate(:);
         end
