@@ -191,7 +191,9 @@ for t=1:sample_size
             PredictionError = bsxfun(@minus,Y(t,:)', tmp(mf1,:));
             % Replace Gaussian density with a Student density with 3 degrees of freedom for fat tails.
             z = sum(PredictionError.*(ReducedForm.H\PredictionError), 1) ;
-            tau_tilde(i) = weights(i).*(tpdf(z, 3*ones(size(z)))+1e-99) ;
+            ddl = 3 ;
+            %tau_tilde(i) = weights(i).*(tpdf(z,3*ones(size(z)))+1e-99) ;
+            tau_tilde(i) = weights(i)*(exp(gammaln((ddl + 1) / 2) - gammaln(ddl/2))/(sqrt(ddl*pi)*(1 + (z^2)/ddl)^((ddl + 1)/2))+1e-99) ;
         else
             tau_tilde(i) = 0 ;
         end

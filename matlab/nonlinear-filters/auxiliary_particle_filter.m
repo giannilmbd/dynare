@@ -132,7 +132,9 @@ for t=1:sample_size
     end
     PredictionError = bsxfun(@minus,Y(:,t),tmp(mf1,:));
     z = sum(PredictionError.*(H\PredictionError),1) ;
-    tau_tilde = weights.*(tpdf(z,3*ones(size(z)))+1e-99) ;
+%    tau_tilde = weights.*(tpdf(z,3*ones(size(z)))+1e-99) ;
+    ddl = 3 ;
+    tau_tilde = weights.*(exp(gammaln((ddl + 1) / 2) - gammaln(ddl/2))./(sqrt(ddl*pi).*(1 + (z.^2)./ddl).^((ddl + 1)/2))+1e-99) ;
     tau_tilde = tau_tilde/sum(tau_tilde) ;
     indx = resample(0,tau_tilde',ParticleOptions);
     if pruning
