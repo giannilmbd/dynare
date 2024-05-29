@@ -1,4 +1,4 @@
-function [X, info] = cycle_reduction(A0, A1, A2, cvg_tol, ch)
+function [X, info] = cycle_reduction(A0, A1, A2, cvg_tol, max_it, ch)
 
 %@info:
 %! @deftypefn {Function File} {[@var{X}, @var{info}] =} cycle_reduction (@var{A0},@var{A1},@var{A2},@var{cvg_tol},@var{ch})
@@ -60,14 +60,13 @@ function [X, info] = cycle_reduction(A0, A1, A2, cvg_tol, ch)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-max_it = 300;
 it = 0;
 info = 0;
 X = [];
 crit = Inf;
 A0_0 = A0;
 Ahat1 = A1;
-if (nargin == 5 && ~isempty(ch) )
+if (nargin == 6 && ~isempty(ch) )
     A1_0 = A1;
     A2_0 = A2;
 end
@@ -94,7 +93,7 @@ while cont
         return
     elseif isnan(crit)
         info(1) = 402;
-        info(2) = log(norm(A1,1))
+        info(2) = log(norm(A1,1));
         return
     end
     it = it + 1;
@@ -102,12 +101,12 @@ end
 
 X = -Ahat1\A0_0;
 
-if (nargin == 5 && ~isempty(ch) )
+if (nargin == 6 && ~isempty(ch) )
     %check the solution
     res = norm(A0_0 + A1_0 * X + A2_0 * X * X, 1);
     if (res > cvg_tol)
-        info(1) = 403
-        info(2) = log(res)
+        info(1) = 403;
+        info(2) = log(res);
         dprintf('The norm of the residual is %s whereas the tolerance criterion is %s', num2str(res), num2str(cvg_tol));
     end
 end
@@ -128,7 +127,7 @@ C = diag(15*ones(n,1)); C = C - diag(5*ones(n-1,1),-1); C = C - diag(5*ones(n-1,
 
 % Solve the equation with the cycle reduction algorithm
 try
-    tic; X1 = cycle_reduction(C,B,A,1e-7); elapsedtime = toc;
+    tic; X1 = cycle_reduction(C,B,A,1e-7,100); elapsedtime = toc;
     disp(['Elapsed time for cycle reduction algorithm is: ' num2str(elapsedtime) ' (n=' int2str(n) ').'])
     t(1) = 1;
 catch

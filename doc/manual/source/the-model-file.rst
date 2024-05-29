@@ -4837,6 +4837,11 @@ Computing the stochastic solution
        The convergence criterion used in the cycle reduction
        algorithm. Its default value is ``1e-7``.
 
+    .. option:: dr_cycle_reduction_maxiter = INTEGER
+
+       The maximum number of iterations used in the cycle
+       reduction algorithm. Its default value is ``100``.
+
     .. option:: dr_logarithmic_reduction_tol = DOUBLE
 
        The convergence criterion used in the logarithmic reduction
@@ -7998,6 +8003,11 @@ observed variables.
         See :opt:`dr_cycle_reduction_tol <dr_cycle_reduction_tol = DOUBLE>`.
         Default: ``1e-7``.
 
+    .. option:: dr_cycle_reduction_maxiter = INTEGER
+
+        See :opt:`dr_cycle_reduction_maxiter <dr_cycle_reduction_maxiter = INTEGER>`.
+        Default: ``100``.
+
     .. option:: dr_logarithmic_reduction_tol = DOUBLE
 
         See :opt:`dr_logarithmic_reduction_tol <dr_logarithmic_reduction_tol = DOUBLE>`.
@@ -9925,6 +9935,11 @@ Numerical algorithms options
 
         See :opt:`dr_cycle_reduction_tol <dr_cycle_reduction_tol = DOUBLE>`.
         Default: ``1e-7``.
+
+    .. option:: dr_cycle_reduction_maxiter = INTEGER
+
+        See :opt:`dr_cycle_reduction_maxiter <dr_cycle_reduction_maxiter = INTEGER>`.
+        Default: ``100``.
 
     .. option:: dr_logarithmic_reduction_tol = DOUBLE
 

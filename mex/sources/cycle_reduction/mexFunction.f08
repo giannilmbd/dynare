@@ -28,16 +28,17 @@ module c_reduction
 contains
 
    ! Cycle reduction algorithm
-   subroutine cycle_reduction(A0, A1, A2, X, cvg_tol, check, info)
+   subroutine cycle_reduction(A0, A1, A2, X, cvg_tol, check, max_it, info)
       real(real64), dimension(:,:), intent(in) :: A0, A1, A2
       real(real64), dimension(:,:), intent(inout) :: X
       real(real64), intent(in) :: cvg_tol
       logical, intent(in) :: check
+      integer, intent(in) :: max_it
       real(c_double), dimension(2), intent(inout) :: info
       
       real(real64), dimension(:,:), allocatable :: A02, &
       Q0, Q2, Ahat, invA1_A02, A1i, A0_tmp, A1_tmp
-      integer :: it, n, dn, max_it
+      integer :: it, n, dn
       integer(blint) :: info_inv
       integer(blint), dimension(:), allocatable :: ipiv
       real(real64) :: residual, crit
@@ -51,7 +52,6 @@ contains
       Ahat = A1
       A1i = A1
       it = 0
-      max_it = 300
 loop: do
          ! Computing [A0;A2]*(A1\[A0 A2]) 
          A1_tmp = A1i
@@ -118,7 +118,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    type(c_ptr), dimension(*), intent(out) :: plhs
    integer(c_int), intent(in), value :: nlhs, nrhs
 
-   integer :: i, n
+   integer :: i, n, max_it
    character(kind=c_char, len=2) :: num2str 
    real(real64) :: cvg_tol
    real(real64), dimension(:,:), pointer,  contiguous :: A0, A1, A2, X
@@ -174,13 +174,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    A1(1:n,1:n) => mxGetPr(prhs(2))
    A2(1:n,1:n) => mxGetPr(prhs(3))
    cvg_tol = mxGetScalar(prhs(4))
+   max_it = int(mxGetScalar(prhs(5)))
    info = [0._c_double,0._c_double]
 
    plhs(1) = mxCreateDoubleMatrix(int(n, mwSize), int(n, mwSize), mxREAL)
    X(1:n,1:n) => mxGetPr(plhs(1))
 
    ! 2. Calling the Cycle Reduction algorithm
-   call cycle_reduction(A0, A1, A2, X, cvg_tol, check, info)
+   call cycle_reduction(A0, A1, A2, X, cvg_tol, check, max_it, info)
 
    ! 3. Editing the information output if necessary
    if (nlhs == 2) then

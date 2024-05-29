@@ -158,7 +158,7 @@ if task ~= 1 && (options_.dr_cycle_reduction || options_.dr_logarithmic_reductio
     B1 = [aa(row_indx,index_0m) aa(row_indx,index_0p) ];
     C1 = [zeros(ndynamic,npred) aa(row_indx,index_p)];
     if options_.dr_cycle_reduction
-        [ghx, info] = cycle_reduction(A1, B1, C1, options_.dr_cycle_reduction_tol);
+        [ghx, info] = cycle_reduction(A1, B1, C1, options_.dr_cycle_reduction_tol, options_.dr_cycle_reduction_maxiter);
     else
         [ghx, info] = logarithmic_reduction(C1, B1, A1, options_.dr_logarithmic_reduction_tol, options_.dr_logarithmic_reduction_maxiter);
     end

@@ -689,6 +689,7 @@ options_.dr_logarithmic_reduction_tol = 1e-12;
 
 % convergence criterion for iteratives methods to solve the decision rule
 options_.dr_logarithmic_reduction_maxiter = 100;
+options_.dr_cycle_reduction_maxiter = 100;
 
 % dates for historical time series
 options_.initial_date = dates();

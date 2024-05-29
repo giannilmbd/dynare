@@ -175,6 +175,7 @@ options_mom_ = set_default_option(options_mom_,'pruning',false);                
 options_mom_ = set_default_option(options_mom_,'aim_solver',false);                     % use AIM algorithm to compute perturbation approximation instead of mjdgges
 options_mom_ = set_default_option(options_mom_,'k_order_solver',false);                 % use k_order_perturbation instead of mjdgges
 options_mom_ = set_default_option(options_mom_,'dr_cycle_reduction',false);             % use cycle reduction algorithm to solve the polynomial equation for retrieving the coefficients associated to the endogenous variables in the decision rule
+options_mom_ = set_default_option(options_mom_,'dr_cycle_reduction_maxiter',100); % maximum number of iterations used in the cycle reduction algorithm
 options_mom_ = set_default_option(options_mom_,'dr_cycle_reduction_tol',1e-7);          % convergence criterion used in the cycle reduction algorithm
 options_mom_ = set_default_option(options_mom_,'dr_logarithmic_reduction',false);       % use logarithmic reduction algorithm to solve the polynomial equation for retrieving the coefficients associated to the endogenous variables in the decision rule
 options_mom_ = set_default_option(options_mom_,'dr_logarithmic_reduction_maxiter',100); % maximum number of iterations used in the logarithmic reduction algorithm
