@@ -160,7 +160,7 @@ by the ``dynare`` command.
         Instructs ``dynare`` to save the intermediary file which is obtained
         after macro processing (see :ref:`macro-proc-lang`); the saved output
         will go in the file specified, or if no file is specified in
-        ``FILENAME-macroexp.mod``. See the :ref:`note on quotes<quote-note>`
+        ``FILENAME_macroexp.mod``. See the :ref:`note on quotes<quote-note>`
         for info on passing a ``FILENAME`` argument containing spaces.
 
     .. option:: onlymacro
