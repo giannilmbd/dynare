@@ -7988,6 +7988,26 @@ observed variables.
 
        See :opt:`aim_solver`.
 
+    .. option:: dr = OPTION
+
+        See :opt:`dr <dr = OPTION>`. Default: ``default``, i.e. generalized
+        Schur decomposition.
+
+    .. option:: dr_cycle_reduction_tol = DOUBLE
+
+        See :opt:`dr_cycle_reduction_tol <dr_cycle_reduction_tol = DOUBLE>`.
+        Default: ``1e-7``.
+
+    .. option:: dr_logarithmic_reduction_tol = DOUBLE
+
+        See :opt:`dr_logarithmic_reduction_tol <dr_logarithmic_reduction_tol = DOUBLE>`.
+        Default: ``1e-12``.
+
+    .. option:: dr_logarithmic_reduction_maxiter = INTEGER
+
+        See :opt:`dr_logarithmic_reduction_maxiter <dr_logarithmic_reduction_maxiter = INTEGER>`.
+        Default: ``100``.
+
     .. option:: lyapunov = OPTION
 
        Determines the algorithm used to solve the Lyapunov equation to
