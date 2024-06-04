@@ -28,7 +28,7 @@ X2 = zeros(n,n);
 % 1. Solve the equation with the Matlab cycle reduction algorithm
 tElapsed1 = 0.;
 try
-   tic; [X1,info] = cycle_reduction_matlab(C,B,A,cvg_tol,[0.]); tElapsed1 = toc;
+   tic; [X1,info] = cycle_reduction_matlab(C,B,A,cvg_tol,100); tElapsed1 = toc;
    disp(['Elapsed time for the Matlab cycle reduction algorithm is: ' num2str(tElapsed1) ' (n=' int2str(n) ').'])
    R = norm(C+B*X1+A*X1*X1,1);
    if (R > cvg_tol)
@@ -43,7 +43,7 @@ end
 % 2. Solve the equation with the Fortran cycle reduction algorithm
 tElapsed2 = 0.;
 try
-   tic; [X2,info] = cycle_reduction(C,B,A,cvg_tol,[0.]); tElapsed2 = toc;
+   tic; [X2,info] = cycle_reduction(C,B,A,cvg_tol,100); tElapsed2 = toc;
    disp(['Elapsed time for the Fortran cycle reduction algorithm is: ' num2str(tElapsed2) ' (n=' int2str(n) ').'])
    R = norm(C+B*X2+A*X2*X2,1);
    if (R > cvg_tol)
