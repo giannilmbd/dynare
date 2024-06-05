@@ -962,7 +962,10 @@ The model is declared inside a ``model`` block:
     equal sign, and the expression for which this new variable will
     stand. Later on, every time this variable appears in the model,
     Dynare will substitute it by the expression assigned to the
-    variable. Note that the scope of this variable is restricted to
+    variable (if the model-local variable appears with a lead or a lag
+    attached to it between parenthesis, the substitution will be done by
+    shifting the expression accordingly).
+    Note that the scope of this variable is restricted to
     the model block; it cannot be used outside. To assign a LaTeX name
     to the model local variable, use the declaration syntax outlined
     by :comm:`model_local_variable`. A model local variable declaration

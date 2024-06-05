@@ -1,5 +1,8 @@
-// Tests for model local variables
-// (including in params derivs file, i.e. with identification, see Dynare/preprocessor#13)
+/* Tests for model-local variables
+  (including in params derivs file, i.e. with identification, see Dynare/preprocessor#13)
+   Also tests the possibility of having a lead/lag on a model-local variable
+  (recursively in the definition of another such variable) (see #1929)
+*/
 
 var c, y, k, a, h, b;
 varexo e, u;
@@ -22,8 +25,8 @@ phi   = 0.1;
 model_local_variable foo $\text{foo}$;
 
 model;
-#bar = exp(b)*c;
-#foo = bar/(exp(b(+1))*c(+1));
+#bar = exp(b(+1))*c(+1);
+#foo = bar(-1)/(exp(b(+1))*c(+1));
 c*theta*h^(1+psi)=(1-alpha)*y;
 k = beta*(foo
     *(exp(b(+1))*alpha*y(+1)+(1-delta)*k));
