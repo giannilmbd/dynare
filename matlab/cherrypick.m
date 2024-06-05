@@ -1,17 +1,18 @@
-function json = cherrypick(infile, outfold, eqtags, noresids, json)
+function json = cherrypick(infile, outfold, eqtags, noresids, json, substitutetarget)
 
 % Extract some equations in infile (mod file used for estimation)
 % and write them in outfile (mod file used for simulation).
 %
 % INPUTS
-% - infile        [string]    Name of the mod file where all the equations used for estimation are available.
-% - outfold       [string]    Name of the folder where the generated files are saveda subset of the equations is to be printed.
-% - eqtags        [cell]      Equation tags of the selected equations.
-% - noresids      [logical]   Removes estimation residuals (not to be used in simulation) if true.
-% - json          [char]      Content of a JSON file.
+% - infile            [string]    Name of the mod file where all the equations used for estimation are available.
+% - outfold           [string]    Name of the folder where the generated files are saveda subset of the equations is to be printed.
+% - eqtags            [cell]      Equation tags of the selected equations.
+% - noresids          [logical]   Removes estimation residuals (not to be used in simulation) if true.
+% - json              [char]      Content of a JSON file.
+% - substitutetarget  [logical]   Substitute expression of a composite target in the error correction term of PAC equation if true. Default is false.
 %
 % OUTPUTS
-% - json          [char]      Content of a JSON file.
+% - json              [char]      Content of a JSON file.
 %
 % SPECIAL REQUIREMENTS
 % It is expected that the file infile.mod has already been run, and
@@ -61,10 +62,16 @@ end
 rename = M_.equations_tags(strcmp('rename',M_.equations_tags(:,2)),[1,3]);
 isrename = ~isempty(rename);
 
-if nargin<5
+if nargin<5 || isempty(json)
     % Load json file (original mod file)
     json = loadjson_(sprintf('%s/model/json/modfile-original.json', M_.dname));
 end
+
+if nargin<6
+    substitutetarget = false;
+    % Otherwise substitute target expression (in case of composite target) in the error correction term
+end
+
 
 % Create a new file.
 fid = fopen(sprintf('%s/model.inc', outfold), 'w');
@@ -238,7 +245,14 @@ try
             end
         end
         if ~isempty(istar)
-            RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), targetexpr());
+            if substitutetarget
+                RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), targetexpr());
+            else
+                auxlhs{end+1} = M_.endo_names{M_.pac.(ispac.name).ec.vars(M_.pac.(ispac.name).ec.istarget)};
+                rhs{end+1} = M_.aux_vars(strmatch(auxlhs{end}, M_.endo_names, 'exact')==[M_.aux_vars(:).endo_index]).orig_expr;
+                rhs{end} = remove_aux_variables_from_expression(rhs{end}, M_);
+                RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), sprintf('%s(-1)', auxlhs{end}));
+            end
         end
         % Print equation for unrolled PAC/VAR-expectation and update
         % list of parameters and endogenous variables (if any).
