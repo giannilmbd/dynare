@@ -43,7 +43,9 @@ end
 try
     [dynpp_derivs, dyn_derivs] = k_order_perturbation(dr,M_,options_);
 catch ME
-    disp(ME.message)
+    if options_.verbosity > 0
+        disp(ME.message)
+    end
     info(1)=9;
     return
 end

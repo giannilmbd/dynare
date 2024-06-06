@@ -131,6 +131,11 @@ extern "C"
       mexErrMsgTxt("options_.pruning should be a logical scalar");
     bool pruning = static_cast<bool>(mxGetScalar(pruning_mx));
 
+    const mxArray* verbosity_mx = mxGetField(options_mx, 0, "verbosity");
+    if (!(verbosity_mx && mxIsScalar(verbosity_mx) && mxIsNumeric(verbosity_mx)))
+      mexErrMsgTxt("options_.verbosity should be a numeric scalar");
+    int verbosity {static_cast<int>(mxGetScalar(verbosity_mx))};
+
     // Extract various fields from M_
     const mxArray* fname_mx = mxGetField(M_mx, 0, "fname");
     if (!(fname_mx && mxIsChar(fname_mx) && mxGetM(fname_mx) == 1))
@@ -356,18 +361,21 @@ extern "C"
       }
     catch (const KordException& e)
       {
-        e.print();
+        if (verbosity > 0)
+          e.print();
         mexErrMsgTxt(
             ("dynare:k_order_perturbation: Caught Kord exception: " + e.get_message()).c_str());
       }
     catch (const TLException& e)
       {
-        e.print();
+        if (verbosity > 0)
+          e.print();
         mexErrMsgTxt("dynare:k_order_perturbation: Caught TL exception");
       }
     catch (SylvException& e)
       {
-        e.printMessage();
+        if (verbosity > 0)
+          e.printMessage();
         mexErrMsgTxt("dynare:k_order_perturbation: Caught Sylv exception");
       }
     catch (const DynareException& e)
