@@ -1,4 +1,4 @@
-function json = cherrypick(infile, outfold, eqtags, noresids, json, substitutetarget)
+function json = cherrypick(infile, outfold, eqtags, noresids, json, substitutetarget, donotpicktarget)
 
 % Extract some equations in infile (mod file used for estimation)
 % and write them in outfile (mod file used for simulation).
@@ -10,6 +10,7 @@ function json = cherrypick(infile, outfold, eqtags, noresids, json, substituteta
 % - noresids          [logical]   Removes estimation residuals (not to be used in simulation) if true.
 % - json              [char]      Content of a JSON file.
 % - substitutetarget  [logical]   Substitute expression of a composite target in the error correction term of PAC equation if true. Default is false.
+% - donotpicktarget   [logical]   Do not cherrypick auxiliary equation associated to the composite target. Default is false (equation is automagically cherrypicked).
 %
 % OUTPUTS
 % - json              [char]      Content of a JSON file.
@@ -67,9 +68,14 @@ if nargin<5 || isempty(json)
     json = loadjson_(sprintf('%s/model/json/modfile-original.json', M_.dname));
 end
 
-if nargin<6
+if nargin<6 || isempty(substitutetarget)
     substitutetarget = false;
     % Otherwise substitute target expression (in case of composite target) in the error correction term
+end
+
+if nargin<7 || isempty(donotpicktarget)
+    donotpicktarget = false;
+    % By default the auxiliary equation for the target in PAC equation is cherrypicked
 end
 
 
@@ -248,10 +254,14 @@ try
             if substitutetarget
                 RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), targetexpr());
             else
-                auxlhs{end+1} = M_.endo_names{M_.pac.(ispac.name).ec.vars(M_.pac.(ispac.name).ec.istarget)};
-                rhs{end+1} = M_.aux_vars(strmatch(auxlhs{end}, M_.endo_names, 'exact')==[M_.aux_vars(:).endo_index]).orig_expr;
-                rhs{end} = remove_aux_variables_from_expression(rhs{end}, M_);
-                RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), sprintf('%s(-1)', auxlhs{end}));
+                if ~donotpicktarget
+                    auxlhs{end+1} = M_.endo_names{M_.pac.(ispac.name).ec.vars(M_.pac.(ispac.name).ec.istarget)};
+                    rhs{end+1} = M_.aux_vars(strmatch(auxlhs{end}, M_.endo_names, 'exact')==[M_.aux_vars(:).endo_index]).orig_expr;
+                    rhs{end} = remove_aux_variables_from_expression(rhs{end}, M_);
+                    RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), sprintf('%s(-1)', auxlhs{end}));
+                else
+                    RHS = strrep(RHS, sprintf('pac_target_nonstationary(model_name = %s)', ispac.name), sprintf('%s(-1)', M_.endo_names{M_.pac.(ispac.name).ec.vars(M_.pac.(ispac.name).ec.istarget)}));
+                end
             end
         end
         % Print equation for unrolled PAC/VAR-expectation and update
@@ -342,8 +352,8 @@ try
         % Update lists of parameters, endogenous variables and exogenous variables.
         plist = union(plist, pnames);
         elist = union(elist, enames);
-        xlist = union(xlist, xnames);
-    end
+            xlist = union(xlist, xnames);
+        end
 catch e
     fclose(fid);
     fprintf(2, '%s\n', e.message)
