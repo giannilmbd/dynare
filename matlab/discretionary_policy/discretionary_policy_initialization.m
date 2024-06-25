@@ -30,17 +30,6 @@ if options_.loglinear
     error('discretionary_policy is not compatible with `loglinear` option set to 1')
 end
 
-% safeguard against issues like running ramsey policy first and then running discretion
-if isfield(M_,'orig_model')
-    M_.endo_nbr = M_.orig_model.endo_nbr;
-    M_.endo_names = M_.orig_model.endo_names;
-    M_.lead_lag_incidence = M_.orig_model.lead_lag_incidence;
-    M_.maximum_lead = M_.orig_model.maximum_lead;
-    M_.maximum_endo_lead = M_.orig_model.maximum_endo_lead;
-    M_.maximum_lag = M_.orig_model.maximum_lag;
-    M_.maximum_endo_lag = M_.orig_model.maximum_endo_lag;
-end
-
 instr_nbr=M_.endo_nbr-M_.eq_nbr;
 
 if instr_nbr==0
