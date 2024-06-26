@@ -1,4 +1,4 @@
-function [G1pi,C,impact,nmat,TT1,TT2,gev,eu, DD, E2, E5, GAMMA, FL_RANK ]=PI_gensys(a0,a1,a2,a3,c,PSI,NX,NETA,FL_RANK,M_,options_)
+function [G1pi,C,impact,nmat,TT1,TT2,gev,eu, DD, E2, E5, GAMMA, FL_RANK ]=PI_gensys(a0,a1,a2,c,PSI,NX)
 % System given as
 %        a0*E_t[y(t+1])+a1*y(t)=a2*y(t-1)+c+psi*eps(t)
 % with z an exogenous variable process.
@@ -35,10 +35,10 @@ function [G1pi,C,impact,nmat,TT1,TT2,gev,eu, DD, E2, E5, GAMMA, FL_RANK ]=PI_gen
 
 
 lastwarn('','');
-global lq_instruments;
-eu=[0;0];C=c;
+
+C=c;
 realsmall=1e-6;
-fixdiv=(nargin==6);
+fixdiv=(nargin==5);
 n=size(a0,1);
 DD=[];E2=[]; E5=0; GAMMA=[];
 %
@@ -68,7 +68,7 @@ F3=Sinv*U01'*a2*V01;
 F4=Sinv*U01'*a2*V02;
 F5=Sinv*U01'*PSI;
 singular=0;
-warning('', '');
+
 try
     if rcond(C2) < 1e-8
         singular=1;
@@ -89,20 +89,12 @@ try
     warning('on','MATLAB:singularMatrix');
     warning('on','MATLAB:nearlySingularMatrix');
     if (any(any(isinf(UAVinv))) || any(any(isnan(UAVinv))))
-        if(options_.ACES_solver)
-            disp('ERROR! saving PI_gensys_data_dump');
-            save PI_gensys_data_dump
-            error('PI_gensys: Inversion of poss. zero matrix UAVinv=inv(U02''*a1*V02)!');
-        else
-            warning('PI_gensys: Evading inversion of zero matrix UAVinv=inv(U02''*a1*V02)!');
-            eu=[0,0];
-            return
-        end
+        warning('PI_gensys: Evading inversion of zero matrix UAVinv=inv(U02''*a1*V02)!');
+        eu=[0,0];
+        return
     end
-catch
-    errmsg=lasterror;
-    warning(['error callig PI_gensys_singularC: ' errmsg.message ],'errmsg.identifier');
-    %error('errcode',['error callig PI_gensys_singularC: ' errmsg.message ]);
+catch ME
+    warning(['error callig PI_gensys_singularC: ' ME.message ],'errmsg.identifier');
 end
 %
 % Define TT1, TT2
@@ -128,7 +120,6 @@ G21=zeros(FL_RANK,(n-FL_RANK));
 G22=zeros(FL_RANK,FL_RANK);
 G23=eye(FL_RANK);
 %H2=zeros(FL_RANK,NX);
-num_inst=0;
 
 % New Definitions
 Ze11=zeros(NX,NX);
@@ -146,34 +137,6 @@ G1pi=[Ze11 Ze12 Ze134 Ze134; P1 G11 G12 G13; Ze31 G21 G22 G23; P3 G31 G32 G33];
 
 impact=[eye(NX,NX); zeros(n+FL_RANK,NX)];
 
-if(options_.ACES_solver)
-    if isfield(lq_instruments,'names')
-        num_inst=size(lq_instruments.names,1);
-        if num_inst>0
-            i_var=lq_instruments.inst_var_indices;
-            N1=UAVinv*U02'*lq_instruments.B1;
-            N3=-FF*N1+Sinv*U01'*lq_instruments.B1;
-        else
-            error('WARNING: There are no instrumnets for ACES!');
-        end
-        lq_instruments.N1=N1;
-        lq_instruments.N3=N3;
-    else
-        error('WARNING: There are no instrumnets for ACES!');
-    end
-    E3=V02*[P1 G11 G12 G13];
-    E3= E3+ [zeros(size(V01,1),size(E3,2)-size(V01,2)) V01];
-    E2=-E3;
-    E5=-V02*N1;
-    DD=[zeros(NX,size(N1,2));N1; zeros(FL_RANK,size(N1,2));N3];
-    II=eye(num_inst);
-    GAMMA=[ E3 -E5 %zeros(size(E3,1),num_inst);
-            zeros(num_inst,size(E3,2)), II;
-          ];
-    eu =[1; 1], nmat=[], gev=[];
-    return % do not check B&K compliancy
-end
-
 G0pi=eye(n+FL_RANK+NX);
 try
     if isoctave && octave_ver_less_than('9')
@@ -182,19 +145,12 @@ try
     else
         [a, b, q, z]=qz(G0pi,G1pi);
     end
-catch
+catch ME
     try
-        lerror=lasterror;
-        disp(['PI_Gensys: ' lerror.message]);
+        disp(['PI_Gensys: ' ME.message]);
         if 0==strcmp('MATLAB:qz:matrixWithNaNInf',lerror.identifier)
             disp '** Unexpected Error PI_Gensys:qz: ** :';
-            button=questdlg('Continue Y/N?','Unexpected Error in qz','No','Yes','Yes');
-            switch button
-              case 'No'
-                error ('Terminated')
-                %case 'Yes'
-
-            end
+            error ('Unexpected Error in qz: Terminated')
         end
         G1pi=[];impact=[];nmat=[]; gev=[];
         eu=[-2;-2];
@@ -237,7 +193,7 @@ for i=1:nn
         zxz=1;
     end
 end
-div ;
+
 if ~zxz
     [a, b, ~, z]=qzdiv(div,a,b,q,z);
 end
@@ -251,7 +207,7 @@ if zxz
     nmat=[]; %;gev=[]
     return
 end
-if (FL_RANK ~= nunstab && ~options_.ACES_solver)
+if FL_RANK ~= nunstab
     disp(['Number of unstable variables ' num2str(nunstab)]);
     disp( ['does not match number of expectational equations ' num2str(FL_RANK)]);
     nmat=[];% gev=[];
@@ -260,7 +216,6 @@ if (FL_RANK ~= nunstab && ~options_.ACES_solver)
 end
 
 % New Definitions
-z1=z(:,1:n+NX)';
 z2=z(:,n+NX+1:n+NX+FL_RANK)';
 
 % New N Matrix by J Pearlman

@@ -1,5 +1,5 @@
-function [dr,info]=PCL_resol(ys,check_flag)
-% function [dr,info]=PCL_resol(ys,check_flag)
+function [dr,info]=PCL_resol(M_, options_, oo_)
+% function [dr,info]=PCL_resol(M_, options_, oo_)
 % Computes first and second order approximations
 %
 % INPUTS
@@ -10,17 +10,6 @@ function [dr,info]=PCL_resol(ys,check_flag)
 % OUTPUTS
 %    dr:             structure of decision rules for stochastic simulations
 %    info=1:         the model doesn't determine the current variables '...' uniquely
-%    info=2:         MJDGGES returns the following error code'
-%    info=3:         Blanchard Kahn conditions are not satisfied: no stable '...' equilibrium
-%    info=4:         Blanchard Kahn conditions are not satisfied:'...' indeterminacy
-%    info=5:         Blanchard Kahn conditions are not satisfied:'...' indeterminacy due to rank failure
-%    info=6:         The jacobian evaluated at the steady state is complex.
-%    info=19:        The steadystate file did not compute the steady state (inconsistent deep parameters).
-%    info=20:        can't find steady state info(2) contains sum of sqare residuals
-%    info=21:        steady state is complex
-%                               info(2) contains sum of sqare of
-%                               imaginary part of steady state
-%    info=30:        Variance can't be computed
 %
 % SPECIAL REQUIREMENTS
 %    none
@@ -42,15 +31,6 @@ function [dr,info]=PCL_resol(ys,check_flag)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-global M_ options_ oo_
-global it_
-
-jacobian_flag = false;
-
-info = 0;
-
-it_ = M_.maximum_lag + 1 ;
-
 if M_.exo_nbr == 0
     oo_.exo_steady_state = [] ;
 end
@@ -62,80 +42,13 @@ if M_.exo_det_nbr > 0
     tempexdet = oo_.exo_det_simul;
     oo_.exo_det_simul = repmat(oo_.exo_det_steady_state',M_.maximum_lag+M_.maximum_lead+1,1);
 end
-dr.ys = ys;
-check1 = 0;
-% testing for steadystate file
-static_resid = str2func(sprintf('%s.sparse.static_resid', M_.fname));
-static_g1 = str2func(sprintf('%s.sparse.static_g1', M_.fname));
-function [resid, g1] = static_resid_g1(y, x, params)
-    [resid, T_order, T] = static_resid(y, x, params);
-    g1 = static_g1(y, x, params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
-end
 
-if options_.steadystate_flag
-    [dr.ys,check1] = feval([M_.fname '_steadystate'],dr.ys,...
-                           [oo_.exo_steady_state; ...
-                        oo_.exo_det_steady_state]);
-    if size(dr.ys,1) < M_.endo_nbr
-        if length(M_.aux_vars) > 0
-            dr.ys = add_auxiliary_variables_to_steadystate(dr.ys,M_.aux_vars,...
-                                                           M_.fname,...
-                                                           oo_.exo_steady_state,...
-                                                           oo_.exo_det_steady_state,...
-                                                           M_.params);
-        else
-            error([M_.fname '_steadystate.m doesn''t match the model']);
-        end
-    end
-
-else
-    % testing if ys isn't a steady state or if we aren't computing Ramsey policy
-    if ~options_.ramsey_policy
-        if options_.linear == 0
-            % nonlinear models
-            if max(abs(static_resid_g1(dr.ys, [oo_.exo_steady_state; ...
-                                               oo_.exo_det_steady_state], M_.params))) > options_.solve_tolf
-                opt = options_;
-                opt.jacobian_flag = false;
-                [dr.ys, check1] = dynare_solve(static_resid_g1, dr.ys, options.steady_.maxit, options_.solve_tolf, options_.solve_tolx, ...
-                                               opt, [oo_.exo_steady_state; oo_.exo_det_steady_state], M_.params);
-            end
-        else
-            % linear models
-            [fvec,jacob] = static_resid_g1(dr.ys, [oo_.exo_steady_state;...
-                                                   oo_.exo_det_steady_state], M_.params);
-            if max(abs(fvec)) > 1e-12
-                dr.ys = dr.ys-jacob\fvec;
-            end
-        end
-    end
-end
-% testing for problem
-if check1
-    if options_.steadystate_flag
-        info(1)= 19;
-        resid = check1 ;
-    else
-        info(1)= 20;
-        resid = static_resid(ys, oo_.exo_steady_state, M_.params);
-    end
-    info(2) = resid'*resid ;
+[dr.ys,M_.params,info] = evaluate_steady_state(oo_.steady_state,[oo_.exo_steady_state; oo_.exo_det_steady_state],M_,options_,~options_.steadystate.nocheck);
+if info(1)
     return
 end
 
-if ~isreal(dr.ys)
-    info(1) = 21;
-    info(2) = sum(imag(ys).^2);
-    dr.ys = real(dr.ys);
-    return
-end
-
-dr.fbias = zeros(M_.endo_nbr,1);
-if( options_.partial_information || options_.ACES_solver)%&& (check_flag == 0)
-    [dr,info,M_,options_,oo_] = dr1_PI(dr,check_flag,M_,options_,oo_);
-else
-    [dr,info,M_,options_,oo_] = dr1(dr,check_flag,M_,options_,oo_);
-end
+[dr,info,oo_] = dr1_PI(dr,M_,options_,oo_);
 if info(1)
     return
 end
@@ -144,11 +57,3 @@ if M_.exo_det_nbr > 0
     oo_.exo_det_simul = tempexdet;
 end
 oo_.exo_simul = tempex;
-tempex = [];
-
-end
-
-% 01/01/2003 MJ added dr_algo == 1
-% 08/24/2001 MJ uses Schmitt-Grohe and Uribe (2001) constant correction
-%               in dr.ghs2
-% 05/26/2003 MJ added temporary values for oo_.exo_simul

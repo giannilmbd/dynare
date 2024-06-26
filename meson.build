@@ -1129,6 +1129,8 @@ mod_and_m_tests = [
   { 'test' : [ 'stochastic_simulations/fs2000_k_order_simul.mod' ] },
   { 'test' : [ 'partial_information/PItest3aHc0PCLsimModPiYrVarobsAll.mod' ] },
   { 'test' : [ 'partial_information/PItest3aHc0PCLsimModPiYrVarobsCNR.mod' ] },
+  { 'test' : [ 'partial_information/Partial_ramsey.mod' ] },
+  { 'test' : [ 'partial_information/Partial_steady_state_model.mod' ] },
   { 'test' : [ 'arima/mod1.mod',
                'arima/mod1a.mod',
                'arima/mod1b.mod',

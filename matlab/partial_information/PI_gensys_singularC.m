@@ -28,8 +28,8 @@ level=level+1
 if level>100
     error( ' PI_gensys_singularC recurssion exceeeded its maximum of 100 iterations! ');
 end
-warning('', '');
-M1=[];M2=[]; UAVinv=[];
+
+UAVinv=[];
 %
 % Find SVD of a0, and create partitions of U, S and V
 %

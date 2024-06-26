@@ -357,7 +357,6 @@ options_.drop = 100;
 options_.aim_solver = false; % i.e. by default do not use G.Anderson's AIM solver, use mjdgges instead
 options_.k_order_solver = false; % by default do not use k_order_perturbation but mjdgges
 options_.partial_information = false;
-options_.ACES_solver = false;
 options_.conditional_variance_decomposition = [];
 
 % Ramsey policy
