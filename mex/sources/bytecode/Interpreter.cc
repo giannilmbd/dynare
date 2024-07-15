@@ -660,24 +660,23 @@ Interpreter::check_for_controlled_exo_validity(const vector<s_plan>& sconstraine
   vector<int> endogenous {evaluator.getCurrentBlockVariables()};
   for (auto& it : sconstrained_extended_path)
     {
-      if (find(endogenous.begin(), endogenous.end(), it.exo_num) != endogenous.end()
-          && find(exogenous.begin(), exogenous.end(), it.var_num) == exogenous.end())
+      if (ranges::find(endogenous, it.exo_num) != endogenous.end()
+          && ranges::find(exogenous, it.var_num) == exogenous.end())
         throw FatalException {"\nThe conditional forecast involving as constrained variable "
                               + symbol_table.getName(SymbolType::endogenous, it.exo_num)
                               + " and as endogenized exogenous "
                               + symbol_table.getName(SymbolType::exogenous, it.var_num)
                               + " that do not appear in block=" + to_string(block_num + 1)
                               + ")\nYou should not use block in model options"};
-      else if (find(endogenous.begin(), endogenous.end(), it.exo_num) != endogenous.end()
-               && find(exogenous.begin(), exogenous.end(), it.var_num) != exogenous.end()
+      else if (ranges::find(endogenous, it.exo_num) != endogenous.end()
+               && ranges::find(exogenous, it.var_num) != exogenous.end()
                && (type == BlockSimulationType::evaluateForward
                    || type == BlockSimulationType::evaluateBackward))
         throw FatalException {"\nThe conditional forecast cannot be implemented for the block="
                               + to_string(block_num + 1)
                               + ") that has to be evaluated instead to be solved\nYou should not "
                                 "use block in model options"};
-      else if (find(previous_block_exogenous.begin(), previous_block_exogenous.end(), it.var_num)
-               != previous_block_exogenous.end())
+      else if (ranges::find(previous_block_exogenous, it.var_num) != previous_block_exogenous.end())
         throw FatalException {
             "\nThe conditional forecast involves in the block " + to_string(block_num + 1)
             + " the endogenized exogenous "

@@ -22,6 +22,7 @@
 #include "permutation.hh"
 #include "tl_exception.hh"
 
+#include <algorithm>
 #include <iostream>
 #include <numeric>
 
@@ -85,14 +86,7 @@ OrdSequence::add(const OrdSequence& s)
 bool
 OrdSequence::has(int i) const
 {
-  auto vit = data.begin();
-  while (vit != data.end())
-    {
-      if (*vit == i)
-        return true;
-      ++vit;
-    }
-  return false;
+  return std::ranges::find(data, i) != data.end();
 }
 
 /* Return an average of the class. */
