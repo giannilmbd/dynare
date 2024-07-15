@@ -23,6 +23,7 @@
 #include "tl_exception.hh"
 
 #include <iostream>
+#include <numeric>
 
 int
 OrdSequence::operator[](int i) const
@@ -102,11 +103,8 @@ OrdSequence::has(int i) const
 double
 OrdSequence::average() const
 {
-  double res = 0;
-  for (int i : data)
-    res += i;
-  TL_RAISE_IF(data.size() == 0, "Attempt to take average of empty class in OrdSequence::average");
-  return res / data.size();
+  TL_RAISE_IF(data.empty(), "Attempt to take average of empty class in OrdSequence::average");
+  return std::accumulate(data.begin(), data.end(), 0.) / data.size();
 }
 
 /* Debug print. */
