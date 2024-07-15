@@ -18,6 +18,7 @@ fortran_compiler = meson.get_compiler('fortran')
 c_compiler = meson.get_compiler('c')
 
 # If this is GCC, enforce minimal version
+# NB: when modifiying this value, also update the gcc-*.ini native file under scripts/
 # Other compilers are unsupported, but do not fail in that case
 gcc_minimal_version = 10
 if ((cpp_compiler.get_id() == 'gcc'
