@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -165,8 +165,7 @@ public:
   check(const Symmetry& s) const
   {
     TL_RAISE_IF(s.num() != num(), "Incompatible symmetry lookup in TensorContainer::check");
-    auto it = m.find(s);
-    return it != m.end();
+    return m.contains(s);
   }
 
   virtual void
