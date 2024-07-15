@@ -77,12 +77,8 @@ OrdSequence::add(int i)
 void
 OrdSequence::add(const OrdSequence& s)
 {
-  auto vit = s.data.begin();
-  while (vit != s.data.end())
-    {
-      add(*vit);
-      ++vit;
-    }
+  for (int i : s.data)
+    add(i);
 }
 
 /* Answers true if a given number is in the class. */
