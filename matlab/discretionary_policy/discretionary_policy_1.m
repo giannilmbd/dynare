@@ -76,32 +76,20 @@ g2_v = feval([M_.fname,'.objective.sparse.static_g2'], y, [], params, T_order, T
 W = build_two_dim_hessian(M_.objective_g2_sparse_indices, g2_v, 1, M_.endo_nbr);
 W=reshape(W,M_.endo_nbr,M_.endo_nbr);
 
-klen = M_.maximum_lag + M_.maximum_lead + 1;
-iyv=M_.lead_lag_incidence';
 % Find the jacobian
-z = repmat(ys,1,klen);
-iyr0 = find(iyv(:)) ;
-
-z = z(iyr0);
-it_ = M_.maximum_lag + 1 ;
-
-[junk,jacobia_] = feval([M_.fname '.dynamic'],z,zeros(M_.exo_nbr+M_.exo_det_nbr,klen), M_.params, ys, it_);
-if max(abs(junk))>options_.solve_tolf
+y3n = repmat(ys, 1, 3);
+x = zeros(M_.exo_nbr+M_.exo_det_nbr, 1);
+[resid, T_order, T] = feval([M_.fname '.sparse.dynamic_resid'], y3n, x, M_.params, ys);
+if max(abs(resid)) > options_.solve_tolf
      info = 65; %the model must be written in deviation form and not have constant terms or have a steady state provided
      return;
 end
+g1 = feval([M_.fname '.sparse.dynamic_g1'], y3n, x, M_.params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, T_order, T);
 
-Indices={'lag','contemp','lead'};
-iter=1;
-for j=1:numel(Indices)
-    A.(Indices{j})=zeros(M_.eq_nbr,M_.endo_nbr);
-    if strcmp(Indices{j},'contemp')||(strcmp(Indices{j},'lag') && M_.maximum_lag)||(strcmp(Indices{j},'lead') && M_.maximum_lead)
-        [~,row,col]=find(M_.lead_lag_incidence(iter,:));
-        A.(Indices{j})(:,row)=jacobia_(:,col);
-        iter=iter+1;
-    end
-end
-B=jacobia_(:,nnz(iyv)+1:end);
+A.lag = full(g1(:,1:M_.endo_nbr));
+A.contemp = full(g1(:,M_.endo_nbr+(1:M_.endo_nbr)));
+A.lead = full(g1(:,2*M_.endo_nbr+(1:M_.endo_nbr)));
+B = full(g1(:,3*M_.endo_nbr+1:end));
 
 %%% MAIN ENGINE %%%
 
