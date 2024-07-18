@@ -272,9 +272,11 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
       double* constrained_pf = mxGetPr(constrained_perfect_foresight_);
       double* shock_pf = mxGetPr(shock_perfect_foresight_);
       if (auto is_pf = [](double v) { return v != 0; };
-          any_of(constrained_pf,
-                 constrained_pf + mxGetNumberOfElements(constrained_perfect_foresight_), is_pf)
-          || any_of(shock_pf, shock_pf + mxGetNumberOfElements(shock_perfect_foresight_), is_pf))
+          ranges::any_of(constrained_pf,
+                         constrained_pf + mxGetNumberOfElements(constrained_perfect_foresight_),
+                         is_pf)
+          || ranges::any_of(shock_pf, shock_pf + mxGetNumberOfElements(shock_perfect_foresight_),
+                            is_pf))
         mexErrMsgTxt(
             "Shocks of type 'perfect_foresight' are not supported with the bytecode option.");
 
