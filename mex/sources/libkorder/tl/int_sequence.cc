@@ -217,7 +217,7 @@ IntSequence::add(int f, const IntSequence& s)
 bool
 IntSequence::isPositive() const
 {
-  return std::all_of(data, data + length, [](int x) { return x >= 0; });
+  return std::ranges::all_of(data, data + length, [](int x) { return x >= 0; });
 }
 
 bool
@@ -225,7 +225,7 @@ IntSequence::isConstant() const
 {
   if (length < 2)
     return true;
-  return std::all_of(data + 1, data + length, [this](int x) { return x == operator[](0); });
+  return std::ranges::all_of(data + 1, data + length, [this](int x) { return x == operator[](0); });
 }
 
 bool
