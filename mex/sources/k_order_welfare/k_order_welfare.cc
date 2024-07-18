@@ -173,7 +173,7 @@ extern "C"
     if (!(param_names_mx && mxIsCell(param_names_mx)))
       mexErrMsgTxt("M_.param_names should be a cell array");
     std::vector<std::string> paramNames = DynareMxArrayToString(param_names_mx);
-    auto it = std::find(paramNames.begin(), paramNames.end(), "optimal_policy_discount_factor");
+    auto it = std::ranges::find(paramNames, "optimal_policy_discount_factor");
     double discount_factor;
     if (it != paramNames.end())
       discount_factor = modParams[std::distance(paramNames.begin(), it)];
