@@ -72,7 +72,7 @@ public:
   // Constructor allocating and then initializing all members to a given number
   IntSequence(int l, int n) : data {new int[l]}, length {l}
   {
-    std::fill_n(data, length, n);
+    std::ranges::fill_n(data, length, n);
   }
   /* Constructor using an initializer list (gives the contents of the
      IntSequence, similarly to std::vector) */

@@ -520,7 +520,7 @@ Interpreter::simulate_a_block(
       mxFree(u);
       mxFree(index_equa);
       mxFree(index_vara);
-      fill_n(direction, y_size * col_y, 0);
+      ranges::fill_n(direction, y_size * col_y, 0);
       End_Solver();
       break;
     case BlockSimulationType::solveBackwardComplete:
@@ -541,7 +541,7 @@ Interpreter::simulate_a_block(
 
       mxFree(index_equa);
       mxFree(index_vara);
-      fill_n(direction, y_size * col_y, 0);
+      ranges::fill_n(direction, y_size * col_y, 0);
       mxFree(u);
       End_Solver();
       break;
@@ -642,7 +642,7 @@ Interpreter::simulate_a_block(
         mxFree(index_equa);
       if (res)
         mxFree(res);
-      fill_n(direction, y_size * col_y, 0);
+      ranges::fill_n(direction, y_size * col_y, 0);
       End_Solver();
       break;
     default:
@@ -2560,7 +2560,7 @@ Interpreter::Sparse_transpose(const mxArray* A_m)
   mwIndex* C_j = mxGetJc(C_m);
   double* C_d = mxGetPr(C_m);
   unsigned int nze_C = 0, nze_A = 0;
-  fill_n(C_j, m_A + 1, 0);
+  ranges::fill_n(C_j, m_A + 1, 0);
   map<pair<mwIndex, unsigned int>, double> B2;
   for (unsigned int i = 0; i < n_A; i++)
     while (nze_A < static_cast<unsigned int>(A_j[i + 1]))
@@ -4786,6 +4786,6 @@ Interpreter::fixe_u()
 #ifdef DEBUG
   mexPrintf("u=%d\n", u);
 #endif
-  fill_n(u, u_count_alloc, 0);
+  ranges::fill_n(u, u_count_alloc, 0);
   u_count_init = u_count_int;
 }

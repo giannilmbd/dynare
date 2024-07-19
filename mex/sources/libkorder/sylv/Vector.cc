@@ -118,7 +118,7 @@ void
 Vector::zeros()
 {
   if (s == 1)
-    std::fill_n(data, len, 0.0);
+    std::ranges::fill_n(data, len, 0.0);
   else
     for (int i = 0; i < len; i++)
       operator[](i) = 0.0;

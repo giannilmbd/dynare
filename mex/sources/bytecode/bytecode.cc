@@ -518,7 +518,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   auto* x = static_cast<double*>(mxMalloc(col_x * row_x * sizeof(double)));
   test_mxMalloc(x, __LINE__, __FILE__, __func__, col_x * row_x * sizeof(double));
 
-  fill_n(direction, row_y * col_y, 0);
+  ranges::fill_n(direction, row_y * col_y, 0);
   ranges::copy_n(xd, row_x * col_x, x);
   ranges::copy_n(yd, row_y * col_y, y);
   ranges::copy_n(yd, row_y * col_y, ya);
