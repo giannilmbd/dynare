@@ -579,7 +579,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         {
           vector<double> residual = interprete.get_residual();
           plhs[0] = mxCreateDoubleMatrix(residual.size() / periods, periods, mxREAL);
-          std::copy(residual.begin(), residual.end(), mxGetPr(plhs[0]));
+          std::ranges::copy(residual, mxGetPr(plhs[0]));
         }
       else
         {

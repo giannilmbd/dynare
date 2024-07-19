@@ -79,7 +79,7 @@ public:
   IntSequence(std::initializer_list<int> init) :
       data {new int[init.size()]}, length {static_cast<int>(init.size())}
   {
-    std::copy(init.begin(), init.end(), data);
+    std::ranges::copy(init, data);
   }
   // Copy constructor
   IntSequence(const IntSequence& s) : data {new int[s.length]}, length {s.length}
