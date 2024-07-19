@@ -71,7 +71,7 @@ copy_derivatives(mxArray* destin, const Symmetry& sym, const FGSContainer& deriv
   int n = x_unfolded->nrows();
   int m = x_unfolded->ncols();
   mxArray* tmp = mxCreateDoubleMatrix(n, m, mxREAL);
-  std::copy_n(x_unfolded->getData().base(), n * m, mxGetPr(tmp));
+  std::ranges::copy_n(x_unfolded->getData().base(), n * m, mxGetPr(tmp));
   mxSetField(destin, 0, fieldname, tmp);
 }
 
@@ -363,7 +363,7 @@ extern "C"
         mxArray* tmp = mxCreateDoubleMatrix(t.nrows(), t.ncols(), mxREAL);
         const ConstVector& vec = t.getData();
         assert(vec.skip() == 1);
-        std::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
+        std::ranges::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
         mxSetField(plhs[0], 0, ("W_" + std::to_string(i)).c_str(), tmp);
       }
   } // end of mexFunction()

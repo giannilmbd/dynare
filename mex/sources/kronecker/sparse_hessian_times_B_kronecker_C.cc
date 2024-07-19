@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2023 Dynare Team
+ * Copyright © 2007-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -80,7 +80,7 @@ sparse_hessian_times_B_kronecker_B(const mwIndex* isparseA, const mwIndex* jspar
                 }
             }
           if (nz_in_column_ii_of_A > 0)
-            std::copy_n(&D[jj * mA], mA, &D[(j2B * nB + j1B) * mA]);
+            std::ranges::copy_n(&D[jj * mA], mA, &D[(j2B * nB + j1B) * mA]);
         }
     }
 }

@@ -588,7 +588,7 @@ Interpreter::simulate_a_block(
               res1 = 0;
               max_res = 0;
               max_res_idx = 0;
-              copy_n(y, y_size * (periods + y_kmax + y_kmin), y_save);
+              ranges::copy_n(y, y_size * (periods + y_kmax + y_kmin), y_save);
               if (vector_table_conditional_local.size())
                 for (auto& it1 : vector_table_conditional_local)
                   if (it1.is_cond)
@@ -597,7 +597,7 @@ Interpreter::simulate_a_block(
               if (!(isnan(res1) || isinf(res1)))
                 cvg = (max_res < solve_tolf);
               if (isnan(res1) || isinf(res1) || (stack_solve_algo == 4 && iter > 0))
-                copy_n(y_save, y_size * (periods + y_kmax + y_kmin), y);
+                ranges::copy_n(y_save, y_size * (periods + y_kmax + y_kmin), y);
               u_count = u_count_saved;
               int prev_iter = iter;
               Simulate_Newton_Two_Boundaries(cvg, vector_table_conditional_local);
@@ -4346,10 +4346,10 @@ Interpreter::Simulate_One_Boundary()
               Ax_save = static_cast<double*>(mxMalloc(Ap[size] * sizeof(double)));
               test_mxMalloc(Ax_save, __LINE__, __FILE__, __func__, Ap[size] * sizeof(double));
             }
-          copy_n(Ap, size + 1, Ap_save);
-          copy_n(Ai, Ap[size], Ai_save);
-          copy_n(Ax, Ap[size], Ax_save);
-          copy_n(b, size, b_save);
+          ranges::copy_n(Ap, size + 1, Ap_save);
+          ranges::copy_n(Ai, Ap[size], Ai_save);
+          ranges::copy_n(Ax, Ap[size], Ax_save);
+          ranges::copy_n(b, size, b_save);
         }
     }
   if (zero_solution)

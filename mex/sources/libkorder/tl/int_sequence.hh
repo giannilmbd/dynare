@@ -84,7 +84,7 @@ public:
   // Copy constructor
   IntSequence(const IntSequence& s) : data {new int[s.length]}, length {s.length}
   {
-    std::copy_n(s.data, length, data);
+    std::ranges::copy_n(s.data, length, data);
   }
   // Move constructor
   IntSequence(IntSequence&& s) noexcept :
@@ -101,7 +101,7 @@ public:
   // Subsequence constructor (without pointer sharing)
   IntSequence(const IntSequence& s, int i1, int i2) : data {new int[i2 - i1]}, length {i2 - i1}
   {
-    std::copy_n(s.data + i1, length, data);
+    std::ranges::copy_n(s.data + i1, length, data);
   }
   /* Unfolds a given integer sequence with respect to a given symmetry. If for
      example the sequence is (a,b) and the symmetry is (2,3), then the

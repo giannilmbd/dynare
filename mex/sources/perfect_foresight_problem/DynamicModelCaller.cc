@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -108,8 +108,8 @@ DynamicModelDllCaller::DynamicModelDllCaller(size_t ntt, mwIndex ny, mwIndex nx,
 void
 DynamicModelDllCaller::copy_jacobian_column(mwIndex col, double* dest) const
 {
-  std::copy_n(jacobian_p.data() + g1_sparse_colptr[col] - 1,
-              g1_sparse_colptr[col + 1] - g1_sparse_colptr[col], dest);
+  std::ranges::copy_n(jacobian_p.data() + g1_sparse_colptr[col] - 1,
+                      g1_sparse_colptr[col + 1] - g1_sparse_colptr[col], dest);
 }
 
 void
@@ -223,7 +223,7 @@ DynamicModelMatlabCaller::eval(double* resid)
     if (mxIsComplex(plhs[0]))
       plhs[0] = cmplxToReal<false>(plhs[0]);
 
-    std::copy_n(mxGetPr(plhs[0]), mxGetNumberOfElements(plhs[0]), resid);
+    std::ranges::copy_n(mxGetPr(plhs[0]), mxGetNumberOfElements(plhs[0]), resid);
     mxDestroyArray(plhs[0]);
 
     T_order_mx = plhs[1];

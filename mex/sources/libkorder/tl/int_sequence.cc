@@ -85,7 +85,7 @@ IntSequence&
 IntSequence::operator=(const IntSequence& s)
 {
   TL_RAISE_IF(length != s.length, "Wrong length for in-place IntSequence::operator=");
-  std::copy_n(s.data, length, data);
+  std::ranges::copy_n(s.data, length, data);
   return *this;
 }
 
@@ -93,7 +93,7 @@ IntSequence&
 IntSequence::operator=(IntSequence&& s)
 {
   TL_RAISE_IF(length != s.length, "Wrong length for in-place IntSequence::operator=");
-  std::copy_n(s.data, length, data);
+  std::ranges::copy_n(s.data, length, data);
   return *this;
 }
 

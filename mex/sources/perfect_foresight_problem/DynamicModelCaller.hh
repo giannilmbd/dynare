@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -154,8 +154,8 @@ DynamicModelMatlabCaller::cmplxToReal(mxArray* cmplx_mx)
 
   if constexpr (sparse)
     {
-      std::copy_n(mxGetIr(cmplx_mx), mxGetNzmax(cmplx_mx), mxGetIr(real_mx));
-      std::copy_n(mxGetJc(cmplx_mx), mxGetN(cmplx_mx) + 1, mxGetJc(real_mx));
+      std::ranges::copy_n(mxGetIr(cmplx_mx), mxGetNzmax(cmplx_mx), mxGetIr(real_mx));
+      std::ranges::copy_n(mxGetJc(cmplx_mx), mxGetN(cmplx_mx) + 1, mxGetJc(real_mx));
     }
 
 #if MX_HAS_INTERLEAVED_COMPLEX

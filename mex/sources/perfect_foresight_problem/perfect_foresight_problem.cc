@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -226,22 +226,22 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
       {
         // Fill vector of dynamic variables
         if (T > 0 && T < periods - 1)
-          std::copy_n(y + (T - 1) * ny, 3 * ny, m->y());
+          std::ranges::copy_n(y + (T - 1) * ny, 3 * ny, m->y());
         else if (T > 0) // Last simulation period
           {
-            std::copy_n(y + (T - 1) * ny, 2 * ny, m->y());
-            std::copy_n(yT, ny, m->y() + 2 * ny);
+            std::ranges::copy_n(y + (T - 1) * ny, 2 * ny, m->y());
+            std::ranges::copy_n(yT, ny, m->y() + 2 * ny);
           }
         else if (T < periods - 1) // First simulation period
           {
-            std::copy_n(y0, ny, m->y());
-            std::copy_n(y + T * ny, 2 * ny, m->y() + ny);
+            std::ranges::copy_n(y0, ny, m->y());
+            std::ranges::copy_n(y + T * ny, 2 * ny, m->y() + ny);
           }
         else // Special case: periods=1 (and so T=0)
           {
-            std::copy_n(y0, ny, m->y());
-            std::copy_n(y, ny, m->y() + ny);
-            std::copy_n(yT, ny, m->y() + 2 * ny);
+            std::ranges::copy_n(y0, ny, m->y());
+            std::ranges::copy_n(y, ny, m->y() + ny);
+            std::ranges::copy_n(yT, ny, m->y() + 2 * ny);
           }
 
         // Fill exogenous

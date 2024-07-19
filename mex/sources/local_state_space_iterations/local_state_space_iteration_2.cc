@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010-2022 Dynare Team
+ * Copyright © 2010-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -77,8 +77,8 @@ ss2Iteration_pruning(double* y2, double* y1, const double* yhat2, const double* 
       int particle_ = particle * m;
       int particle__ = particle * n;
       int particle___ = particle * q;
-      std::copy_n(constant, m, &y2[particle_]);
-      std::copy_n(ss, m, &y1[particle_]);
+      std::ranges::copy_n(constant, m, &y2[particle_]);
+      std::ranges::copy_n(ss, m, &y1[particle_]);
 #ifdef USE_BLAS_AT_FIRST_ORDER
       dgemv("N", &m, &n, &one, ghx, &m, &yhat2[particle__], &ONE, &one, &y2[particle_], &ONE);
       dgemv("N", &m, &q, &one, ghu, &m, &epsilon[particle___], &ONE, &one, &y2[particle_], &ONE);
@@ -156,7 +156,7 @@ ss2Iteration(double* y, const double* yhat, const double* epsilon, const double*
       int particle_ = particle * m;
       int particle__ = particle * n;
       int particle___ = particle * q;
-      std::copy_n(constant, m, &y[particle_]);
+      std::ranges::copy_n(constant, m, &y[particle_]);
 #ifdef USE_BLAS_AT_FIRST_ORDER
       dgemv("N", &m, &n, &one, ghx, &m, &yhat[particle__], &ONE, &one, &y[particle_], &ONE);
       dgemv("N", &m, &q, &one, ghu, &m, &epsilon[particle___], &ONE, &one, &y[particle_], &ONE);

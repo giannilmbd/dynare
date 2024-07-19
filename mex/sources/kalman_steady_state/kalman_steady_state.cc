@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009-2020 Dynare Team.
+ * Copyright © 2009-2024 Dynare Team.
  *
  * This file is part of Dynare.
  *
@@ -119,11 +119,11 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   // Get input matrices.
   const double* T = mxGetPr(prhs[0]);
   auto QQ = std::make_unique<double[]>(n * n);
-  std::copy_n(mxGetPr(prhs[1]), n * n, QQ.get());
+  std::ranges::copy_n(mxGetPr(prhs[1]), n * n, QQ.get());
   const double* Z = mxGetPr(prhs[2]);
   auto H = std::make_unique<double[]>(p * p);
   if (measurement_error_flag)
-    std::copy_n(mxGetPr(prhs[3]), p * p, H.get());
+    std::ranges::copy_n(mxGetPr(prhs[3]), p * p, H.get());
   // L will not be used.
   auto L = std::make_unique<double[]>(n * p);
   lapack_int nn = 2 * n;

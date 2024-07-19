@@ -73,7 +73,7 @@ copy_derivatives(mxArray* destin, const Symmetry& sym, const FGSContainer& deriv
   int n = x_unfolded->nrows();
   int m = x_unfolded->ncols();
   mxArray* tmp = mxCreateDoubleMatrix(n, m, mxREAL);
-  std::copy_n(x_unfolded->getData().base(), n * m, mxGetPr(tmp));
+  std::ranges::copy_n(x_unfolded->getData().base(), n * m, mxGetPr(tmp));
   mxSetField(destin, 0, fieldname, tmp);
 }
 
@@ -289,7 +289,7 @@ extern "C"
             std::vector<std::string> g_fieldnames_pruning(g_fieldnames);
             g_fieldnames_pruning.emplace_back("pruning");
             const char* g_fieldnames_pruning_c[kOrder + 2];
-            std::copy_n(g_fieldnames_c, kOrder + 1, g_fieldnames_pruning_c);
+            std::ranges::copy_n(g_fieldnames_c, kOrder + 1, g_fieldnames_pruning_c);
             g_fieldnames_pruning_c[kOrder + 1] = g_fieldnames_pruning.back().c_str();
             plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 2, g_fieldnames_pruning_c);
           }
@@ -303,7 +303,7 @@ extern "C"
             mxArray* tmp = mxCreateDoubleMatrix(t.nrows(), t.ncols(), mxREAL);
             const ConstVector& vec = t.getData();
             assert(vec.skip() == 1);
-            std::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
+            std::ranges::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
             mxSetField(plhs[0], 0, g_fieldnames_c[i], tmp);
           }
 
@@ -322,7 +322,7 @@ extern "C"
                 mxArray* tmp = mxCreateDoubleMatrix(t.nrows(), t.ncols(), mxREAL);
                 const ConstVector& vec = t.getData();
                 assert(vec.skip() == 1);
-                std::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
+                std::ranges::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
                 mxSetField(dr_pruning, 0, g_fieldnames_c[i], tmp);
               }
           }

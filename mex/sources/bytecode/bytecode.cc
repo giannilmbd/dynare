@@ -519,9 +519,9 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   test_mxMalloc(x, __LINE__, __FILE__, __func__, col_x * row_x * sizeof(double));
 
   fill_n(direction, row_y * col_y, 0);
-  copy_n(xd, row_x * col_x, x);
-  copy_n(yd, row_y * col_y, y);
-  copy_n(yd, row_y * col_y, ya);
+  ranges::copy_n(xd, row_x * col_x, x);
+  ranges::copy_n(yd, row_y * col_y, y);
+  ranges::copy_n(yd, row_y * col_y, ya);
 
   const filesystem::path codfile {file_name + "/model/bytecode/"
                                   + (block_decomposed ? "block/" : "")
@@ -585,7 +585,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         {
           int out_periods = extended_path ? max_periods + y_kmin : col_y;
           plhs[0] = mxCreateDoubleMatrix(row_y, out_periods, mxREAL);
-          std::copy_n(y, row_y * out_periods, mxGetPr(plhs[0]));
+          std::ranges::copy_n(y, row_y * out_periods, mxGetPr(plhs[0]));
         }
       if (nlhs > 1)
         {

@@ -96,9 +96,9 @@ KordpDynare::calcDerivativesAtSteady()
   Vector out(nY);
   out.zeros();
   Vector llxSteady(3 * nY);
-  std::copy_n(ySteady.base(), nY, llxSteady.base());
-  std::copy_n(ySteady.base(), nY, llxSteady.base() + nY);
-  std::copy_n(ySteady.base(), nY, llxSteady.base() + 2 * nY);
+  std::ranges::copy_n(ySteady.base(), nY, llxSteady.base());
+  std::ranges::copy_n(ySteady.base(), nY, llxSteady.base() + nY);
+  std::ranges::copy_n(ySteady.base(), nY, llxSteady.base() + 2 * nY);
 
   dynamicModelFile->eval(llxSteady, xx, params, ySteady, out, dynToDynpp, md);
 }

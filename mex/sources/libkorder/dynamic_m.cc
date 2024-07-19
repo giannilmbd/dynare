@@ -73,16 +73,16 @@ DynamicModelMFile::eval(const Vector& y, const Vector& x, const Vector& modParam
                         TensorContainer<FSSparseTensor>& derivatives) noexcept(false)
 {
   mxArray* y_mx = mxCreateDoubleMatrix(y.length(), 1, mxREAL);
-  std::copy_n(y.base(), y.length(), mxGetPr(y_mx));
+  std::ranges::copy_n(y.base(), y.length(), mxGetPr(y_mx));
 
   mxArray* x_mx = mxCreateDoubleMatrix(1, x.length(), mxREAL);
-  std::copy_n(x.base(), x.length(), mxGetPr(x_mx));
+  std::ranges::copy_n(x.base(), x.length(), mxGetPr(x_mx));
 
   mxArray* params_mx = mxCreateDoubleMatrix(modParams.length(), 1, mxREAL);
-  std::copy_n(modParams.base(), modParams.length(), mxGetPr(params_mx));
+  std::ranges::copy_n(modParams.base(), modParams.length(), mxGetPr(params_mx));
 
   mxArray* steady_state_mx = mxCreateDoubleMatrix(ySteady.length(), 1, mxREAL);
-  std::copy_n(ySteady.base(), ySteady.length(), mxGetPr(steady_state_mx));
+  std::ranges::copy_n(ySteady.base(), ySteady.length(), mxGetPr(steady_state_mx));
 
   mxArray *T_order_mx, *T_mx;
 

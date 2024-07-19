@@ -124,7 +124,7 @@ icdfmSigma(int d, int n, floating_point auto* U, const double* LowerCholSigma)
   icdfm(n * d, U);
   vector<double> tmp(n * d);
   dgemm("N", "N", &dd, &nn, &dd, &one, LowerCholSigma, &dd, U, &dd, &zero, tmp.data(), &dd);
-  copy_n(tmp.begin(), d * n, U);
+  ranges::copy_n(tmp.begin(), d * n, U);
 }
 
 void
