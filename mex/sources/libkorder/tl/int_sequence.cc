@@ -100,7 +100,7 @@ IntSequence::operator=(IntSequence&& s)
 bool
 IntSequence::operator==(const IntSequence& s) const
 {
-  return std::equal(data, data + length, s.data, s.data + s.length);
+  return std::ranges::equal(data, data + length, s.data, s.data + s.length);
 }
 
 std::strong_ordering
