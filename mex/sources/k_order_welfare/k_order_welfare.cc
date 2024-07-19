@@ -242,8 +242,8 @@ extern "C"
           && mxGetNumberOfElements(order_var_mx) == static_cast<size_t>(nEndo)))
       mexErrMsgTxt("dr.order_var should be a real dense array of M_.endo_nbr elements");
     std::vector<int> dr_order(nEndo);
-    std::transform(mxGetPr(order_var_mx), mxGetPr(order_var_mx) + nEndo, dr_order.begin(),
-                   [](double x) { return static_cast<int>(x) - 1; });
+    std::ranges::transform(mxGetPr(order_var_mx), mxGetPr(order_var_mx) + nEndo, dr_order.begin(),
+                           [](double x) { return static_cast<int>(x) - 1; });
 
     // Retrieve sparse indices for dynamic model
 
