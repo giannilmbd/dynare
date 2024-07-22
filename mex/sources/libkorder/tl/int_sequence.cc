@@ -231,7 +231,7 @@ IntSequence::isConstant() const
 bool
 IntSequence::isSorted() const
 {
-  return std::is_sorted(data, data + length);
+  return std::ranges::is_sorted(data, data + length);
 }
 
 /* Debug print. */
