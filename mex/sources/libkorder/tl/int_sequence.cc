@@ -134,7 +134,7 @@ IntSequence::less(const IntSequence& s) const
 void
 IntSequence::sort()
 {
-  std::sort(data, data + length);
+  std::ranges::sort(data, data + length);
 }
 
 void
