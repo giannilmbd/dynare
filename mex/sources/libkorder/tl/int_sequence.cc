@@ -196,7 +196,7 @@ IntSequence::getMax() const
 {
   if (length == 0)
     return std::numeric_limits<int>::min();
-  return *std::max_element(data, data + length);
+  return *std::ranges::max_element(data, data + length);
 }
 
 void
