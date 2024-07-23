@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2022 Dynare Team
+ * Copyright © 2007-2024 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -124,7 +124,7 @@ Mem_Mngr::mxFree_NZE(void* pos)
 void
 Mem_Mngr::Free_All()
 {
-  while (NZE_Mem_Allocated.size())
+  while (!NZE_Mem_Allocated.empty())
     {
       mxFree(NZE_Mem_Allocated.back());
       NZE_Mem_Allocated.pop_back();

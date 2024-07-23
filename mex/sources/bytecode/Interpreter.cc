@@ -506,13 +506,13 @@ Interpreter::simulate_a_block(
       mexPrintf("SOLVE FORWARD COMPLETE\n");
       mexEvalString("drawnow;");
 #endif
-      if (vector_table_conditional_local.size())
-        evaluate_a_block(true, single_block, bin_base_name);
-      else
+      if (vector_table_conditional_local.empty())
         {
           fixe_u();
           Read_SparseMatrix(bin_base_name, false);
         }
+      else
+        evaluate_a_block(true, single_block, bin_base_name);
       Per_u_ = 0;
 
       Simulate_Newton_One_Boundary(true);
@@ -528,13 +528,13 @@ Interpreter::simulate_a_block(
       mexPrintf("SOLVE BACKWARD COMPLETE\n");
       mexEvalString("drawnow;");
 #endif
-      if (vector_table_conditional_local.size())
-        evaluate_a_block(true, single_block, bin_base_name);
-      else
+      if (vector_table_conditional_local.empty())
         {
           fixe_u();
           Read_SparseMatrix(bin_base_name, false);
         }
+      else
+        evaluate_a_block(true, single_block, bin_base_name);
       Per_u_ = 0;
 
       Simulate_Newton_One_Boundary(false);
@@ -557,13 +557,13 @@ Interpreter::simulate_a_block(
             mexPrintf("SOLVE TWO BOUNDARIES in a steady state model: impossible case\n");
           return ERROR_ON_EXIT;
         }
-      if (vector_table_conditional_local.size())
-        evaluate_a_block(true, single_block, bin_base_name);
-      else
+      if (vector_table_conditional_local.empty())
         {
           fixe_u();
           Read_SparseMatrix(bin_base_name, true);
         }
+      else
+        evaluate_a_block(true, single_block, bin_base_name);
       u_count = u_count_int * (periods + y_kmax + y_kmin);
       r = static_cast<double*>(mxMalloc(size * sizeof(double)));
       test_mxMalloc(r, __LINE__, __FILE__, __func__, size * sizeof(double));
@@ -589,10 +589,9 @@ Interpreter::simulate_a_block(
               max_res = 0;
               max_res_idx = 0;
               ranges::copy_n(y, y_size * (periods + y_kmax + y_kmin), y_save);
-              if (vector_table_conditional_local.size())
-                for (auto& it1 : vector_table_conditional_local)
-                  if (it1.is_cond)
-                    y[it1.var_endo + y_kmin * size] = it1.constrained_value;
+              for (auto& it1 : vector_table_conditional_local)
+                if (it1.is_cond)
+                  y[it1.var_endo + y_kmin * size] = it1.constrained_value;
               compute_complete_2b();
               if (!(isnan(res1) || isinf(res1)))
                 cvg = (max_res < solve_tolf);
@@ -784,7 +783,9 @@ Interpreter::MainLoop(const string& bin_basename, bool evaluate, int block, bool
                     u_count_int);
 #endif
           bool result;
-          if (sconstrained_extended_path.size())
+          if (sconstrained_extended_path.empty())
+            result = simulate_a_block(vector_table_conditional_local, block >= 0, bin_basename);
+          else
             {
               jacobian_block[current_block]
                   = mxCreateDoubleMatrix(size, evaluator.getCurrentBlockNbColJacob(), mxREAL);
@@ -795,8 +796,6 @@ Interpreter::MainLoop(const string& bin_basename, bool evaluate, int block, bool
               residual = vector<double>(size * periods);
               result = simulate_a_block(vector_table_conditional_local, block >= 0, bin_basename);
             }
-          else
-            result = simulate_a_block(vector_table_conditional_local, block >= 0, bin_basename);
           if (max_res > max_res_local)
             {
               max_res_local = max_res;
@@ -1508,7 +1507,9 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
 #ifdef DEBUG
   int col_x;
 #endif
-  if (vector_table_conditional_local.size())
+  if (vector_table_conditional_local.empty())
+    jacob_exo = nullptr;
+  else
     {
       jacob_exo = mxGetPr(jacobian_exo_block[block_num]);
       row_x = mxGetM(jacobian_exo_block[block_num]);
@@ -1516,8 +1517,6 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
       col_x = mxGetN(jacobian_exo_block[block_num]);
 #endif
     }
-  else
-    jacob_exo = nullptr;
 #ifdef DEBUG
   int local_index;
 #endif
@@ -1542,7 +1541,7 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
               last_var = var;
               if (var < size * (periods + y_kmax))
                 {
-                  if (t == 0 && vector_table_conditional_local.size())
+                  if (t == 0 && !vector_table_conditional_local.empty())
                     {
                       fliped = vector_table_conditional_local[var].is_cond;
                       fliped_exogenous_derivatives_updated = false;
@@ -1556,7 +1555,7 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
           if (fliped)
             {
               if (t == 0 && var < (periods + y_kmax) * size && lag == 0
-                  && vector_table_conditional_local.size())
+                  && !vector_table_conditional_local.empty())
                 {
                   flip_exo = vector_table_conditional_local[var].var_exo;
 #ifdef DEBUG
@@ -2920,7 +2919,15 @@ Interpreter::Solve_LU_UMFPack_Two_Boundaries(
       throw FatalException {"umfpack_dl_solve failed"};
     }
 
-  if (vector_table_conditional_local.size())
+  if (vector_table_conditional_local.empty())
+    for (int i = 0; i < n; i++)
+      {
+        int eq = index_vara[i + size * y_kmin];
+        double yy = -(res[i] + y[eq]);
+        direction[eq] = yy;
+        y[eq] += slowc * yy;
+      }
+  else
     {
       for (int t = 0; t < periods; t++)
         if (t == 0)
@@ -2955,16 +2962,6 @@ Interpreter::Solve_LU_UMFPack_Two_Boundaries(
                 y[eq] += slowc * yy;
               }
           }
-    }
-  else
-    {
-      for (int i = 0; i < n; i++)
-        {
-          int eq = index_vara[i + size * y_kmin];
-          double yy = -(res[i] + y[eq]);
-          direction[eq] = yy;
-          y[eq] += slowc * yy;
-        }
     }
 
   mxFree(Ap);
