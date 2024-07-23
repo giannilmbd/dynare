@@ -865,9 +865,6 @@ Interpreter::extended_path(const string& file_name, bool evaluate, int block, in
   auto* x_save = static_cast<double*>(mxMalloc(nb_row_x * col_x * sizeof(double)));
   test_mxMalloc(x_save, __LINE__, __FILE__, __func__, nb_row_x * col_x * sizeof(double));
 
-  vector_table_conditional_local_type vector_table_conditional_local;
-  vector_table_conditional_local.clear();
-
   int endo_name_length_l = static_cast<int>(symbol_table.maxEndoNameLength());
   for (int j = 0; j < col_x * nb_row_x; j++)
     {
@@ -916,7 +913,7 @@ Interpreter::extended_path(const string& file_name, bool evaluate, int block, in
       for (const auto& it : sextended_path)
         x[y_kmin + (it.exo_num - 1) * nb_row_x] = it.value[t];
 
-      vector_table_conditional_local.clear();
+      vector_table_conditional_local_type vector_table_conditional_local;
       if (auto it = table_conditional_global.find(t); it != table_conditional_global.end())
         vector_table_conditional_local = it->second;
       tie(r, blocks) = MainLoop(file_name, evaluate, block, true, sconstrained_extended_path,
@@ -964,11 +961,7 @@ pair<bool, vector<int>>
 Interpreter::compute_blocks(const string& file_name, bool evaluate, int block)
 {
   // The big loop on intructions
-  vector<s_plan> s_plan_junk;
-  vector_table_conditional_local_type vector_table_conditional_local_junk;
-
-  auto [r, blocks] = MainLoop(file_name, evaluate, block, false, s_plan_junk,
-                              vector_table_conditional_local_junk);
+  auto [r, blocks] = MainLoop(file_name, evaluate, block, false, {}, {});
 
   return {true, blocks};
 }
@@ -1517,13 +1510,9 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
       col_x = mxGetN(jacobian_exo_block[block_num]);
 #endif
     }
-#ifdef DEBUG
-  int local_index;
-#endif
 
   bool fliped = false;
   bool fliped_exogenous_derivatives_updated = false;
-  int flip_exo;
   Ap[0] = 0;
   for (int t = 0; t < periods; t++)
     {
@@ -1539,63 +1528,48 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
             {
               Ap[1 + last_var + t * size] = NZE;
               last_var = var;
-              if (var < size * (periods + y_kmax))
+              if (var < size * (periods + y_kmax) && t == 0
+                  && !vector_table_conditional_local.empty())
                 {
-                  if (t == 0 && !vector_table_conditional_local.empty())
-                    {
-                      fliped = vector_table_conditional_local[var].is_cond;
-                      fliped_exogenous_derivatives_updated = false;
-                    }
-                  else
-                    fliped = false;
+                  fliped = vector_table_conditional_local[var].is_cond;
+                  fliped_exogenous_derivatives_updated = false;
                 }
               else
                 fliped = false;
             }
-          if (fliped)
+          if (fliped && t == 0 && var < (periods + y_kmax) * size && lag == 0
+              && !vector_table_conditional_local.empty()
+              && !exchange(fliped_exogenous_derivatives_updated, true))
             {
-              if (t == 0 && var < (periods + y_kmax) * size && lag == 0
-                  && !vector_table_conditional_local.empty())
-                {
-                  flip_exo = vector_table_conditional_local[var].var_exo;
+              int flip_exo {vector_table_conditional_local[var].var_exo};
 #ifdef DEBUG
-                  local_index = eq;
+              int local_index = eq;
 #endif
-                  if (!fliped_exogenous_derivatives_updated)
-                    {
-                      fliped_exogenous_derivatives_updated = true;
-                      for (int k = 0; k < row_x; k++)
-                        {
-                          if (jacob_exo[k + row_x * flip_exo] != 0)
-                            {
-                              Ax[NZE] = jacob_exo[k + row_x * flip_exo];
-                              Ai[NZE] = k;
-                              NZE++;
+              for (int k = 0; k < row_x; k++)
+                if (jacob_exo[k + row_x * flip_exo] != 0)
+                  {
+                    Ax[NZE] = jacob_exo[k + row_x * flip_exo];
+                    Ai[NZE] = k;
+                    NZE++;
 
 #ifdef DEBUG
-                              if (local_index < 0 || local_index >= size * periods)
-                                throw FatalException {
-                                    "In Init_UMFPACK_Sparse_Two_Boundaries, index ("
-                                    + to_string(local_index) + ") out of range for b vector"};
-                              if (k + row_x * flip_exo < 0 || k + row_x * flip_exo >= row_x * col_x)
-                                throw FatalException {
-                                    "In Init_UMFPACK_Sparse_Two_Boundaries, index ("
-                                    + to_string(var + size * (y_kmin + t + lag))
-                                    + ") out of range for jacob_exo vector"};
-                              if (t + y_kmin + flip_exo * nb_row_x < 0
-                                  || t + y_kmin + flip_exo * nb_row_x >= nb_row_x * this->col_x)
-                                throw FatalException {
-                                    "In Init_UMFPACK_Sparse_Two_Boundaries, index ("
-                                    + to_string(index_vara[var + size * (y_kmin + t + lag)])
-                                    + ") out of range for x vector max="
-                                    + to_string(nb_row_x * this->col_x)};
+                    if (local_index < 0 || local_index >= size * periods)
+                      throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, index ("
+                                            + to_string(local_index)
+                                            + ") out of range for b vector"};
+                    if (k + row_x * flip_exo < 0 || k + row_x * flip_exo >= row_x * col_x)
+                      throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, index ("
+                                            + to_string(var + size * (y_kmin + t + lag))
+                                            + ") out of range for jacob_exo vector"};
+                    if (t + y_kmin + flip_exo * nb_row_x < 0
+                        || t + y_kmin + flip_exo * nb_row_x >= nb_row_x * this->col_x)
+                      throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, index ("
+                                            + to_string(index_vara[var + size * (y_kmin + t + lag)])
+                                            + ") out of range for x vector max="
+                                            + to_string(nb_row_x * this->col_x)};
 #endif
-                              u[k] -= jacob_exo[k + row_x * flip_exo]
-                                      * x[t + y_kmin + flip_exo * nb_row_x];
-                            }
-                        }
-                    }
-                }
+                    u[k] -= jacob_exo[k + row_x * flip_exo] * x[t + y_kmin + flip_exo * nb_row_x];
+                  }
             }
 
           if (var < (periods + y_kmax) * size)
@@ -2928,41 +2902,23 @@ Interpreter::Solve_LU_UMFPack_Two_Boundaries(
         y[eq] += slowc * yy;
       }
   else
-    {
-      for (int t = 0; t < periods; t++)
-        if (t == 0)
+    for (int t = 0; t < periods; t++)
+      for (int i = 0; i < size; i++)
+        if (t == 0 && vector_table_conditional_local[i].is_cond)
           {
-            for (int i = 0; i < size; i++)
-              {
-                bool fliped = vector_table_conditional_local[i].is_cond;
-                if (fliped)
-                  {
-                    int eq = index_vara[i + size * (y_kmin)];
-                    int flip_exo = vector_table_conditional_local[i].var_exo;
-                    double yy = -(res[i] + x[y_kmin + flip_exo * nb_row_x]);
-                    direction[eq] = 0;
-                    x[flip_exo * nb_row_x + y_kmin] += slowc * yy;
-                  }
-                else
-                  {
-                    int eq = index_vara[i + size * (y_kmin)];
-                    double yy = -(res[i] + y[eq]);
-                    direction[eq] = yy;
-                    y[eq] += slowc * yy;
-                  }
-              }
+            int eq = index_vara[i + size * (y_kmin)];
+            int flip_exo = vector_table_conditional_local[i].var_exo;
+            double yy = -(res[i] + x[y_kmin + flip_exo * nb_row_x]);
+            direction[eq] = 0;
+            x[flip_exo * nb_row_x + y_kmin] += slowc * yy;
           }
         else
           {
-            for (int i = 0; i < size; i++)
-              {
-                int eq = index_vara[i + size * (t + y_kmin)];
-                double yy = -(res[i + size * t] + y[eq]);
-                direction[eq] = yy;
-                y[eq] += slowc * yy;
-              }
+            int eq = index_vara[i + size * (t + y_kmin)];
+            double yy = -(res[i + size * t] + y[eq]);
+            direction[eq] = yy;
+            y[eq] += slowc * yy;
           }
-    }
 
   mxFree(Ap);
   mxFree(Ai);
