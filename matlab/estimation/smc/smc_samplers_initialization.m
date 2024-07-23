@@ -1,32 +1,24 @@
-function [particles, tlogpostkernel, loglikelihood, SimulationFolder] = smc_samplers_initialization(funobj, sampler, n, Prior, SimulationFolder, nsteps)
-
+function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initialization(funobj, sampler, n, Prior, SimulationFolder, nsteps)
+% function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initialization(funobj, sampler, n, Prior, SimulationFolder, nsteps)
 % Initialize SMC samplers by drawing initial particles in the prior distribution.
 %
 % INPUTS
-% - TargetFun        [char]     string specifying the name of the objective function (posterior kernel).
+% - funobj           [char]     string specifying the name of the objective function (posterior kernel).
 % - sampler          [char]     name of the sampler.
 % - n                [integer]  scalar, number of particles.
-% - mh_bounds        [double]   p×2 matrix defining lower and upper bounds for the estimated parameters.
-% - dataset_         [dseries]  sample
-% - dataset_info     [struct]   informations about the dataset
-% - options_         [struct]   dynare's options
-% - M_               [struct]   model description
-% - estim_params_    [struct]   estimated parameters
-% - bayestopt_       [struct]   estimated parameters
-% - oo_              [struct]   outputs
+% - Prior            [class]    prior information
+% - SimulationFolder [char]     name of output folder
+% - nsteps           [integer]  number of steps
 %
 % OUTPUTS
-% - ix2                   [double]    p×n matrix of particles
-% - ilogpo2               [double]    n×1 vector of posterior kernel values for the particles
-% - iloglik2              [double]    n×1 vector of likelihood values for the particles
-% - ModelName             [string]    name of the mod-file
-% - MetropolisFolder      [string]    path to the Metropolis subfolder
-% - bayestopt_            [structure] estimation options structure
+% - particles             [double]    p×n matrix of particles
+% - tlogpostkernel        [double]    n×1 vector of posterior kernel values for the particles
+% - loglikelihood         [double]    n×1 vector of likelihood values for the particles
 %
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
