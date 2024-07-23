@@ -6,7 +6,7 @@ function [dbase, info] = checkdatabase(dbase, M_, inversionflag, simulationflag)
 % endogenous variables in difference (which may be lagged), or lags on the
 % exogenous variables, then thee routine complete the database.
 
-% Copyright © 2018-2023 Dynare Team
+% Copyright © 2018-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -51,10 +51,21 @@ if ~isempty(M_.aux_vars)
         listoflaggedendogenousvariables = union(listoflaggedendogenousvariables, M_.endo_names([M_.aux_vars(laggedendogenousvariablesidx).orig_index]));
     end
     laggedendogenousvariablesidx = find([M_.aux_vars.type]==8);
-    if ~isempty(laggedendogenousvariablesidx)
-        listoflaggedendogenousvariables = union(listoflaggedendogenousvariables, M_.endo_names([M_.aux_vars(laggedendogenousvariablesidx).orig_index]));
+    for i=1:length(laggedendogenousvariablesidx)
+        if ~isempty(laggedendogenousvariablesidx(i))
+            % WORKAROUND for https://git.dynare.org/Dynare/preprocessor/-/issues/130
+            % The preprocessor does not make the difference between the diff of an exogenous
+            % variable and the diff of an endogenous variable.
+            tockens = strsplit(M_.aux_vars(laggedendogenousvariablesidx(i)).orig_expr, 'diff|log|exp|\(|\)|\<[0-9]|\+|\-', 'DelimiterType', 'RegularExpression');
+            tockens = tockens(~cellfun('isempty',tockens));
+            if ismember(tockens{1}, M_.endo_names)
+                listoflaggedendogenousvariables = union(listoflaggedendogenousvariables, M_.endo_names([M_.aux_vars(laggedendogenousvariablesidx(i)).orig_index]));
+            end
+        end
     end
 end
+
+listoflaggedendogenousvariables
 
 info = struct;
 info.endonames = M_.endo_names;
