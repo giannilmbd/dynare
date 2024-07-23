@@ -336,9 +336,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                              .c_str());
 
           sconditional_extended_path[i].per_value.resize(nb_local_periods);
-          sconditional_extended_path[i].value.resize(nb_periods);
-          for (int j = 0; j < nb_periods; j++)
-            sconditional_extended_path[i].value[j] = 0;
+          sconditional_extended_path[i].value.resize(nb_periods, 0);
           for (int j = 0; j < nb_local_periods; j++)
             {
               constrained_int_date[j] = static_cast<int>(specific_constrained_int_date_[j]) - 1;
@@ -374,9 +372,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                           + to_string(nb_local_periods))
                              .c_str());
           sextended_path[i].per_value.resize(nb_local_periods);
-          sextended_path[i].value.resize(nb_periods);
-          for (int j = 0; j < nb_periods; j++)
-            sextended_path[i].value[j] = 0;
+          sextended_path[i].value.resize(nb_periods, 0);
           for (int j = 0; j < nb_local_periods; j++)
             {
               sextended_path[i].per_value[j]
