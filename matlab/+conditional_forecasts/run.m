@@ -80,7 +80,7 @@ end
 
 if estimated_model
     if options_.prefilter
-        error('imcforecast:: Conditional forecasting does not support the prefiltering option')
+        error('conditional_forecast: Conditional forecasting does not support the prefiltering option')
     end
     if ischar(options_cond_fcst.parameter_set)
         switch options_cond_fcst.parameter_set
@@ -103,19 +103,19 @@ if estimated_model
             xparam = bayestopt_.p1;
             graph_title='Prior Mean';
           otherwise
-            disp('imcforecast:: If the input argument is a string, then it has to be equal to:')
-            disp('                   ''calibration'', ')
-            disp('                   ''posterior_mode'', ')
-            disp('                   ''posterior_mean'', ')
-            disp('                   ''posterior_median'', ')
-            disp('                   ''prior_mode'' or')
-            disp('                   ''prior_mean''.')
-            error('imcforecast:: Wrong argument type!')
+            disp('conditional_forecast: If the input argument is a string, then it has to be equal to:')
+            disp('                      ''calibration'', ')
+            disp('                      ''posterior_mode'', ')
+            disp('                      ''posterior_mean'', ')
+            disp('                      ''posterior_median'', ')
+            disp('                      ''prior_mode'' or')
+            disp('                      ''prior_mean''.')
+            error('conditional_forecast: Wrong argument type!')
         end
     else
         xparam = options_cond_fcst.parameter_set;
         if length(xparam)~=length(M_.params)
-            error('imcforecast:: The dimension of the vector of parameters doesn''t match the number of estimated parameters!')
+            error('conditional_forecast: The dimension of the vector of parameters doesn''t match the number of estimated parameters!')
         end
     end
     set_parameters(xparam);
@@ -219,7 +219,7 @@ n2 = size(options_cond_fcst.controlled_varexo,1);
 constrained_vars = oo_.dr.inv_order_var(constrained_vars); % must be in decision rule order
 
 if n1 ~= n2
-    error('imcforecast:: The number of constrained variables doesn''t match the number of controlled shocks')
+    error('conditional_forecast: The number of constrained variables doesn''t match the number of controlled shocks')
 end
 
 % Get indices of controlled varexo.
