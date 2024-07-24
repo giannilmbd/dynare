@@ -4,9 +4,10 @@ function density = multivariate_student_pdf(X,Mean,Sigma_upper_chol,df)
 %
 % INPUTS
 %
-%    X                  [double]    1*n vector
+%    X                  [double]    dim*n vector
 %    Mean               [double]    1*n vector, expectation of the multivariate random variable.
-%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the "covariance matrix").
+%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the covariance 
+%                                   matrix up to a factor df/(df-2)).
 %    df                 [integer]   degrees of freedom.
 %
 % OUTPUTS
@@ -14,7 +15,7 @@ function density = multivariate_student_pdf(X,Mean,Sigma_upper_chol,df)
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2003-2017 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -30,7 +31,27 @@ function density = multivariate_student_pdf(X,Mean,Sigma_upper_chol,df)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-nn = length(X);
-t1 = gamma( .5*(nn+df) ) / ( gamma( .5*nn ) * (df*pi)^(.5*nn) ) ;
+if df <=0
+    error('Degrees of freedom ''df'' must be positive')
+end
+[~, nn] = size(X);
+t1 = gamma( .5*(nn+df) ) / ( gamma( .5*df ) * (df*pi)^(.5*nn) );
 t2 = t1 / prod(diag(Sigma_upper_chol)) ;
-density = t2 / ( 1 + (X-Mean)*(Sigma_upper_chol\(transpose(Sigma_upper_chol)\transpose(X-Mean)))/df )^(.5*(nn+df));
+density = t2 ./ ( 1 + sum(((X-Mean)/Sigma_upper_chol).^2, 2)/df ).^(.5*(nn+df));
+
+return % --*-- Unit tests --*--
+
+%@test:1
+% Normal density
+try
+    m1 = multivariate_student_pdf([1 2],0,chol([1 0.5; 0.5 1]),10)
+    t(1) = true;
+catch
+    t(1) = false;
+end
+%$
+if t(1)
+    t(2) = dassert(m1,0.02440738691918476,1e-6);
+end
+T = all(t);
+%@eof:1

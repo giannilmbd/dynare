@@ -1,19 +1,19 @@
-function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df)
-% function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df)
+function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df,n)
+% function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df,n)
 % Pseudo random draws from a multivariate student distribution,
 % with expectation Mean, variance Sigma*df/(df-2) and degrees of freedom df>0.
 %
 % INPUTS
 %
 %    Mean               [double]    1*n vector, expectation of the multivariate random variable.
-%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma
-%                                   (the covariance matrix up to a factor df/(df-2)).
+%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the covariance 
+%                                   matrix up to a factor df/(df-2)).
 %    df                 [integer]   degrees of freedom.
+%    n                  [integer]   number of draws (defaults to 1).
 %
 % OUTPUTS
-%    draw               [double]    1*n vector drawn from a multivariate normal distribution with expectation Mean and
+%    draw               [double]    n*dim vector drawn from a multivariate normal distribution with expectation Mean and
 %                                   covariance Sigma.
-%
 %
 % NOTE See Zellner (appendix B.2, 1971) for a definition.
 %    Computes the t-distributed random numbers from
@@ -39,6 +39,8 @@ function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-n = length(Mean);
-draw = Mean + randn(1,n) * Sigma_upper_chol * sqrt(df/sum(randn(df,1).^2));
+if nargin == 3
+    n = 1
+end
+dim = length(Mean);
+draw = Mean + (randn(n,dim) * Sigma_upper_chol) .* sqrt(df./sum(randn(n,df).^2,2));
