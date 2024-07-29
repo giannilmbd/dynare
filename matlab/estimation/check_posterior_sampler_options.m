@@ -405,6 +405,49 @@ if init
             options_.mh_replic = 0;
             options_.mh_posterior_mode_estimation = false;
 
+          case 'dime_mcmc'
+
+            % default options
+            posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.dime);
+
+            % user defined options
+            if ~isempty(options_.posterior_sampler_options.sampling_opt)
+                options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
+                for i=1:rows(options_list)
+                    switch options_list{i,1}
+                      case 'nchain'
+                        posterior_sampler_options.nchain = options_list{i,2};
+                      case 'niter'
+                        posterior_sampler_options.niter = options_list{i,2};
+                      case 'parallel'
+                        posterior_sampler_options.parallel = options_list{i,2};
+                      case 'tune'
+                        posterior_sampler_options.tune = options_list{i,2};
+                      case 'aimh_prob'
+                        posterior_sampler_options.aimh_prob = options_list{i,2};
+                      case 'sigma'
+                        posterior_sampler_options.sigma = options_list{i,2};
+                      case 'gamma'
+                        posterior_sampler_options.gamma = options_list{i,2};
+                      case 'df_proposal_dist'
+                        posterior_sampler_options.df_proposal_dist = options_list{i,2};
+                      case 'rho'
+                        posterior_sampler_options.rho = options_list{i,2};
+                      otherwise
+                        warning(['dime: Unknown option (' options_list{i,1} ')!'])
+                    end
+                end
+            end
+
+            if ~isfield(posterior_sampler_options,'tune')
+                posterior_sampler_options.tune = ceil(50000 / posterior_sampler_options.nchain);
+                dprintf('dime: setting number of ensemble iterations to keep (`tune`) to %d.', posterior_sampler_options.tune)
+            end
+            options_.mode_compute = 0;
+            options_.cova_compute = 0;
+            options_.mh_replic = 0;
+            options_.mh_posterior_mode_estimation = false;
+
       case 'dsmh'
 
         % default options

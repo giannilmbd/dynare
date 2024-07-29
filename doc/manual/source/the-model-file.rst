@@ -7462,6 +7462,12 @@ observed variables.
                density is recentered to the previous draw in every
                step.
 
+           ``'dime_mcmc'``
+
+               Instructs Dynare to use the Differential-Independence Mixture Ensemble ("DIME") MCMC sampler of *Boehl (2022)* instead of the standard Random-Walk Metropolis-Hastings. DIME is robust for odd shaped, multimodal, black-box distributions and shown to require significantly less likelihood evaluations than alternative samplers. Many chains run simultaneously, thereby further increasing sampling speed. The algorithm is based on a gradient-free global multi-start optimizer and does not require any posterior mode density maximization prior to MCMC sampling. DIME proposals are generated from an endogenous and adaptive proposal distribution, thereby providing close-to-optimal proposal distributions for black box target distributions without manual fine-tuning. Does not yet support ``moments_varendo``, ``bayesian_irf``, and ``smoother``. 
+
+               Note that, since DIME is using parameter transformations, setting parameter bounds is often counterproductive. The ``prior_trunc`` option is disabled and set to zero.
+
            ``'tailored_random_block_metropolis_hastings'``
 
                Instructs Dynare to use the Tailored randomized block
@@ -7577,6 +7583,42 @@ observed variables.
                   refresh rate of the status bar instead of just saving
                   the draws when the current ``_mh*_blck`` file is
                   full. Default: ``0``
+
+           ``'dime_mcmc'``
+
+               Available options are:           
+           
+                  ``'niter'``
+
+                  Number of iterations. Default value is 1500.
+
+                  ``'nchain'``
+
+                  Number of chains/particles. A range between :math:`4 ndim` and :math:`6 ndim` is recommended. For very difficult problems, double the number of chains. Default value is: :math:`5 ndim`. 
+
+                  ``'tune'``
+
+                  Number of ensemble iterations to keep after burnin. Default value is chosen to obtain at least 50,000 samples.
+
+                  ``'aimh_prob'``
+
+                  Probability to draw a global transition kernel. By default this is set to :math:`0.1`. It is usually not necessary to change this value.
+
+                  ``'df_proposal_dist'``
+
+                  Degrees of freedom of the multivariate t distribution used for global kernel proposals. Defaults to :math:`10`.
+
+                  ``'rho'``
+
+                  Decay parameter for the mean and covariances of the global transistion kernel. Defaults to :math:`0.999`.
+
+                  ``'gamma'``
+
+                  Mean stretch factor for the proposal vector. By default, it is :math:`2.38 / \sqrt{2\,\mathrm{ndim}}` as recommended by *ter Braak (2006)*
+
+                  ``'sigma'``
+
+                  Standard deviation of the Gaussian used to stretch the proposal vector. This is normally negligible. Defaults to :math:`1e-5`.
 
            ``'independent_metropolis_hastings'``
 

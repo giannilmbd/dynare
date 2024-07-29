@@ -372,6 +372,9 @@ end
 k = find(isnan(bayestopt_.jscale));
 bayestopt_.jscale(k) = options_.mh_jscale;
 
+% set default number of chains for DIME
+options_.posterior_sampler_options.dime.nchain = 5 * length(xparam1);
+
 % Build the dataset
 if ~isempty(options_.datafile)
     [~,name] = fileparts(options_.datafile);

@@ -30,6 +30,9 @@ function generate_trace_plots(chain_number)
 
 global M_ options_ estim_params_
 
+if issmc(options_)
+    error('generate_trace_plots:: SMC methods do not support trace plots')
+end
 
 % Get informations about the posterior draws:
 MetropolisFolder = CheckPath('metropolis', M_.dname);
