@@ -31,6 +31,8 @@ function dynare_estimation_1(var_list_,dname)
 
 global M_ options_ oo_ estim_params_ bayestopt_ dataset_ dataset_info
 
+dispString = 'Estimation::mcmc';
+
 if issmc(options_)
     options_.mode_compute = 0;
     options_.mh_replic = 0;
@@ -38,8 +40,10 @@ if issmc(options_)
     options_.load_mh_file = false;
     options_.load_results_after_load_mh = false;
 end
-
-dispString = 'Estimation::mcmc';
+if isdime(options_) && options_.prior_trunc
+    options_.prior_trunc = 0;
+    fprintf('%s: DIME requires no prior truncation. Resetting options_.prior_trunc=0.\n', dispString);
+end
 
 if ~exist([M_.dname filesep 'Output'],'dir')
     mkdir(M_.dname,'Output');
@@ -396,6 +400,10 @@ if ishssmc(options_)
     [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
     options_.posterior_sampler_options.current_options = posterior_sampler_options;
     oo_.MarginalDensity.hssmc = hssmc(objective_function, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
+elseif isdime(options_)
+    [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
+    options_.posterior_sampler_options.current_options = posterior_sampler_options;
+    dime(objective_function, xparam1, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
 elseif isdsmh(options_)
     dsmh(objective_function, xparam1, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
 end
@@ -456,9 +464,12 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                     oo_.convergence=oo_load_mh.oo_.convergence;
                 end
             end
+        elseif isdime(options_) && ~options_.nodiagnostic
+            % provide plot of log densities over iterations
+            oo_.lprob = trace_plot_dime(options_, M_);
         end
         % Estimation of the marginal density from the Mh draws:
-        if ishssmc(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
+        if ishssmc(options_) || isdime(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             if ~issmc(options_)
                 [~, oo_] = marginal_density(M_, options_, estim_params_, oo_, bayestopt_);
             end
@@ -469,8 +480,9 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
             end
             % Store posterior mean in a vector and posterior variance in
             % a matrix
-            [oo_.posterior.metropolis.mean,oo_.posterior.metropolis.Variance] ...
-                = GetPosteriorMeanVariance(options_, M_);
+            if ~isdime(options_)
+                [oo_.posterior.metropolis.mean,oo_.posterior.metropolis.Variance] = GetPosteriorMeanVariance(options_, M_);
+            end
         elseif options_.load_mh_file && options_.load_results_after_load_mh
             % load fields from previous MCMC run stored in results-file
             field_names={'posterior_mode','posterior_std_at_mode',...% fields set by marginal_density
@@ -537,7 +549,7 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                 end
             end
             if options_.smoother || ~isempty(options_.filter_step_ahead) || options_.forecast
-                if ~ishssmc(options_)
+                if ~ishssmc(options_) && ~isdime(options_)
                     if error_flag
                         error('%s: I cannot compute the posterior statistics!',dispString)
                     end

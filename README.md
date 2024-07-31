@@ -54,6 +54,7 @@ a 32-bit Octave.
 1. [**General Instructions**](#general-instructions)
 1. [**Debian or Ubuntu**](#debian-or-ubuntu)
 1. [**Fedora, CentOS or RHEL**](#fedora-centos-or-rhel)
+1. [**Arch Linux**](#arch-linux)
 1. [**Windows**](#windows)
 1. [**macOS**](#macos)
 1. [**Docker**](#docker)
@@ -264,7 +265,8 @@ make -f makefile.gf FFLAGS="-O2 -std=legacy" PROGRAM=x13as
 sudo cp x13as /usr/bin/
 ```
 
-If you use MATLAB, we strongly advise to also rename or exclude the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by Fedora, see e.g. [Matlab on Fedora 33](https://mutschler.eu/linux/install-guides/fedora-post-install/#matlab) or [MATLAB-ArchWiki](https://wiki.archlinux.org/index.php/MATLAB) for instructions.
+If you use MATLAB, we strongly advise to also rename or exclude the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by Fedora, see e.g. the [OpenGL Section of the ArchWiki article on MATLAB](https://wiki.archlinux.org/title/MATLAB#OpenGL_acceleration) for instructions.
+
 
 Now use the following commands if using MATLAB (adapt them for Octave, see above):
 ```sh
@@ -290,6 +292,43 @@ export PATH=/home/$USER/dynare/bison/bin:$PATH
 bison --version # bison (GNU Bison) 3.6.4
 ```
 Now configure dynare as above.
+
+## Arch Linux
+
+The following steps show how to install Dynare on Arch Linux from source. 
+- Install all needed dependencies:
+```sh
+pacman -S git make meson boost blas gsl libmatio gcc-fortran gcc-libs
+```
+- Compile and install SLICOT:
+```sh
+wget https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v5.9.tar.gz
+tar xf v5.9.tar.gz
+cd SLICOT-Reference-5.9
+make -f makefile_Unix FORTRAN=gfortran OPTS="-O2 -fno-underscoring -fdefault-integer-8" LOADER=gfortran lib
+mkdir -p /usr/local/lib
+cp slicot.a /usr/local/lib/libslicot64_pic.a
+cd ..
+```
+- Install `x13as-bin` from the AUR ([link to PKGBUILD](https://aur.archlinux.org/packages/x13as-bin)), either by using your favorite AUR-helper or by following the [Arch wiki](https://wiki.archlinux.org/title/Arch_User_Repository)
+- Prepare the Dynare sources:
+```sh
+git clone --recurse-submodules https://git.dynare.org/Dynare/dynare.git
+cd dynare
+```
+- Configure Dynare from the source directory (adjust `matlab_path` if you use a different version than R2024a):
+```sh
+meson setup -Dmatlab_path=/usr/local/MATLAB/R2024a -Dbuildtype=debugoptimized build-matlab  
+```
+- Compile:
+```sh
+meson compile -C build-matlab
+```
+- Optionally, run the testsuite:
+```sh
+meson test -C build-matlab
+```
+If you run into errors with GCC libraries/`libstdc++`, you need to prevent MATLAB from using the libraries it is shipping. For example, you could follow the [OpenGL Section of the ArchWiki article on MATLAB](https://wiki.archlinux.org/title/MATLAB#OpenGL_acceleration) by setting/exporting `LD_PRELOAD` and `LD_LIBRARY` (the exports could also be placed in your `.zprofile`). If necessary, add `java.opts` as described in the section.
 
 ## Windows
 

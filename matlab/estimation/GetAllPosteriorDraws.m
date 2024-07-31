@@ -42,6 +42,16 @@ if ishssmc(options_)
     pfiles = dir(sprintf('%s/hssmc/particles-*.mat', dname));
     posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', dname, length(pfiles), length(pfiles)));
     draws = transpose(posterior.particles(column,:));
+elseif isdime(options_)
+    posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
+    tune = posterior.tune;
+    chains = posterior.chains(end-tune:end,:,:);
+    if column>0
+        chains = reshape(chains, [], size(chains, 3));
+        draws = chains(:,column);
+    else
+        draws = posterior.lprobs;
+    end
 else
     iline = FirstLine;
     linee = 1;

@@ -498,6 +498,13 @@ options_.posterior_sampler_options.hssmc.particles = 20000;
 options_.posterior_sampler_options.hssmc.scale = 0.5;
 options_.posterior_sampler_options.hssmc.acpt = 1.00;
 options_.posterior_sampler_options.hssmc.target = 0.25;
+% DIME MCMC Sampler
+options_.posterior_sampler_options.dime.niter = 1500;
+options_.posterior_sampler_options.dime.parallel = false;
+options_.posterior_sampler_options.dime.aimh_prob = .1;
+options_.posterior_sampler_options.dime.sigma = 1e-5;
+options_.posterior_sampler_options.dime.df_proposal_dist = 10;
+options_.posterior_sampler_options.dime.rho = 0.999;
 % DSMH: Dynamic Striated Metropolis-Hastings algorithm
 options_.posterior_sampler_options.dsmh.H = 25 ;
 options_.posterior_sampler_options.dsmh.N = 20 ;

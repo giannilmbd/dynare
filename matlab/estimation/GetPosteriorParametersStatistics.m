@@ -69,6 +69,8 @@ if ishssmc(options_)
     dprintf('Log data density is %f.', oo_.MarginalDensity.hssmc);
     % Set function handle for GetAllPosteriorDraws
     getalldraws = @(i) GetAllPosteriorDraws(options_, M_.dname, [], i);
+elseif isdime(options_)
+    getalldraws = @(i) GetAllPosteriorDraws(options_, M_.dname, [], i);
 else
     if ~isfield(oo_,'MarginalDensity') || (issmc(options_) && ~isfield(oo_.MarginalDensity,'ModifiedHarmonicMean'))
         [~, oo_] = marginal_density(M_, options_, estim_params_, oo_, bayestopt_);
@@ -80,6 +82,11 @@ end
 
 if ishssmc(options_)
     num_draws = options_.posterior_sampler_options.hssmc.particles;
+    hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
+elseif isdime(options_)
+    nchain = options_.posterior_sampler_options.current_options.nchain;
+    tune = options_.posterior_sampler_options.current_options.tune;
+    num_draws = nchain*tune;
     hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 else
     num_draws=NumberOfDraws*mh_nblck;
