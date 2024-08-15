@@ -18,7 +18,7 @@ function [forecast, error_flag] = forecast(options_,M_,dr,endo_steady_state,exo_
 % SPECIAL REQUIREMENTS
 %   none.
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -79,6 +79,7 @@ if ~isempty(shocks_input)
 end
 
 if opts.replic
+    options_.noprint=true;
     h = dyn_waitbar(0,'Please wait occbin forecast replic ...');
     ishock = find(sqrt(diag((M_.Sigma_e))));
     options_.occbin.simul.exo_pos=ishock;
@@ -98,7 +99,7 @@ if opts.replic
     error_flag=true(opts.replic,1);
     simul_SHOCKS=NaN(forecast_horizon,M_.exo_nbr,opts.replic);
     for iter=1:opts.replic
-        options_.occbin.simul.SHOCKS = shocks_base+transpose(U*sqrt(S)*SHOCKS_add(:,:,iter));
+        options_.occbin.simul.SHOCKS = shocks_base(:,ishock)+transpose(U*sqrt(S)*SHOCKS_add(:,:,iter));
         options_.occbin.simul.waitbar=0;
         [~, out] = occbin.solver(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state);
         error_flag(iter)=out.error_flag;
@@ -120,6 +121,9 @@ if opts.replic
          save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag')
     end
     inx=find(error_flag==0);
+    if length(inx)<opts.replic
+        fprintf('\noccbin.forecast: forecast simulation was only successful in %u of %u simulations.\n',length(inx),opts.replic);
+    end
     z.linear=z.linear(:,:,inx);
     z.piecewise=z.piecewise(:,:,inx);
     z.min.piecewise = min(z.piecewise,[],3);
