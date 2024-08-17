@@ -22,7 +22,6 @@ sigmaA = 0.05;
 model;
 
     #kappa = exp( log_kappa );
-    #LEAD_kappa = exp( log_kappa(+1) );
 
     #min_A = theta ^ ( 1/alpha );
     #mean_a = log( 1 - min_A );
@@ -30,25 +29,21 @@ model;
     @#for Country in 1:NumberOfCountries
 
         #K@{Country}        = exp( k@{Country} );
-        #LAG_K@{Country}    = exp( k@{Country}(-1) );
-        #LEAD_A@{Country}   = min_A + exp( a@{Country}(+1) );
         #A@{Country}        = min_A + exp( a@{Country} );
-        #LAG_A@{Country}    = min_A + exp( a@{Country}(-1) );
         #L@{Country}        = 1 / ( 1 + exp( -logit_l@{Country} ) );
-        #LEAD_L@{Country}   = 1 / ( 1 + exp( -logit_l@{Country}(+1) ) );
 
         #C@{Country} = kappa ^ ( -1/varrho ) - theta / ( 1-alpha ) * ( A@{Country}*(1-L@{Country}) ) ^ ( 1-alpha );
-        #LEAD_phi@{Country} = ( 1 - theta * ( LEAD_A@{Country}*(1-LEAD_L@{Country}) ) ^ ( -alpha ) ) * LEAD_kappa;
-        #I@{Country} = K@{Country} - ( 1-delta ) * LAG_K@{Country};
+        #phi@{Country} = ( 1 - theta * ( A@{Country}*(1-L@{Country}) ) ^ ( -alpha ) ) * kappa;
+        #I@{Country} = K@{Country} - ( 1-delta ) * K@{Country}(-1);
 
     @#endfor
 
     @#for Country in 1:NumberOfCountries
 
         ( a@{Country} - mean_a ) = rhoA * ( a@{Country}(-1) - mean_a ) - sigmaA * epsilonA@{Country};
-        L@{Country} = min( LAG_K@{Country} / A@{Country}, 1 - theta ^ ( 1/alpha ) / A@{Country} );
-        kappa - mu@{Country} = beta * ( ( 1-delta ) * ( LEAD_kappa - mu@{Country}(+1) ) + LEAD_phi@{Country} );
-        kappa = max( beta * ( ( 1-delta ) * ( LEAD_kappa - mu@{Country}(+1) ) + LEAD_phi@{Country} ), ( theta / ( 1-alpha ) * ( A@{Country}*(1-L@{Country}) ) ^ ( 1-alpha )
+        L@{Country} = min( K@{Country}(-1) / A@{Country}, 1 - theta ^ ( 1/alpha ) / A@{Country} );
+        kappa - mu@{Country} = beta * ( ( 1-delta ) * ( kappa(+1) - mu@{Country}(+1) ) + phi@{Country}(+1) );
+        kappa = max( beta * ( ( 1-delta ) * ( kappa(+1) - mu@{Country}(+1) ) + phi@{Country}(+1) ), ( theta / ( 1-alpha ) * ( A@{Country}*(1-L@{Country}) ) ^ ( 1-alpha )
         @#for OtherCountry in 1:NumberOfCountries
             + A@{OtherCountry} * L@{OtherCountry}
             @#if OtherCountry != Country
@@ -110,7 +105,9 @@ perfect_foresight_solver(robust_lin_solve);
 if ~oo_.deterministic_simulation.status
     error('Model did not solve')
 else
-% store results
-    endo_simul=oo_.endo_simul;
-    save endo_simul endo_simul
+% check consistency
+    load endo_simul endo_simul
+    if max(max(abs(endo_simul-oo_.endo_simul))) > 1.e-12
+        error('Using leads/lags in #declarations does not deliver the same results as in baseline model')
+    end
 end
