@@ -413,4 +413,13 @@ if length(likvec)>1
     % sum the likelihood of multiple solutions
     likx = -2*log(sum(exp(-likvec./2)));
 end
+
+if info(1)==0
+    if isnan(likx)
+        info = 323;
+    elseif any(any(isnan(ax)))
+        info = 324;
+    end
+end
+
 end

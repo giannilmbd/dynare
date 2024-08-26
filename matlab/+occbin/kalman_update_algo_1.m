@@ -213,7 +213,12 @@ if any(myregime) || ~isequal(regimes_(1),regimes0(1))
         if M_.occbin.constraint_nbr==1
             regime_end(niter) = regimes_(1).regimestart(end);
         end
-        [a, a1, P, P1, v, alphahat, etahat, lik, V] = occbin_kalman_update0(a,a1,P,P1,data_index,Z,v,Y,H,QQQ,TT,RR,CC,iF,L,mm, options_.rescale_prediction_error_covariance, options_.occbin.likelihood.IF_likelihood, options_.occbin.filter.state_covariance);
+        [a, a1, P, P1, v, alphahat, etahat, lik, V, error_flag] = occbin_kalman_update0(a,a1,P,P1,data_index,Z,v,Y,H,QQQ,TT,RR,CC,iF,L,mm, options_.rescale_prediction_error_covariance, options_.occbin.likelihood.IF_likelihood, options_.occbin.filter.state_covariance);
+        if error_flag
+            etahat=NaN(size(QQQ,1),1);
+            warning(orig_warning_state);
+            return;
+        end
         etahat_hist(niter) = {etahat};
         lik_hist(niter) = lik;
         opts_simul.SHOCKS(1,:) = etahat(:,2)';
@@ -278,7 +283,12 @@ if any(myregime) || ~isequal(regimes_(1),regimes0(1))
                         TT(:,:,2)=ss.T(my_order_var,my_order_var,1);
                         RR(:,:,2)=ss.R(my_order_var,:,1);
                         CC(:,2)=ss.C(my_order_var,1);
-                        [a, a1, P, P1, v, alphahat, etahat, lik, V] = occbin_kalman_update0(a,a1,P,P1,data_index,Z,v,Y,H,QQQ,TT,RR,CC,iF,L,mm, options_.rescale_prediction_error_covariance, options_.occbin.likelihood.IF_likelihood, options_.occbin.filter.state_covariance);
+                        [a, a1, P, P1, v, alphahat, etahat, lik, V, error_flag] = occbin_kalman_update0(a,a1,P,P1,data_index,Z,v,Y,H,QQQ,TT,RR,CC,iF,L,mm, options_.rescale_prediction_error_covariance, options_.occbin.likelihood.IF_likelihood, options_.occbin.filter.state_covariance);
+                        if error_flag
+                            etahat=NaN(size(QQQ,1),1);
+                            warning(orig_warning_state);
+                            return;
+                        end
                     end
                 else
                     error_flag = 330;
@@ -294,7 +304,7 @@ end
 
 error_flag = out.error_flag;
 if ~error_flag && niter>options_.occbin.likelihood.max_number_of_iterations && ~isequal(regimes_(1),regimes0(1))
-    error_flag = 1;
+    error_flag = 331;
 end
 
 if ~error_flag
@@ -357,7 +367,7 @@ else
     F = ZZ*P(:,:,t)*ZZ' + H(di,di);
     sig=sqrt(diag(F));
     if any(any(isnan(F)))
-        error_flag=1;
+        error_flag=325;
         warning(orig_warning_state);
         return;
     end

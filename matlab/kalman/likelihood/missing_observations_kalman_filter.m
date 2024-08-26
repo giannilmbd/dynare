@@ -276,12 +276,6 @@ while notsteady && t<=last
             [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx] = occbin.kalman_update_engine(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),base_regime,d_index,M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
 %            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regimes_(t:t+2), info, M_, likx] = occbin.kalman_update_algo_1(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
         end
-        if isnan(likx) || any(any(isnan(ax)))
-            if options_.debug
-                fprintf('\nmissing_observations_kalman_filter:PKF failed in period %u with: NaN in likelihood value\n', t);
-            end
-            return
-        end
         if info
             if options_.debug
                 fprintf('\nmissing_observations_kalman_filter:PKF failed in period %u with: %s\n', t, get_error_message(info,options_));

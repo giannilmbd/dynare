@@ -282,7 +282,7 @@ end
 
 error_flag = out.error_flag;
 if ~error_flag && niter>options_.occbin.likelihood.max_number_of_iterations && ~isequal(regimes_(1),regimes0(1)) %fixed point algorithm did not converge
-  error_flag = 1;
+  error_flag = 331;
 end
 
 if ~error_flag
