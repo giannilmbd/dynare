@@ -506,6 +506,13 @@ else
         aaa = zeros(nk,M_.endo_nbr,gend+nk);
         aaa(:,oo_.dr.restrict_var_list,:)=aK;
         
+        if isoccbin
+            tstart = 1;
+        else
+            % we enter here in the first occbin smoother iteration
+            % occbin kalman update is not yet able to accommodate diffuse steps!
+            tstart=d+2; 
+        end
         for k=2:gend+1
             opts_simul.curb_retrench = options_.occbin.smoother.curb_retrench;
             opts_simul.waitbar = options_.occbin.smoother.waitbar;
@@ -530,6 +537,20 @@ else
                 for jnk=1:nk
                     aaa(jnk,oo_.dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
                 end
+            elseif k>tstart
+                % the issue only matters non-stationary models, with
+                % diffuse filter, and for the first occbin smoother iteration,
+                % where tstart>1
+                %
+                % if k>tstart, the same simulation should have been done
+                % already in occbin.kalman_update, so it should never give
+                % an error
+                %
+                % if k<=tstart, the simulation may crash, since we ignore OBC in the first (diffuse) steps
+                % and it may happen that, given the linear updated states,
+                % the occbin simulation does not converge
+                error('this error should not occur, please contact the developers!')
+
             end
         end
         aK=aaa;
