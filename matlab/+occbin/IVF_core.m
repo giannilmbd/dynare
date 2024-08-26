@@ -92,6 +92,9 @@ for this_period=1:sample_length
         filtered_errs=NaN;
         error_code(1) = 304;
         error_code(4) = 1000;
+        if this_period == 1
+            regime_history(this_period) = [];
+        end
         if options_.occbin.likelihood.waitbar; dyn_waitbar_close(hh_fig); end
         return
     end

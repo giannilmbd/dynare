@@ -58,6 +58,8 @@ trend_coeff = [];
 obs = dataset_.data;
 obs_list = options_.varobs(:);
 exit_flag   = 1;
+% initialize output argument in case of early return
+regime_history = [];
 
 
 if size(xparam1,1)<size(xparam1,2)
