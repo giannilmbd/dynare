@@ -200,6 +200,7 @@ if realtime_ && isstruct(oo_) && isfield(oo_, 'realtime_shock_decomposition')
 
                 % make annualized shock decomp
                 z = annualiz(z,t0,q2a,aux,steady_state);
+                oo_.annualized_realtime_shock_decomposition.(['yr_' int2str(yr)]) = z;
 
             end
             oo_.annualized_realtime_forecast_shock_decomposition.(['yr_' int2str(yr)]) = z(:,:,end-nfrcst:end);

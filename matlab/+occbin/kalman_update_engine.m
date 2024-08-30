@@ -1,6 +1,6 @@
 function [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphahat, V, Fix, Kix, TTx,RRx,CCx] = ...
-                    kalman_update_engine(a0,a1,P0,P1,t,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,regimes_,base_regime,d_index,M_,...
-                    dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options, Fi,Ki,kalman_tol,nk)
+    kalman_update_engine(a0,a1,P0,P1,t,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,regimes_,base_regime,d_index,M_,...
+    dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options, Fi,Ki,kalman_tol,nk)
 % [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphahat, V, Fix, Kix, TTx,RRx,CCx] = kalman_update_engine(
 %                                       a0,a1,P0,P1,t,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,regimes_,base_regime,d_index,M_,
 %                                       dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options, Fi,Ki,kalman_tol,nk)
@@ -32,13 +32,14 @@ if nargin>26
     is_multivariate = false;
 end
 
-use_relaxation = false;
 
 if is_multivariate
     [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphahat, V] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,struct(),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
 else
     [ax, a1x, Px, P1x, vx, Fix, Kix, Tx, Rx, Cx, regx, info, M_, likx, alphahat, etahat,TTx,RRx,CCx] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,struct(),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
 end
+likvec = likx;
+regvec = regx(1);
 info0=info;
 if info
     if ~isequal(regimes_(1:2),[base_regime base_regime])
@@ -48,6 +49,8 @@ if info
             [ax, a1x, Px, P1x, vx, Fix, Kix, Tx, Rx, Cx, regx, info, M_, likx, alphahat, etahat,TTx,RRx,CCx] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,regimes_(1:2),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
         end
     end
+    likvec = likx;
+    regvec = regx(1);
     info1=info;
 else
     if ~isequal(regimes_(1:2),[base_regime base_regime])
@@ -55,6 +58,10 @@ else
             [ax1, a1x1, Px1, P1x1, vx1, Tx1, Rx1, Cx1, regx1, info1, M_1, likx1, etahat1, alphahat1, V1] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,regimes_(1:2),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
         else
             [ax1, a1x1, Px1, P1x1, vx1, Fix1, Kix1, Tx1, Rx1, Cx1, regx1, info1, M_1, likx1, alphahat1, etahat1,TTx1,RRx1,CCx1] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,regimes_(1:2),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
+        end
+        if info1==0 && not(isequal(regx1,regx))
+            likvec = [likvec likx1];
+            regvec = [regvec; regx1(1)];
         end
         if info1==0 && likx1<likx
             ax=ax1;
@@ -72,7 +79,7 @@ else
             etahat=etahat1;
             alphahat=alphahat1;
             if is_multivariate
-            V=V1;
+                V=V1;
             else
                 Fix = Fix1;
                 Kix = Kix1;
@@ -85,8 +92,8 @@ else
         if t>options_.occbin.likelihood.number_of_initial_periods_with_extra_regime_guess
             info1=0;
         else
-        % may help in first 2 periods to try some other guess regime, due to
-        % larger state uncertainty
+            % may help in first 2 periods to try some other guess regime, due to
+            % larger state uncertainty
             info1=1;
             options_.occbin.likelihood.brute_force_regime_guess   = true;
             options_.occbin.likelihood.loss_function_regime_guess = true;
@@ -97,27 +104,83 @@ end
 
 diffstart=0;
 if info==0
-if M_.occbin.constraint_nbr==1
-    oldstart = regimes_(1).regimestart(end);
-    newstart = regx(1).regimestart(end);
-    diffstart = newstart-oldstart;
-else
-    newstart1 = regx(1).regimestart1(end);
-    newstart2 = regx(1).regimestart2(end);
-    oldstart1 = regimes_(1).regimestart1(end);
-    oldstart2 = regimes_(1).regimestart2(end);
-    diffstart = max(newstart1-oldstart1,newstart2-oldstart2);
-end
-end
-
-if options_.occbin.filter.use_relaxation && diffstart>2
-    if info0==0
-        % make sure we match criteria to enter further solution attempts
-        info1=1;
+    if M_.occbin.constraint_nbr==1
+        oldstart = regimes_(1).regimestart(end);
+        newstart = regx(1).regimestart(end);
+        diffstart = newstart-oldstart;
+        regname = 'regimestart';
+    else
+        newstart1 = regx(1).regimestart1(end);
+        newstart2 = regx(1).regimestart2(end);
+        oldstart1 = regimes_(1).regimestart1(end);
+        oldstart2 = regimes_(1).regimestart2(end);
+        [diffstart, diffregime] = max([newstart1-oldstart1,newstart2-oldstart2]);
+        switch diffregime
+            case 1
+                regname = 'regimestart1';
+            case 2
+                regname = 'regimestart2';
     end
-    options_.occbin.likelihood.brute_force_regime_guess   = true;
-    options_.occbin.likelihood.loss_function_regime_guess = true;
-    use_relaxation = true;
+end
+end
+if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation
+    guess_regime = [base_regime base_regime];
+    options_.occbin.filter.guess_regime = true;
+    guess_regime(1) = regx(1);
+    regx2= regx;
+    while isequal(guess_regime(1),regx2(1))
+        % we reduce length until the converged regime does not change
+
+        guess_regime(1).(regname)(end) = regx2(1).(regname)(end)-1;
+        if guess_regime(1).(regname)(end-1)==guess_regime(1).(regname)(end)
+            guess_regime(1).(regname)(end-1) = guess_regime(1).(regname)(end-1)-1;
+        end
+        if is_multivariate
+            [ax2, a1x2, Px2, P1x2, vx2, Tx2, Rx2, Cx2, regx2, info2, M_2, likx2, etahat2, alphahat2, V2] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
+        else
+            [ax2, a1x2, Px2, P1x2, vx2, Fix2, Kix2, Tx2, Rx2, Cx2, regx2, info2, M_2, likx2, alphahat2, etahat2,TTx2,RRx2,CCx2] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
+        end
+        isnew=true;
+        for kr=1:length(likvec)
+            % make sure likelihood does not differ by rounding issue
+            % but due to different regimes
+            if isequal(regx2(1),regvec(kr))
+                isnew = false;
+            end
+        end
+        if isnew
+            likvec = [likvec likx2];
+            regvec = [regvec; regx2(1)];
+        end
+        if info2==0 && likx2<likx
+            ax=ax2;
+            a1x=a1x2;
+            Px=Px2;
+            P1x=P1x2;
+            vx=vx2;
+            Tx=Tx2;
+            Rx=Rx2;
+            Cx=Cx2;
+            regx=regx2;
+            info=info2;
+            likx=likx2;
+            M_= M_2;
+            etahat=etahat2;
+            alphahat=alphahat2;
+            if is_multivariate
+                V=V2;
+            else
+                Fix = Fix2;
+                Kix = Kix2;
+                TTx = TTx2;
+                RRx = RRx2;
+                CCx = CCx2;
+            end
+        end
+    end
+    options_.occbin.filter.guess_regime = false;
+    options_.occbin.likelihood.brute_force_regime_guess   = false;
+    options_.occbin.likelihood.loss_function_regime_guess = false;
 end
 
 if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (info==0 &&  ~isequal(regx(1),base_regime))
@@ -137,9 +200,8 @@ if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (
             end
             if info2==0
                 use_index= 1;
-                if not(info==0 && isequal(regx2{1},regx)) && not(use_relaxation && likx2{1}>=likx)
-                    % found a solution, different from previous or
-                    % use_relaxation and likelihood is better
+                if not(info==0 && isequal(regx2{1},regx)) 
+                    % found a solution, different from previous 
                     break
                 end
             end
@@ -153,8 +215,6 @@ if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (
             end
             if info2==0
                 use_index = 2;
-                % if use_relaxation and we are here, previous guess did not
-                % improve solution, so we test for this one
             end
 
             if use_index
@@ -216,18 +276,16 @@ if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (
                             end
                             if info2==0
                                 use_index= gindex;
-                                if not(info==0 && isequal(regx2{gindex},regx)) && not(use_relaxation && likx2{gindex}>=likx)
+                                if not(info==0 && isequal(regx2{gindex},regx)) 
                                     % found a solution, different from previous one
-                                    % use_relaxation and likelihood improves
-                                    break
+                                     break
                                 end
                             end
                         end % loop over other regime slack, binding in expectation or binding in current period
 
                         if info2==0
-                            if not(info==0 && isequal(regx2{gindex},regx)) && not(use_relaxation && likx2{gindex}>=likx)
+                            if not(info==0 && isequal(regx2{gindex},regx)) 
                                 % found a solution, different from previous one
-                                % use_relaxation and likelihood improves
                                 break
                             end
                         end
@@ -235,9 +293,8 @@ if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (
                     end % loop over current regime binding in expectation vs binding in current period
 
                     if info2==0
-                        if not(info==0 && isequal(regx2{gindex},regx)) && not(use_relaxation && likx2{gindex}>=likx)
+                        if not(info==0 && isequal(regx2{gindex},regx)) 
                             % found a solution, different from previous one
-                            % use_relaxation and likelihood improves
                             break
                         end
                     end
@@ -261,6 +318,18 @@ if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (
         % so that we DO NOT enter IVF step
         info0=0;
         info1=0;
+        isnew=true;
+        for kr=1:length(likvec)
+            % make sure likelihood does not differ by rounding issue
+            % but truly for different regimes
+            if isequal(regx2{use_index}(1),regvec(kr))
+                isnew = false;
+            end
+        end
+        if isnew
+            likvec = [likvec likx2{use_index}];
+            regvec = [regvec; regx2{use_index}(1)];
+        end
     end
     if info2==0 && likx2{use_index}<likx
         ax=ax2{use_index};
@@ -301,6 +370,18 @@ if options_.occbin.likelihood.loss_function_regime_guess && (info0 || info1) %||
             [ax2, a1x2, Px2, P1x2, vx2, Fix2, Kix2, Tx2, Rx2, Cx2, regx2, info2, M_2, likx2, alphahat2, etahat2,TTx2,RRx2,CCx2] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
         end
         options_.occbin.filter.guess_regime = false;
+        isnew=true;
+        for kr=1:length(likvec)
+            % make sure likelihood does not differ by rounding issue
+            % but due to different regimes
+            if isequal(regx2(1),regvec(kr))
+                isnew = false;
+            end
+        end
+        if isnew
+            likvec = [likvec likx2];
+            regvec = [regvec; regx2(1)];
+        end
         if info2==0 && likx2<likx
             ax=ax2;
             a1x=a1x2;
@@ -328,4 +409,17 @@ if options_.occbin.likelihood.loss_function_regime_guess && (info0 || info1) %||
         end
     end
 end
+if length(likvec)>1
+    % sum the likelihood of multiple solutions
+    likx = -2*log(sum(exp(-likvec./2)));
+end
+
+if info(1)==0
+    if isnan(likx)
+        info = 323;
+    elseif any(any(isnan(ax)))
+        info = 324;
+    end
+end
+
 end

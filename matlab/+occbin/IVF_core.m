@@ -1,4 +1,4 @@
-function [filtered_errs, resids, Emat, stateval, error_code] = IVF_core(M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,err_index,filtered_errs_init,my_obs_list,obs,init_val)
+function [filtered_errs, resids, Emat, stateval, error_code, regime_history] = IVF_core(M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,err_index,filtered_errs_init,my_obs_list,obs,init_val)
 % [filtered_errs, resids, Emat, stateval, error_code] = IVF_core(M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,err_index,filtered_errs_init,my_obs_list,obs,init_val)
 % Calls the solver to get the shocks explaining the data for the inversion filter
 %
@@ -92,6 +92,9 @@ for this_period=1:sample_length
         filtered_errs=NaN;
         error_code(1) = 304;
         error_code(4) = 1000;
+        if this_period == 1
+            regime_history(this_period) = [];
+        end
         if options_.occbin.likelihood.waitbar; dyn_waitbar_close(hh_fig); end
         return
     end
@@ -99,9 +102,10 @@ for this_period=1:sample_length
 
     opts_simul.SHOCKS = err_vals_out;
 
-    [ resids(this_period,inan), ~, stateval(this_period,:), Emat(:,inan,this_period), M_] = occbin.match_function(...
+    [ resids(this_period,inan), ~, stateval(this_period,:), Emat(:,inan,this_period), M_, out] = occbin.match_function(...
         err_vals_out,obs_list,current_obs,opts_simul, M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_);
     init_val = stateval(this_period,:); %update
+    regime_history(this_period) = out.regime_history(1);
     if max(abs(err_vals_out))>1e8
         error_code(1) = 306;
         error_code(4) = max(abs(err_vals_out))/1000;

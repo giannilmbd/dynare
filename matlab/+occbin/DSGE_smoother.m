@@ -124,6 +124,8 @@ occbin_options.opts_regime.binding_indicator = options_.occbin.smoother.init_bin
 occbin_options.opts_regime.regime_history=options_.occbin.smoother.init_regime_history;
 
 error_indicator=false;
+options_.noprint = true;
+
 try
     %blanket try-catch should be replaced be proper error handling, see https://git.dynare.org/Dynare/dynare/-/merge_requests/2226#note_20318
     [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
@@ -178,7 +180,6 @@ opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
 opts_simul.init_regime=regime_history; % use realtime regime for guess, to avoid multiple solution issues!
 opts_simul.periods = size(opts_simul.SHOCKS,1);
 options_.occbin.simul=opts_simul;
-options_.noprint = true;
 [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
 if out.error_flag
     fprintf('Occbin smoother:: simulation within smoother did not converge.\n')

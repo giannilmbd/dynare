@@ -309,7 +309,7 @@ varobs yg inom pi;
             datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1],smoothed_state_uncertainty);
+            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
     
     // plot regimes
     occbin.plot_regimes(oo_.occbin.smoother.regime_history,M_,options_)
@@ -350,7 +350,7 @@ varobs yg inom pi;
             datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother, smoother_redux,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1],smoothed_state_uncertainty);
+            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
 
     // check consistency of smoother_redux
     for k=1:M_.endo_nbr, 
@@ -362,6 +362,33 @@ varobs yg inom pi;
         disp('smoother redux successfully recovers full smoother results!')
     end
 
+    for k=1:M_.endo_nbr, 
+    mer(k)=max(abs(oo_.UpdatedVariables.(M_.endo_names{k})-oo0.UpdatedVariables.(M_.endo_names{k}))); 
+    end
+    if max(mer)>1.e-10
+    error('smoother redux does not recover full updated variables results!')
+    else
+    disp('smoother redux successfully recovers full updated variables results!')
+    end
+    
+    
+    for k=1:M_.endo_nbr, 
+    mer(k)=max(abs(oo_.FilteredVariables.(M_.endo_names{k})-oo0.FilteredVariables.(M_.endo_names{k}))); 
+    end
+    if max(mer)>1.e-10
+    error('smoother redux does not recover full filtered variables results!')
+    else
+    disp('smoother redux successfully recovers full filtered variables results!')
+    end
+    
+    for k=1:M_.endo_nbr, 
+        mer(k)=max(max(max(abs(oo_.FilteredVariablesKStepAhead(:,k,:)-oo0.FilteredVariablesKStepAhead(:,k,:))))); 
+    end
+    if max(mer)>1.e-10
+    error('smoother redux does not recover full k-step ahead variables results!')
+    else
+    disp('smoother redux successfully recovers full k-step ahead variables results!')
+    end
     // use inversion filter (note that IF provides smoother together with likelihood)
     occbin_setup(likelihood_inversion_filter,smoother_inversion_filter);
             
@@ -369,7 +396,7 @@ varobs yg inom pi;
             datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1],smoothed_state_uncertainty);
+            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
             
     // show initial condition effect of IF
     figure('Name','OccBin: Smoothed shocks')

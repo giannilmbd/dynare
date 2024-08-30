@@ -197,6 +197,16 @@ switch info(1)
         message = 'Occbin: there was a problem in running the smoother. Simulation within smoother failed.';
     case 322
         message = 'Occbin: smoother did not converge.';
+    case 323
+        message = 'Piecewise linear Kalman filter: the likelihood is NaN.';
+    case 324
+        message = 'Piecewise linear Kalman filter: updated state vector is NaN.';
+    case 325
+        message = 'Piecewise linear Kalman filter: filter covariance NaN.';
+    case 330
+        message = 'Piecewise linear Kalman filter: update step did not reach a fixed point (periodic loop).';
+    case 331
+        message = 'Piecewise linear Kalman filter: update step did not reach a fixed point (max number of iterations reached).';
     case 401
         message = 'Cycle reduction reached the iteration limit. Try increasing maxit.';
     case 402
