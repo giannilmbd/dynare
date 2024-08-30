@@ -258,11 +258,12 @@ end
 %exogenous deterministic variables
 if M_.exo_det_nbr > 0
     gx = dr.gx;
-    f1 = g1(:,2*M_.endo_nbr + order_var(nstatic+npred+(1:nsfwrd)));
-    f0 = g1(:,M_.endo_nbr + order_var(icurr_dr));
-    fudet = g1(:,3*M_.endo_nbr+M_.exo_nbr+1:end);
-    M1 = inv(f0+[zeros(M_.endo_nbr,nstatic) f1*gx zeros(M_.endo_nbr,nsfwrd-nboth)]);
-    M2 = M1*f1;
+    % Algorithm at https://git.dynare.org/Dynare/dynare/-/wikis/varexo_det:-Implementation
+    f1 = g1(:,2*M_.endo_nbr + order_var(nstatic+npred+(1:nsfwrd))); %A matrix, N ny N_forward
+    f0 = g1(:,M_.endo_nbr + order_var(icurr_dr)); %B matrix, N by N
+    fudet = g1(:,3*M_.endo_nbr+M_.exo_nbr+1:end); %K matrix, N by N_exo_det
+    M1 = inv(f0+[zeros(M_.endo_nbr,nstatic) f1*gx zeros(M_.endo_nbr,nsfwrd-nboth)]); %(AF+B)^(-1)
+    M2 = M1*f1; %A*(B+AF)^(-1)
 
     dr.exo_det_length = 0;
     for i = 1:length(M_.det_shocks)
@@ -272,9 +273,9 @@ if M_.exo_det_nbr > 0
     end
 
     dr.ghud = cell(dr.exo_det_length,1);
-    dr.ghud{1} = -M1*fudet;
+    dr.ghud{1} = -M1*fudet; %-K*(AF+B)^(-1)
     for i = 2:dr.exo_det_length
-        dr.ghud{i} = -M2*dr.ghud{i-1}(end-nsfwrd+1:end,:);
+        dr.ghud{i} = -M2*dr.ghud{i-1}(end-nsfwrd+1:end,:); %-AH_{i-1}*(AF+B)^(-1)
     end
 
     if local_order > 1
