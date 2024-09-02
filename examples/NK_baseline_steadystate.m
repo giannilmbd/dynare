@@ -32,6 +32,10 @@ function [ys,params,check] = NK_baseline_steadystate(ys,exo,M_,options_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+% make parameter explicitly known to Matlab to avoid naming conflicts; actual value is read out
+% in next eval-loop 
+delta=0;
+
 % read out parameters to access them with their name
 NumberOfParameters = M_.param_nbr;
 for ii = 1:NumberOfParameters
