@@ -1,11 +1,12 @@
-function  AutoCOR_YRk=PCL_Part_info_moments( H, varobs, dr,ivar)
+function oo_=PCL_Part_info_moments(M_, oo_, options_, varobs, dr, ivar)
+% function oo_=PCL_Part_info_moments(M_, oo_, options_, varobs, dr, ivar)
 % sets up parameters and calls part-info kalman filter
 % developed by G Perendia, July 2006 for implementation from notes by Prof. Joe Pearlman to
 % suit partial information RE solution in accordance with, and based on, the
 % Pearlman, Currie and Levine 1986 solution.
 % 22/10/06 - Version 2 for new Riccati with 4 params instead 5
 
-% Copyright © 2006-2018 Dynare Team
+% Copyright © 2006-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -27,7 +28,10 @@ function  AutoCOR_YRk=PCL_Part_info_moments( H, varobs, dr,ivar)
 % and the jump variables x(t).
 % The jump variables have dimension NETA
 
-global M_ options_ oo_
+if ~exist([M_.dname '/Output'],'dir')
+    mkdir(M_.dname,'Output');
+end
+
 warning_old_state = warning;
 warning off
 
@@ -40,29 +44,16 @@ NOBS = length(OBS);
 G1=dr.PI_ghx;
 impact=dr.PI_ghu;
 nmat=dr.PI_nmat;
-CC=dr.PI_CC;
 NX=M_.exo_nbr; % no of exogenous varexo shock variables.
 FL_RANK=dr.PI_FL_RANK;
 NY=M_.endo_nbr;
 LL = sparse(1:NOBS,OBS,ones(NOBS,1),NY,NY);
 
-if exist( 'irfpers')==1
-    if ~isempty(irfpers)
-        if irfpers<=0, irfpers=20, end
-    else
-        irfpers=20;
-    end
-else
-    irfpers=20;
-end
-
 ss=size(G1,1);
 
 pd=ss-size(nmat,1);
 SDX=M_.Sigma_e^0.5; % =SD,not V-COV, of Exog shocks or M_.Sigma_e^0.5 num_exog x num_exog matrix
-if isempty(H)
-    H=M_.H;
-end
+H=M_.H;
 VV=H; % V-COV of observation errors.
 MM=impact*SDX; % R*(Q^0.5) in standard KF notation
                % observation vector indices
@@ -93,17 +84,14 @@ A11=G1(1:pd,1:pd);
 A22=G1(pd+1:end, pd+1:end);
 A12=G1(1:pd, pd+1:end);
 A21=G1(pd+1:end,1:pd);
-Lambda= nmat*A12+A22;
-I_L=inv(Lambda);
-BB=A12*inv(A22);
-FF=K2*inv(A22);
+BB=A12/A22;
+FF=K2/A22;
 QQ=BB*U22*BB' + U11;
 UFT=U22*FF';
 % kf_param structure:
 AA=A11-BB*A21;
 CCCC=A11-A12*nmat; % F in new notation
 DD=K1-FF*A21; % H in new notation
-EE=K1-K2*nmat;
 RR=FF*UFT+VV;
 if ~any(RR)
     % if zero add some dummy measurement err. variance-covariances
@@ -113,30 +101,23 @@ if ~any(RR)
     RR=eye(size(RR,1))*1.0e-6;
 end
 SS=BB*UFT;
-VKLUFT=VV+K2*I_L*UFT;
-ALUFT=A12*I_L*UFT;
-FULKV=FF*U22*I_L'*K2'+VV;
-FUBT=FF*U22*BB';
-nmat=nmat;
 % initialise pshat
 AQDS=AA*QQ*DD'+SS;
 DQDR=DD*QQ*DD'+RR;
-I_DQDR=inv(DQDR);
-AQDQ=AQDS*I_DQDR;
+AQDQ=AQDS/DQDR;
 ff=AA-AQDQ*DD;
 hh=AA*QQ*AA'-AQDQ*AQDS';%*(DD*QQ*AA'+SS');
 rr=DD*QQ*DD'+RR;
 ZSIG0=disc_riccati_fast(ff,DD,rr,hh);
 PP=ZSIG0 +QQ;
 
-exo_names = M_.exo_names;
-
 DPDR=DD*PP*DD'+RR;
-I_DPDR=inv(DPDR);
-PDIDPDRD=PP*DD'*I_DPDR*DD;
-MSIG=disclyap_fast(CCCC, CCCC*PDIDPDRD*PP*CCCC', options_.lyapunov_doubling_tol);
+PDIDPDRD=PP*DD'/DPDR*DD;
+
+MSIG=lyapunov_solver(CCCC,CCCC,PDIDPDRD*PP,options_);
 
 COV_P=[ PP, PP; PP, PP+MSIG]; % P0
+COV_P=(COV_P+COV_P')/2; %assure symmetry
 
 dr.PI_GG=[CCCC (AA-CCCC)*(eye(ss-FL_RANK)-PDIDPDRD); zeros(ss-FL_RANK) AA*(eye(ss-FL_RANK)-PDIDPDRD)];
 
@@ -144,10 +125,11 @@ GAM= [ AA*(eye(ss-FL_RANK)-PDIDPDRD) zeros(ss-FL_RANK); (AA-CCCC)*(eye(ss-FL_RAN
 
 VV = [  dr.PI_TT1 dr.PI_TT2];
 nn=size(VV,1);
-COV_OMEGA= COV_P( end-nn+1:end, end-nn+1:end);
+COV_OMEGA= COV_P(end-nn+1:end,end-nn+1:end);
 COV_YR0= VV*COV_OMEGA*VV';
 diagCovYR0=diag(COV_YR0);
-labels = M_.endo_names(ivar);
+diagCovYR0(abs(diagCovYR0)<1e-10)=0;
+labels=get_labels_transformed_vars(M_.endo_names,ivar,options_,false);
 
 if ~options_.nomoments
     z = [ sqrt(diagCovYR0(ivar)) diagCovYR0(ivar) ];
@@ -157,18 +139,36 @@ if ~options_.nomoments
 end
 if ~options_.nocorr
     diagSqrtCovYR0 = sqrt(diagCovYR0);
-    DELTA = inv(diag(diagSqrtCovYR0));
+    non_zero_indices=find(diagSqrtCovYR0>1e-10);
+    temp=1./diagSqrtCovYR0(non_zero_indices);
+    DELTA = zeros(length(diagCovYR0),1);
+    DELTA(non_zero_indices)=temp;
+    DELTA=diag(DELTA);
     COR_Y = DELTA*COV_YR0*DELTA;
-    title = 'MATRIX OF CORRELATION';
-    headers = vertcat('VARIABLE', M_.endo_names(ivar));
-    dyntable(options_, title, headers, labels, COR_Y(ivar,ivar), size(labels,2)+2, 8, 4);
+    i1=intersect(non_zero_indices,ivar);
+    if options_.contemporaneous_correlation
+        oo_.contemporaneous_correlation = COR_Y(ivar,ivar);
+    end
+    if ~options_.noprint
+        skipline()
+        title = 'MATRIX OF CORRELATIONS';
+        labels=get_labels_transformed_vars(M_.endo_names,i1,options_,false);
+        headers = vertcat('Variables', labels);
+        lh = cellofchararraymaxlength(labels)+2;
+        dyntable(options_, title, headers, labels, COR_Y(i1,i1), lh, 8, 4);
+        if options_.TeX
+            labels=get_labels_transformed_vars(M_.endo_names_tex,i1,options_,true);
+            headers = vertcat('Variables', labels);
+            lh = cellofchararraymaxlength(labels)+2;
+            dyn_latex_table(M_, options_, title, 'th_corr_matrix', headers, labels, COR_Y(i1,i1), lh, 8, 4);
+        end
+    end
 else
     COR_Y=[];
 end
 
 ar = options_.ar;
 if ar > 0
-    COV_YRk = zeros(nn, ar);
     AutoCOR_YRk= zeros(nn, ar);
     for k = 1:ar
         COV_P = GAM*COV_P;
@@ -179,10 +179,18 @@ if ar > 0
         AutoCOR_YRk(:,k) = diag(COV_YRk)./diagCovYR0;
     end
     title = 'COEFFICIENTS OF AUTOCORRELATION';
-    headers = vertcat('VARIABLE', cellstr(int2str([1:ar]')));
-    dyntable(options_, title, headers, labels, AutoCOR_YRk(ivar,:), size(labels,2)+2, 8, 4);
+    labels=get_labels_transformed_vars(M_.endo_names,i1,options_,false);
+    headers = vertcat('Order ', cellstr(int2str((1:options_.ar)')));
+    lh = cellofchararraymaxlength(labels)+2;
+    dyntable(options_, title, headers, labels, AutoCOR_YRk(i1,:), lh, 8, 4);
+    if options_.TeX
+        labels=get_labels_transformed_vars(M_.endo_names_tex,i1,options_,true);
+        headers = vertcat('Order ', cellstr(int2str((1:options_.ar)')));
+        lh = cellofchararraymaxlength(labels)+2;
+        dyn_latex_table(M_, options_, title, 'th_autocorr_matrix', headers, labels, AutoCOR_YRk(i1,:), lh, 8, 4);
+    end
 else
     AutoCOR_YRk = [];
 end
-save ([M_.fname '_PCL_moments'], 'COV_YR0','AutoCOR_YRk', 'COR_Y');
+save ([M_.dname filesep 'Output' filesep M_.fname '_PCL_moments'], 'COV_YR0','AutoCOR_YRk', 'COR_Y');
 warning(warning_old_state);

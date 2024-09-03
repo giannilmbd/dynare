@@ -63,10 +63,10 @@ if isempty(options_.qz_criterium)
     options_.qz_criterium = 1+1e-6;
 end
 
-if options_.partial_information || options_.ACES_solver
+if options_.partial_information
     PI_PCL_solver = 1;
     if options_.order ~= 1
-        warning('stoch_simul:: forcing order=1 since you are using partial_information or ACES solver')
+        warning('stoch_simul:: forcing order=1 since you are using partial_information')
         options_.order = 1;
     end
 else
@@ -93,7 +93,7 @@ check_model(M_);
 oo_.dr=set_state_space(oo_.dr,M_);
 
 if PI_PCL_solver
-    [oo_.dr, info] = PCL_resol(oo_.steady_state,0);
+    [oo_.dr, info] = PCL_resol(M_, options_, oo_);
 elseif options_.discretionary_policy
     if ~options_.order==1
         error('discretionary_policy: only linear-quadratic problems can be solved');
@@ -201,7 +201,7 @@ end
 
 if ~options_.nomoments
     if PI_PCL_solver
-        PCL_Part_info_moments(0, PCL_varobs, oo_.dr, i_var);
+        oo_=PCL_Part_info_moments(M_, oo_, options_, PCL_varobs, oo_.dr, i_var);
     elseif options_.periods == 0
         if options_.order == 1 || (options_.order == 2 && ~options_.pruning)
             oo_=disp_th_moments(oo_.dr,var_list,M_,options_,oo_);

@@ -11,7 +11,7 @@ function Z=disc_riccati_fast(F,D,R,H,ch)
 % V.2 22/10/06
 % =================================================================
 
-% Copyright © 2006-2017 Dynare Team
+% Copyright © 2006-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -34,7 +34,6 @@ else
     flag_ch = 1;
 end
 
-
 % intialisation
 tol = 1e-10; % iteration convergence threshold
 P0=H;
@@ -43,7 +42,7 @@ if ~any(R) % i.e. ==0
     warning('Dangerously evading inversion of zero matrix!');
     Y0=zeros(size(R));
 else
-    Y0=D'*inv(R)*D;
+    Y0=D'/R*D;
 end
 POYO=P0*Y0;
 I=eye(size(POYO));
@@ -63,7 +62,6 @@ while matd > tol && count < 100
     X0=X1;
     Y0=Y1;
     count=count+1;
-    %    matd;
 end
 
 Z=(P0+P0')/2;
@@ -72,15 +70,7 @@ Z=(P0+P0')/2;
 if count==100
     matd
     error('Riccati not converged fast enough!');
-    %    error.identifier='Riccati not converged!'
-    %    error
 end
-%if count >5
-%    disp('Riccati count= ');
-%    count
-%end
-
-clear X0 X1 Y0 Y1 P1 I INVPY;
 
 % Check that X is positive definite
 if flag_ch==1
