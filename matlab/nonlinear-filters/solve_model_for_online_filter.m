@@ -126,7 +126,8 @@ M_.H = H;
 
 warning('off', 'MATLAB:nearlySingularMatrix')
 [oo_.dr, info, M_.params] = ...
-    resol(0,M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+    compute_decision_rules(M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+%    resol(0,M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
 warning('on', 'MATLAB:nearlySingularMatrix')
 
 if info(1)~=0
