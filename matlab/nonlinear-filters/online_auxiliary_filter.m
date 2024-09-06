@@ -171,7 +171,7 @@ for t=1:sample_size
             else
                 if pruning
                     yhat_ = bsxfun(@minus,StateVectors_(:,i),state_variables_steady_state_);
-                    if order <= 2
+                    if order == 2
                         tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, constant, ghxx, ghuu, ghxu, yhat_, steadystate, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
                         tmp = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations, 1), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
@@ -179,7 +179,9 @@ for t=1:sample_size
                     error('Pruning is not available for orders > 3');
                     end
                 else
-                    if order <= 2
+                    if order == 1 
+                        tmp = bsxfun(@plus,constant,ghx*yhat);
+                    elseif order == 2
                         tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, constant, ghxx, ghuu, ghxu, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
                         tmp = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
@@ -238,7 +240,7 @@ for t=1:sample_size
                         ghxu = ReducedForm.ghxu;
                         if (order == 3)
                             % Set local state space model (third order approximation).
-                            ghs2 = ReducedForm.ghs2;
+                            ghs2 = ReducedForm.ghs2; % only needed for order=3 as already included in constant for order=2
                             ghxxx = ReducedForm.ghxxx;
                             ghuuu = ReducedForm.ghuuu;
                             ghxxu = ReducedForm.ghxxu;
@@ -280,7 +282,9 @@ for t=1:sample_size
                             end
                             StateVectors_(:,i) = tmp_(mf0_,:);
                         else
-                            if order <= 2
+    	                    if order == 1 
+                                tmp = bsxfun(@plus,constant,ghx*yhat)+ghu*epsilon;
+                            elseif order == 2
                                 tmp = local_state_space_iteration_2(yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, options_.threads.local_state_space_iteration_2);
                             elseif order == 3
                                 tmp = local_state_space_iteration_3(yhat, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
