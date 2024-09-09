@@ -3093,6 +3093,10 @@ Finding the steady state with Dynare nonlinear solver
        unit roots as, in this case, the steady state is not unique or
        doesn’t exist.
 
+    .. option:: noprint
+
+       See :opt:`noprint`.
+
     .. _steady_markowitz:
 
     .. option:: markowitz = DOUBLE

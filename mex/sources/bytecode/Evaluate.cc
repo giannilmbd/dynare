@@ -668,6 +668,8 @@ Evaluate::print_expression(const Evaluate::it_code_type& expr_begin,
                   return "diff";
                 case UnaryOpcode::adl:
                   return "adl";
+                case UnaryOpcode::sum:
+                  throw FatalException {"Unexpected sum operator"};
                 }
               throw FatalException {"Unknown opcode"};
             }();
@@ -1856,6 +1858,8 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
               throw FatalException {"Internal error: operator diff should not appear"};
             case UnaryOpcode::adl:
               throw FatalException {"Internal error: operator adl should not appear"};
+            case UnaryOpcode::sum:
+              throw FatalException {"Internal error: operator sum should not appear"};
             }
           break;
         case Tag::FTRINARY:
