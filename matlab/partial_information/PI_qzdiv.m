@@ -1,5 +1,5 @@
-function [A,B,Q,Z] = qzdiv(stake,A,B,Q,Z)
-%function [A,B,Q,Z] = qzdiv(stake,A,B,Q,Z)
+function [A,B,Q,Z] = PI_qzdiv(stake,A,B,Q,Z)
+%function [A,B,Q,Z] = PI_qzdiv(stake,A,B,Q,Z)
 %
 % Takes U.T. matrices A, B, orthonormal matrices Q,Z, rearranges them
 % so that all cases of abs(B(i,i)/A(i,i))>stake are in lower right
@@ -10,7 +10,7 @@ function [A,B,Q,Z] = qzdiv(stake,A,B,Q,Z)
 % http://sims.princeton.edu/yftp/gensys/mfiles/qzdiv.m
 
 % Copyright © 1993-2007 Christopher Sims
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -43,7 +43,7 @@ for i = n:-1:1
         return
     end
     for k=m:1:i-1
-        [A, B, Q, Z] = qzswitch(k,A,B,Q,Z);
+        [A, B, Q, Z] = PI_qzswitch(k,A,B,Q,Z);
         tmp = root(k,2);
         root(k,2) = root(k+1,2);
         root(k+1,2) = tmp;

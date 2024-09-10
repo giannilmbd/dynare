@@ -1,5 +1,5 @@
-function [A,B,Q,Z] = qzswitch(i,A,B,Q,Z)
-%function [A,B,Q,Z] = qzswitch(i,A,B,Q,Z)
+function [A,B,Q,Z] = PI_qzswitch(i,A,B,Q,Z)
+%function [A,B,Q,Z] = PI_qzswitch(i,A,B,Q,Z)
 %
 % Takes U.T. matrices A, B, orthonormal matrices Q,Z, interchanges
 % diagonal elements i and i+1 of both A and B, while maintaining
@@ -14,7 +14,7 @@ function [A,B,Q,Z] = qzswitch(i,A,B,Q,Z)
 % http://sims.princeton.edu/yftp/gensys/mfiles/qzswitch.m
 
 % Copyright © 1993-2007 Christopher Sims
-% Copyright © 2008-2011 Dynare Team
+% Copyright © 2008-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -195,7 +195,7 @@ for i=1:nn
 end
 
 if ~zxz
-    [a, b, ~, z]=qzdiv(div,a,b,q,z);
+    [a, b, ~, z]=PI_qzdiv(div,a,b,q,z);
 end
 
 gev=[diag(a) diag(b)];
