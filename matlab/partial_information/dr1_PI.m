@@ -57,8 +57,6 @@ info = 0;
 
 options_ = set_default_option(options_,'qz_criterium',1.000001);
 
-xlen = M_.maximum_endo_lead + M_.maximum_endo_lag + 1;
-
 if options_.aim_solver
     error('Anderson and Moore AIM solver is not compatible with Partial Information models');
 end % end if useAIM and...
@@ -68,69 +66,32 @@ if (options_.order > 1)
     options_.order =1;
 end
 
-klen = M_.maximum_lag + M_.maximum_lead + 1;
-iyv = M_.lead_lag_incidence';
-
 if M_.exo_nbr == 0
     oo_.exo_steady_state = [] ;
 end
 
 
-z = repmat(dr.ys,1,klen);
-z = z(find(iyv(:))) ;
-[~,jacobia_] = feval([M_.fname '.dynamic'],z,[oo_.exo_simul ...
-    oo_.exo_det_simul], M_.params, dr.ys, M_.maximum_lag + 1);
+g1 = feval([M_.fname '.sparse.dynamic_g1'], repmat(dr.ys, 3, 1), [oo_.exo_steady_state; oo_.exo_det_steady_state], ...
+           M_.params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
+           M_.dynamic_g1_sparse_colptr);
 
 if options_.debug
     save([M_.dname filesep 'Output' filesep M_.fname '_debug.mat'],'jacobia_')
 end
 
-% find size xlen of the state vector Y and of A0, A1 and A2 transition matrices:
-% it is the sum the all i variables's lag/lead representations,
-% for each variable i representation being defined as:
-% Max (i_lags-1,0)+ Max (i_leads-1,0)+1
-% so that if variable x appears with 2 lags and 1 lead, and z
-% with 2 lags and 3 leads, the size of the state space is:
-% 1+0+1   +   1+2+1   =6
-% e.g. E_t Y(t+1)=
-%     E_t x(t)
-%     E_t x(t+1)
-%     E_t z(t)
-%     E_t z(t+1)
-%     E_t z(t+2)
-%     E_t z(t+3)
+AA2=full(g1(:,1:M_.endo_nbr));                 % Jacobian for lagged endos
+AA1=full(g1(:,M_.endo_nbr+(1:M_.endo_nbr)));   % Jacobian for contemporaneous endos
+AA0=full(g1(:,2*M_.endo_nbr+(1:M_.endo_nbr))); % Jacobian for leaded endos
+PSI=-full(g1(:,3*M_.endo_nbr+1:end));          % Jacobian for (contemporaneous) exos
 
-% partition jacobian:
-jlen=M_.nspred+M_.nsfwrd+M_.endo_nbr+M_.exo_nbr; % length of jacobian
-% first transpose M_.lead_lag_incidence';
-lead_lag=M_.lead_lag_incidence';
-if ( M_.maximum_lag <= 1) && (M_.maximum_lead <= 1)
-    xlen=size(jacobia_,1);%nendo;
-    AA0=zeros(xlen,xlen);  % empty A0
-    AA2=AA0; % empty A2 and A3
-    AA3=AA0;
-    if xlen==M_.endo_nbr % && M_.maximum_lag <=1 && M_.maximum_lead <=1 % apply a shortcut
-        AA1=jacobia_(:,M_.nspred+1:M_.nspred+M_.endo_nbr);
-        if M_.maximum_lead ==1
-            fnd = find(lead_lag(:,M_.maximum_lag+2));
-            AA0(:, fnd)= jacobia_(:,nonzeros(lead_lag(:,M_.maximum_lag+2))); %forwd jacobian
-        end
-        if M_.nspred>0 && M_.maximum_lag ==1
-            fnd = find(lead_lag(:,1));
-            AA2(:, fnd)= jacobia_(:,nonzeros(lead_lag(:,1))); %backward
-        end
-    else
-        error('More than one lead or lag in the jabian');
-    end
-    if M_.orig_endo_nbr<M_.endo_nbr
-        % findif there are any expectations at time t
-        exp_0= strmatch('AUX_EXPECT_LEAD_0_', M_.endo_names);
-        if ~isempty(exp_0) 
-    	    error('Partial Information does not support EXPECTATION(0) operators')
-        end
+if M_.orig_endo_nbr<M_.endo_nbr
+    % findif there are any expectations at time t
+    exp_0= strmatch('AUX_EXPECT_LEAD_0_', M_.endo_names);
+    if ~isempty(exp_0)
+    	error('Partial Information does not support EXPECTATION(0) operators')
     end
 end
-PSI=-[[zeros(xlen-M_.endo_nbr,M_.exo_nbr)];[jacobia_(:, jlen-M_.exo_nbr+1:end)]]; % exog
+
 cc=0;
 
 try
@@ -145,11 +106,7 @@ try
     %      y(t)=[TT1 TT2][s(t)' x(t)']'.
 
     %% for expectational models when complete
-    if any(AA3)
-        error('Unsupported case')
-    else
-        [G1pi,CC,impact,nmat,TT1,TT2,gev,eu, DD, E2,E5, GAMMA, FL_RANK]=PI_gensys(AA0,AA1,-AA2,cc,PSI,M_.exo_nbr);
-    end
+    [G1pi,CC,impact,nmat,TT1,TT2,gev,eu, DD, E2,E5, GAMMA, FL_RANK]=PI_gensys(AA0,AA1,-AA2,cc,PSI,M_.exo_nbr);
 
     % reuse some of the bypassed code and tests that may be needed
     if (eu(1) ~= 1 || eu(2) ~= 1)
