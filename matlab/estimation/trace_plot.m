@@ -52,22 +52,35 @@ if isempty(column)
     return
 end
 
-% Get informations about the posterior draws:
-MetropolisFolder = CheckPath('metropolis',M_.dname);
-record=load_last_mh_history_file(MetropolisFolder, M_.fname);
+if ~issmc(options_)
+    % Get informations about the posterior draws:
+    MetropolisFolder = CheckPath('metropolis',M_.dname);
+    record=load_last_mh_history_file(MetropolisFolder, M_.fname);
 
-FirstMhFile = 1;
-FirstLine = 1;
-TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
-TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-[mh_nblck] = size(record.LastParameters,2);
-clear record;
+    FirstMhFile = 1;
+    FirstLine = 1;
+    TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
+    TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
+    [mh_nblck] = size(record.LastParameters,2);
+    clear record;
 
-n_nblocks_to_plot=length(blck);
+    n_nblocks_to_plot=length(blck);
+else
+    if ishssmc(options_)
+        n_nblocks_to_plot=1;
+    elseif isdime(options_)
+        error('trace_plot:: DIME does not support the trace_plot command')
+    end
+end
 
 if n_nblocks_to_plot==1
 % Get all the posterior draws:
-    PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname,M_.fname,column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, TotalNumberOfMhDraws, mh_nblck, blck);
+    if ishssmc(options_)
+        PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname,[],column);
+        TotalNumberOfMhDraws=length(PosteriorDraws);
+    else
+        PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname,M_.fname,column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, TotalNumberOfMhDraws, mh_nblck, blck);
+    end
 else
     PosteriorDraws=NaN(TotalNumberOfMhDraws,n_nblocks_to_plot);
     save_string='';

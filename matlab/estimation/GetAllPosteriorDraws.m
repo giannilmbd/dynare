@@ -41,7 +41,11 @@ if ishssmc(options_)
     % Load draws from the posterior distribution
     pfiles = dir(sprintf('%s/hssmc/particles-*.mat', dname));
     posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', dname, length(pfiles), length(pfiles)));
-    draws = transpose(posterior.particles(column,:));
+    if column==0
+        draws = posterior.tlogpostkernel;
+    else
+        draws = transpose(posterior.particles(column,:));
+    end
 elseif isdime(options_)
     posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
     tune = posterior.tune;

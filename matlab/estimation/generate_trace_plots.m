@@ -30,15 +30,21 @@ function generate_trace_plots(chain_number)
 
 global M_ options_ estim_params_
 
-if issmc(options_)
-    error('generate_trace_plots:: SMC methods do not support trace plots')
-end
-
-% Get informations about the posterior draws:
-MetropolisFolder = CheckPath('metropolis', M_.dname);
-record=load_last_mh_history_file(MetropolisFolder, M_.fname);
-if max(chain_number)>record.Nblck
-    error('generate_trace_plots:: chain number is bigger than existing number of chains')
+if ~issmc(options_)
+    % Get informations about the posterior draws:
+    MetropolisFolder = CheckPath('metropolis', M_.dname);
+    record=load_last_mh_history_file(MetropolisFolder, M_.fname);
+    if max(chain_number)>record.Nblck
+        error('generate_trace_plots:: chain number is bigger than existing number of chains')
+    end
+else
+    if ishssmc(options_)
+       if max(chain_number)>1
+           error('generate_trace_plots:: HSSMC only has one chain')           
+       end
+    elseif isdime(options_)
+        error('generate_trace_plots:: DIME does not support generate_trace_plots')
+    end
 end
 
 trace_plot(options_, M_, estim_params_, 'PosteriorDensity', chain_number)
