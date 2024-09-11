@@ -86,12 +86,6 @@ endo_steady_state = myinputs.endo_steady_state;
 exo_steady_state=myinputs.exo_steady_state;
 exo_det_steady_state=myinputs.exo_det_steady_state;
 
-% Necessary only for remote computing!
-if whoiam
-    % initialize persistent variables in priordens()
-    priordens(xparam1,bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7, bayestopt_.p3,bayestopt_.p4,1);
-end
-
 MetropolisFolder = CheckPath('metropolis',M_.dname);
 ModelName = M_.fname;
 BaseName = [MetropolisFolder filesep ModelName];

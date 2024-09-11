@@ -136,8 +136,6 @@ else
     options_ = default_option_values(M_);
 end
 
-% initialize persistent variables in priordens()
-priordens([],[],[],[],[],[],1);
 % initialize persistent variables in dyn_first_order_solver()
 dyn_first_order_solver();
 

@@ -1,4 +1,4 @@
-function [logged_prior_density, dlprior, d2lprior, info] = priordens(x, pshape, p6, p7, p3, p4, initialization)
+function [logged_prior_density, dlprior, d2lprior, info] = priordens(x, pshape, p6, p7, p3, p4)
 % Computes a prior density for the structural parameters of DSGE models
 %
 % INPUTS
@@ -8,14 +8,13 @@ function [logged_prior_density, dlprior, d2lprior, info] = priordens(x, pshape, 
 %    p7:            [double]      vector with n elements, second parameter of the prior distribution (bayestopt_.p7).
 %    p3:            [double]      vector with n elements, lower bounds of the untruncated standard or generalized distribution
 %    p4:            [double]      vector with n elements, upper bound of the untruncated standard or generalized distribution
-%    initialization [integer]     if 1: initialize persistent variables
 %
 % OUTPUTS
 %    logged_prior_density  [double]  scalar, log of the prior density evaluated at x.
 %    info                  [double]  error code for index of Inf-prior parameter
 %
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -32,54 +31,49 @@ function [logged_prior_density, dlprior, d2lprior, info] = priordens(x, pshape, 
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-persistent id1 id2 id3 id4 id5 id6 id8
-persistent tt1 tt2 tt3 tt4 tt5 tt6 tt8
-
 info=0;
 
-if nargin > 6  && initialization
-    % Beta indices.
-    tt1 = true;
-    id1 = find(pshape==1);
-    if isempty(id1)
-        tt1 = false;
-    end
-    % Gamma indices.
-    tt2 = true;
-    id2 = find(pshape==2);
-    if isempty(id2)
-        tt2 = false;
-    end
-    % Gaussian indices.
-    tt3 = true;
-    id3 = find(pshape==3);
-    if isempty(id3)
-        tt3 = false;
-    end
-    % Inverse-Gamma-1 indices.
-    tt4 = true;
-    id4 = find(pshape==4);
-    if isempty(id4)
-        tt4 = false;
-    end
-    % Uniform indices.
-    tt5 = true;
-    id5 = find(pshape==5);
-    if isempty(id5)
-        tt5 = false;
-    end
-    % Inverse-Gamma-2 indices.
-    tt6 = true;
-    id6 = find(pshape==6);
-    if isempty(id6)
-        tt6 = false;
-    end
-    % Weibull indices.
-    tt8 = true;
-    id8 = find(pshape==8);
-    if isempty(id8)
-        tt8 = false;
-    end
+% Beta indices.
+tt1 = true;
+id1 = find(pshape==1);
+if isempty(id1)
+    tt1 = false;
+end
+% Gamma indices.
+tt2 = true;
+id2 = find(pshape==2);
+if isempty(id2)
+    tt2 = false;
+end
+% Gaussian indices.
+tt3 = true;
+id3 = find(pshape==3);
+if isempty(id3)
+    tt3 = false;
+end
+% Inverse-Gamma-1 indices.
+tt4 = true;
+id4 = find(pshape==4);
+if isempty(id4)
+    tt4 = false;
+end
+% Uniform indices.
+tt5 = true;
+id5 = find(pshape==5);
+if isempty(id5)
+    tt5 = false;
+end
+% Inverse-Gamma-2 indices.
+tt6 = true;
+id6 = find(pshape==6);
+if isempty(id6)
+    tt6 = false;
+end
+% Weibull indices.
+tt8 = true;
+id8 = find(pshape==8);
+if isempty(id8)
+    tt8 = false;
 end
 
 logged_prior_density = 0.0;
@@ -257,8 +251,8 @@ end
 
 % Call the tested routine
 try
-    % Initialization of priordens.
-    lpdstar = priordens(p5, p0, p6, p7, p3, p4, true);
+    % Prior (logged) density at the mode
+    lpdstar = priordens(p5, p0, p6, p7, p3, p4);
     % Do simulations in a loop and estimate recursively the mean and teh variance.
     LPD = NaN(10000,1);
     for i = 1:10000
