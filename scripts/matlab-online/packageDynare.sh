@@ -4,7 +4,7 @@ set -exo pipefail
 # Creates a dynare-X.Y.mltbx in the current repository, using the settings below.
 # Needs to be run from Ubuntu 22.04 LTS, with the needed packages installed.
 
-X13ASVER=1-1-b60
+X13ASVER=1-1-b61
 MATLABPATH=/opt/MATLAB/R2024b
 # TODO: change size and put white background for better rendering in MATLAB Add-Ons browser
 DYNARE_PNG_LOGO=../../preprocessor/doc/logos/dlogo.png
