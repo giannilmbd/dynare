@@ -90,8 +90,8 @@ Section "Dynare core (preprocessor and M-files)"
 SectionEnd
 
 
-Section "MEX files for MATLAB 64-bit, version 9.5 to 23.2 (R2018b to R2024a)"
- SetOutPath $INSTDIR\mex\matlab\win64-9.5-24.1
+Section "MEX files for MATLAB 64-bit, version 9.5 to 24.2 (R2018b to R2024b)"
+ SetOutPath $INSTDIR\mex\matlab\win64-9.5-24.2
  File ..\build-win-matlab\*.mexw64
 SectionEnd
 

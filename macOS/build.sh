@@ -38,7 +38,7 @@ else
     path_remove PATH /opt/homebrew/bin
     MATLAB_ARCH=maci64
 fi
-MATLAB_PATH=/Applications/"$PKG_ARCH"/MATLAB_R2024a.app
+MATLAB_PATH=/Applications/"$PKG_ARCH"/MATLAB_R2024b.app
 
 # Workaround for bug in Xcode 15.3 which does not include m4
 # See https://github.com/Homebrew/homebrew-core/issues/165388
@@ -122,9 +122,9 @@ mkdir -p \
       "$PKGFILES"/scripts \
       "$PKGFILES"/contrib/ms-sbvar/TZcode
 if [[ "$PKG_ARCH" == x86_64 ]]; then
-    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-24.1
+    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-24.2
 else
-    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-24.1
+    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-24.2
 fi      
 
 cp -p  "$ROOTDIR"/NEWS.md                                            "$PKGFILES"
@@ -143,9 +143,9 @@ mkdir -p                                                             "$PKGFILES"
 ln -sf ../../preprocessor/dynare-preprocessor                        "$PKGFILES"/matlab/preprocessor64/dynare_m
 
 if [[ "$PKG_ARCH" == x86_64 ]]; then
-    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-24.1
+    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-24.2
 else
-    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-24.1
+    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-24.2
 fi
 
 cp -p  "$ROOTDIR"/scripts/dynare.el                                  "$PKGFILES"/scripts

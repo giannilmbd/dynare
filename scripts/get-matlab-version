@@ -58,6 +58,9 @@ fi
 
 # If needed, convert a release number (Rnnnnx) into a version number (x.y)
 case ${MATLAB_VERSION} in
+    *2024[bB])
+        MATLAB_VERSION="24.2"
+        ;;
     *2024[aA])
         MATLAB_VERSION="24.1"
         ;;
