@@ -86,10 +86,9 @@ end
 if pshape(indx) ~= 5
     [~,k1] = max(dens);
     if k1 == 1 || k1 == length(dens)
-        k = find(dens > 10);
-        dens(k) = NaN;
-        end
+        dens(dens > 10) = NaN;
     end
+end
 binf = abscissa(1);
 bsup = abscissa(end);
 x = abscissa;
