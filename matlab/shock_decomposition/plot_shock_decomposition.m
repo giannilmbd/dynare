@@ -265,6 +265,7 @@ if ~isempty(init2shocks) && ~expand
     end
     n=size(init2shocks,1);
     M_.exo_names_init=M_.exo_names;
+    M_.orig_exo_names=M_.exo_names;
     for i=1:n
         j=strmatch(init2shocks{i}{1},orig_endo_names,'exact');
         if ~isempty(init2shocks{i}{2})
@@ -479,7 +480,31 @@ switch type
                     opts=options_;
                     opts.plot_shock_decomp.type='qoq';
                     opts.plot_shock_decomp.use_shock_groups=[];
+                    if ~isempty(init2shocks)
+                        M_.exo_names = M_.orig_exo_names;
+                    end
+                    is_squeezed_steady_state=false;
+                    if length(steady_state)<length(oo_.steady_state)
+                        is_squeezed_steady_state=true;
+                        if isfield(oo_.dr,'ys')
+                            steady_state0= oo_.dr.ys;
+                            oo_.dr.ys = steady_state;
+                        else
+                            steady_state0=oo_.steady_state;
+                            oo_.steady_state=steady_state;
+                        end
+                    end
                     [y_aux, steady_state_aux] = plot_shock_decomposition(M_,oo_,opts,q2a.aux.y);
+                    if is_squeezed_steady_state
+                        if isfield(oo_.dr,'ys')
+                            oo_.dr.ys = steady_state0;
+                        else
+                            oo_.steady_state=steady_state0;
+                        end
+                    end
+                    if ~isempty(init2shocks)
+                        M_.exo_names = M_.exo_names_init;
+                    end
                     q2a.aux.y=y_aux;
                     q2a.aux.yss=steady_state_aux;
                 end
