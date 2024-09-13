@@ -297,8 +297,6 @@ if status
     error('Dynare: preprocessing failed')
 end
 
-% We need to clear the driver (and only the driver, because the "clear all"
-% within the driver will clean the rest)
 clear(['+' fname(1:end-4) '/driver'])
 
 try

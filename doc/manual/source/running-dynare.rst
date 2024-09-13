@@ -125,23 +125,20 @@ by the ``dynare`` command.
 
     .. option:: noclearall
 
-        By default, ``dynare`` will issue a ``clear all`` command to
-        MATLAB (<R2015b) or Octave, thereby deleting all workspace
-        variables and functions; this option instructs ``dynare`` not
-        to clear the workspace. Note that starting with MATLAB 2015b
-        ``dynare`` only deletes the global variables and the functions
-        using persistent variables, in order to benefit from the JIT
-        (Just In Time) compilation. In this case the option instructs
-        ``dynare`` not to clear the globals and functions.
+        By default, ``dynare`` deletes all the global variables and the
+        functions using persistent variables, in order to benefit from the JIT
+        (just-in-time) compilation. This option instructs ``dynare`` not to
+        clear those.
 
     .. option:: onlyclearglobals
 
-        By default, ``dynare`` will issue a ``clear all`` command to
-        MATLAB versions before 2015b and to Octave, thereby deleting
-        all workspace variables; this option instructs ``dynare`` to
-        clear only the global variables (i.e. ``M_, options_, oo_,
-        estim_params_, bayestopt_``, and ``dataset_``), leaving the
-        other variables in the workspace.
+        By default, ``dynare`` deletes all the global variables and the
+        functions using persistent variables, in order to benefit from the JIT
+        (just-in-time) compilation. This option instructs ``dynare`` to clear
+        only its own global variables (*i.e.* ``M_, options_, oo_,
+        estim_params_, bayestopt_``, ``dataset_``, ``dataset_info`` and
+        ``estimation_info``), leaving the other variables in the workspace, and
+        not clearing functions using persistent variables.
 
     .. option:: debug
 
