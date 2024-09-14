@@ -217,10 +217,7 @@ if strcmpi(type,'posterior')
             x(:,column) = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck);
         end
     else
-        logpost=NaN(B,1);
-        for b=1:B
-            [x(b,:), logpost(b)] = GetOneDraw(type,M_,estim_params_,oo_,options_,bayestopt_);
-        end
+        [x, logpost]=get_posterior_subsample(M_,options_,B);
     end
     localVars.logpost=logpost;
 end

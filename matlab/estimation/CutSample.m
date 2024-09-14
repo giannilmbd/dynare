@@ -46,7 +46,7 @@ npar=size(record.LastParameters,2);
 % Get the list of files where the mcmc draw are saved.
 mh_files = dir([ MetropolisFolder ,filesep, M_.fname '_mh*.mat' ]);
 
-if ~length(mh_files)
+if isempty(mh_files)
     error('%s: I can''t find MH file to load here!',dispString)
 end
 

@@ -1,11 +1,12 @@
-function [info,description] = check_posterior_analysis_data(type,M_)
-% function [info,description] = check_posterior_analysis_data(type,M_)
+function [info,description] = check_posterior_analysis_data(type,M_,options_)
+% function [info,description] = check_posterior_analysis_data(type,M_,options_)
 % Checks the status of posterior analysis and in particular if files need to be
 % created or updated; called by posterior_analysis.m
 %
 % Inputs:
 %   type        [string]        name of the posterior moment considered
 %   M_          [structure]     Dynare model structure
+%   options_    [structure]     Dynare options structure
 %
 % Outputs:
 %   info        [scalar]        return code
@@ -17,7 +18,7 @@ function [info,description] = check_posterior_analysis_data(type,M_)
 %                                   info = 6; % Ok (nothing to do ;-)
 %   description [string]        Message corresponding to info
 
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -39,16 +40,23 @@ if nargout>1
     description = '';
 end
 
-[MetropolisFolder, info] = CheckPath('metropolis',M_.dname);
+if ~issmc(options_)
+    [MetropolisFolder, info] = CheckPath('metropolis',M_.dname);
+else
+    if ishssmc(options_)
+        [MetropolisFolder, info] = CheckPath('hssmc',M_.dname);
+    elseif isdime(options_)
+        [MetropolisFolder, info] = CheckPath('dime',M_.dname);
+    else
+        error('check_posterior_analysis_data:: case should not happen. Please contact the developers')
+    end
+end
 
 % Get informations about mcmc files.
 if info
     disp('check_posterior_analysis_data:: Can''t find any mcmc file!')
     return
 end
-
-mhname = get_name_of_the_last_mh_file(M_);
-mhdate = get_date_of_a_file([MetropolisFolder filesep mhname]);
 
 % Get informations about _posterior_draws files.
 drawsinfo = dir([ MetropolisFolder filesep M_.fname '_posterior_draws*.mat']);
@@ -59,7 +67,19 @@ if isempty(drawsinfo)
     end
     return
 else
-    number_of_last_posterior_draws_file = length(drawsinfo);
+    mhname = get_name_of_the_last_mh_file(M_);
+    if ~issmc(options_)
+        mhdate = get_date_of_a_file([MetropolisFolder filesep mhname]);
+        number_of_last_posterior_draws_file = length(drawsinfo);
+    else
+        if ishssmc(options_)
+            % Load draws from the posterior distribution
+            pfiles = dir(sprintf('%s/hssmc/particles-*.mat', M_.dname));
+            mhdate = get_date_of_a_file(sprintf('%s/hssmc/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
+        elseif isdime(options_)
+            mhdate = get_date_of_a_file(sprintf('%s%s%s%schains.mat', M_.dname, filesep(), 'dime', filesep()));
+        end
+    end
     pddate = get_date_of_a_file([ MetropolisFolder filesep M_.fname '_posterior_draws' int2str(number_of_last_posterior_draws_file) '.mat']);
     if pddate<mhdate
         info = 2; % _posterior_draws files have to be updated.

@@ -17,7 +17,7 @@ function oo_=execute_prior_posterior_function(posterior_function_name,M_,options
 % OUTPUTS
 %   oo_          [structure]     Matlab/Octave structure gathering the results (initialized by dynare, see @ref{oo_}).
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -53,9 +53,8 @@ if strcmpi(type,'posterior')
     % Get informations about the _posterior_draws files.
     % discard first mh_drop percent of the draws:
     CutSample(M_, options_, 'prior_posterior_function');
-    % initialize metropolis draws
     options_.sub_draws = n_draws; % set draws for sampling; changed value is not returned to base workspace
-    [error_flag, ~, options_] = metropolis_draw(1, options_, estim_params_, M_);
+    [options_.sub_draws, error_flag]=set_number_of_subdraws(M_,options_); %check whether number is feasible
     if error_flag
         error('EXECUTE_POSTERIOR_FUNCTION: The draws could not be initialized')
     end
@@ -69,7 +68,7 @@ elseif strcmpi(type,'prior')
             error('The prior distributions are not properly set up.')
         end
     end
-    if exist([M_.fname '_prior_restrictions.m'])
+    if exist([M_.fname '_prior_restrictions.m'],"file")
         warning('prior_function currently does not support endogenous prior restrictions. They will be ignored. Consider using a posterior_function with nobs=1.')
     end
     Prior = dprior(bayestopt_, options_.prior_trunc);
@@ -77,13 +76,11 @@ else
     error('EXECUTE_POSTERIOR_FUNCTION: Unknown type!')
 end
 
+
 if strcmpi(type, 'prior')
     parameter_mat = Prior.draws(n_draws);
 else
-    parameter_mat = NaN(length(bayestopt_.p6), n_draws);
-    for i = 1:n_draws
-        parameter_mat(:,i) = GetOneDraw(type, M_, estim_params_, oo_, options_, bayestopt_);
-    end
+    parameter_mat=get_posterior_subsample(M_,options_,n_draws)';
 end
 
 % Get output size

@@ -2,8 +2,7 @@ function SampleAddress = selec_posterior_draws(M_,options_,dr,endo_steady_state,
 % Selects a sample of draws from the posterior distribution and if nargin>1
 % saves the draws in _pdraws mat files (metropolis folder). If drsize>0
 % the dr structure, associated to the parameters, is also saved in _pdraws.
-% This routine is more efficient than metropolis_draw.m because here an
-% _mh file cannot be opened twice.
+% This routine assures an _mh file cannot be opened twice.
 %
 % INPUTS
 %   o M_                    [structure]     Matlab's structure describing the model
@@ -55,7 +54,7 @@ switch nargin
   case 8
     info = 0;
   case 9
-    MAX_mega_bytes = 10;% Should be an option...
+    MAX_mega_bytes = 100;% Should be an option...
     if drsize>0
         info=2;
     else
@@ -66,100 +65,55 @@ switch nargin
     error('selec_posterior_draws:: Unexpected number of input arguments!')
 end
 
-MetropolisFolder = CheckPath('metropolis',M_.dname);
+if ~issmc(options_)
+    MetropolisFolder = CheckPath('metropolis',M_.dname);
+else
+    if ishssmc(options_)
+        [MetropolisFolder] = CheckPath('metropolis',M_.dname);
+    elseif isdime(options_)
+        [MetropolisFolder] = CheckPath('dime',M_.dname);
+    else
+        error('check_posterior_analysis_data:: case should not happen. Please contact the developers')
+    end
+end
+
 ModelName = M_.fname;
 BaseName = [MetropolisFolder filesep ModelName];
 
-% Get informations about the mcmc:
-record=load_last_mh_history_file(MetropolisFolder, ModelName);
-FirstMhFile = record.KeepedDraws.FirstMhFile;
-FirstLine = record.KeepedDraws.FirstLine;
-TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
-MAX_nruns = ceil(options_.MaxNumberOfBytes/(npar+2)/8);
-mh_nblck = options_.mh_nblck;
-
-% Randomly select draws in the posterior distribution:
-SampleAddress = zeros(SampleSize,4);
-for i = 1:SampleSize
-    ChainNumber = ceil(rand*mh_nblck);
-    DrawNumber  = ceil(rand*NumberOfDraws);
-    SampleAddress(i,1) = DrawNumber;
-    SampleAddress(i,2) = ChainNumber;
-    if DrawNumber <= MAX_nruns-FirstLine+1
-        MhFileNumber = FirstMhFile;
-        MhLineNumber = FirstLine+DrawNumber-1;
-    else
-        DrawNumber  = DrawNumber-(MAX_nruns-FirstLine+1);
-        MhFileNumber = FirstMhFile+ceil(DrawNumber/MAX_nruns);
-        MhLineNumber = DrawNumber-(MhFileNumber-FirstMhFile-1)*MAX_nruns;
-    end
-    SampleAddress(i,3) = MhFileNumber;
-    SampleAddress(i,4) = MhLineNumber;
-end
-SampleAddress = sortrows(SampleAddress,[3 2]);
+parameter_draws=get_posterior_subsample(M_,options_,SampleSize);
 
 % Selected draws in the posterior distribution, and if drsize>0
 % reduced form solutions, are saved on disk.
 if info
     %delete old stale files before creating new ones
     delete_stale_file([BaseName '_posterior_draws*.mat'])
-    if  SampleSize*drawsize <= MAX_mega_bytes% The posterior draws are saved in one file.
-        pdraws = cell(SampleSize,info);
-        old_mhfile = 0;
-        old_mhblck = 0;
-        for i = 1:SampleSize
-            mhfile = SampleAddress(i,3);
-            mhblck = SampleAddress(i,2);
-            if (mhfile ~= old_mhfile) || (mhblck ~= old_mhblck)
-                load([BaseName '_mh' num2str(mhfile) '_blck' num2str(mhblck) '.mat'],'x2')
-            end
-            pdraws(i,1) = {x2(SampleAddress(i,4),:)};
-            if info==2
-                M_ = set_parameters_locally(M_,pdraws{i,1});
-                [dr,~,M_.params] =compute_decision_rules(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state);
-                pdraws(i,2) = { dr };
-            end
-            old_mhfile = mhfile;
-            old_mhblck = mhblck;
-        end
-        clear('x2')
-        save([BaseName '_posterior_draws1.mat'],'pdraws','estim_params_')
-    else% The posterior draws are saved in xx files.
-        NumberOfDrawsPerFile = fix(MAX_mega_bytes/drawsize);
-        NumberOfFiles = ceil(SampleSize*drawsize/MAX_mega_bytes);
-        NumberOfLines = SampleSize - (NumberOfFiles-1)*NumberOfDrawsPerFile;
-        linee = 0;
-        fnum  = 1;
+    NumberOfDrawsPerFile = fix(MAX_mega_bytes/drawsize);
+    NumberOfFiles = ceil(SampleSize*drawsize/MAX_mega_bytes);
+    NumberOfLinesLastFile = SampleSize - (NumberOfFiles-1)*NumberOfDrawsPerFile;
+    linee = 0;
+    fnum  = 1;
+    if fnum < NumberOfFiles
         pdraws = cell(NumberOfDrawsPerFile,info);
-        old_mhfile = 0;
-        old_mhblck = 0;
-        for i=1:SampleSize
-            linee = linee+1;
-            mhfile = SampleAddress(i,3);
-            mhblck = SampleAddress(i,2);
-            if (mhfile ~= old_mhfile) || (mhblck ~= old_mhblck)
-                load([BaseName '_mh' num2str(mhfile) '_blck' num2str(mhblck) '.mat'],'x2')
-            end
-            pdraws(linee,1) = {x2(SampleAddress(i,4),:)};
-            if info==2
-                M_ = set_parameters_locally(M_,pdraws{linee,1});
-                [dr,~,M_.params] = compute_decision_rules(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
-                pdraws(linee,2) = { dr };
-            end
-            old_mhfile = mhfile;
-            old_mhblck = mhblck;
-            if fnum < NumberOfFiles && linee == NumberOfDrawsPerFile
-                linee = 0;
-                save([BaseName '_posterior_draws' num2str(fnum) '.mat'],'pdraws','estim_params_')
-                fnum = fnum+1;
-                if fnum < NumberOfFiles
-                    pdraws = cell(NumberOfDrawsPerFile,info);
-                else
-                    pdraws = cell(NumberOfLines,info);
-                end
+    else
+        pdraws = cell(NumberOfLinesLastFile,info);
+    end
+    for i=1:SampleSize
+        linee = linee+1;
+        pdraws(i,1) = {parameter_draws(i,:)};
+        if info==2
+            M_ = set_parameters_locally(M_,pdraws{linee,1});
+            [dr,~,M_.params] = compute_decision_rules(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            pdraws(linee,2) = { dr };
+        end
+        if (fnum < NumberOfFiles && linee == NumberOfDrawsPerFile) || (fnum <= NumberOfFiles && i==SampleSize)
+            linee = 0;
+            save([BaseName '_posterior_draws' num2str(fnum) '.mat'],'pdraws','estim_params_')
+            fnum = fnum+1;
+            if fnum < NumberOfFiles
+                pdraws = cell(NumberOfDrawsPerFile,info);
+            else
+                pdraws = cell(NumberOfLinesLastFile,info);
             end
         end
-        save([BaseName '_posterior_draws' num2str(fnum) '.mat'],'pdraws','estim_params_')
     end
 end

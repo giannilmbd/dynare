@@ -156,10 +156,7 @@ localVars.npar = npar;
 
 localVars.type=type;
 if strcmpi(type,'posterior')
-    while b<B
-        b = b + 1;
-        x(b,:) = GetOneDraw(type,M_,estim_params_,oo_,options_,bayestopt_);
-    end
+    x=get_posterior_subsample(M_,options_,B);
 end
 
 if ~strcmpi(type,'prior')

@@ -37,24 +37,28 @@ function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstMhFil
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if ishssmc(options_)
-    % Load draws from the posterior distribution
-    pfiles = dir(sprintf('%s/hssmc/particles-*.mat', dname));
-    posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', dname, length(pfiles), length(pfiles)));
-    if column==0
-        draws = posterior.tlogpostkernel;
+if issmc(options_)
+    if ishssmc(options_)
+        % Load draws from the posterior distribution
+        pfiles = dir(sprintf('%s/hssmc/particles-*.mat', dname));
+        posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', dname, length(pfiles), length(pfiles)));
+        if column==0
+            draws = posterior.tlogpostkernel;
+        else
+            draws = transpose(posterior.particles(column,:));
+        end
+    elseif isdime(options_)
+        posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
+        tune = posterior.tune;
+        chains = posterior.chains(end-tune:end,:,:);
+        if column>0
+            chains = reshape(chains, [], size(chains, 3));
+            draws = chains(:,column);
+        else
+            draws = posterior.lprobs;
+        end
     else
-        draws = transpose(posterior.particles(column,:));
-    end
-elseif isdime(options_)
-    posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
-    tune = posterior.tune;
-    chains = posterior.chains(end-tune:end,:,:);
-    if column>0
-        chains = reshape(chains, [], size(chains, 3));
-        draws = chains(:,column);
-    else
-        draws = posterior.lprobs;
+        error('GetAllPosteriorDraws:: case should not happen. Please contact the developers')
     end
 else
     iline = FirstLine;
