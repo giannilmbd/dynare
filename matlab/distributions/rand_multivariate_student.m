@@ -40,7 +40,7 @@ function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df,n)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 if nargin == 3
-    n = 1
+    n = 1;
 end
 dim = length(Mean);
 draw = Mean + (randn(n,dim) * Sigma_upper_chol) .* sqrt(df./sum(randn(n,df).^2,2));
