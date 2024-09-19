@@ -103,7 +103,7 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
         else
             dprintf('%3u          %5.4f     %9.5E         %5.4f        %4.3f     %3s       %5.2f', i, phi(i), ESS(i), acpt(i), scl(i), 'no', tt)
         end
-        if i==smcopt.steps
+        if i==smcopt.steps && ~resampled_particle_swarm
             iresample = kitagawa(weights);
             particles = particles(:,iresample);
         end
