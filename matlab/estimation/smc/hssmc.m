@@ -107,8 +107,12 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
             iresample = kitagawa(weights);
             particles = particles(:,iresample);
         end
-        save(sprintf('%s%sparticles-%u-%u.mat', SimulationFolder, filesep(), i, smcopt.steps), 'particles', 'tlogpostkernel', 'loglikelihood')
-        resampled_particle_swarm = false;
+        if resampled_particle_swarm
+            save(sprintf('%s%sparticles-%u-%u.mat', SimulationFolder, filesep(), i, smcopt.steps), 'particles', 'tlogpostkernel', 'loglikelihood')
+            resampled_particle_swarm = false;
+        else
+            save(sprintf('%s%sparticles-%u-%u.mat', SimulationFolder, filesep(), i, smcopt.steps), 'particles', 'tlogpostkernel', 'loglikelihood', 'weights')
+        end
     end
 
 end
