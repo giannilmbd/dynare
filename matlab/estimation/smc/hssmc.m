@@ -38,6 +38,8 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
 
     % Set location for the simulated particles.
     SimulationFolder = CheckPath('hssmc', M_.dname);
+    %delete old stale files before creating new ones
+    delete_stale_file(sprintf('%s%sparticles-*.mat', SimulationFolder,filesep))
 
     % Define prior distribution
     Prior = dprior(bayestopt_, options_.prior_trunc);
