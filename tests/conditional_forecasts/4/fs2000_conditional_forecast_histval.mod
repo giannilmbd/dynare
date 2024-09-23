@@ -61,7 +61,7 @@ steady;
 
 check;
 
-stoch_simul(irf=0);
+stoch_simul(irf=0,order=1);
 
 conditional_forecast_paths;
 var gy_obs;
