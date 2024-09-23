@@ -429,7 +429,7 @@ if pf && ~surprise
         not_achieved = 1;
         alpha = 1;
         while not_achieved
-            simul();
+            oo_ = perfect_foresight_solver(M_, options_, oo_);
             result = sum(sum(isfinite(oo_.endo_simul(:,time_index_constraint)))) == ny * constrained_periods;
             if result
                 y = oo_.endo_simul(constrained_vars, time_index_constraint);
