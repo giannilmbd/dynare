@@ -54,6 +54,16 @@ elseif nargin==6
     mean_varobs=dataset_info.descriptive.mean';
 end
 
+if options_.order>1 && M_.exo_det_nbr == 0 
+    error('forecasting without varexo_det does not support order>1.')
+end
+if options_.order>2 && M_.exo_det_nbr > 0
+    error('forecasting with varexo_det does not support order>2.')
+end
+if options_.order==2 && options_.pruning
+    error('forecasting with varexo_det does not support pruning.')
+end
+
 oo_=make_ex_(M_,options_,oo_);
 
 maximum_lag = M_.maximum_lag;

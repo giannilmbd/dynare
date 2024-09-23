@@ -12,7 +12,7 @@ function dynare_estimation_1(var_list_,dname)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -582,12 +582,25 @@ if options_.particle.status
 end
 
 %Run and store classical smoother if needed
-if (~((any(bayestopt_.pshape > 0) && options_.mh_replic) || (any(bayestopt_.pshape> 0) && options_.load_mh_file)) ...
-    || ~options_.smoother ) && ~options_.partial_information  % to be fixed
+if options_.smoother && ... %Bayesian smoother requested before
+    (any(bayestopt_.pshape > 0) && options_.mh_replic || ... % Bayesian with MCMC run
+    any(bayestopt_.pshape > 0) && options_.load_mh_file) % Bayesian with loaded MCMC
+    % nothing to do
+elseif options_.partial_information ||...
+    options_.order>1 %no particle smoother
+    % smoothing not yet supported
+else
     %% ML estimation, or posterior mode without Metropolis-Hastings or Metropolis without Bayesian smoothed variables
     oo_=save_display_classical_smoother_results(xparam1,M_,oo_,options_,bayestopt_,dataset_,dataset_info,estim_params_);
 end
-if options_.forecast > 0 && options_.mh_replic == 0 && ~options_.load_mh_file
+
+if options_.forecast == 0 || options_.mh_replic > 0 || options_.load_mh_file
+    % nothing to do
+elseif options_.order>1 && M_.exo_det_nbr == 0 || ...
+        options_.order>2 && M_.exo_det_nbr > 0 || ...
+        options_.order==2 && options_.pruning
+    %forecasting not yet supported
+else
     oo_.forecast = dyn_forecast(var_list_,M_,options_,oo_,'smoother',dataset_info);
 end
 
