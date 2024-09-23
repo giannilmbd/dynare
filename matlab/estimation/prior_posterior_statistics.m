@@ -62,7 +62,8 @@ end
 maxlag = M_.maximum_endo_lag;
 
 if strcmpi(type,'posterior')
-    DirectoryName = CheckPath('metropolis',M_.dname);
+    folder_name=get_posterior_folder_name(options_);
+    DirectoryName = CheckPath(folder_name,M_.dname);
     B = options_.sub_draws;
 elseif strcmpi(type,'gsa')
     RootDirectoryName = CheckPath('gsa',M_.dname);

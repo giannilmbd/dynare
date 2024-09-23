@@ -19,7 +19,7 @@ function oo_ = covariance_mc_analysis(NumberOfSimulations,type,dname,fname,varta
 % OUTPUTS
 %   oo_                     [structure]        Dynare structure where the results are saved.
 
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,8 +37,9 @@ function oo_ = covariance_mc_analysis(NumberOfSimulations,type,dname,fname,varta
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if strcmpi(type,'posterior')
+    folder_name=get_posterior_folder_name(options_);
     TYPE = 'Posterior';
-    PATH = [dname '/metropolis/'];
+    PATH = [dname filesep folder_name filesep];
 else
     TYPE = 'Prior';
     PATH = [dname '/prior/moments/'];

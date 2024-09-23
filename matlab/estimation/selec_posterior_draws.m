@@ -69,7 +69,7 @@ if ~issmc(options_)
     MetropolisFolder = CheckPath('metropolis',M_.dname);
 else
     if ishssmc(options_)
-        [MetropolisFolder] = CheckPath('metropolis',M_.dname);
+        [MetropolisFolder] = CheckPath('hssmc',M_.dname);
     elseif isdime(options_)
         [MetropolisFolder] = CheckPath('dime',M_.dname);
     else

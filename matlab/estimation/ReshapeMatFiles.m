@@ -30,7 +30,7 @@ function ReshapeMatFiles(fname, dname, exo_nbr, endo_nbr, options_, type, type2)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -48,10 +48,12 @@ function ReshapeMatFiles(fname, dname, exo_nbr, endo_nbr, options_, type, type2)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if nargin==6
-    MhDirectoryName = [ CheckPath('metropolis',dname) filesep ];
+    folder_name=get_posterior_folder_name(options_);
+    MhDirectoryName = [CheckPath(folder_name,dname) filesep ];
 else
     if strcmpi(type2,'posterior')
-        MhDirectoryName = [CheckPath('metropolis',dname) filesep ];
+        folder_name=get_posterior_folder_name(options_);
+        MhDirectoryName = [CheckPath(folder_name,dname) filesep ];
     elseif strcmpi(type2,'gsa')
         if options_.opt_gsa.morris==1
             MhDirectoryName = [CheckPath('gsa/screen',dname) filesep ];

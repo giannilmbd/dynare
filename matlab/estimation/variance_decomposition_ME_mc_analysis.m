@@ -25,7 +25,7 @@ function oo_ = variance_decomposition_ME_mc_analysis(NumberOfSimulations,type,dn
 
 
 
-% Copyright © 2017 Dynare Team
+% Copyright © 2017-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -43,8 +43,9 @@ function oo_ = variance_decomposition_ME_mc_analysis(NumberOfSimulations,type,dn
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if strcmpi(type,'posterior')
+    folder_name=get_posterior_folder_name(options_);
     TYPE = 'Posterior';
-    PATH = [dname '/metropolis/'];
+    PATH = [dname filesep folder_name filesep];
 else
     TYPE = 'Prior';
     PATH = [dname '/prior/moments/'];

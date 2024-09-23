@@ -67,10 +67,10 @@ if isempty(drawsinfo)
     end
     return
 else
-    mhname = get_name_of_the_last_mh_file(M_);
+    number_of_last_posterior_draws_file = length(drawsinfo);
     if ~issmc(options_)
+        mhname = get_name_of_the_last_mh_file(M_);
         mhdate = get_date_of_a_file([MetropolisFolder filesep mhname]);
-        number_of_last_posterior_draws_file = length(drawsinfo);
     else
         if ishssmc(options_)
             % Load draws from the posterior distribution

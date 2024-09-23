@@ -19,7 +19,7 @@ function [nvar,vartan,NumberOfConditionalDecompFiles] = ...
 %   vartan                           [char]     array of characters (with nvar rows).
 %   NumberOfConditionalDecompFiles   [integer]  scalar, number of prior or posterior data files (for covariance).
 
-% Copyright © 2009-2023 Dynare Team
+% Copyright © 2009-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,9 +37,11 @@ function [nvar,vartan,NumberOfConditionalDecompFiles] = ...
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 
+folder_name=get_posterior_folder_name(options_);
+
 % Get informations about the _posterior_draws files.
 if strcmpi(type,'posterior')
-    NumberOfDrawsFiles = length(dir([M_.dname '/metropolis/' M_.fname '_' type '_draws*' ]));
+    NumberOfDrawsFiles = length(dir([M_.dname filesep folder_name filesep M_.fname '_' type '_draws*' ]));
     posterior = 1;
 elseif strcmpi(type,'prior')
     NumberOfDrawsFiles = length(dir([M_.dname '/prior/draws/' type '_draws*' ]));
@@ -51,8 +53,8 @@ end
 
 %delete old stale files before creating new ones
 if posterior
-    delete_stale_file([M_.dname '/metropolis/' M_.fname '_PosteriorConditionalVarianceDecomposition*'])
-    delete_stale_file([M_.dname '/metropolis/' M_.fname '_PosteriorConditionalVarianceDecompositionME*'])
+    delete_stale_file([M_.dname filesep folder_name filesep M_.fname '_PosteriorConditionalVarianceDecomposition*'])
+    delete_stale_file([M_.dname filesep folder_name filesep M_.fname '_PosteriorConditionalVarianceDecompositionME*'])
 else
     delete_stale_file([M_.dname '/prior/moments/' M_.fname '_PriorConditionalVarianceDecomposition*'])
     delete_stale_file([M_.dname '/prior/moments/' M_.fname '_PriorConditionalVarianceDecompositionME*'])
@@ -118,7 +120,7 @@ linea = 0;
 linea_ME = 0;
 for file = 1:NumberOfDrawsFiles
     if posterior
-        temp=load([M_.dname '/metropolis/' M_.fname '_' type '_draws' num2str(file) ]);
+        temp=load([M_.dname filesep folder_name filesep M_.fname '_' type '_draws' num2str(file) ]);
     else
         temp=load([M_.dname '/prior/draws/' type '_draws' num2str(file) ]);
     end
@@ -146,7 +148,7 @@ for file = 1:NumberOfDrawsFiles
             ConditionalDecompFileNumber = ConditionalDecompFileNumber + 1;
             linea = 0;
             if posterior
-                save([M_.dname '/metropolis/' M_.fname '_PosteriorConditionalVarianceDecomposition' int2str(ConditionalDecompFileNumber) '.mat' ], ...
+                save([M_.dname filesep folder_name filesep M_.fname '_PosteriorConditionalVarianceDecomposition' int2str(ConditionalDecompFileNumber) '.mat' ], ...
                      'Conditional_decomposition_array','endo_names');
             else
                 save([M_.dname '/prior/moments/' M_.fname '_PriorConditionalVarianceDecomposition' int2str(ConditionalDecompFileNumber) '.mat' ], ...
@@ -167,7 +169,7 @@ for file = 1:NumberOfDrawsFiles
                 ConditionalDecompFileNumber_ME = ConditionalDecompFileNumber_ME + 1;
                 linea_ME = 0;
                 if posterior
-                    save([M_.dname '/metropolis/' M_.fname '_PosteriorConditionalVarianceDecompME' int2str(ConditionalDecompFileNumber_ME) '.mat' ], ...
+                    save([M_.dname filesep folder_name filesep M_.fname '_PosteriorConditionalVarianceDecompME' int2str(ConditionalDecompFileNumber_ME) '.mat' ], ...
                          'Conditional_decomposition_array_ME','endo_names');
                 else
                     save([M_.dname '/prior/moments/' M_.fname '_PriorConditionalVarianceDecompME' int2str(ConditionalDecompFileNumber_ME) '.mat' ], ...

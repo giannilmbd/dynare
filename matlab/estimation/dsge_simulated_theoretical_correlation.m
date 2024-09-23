@@ -18,7 +18,7 @@ function [nvar,vartan,CorrFileNumber] = dsge_simulated_theoretical_correlation(S
 %   vartan         [char]           array of characters (with nvar rows).
 %   CorrFileNumber [integer]        scalar, number of prior or posterior data files (for correlation).
 
-% Copyright © 2007-2021 Dynare Team
+% Copyright © 2007-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,9 +38,11 @@ function [nvar,vartan,CorrFileNumber] = dsge_simulated_theoretical_correlation(S
 [ivar,vartan] = get_variables_list(options_, M_);
 nvar = length(ivar);
 
+folder_name=get_posterior_folder_name(options_);
+
 % Get informations about the _posterior_draws files.
 if strcmpi(type,'posterior')
-    CorrFileNumber = length(dir([M_.dname '/metropolis/' M_.fname '_PosteriorCorrelations*']));
+    CorrFileNumber = length(dir([M_.dname filesep folder_name filesep M_.fname '_PosteriorCorrelations*']));
 elseif strcmpi(type,'prior')
     CorrFileNumber = length(dir([M_.dname '/prior/moments/' M_.fname '_PriorCorrelations*']));
 else
