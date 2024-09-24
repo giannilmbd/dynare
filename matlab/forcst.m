@@ -1,5 +1,5 @@
-function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,oo_,options_)
-% function [yf,int_width,int_width_ME]=forecst(dr,y0,horizon,var_list,M_,oo_,options_)
+function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,options_)
+% function [yf,int_width,int_width_ME]=forecst(dr,y0,horizon,var_list,M_,options_)
 %   computes mean forecast for a given value of the parameters
 %   computes also confidence band for the forecast
 %
@@ -10,7 +10,6 @@ function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,oo_,option
 %   var_list:    list of variables (character matrix)
 %   M_:          Dynare model structure
 %   options_:    Dynare options structure
-%   oo_:         Dynare results structure
 
 % OUTPUTS:
 %   yf:          mean forecast

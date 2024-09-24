@@ -162,9 +162,9 @@ end
 
 if M_.exo_det_nbr == 0
     if isequal(M_.H,0)
-        [yf,int_width] = forcst(oo_.dr,y0,horizon,var_list,M_,oo_,options_);
+        [yf,int_width] = forcst(oo_.dr,y0,horizon,var_list,M_,options_);
     else
-        [yf,int_width,int_width_ME] = forcst(oo_.dr,y0,horizon,var_list,M_,oo_,options_);
+        [yf,int_width,int_width_ME] = forcst(oo_.dr,y0,horizon,var_list,M_,options_);
     end
 else
     exo_det_length = size(oo_.exo_det_simul,1)-M_.maximum_lag;
