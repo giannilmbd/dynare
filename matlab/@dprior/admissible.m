@@ -133,7 +133,7 @@ try
     for i = 1:ndraws
         draw = o.draw();
         if ~o.admissible(draw)
-            error()
+            error('problem in admissible')
         end
     end
     t(1) = true;

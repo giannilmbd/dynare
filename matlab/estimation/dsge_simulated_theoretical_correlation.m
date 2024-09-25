@@ -44,6 +44,5 @@ if strcmpi(type,'posterior')
 elseif strcmpi(type,'prior')
     CorrFileNumber = length(dir([M_.dname '/prior/moments/' M_.fname '_PriorCorrelations*']));
 else
-    disp('dsge_simulated_theoretical_correlation:: Unknown type!');
-    error()
+    error('dsge_simulated_theoretical_correlation:: Unknown type!');
 end
