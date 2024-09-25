@@ -1,3 +1,58 @@
+Announcement for Dynare 6.2 (on 2024-09-25)
+===========================================
+
+We are pleased to announce the release of Dynare 6.2.
+
+This maintenance release fixes various bugs.
+
+The Windows, macOS, MATLAB online and source packages are available for
+download at [the Dynare website](https://www.dynare.org/download/).
+
+This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
+24.2 (R2024b), and with GNU Octave versions ranging from 7.1.0 to 9.2.0 (NB:
+the Windows package requires version 9.2.0 specifically).
+
+Here is a list of the problems identified in version 6.1 and that have been
+fixed in version 6.2:
+
+* The mixed complementarity problem (MCP) solver could fail or give wrong
+  results in some cases where there were multiple complementarity conditions
+* The `qmc_sequence` MEX file from the macOS package would fail to load
+* OccBin forecasts would crash in case of shocks with zero variance
+* OccBin smoother would crash if simulation did not converge
+* Computation of posterior moments could crash in large models
+* The auxiliary particle filter and the Liu & West online filter
+  (`mode_compute=11`) required the Statistics Toolbox
+* The auxiliary particle filter and the Liu & West online filter
+  (`mode_compute=11`) would not work with the `discretionary_policy` command
+* The `discretionary_policy` command would crash if there were fewer than two
+  exogenous variables
+* Using the `forecast` command with a model solved at `order>1` without
+  `varexo_det` would return forecasts based on a first order approximation
+  instead of providing an error message
+* Using the `forecast` command with a model solved at `order=2` with
+  `varexo_det` and `pruning` would return forecasts without `pruning` instead
+  of providing an error message
+* Using the `forecast` command with a model solved at `order=3` would crash
+* SMC methods could return wrong posterior results if the Parallel Toolbox was
+  installed
+* The Herbst-Schorfheide SMC sampler would crash at `order>1`
+* Annualized shock decomposition would not output results if desired vintage
+  date did not coincide to an end-of-the-year Q4 period
+* Using `rand_multivariate_student` as the proposal density in the
+  `tailored_random_block_metropolis_hastings` posterior sampler would return
+  wrong results
+* The `onlyclearglobals` of the `dynare` command was not working as intended
+* The `det_cond_forecast` command would crash with plans including only
+  expected shocks
+* Estimation could crash in some rare cases when computing the 2nd order
+  moments of prior or posterior distribution
+* Successive calls of the Herbst-Schorfheide SMC sampler could crash due to
+  some stale files being left on disk
+* The shock decomposition plot could be wrong in the presence of leads/lags on
+  exogenous variables, or when the steady state is squeezed
+
+
 Announcement for Dynare 6.1 (on 2024-05-02)
 ===========================================
 
