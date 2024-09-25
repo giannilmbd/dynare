@@ -87,6 +87,6 @@ steady;
 smoother2histval(period = 5);
 
 options_.loglinear=0;
-stoch_simul(nomoments);
+stoch_simul(nomoments,order=1);
 
 forecast;

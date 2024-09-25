@@ -54,6 +54,6 @@ b(0) = 0.1;
 a(0) = 0.3;
 end;
 
-stoch_simul(nograph, periods = 200);
+stoch_simul(nograph, periods = 200,order=1);
 
 forecast;

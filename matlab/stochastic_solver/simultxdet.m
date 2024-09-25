@@ -1,5 +1,5 @@
 function [y_,int_width,int_width_ME]=simultxdet(y0,ex,ex_det, iorder,var_list,M_,oo_,options_)
-%function [y_,int_width]=simultxdet(y0,ex,ex_det, iorder,var_list,M_,oo_,options_)
+%function [y_,int_width,int_width_ME]=simultxdet(y0,ex,ex_det, iorder,var_list,M_,oo_,options_)
 %
 % Simulates a stochastic model in the presence of deterministic exogenous shocks
 %
@@ -39,6 +39,11 @@ function [y_,int_width,int_width_ME]=simultxdet(y0,ex,ex_det, iorder,var_list,M_
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+if options_.order>2 
+    error('simultxdet.m: Forecasting with varexo_det does not support order>2.')   
+elseif options_.order==2 && options_.pruning
+    error('simultxdet.m: Forecasting with varexo_det does not support pruning.')
+end
 dr = oo_.dr;
 ykmin = M_.maximum_lag;
 endo_nbr = M_.endo_nbr;
@@ -50,7 +55,6 @@ iter = size(ex,1);
 if size(ex_det, 1) ~= iter+ykmin
     error('Size mismatch: number of forecasting periods for stochastic exogenous and deterministic exogenous don''t match')
 end
-nx = size(dr.ghu,2);
 y_ = zeros(size(y0,1),iter+ykmin);
 y_(:,1:ykmin) = y0;
 k1 = ykmin:-1:1;

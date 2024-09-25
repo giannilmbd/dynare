@@ -1,5 +1,5 @@
-function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,oo_,options_)
-% function [yf,int_width,int_width_ME]=forecst(dr,y0,horizon,var_list,M_,oo_,options_)
+function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,options_)
+% function [yf,int_width,int_width_ME]=forecst(dr,y0,horizon,var_list,M_,options_)
 %   computes mean forecast for a given value of the parameters
 %   computes also confidence band for the forecast
 %
@@ -10,7 +10,6 @@ function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,oo_,option
 %   var_list:    list of variables (character matrix)
 %   M_:          Dynare model structure
 %   options_:    Dynare options structure
-%   oo_:         Dynare results structure
 
 % OUTPUTS:
 %   yf:          mean forecast
@@ -22,7 +21,7 @@ function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,oo_,option
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2019 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,6 +37,10 @@ function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,oo_,option
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
+if options_.order>1
+    error('forcst.m: Only order=1 is supported. Skipping computuations.')
+end
 
 yf = simult_(M_,options_,y0,dr,zeros(horizon,M_.exo_nbr),1);
 nstatic = M_.nstatic;
