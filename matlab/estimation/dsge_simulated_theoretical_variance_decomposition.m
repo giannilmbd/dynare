@@ -46,8 +46,7 @@ elseif strcmpi(type,'prior')
     CheckPath('prior/moments',M_.dname);
     posterior = 0;
 else
-    disp('dsge_simulated_theoretical_variance_decomposition:: Unknown type!')
-    error()
+    error('dsge_simulated_theoretical_variance_decomposition:: Unknown type!')
 end
 
 %delete old stale files before creating new ones

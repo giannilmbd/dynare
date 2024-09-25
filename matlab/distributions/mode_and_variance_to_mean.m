@@ -177,8 +177,7 @@ if (distribution==4)% Beta distribution
     if length(idx)>1
         error('Multiplicity of solutions for the beta distribution specification.')
     elseif isempty(idx)
-        disp('No solution for the beta distribution specification. You should reduce the variance.')
-        error();
+        error('No solution for the beta distribution specification. You should reduce the variance.')
     end
     alpha = real_roots(idx);
     beta = ((1-m)*alpha+2*m-1)/m;

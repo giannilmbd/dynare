@@ -9,12 +9,16 @@ function [y_,int_width,int_width_ME]=simultxdet(y0,ex,ex_det, iorder,var_list,M_
 %    ex_det:    matrix of deterministic exogenous shocks, starting at period 1-M_.maximum_lag
 %    iorder:    order of approximation
 %    var_list:  list of endogenous variables to simulate
-%   int_width_ME:distance between upper bound and
-%                mean forecast when considering measurement error
+%    M_:        Dynare model structure
+%    oo_:       Dynare results structure
+%    options_:  Dynare options structure
+%
 % OUTPUTS:
 %   yf:          mean forecast
 %   int_width:   distance between upper bound and
 %                mean forecast
+%   int_width_ME:distance between upper bound and
+%                mean forecast when considering measurement error
 %   int_width_ME:distance between upper bound and
 %                mean forecast when considering measurement error
 %
@@ -118,6 +122,8 @@ elseif iorder == 2
         end
         k1 = k1+1;
     end
+else
+    error('simultxdet.m: order>2 not supported.')
 end
 
 [A,B] = kalman_transition_matrix(dr,nstatic+(1:nspred),1:nc);
@@ -132,7 +138,7 @@ sigma_y = 0;
 
 var_yf=NaN(iter,nvar); %initialize
 for i=1:iter
-    sigma_y1 = ghx1*sigma_y*ghx1'+sigma_u1;
+    sigma_y1 = ghx1*sigma_y*ghx1'+sigma_u1; %only valid at first order, needs to be fixed, see https://git.dynare.org/Dynare/dynare/-/issues/1940
     var_yf(i,:) = diag(sigma_y1)';
     if i == iter
         break

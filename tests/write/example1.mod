@@ -84,6 +84,6 @@ end;
 
 verbatim;
   if ~isequal(M_.observed_exo_names, {'ey'; 'ex'})
-    error()
+    error('Arguments are not identical')
   end
 end;
