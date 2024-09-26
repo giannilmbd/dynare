@@ -1,6 +1,6 @@
 function [endogenousvariables, success] = solve_stacked_linear_problem(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, M_, options_)
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -17,27 +17,31 @@ function [endogenousvariables, success] = solve_stacked_linear_problem(endogenou
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-[options_, y0, yT, z, i_cols, i_cols_J1, i_cols_T, i_cols_j, i_cols_1, i_cols_0, i_cols_J0, dynamicmodel] = ...
-    initialize_stacked_problem(endogenousvariables, options_, M_, steadystate_y);
+if M_.maximum_lag > 0
+    y0 = endogenousvariables(:, M_.maximum_lag);
+else
+    y0 = NaN(M_.endo_nbr, 1);
+end
+if M_.maximum_lead > 0
+    yT = endogenousvariables(:, M_.maximum_lag+options_.periods+1);
+else
+    yT = NaN(M_.endo_nbr, 1);
+end
+z = endogenousvariables(:,M_.maximum_lag+(1:options_.periods));
 
-ip = find(M_.lead_lag_incidence(1,:)');
-ic = find(M_.lead_lag_incidence(2,:)');
-in = find(M_.lead_lag_incidence(3,:)');
-
-% Evaluate the Jacobian of the dynamic model at the deterministic steady state.
-[d1,jacobian] = dynamicmodel(steadystate_y([ip; ic; in]), transpose(steadystate_x), M_.params, steadystate_y, 1);
+% Evaluate the residuals and Jacobian of the dynamic model at the deterministic steady state.
+y3n = repmat(steadystate_y, 3, 1);
+[d1, TT_order, TT] = feval([M_.fname,'.sparse.dynamic_resid'], y3n, steadystate_x', M_.params, ...
+                           steadystate_y);
+jacobian = feval([M_.fname,'.sparse.dynamic_g1'], y3n, steadystate_x', M_.params, steadystate_y, ...
+                 M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
+                 M_.dynamic_g1_sparse_colptr, TT_order, TT);
 
 % Check that the dynamic model was evaluated at the steady state.
 if ~options_.steadystate.nocheck && max(abs(d1))>1e-12
     error('Jacobian is not evaluated at the steady state!')
 end
 
-nyp = nnz(M_.lead_lag_incidence(1,:));
-ny0 = nnz(M_.lead_lag_incidence(2,:));
-nyf = nnz(M_.lead_lag_incidence(3,:));
-nd = nyp+ny0+nyf; % size of y (first argument passed to the dynamic file).
-jexog = transpose(nd+(1:M_.exo_nbr));
-jendo = transpose(1:nd);
 z = bsxfun(@minus, z, steadystate_y);
 x = bsxfun(@minus, exogenousvariables, steadystate_x');
 
@@ -46,9 +50,7 @@ x = bsxfun(@minus, exogenousvariables, steadystate_x');
                                            options_, ...
                                            jacobian, y0-steadystate_y, yT-steadystate_y, ...
                                            x, M_.params, steadystate_y, ...
-                                           M_.maximum_lag, options_.periods, M_.endo_nbr, i_cols, ...
-                                           i_cols_J1, i_cols_1, i_cols_T, i_cols_j, i_cols_0, i_cols_J0, ...
-                                           jendo, jexog);
+                                           M_.maximum_lag, options_.periods, M_.endo_nbr);
 
 if all(imag(y)<.1*options_.dynatol.x)
     if ~isreal(y)
