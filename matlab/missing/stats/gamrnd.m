@@ -132,7 +132,7 @@ return % --*-- Unit tests --*--
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Weibull-rejection', 'large', 'Knuth');
     n = 1000000;
-    m = 100;
+    m = 1;
     a = 0.1;
     b = 1.0;
     try
@@ -171,7 +171,7 @@ end
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Johnk', 'large', 'Knuth');
     n = 1000000;
-    m = 100;
+    m = 1;
     a = 0.1;
     b = 1.0;
     try
@@ -210,7 +210,7 @@ end
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Berman', 'large', 'Knuth');
     n = 1000000;
-    m = 100;
+    m = 1;
     a = 0.1;
     b = 1.0;
     try
@@ -249,7 +249,7 @@ end
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Ahrens-Dieter', 'large', 'Knuth');
     n = 1000000;
-    m = 100;
+    m = 1;
     a = 0.1;
     b = 1.0;
     try
@@ -287,8 +287,8 @@ end
 %@test:5
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Best', 'large', 'Knuth');
-    n = 1000000;
-    m = 100;
+    n = 10000000;
+    m = 1;
     a = 0.1;
     b = 1.0;
     try
@@ -326,8 +326,8 @@ end
 %@test:6
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Weibull-rejection', 'large', 'Knuth');
-    n = 1000000;
-    m = 100;
+    n = 10000000;
+    m = 1;
     a = 1.5;
     b = 1.0;
     try
@@ -365,8 +365,8 @@ end
 %@test:7
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Weibull-rejection', 'large', 'Cheng');
-    n = 1000000;
-    m = 100;
+    n = 10000000;
+    m = 1;
     a = 1.5;
     b = 1.0;
     try
@@ -404,8 +404,8 @@ end
 %@test:8
 if ~isoctave && ~user_has_matlab_license('statistics_toolbox')
     method = struct('small', 'Weibull-rejection', 'large', 'Best');
-    n = 1000000;
-    m = 100;
+    n = 10000000;
+    m = 1;
     a = 1.5;
     b = 1.0;
     try
