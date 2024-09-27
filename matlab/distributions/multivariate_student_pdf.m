@@ -44,7 +44,7 @@ return % --*-- Unit tests --*--
 %@test:1
 % Normal density
 try
-    m1 = multivariate_student_pdf([1 2],0,chol([1 0.5; 0.5 1]),10)
+    m1 = multivariate_student_pdf([1 2],0,chol([1 0.5; 0.5 1]),10);
     t(1) = true;
 catch
     t(1) = false;
