@@ -27,6 +27,10 @@ pfm.ny = M_.endo_nbr;
 pfm.Sigma = M_.Sigma_e;
 if det(pfm.Sigma) > 0
     pfm.Omega = chol(pfm.Sigma,'upper'); % Sigma = Omega'*Omega
+else
+    if options_.ep.stochastic.order>0
+        error('setup_stochastic_perfect_foresight_model_solver:: the covariance matrix of shocks must be positive definite when using stochastic extended path')
+    end
 end
 pfm.number_of_shocks = length(pfm.Sigma);
 pfm.stochastic_order = options_.ep.stochastic.order;
