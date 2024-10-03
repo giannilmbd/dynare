@@ -542,17 +542,13 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                 oo_ = compute_moments_varendo('posterior',options_,M_,oo_,estim_params_,var_list_);
             end
             if options_.smoother || ~isempty(options_.filter_step_ahead) || options_.forecast
-                if ~ishssmc(options_) && ~isdime(options_)
-                    if error_flag
-                        error('%s: I cannot compute the posterior statistics!',dispString)
-                    end
-                    if options_.order==1 && ~options_.particle.status
-                        oo_=prior_posterior_statistics('posterior',dataset_,dataset_info,M_,oo_,options_,estim_params_,bayestopt_,dispString); %get smoothed and filtered objects and forecasts
-                    else
-                        error('%s: Particle Smoothers are not yet implemented.',dispString)
-                    end
+                if error_flag
+                    error('%s: I cannot compute the posterior statistics!',dispString)
+                end
+                if options_.order==1 && ~options_.particle.status
+                    oo_=prior_posterior_statistics('posterior',dataset_,dataset_info,M_,oo_,options_,estim_params_,bayestopt_,dispString); %get smoothed and filtered objects and forecasts
                 else
-                    fprintf('%s: SMC does not yet support the smoother and forecast options. Skipping computation.\n',dispString);
+                    error('%s: Particle Smoothers are not yet implemented.',dispString)
                 end
             end
         else
