@@ -32,9 +32,10 @@ error_flag=false;
 if ~issmc(options_)
     record=load_last_mh_history_file([M_.dname filesep 'metropolis'], M_.fname);
     TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-    NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
+    NumberOfDrawsPerChain = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
+    NumberOfDraws=NumberOfDrawsPerChain*record.Nblck;
     if isempty(options_.sub_draws)
-        sub_draws = min(options_.posterior_max_subsample_draws, ceil(.25*NumberOfDraws));
+        sub_draws = min(options_.posterior_max_subsample_draws, ceil(NumberOfDraws));
     else
         if options_.sub_draws>NumberOfDraws*record.Nblck
             skipline()
@@ -62,7 +63,7 @@ else
         error('set_number_of_subdraws:: case should not happen. Please contact the developers')
     end
     if isempty(options_.sub_draws)
-        sub_draws = min(options_.posterior_max_subsample_draws, ceil(.25*NumberOfDraws));
+        sub_draws = min(options_.posterior_max_subsample_draws, NumberOfDraws);
     else
         if options_.sub_draws>NumberOfDraws
             skipline()
