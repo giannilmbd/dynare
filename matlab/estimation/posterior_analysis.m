@@ -20,25 +20,25 @@ function oo_ = posterior_analysis(type,arg1,arg2,arg3,options_,M_,oo_,estim_para
 info = check_posterior_analysis_data(type,M_,options_);
 SampleSize = options_.sub_draws;
 switch info
-  case 0
-    disp('check_posterior_analysis_data:: Can''t find any mcmc file!')
-    error('Check the options of the estimation command...')
-  case {1,2}
-    MaxMegaBytes = options_.MaximumNumberOfMegaBytes;
-    drsize = size_of_the_reduced_form_model(oo_.dr);
-    if drsize*SampleSize>MaxMegaBytes
-        drsize=0;
-    end
-    selec_posterior_draws(M_,options_,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state,estim_params_,SampleSize,drsize); %save draws to disk
-    oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
-  case {4,5}
-    oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
-  case 6
-    [ivar,vartan] = get_variables_list(options_,M_);
-    nvar = length(ivar);
-    oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_,nvar,vartan);
-  otherwise
-    error('posterior_analysis:: Check_posterior_analysis_data gave a meaningless output!')
+    case 0
+        disp('check_posterior_analysis_data:: Can''t find any mcmc file!')
+        error('Check the options of the estimation command...')
+    case {1,2} %need to get draws and store posterior
+        MaxMegaBytes = options_.MaximumNumberOfMegaBytes;
+        drsize = size_of_the_reduced_form_model(oo_.dr);
+        if drsize*SampleSize>MaxMegaBytes
+            drsize=0;
+        end
+        selec_posterior_draws(M_,options_,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state,estim_params_,SampleSize,drsize); %save draws to disk
+        oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
+    case {4,5} %process draws and save files
+        oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
+    case 6 %just read out
+        [ivar,vartan] = get_variables_list(options_,M_);
+        nvar = length(ivar);
+        oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_,nvar,vartan);
+    otherwise
+        error('posterior_analysis:: Check_posterior_analysis_data gave a meaningless output!')
 end
 
 
