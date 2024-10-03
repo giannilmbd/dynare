@@ -1,26 +1,22 @@
-function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstMhFile, FirstLine, TotalNumberOfMhFile, NumberOfDraws, nblcks, blck)
-
+function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstLine , FirstMhFile, blck)
+% function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstLine , FirstMhFile, blck)
 % Gets all posterior draws.
 %
 % INPUTS
-% - options_               [struct]   Dynare's options.
-% - dname                  [char]     name of directory with results.
-% - fname                  [char]     name of mod file.
-% - column                 [integer]  scalar, parameter index.
-% - FirstMhFile            [integer]  scalar, first MH file.
-% - FirstLine              [integer]  scalar, first line in first MH file.
-% - TotalNumberOfMhFile    [integer]  scalar, total number of MH file.
-% - NumberOfDraws          [integer]  scalar, number of posterior draws.
-% - nblcks                 [integer]  scalar, total number of blocks.
-% - blck:                  [integer]  scalar, desired block to read.
+% - options_               [struct]             Dynare's options.
+% - dname                  [char]               name of directory with results.
+% - fname                  [char]               name of mod file.
+% - column                 [integer or string]  scalar, parameter index
+%                                               'all' if all parameters are 
+%                                               requested
+% - FirstMhFile            [integer]            optional scalar, first MH file to be used
+% - FirstLine              [integer]            optional scalar, first line in first MH file to be used
+% - blck:                  [integer]  scalar, desired block to read (optional)
 %
 % OUTPUTS
 % - draws:                 [double]   NumberOfDraws×1 vector, draws from posterior distribution.
-%
-% REMARKS
-% Only the first and third input arguments are required for SMC samplers.
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,23 +33,35 @@ function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstMhFil
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+if isnumeric(column) && column<0
+    error('GetAllPosteriorDraws:: column cannot be negative');
+end
+
 if issmc(options_)
     if ishssmc(options_)
         % Load draws from the posterior distribution
         pfiles = dir(sprintf('%s/hssmc/particles-*.mat', dname));
         posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', dname, length(pfiles), length(pfiles)));
-        if column==0
-            draws = posterior.tlogpostkernel;
+        if column>0 || strcmp(column,'all')
+            if strcmp(column,'all')
+                draws = transpose(posterior.particles);
+            else
+                draws = transpose(posterior.particles(column,:));
+            end
         else
-            draws = transpose(posterior.particles(column,:));
+            draws = posterior.tlogpostkernel;
         end
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
         tune = posterior.tune;
         chains = posterior.chains(end-tune:end,:,:);
-        if column>0
+        if column>0 || strcmp(column,'all')
             chains = reshape(chains, [], size(chains, 3));
-            draws = chains(:,column);
+            if strcmp(column,'all')
+                draws = chains;
+            else
+                draws = chains(:,column);
+            end
         else
             draws = posterior.lprobs;
         end
@@ -61,11 +69,26 @@ if issmc(options_)
         error('GetAllPosteriorDraws:: case should not happen. Please contact the developers')
     end
 else
+    DirectoryName = CheckPath('metropolis',dname);
+    record=load_last_mh_history_file(DirectoryName,fname);
+    if nargin<5 || isempty(FirstLine)
+        FirstLine = record.KeepedDraws.FirstLine;
+    end
+    if nargin<6 || isempty(FirstMhFile)
+        FirstMhFile = record.KeepedDraws.FirstMhFile;
+    end
+    TotalNumberOfMhFile = sum(record.MhDraws(:,2));
+    TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
+    NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
+    [nblcks, npar] = size(record.LastParameters);
     iline = FirstLine;
     linee = 1;
-    DirectoryName = CheckPath('metropolis',dname);
-    if nblcks>1 && nargin<10
-        draws = zeros(NumberOfDraws*nblcks,1);
+    if nblcks>1 && nargin<7
+        if strcmp(column,'all')
+            draws = zeros(NumberOfDraws*nblcks,npar);
+        else
+            draws = zeros(NumberOfDraws*nblcks,1);
+        end
         iline0=iline;
         if column>0
             for blck = 1:nblcks
@@ -73,7 +96,11 @@ else
                 for file = FirstMhFile:TotalNumberOfMhFile
                     load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'x2')
                     NumberOfLines = size(x2(iline:end,:),1);
-                    draws(linee:linee+NumberOfLines-1) = x2(iline:end,column);
+                    if strcmp(column,'all')
+                        draws(linee:linee+NumberOfLines-1,:) = x2(iline:end,:);
+                    else
+                        draws(linee:linee+NumberOfLines-1) = x2(iline:end,column);
+                    end
                     linee = linee+NumberOfLines;
                     iline = 1;
                 end
@@ -90,15 +117,25 @@ else
                 end
             end
         end
-    else
+    else %read desired block
         if nblcks==1
             blck=1;
         end
+        if strcmp(column,'all')
+            draws = zeros(NumberOfDraws,npar);
+        else
+            draws = zeros(NumberOfDraws,1);
+        end
+
         if column>0
             for file = FirstMhFile:TotalNumberOfMhFile
                 load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'x2')
                 NumberOfLines = size(x2(iline:end,:),1);
-                draws(linee:linee+NumberOfLines-1) = x2(iline:end,column);
+                if strcmp(column,'all')
+                    draws(linee:linee+NumberOfLines-1,:) = x2(iline:end,:);
+                else
+                    draws(linee:linee+NumberOfLines-1) = x2(iline:end,column);
+                end
                 linee = linee+NumberOfLines;
                 iline = 1;
             end

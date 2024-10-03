@@ -203,20 +203,12 @@ localVars.bayestopt_=bayestopt_;
 
 
 if strcmpi(type,'posterior')
-    record=load_last_mh_history_file(DirectoryName, M_.fname);
-    [nblck, npar] = size(record.LastParameters);
-    FirstMhFile = record.KeepedDraws.FirstMhFile;
-    FirstLine = record.KeepedDraws.FirstLine;
-    TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
-    TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-    NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
-    mh_nblck = options_.mh_nblck;
-    if B==NumberOfDraws*mh_nblck
+    [~, ~, NumberOfDraws]=set_number_of_subdraws(M_,options_);
+
+    if B==NumberOfDraws
         % we load all retained MH runs !
-        logpost=GetAllPosteriorDraws(options_, M_.dname, M_.fname, 0, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck);
-        for column=1:npar
-            x(:,column) = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck);
-        end
+        logpost=GetAllPosteriorDraws(options_, M_.dname, M_.fname, 0);
+        x = GetAllPosteriorDraws(options_, M_.dname, M_.fname, 'all');
     else
         [x, logpost]=get_posterior_subsample(M_,options_,B);
     end

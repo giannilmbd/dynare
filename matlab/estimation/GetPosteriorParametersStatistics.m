@@ -44,17 +44,7 @@ np      = estim_params_.np ;
 latexFolder = CheckPath('latex',M_.dname);
 FileName = M_.fname;
 
-if ~issmc(options_)
-    MetropolisFolder = CheckPath('metropolis',M_.dname);
-    record=load_last_mh_history_file(MetropolisFolder,FileName);
-    FirstLine = record.KeepedDraws.FirstLine;
-    TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
-    TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-    FirstMhFile = record.KeepedDraws.FirstMhFile;
-    NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
-    mh_nblck = size(record.LastParameters,1);
-    clear record;
-end
+[~, ~, num_draws]=set_number_of_subdraws(M_,options_); %get number of draws
 
 header_width = row_header_width(M_, estim_params_, bayestopt_);
 hpd_interval=[num2str(options_.mh_conf_sig*100), '% HPD interval'];
@@ -67,31 +57,18 @@ skipline()
 
 if ishssmc(options_)
     dprintf('Log data density is %f.', oo_.MarginalDensity.hssmc);
-    % Set function handle for GetAllPosteriorDraws
-    getalldraws = @(i) GetAllPosteriorDraws(options_, M_.dname, [], i);
+    hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 elseif isdime(options_)
-    getalldraws = @(i) GetAllPosteriorDraws(options_, M_.dname, [], i);
+    hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 else
     if ~isfield(oo_,'MarginalDensity') || (issmc(options_) && ~isfield(oo_.MarginalDensity,'ModifiedHarmonicMean'))
         [~, oo_] = marginal_density(M_, options_, estim_params_, oo_, bayestopt_);
     end
     fprintf('Log data density (Modified Harmonic Mean) is %f.', oo_.MarginalDensity.ModifiedHarmonicMean);
-    % Set function handle for GetAllPosteriordraws
-    getalldraws = @(i) GetAllPosteriorDraws(options_, M_.dname, M_.fname, i, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, mh_nblck);
-end
-
-if ishssmc(options_)
-    num_draws = options_.posterior_sampler_options.hssmc.particles;
-    hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
-elseif isdime(options_)
-    nchain = options_.posterior_sampler_options.current_options.nchain;
-    tune = options_.posterior_sampler_options.current_options.tune;
-    num_draws = nchain*tune;
-    hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
-else
-    num_draws=NumberOfDraws*mh_nblck;
     hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 end
+% Set function handle for GetAllPosteriorDraws
+getalldraws = @(i) GetAllPosteriorDraws(options_, M_.dname, M_.fname, i);
 
 if hpd_draws<2
     fprintf('posterior_moments: There are not enough draws computes to compute HPD Intervals. Skipping their computation.\n')
