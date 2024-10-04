@@ -133,3 +133,15 @@ end
 if max(abs(endo_simul_0(:)-endo_simul_1(:)))>.01*options_.dynatol.f
     error('Something is wrong!')
 end
+
+// Test stack_solve_algo=0+linear_approximation, which uses a different codepath than stack_solve_algo=7
+perfect_foresight_setup(periods=300);
+perfect_foresight_solver(linear_approximation, stack_solve_algo=0);
+endo_simul_2 = oo_.endo_simul;
+if ~oo_.deterministic_simulation.status
+   error('Perfect foresight simulation failed')
+end
+
+if max(abs(endo_simul_0(:)-endo_simul_2(:)))>.01*options_.dynatol.f
+    error('Something is wrong!')
+end

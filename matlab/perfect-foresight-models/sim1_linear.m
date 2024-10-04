@@ -39,7 +39,7 @@ function [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, 
 % to center the variables around the deterministic steady state to solve the
 % perfect foresight model.
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -58,48 +58,14 @@ function [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, 
 
 verbose = options_.verbosity;
 
-lead_lag_incidence = M_.lead_lag_incidence;
-
 ny = M_.endo_nbr;
 nx = M_.exo_nbr;
 
 maximum_lag = M_.maximum_lag;
-max_lag = M_.maximum_endo_lag;
-
-nyp = nnz(lead_lag_incidence(1,:));
-ny0 = nnz(lead_lag_incidence(2,:));
-nyf = nnz(lead_lag_incidence(3,:));
-
-nd = nyp+ny0+nyf; % size of y (first argument passed to the dynamic file).
 
 periods = options_.periods;
 
 params = M_.params;
-
-% Indices in A.
-ip   = find(lead_lag_incidence(1,:)');
-ic   = find(lead_lag_incidence(2,:)');
-in   = find(lead_lag_incidence(3,:)');
-icn  = find(lead_lag_incidence(2:3,:)');
-ipcn = find(lead_lag_incidence');
-
-% Indices in y.
-jp  = nonzeros(lead_lag_incidence(1,:)');
-jc  = nonzeros(lead_lag_incidence(2,:)');
-jn  = nonzeros(lead_lag_incidence(3,:)');
-jpc = [jp; jc];
-jcn = [jc; jn];
-
-jexog = transpose(nd+(1:nx));
-jendo = transpose(1:nd);
-
-i_upd = maximum_lag*ny+(1:periods*ny);
-
-% Center the endogenous and exogenous variables around the deterministic steady state.
-endogenousvariables = bsxfun(@minus, endogenousvariables, steadystate_y);
-exogenousvariables = bsxfun(@minus, exogenousvariables, transpose(steadystate_x));
-
-Y = endogenousvariables(:);
 
 if verbose
     skipline()
@@ -108,24 +74,26 @@ if verbose
     skipline()
 end
 
-dynamicmodel = str2func([M_.fname,'.dynamic']);
-
-z = steadystate_y([ip; ic; in]);
-x = repmat(transpose(steadystate_x), 1+M_.maximum_exo_lag+M_.maximum_exo_lead, 1);
-
 % Evaluate the Jacobian of the dynamic model at the deterministic steady state.
-[d1, jacobian] = dynamicmodel(z, x, params, steadystate_y, M_.maximum_exo_lag+1);
+y3n = repmat(steadystate_y, 3, 1);
+[d1, TT_order, TT] = feval([M_.fname,'.sparse.dynamic_resid'], y3n, steadystate_x', params, ...
+                           steadystate_y);
+jacobian = feval([M_.fname,'.sparse.dynamic_g1'], y3n, steadystate_x', params, steadystate_y, ...
+                 M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
+                 M_.dynamic_g1_sparse_colptr, TT_order, TT);
+
 if options_.debug
-    column=find(all(jacobian==0,1));
+    column=find(all(jacobian(:, 1:3*ny)==0,1));
     if ~isempty(column)
         fprintf('The dynamic Jacobian is singular. The problem derives from:\n')
         for iter=1:length(column)
-            [var_row,var_index]=find(M_.lead_lag_incidence==column(iter));            
-            if var_row==2
+            var_index = mod(column(iter)-1, ny)+1;
+            lead_lag = floor((column(iter)-1)/ny)-1;
+            if lead_lag == 0
                 fprintf('The derivative with respect to %s being 0 for all equations.\n',M_.endo_names{var_index})
-            elseif var_row==1
+            elseif lead_lag == -1
                 fprintf('The derivative with respect to the lag of %s being 0 for all equations.\n',M_.endo_names{var_index})
-            elseif var_row==3
+            elseif lead_lag == 1
                 fprintf('The derivative with respect to the lead of %s being 0 for all equations.\n',M_.endo_names{var_index})
             end            
         end
@@ -137,55 +105,25 @@ if ~options_.steadystate.nocheck &&  max(abs(d1))>options_.solve_tolf
     error('Jacobian is not evaluated at the steady state!')
 end
 
-% current variables
-[r0,c0,v0] = find(jacobian(:,jc));
-% current and predetermined
-[rT,cT,vT] = find(jacobian(:,jpc));
-% current and jump variables
-[r1,c1,v1] = find(jacobian(:,jcn));
-% all endogenous variables
-[rr,cc,vv] = find(jacobian(:,jendo));
+% Center the endogenous and exogenous variables around the deterministic steady state.
+endogenousvariables = bsxfun(@minus, endogenousvariables, steadystate_y);
+exogenousvariables = bsxfun(@minus, exogenousvariables, transpose(steadystate_x));
 
-iv0 = 1:length(v0);
-ivT = 1:length(vT);
-iv1 = 1:length(v1);
-iv  = 1:length(vv);
-
-% Initialize the vector of residuals.
-res = zeros(periods*ny, 1);
-
-% Initialize the sparse Jacobian.
-iA = zeros(periods*M_.NNZDerivatives(1), 3);
+if M_.maximum_lag > 0
+    y0 = endogenousvariables(:, maximum_lag);
+else
+    y0 = NaN(M_.endo_nbr, 1);
+end
+if M_.maximum_lead > 0
+    yT = endogenousvariables(:, maximum_lag+periods+1);
+else
+    yT = NaN(M_.endo_nbr, 1);
+end
+Y = vec(endogenousvariables(:,maximum_lag+(1:periods)));
 
 h2 = clock;
-i_rows = (1:ny)';
-i_cols_A = ipcn;
-i_cols = ipcn+(maximum_lag-1)*ny;
-m = 0;
-for it = (maximum_lag+1):(maximum_lag+periods)
-    if periods==1 && isequal(it, maximum_lag+1)
-        nv = length(v0);
-        iA(iv0+m,:) = [i_rows(r0),ic(c0),v0];
-    elseif isequal(it, maximum_lag+periods)
-        nv = length(vT);
-        iA(ivT+m,:) = [i_rows(rT), i_cols_A(jpc(cT)), vT];
-    elseif isequal(it, maximum_lag+1)
-        nv = length(v1);
-        iA(iv1+m,:) = [i_rows(r1), icn(c1), v1];
-    else
-        nv = length(vv);
-        iA(iv+m,:) = [i_rows(rr),i_cols_A(cc),vv];
-    end
-    z(jendo) = Y(i_cols);
-    z(jexog) = transpose(exogenousvariables(it,:));
-    res(i_rows) = jacobian*z;
-    m = m + nv;
-    i_rows = i_rows + ny;
-    i_cols = i_cols + ny;
-    if it > maximum_lag+1
-        i_cols_A = i_cols_A + ny;
-    end
-end
+
+[res, A] = linear_perfect_foresight_problem(Y, jacobian, y0, yT, exogenousvariables, params, steadystate_y, maximum_lag, periods, ny);
 
 % Evaluation of the maximum residual at the initial guess (steady state for the endogenous variables).
 err = max(abs(res));
@@ -201,12 +139,9 @@ if options_.debug
     skipline()
 end
 
-iA = iA(1:m,:);
-A = sparse(iA(:,1), iA(:,2), iA(:,3), periods*ny, periods*ny);
-
 % Try to update the vector of endogenous variables.
 try
-    Y(i_upd) =  Y(i_upd) - A\res;
+    Y =  Y - A\res;
 catch
     % Normally, because the model is linear, the solution of the perfect foresight model should
     % be obtained in one Newton step. This is not the case if the model is singular.
@@ -219,15 +154,13 @@ catch
     return
 end
 
-i_cols = ipcn+(maximum_lag-1)*ny;
+YY = reshape([y0; Y; yT], ny, periods+2);
+
 i_rows = (1:ny)';
-for it = (maximum_lag+1):(maximum_lag+periods)
-    z(jendo) = Y(i_cols);
-    z(jexog) = transpose(exogenousvariables(it,:));
-    m = m + nv;
+for t = 1:periods
+    z = [ vec(YY(:,t+(0:2))); transpose(exogenousvariables(t+maximum_lag, :))];
     res(i_rows) = jacobian*z;
     i_rows = i_rows + ny;
-    i_cols = i_cols + ny;
 end
 
 ERR = max(abs(res));
@@ -239,7 +172,6 @@ end
 
 if any(isnan(res)) || any(isinf(res)) || any(isnan(Y)) || any(isinf(Y)) || ~isreal(res) || ~isreal(Y)
     success = false; % NaN or Inf occurred
-    endogenousvariables = reshape(Y, ny, periods+maximum_lag+M_.maximum_lead);
     if verbose
         skipline()
         if ~isreal(res) || ~isreal(Y)
@@ -251,8 +183,10 @@ if any(isnan(res)) || any(isinf(res)) || any(isnan(Y)) || any(isinf(Y)) || ~isre
     end
 else
     success = true; % Convergency obtained.
-    endogenousvariables = bsxfun(@plus, reshape(Y, ny, periods+maximum_lag+M_.maximum_lead), steadystate_y);
 end
+
+endogenousvariables(:,maximum_lag+(1:periods)) = reshape(Y, ny, periods);
+endogenousvariables = bsxfun(@plus, endogenousvariables, steadystate_y);
 
 if verbose
     skipline();
