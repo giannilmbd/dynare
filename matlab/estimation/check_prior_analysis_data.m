@@ -47,7 +47,6 @@ if ~exist([ M_.dname '/prior/draws'],'dir')
 end
 
 prior_draws_info = dir([ M_.dname '/prior/draws/prior_draws*.mat']);
-date_of_the_last_prior_draw_file = prior_draws_info(end).datenum;
 
 %% Get informations about _posterior_draws files.
 if isempty(prior_draws_info)
@@ -57,6 +56,7 @@ if isempty(prior_draws_info)
     end
     return
 else
+    date_of_the_last_prior_draw_file = prior_draws_info(end).datenum;
     date_of_the_prior_definition = get_date_of_a_file([ M_.dname '/prior/definition.mat']);
     if date_of_the_prior_definition>date_of_the_last_prior_draw_file
         info = 2;

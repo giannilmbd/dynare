@@ -659,7 +659,6 @@ options_.particleswarm = particleswarm;
 
 % prior analysis
 options_.prior_mc = 20000;
-options_.prior_analysis_endo_var_list = {};
 
 % did model undergo block decomposition + minimum feedback set computation ?
 options_.block = false;

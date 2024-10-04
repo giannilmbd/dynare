@@ -6,6 +6,8 @@ function results = prior_sampler(drsave,M_,bayestopt_,options_,oo_,estim_params_
 %   M_          [structure]  Model description.
 %   bayestopt_  [structure]  Prior distribution description.
 %   options_    [structure]  Global options of Dynare.
+%   oo_         [structure]     Dynare structure where the results are saved.
+%   estim_params_       [structure] characterizing parameters to be estimated
 %
 % OUTPUTS:
 %   results     [structure]  Various statistics.
@@ -13,7 +15,7 @@ function results = prior_sampler(drsave,M_,bayestopt_,options_,oo_,estim_params_
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2009-2023 Dynare Team
+% Copyright © 2009-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,14 +35,11 @@ function results = prior_sampler(drsave,M_,bayestopt_,options_,oo_,estim_params_
 % Initialization.
 Prior = dprior(bayestopt_, options_.prior_trunc);
 PriorDirectoryName = CheckPath('prior/draws',M_.dname);
-work = ~drsave;
 iteration = 0;
 loop_indx = 0;
-file_indx = [];
 count_bk_indeterminacy = 0;
 count_bk_unstability = 0;
 count_bk_singularity = 0;
-count_static_var_def = 0;
 count_no_steadystate = 0;
 count_steadystate_file_exit = 0;
 count_dll_problem = 0;

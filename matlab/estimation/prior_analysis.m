@@ -19,26 +19,26 @@ function oo_ = prior_analysis(type,arg1,arg2,arg3,options_,M_,oo_,estim_params_)
 info = check_prior_analysis_data(type,M_);
 SampleSize = options_.prior_mc;
 switch info
-  case {0,1,2}
-    MaxMegaBytes = options_.MaximumNumberOfMegaBytes;
-    drsize = size_of_the_reduced_form_model(oo_.dr);
-    if drsize*SampleSize>MaxMegaBytes
-        drsave=0;
-    else
-        drsave=1;
-    end
-    load([M_.dname '/prior/definition.mat']);
-    prior_sampler(drsave,M_,bayestopt_,options_,oo_,estim_params_);
-    clear('bayestopt_');
-    oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
-  case {4,5}
-    oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
-  case 6
-    [ivar,vartan] = get_variables_list(options_,M_);
-    nvar = length(ivar);
-    oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_,nvar,vartan);
-  otherwise
-    error('prior_analysis:: Check_prior_analysis_data gave a meaningless output!')
+    case {0,1,2}
+        MaxMegaBytes = options_.MaximumNumberOfMegaBytes;
+        drsize = size_of_the_reduced_form_model(oo_.dr);
+        if drsize*SampleSize>MaxMegaBytes
+            drsave=0;
+        else
+            drsave=1;
+        end
+        load([M_.dname '/prior/definition.mat']);
+        prior_sampler(drsave,M_,bayestopt_,options_,oo_,estim_params_);
+        clear('bayestopt_');
+        oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
+    case {4,5}
+        oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
+    case 6
+        [ivar,vartan] = get_variables_list(options_,M_);
+        nvar = length(ivar);
+        oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_,nvar,vartan);
+    otherwise
+        error('prior_analysis:: Check_prior_analysis_data gave a meaningless output!')
 end
 
 
@@ -53,7 +53,7 @@ switch type
   case 'variance'
     if nargin==narg1
         [nvar,vartan] = ...
-            dsge_simulated_theoretical_covariance(SampleSize,M_,options_,oo_,'prior');
+            dsge_simulated_theoretical_covariance(SampleSize,arg3,M_,options_,oo_,'prior');
     end
     oo_ = covariance_mc_analysis(SampleSize,'prior',M_.dname,M_.fname,...
                                  vartan,nvar,arg1,arg2,options_.mh_conf_sig,oo_,options_);
@@ -64,6 +64,17 @@ switch type
     end
     oo_ = variance_decomposition_mc_analysis(SampleSize,'prior',M_.dname,M_.fname,...
                                              M_.exo_names,arg2,vartan,arg1,options_.mh_conf_sig,oo_,options_);
+    if ~all(diag(M_.H)==0)
+        if strmatch(arg1,options_.varobs,'exact')
+            if isoctave && octave_ver_less_than('8.4') %Octave bug #60347
+                observable_name_requested_vars=intersect_stable(vartan,options_.varobs);
+            else
+                observable_name_requested_vars=intersect(vartan,options_.varobs,'stable');
+            end
+            oo_ = variance_decomposition_ME_mc_analysis(SampleSize,'prior',M_.dname,M_.fname,...
+                [M_.exo_names;'ME'],arg2,observable_name_requested_vars,arg1,options_.mh_conf_sig,oo_,options_);
+        end
+    end
   case 'correlation'
     if nargin==narg1
         [nvar,vartan] = ...
@@ -79,9 +90,9 @@ switch type
     oo_ = conditional_variance_decomposition_mc_analysis(SampleSize,'prior',M_.dname,M_.fname,...
                                                       arg3,M_.exo_names,arg2,vartan,arg1,options_.mh_conf_sig,oo_,options_);
     if ~all(diag(M_.H)==0)
-        if strmatch(vartan(arg1,:),options_.varobs,'exact')
+        if strmatch(arg1,options_.varobs,'exact')
             oo_ = conditional_variance_decomposition_ME_mc_analysis(SampleSize,'prior',M_.dname,M_.fname,...
-                                                              arg3,M_.exo_names,arg2,vartan,arg1,options_.mh_conf_sig,oo_,options_);
+                                                              arg3,[M_.exo_names;'ME'],arg2,vartan,arg1,options_.mh_conf_sig,oo_,options_);
         end
     end
   otherwise

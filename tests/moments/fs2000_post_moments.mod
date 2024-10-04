@@ -285,6 +285,12 @@ for var_iter_1=1:nvars
     end
 end
 
+
+options_.prior_mc=100;
+options_.qz_criterium = 1+1e-6;
+oo_ = compute_moments_varendo('prior',options_,M_,oo_,estim_params_,M_.endo_names(1:M_.orig_endo_nbr));
+
+
 /*
  * The following lines were used to generate the data file. If you want to
  * generate another random data file, comment the "estimation" line and uncomment

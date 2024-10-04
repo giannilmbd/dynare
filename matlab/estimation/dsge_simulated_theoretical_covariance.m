@@ -59,19 +59,8 @@ else
 end
 
 % Set varlist (vartan)
-if ~posterior
-    if isfield(options_,'varlist')
-        temp = options_.varlist;
-    end
-    options_.varlist = options_.prior_analysis_endo_var_list;
-end
 endo_names=options_.varlist;
 [ivar,vartan] = get_variables_list(options_,M_);
-if ~posterior
-    if exist('temp','var')
-        options_.varlist = temp;
-    end
-end
 nvar = length(ivar);
 
 if options_.pruning
@@ -117,6 +106,9 @@ for file = 1:NumberOfDrawsFiles
         temp=load([M_.dname filesep folder_name filesep M_.fname '_' type '_draws' num2str(file) ]);
     else
         temp=load([M_.dname '/prior/draws/' type '_draws' num2str(file) ]);
+        if columns(temp.pdraws)==3 && isstruct(temp.pdraws{1,3})
+            temp.pdraws(:,2)=[];
+        end
     end
     NumberOfDraws = rows(temp.pdraws);
     isdrsaved = columns(temp.pdraws)-1;
