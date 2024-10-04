@@ -36,8 +36,6 @@ if isoctave
     mlist = mlist(find(~strcmp([matlab_dir filesep 'load_m_file_data_legacy.m'], mlist)));
 end
 
-rng(1);
-
 failedtests = {};
 
 for i = 1:length(mlist)
