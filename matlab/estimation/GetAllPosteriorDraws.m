@@ -83,51 +83,21 @@ else
     [nblcks, npar] = size(record.LastParameters);
     iline = FirstLine;
     linee = 1;
-    if nblcks>1 && nargin<7
-        if strcmp(column,'all')
-            draws = zeros(NumberOfDraws*nblcks,npar);
-        else
-            draws = zeros(NumberOfDraws*nblcks,1);
-        end
-        iline0=iline;
-        if column>0
-            for blck = 1:nblcks
-                iline=iline0;
-                for file = FirstMhFile:TotalNumberOfMhFile
-                    load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'x2')
-                    NumberOfLines = size(x2(iline:end,:),1);
-                    if strcmp(column,'all')
-                        draws(linee:linee+NumberOfLines-1,:) = x2(iline:end,:);
-                    else
-                        draws(linee:linee+NumberOfLines-1) = x2(iline:end,column);
-                    end
-                    linee = linee+NumberOfLines;
-                    iline = 1;
-                end
-            end
-        else
-            for blck = 1:nblcks
-                iline=iline0;
-                for file = FirstMhFile:TotalNumberOfMhFile
-                    load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'logpo2')
-                    NumberOfLines = size(logpo2(iline:end),1);
-                    draws(linee:linee+NumberOfLines-1) = logpo2(iline:end);
-                    linee = linee+NumberOfLines;
-                    iline = 1;
-                end
-            end
-        end
-    else %read desired block
-        if nblcks==1
-            blck=1;
-        end
-        if strcmp(column,'all')
-            draws = zeros(NumberOfDraws,npar);
-        else
-            draws = zeros(NumberOfDraws,1);
-        end
-
-        if column>0
+    if nargin==7
+        blocks_to_load=blck;
+        nblcks=length(blck);
+    else
+        blocks_to_load=1:nblcks;
+    end
+    if strcmp(column,'all')
+        draws = zeros(NumberOfDraws*nblcks,npar);
+    else
+        draws = zeros(NumberOfDraws*nblcks,1);
+    end
+    iline0=iline;
+    if column>0
+        for blck = blocks_to_load
+            iline=iline0;
             for file = FirstMhFile:TotalNumberOfMhFile
                 load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'x2')
                 NumberOfLines = size(x2(iline:end,:),1);
@@ -139,10 +109,13 @@ else
                 linee = linee+NumberOfLines;
                 iline = 1;
             end
-        else
+        end
+    else
+        for blck = blocks_to_load
+            iline=iline0;
             for file = FirstMhFile:TotalNumberOfMhFile
                 load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'logpo2')
-                NumberOfLines = size(logpo2(iline:end,:),1);
+                NumberOfLines = size(logpo2(iline:end),1);
                 draws(linee:linee+NumberOfLines-1) = logpo2(iline:end);
                 linee = linee+NumberOfLines;
                 iline = 1;
