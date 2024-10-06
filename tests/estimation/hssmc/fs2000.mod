@@ -91,3 +91,5 @@ estimation(order=1, datafile='../fsdat_simul.m', nobs=192, loglinear,
                                       'target', .25),
 bayesian_irf, smoother, moments_varendo,consider_all_endogenous
 );
+
+generate_trace_plots(1);

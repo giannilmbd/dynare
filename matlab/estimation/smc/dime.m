@@ -85,7 +85,6 @@ function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_
     t0 = tic;
     [x, ~, lprob] = ...
         smc_samplers_initialization(funobj, 'dime', nchain, Prior, SimulationFolder, opts.niter);
-    tt = toc(t0);
     x = ptransform(x', bounds, true);
 
     disp_verbose(sprintf('Estimation:dime: log-posterior standard deviation (post.std) of a multivariate normal would be %.2f.\n', sqrt(0.5*ndim)), options_.verbosity);
@@ -164,7 +163,7 @@ function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_
 
         % be informative
         tt = toc(t0);
-        if iter == 1 | ~mod(iter,15)
+        if iter == 1 || ~mod(iter,15)
             disp_verbose('     #iter.      post.mode     post.std    %accept     lapsed', options_.verbosity)
             disp_verbose('     ------      ---------     --------    -------     ------', options_.verbosity)
         end

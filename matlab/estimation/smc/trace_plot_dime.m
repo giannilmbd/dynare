@@ -43,7 +43,6 @@ else
 end
 
 graphFolder = CheckPath('graphs',M_.dname);
-latexFolder = CheckPath('latex',M_.dname);
 hh_fig = dyn_figure(options_.nodisplay,'Name','DIME Convergence Diagnostics');
 
 hold on
