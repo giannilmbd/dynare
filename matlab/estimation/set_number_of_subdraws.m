@@ -1,5 +1,5 @@
-function [sub_draws, error_flag]=set_number_of_subdraws(M_,options_)
-% function [sub_draws, error_flag]=set_number_of_subdraws(M_,options_)
+function [sub_draws, error_flag, NumberOfDrawsPerChain]=set_number_of_subdraws(M_,options_)
+% function [sub_draws, error_flag, NumberOfDrawsPerChain]=set_number_of_subdraws(M_,options_)
 % Set option field sub_draws based on size of available sample
 % Inputs:
 %   M_          [structure]     Dynare model structure
@@ -9,6 +9,8 @@ function [sub_draws, error_flag]=set_number_of_subdraws(M_,options_)
 %   sub_draws   [scalar]        number of sub-draws
 %   error_flag  [boolean]       error indicate of insufficient draws are
 %                               available
+%   NumberOfDrawsPerChain [integer]     number of available posterior draws
+%                                       per chain
 
 % Copyright © 2024 Dynare Team
 %
@@ -54,11 +56,13 @@ else
         pfiles = dir(sprintf('%s/hssmc/particles-*.mat', M_.dname));
         posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
         NumberOfDraws = size(posterior.particles,2);
+        NumberOfDrawsPerChain=NumberOfDraws;
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', M_.dname, filesep(), 'dime', filesep()));
         tune = posterior.tune;
         chains = reshape(posterior.chains(end-tune:end,:,:), [], size(posterior.chains, 3));
         NumberOfDraws=size(chains,1);
+        NumberOfDrawsPerChain=NumberOfDraws;
     else
         error('set_number_of_subdraws:: case should not happen. Please contact the developers')
     end
