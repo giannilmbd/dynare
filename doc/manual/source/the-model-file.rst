@@ -11587,10 +11587,10 @@ the :comm:`bvar_forecast` command.
 
     |br| Describes the path of constrained endogenous, before calling
     ``conditional_forecast``. The syntax is similar to deterministic
-    shocks in ``shocks``, see ``conditional_forecast`` for an example.
+    shocks in ``shocks``, see :comm:`conditional_forecast` for an
+    example and :ref:`shocks-exo` for the detailed syntax reference.
 
-    The syntax of the block is the same as for the deterministic
-    shocks in the ``shocks`` blocks (see :ref:`shocks-exo`). Note that
+    Note that
     you need to specify the full path for all constrained endogenous
     variables between the first and last specified period. If an
     intermediate period is not specified, a value of 0 is
