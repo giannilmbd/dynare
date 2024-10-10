@@ -33,6 +33,7 @@ function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstLine 
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+<<<<<<< HEAD
 if isnumeric(column) && column<0
     error('GetAllPosteriorDraws:: column cannot be negative');
 end
@@ -47,6 +48,48 @@ if issmc(options_)
                 draws = transpose(posterior.particles);
             else
                 draws = transpose(posterior.particles(column,:));
+=======
+if ishssmc(options_)
+    % Load draws from the posterior distribution
+    pfiles = dir(sprintf('%s/hssmc/particles-*.mat', dname));
+    posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', dname, length(pfiles), length(pfiles)));
+    if column==0
+        draws = posterior.tlogpostkernel;
+    else
+        draws = transpose(posterior.particles(column,:));
+    end
+elseif isdime(options_)
+    posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
+    tune = posterior.tune;
+    chains = posterior.chains(end-tune:end,:,:);
+    if column>0
+        chains = reshape(chains, [], size(chains, 3));
+        draws = chains(:,column);
+    else
+        draws = posterior.lprobs;
+    end
+    draws = transpose(posterior.particles(column,:));
+elseif isonline(options_)
+    posterior = load(sprintf('%s/online/parameters_particles_final.mat', dname));
+    draws = transpose(posterior.param(column,:));
+else
+    iline = FirstLine;
+    linee = 1;
+    DirectoryName = CheckPath('metropolis',dname);
+    if nblcks>1 && nargin<10
+        draws = zeros(NumberOfDraws*nblcks,1);
+        iline0=iline;
+        if column>0
+            for blck = 1:nblcks
+                iline=iline0;
+                for file = FirstMhFile:TotalNumberOfMhFile
+                    load([DirectoryName '/'  fname '_mh' int2str(file) '_blck' int2str(blck)],'x2')
+                    NumberOfLines = size(x2(iline:end,:),1);
+                    draws(linee:linee+NumberOfLines-1) = x2(iline:end,column);
+                    linee = linee+NumberOfLines;
+                    iline = 1;
+                end
+>>>>>>> 377185759 (Make compatible the outputs of the online particle filter with the Dynare routines for presenting results + migrate the Online Particle Filter from nonlinear filters to posterior samplers. Now require to create an online option for posterior_sampling_method.)
             end
         else
             draws = posterior.tlogpostkernel;

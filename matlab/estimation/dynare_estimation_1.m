@@ -238,11 +238,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
     optimizer_vec = [options_.mode_compute;num2cell(options_.additional_optimizer_steps)];
     for optim_iter = 1:length(optimizer_vec)
         current_optimizer = optimizer_vec{optim_iter};
-        if current_optimizer~=11  
-          [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info] = dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
-        else 
-          [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info] = dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_);
-        end
+        [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info] = dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
         fprintf('\nFinal value of minus the log posterior (or likelihood):%f \n', fval);
 
         if isnumeric(current_optimizer)
@@ -272,7 +268,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                         hh = hessian(penalized_objective_function, xparam1, options_.gstep, objective_function, fval, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                     else
                         hh = hessian(objective_function, xparam1, options_.gstep, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
-                    end
+                    end 
                     hh = reshape(hh, nx, nx);
                 elseif isnumeric(current_optimizer) && isequal(current_optimizer,5)
                     % other numerical hessian options available with optimizer
@@ -399,7 +395,11 @@ end
 % Run SMC sampler.
 %
 
-if ishssmc(options_)
+if isonline(options_)
+    [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
+    options_.posterior_sampler_options.current_options = posterior_sampler_options;
+    online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_);
+elseif ishssmc(options_)
     [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
     options_.posterior_sampler_options.current_options = posterior_sampler_options;
     oo_.MarginalDensity.hssmc = hssmc(objective_function, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
@@ -472,7 +472,7 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
             oo_.lprob = trace_plot_dime(options_, M_);
         end
         % Estimation of the marginal density from the Mh draws:
-        if ishssmc(options_) || isdime(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
+        if ishssmc(options_) || isonline(options_) || isdime(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             if ~issmc(options_)
                 [~, oo_] = marginal_density(M_, options_, estim_params_, oo_, bayestopt_);
             end

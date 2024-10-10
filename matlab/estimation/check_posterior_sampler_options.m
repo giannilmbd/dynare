@@ -374,125 +374,148 @@ if init
                 posterior_sampler_options.WR=[];
             end
 
-          case 'hssmc'
+      case 'hssmc'
 
-            % default options
-            posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.hssmc);
+          % default options
+          posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.hssmc);
 
-            % user defined options
-            if ~isempty(options_.posterior_sampler_options.sampling_opt)
-                options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
-                for i=1:rows(options_list)
-                    switch options_list{i,1}
+          % user defined options
+          if ~isempty(options_.posterior_sampler_options.sampling_opt)
+              options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
+              for i=1:rows(options_list)
+                  switch options_list{i,1}
                       case 'target'
-                        posterior_sampler_options.target = options_list{i,2};
+                          posterior_sampler_options.target = options_list{i,2};
                       case 'steps'
-                        posterior_sampler_options.steps = options_list{i,2};
+                          posterior_sampler_options.steps = options_list{i,2};
                       case 'scale'
-                        posterior_sampler_options.scale = options_list{i,2};
+                          posterior_sampler_options.scale = options_list{i,2};
                       case 'particles'
-                        posterior_sampler_options.particles = options_list{i,2};
+                          posterior_sampler_options.particles = options_list{i,2};
                       case 'lambda'
-                        posterior_sampler_options.lambda = options_list{i,2};
+                          posterior_sampler_options.lambda = options_list{i,2};
                       otherwise
-                        warning(['hssmc: Unknown option (' options_list{i,1} ')!'])
-                    end
-                end
-            end
+                          warning(['hssmc: Unknown option (' options_list{i,1} ')!'])
+                  end
+              end
+          end
+          
+          options_.mode_compute = 0;
+          options_.cova_compute = 0;
+          options_.mh_replic = 0;
+          options_.mh_posterior_mode_estimation = false;
+          
+      case 'dime_mcmc'
+          
+          % default options
+          posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.dime);
 
-            options_.mode_compute = 0;
-            options_.cova_compute = 0;
-            options_.mh_replic = 0;
-            options_.mh_posterior_mode_estimation = false;
-
-          case 'dime_mcmc'
-
-            % default options
-            posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.dime);
-
-            % user defined options
-            if ~isempty(options_.posterior_sampler_options.sampling_opt)
-                options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
-                for i=1:rows(options_list)
-                    switch options_list{i,1}
+          if ~isempty(options_.posterior_sampler_options.sampling_opt)
+              options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
+              for i=1:rows(options_list)
+                  switch options_list{i,1}
                       case 'nchain'
-                        posterior_sampler_options.nchain = options_list{i,2};
+                          posterior_sampler_options.nchain = options_list{i,2};
                       case 'niter'
-                        posterior_sampler_options.niter = options_list{i,2};
+                          posterior_sampler_options.niter = options_list{i,2};
                       case 'parallel'
-                        posterior_sampler_options.parallel = options_list{i,2};
+                          posterior_sampler_options.parallel = options_list{i,2};
                       case 'tune'
-                        posterior_sampler_options.tune = options_list{i,2};
+                          posterior_sampler_options.tune = options_list{i,2};
                       case 'aimh_prob'
-                        posterior_sampler_options.aimh_prob = options_list{i,2};
+                          posterior_sampler_options.aimh_prob = options_list{i,2};
                       case 'sigma'
-                        posterior_sampler_options.sigma = options_list{i,2};
+                          posterior_sampler_options.sigma = options_list{i,2};
                       case 'gamma'
-                        posterior_sampler_options.gamma = options_list{i,2};
+                          posterior_sampler_options.gamma = options_list{i,2};
                       case 'df_proposal_dist'
-                        posterior_sampler_options.df_proposal_dist = options_list{i,2};
+                          posterior_sampler_options.df_proposal_dist = options_list{i,2};
                       case 'rho'
-                        posterior_sampler_options.rho = options_list{i,2};
+                          posterior_sampler_options.rho = options_list{i,2};
                       otherwise
-                        warning(['dime: Unknown option (' options_list{i,1} ')!'])
-                    end
-                end
-            end
+                          warning(['dime: Unknown option (' options_list{i,1} ')!'])
+                  end
+              end
+          end
 
-            if ~isfield(posterior_sampler_options,'tune')
-                posterior_sampler_options.tune = ceil(50000 / posterior_sampler_options.nchain);
-                dprintf('dime: setting number of ensemble iterations to keep (`tune`) to %d.', posterior_sampler_options.tune)
-            end
-            options_.mode_compute = 0;
-            options_.cova_compute = 0;
-            options_.mh_replic = 0;
-            options_.mh_posterior_mode_estimation = false;
+          if ~isfield(posterior_sampler_options,'tune')
+              posterior_sampler_options.tune = ceil(50000 / posterior_sampler_options.nchain);
+              dprintf('dime: setting number of ensemble iterations to keep (`tune`) to %d.', posterior_sampler_options.tune)
+          end
+
+      case 'online'
+
+          % default options
+          posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.online);
+
+          % user defined options
+          if ~isempty(options_.posterior_sampler_options.sampling_opt)
+              options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
+              for i=1:rows(options_list)
+                  switch options_list{i,1}
+                      case 'particles'
+                          posterior_sampler_options.particles = options_list{i,2};
+                      case 'liu_west_delta'
+                          posterior_sampler_options.liu_west_delta = options_list{i,2};
+                      case 'liu_west_max_resampling_tries'
+                          posterior_sampler_options.liu_west_max_resampling_tries= options_list{i,2};
+                      otherwise
+                          warning(['online: Unknown option (' options_list{i,1} ')!'])
+                  end
+              end
+          end
+          
+          options_.mode_compute = 0;
+          options_.cova_compute = 0;
+          options_.mh_replic = 0;
+          options_.mh_posterior_mode_estimation = false;
 
       case 'dsmh'
 
-        % default options
-        posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.dsmh);
+          % default options
+          posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.dsmh);
 
-        % user defined options
-        if ~isempty(options_.posterior_sampler_options.sampling_opt)
-            options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
-            for i=1:rows(options_list)
-                switch options_list{i,1}
-                  case 'proposal_distribution'
-                    if ~(strcmpi(options_list{i,2}, 'rand_multivariate_student') || ...
-                         strcmpi(options_list{i,2}, 'rand_multivariate_normal'))
-                        error(['initial_estimation_checks:: the proposal_distribution option to estimation takes either ' ...
-                               'rand_multivariate_student or rand_multivariate_normal as options']);
-                    else
-                        posterior_sampler_options.proposal_distribution=options_list{i,2};
-                    end
-                  case 'student_degrees_of_freedom'
-                    if options_list{i,2} <= 0
-                        error('initial_estimation_checks:: the student_degrees_of_freedom takes a positive integer argument');
-                    else
-                        posterior_sampler_options.student_degrees_of_freedom=options_list{i,2};
-                    end
-                  case 'save_tmp_file'
-                    posterior_sampler_options.save_tmp_file = options_list{i,2};
-                  case 'number_of_particles'
-                    posterior_sampler_options.particles = options_list{i,2};
-                  otherwise
-                    warning(['rwmh_sampler: Unknown option (' options_list{i,1} ')!'])
-                end
-            end
-        end
+          % user defined options
+          if ~isempty(options_.posterior_sampler_options.sampling_opt)
+              options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
+              for i=1:rows(options_list)
+                  switch options_list{i,1}
+                      case 'proposal_distribution'
+                          if ~(strcmpi(options_list{i,2}, 'rand_multivariate_student') || ...
+                               strcmpi(options_list{i,2}, 'rand_multivariate_normal'))
+                              error(['initial_estimation_checks:: the proposal_distribution option to estimation takes either ' ...
+                                         'rand_multivariate_student or rand_multivariate_normal as options']);
+                          else
+                              posterior_sampler_options.proposal_distribution=options_list{i,2};
+                          end
+                      case 'student_degrees_of_freedom'
+                          if options_list{i,2} <= 0
+                              error('initial_estimation_checks:: the student_degrees_of_freedom takes a positive integer argument');
+                          else
+                              posterior_sampler_options.student_degrees_of_freedom=options_list{i,2};
+                          end
+                      case 'save_tmp_file'
+                          posterior_sampler_options.save_tmp_file = options_list{i,2};
+                      case 'number_of_particles'
+                          posterior_sampler_options.particles = options_list{i,2};
+                      otherwise
+                          warning(['rwmh_sampler: Unknown option (' options_list{i,1} ')!'])
+                  end
+                  end
+          end
+          
+          options_.mode_compute = 0;
+          options_.cova_compute = 0;
+          options_.mh_replic = 0;
+          options_.mh_posterior_mode_estimation = true;
+              
+      otherwise
+          error('check_posterior_sampler_options:: Unknown posterior_sampling_method option %s ',posterior_sampler_options.posterior_sampling_method);
+    end
 
-        options_.mode_compute = 0;
-        options_.cova_compute = 0;
-        options_.mh_replic = 0;
-        options_.mh_posterior_mode_estimation = true;
+    return
 
-          otherwise
-            error('check_posterior_sampler_options:: Unknown posterior_sampling_method option %s ',posterior_sampler_options.posterior_sampling_method);
-        end
-
-        return
-end
+end % if init
 
 % here are all samplers requiring a proposal distribution
 if ~strcmp(posterior_sampler_options.posterior_sampling_method,'slice')

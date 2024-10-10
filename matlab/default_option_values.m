@@ -288,9 +288,6 @@ particle.resampling.number_of_partitions = 200;
 particle.mixture_state_variables = 5 ;
 particle.mixture_structural_shocks = 1 ;
 particle.mixture_measurement_shocks = 1 ;
-% Online approach
-particle.liu_west_delta = 0.99 ;
-particle.liu_west_max_resampling_tries = 5000;
 % Options for setting the weights in conditional particle filters.
 particle.cpf_weights_method.amisanotristani = true;
 particle.cpf_weights_method.murrayjonesparslow = false;
@@ -514,6 +511,10 @@ options_.posterior_sampler_options.dsmh.particles = 20000 ;
 options_.posterior_sampler_options.dsmh.alpha0 = 0.2 ;
 options_.posterior_sampler_options.dsmh.alpha1 = 0.3 ;
 options_.posterior_sampler_options.dsmh.tau = 10 ;
+% Liu and West online Sampler
+options_.posterior_sampler_options.online.particles= 5000 ;
+options_.posterior_sampler_options.online.liu_west_delta = 0.99 ;
+options_.posterior_sampler_options.online.liu_west_max_resampling_tries = 5000 ;
 
 options_.trace_plot_ma = 200;
 options_.mh_autocorrelation_function_size = 30;
@@ -656,6 +657,12 @@ particleswarm.ObjectiveLimit = -Inf;
 particleswarm.UseParallel = false;
 particleswarm.UseVectorized = false;
 options_.particleswarm = particleswarm;
+
+% One step
+one_step.gradient = [] ;
+one_step.hessian = [] ;
+one_step.outer_product = 0 ;
+options_.one_step= one_step ;
 
 % prior analysis
 options_.prior_mc = 20000;

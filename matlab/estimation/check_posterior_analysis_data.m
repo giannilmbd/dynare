@@ -45,6 +45,8 @@ if ~issmc(options_)
 else
     if ishssmc(options_)
         [MetropolisFolder, info] = CheckPath('hssmc',M_.dname);
+    elseif isonline(options_)
+        [MetropolisFolder, info] = CheckPath('online',M_.dname);
     elseif isdime(options_)
         [MetropolisFolder, info] = CheckPath('dime',M_.dname);
     else
@@ -76,6 +78,10 @@ else
             % Load draws from the posterior distribution
             pfiles = dir(sprintf('%s/hssmc/particles-*.mat', M_.dname));
             mhdate = get_date_of_a_file(sprintf('%s/hssmc/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
+        elseif isonline(options_)
+            % Load draws from the posterior distribution
+            pfiles = dir(sprintf('%s/online/parameters_particles_final.mat', M_.dname));
+            mhdate = get_date_of_a_file(sprintf('%s/online/parameters_particles_final.mat', M_.dname, length(pfiles), length(pfiles)));
         elseif isdime(options_)
             mhdate = get_date_of_a_file(sprintf('%s%s%s%schains.mat', M_.dname, filesep(), 'dime', filesep()));
         end

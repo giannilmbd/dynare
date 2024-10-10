@@ -1,6 +1,6 @@
-function bool = issmc(options_)
+function bool = isonline(options_)
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -17,4 +17,9 @@ function bool = issmc(options_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-bool = ishssmc(options_) || isonline(options_) || isdsmh(options_) || isdime(options_);
+bool = false;
+if isfield(options_, 'posterior_sampler_options')
+    if strcmp(options_.posterior_sampler_options.posterior_sampling_method, 'online')
+        bool = true;
+    end
+end

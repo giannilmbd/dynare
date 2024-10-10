@@ -55,7 +55,7 @@ skipline(2)
 disp('ESTIMATION RESULTS')
 skipline()
 
-if ishssmc(options_)
+if ishssmc(options_) || isonline(options_)
     dprintf('Log data density is %f.', oo_.MarginalDensity.hssmc);
     hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 elseif isdime(options_)
@@ -87,7 +87,7 @@ if np
     disp(tit2)
     ip = nvx+nvn+ncx+ncn+1;
     for i=1:np
-        if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh) || ishssmc(options_)
+        if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh) || ishssmc(options_) || isonline(options_)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
             name = bayestopt_.name{ip};

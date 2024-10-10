@@ -1,4 +1,5 @@
-function [pmean, pmode, pmedian, pstdev, p025, p975, covariance] = online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_)
+%function [xparam,mean_xparam,median_xparam,lb95_xparam,ub95_xparam] = 
+function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_)
 % [pmean, pmode, pmedian, pstdev, p025, p975, covariance] = online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_)
 % Liu & West particle filter = auxiliary particle filter including Liu & West filter on parameters.
 %
@@ -13,14 +14,12 @@ function [pmean, pmode, pmedian, pstdev, p025, p975, covariance] = online_auxili
 % - oo_                      [struct]    Results.
 %
 % OUTPUTS
-% - pmean                    [double]    n×1 vector, mean of the particles at the end of the sample (for the parameters).
-% - pmode                    [double]    n×1 vector, mode of the particles at the end of the sample (for the parameters).
-% - pmedian                  [double]    n×1 vector, median of the particles at the end of the sample (for the parameters).
-% - pstdev                   [double]    n×1 vector, st. dev. of the particles at the end of the sample (for the parameters).
-% - p025                     [double]    n×1 vector, 2.5 percent of the particles are below p025(i) for i=1,…,n.
-% - p975                     [double]    n×1 vector, 97.5 percent of the particles are below p975(i) for i=1,…,n.
-% - covariance               [double]    n×n matrix, covariance of the particles at the end of the sample.
-
+% - xparam                   [double]    n×M matrix, parameters particles at the end of the sample (posterior approx.).
+% - mean_xparam              [double]    n×T matrix, time series of the parameters particles mean.
+% - median_xparam            [double]    n×T matrix, time series of the parameters particles median.
+% - lb95_xparam              [double]    n×T matrix, time series of 2.5 percent of the particles are below p025(i) for i=1,…,n.
+% - ub95_xparam              [double]    n×T matrix, time series of 97.5 percent of the particles are below p975(i) for i=1,…,n.
+%
 % Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
@@ -43,6 +42,10 @@ options_ = set_dynare_seed_local_options(options_,'default');
 pruning = options_.particle.pruning;
 second_resample = options_.particle.resampling.status.systematic;
 variance_update = true;
+online_opt = options_.posterior_sampler_options.current_options;
+
+% Set location for the simulated particles.
+SimulationFolder = CheckPath('online', M_.dname);
 
 bounds = prior_bounds(bayestopt_, options_.prior_trunc); % Reset bounds as lb and ub must only be operational during mode-finding
 
@@ -52,13 +55,13 @@ bounds = prior_bounds(bayestopt_, options_.prior_trunc); % Reset bounds as lb an
 order = options_.order;
 mf0 = ReducedForm.mf0;
 mf1 = ReducedForm.mf1;
-number_of_particles = options_.particle.number_of_particles;
+number_of_particles = online_opt.particles;
 number_of_parameters = size(xparam1,1);
 Y = dataset_.data;
 sample_size = size(Y,1);
 number_of_observed_variables = length(mf1);
 number_of_structural_innovations = length(ReducedForm.Q);
-liu_west_delta = options_.particle.liu_west_delta;
+liu_west_delta = online_opt.liu_west_delta;
 
 % Get initial conditions for the state particles
 StateVectorMean = ReducedForm.StateVectorMean;
@@ -99,7 +102,7 @@ weights = ones(1,number_of_particles)/number_of_particles;
 % Initialization of the likelihood.
 const_lik = log(2*pi)*number_of_observed_variables;
 mean_xparam = zeros(number_of_parameters,sample_size);
-mode_xparam = zeros(number_of_parameters,sample_size);
+%mode_xparam = zeros(number_of_parameters,sample_size);
 median_xparam = zeros(number_of_parameters,sample_size);
 std_xparam = zeros(number_of_parameters,sample_size);
 lb95_xparam = zeros(number_of_parameters,sample_size);
@@ -194,7 +197,6 @@ for t=1:sample_size
             % Replace Gaussian density with a Student density with 3 degrees of freedom for fat tails.
             z = sum(PredictionError.*(ReducedForm.H\PredictionError), 1) ;
             ddl = 3 ;
-            %tau_tilde(i) = weights(i).*(tpdf(z,3*ones(size(z)))+1e-99) ;
             tau_tilde(i) = weights(i)*(exp(gammaln((ddl + 1) / 2) - gammaln(ddl/2))/(sqrt(ddl*pi)*(1 + (z^2)/ddl)^((ddl + 1)/2))+1e-99) ;
         else
             tau_tilde(i) = 0 ;
@@ -202,7 +204,7 @@ for t=1:sample_size
     end
     % particles selection
     tau_tilde = tau_tilde/sum(tau_tilde);
-    indx = resample(0, tau_tilde', options_.particle);
+    indx = kitagawa(tau_tilde');
     StateVectors = StateVectors(:,indx);
     xparam = fore_xparam(:,indx);
     if pruning
@@ -214,7 +216,7 @@ for t=1:sample_size
     for i=1:number_of_particles
         info = 12042009;
         counter=0;
-        while info(1) && counter <options_.particle.liu_west_max_resampling_tries
+        while info(1) && counter <online_opt.liu_west_max_resampling_tries
             counter=counter+1;
             candidate = xparam(:,i) + chol_sigma_bar*randn(number_of_parameters, 1);
             if all(candidate>=bounds.lb) && all(candidate<=bounds.ub)
@@ -298,12 +300,12 @@ for t=1:sample_size
                     wtilde(i) = w_stage1(i)*exp(-.5*(const_lik+log(det(ReducedForm.H))+sum(PredictionError.*(ReducedForm.H\PredictionError), 1)));
                 end
             end
-            if counter==options_.particle.liu_west_max_resampling_tries
-                fprintf('\nLiu & West particle filter: I haven''t been able to solve the model in %u tries.\n',options_.particle.liu_west_max_resampling_tries)
-                fprintf('Liu & West particle filter: The last error message was: %s\n',get_error_message(info))
-                fprintf('Liu & West particle filter: You can try to increase liu_west_max_resampling_tries, but most\n')
-                fprintf('Liu & West particle filter: likely there is an issue with the model.\n')
-                error('Liu & West particle filter: unable to solve the model.')
+            if counter==online_opt.liu_west_max_resampling_tries
+                fprintf('\nLiu & West online filter: I haven''t been able to solve the model in %u tries.\n',online_opt.liu_west_max_resampling_tries)
+                fprintf('Liu & West online filter: The last error message was: %s\n',get_error_message(info))
+                fprintf('Liu & West online filter: You can try to increase liu_west_max_resampling_tries, but most\n')
+                fprintf('Liu & West online filter: likely there is an issue with the model.\n')
+                error('Liu & West online filter: unable to solve the model.')
             end
         end
     end
@@ -314,9 +316,9 @@ for t=1:sample_size
     end
     % final resampling (not advised)
     if second_resample
-        [~, idmode] = max(weights);
-        mode_xparam(:,t) = xparam(:,idmode);
-        indx = resample(0, weights,options_.particle);
+%        [~, idmode] = max(weights);
+%        mode_xparam(:,t) = xparam(:,idmode);
+        indx = kitagawa(weights);
         StateVectors = StateVectors(:,indx) ;
         if pruning
             StateVectors_ = StateVectors_(:,indx);
@@ -333,10 +335,13 @@ for t=1:sample_size
             median_xparam(i,t) = temp(0.5*number_of_particles);
             ub95_xparam(i,t) = temp(0.975*number_of_particles);
         end
-    end
-    if second_resample
-        [~, idmode] = max(weights);
-        mode_xparam(:,t) = xparam(:,idmode);
+        if t==sample_size
+            param = xparam ;
+            save(sprintf('%s%sparameters_particles_final.mat', SimulationFolder, filesep()), 'param');
+        end 
+    else
+%        [~, idmode] = max(weights);
+%        mode_xparam(:,t) = xparam(:,idmode);
         mean_xparam(:,t) = xparam*(weights');
         mat_var_cov = bsxfun(@minus, xparam,mean_xparam(:,t));
         mat_var_cov = mat_var_cov*(bsxfun(@times, mat_var_cov, weights)');
@@ -362,22 +367,21 @@ for t=1:sample_size
                 end
             end
         end
+        if t==sample_size
+            param = xparam(:,kitagawa(weights));
+            save(sprintf('%s%sparameters_particles_final.mat', SimulationFolder, filesep()), 'param');
+        end 
     end
+    save(sprintf('%s%sparameters_particles-%u.mat', SimulationFolder, filesep(), t), 'xparam');
+
     str = sprintf(' Lower Bound (95%%) \t Mean \t\t\t Upper Bound (95%%)');
     for l=1:size(xparam,1)
         str = sprintf('%s\n %5.4f \t\t %7.5f \t\t %5.4f', str, lb95_xparam(l,t), mean_xparam(l,t), ub95_xparam(l,t));
     end
     disp(str)
     disp('')
-end
 
-pmean = xparam(:,sample_size);
-pmode = mode_xparam(:,sample_size);
-pstdev = std_xparam(:,sample_size) ;
-p025 = lb95_xparam(:,sample_size) ;
-p975 = ub95_xparam(:,sample_size) ;
-pmedian = median_xparam(:,sample_size) ;
-covariance = mat_var_cov;
+end
 
 %% Plot parameters trajectory
 TeX = options_.TeX;
@@ -395,7 +399,7 @@ end
 
 for plt = 1:nbplt
     hh_fig = dyn_figure(options_.nodisplay,'Name','Parameters Trajectories');
-    for k=1:length(pmean)
+    for k=1:number_of_parameters
         subplot(nr,nc,k)
         [name,texname] = get_the_name(k,TeX,M_,estim_params_,options_.varobs);
         % Draw the surface for an interval containing 95% of the particles.
@@ -426,38 +430,3 @@ for plt = 1:nbplt
     end
 end
 
-% Plot Parameter Densities
-number_of_grid_points = 2^9;      % 2^9 = 512 !... Must be a power of two.
-bandwidth = 0;                    % Rule of thumb optimal bandwidth parameter.
-kernel_function = 'gaussian';     % Gaussian kernel for Fast Fourier Transform approximation.
-for plt = 1:nbplt
-    hh_fig = dyn_figure(options_.nodisplay,'Name','Parameters Densities');
-    for k=1:length(pmean)
-        subplot(nr,nc,k)
-        [name,texname] = get_the_name(k,TeX,M_,estim_params_,options_.varobs);
-        optimal_bandwidth = mh_optimal_bandwidth(xparam(k,:)',number_of_particles,bandwidth,kernel_function);
-        [density(:,1),density(:,2)] = kernel_density_estimate(xparam(k,:)', number_of_grid_points, ...
-                                                          number_of_particles, optimal_bandwidth, kernel_function);
-        plot(density(:,1), density(:,2));
-        hold on
-        if TeX
-            title(texname,'interpreter','latex')
-        else
-            title(name,'interpreter','none')
-        end
-        hold off
-        axis tight
-        drawnow
-    end
-    dyn_saveas(hh_fig,[ M_.fname '_param_density' int2str(plt) ],options_.nodisplay,options_.graph_format);
-    if TeX && any(strcmp('eps',cellstr(options_.graph_format)))
-        % TeX eps loader file
-        fprintf(fidTeX, '\\begin{figure}[H]\n');
-        fprintf(fidTeX,'\\centering \n');
-        fprintf(fidTeX,'\\includegraphics[width=%2.2f\\textwidth]{%_param_density%s}\n',min(k/nc,1),M_.fname,int2str(plt));
-        fprintf(fidTeX,'\\caption{Parameter densities based on the Liu/West particle filter.}');
-        fprintf(fidTeX,'\\label{Fig:ParameterDensities:%s}\n',int2str(plt));
-        fprintf(fidTeX,'\\end{figure}\n');
-        fprintf(fidTeX,' \n');
-    end
-end
