@@ -161,19 +161,6 @@ if options_.bytecode
     end
     data_set = merge(dset(dset.dates(1):(plan.date(1)-1)), data_set);
     return
-    union_names = union(data_set.name, dset.name);
-    dif = setdiff(union_names, data_set.name);
-    data_set_nobs = data_set.nobs;
-    for i = 1:length(dif)
-        data_set{dif{i}} = dseries(nan(data_set_nobs,1),plan.date(1), dif(i), dif(i));
-    end
-    dif = setdiff(union_names, dset.name);
-    dset_nobs = dset.nobs;
-    for i = 1:length(dif)
-        dset{dif{i}} = dseries(nan(dset_nobs,1),dset.dates(1), dif(i), dif(i));
-    end
-    data_set = [dset(dset.dates(1):(plan.date(1)-1)) ; data_set];
-    return
 end
 
 
