@@ -195,7 +195,6 @@ constrained_paths = zeros(n_periods, length(total_periods));
 max_periods_simulation = 0;
 for i = 1:n_periods
     period_i = constrained_periods{i};
-                                %period_i
     tp = total_periods(1);
     if size(period_i) > 1
         init_periods = period_i(1);
@@ -234,7 +233,6 @@ if shocks_present
     is_shock = zeros(length(total_periods), n_periods);
     for i = 1:n_periods
         period_i = shock_periods{i};
-                                %period_i
         tp = total_periods(1);
         if size(period_i) > 1
             init_periods = period_i(1);
@@ -318,7 +316,7 @@ save_options_periods = options_.periods;
 options_.periods = options_cond_fcst.periods;
 save_options_dynatol_f = options_.dynatol.f;
 options_.dynatol.f = 1e-8;
-eps1  = 1e-7;%1e-4;
+eps1 = 1e-7;
 exo = zeros(maximum_lag + options_cond_fcst.periods, nx);
 endo = zeros(maximum_lag + options_cond_fcst.periods, ny);
 endo(1,:) = oo_.steady_state';
@@ -452,21 +450,6 @@ if pf && ~surprise
             cum_l1 = cum_l1 + length(constrained_vars(j1));
         end
 
-
-        %         col_count = 1;
-        %         for j = controlled_varexo'
-        %             for time = time_index_constraint
-        %                 saved = oo_.exo_simul(time,j);
-        %                 oo_.exo_simul(time,j) = oo_.exo_simul(time,j) + eps1;
-        %                 simul();
-        %                 J1(:,col_count) = (oo_.endo_simul(indx_endo) - ys) / eps1;
-        %                 oo_.exo_simul(time,j) = saved;
-        %                 col_count = col_count + 1;
-        %             end
-        %         end
-        %         J1
-        %         sdfmlksdf;
-
         disp(['iteration ' int2str(it) ' error = ' num2str(normr)]);
 
         if normr <= eps
@@ -477,7 +460,6 @@ if pf && ~surprise
             old_exo = oo_.exo_simul(time_index_constraint,:);
             D_exo = - J \ r;
             col_count = 1;
-            %constrained_periods
             for j = controlled_varexo'
                 oo_.exo_simul(time_index_constraint,j) = oo_.exo_simul(time_index_constraint,j) + D_exo(col_count: (col_count + constrained_periods - 1));
                 col_count = col_count + constrained_periods - 1;
@@ -541,7 +523,6 @@ else
             end
             oo_=make_y_(M_,options_,oo_);
         end
-        %exo_init
         oo_.exo_simul = exo_init;
         oo_.endo_simul(:,1) = initial_conditions;
 
@@ -649,7 +630,6 @@ else
             cur_indx = M_.endo_nbr + find(M_.lead_lag_incidence(2,:));
             lead_indx = 2 * M_.endo_nbr + find(M_.lead_lag_incidence(3,:));
             cum_l1 = 0;
-            %indx_x = zeros(length(constraint_index_t)* constrained_periods, 1);
             cum_index_d_y_x = [];
             indx_x = [];
             for k = 1 : per
@@ -730,37 +710,6 @@ else
                 end
                 cum_l1 = cum_l1 + length(constrained_vars_t(j1));
             end
-
-
-            %             % Numerical computation of the derivatives in the second systme
-            %             J1 = [];
-            %             col_count = 1;
-            %             for j = constraint_index_t
-            %                 j_pos = controlled_varexo(j);
-            %                 if constrained_perfect_foresight(j)
-            %                     for time = time_index_constraint
-            %                         saved = oo_.exo_simul(time,j_pos);
-            %                         oo_.exo_simul(time,j_pos) = oo_.exo_simul(time,j_pos) + eps1;
-            %                         simul();
-            %                         J1(:,col_count) = (oo_.endo_simul(indx_endo) - ys) / eps1;
-            %                         oo_.exo_simul(time,j_pos) = saved;
-            %                         col_count = col_count + 1;
-            %                     end
-            %                 else
-            %                     saved = oo_.exo_simul(maximum_lag+1,j_pos);
-            %                     oo_.exo_simul(maximum_lag+1,j_pos) = oo_.exo_simul(maximum_lag+1,j_pos) + eps1;
-            %                     simul();
-            % %                    indx_endo
-            %                     J1(:,col_count) = (oo_.endo_simul(indx_endo) - ys) / eps1;
-            % %                    J(:,col_count) = (oo_.endo_simul((pp - 1) * M_.endo_nbr + 1: pp * M_.endo_nbr) - ys) / eps1;
-            %                     oo_.exo_simul(maximum_lag+1,j_pos) = saved;
-            %                     col_count = col_count + 1;
-            %                 end
-            %             end
-            %             disp('J1');
-            %             disp(full(J1));
-            %             sdfmlk;
-
 
             normr = norm(r, 1);
 
