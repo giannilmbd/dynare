@@ -11724,18 +11724,17 @@ is described with the function ``flip_plan``:
 Once the forecast scenario if fully described, the forecast is
 computed with the command ``det_cond_forecast``:
 
-.. matcomm:: DSERIES = det_cond_forecast (HANDLE[, DSERIES [, DATES]]);
+.. matcomm:: DSERIES = det_cond_forecast (HANDLE, DSERIES, DATES);
 
     Computes the forecast or the conditional forecast using an
     extended path method for the given forecast scenario (first
-    argument). The past values of the endogenous and exogenous
-    variables provided with a dseries class (see :ref:`dseries class
-    members <dseries-members>`) can be indicated in the second
-    argument. By default, the past values of the variables are equal
-    to their steady-state values. The initial date of the forecast can
-    be provided in the third argument. By default, the forecast will
-    start at the first date indicated in the ``init_plan``
-    command. This function returns a dataset containing the historical
+    argument). The first argument is a handle to the forecast scenario
+    as created by `init_plan` and associated commands.
+    The second argument contains the past values of the endogenous and the path
+    of exogenous variables, in a dseries object (see :ref:`dseries class
+    members <dseries-members>`). The third argument is the date range of the
+    forecast, typically the range used when creating the scenario handle.
+    This function returns a dataset containing the historical
     and forecast values for the endogenous and exogenous variables.
 
 
@@ -11751,11 +11750,12 @@ computed with the command ``det_cond_forecast``:
         ...
         smoothed = dseries('smoothed_variables.csv');
 
-        fplan = init_plan(2013Q4:2029Q4);
-        fplan = flip_plan(fplan, 'y', 'u', 'surprise', 2013Q4:2014Q4,  [1 1.1 1.2 1.1 ]);
-        fplan = flip_plan(fplan, 'r', 'e', 'perfect_foresight', 2013Q4:2014Q4,  [2 1.9 1.9 1.9 ]);
+        frng = 2013Q4:2029Q4;
+        fplan = init_plan(frng);
+        fplan = flip_plan(fplan, 'y', 'u', 'surprise', frng(1:4), [1 1.1 1.2 1.1]);
+        fplan = flip_plan(fplan, 'r', 'e', 'perfect_foresight', frng(1:4),  [2 1.9 1.9 1.9]);
 
-        dset_forecast = det_cond_forecast(fplan, smoothed);
+        dset_forecast = det_cond_forecast(fplan, smoothed, frng);
 
         plot(dset_forecast.{'y','u'});
         plot(dset_forecast.{'r','e'});
