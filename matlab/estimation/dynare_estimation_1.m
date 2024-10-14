@@ -483,9 +483,7 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
             end
             % Store posterior mean in a vector and posterior variance in
             % a matrix
-            if ~isdime(options_)
-                [oo_.posterior.metropolis.mean,oo_.posterior.metropolis.Variance] = GetPosteriorMeanVariance(options_, M_);
-            end
+            [oo_.posterior.metropolis.mean,oo_.posterior.metropolis.Variance] = GetPosteriorMeanVariance(options_, M_);
         elseif options_.load_mh_file && options_.load_results_after_load_mh
             % load fields from previous MCMC run stored in results-file
             field_names={'posterior_mode','posterior_std_at_mode',...% fields set by marginal_density
@@ -506,28 +504,22 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                 oo_.posterior.metropolis=oo_load_mh.oo_.posterior.metropolis;
             end
         end
-        if ~issmc(options_)
-            [error_flag, ~, options_]= metropolis_draw(1, options_, estim_params_, M_);
-        else
-            error_flag=false;
-        end
+        [options_.sub_draws, error_flag]=set_number_of_subdraws(M_,options_); %check whether number is feasible
         if ~(~isempty(options_.sub_draws) && options_.sub_draws==0)
             if options_.bayesian_irf
-                if ~issmc(options_)
-                    if error_flag
-                        error('%s: I cannot compute the posterior IRFs!',dispString)
-                    end
-                    oo_=PosteriorIRF('posterior',options_,estim_params_,oo_,M_,bayestopt_,dataset_,dataset_info,dispString);
-                else
-                    fprintf('%s: SMC does not yet support the bayesian_irf option. Skipping computation.\n',dispString);
+                if error_flag
+                    error('%s: I cannot compute the posterior IRFs!',dispString)
                 end
+                oo_=PosteriorIRF('posterior',options_,estim_params_,oo_,M_,bayestopt_,dataset_,dataset_info,dispString);
             end
             if options_.moments_varendo
-                if ~issmc(options_)
-                    if error_flag
-                        error('%s: I cannot compute the posterior moments for the endogenous variables!',dispString)
-                    end
-                    if options_.load_mh_file && options_.mh_replic==0 %user wants to recompute results
+                if error_flag
+                    error('%s: I cannot compute the posterior moments for the endogenous variables!',dispString)
+                end
+                if options_.load_mh_file
+                    if issmc(options_)
+                        error('%s: SMC does not yet support the load_mh_file option.\n',dispString);
+                    elseif options_.mh_replic==0 %user wants to recompute results for standard MCMC
                         [MetropolisFolder, info] = CheckPath('metropolis',M_.dname);
                         if ~info
                             generic_post_data_file_name={'Posterior2ndOrderMoments','decomposition','PosteriorVarianceDecomposition','correlation','PosteriorCorrelations','conditional decomposition','PosteriorConditionalVarianceDecomposition'};
@@ -546,23 +538,17 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                             end
                         end
                     end
-                    oo_ = compute_moments_varendo('posterior',options_,M_,oo_,estim_params_,var_list_);
-                else
-                    fprintf('%s: SMC does not yet support the moments_varendo option. Skipping computation.\n',dispString);
                 end
+                oo_ = compute_moments_varendo('posterior',options_,M_,oo_,estim_params_,var_list_);
             end
             if options_.smoother || ~isempty(options_.filter_step_ahead) || options_.forecast
-                if ~ishssmc(options_) && ~isdime(options_)
-                    if error_flag
-                        error('%s: I cannot compute the posterior statistics!',dispString)
-                    end
-                    if options_.order==1 && ~options_.particle.status
-                        oo_=prior_posterior_statistics('posterior',dataset_,dataset_info,M_,oo_,options_,estim_params_,bayestopt_,dispString); %get smoothed and filtered objects and forecasts
-                    else
-                        error('%s: Particle Smoothers are not yet implemented.',dispString)
-                    end
+                if error_flag
+                    error('%s: I cannot compute the posterior statistics!',dispString)
+                end
+                if options_.order==1 && ~options_.particle.status
+                    oo_=prior_posterior_statistics('posterior',dataset_,dataset_info,M_,oo_,options_,estim_params_,bayestopt_,dispString); %get smoothed and filtered objects and forecasts
                 else
-                    fprintf('%s: SMC does not yet support the smoother and forecast options. Skipping computation.\n',dispString);
+                    error('%s: Particle Smoothers are not yet implemented.',dispString)
                 end
             end
         else

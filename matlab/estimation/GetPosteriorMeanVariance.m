@@ -1,7 +1,6 @@
 function [mean, variance] = GetPosteriorMeanVariance(options_, M_)
 % [mean,variance] = GetPosteriorMeanVariance(options_, M_)
 % Computes the posterior mean and variance
-% (+updates of oo_ & TeX output).
 %
 % INPUTS
 % - options_         [struct]    Dynare's options.
@@ -28,14 +27,25 @@ function [mean, variance] = GetPosteriorMeanVariance(options_, M_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if ishssmc(options_)
-    % Load draws from the posterior distribution
-    pfiles = dir(sprintf('%s/hssmc/particles-*.mat', M_.dname));
-    posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
-    % Compute the posterior mean
-    mean = sum(posterior.particles, 2)/length(posterior.tlogpostkernel);
-    % Compute the posterior covariance
-    variance = (posterior.particles-mean)*(posterior.particles-mean)'/length(posterior.tlogpostkernel);
+if issmc(options_)
+    if ishssmc(options_)
+        % Load draws from the posterior distribution
+        pfiles = dir(sprintf('%s/hssmc/particles-*.mat', M_.dname));
+        posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
+        % Compute the posterior mean
+        mean = sum(posterior.particles, 2)/length(posterior.tlogpostkernel);
+        % Compute the posterior covariance
+        variance = (posterior.particles-mean)*(posterior.particles-mean)'/length(posterior.tlogpostkernel);
+    elseif isdime(options_)
+        posterior = load(sprintf('%s%s%s%schains.mat', M_.dname, filesep(), 'dime', filesep()));
+        tune = posterior.tune;
+        chains = transpose(reshape(posterior.chains(end-tune:end,:,:), [], size(posterior.chains, 3)));
+        mean = sum(chains, 2)/size(chains,1);
+        % Compute the posterior covariance
+        variance = (chains-mean)*(chains-mean)'/size(chains,1);
+    else
+        error('GetPosteriorMeanVariance:: case should not happen. Please contact the developers')
+    end
 else
     MetropolisFolder = CheckPath('metropolis',M_.dname);
     FileName = M_.fname;

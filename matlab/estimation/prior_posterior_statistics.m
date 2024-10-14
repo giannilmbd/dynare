@@ -22,7 +22,7 @@ function oo_=prior_posterior_statistics(type,dataset_,dataset_info,M_,oo_,option
 % See the comments in the posterior_sampler.m funtion.
 
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,7 +62,8 @@ end
 maxlag = M_.maximum_endo_lag;
 
 if strcmpi(type,'posterior')
-    DirectoryName = CheckPath('metropolis',M_.dname);
+    folder_name=get_posterior_folder_name(options_);
+    DirectoryName = CheckPath(folder_name,M_.dname);
     B = options_.sub_draws;
 elseif strcmpi(type,'gsa')
     RootDirectoryName = CheckPath('gsa',M_.dname);
@@ -202,25 +203,14 @@ localVars.bayestopt_=bayestopt_;
 
 
 if strcmpi(type,'posterior')
-    record=load_last_mh_history_file(DirectoryName, M_.fname);
-    [nblck, npar] = size(record.LastParameters);
-    FirstMhFile = record.KeepedDraws.FirstMhFile;
-    FirstLine = record.KeepedDraws.FirstLine;
-    TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
-    TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-    NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
-    mh_nblck = options_.mh_nblck;
-    if B==NumberOfDraws*mh_nblck
+    [~, ~, NumberOfDraws]=set_number_of_subdraws(M_,options_);
+
+    if B==NumberOfDraws
         % we load all retained MH runs !
-        logpost=GetAllPosteriorDraws(options_, M_.dname, M_.fname, 0, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck);
-        for column=1:npar
-            x(:,column) = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck);
-        end
+        logpost=GetAllPosteriorDraws(options_, M_.dname, M_.fname, 0);
+        x = GetAllPosteriorDraws(options_, M_.dname, M_.fname, 'all');
     else
-        logpost=NaN(B,1);
-        for b=1:B
-            [x(b,:), logpost(b)] = GetOneDraw(type,M_,estim_params_,oo_,options_,bayestopt_);
-        end
+        [x, logpost]=get_posterior_subsample(M_,options_,B);
     end
     localVars.logpost=logpost;
 end

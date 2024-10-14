@@ -53,17 +53,7 @@ if isempty(column)
 end
 
 if ~issmc(options_)
-    % Get informations about the posterior draws:
-    MetropolisFolder = CheckPath('metropolis',M_.dname);
-    record=load_last_mh_history_file(MetropolisFolder, M_.fname);
-
-    FirstMhFile = 1;
-    FirstLine = 1;
-    TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
-    TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-    [mh_nblck] = size(record.LastParameters,2);
-    clear record;
-
+    options_.mh_drop=0; % locally, do not drop as we want all draws
     n_nblocks_to_plot=length(blck);
 else
     if ishssmc(options_)
@@ -73,14 +63,11 @@ else
     end
 end
 
+[~, ~, TotalNumberOfMhDraws]=set_number_of_subdraws(M_,options_); 
+
 if n_nblocks_to_plot==1
 % Get all the posterior draws:
-    if ishssmc(options_)
-        PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname,[],column);
-        TotalNumberOfMhDraws=length(PosteriorDraws);
-    else
-        PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname,M_.fname,column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, TotalNumberOfMhDraws, mh_nblck, blck);
-    end
+    PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname,M_.fname,column, 1, 1, blck);
 else
     PosteriorDraws=NaN(TotalNumberOfMhDraws,n_nblocks_to_plot);
     save_string='';
@@ -88,7 +75,7 @@ else
         title_string_tex='';
     end
     for block_iter=1:n_nblocks_to_plot
-        PosteriorDraws(:,block_iter) = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, TotalNumberOfMhDraws, mh_nblck, blck(block_iter));
+        PosteriorDraws(:,block_iter) = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, 1, 1, blck(block_iter));
         save_string=[save_string,'_',num2str(blck(block_iter))];
         if options_.TeX
             title_string_tex=[title_string_tex, ', ' num2str(blck(block_iter))];

@@ -25,7 +25,7 @@ function oo_=PosteriorIRF(type,options_,estim_params_,oo_,M_,bayestopt_,dataset_
 % functions associated with it(the _core1 and _core2).
 % See also the comments posterior_sampler.m funtion.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -83,12 +83,13 @@ end
 
 DirectoryName = CheckPath('Output',M_.dname);
 if strcmpi(type,'posterior')
-    MhDirectoryName = CheckPath('metropolis',M_.dname);
+    folder_name=get_posterior_folder_name(options_);
+    MhDirectoryName = CheckPath(folder_name,M_.dname);
 elseif strcmpi(type,'gsa')
     if options_.opt_gsa.pprior
-        MhDirectoryName = CheckPath(['GSA' filesep 'prior'],M_.dname);
+        MhDirectoryName = CheckPath(['gsa' filesep 'prior'],M_.dname);
     else
-        MhDirectoryName = CheckPath(['GSA' filesep 'mc'],M_.dname);
+        MhDirectoryName = CheckPath(['gsa' filesep 'mc'],M_.dname);
     end
 else
     MhDirectoryName = CheckPath('prior',M_.dname);
@@ -156,10 +157,7 @@ localVars.npar = npar;
 
 localVars.type=type;
 if strcmpi(type,'posterior')
-    while b<B
-        b = b + 1;
-        x(b,:) = GetOneDraw(type,M_,estim_params_,oo_,options_,bayestopt_);
-    end
+    x=get_posterior_subsample(M_,options_,B);
 end
 
 if ~strcmpi(type,'prior')

@@ -45,21 +45,8 @@ if isempty(column)
     return
 end
 
-% Get informations about the posterior draws:
-MetropolisFolder = CheckPath('metropolis',M_.dname);
-record=load_last_mh_history_file(MetropolisFolder, M_.fname);
-
-FirstMhFile = record.KeepedDraws.FirstMhFile;
-FirstLine = record.KeepedDraws.FirstLine; ifil = FirstLine;
-TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
-TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
-nblck = size(record.LastParameters,1);
-
-clear record;
-
 % Get all the posterior draws:
-PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck, blck);
+PosteriorDraws = GetAllPosteriorDraws(options_, M_.dname, M_.fname, column, [],[], blck);
 
 % Compute the autocorrelation function:
 [~,autocor] = sample_autocovariance(PosteriorDraws,options_.mh_autocorrelation_function_size);

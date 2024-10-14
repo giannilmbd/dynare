@@ -733,7 +733,7 @@ if do_bayesian_estimation_mcmc
                 oo_.mom.posterior.metropolis = oo_load_mh.oo_.mom.posterior.metropolis;
             end
         end
-        [error_flag,~,options_mom_]= metropolis_draw(1,options_mom_,estim_params_,M_);
+        [options_mom_.sub_draws, error_flag]=set_number_of_subdraws(M_,options_mom_); %check whether number of sub_draws is feasible
         if ~(~isempty(options_mom_.sub_draws) && options_mom_.sub_draws==0)
             % THIS IS PROBABLY NOT USEFUL HERE AND CAN BE REMOVED (PREPROCESSOR: REMOVE bayesian_irf, moments_varendo)
             %if options_mom_.bayesian_irf

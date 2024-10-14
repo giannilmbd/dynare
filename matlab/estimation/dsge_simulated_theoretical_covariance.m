@@ -16,7 +16,7 @@ function [nvar,vartan,CovarFileNumber] = dsge_simulated_theoretical_covariance(S
 %   vartan            [char]     array of characters (with nvar rows).
 %   CovarFileNumber   [integer]  scalar, number of prior or posterior data files (for covariance).
 
-% Copyright © 2007-2021 Dynare Team
+% Copyright © 2007-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -35,9 +35,11 @@ function [nvar,vartan,CovarFileNumber] = dsge_simulated_theoretical_covariance(S
 
 nodecomposition = 1;
 
+folder_name=get_posterior_folder_name(options_);
+    
 % Get informations about the _posterior_draws files.
 if strcmpi(type,'posterior')
-    NumberOfDrawsFiles = length(dir([M_.dname '/metropolis/' M_.fname '_' type '_draws*' ]));
+    NumberOfDrawsFiles = length(dir([M_.dname filesep folder_name filesep M_.fname '_' type '_draws*' ]));
     posterior = 1;
 elseif strcmpi(type,'prior')
     NumberOfDrawsFiles = length(dir([M_.dname '/prior/draws/' type '_draws*' ]));
@@ -49,27 +51,16 @@ end
 
 %delete old stale files before creating new ones
 if posterior
-    delete_stale_file([M_.dname '/metropolis/' M_.fname '_Posterior2ndOrderMoments*'])
-    delete_stale_file([M_.dname '/metropolis/' M_.fname '_PosteriorCorrelations*']);
+    delete_stale_file([M_.dname filesep folder_name filesep M_.fname '_Posterior2ndOrderMoments*'])
+    delete_stale_file([M_.dname filesep folder_name filesep M_.fname '_PosteriorCorrelations*']);
 else
     delete_stale_file([M_.dname '/prior/moments/' M_.fname '_Prior2ndOrderMoments*'])
     delete_stale_file([M_.dname '/prior/moments/' M_.fname '_PriorCorrelations*']);
 end
 
 % Set varlist (vartan)
-if ~posterior
-    if isfield(options_,'varlist')
-        temp = options_.varlist;
-    end
-    options_.varlist = options_.prior_analysis_endo_var_list;
-end
 endo_names=options_.varlist;
 [ivar,vartan] = get_variables_list(options_,M_);
-if ~posterior
-    if exist('temp','var')
-        options_.varlist = temp;
-    end
-end
 nvar = length(ivar);
 
 if options_.pruning
@@ -112,9 +103,12 @@ linea_cov = 0;
 linea_corr = 0;
 for file = 1:NumberOfDrawsFiles
     if posterior
-        temp=load([M_.dname '/metropolis/' M_.fname '_' type '_draws' num2str(file) ]);
+        temp=load([M_.dname filesep folder_name filesep M_.fname '_' type '_draws' num2str(file) ]);
     else
         temp=load([M_.dname '/prior/draws/' type '_draws' num2str(file) ]);
+        if columns(temp.pdraws)==3 && isstruct(temp.pdraws{1,3})
+            temp.pdraws(:,2)=[];
+        end
     end
     NumberOfDraws = rows(temp.pdraws);
     isdrsaved = columns(temp.pdraws)-1;
@@ -148,7 +142,7 @@ for file = 1:NumberOfDrawsFiles
 
         if linea_cov == NumberOfCovarLines
             if posterior
-                save([ M_.dname '/metropolis/' M_.fname '_Posterior2ndOrderMoments' int2str(CovarFileNumber) '.mat' ],'Covariance_matrix','endo_names');
+                save([ M_.dname filesep folder_name filesep M_.fname '_Posterior2ndOrderMoments' int2str(CovarFileNumber) '.mat' ],'Covariance_matrix','endo_names');
             else
                 save([ M_.dname '/prior/moments/' M_.fname '_Prior2ndOrderMoments' int2str(CovarFileNumber) '.mat' ],'Covariance_matrix','endo_names');
             end
@@ -166,7 +160,7 @@ for file = 1:NumberOfDrawsFiles
         end
         if linea_corr == NumberOfCorrLines
             if posterior
-                save([ M_.dname '/metropolis/' M_.fname '_PosteriorCorrelations' int2str(CorrFileNumber) '.mat' ],'Correlation_array','endo_names');
+                save([ M_.dname filesep folder_name filesep M_.fname '_PosteriorCorrelations' int2str(CorrFileNumber) '.mat' ],'Correlation_array','endo_names');
             else
                 save([ M_.dname '/prior/moments/' M_.fname '_PriorCorrelations' int2str(CorrFileNumber) '.mat' ],'Correlation_array','endo_names');
             end

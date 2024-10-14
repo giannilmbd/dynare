@@ -119,7 +119,8 @@ end
 
 % DirectoryName = myinputs.DirectoryName;
 if strcmpi(type,'posterior')
-    DirectoryName = CheckPath('metropolis',M_.dname);
+    folder_name=get_posterior_folder_name(options_);
+    DirectoryName = CheckPath(folder_name,M_.dname);
 elseif strcmpi(type,'gsa')
     if options_.opt_gsa.pprior
         DirectoryName = CheckPath(['gsa',filesep,'prior'],M_.dname);

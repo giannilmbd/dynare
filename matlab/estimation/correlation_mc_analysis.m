@@ -2,7 +2,7 @@ function oo_ = correlation_mc_analysis(SampleSize,type,dname,fname,vartan,nvar,v
 % This function analyses the (posterior or prior) distribution of the
 % endogenous variables correlation function.
 
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -20,8 +20,9 @@ function oo_ = correlation_mc_analysis(SampleSize,type,dname,fname,vartan,nvar,v
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if strcmpi(type,'posterior')
+    folder_name=get_posterior_folder_name(options_);
     TYPE = 'Posterior';
-    PATH = [dname '/metropolis/'];
+    PATH = [dname filesep folder_name filesep];
 else
     TYPE = 'Prior';
     PATH = [dname '/prior/moments/'];

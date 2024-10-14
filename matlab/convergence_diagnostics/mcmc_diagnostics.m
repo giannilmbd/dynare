@@ -59,16 +59,14 @@ if issue_an_error_message
 end
 
 % compute inefficiency factor
-FirstLine = record.KeepedDraws.FirstLine;
-TotalNumberOfMhFiles = sum(record.MhDraws(:,2));
 TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
-FirstMhFile = record.KeepedDraws.FirstMhFile;
 NumberOfDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
 
 param_name = {};
 param_name_tex = {};
 
 Ifac=NaN(nblck,npar);
+AllDraws = GetAllPosteriorDraws(options_, M_.dname, M_.fname, 'all');
 for jj = 1:npar
     if options_.TeX
         [par_name_temp, par_name_tex_temp] = get_the_name(jj, options_.TeX, M_,estim_params_, options_.varobs);
@@ -79,8 +77,7 @@ for jj = 1:npar
         par_name_temp = get_the_name(jj, options_.TeX, M_, estim_params_, options_.varobs);
         param_name = vertcat(param_name, par_name_temp);
     end
-    Draws = GetAllPosteriorDraws(options_, M_.dname, M_.fname, jj, FirstMhFile, FirstLine, TotalNumberOfMhFiles, NumberOfDraws, nblck);
-    Draws = reshape(Draws, [NumberOfDraws nblck]);
+    Draws = reshape(AllDraws(:,jj), [NumberOfDraws nblck]);
     Nc = min(1000, NumberOfDraws/2);
     for ll = 1:nblck
         Ifac(ll,jj) = mcmc_ifac(Draws(:,ll), Nc);

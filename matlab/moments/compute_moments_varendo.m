@@ -64,10 +64,7 @@ if strcmpi(type,'posterior')
 elseif strcmpi(type,'prior')
     posterior = 0;
     if nargin==5
-        var_list_ = options_.prior_analysis_endo_var_list;
-        if isempty(var_list_)
-            options_.prior_analysis_var_list = options_.varobs;
-        end
+        var_list_ = options_.varobs;
     end
     if isfield(oo_,'PriorTheoreticalMoments')
         oo_=rmfield(oo_,'PriorTheoreticalMoments');
@@ -103,7 +100,7 @@ if posterior
 else
     for i=1:NumberOfEndogenousVariables
         for j=i:NumberOfEndogenousVariables
-            oo_ = prior_analysis('variance', var_list_{i}, var_list_{j}, [], options_, M_, oo_, estim_params_);
+            oo_ = prior_analysis('variance', var_list_{i}, var_list_{j}, NumberOfLags, options_, M_, oo_, estim_params_);
         end
     end
 end
