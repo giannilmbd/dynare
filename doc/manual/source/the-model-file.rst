@@ -2051,7 +2051,7 @@ in this case ``initval`` is used to specify the terminal conditions.
 
     .. option:: last_obs = {INTEGER | DATE}
 
-        The observaton number or the date (see
+        The observation number or the date (see
 	:ref:`dates-members`) of the last observation to be used in
 	the file.
 
