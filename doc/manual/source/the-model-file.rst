@@ -11422,7 +11422,7 @@ the :comm:`bvar_forecast` command.
 
         .. math::
 
-           \varepsilon_{c,t} = R_{c,c}^{-1}\bigl( y_{c,t} - T_{c,c}y_{c,t} - T_{c,u}y_{u,t}  - R_{c,u}\varepsilon_{u,t}\bigr)
+           \varepsilon_{c,t} = R_{c,c}^{-1}\bigl( y_{c,t} - T_{c,c}y_{c,t-1} - T_{c,u}y_{u,t-1}  - R_{c,u}\varepsilon_{u,t}\bigr)
 
     and :math:`y_{u,t}` can be updated by evaluating the second block of equations:
 
