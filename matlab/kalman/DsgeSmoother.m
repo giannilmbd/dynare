@@ -215,12 +215,8 @@ elseif options_.lik_init == 4           % Start from the solution of the Riccati
 elseif options_.lik_init == 5            % Old diffuse Kalman filter only for the non stationary variables
     [eigenvect, eigenv] = eig(T);
     eigenv = diag(eigenv);
-    nstable = length(find(abs(abs(eigenv)-1) > 1e-7));
-    unstable = find(abs(abs(eigenv)-1) < 1e-7);
-    V = eigenvect(:,unstable);
-    indx_unstable = find(sum(abs(V),2)>1e-5);
+    V = eigenvect(:,abs(abs(eigenv)-1) < 1e-7);
     stable = find(sum(abs(V),2)<1e-5);
-    nunit = length(eigenv) - nstable;
     Pstar = options_.Harvey_scale_factor*eye(np);
     if kalman_algo ~= 2
         kalman_algo = 1;
@@ -233,7 +229,6 @@ elseif options_.lik_init == 5            % Old diffuse Kalman filter only for th
 end
 kalman_tol = options_.kalman_tol;
 diffuse_kalman_tol = options_.diffuse_kalman_tol;
-riccati_tol = options_.riccati_tol;
 data1 = Y-trend;
 % -----------------------------------------------------------------------------
 %  4. Kalman smoother
