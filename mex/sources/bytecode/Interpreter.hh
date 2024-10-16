@@ -153,7 +153,6 @@ private:
 
   int verbosity; // Corresponds to options_.verbosity
 
-  vector<int> previous_block_exogenous;
   bool print; // Whether the “print” command is requested
   int col_x, col_y;
   vector<double> residual;
@@ -166,7 +165,6 @@ private:
   int simulate_a_block(const vector_table_conditional_local_type& vector_table_conditional_local,
                        bool single_block, const string& bin_base_name);
   static string elastic(string str, unsigned int len, bool left);
-  void check_for_controlled_exo_validity(const vector<s_plan>& sconstrained_extended_path);
   pair<bool, vector<int>>
   MainLoop(const string& bin_basename, bool evaluate, int block, bool constrained,
            const vector<s_plan>& sconstrained_extended_path,

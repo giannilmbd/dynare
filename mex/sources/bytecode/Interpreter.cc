@@ -652,40 +652,6 @@ Interpreter::simulate_a_block(
   return NO_ERROR_ON_EXIT;
 }
 
-void
-Interpreter::check_for_controlled_exo_validity(const vector<s_plan>& sconstrained_extended_path)
-{
-  vector<int> exogenous {evaluator.getCurrentBlockExogenous()};
-  vector<int> endogenous {evaluator.getCurrentBlockVariables()};
-  for (auto& it : sconstrained_extended_path)
-    {
-      if (ranges::find(endogenous, it.exo_num) != endogenous.end()
-          && ranges::find(exogenous, it.var_num) == exogenous.end())
-        throw FatalException {"\nThe conditional forecast involving as constrained variable "
-                              + symbol_table.getName(SymbolType::endogenous, it.exo_num)
-                              + " and as endogenized exogenous "
-                              + symbol_table.getName(SymbolType::exogenous, it.var_num)
-                              + " that do not appear in block=" + to_string(block_num + 1)
-                              + ")\nYou should not use block in model options"};
-      else if (ranges::find(endogenous, it.exo_num) != endogenous.end()
-               && ranges::find(exogenous, it.var_num) != exogenous.end()
-               && (type == BlockSimulationType::evaluateForward
-                   || type == BlockSimulationType::evaluateBackward))
-        throw FatalException {"\nThe conditional forecast cannot be implemented for the block="
-                              + to_string(block_num + 1)
-                              + ") that has to be evaluated instead to be solved\nYou should not "
-                                "use block in model options"};
-      else if (ranges::find(previous_block_exogenous, it.var_num) != previous_block_exogenous.end())
-        throw FatalException {
-            "\nThe conditional forecast involves in the block " + to_string(block_num + 1)
-            + " the endogenized exogenous "
-            + symbol_table.getName(SymbolType::exogenous, it.var_num)
-            + " that appear also in a previous block\nYou should not use block in model options"};
-    }
-  for (auto it : exogenous)
-    previous_block_exogenous.push_back(it);
-}
-
 pair<bool, vector<int>>
 Interpreter::MainLoop(const string& bin_basename, bool evaluate, int block, bool constrained,
                       const vector<s_plan>& sconstrained_extended_path,
@@ -734,8 +700,8 @@ Interpreter::MainLoop(const string& bin_basename, bool evaluate, int block, bool
       equations = evaluator.getCurrentBlockEquations();
       u_count_int = evaluator.getCurrentBlockUCount();
 
-      if (constrained)
-        check_for_controlled_exo_validity(sconstrained_extended_path);
+      if (constrained && block_decomposed)
+        throw FatalException {"Conditional forecasting is not compatible with block decomposition"};
       if (print)
         {
           if (steady_state)
@@ -904,7 +870,6 @@ Interpreter::extended_path(const string& file_name, bool evaluate, int block, in
   vector<int> blocks;
   for (int t = 0; t < nb_periods; t++)
     {
-      previous_block_exogenous.clear();
       if (old_verbosity >= 1)
         {
           mexPrintf("|%s|", elastic(dates[t], date_length + 2, false).c_str());

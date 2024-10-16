@@ -69,6 +69,10 @@ if (range(range.ndat) > dset.dates(dset.nobs)+1 )
     error(['det_cond_forecast: The dseries ' inputname(2) ' finishes at time ' s1{1} ' before the last period of forecast ' s2{1}]);
 end
 
+if options_.block
+    warning('det_cond_forecast: ignoring the block option, which is not compatible with conditional forecasting')
+end
+
 sym_dset = dset(dates(-range(1)):dates(range(range.ndat)));
 periods = options_.periods + M_.maximum_lag + M_.maximum_lead;
 total_periods = periods + range.ndat;
@@ -125,11 +129,7 @@ end
 if options_.bytecode
     save_options_dynatol_f = options_.dynatol.f;
     options_.dynatol.f = 1e-7;
-    if options_.block
-        [endo, exo] = bytecode('extended_path', plan, 'block_decomposed', M_, options_, oo_.endo_simul, oo_.exo_simul, M_.params, oo_.steady_state, options_.periods);
-    else
-        [endo, exo] = bytecode('extended_path', plan, M_, options_, oo_.endo_simul, oo_.exo_simul, M_.params, oo_.steady_state, options_.periods);
-    end
+    [endo, exo] = bytecode('extended_path', plan, M_, options_, oo_.endo_simul, oo_.exo_simul, M_.params, oo_.steady_state, options_.periods);
     options_.dynatol.f = save_options_dynatol_f;
 
     oo_.endo_simul = endo;
@@ -389,11 +389,7 @@ if pf && ~surprise
             if k == 1
                 data1 = M_;
                 if (options_.bytecode)
-                    if options_.block
-                        [~, data1]= bytecode('dynamic','block_decomposed','evaluate', M_, options_, z, zx, M_.params, oo_.steady_state, k, data1);
-                    else
-                        [~, data1]= bytecode('dynamic','evaluate', M_, options_, z, zx, M_.params, oo_.steady_state, k, data1);
-                    end
+                    [~, data1]= bytecode('dynamic','evaluate', M_, options_, z, zx, M_.params, oo_.steady_state, k, data1);
                 else
                     [~, g1b] = feval([M_.fname '.dynamic'], z', zx, M_.params, oo_.steady_state, k);
                     data1.g1_x = g1b(:,end - M_.exo_nbr + 1:end);
@@ -636,11 +632,7 @@ else
                 if k == 1
                     data1 = M_;
                     if (options_.bytecode)
-                        if options_.block
-                            [~, data1]= bytecode('dynamic','block_decomposed','evaluate', M_, options_, z, zx, M_.params, oo_.steady_state, k, data1);
-                        else
-                            [~, data1]= bytecode('dynamic','evaluate', M_, options_, z, zx, M_.params, oo_.steady_state, k, data1);
-                        end
+                        [~, data1]= bytecode('dynamic','evaluate', M_, options_, z, zx, M_.params, oo_.steady_state, k, data1);
                     else
                         [~, g1b] = feval([M_.fname '.dynamic'], z', zx, M_.params, oo_.steady_state, k);
                         data1.g1_x = g1b(:,end - M_.exo_nbr + 1:end);
