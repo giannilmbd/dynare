@@ -40,7 +40,6 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 % Set seed for randn().
 options_ = set_dynare_seed_local_options(options_,'default');
 pruning = options_.particle.pruning;
-second_resample = options_.particle.resampling.status.systematic;
 variance_update = true;
 online_opt = options_.posterior_sampler_options.current_options;
 
@@ -102,7 +101,6 @@ weights = ones(1,number_of_particles)/number_of_particles;
 % Initialization of the likelihood.
 const_lik = log(2*pi)*number_of_observed_variables;
 mean_xparam = zeros(number_of_parameters,sample_size);
-%mode_xparam = zeros(number_of_parameters,sample_size);
 median_xparam = zeros(number_of_parameters,sample_size);
 std_xparam = zeros(number_of_parameters,sample_size);
 lb95_xparam = zeros(number_of_parameters,sample_size);
@@ -315,9 +313,7 @@ for t=1:sample_size
         variance_update = false;
     end
     % final resampling (not advised)
-    if second_resample
-%        [~, idmode] = max(weights);
-%        mode_xparam(:,t) = xparam(:,idmode);
+    if online_opt.systematic_resampling
         indx = kitagawa(weights);
         StateVectors = StateVectors(:,indx) ;
         if pruning
@@ -340,8 +336,6 @@ for t=1:sample_size
             save(sprintf('%s%sparameters_particles_final.mat', SimulationFolder, filesep()), 'param');
         end 
     else
-%        [~, idmode] = max(weights);
-%        mode_xparam(:,t) = xparam(:,idmode);
         mean_xparam(:,t) = xparam*(weights');
         mat_var_cov = bsxfun(@minus, xparam,mean_xparam(:,t));
         mat_var_cov = mat_var_cov*(bsxfun(@times, mat_var_cov, weights)');
