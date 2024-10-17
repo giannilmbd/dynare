@@ -53,8 +53,7 @@ if issmc(options_)
         end
     elseif isonline(options_)
         % Load draws from the posterior distribution
-        pfiles = dir(sprintf('%s/online/particles-*.mat', dname));
-        posterior = load(sprintf('%s/online/particles-final.mat', dname, length(pfiles), length(pfiles)));
+        posterior = load(sprintf('%s/online/parameters_particles_final.mat', dname));
         if column>0 || strcmp(column,'all')
             if strcmp(column,'all')
                 draws = transpose(posterior.param);
@@ -62,7 +61,7 @@ if issmc(options_)
                 draws = transpose(posterior.param(column,:));
             end
         else
-            draws = posterior.tlogpostkernel;
+%            draws = posterior.tlogpostkernel;
         end
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));

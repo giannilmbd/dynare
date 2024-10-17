@@ -59,8 +59,7 @@ else
         NumberOfDrawsPerChain=NumberOfDraws;
     elseif isonline(options_)
         % Load draws from the posterior distribution
-        pfiles = dir(sprintf('%s/online/particles-*.mat', M_.dname));
-        posterior = load(sprintf('%s/online/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
+        posterior = load(sprintf('%s/online/parameters_particles_final.mat', M_.dname));
         NumberOfDraws = size(posterior.param,2);
         NumberOfDrawsPerChain=NumberOfDraws;
     elseif isdime(options_)
