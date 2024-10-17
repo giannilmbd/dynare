@@ -459,8 +459,8 @@ if init
                           posterior_sampler_options.liu_west_delta = options_list{i,2};
                       case 'liu_west_max_resampling_tries'
                           posterior_sampler_options.liu_west_max_resampling_tries = options_list{i,2};
-                      case 'systematic_resampling'
-                          posterior_sampler_options.systematic_resampling = options_list{i,2};
+                      case 'second_resampling'
+                          posterior_sampler_options.second_resampling = options_list{i,2};
                       otherwise
                           warning(['online: Unknown option (' options_list{i,1} ')!'])
                   end

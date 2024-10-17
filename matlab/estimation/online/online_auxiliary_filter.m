@@ -313,7 +313,7 @@ for t=1:sample_size
         variance_update = false;
     end
     % final resampling (not advised)
-    if online_opt.systematic_resampling
+    if online_opt.second_resampling
         indx = kitagawa(weights);
         StateVectors = StateVectors(:,indx) ;
         if pruning

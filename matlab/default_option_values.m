@@ -515,7 +515,7 @@ options_.posterior_sampler_options.dsmh.tau = 10 ;
 options_.posterior_sampler_options.online.particles= 5000 ;
 options_.posterior_sampler_options.online.liu_west_delta = 0.99 ;
 options_.posterior_sampler_options.online.liu_west_max_resampling_tries = 5000 ;
-options_.posterior_sampler_options.online.systematic_resampling = false;
+options_.posterior_sampler_options.online.second_resampling = false;
 
 options_.trace_plot_ma = 200;
 options_.mh_autocorrelation_function_size = 30;
