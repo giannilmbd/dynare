@@ -496,9 +496,11 @@ switch minimizer_algorithm
     [LB, UB]=set_bounds_to_finite_values(bounds, options_.huge_number);
     [opt_par_values, fval, exitflag] = simpsa(func2str(objective_function),start_par_value,LB,UB,simpsaOptions,varargin{:});
   case 11
-    options_.cova_compute = 0;
-    subvarargin = [varargin(1), varargin(3:6), varargin(8)];
-    opt_par_values = online_auxiliary_filter(start_par_value, subvarargin{:});
+    % waiting for validation 
+    %    options_.cova_compute = 0;
+    %    subvarargin = [varargin(1), varargin(3:6), varargin(8)];
+    %    opt_par_values = online_auxiliary_filter(start_par_value, subvarargin{:});
+    warning('Online particle filter is no more available with mode_compute=11; use posterior_sampler with option online')
   case 12
     if isoctave
         error('Option mode_compute=12 is not available under Octave')
