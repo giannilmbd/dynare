@@ -1,6 +1,5 @@
-%function [xparam,mean_xparam,median_xparam,lb95_xparam,ub95_xparam] = 
 function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_)
-% [pmean, pmode, pmedian, pstdev, p025, p975, covariance] = online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_)
+% online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_)
 % Liu & West particle filter = auxiliary particle filter including Liu & West filter on parameters.
 %
 % INPUTS
@@ -13,14 +12,7 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 % - bayestopt_               [struct]    Prior definition.
 % - oo_                      [struct]    Results.
 %
-% OUTPUTS
-% - xparam                   [double]    n×M matrix, parameters particles at the end of the sample (posterior approx.).
-% - mean_xparam              [double]    n×T matrix, time series of the parameters particles mean.
-% - median_xparam            [double]    n×T matrix, time series of the parameters particles median.
-% - lb95_xparam              [double]    n×T matrix, time series of 2.5 percent of the particles are below p025(i) for i=1,…,n.
-% - ub95_xparam              [double]    n×T matrix, time series of 97.5 percent of the particles are below p975(i) for i=1,…,n.
-%
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
