@@ -61,7 +61,7 @@ if issmc(options_)
                 draws = transpose(posterior.param(column,:));
             end
         else
-            draws = NaN;
+            draws=NaN(size(posterior.param,2),1);
         end
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
