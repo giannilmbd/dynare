@@ -61,7 +61,7 @@ if issmc(options_)
                 draws = transpose(posterior.param(column,:));
             end
         else
-%            draws = posterior.tlogpostkernel;
+            draws = NaN;
         end
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
