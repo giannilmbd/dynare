@@ -13,7 +13,7 @@ function [h_minus_1, h, h_plus_1, h_exo, resid] = get_deriv(M_, ys_)
 % - h_exo      [N by N_exo] derivative matrix with respect to exogenous variables
 % - resid      [N by 1]     vector of residuals
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -30,40 +30,16 @@ function [h_minus_1, h, h_plus_1, h_exo, resid] = get_deriv(M_, ys_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-x = zeros(M_.maximum_lag + M_.maximum_lead + 1,M_.exo_nbr);
+dyn_endo_ss = repmat(ys_, 3, 1);
+x = zeros(M_.exo_nbr);
 
-iyv = M_.lead_lag_incidence';
-iyr0 = find(iyv(:)) ;
-z=repmat(ys_,1,M_.maximum_lag + M_.maximum_lead + 1);
+[resid, T_order, T] = feval([M_.fname '.sparse.dynamic_resid'], dyn_endo_ss, x, M_.params, ys_);
 
-[resid,g1]=feval([M_.fname,'.dynamic'],z(iyr0),x, M_.params, ys_, M_.maximum_exo_lag+1);
+g1 = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, x, M_.params, ys_, ...
+           M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
+           M_.dynamic_g1_sparse_colptr, T_order, T);
 
-% Initialize matrices
-h_minus_1=zeros(M_.endo_nbr);
-h = h_minus_1;
-h_plus_1 = h_minus_1;
-
-% build h_minus_1
-if M_.maximum_lag
-    lag_columns=find(iyv(:,1));
-    n_lag_columns=length(lag_columns);
-    h_minus_1(:,lag_columns) = g1(:,1:n_lag_columns);
-else
-    n_lag_columns=0;
-end
-
-% build h
-contemporaneous_columns=find(iyv(:,M_.maximum_lag+1));
-n_contemporaneous_columns = length(contemporaneous_columns);
-h(:,contemporaneous_columns) = g1(:,1+n_lag_columns:n_lag_columns+n_contemporaneous_columns);
-
-%build h_plus_1
-if M_.maximum_lead
-    lead_columns=find(iyv(:,end));
-    n_lead_columns = length(lead_columns);
-    h_plus_1(:,lead_columns) = g1(:,n_lag_columns+n_contemporaneous_columns+1:n_lag_columns+n_contemporaneous_columns+n_lead_columns);
-else
-    n_lead_columns=0;
-end
-
-h_exo =g1(:,n_lag_columns+n_contemporaneous_columns+n_lead_columns+1:end);
+h_minus_1 = full(g1(:,1:M_.endo_nbr));
+h = full(g1(:,M_.endo_nbr + (1:M_.endo_nbr)));
+h_plus_1 = full(g1(:,2*M_.endo_nbr + (1:M_.endo_nbr)));
+h_exo = full(g1(:,3*M_.endo_nbr+1:end));
