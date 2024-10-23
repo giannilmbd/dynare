@@ -271,10 +271,12 @@ else
     localVars.ifil = ifil;
     globalVars = [];
     % which files have to be copied to run remotely
-    NamFileInput(1,:) = {'',[M_.fname '.static.m']};
-    NamFileInput(2,:) = {'',[M_.fname '.dynamic.m']};
+    NamFileInput(1,:) = {'',[M_.fname '.sparse.static_resid.m']};
+    NamFileInput(2,:) = {'',[M_.fname '.sparse.static_g1.m']};
+    NamFileInput(3,:) = {'',[M_.fname '.sparse.dynamic_resid.m']};
+    NamFileInput(4,:) = {'',[M_.fname '.sparse.dynamic_g1.m']};
     if M_.set_auxiliary_variables
-        NamFileInput(3,:) = {'',[M_.fname '.set_auxiliary_variables.m']};
+        NamFileInput(5,:) = {'',[M_.fname '.set_auxiliary_variables.m']};
     end
     if options_.steadystate_flag
         if options_.steadystate_flag == 1
