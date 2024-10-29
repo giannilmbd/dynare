@@ -15,7 +15,7 @@ function write(M_)
 % REMARKS
 % - The trends are assumed to be multiplicative.
 
-% Copyright © 2019-2023 Dynare Team
+% Copyright © 2019-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -84,37 +84,40 @@ fprintf(fid, 'y = z(1:%u);\n\n', M_.endo_nbr);
 fprintf(fid, 'g = z(%u:%u);\n', M_.endo_nbr+1, 2*M_.endo_nbr);
 
 % Define the point where the dynamic model is to be evaluated.
-fprintf(fid, 'Y = zeros(%u, 1);\n', 2*(n0+n1+n2));
+% In period t, then in period t+1
+fprintf(fid, 'Y0 = NaN(%u, 1);\n', 3*M_.endo_nbr);
+fprintf(fid, 'Y1 = NaN(%u, 1);\n', 3*M_.endo_nbr);
 for i=1:length(I0) % period t equations, lagged variables.
     if I0(i)
-        fprintf(fid, 'Y(%u) = y(%u);\n', I0(i), i);
+        fprintf(fid, 'Y0(%u) = y(%u);\n', i+(purely_forward_model*M_.endo_nbr), i);
     end
 end
 for i=1:length(I1) % period t equations, current variables.
     if I1(i)
-        fprintf(fid, 'Y(%u) = y(%u)*g(%u);\n', I1(i), i, i);
+        fprintf(fid, 'Y0(%u) = y(%u)*g(%u);\n', i+M_.endo_nbr+(purely_forward_model*M_.endo_nbr), i, i);
     end
 end
 for i=1:length(I2) % period t equations, leaded variables.
     if I2(i)
-        fprintf(fid, 'Y(%u) = y(%u)*g(%u)*g(%u);\n', I2(i), i, i, i);
+        fprintf(fid, 'Y0(%u) = y(%u)*g(%u)*g(%u);\n', i+2*M_.endo_nbr, i, i, i);
     end
 end
 for i=1:length(I0) % period t+1 equations lagged variables.
     if I0(i)
-        fprintf(fid, 'Y(%u) = y(%u)*g(%u);\n', n0+n1+n2+I0(i), i, i);
+        fprintf(fid, 'Y1(%u) = y(%u)*g(%u);\n', i+(purely_forward_model*M_.endo_nbr), i, i);
     end
 end
 for i=1:length(I1) % period t+1 equations current variables.
     if I1(i)
-        fprintf(fid, 'Y(%u) = y(%u)*g(%u)*g(%u);\n', n0+n1+n2+I1(i), i, i, i);
+        fprintf(fid, 'Y1(%u) = y(%u)*g(%u)*g(%u);\n', i+M_.endo_nbr+(purely_forward_model*M_.endo_nbr), i, i, i);
     end
 end
 for i=1:length(I2) % period t+1 equations leaded variables.
     if I2(i)
-        fprintf(fid, 'Y(%u) = y(%u)*g(%u)*g(%u)*g(%u);\n', n0+n1+n2+I2(i), i, i, i, i);
+        fprintf(fid, 'Y1(%u) = y(%u)*g(%u)*g(%u)*g(%u);\n', i+2*M_.endo_nbr, i, i, i, i);
     end
 end
+
 fprintf(fid, '\n');
 
 % Define the vector of parameters.
@@ -131,19 +134,36 @@ fprintf(fid, 'F = NaN(%u, 1);\n', 2*M_.endo_nbr);
 fprintf(fid, 'x = zeros(1, %u);\n\n', M_.exo_nbr);
 
 % Evaluate the residuals and jacobian of the dynamic model in periods t and t+1.
+fprintf(fid, '[F(1:%u), T0_order, T0] = %s.sparse.dynamic_resid(Y0, x, p, y);\n', M_.endo_nbr, M_.fname);
+fprintf(fid, '[F(%u:%u), T1_order, T1] = %s.sparse.dynamic_resid(Y1, x, p, y);\n', M_.endo_nbr+1, 2*M_.endo_nbr, M_.fname);
 fprintf(fid, 'if nargout>1\n');
-fprintf(fid, '    J = zeros(%u, %u);\n', 2*M_.endo_nbr, n0+n1+n2+M_.endo_nbr);
-fprintf(fid, '    [F(1:%u), tmp] = %s.dynamic(Y(1:%u), x, p, y, 1);\n', M_.endo_nbr, M_.fname, n0+n1+n2);
-fprintf(fid, '    J(1:%u,1:%u) = tmp(:,1:%u);\n', M_.endo_nbr, n0+n1+n2, n0+n1+n2);
-fprintf(fid, '    [F(%u:%u), tmp] = %s.dynamic(Y(1+%u:%u), x, p, y, 1);\n', M_.endo_nbr+1, 2*M_.endo_nbr, M_.fname, n0+n1+n2, 2*(n0+n1+n2));
-fprintf(fid, '    J(%u:%u,1:%u) = tmp(:,1:%u);\n', M_.endo_nbr+1, 2*M_.endo_nbr, n0+n1+n2, n0+n1+n2);
-fprintf(fid, 'else\n');
-fprintf(fid, '    F(1:%u) = %s.dynamic(Y(1:%u), x, p, y, 1);\n', M_.endo_nbr, M_.fname, n0+n1+n2);
-fprintf(fid, '    F(%u:%u) = %s.dynamic(Y(1+%u:%u), x, p, y, 1);\n', M_.endo_nbr+1, 2*M_.endo_nbr, M_.fname, n0+n1+n2, 2*(n0+n1+n2));
-fprintf(fid, 'end\n\n');
+fprintf(fid, '    sparse_rowval = [');
+fprintf(fid, '%u ', M_.dynamic_g1_sparse_rowval);
+fprintf(fid, '];\n');
+fprintf(fid, '    sparse_colval = [');
+fprintf(fid, '%u ', M_.dynamic_g1_sparse_colval);
+fprintf(fid, '];\n');
+fprintf(fid, '    sparse_colptr = [');
+fprintf(fid, '%u ', M_.dynamic_g1_sparse_colptr);
+fprintf(fid, '];\n');
+fprintf(fid, '    J0 = %s.sparse.dynamic_g1(Y0, x, p, y, sparse_rowval, sparse_colval, sparse_colptr, T0_order, T0);\n', M_.fname);
+fprintf(fid, '    J1 = %s.sparse.dynamic_g1(Y1, x, p, y, sparse_rowval, sparse_colval, sparse_colptr, T1_order, T1);\n', M_.fname);
 
-% Compute the jacobian if required.
-fprintf(fid, 'if nargout>1\n');
+% Transform back the Jacobians J0 and J1 in the legacy format (non-sparse)
+% NB: it is probably possible to simplify the rest of this file, but maintaining
+% decent performance does not seem straightforward.
+lli = find(M_.lead_lag_incidence');
+if purely_forward_model
+    lli = lli + M_.endo_nbr;
+end
+fprintf(fid, '    lli = [');
+fprintf(fid, '%u ', lli);
+fprintf(fid, '];\n');
+
+fprintf(fid, '    J = zeros(%u, %u);\n', 2*M_.endo_nbr, n0+n1+n2+M_.endo_nbr);
+fprintf(fid, '    J(1:%u,1:%u) = full(J0(:,lli));\n', M_.endo_nbr, n0+n1+n2);
+fprintf(fid, '    J(%u:%u,1:%u) = full(J1(:,lli));\n', M_.endo_nbr+1, 2*M_.endo_nbr, n0+n1+n2);
+
 fprintf(fid, '    JAC = zeros(%u,%u);\n', 2*M_.endo_nbr, 2*M_.endo_nbr);
 
 % Compute the derivatives of the first block of equations (period t)
@@ -279,7 +299,7 @@ else
 end
 
 % Compute the derivatives of the second block of equations (period t+1)
-% with respect to the endogenous variables.
+% with respect to the growth factors.
 if purely_backward_model || purely_forward_model
     for i=M_.eq_nbr+1:2*M_.eq_nbr
         for j=1:M_.endo_nbr
