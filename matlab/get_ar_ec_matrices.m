@@ -68,12 +68,10 @@ else
 end
 
 %% Call Dynamic Function
-[~, g1] = feval([M_.fname '.dynamic'], ...
-    ones(max(max(M_.lead_lag_incidence)), 1), ...
-    ones(1, M_.exo_nbr), ...
-    M_.params, ...
-    zeros(M_.endo_nbr, 1), ...
-    1);
+g1 = feval([M_.fname '.sparse.dynamic_g1'], ones(3*M_.endo_nbr, 1), ones(1, M_.exo_nbr), ...
+           M_.params, zeros(M_.endo_nbr, 1), ...
+           M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
+           M_.dynamic_g1_sparse_colptr);
 
 % Choose rows of Jacobian based on equation tags
 ntags = length(M_.(model_type).(model_name).eqtags);
@@ -88,8 +86,7 @@ g1 = -1 * g1(g1rows, :);
 
 % Check for leads
 if rows(M_.lead_lag_incidence) == 3
-    idxs = M_.lead_lag_incidence(3, M_.lead_lag_incidence(3, :) ~= 0);
-    assert(~any(any(g1(g1rows, idxs))), ...
+    assert(~any(any(g1(g1rows, 2*M_.endo_nbr+(1:M_.endo_nbr)))), ...
         ['You cannot have leads in the equations specified by ' strjoin(M_.(model_type).(model_name).eqtags, ',')]);
 end
 
@@ -152,11 +149,11 @@ for i = 1:length(lhs)
     for j = 1:length(rhsvars{i}.vars)
         var = rhsvars{i}.vars(j);
         if rhsvars{i}.lags(j) == -1
-            g1col = M_.lead_lag_incidence(1, var);
+            g1col = var;
         else
-            g1col = M_.lead_lag_incidence(2, var);
+            g1col = var + M_.endo_nbr;
         end
-        if g1col ~= 0 && any(g1(:, g1col))
+        if any(g1(:, g1col))
             if rhsvars{i}.arRhsIdxs(j) > 0
                 % Fill AR
                 lag = findLagForVar(var, -rhsvars{i}.lags(j), 0, lhs);
