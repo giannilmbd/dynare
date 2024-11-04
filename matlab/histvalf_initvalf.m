@@ -11,7 +11,7 @@ function [series, p] = histvalf_initvalf(caller, M_, options)
 % - series           [dseries]   selected data from a file or a dseries
 % - p                [integer]   number of periods (excluding the initial and terminal conditions)
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -192,7 +192,7 @@ if isfield(options, 'last_obs')
         error('%s_FILE: last_obs = %d is larger than the number of observations in the dataset (%d)', caller, options.last_obs, nobs0)
     elseif first_obs_ispresent
         if nobs > 0 && (periods(options.last_obs) ~= first_obs + nobs - 1)
-            error('%s_FILE: FIST_OBS, LAST_OBS and NOBS contain inconsistent information. Use only two of these options.', caller)
+            error('%s_FILE: FIRST_OBS, LAST_OBS and NOBS contain inconsistent information. Use only two of these options.', caller)
         else
             last_obs = periods(options.last_obs);
         end
@@ -209,7 +209,7 @@ elseif isfield(options, 'lastobs')
         error('%s_FILE: last_obs = %s is larger than the number of observations in the dataset (%s)', caller, options.lastobs, series.last)
     elseif first_obs_ispresent
         if nobs > 0 && (options.lastobs ~= first_obs + nobs - 1)
-            error('%s_FILE: FIST_OBS, LAST_OBS and NOBS contain inconsistent information. Use only two of these options.', caller)
+            error('%s_FILE: FIRST_OBS, LAST_OBS and NOBS contain inconsistent information. Use only two of these options.', caller)
         else
             last_obs = options.lastobs;
         end
