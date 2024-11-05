@@ -13,7 +13,7 @@ function read(json)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2019-2020 Dynare Team
+% Copyright © 2019-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -36,7 +36,6 @@ global M_ options_ oo_
 jm = loadjson_(json, 'SimplifyCell', 1);
 data2json=struct();
 
-M_.exo_det_length = 0;
 for nshocks = 1:length(jm.stochasticshocksdescription)
 	covartype=jm.stochasticshocksdescription{nshocks}.shockattributevalue;
 	thisshock=(jm.stochasticshocksdescription{nshocks}.shockindex)+1;

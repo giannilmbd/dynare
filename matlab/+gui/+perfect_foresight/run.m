@@ -13,7 +13,7 @@ function run(json)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2019-2023 Dynare Team
+% Copyright © 2019-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -103,7 +103,6 @@ if ~isempty(jm.anticipated_transitory_shocks)
             'periods', s.start_date:s.end_date, ...
             'value', s.value)];
     end
-    M_.exo_det_length = 0;
 end
 
 %% Make unanticipated shock map

@@ -87,7 +87,7 @@ if iorder == 1
         tempx2 = tempx1-repmat(dr.ys(dr.order_var),1,ykmin);
         tempx = tempx2(k2);
         y_(dr.order_var,i) = dr.ys(dr.order_var)+dr.ghx*tempx+dr.ghu*ex(i-ykmin,:)';
-        for j=1:min(ykmin+M_.exo_det_length+1-i,M_.exo_det_length)
+        for j=1:min(ykmin+dr.exo_det_length+1-i,dr.exo_det_length)
             y_(dr.order_var,i) = y_(dr.order_var,i) + dr.ghud{j}*(ex_det(i+j-1,:)'-exo_det_steady_state);
         end
 
@@ -105,7 +105,7 @@ elseif iorder == 2
         y_(dr.order_var,i) = dr.ys(dr.order_var)+dr.ghs2/2+dr.ghx*tempx+ ...
             dr.ghu*tempu+0.5*(dr.ghxx*tempxx+dr.ghuu*tempuu)+dr.ghxu* ...
             tempxu;
-        for j=1:min(ykmin+M_.exo_det_length+1-i,M_.exo_det_length)
+        for j=1:min(ykmin+dr.exo_det_length+1-i,dr.exo_det_length)
             tempud = ex_det(i+j-1,:)'-exo_det_steady_state;
             tempudud = kron(tempud,tempud);
             tempxud = kron(tempx,tempud);
