@@ -12,7 +12,7 @@ function options_ = default_option_values(M_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2018-2023 Dynare Team
+% Copyright © 2018-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -372,8 +372,8 @@ options_.initial_period = NaN; %dates(1,1);
 options_.no_init_estimation_check_first_obs=false;
 options_.dataset.file = [];
 options_.dataset.series = [];
-options_.dataset.firstobs = dates();
-options_.dataset.lastobs = dates();
+options_.dataset.first_obs = dates();
+options_.dataset.last_obs = dates();
 options_.dataset.nobs = NaN;
 options_.dataset.xls_sheet = [];
 options_.dataset.xls_range = [];

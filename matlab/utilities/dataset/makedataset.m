@@ -22,7 +22,7 @@ function [dataset_, dataset_info, newdatainterface] = makedataset(options_, init
 %
 % See also dynare_estimation_init
 
-% Copyright © 2014-2023 Dynare Team
+% Copyright © 2014-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -179,25 +179,25 @@ end
 
 % Set firstobs, lastobs and nobs
 if newdatainterface
-    if isempty(options_.dataset.firstobs)
+    if isempty(options_.dataset.first_obs)
         % first_obs option was not used in the data command.
         firstobs = dataset_.init;
     else
-        firstobs = options_.dataset.firstobs;
+        firstobs = options_.dataset.first_obs;
     end
     if isnan(options_.dataset.nobs)
         % nobs option was not used in the data command.
-        if isempty(options_.dataset.lastobs)
+        if isempty(options_.dataset.last_obs)
             % last_obs option was not used in the data command.
             nobs = dataset_.nobs;
             lastobs = dataset_.dates(end);
         else
-            lastobs = options_.dataset.lastobs;
+            lastobs = options_.dataset.last_obs;
             nobs = lastobs-firstobs+1;
         end
     else
         nobs = options_.dataset.nobs;
-        if isempty(options_.dataset.lastobs)
+        if isempty(options_.dataset.last_obs)
             % last_obs option was not used in the data command.
             lastobs = firstobs+(nobs-1);
         else
