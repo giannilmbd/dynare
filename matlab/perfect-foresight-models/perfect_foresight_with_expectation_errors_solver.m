@@ -7,7 +7,7 @@ function oo_=perfect_foresight_with_expectation_errors_solver(M_, options_, oo_)
 % OUTPUTS
 %   oo_                 [structure] storing the results
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -24,8 +24,11 @@ function oo_=perfect_foresight_with_expectation_errors_solver(M_, options_, oo_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-% Same for periods (it will be modified before calling perfect_foresight_solver if constants_simulation_length option is false)
-periods = options_.periods;
+if options_.pfwee.constant_simulation_length && ~isempty(options_.simul.last_simulation_period)
+    error('Options constant_simulation_length and last_simulation_period cannot be used together')
+end
+
+periods = get_simulation_periods(options_);
 
 % Retrieve initial paths built by pfwee_setup
 % (the versions in oo_ will be truncated before calling perfect_foresight_solver)
@@ -67,6 +70,9 @@ while info_period <= periods
     oo_.exo_simul(M_.maximum_lag+periods-info_period+2:end, :) = repmat(oo_.exo_steady_state', sim_length+M_.maximum_lead-(periods-info_period+1), 1);
 
     options_.periods = sim_length;
+    % The following two options are reset to empty, so as to avoid an inconsistency with periods
+    options_.simul.first_simulation_period = dates();
+    options_.simul.last_simulation_period = dates();
 
     if info_period > 1 && homotopy_completion_share < 1 && options_.simul.homotopy_marginal_linearization_fallback > 0
         marginal_linearization_previous_raw_sims.sim1.endo_simul = oo_.deterministic_simulation.sim1.endo_simul(:, info_period:end);

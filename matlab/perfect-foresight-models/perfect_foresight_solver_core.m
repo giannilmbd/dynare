@@ -41,7 +41,7 @@ elseif options_.stack_solve_algo==7 && options_.solve_algo == 11
     options_.lmmcp.status = 1; %Path solver
 end
 
-periods = options_.periods;
+periods = get_simulation_periods(options_);
 
 if options_.linear_approximation && ~(isequal(options_.stack_solve_algo,0) || isequal(options_.stack_solve_algo,7))
     error('perfect_foresight_solver: Option linear_approximation is only available with option stack_solve_algo equal to 0 or 7.')

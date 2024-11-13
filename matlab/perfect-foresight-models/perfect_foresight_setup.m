@@ -14,7 +14,7 @@ function oo_=perfect_foresight_setup(M_, options_, oo_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 1996-2023 Dynare Team
+% Copyright © 1996-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,21 +47,19 @@ if size(M_.lead_lag_incidence,2)-nnz(M_.lead_lag_incidence(M_.maximum_endo_lag+1
     error(mess)
 end
 
-if options_.periods == 0
-    error('PERFECT_FORESIGHT_SETUP: number of periods for the simulation isn''t specified')
-end
+periods = get_simulation_periods(options_);
 
-if ~isempty(M_.det_shocks) && options_.periods<max([M_.det_shocks.periods])
+if ~isempty(M_.det_shocks) && periods < max([M_.det_shocks.periods])
     % Some expected shocks happen after the terminal period.
     mess = sprintf('\nPERFECT_FORESIGHT_SETUP: Problem with the declaration of the expected shocks:\n');
     for i=1:length(M_.det_shocks)
-        if any(M_.det_shocks(i).periods>options_.periods)
+        if any(M_.det_shocks(i).periods > periods)
             mess = sprintf('%s\n   At least one expected value for %s has been declared after the terminal period.', mess, M_.exo_names{M_.det_shocks(i).exo_id});
         end
     end
     disp(mess)
     skipline()
-    error('PERFECT_FORESIGHT_SETUP: Please check the declaration of the shocks or increase the value of the periods option.')
+    error('PERFECT_FORESIGHT_SETUP: Please check the declaration of the shocks or increase the number of periods in the simulation.')
 end
 
 if options_.simul.endval_steady && M_.maximum_lead == 0

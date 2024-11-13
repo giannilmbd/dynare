@@ -31,17 +31,19 @@ function [endogenousvariables, success, maxerror] = solve_stacked_problem(endoge
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+periods = get_simulation_periods(options_);
+
 if M_.maximum_lag > 0
     y0 = endogenousvariables(:, M_.maximum_lag);
 else
     y0 = NaN(M_.endo_nbr, 1);
 end
 if M_.maximum_lead > 0
-    yT = endogenousvariables(:, M_.maximum_lag+options_.periods+1);
+    yT = endogenousvariables(:, M_.maximum_lag+periods+1);
 else
     yT = NaN(M_.endo_nbr, 1);
 end
-z = endogenousvariables(:,M_.maximum_lag+(1:options_.periods));
+z = endogenousvariables(:,M_.maximum_lag+(1:periods));
 
 if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementarity problem
     [lb, ub] = feval(sprintf('%s.dynamic_complementarity_conditions', M_.fname), M_.params);
@@ -50,11 +52,11 @@ if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementari
         ub = ub - steadystate_y;
     end
     if options_.solve_algo == 10
-        options_.lmmcp.lb = repmat(lb,options_.periods,1);
-        options_.lmmcp.ub = repmat(ub,options_.periods,1);
+        options_.lmmcp.lb = repmat(lb,periods,1);
+        options_.lmmcp.ub = repmat(ub,periods,1);
     elseif options_.solve_algo == 11
-        options_.mcppath.lb = repmat(lb,options_.periods,1);
-        options_.mcppath.ub = repmat(ub,options_.periods,1);
+        options_.mcppath.lb = repmat(lb,periods,1);
+        options_.mcppath.ub = repmat(ub,periods,1);
     end
     dynamic_resid_function = str2func([M_.fname,'.sparse.dynamic_resid']);
     dynamic_g1_function = str2func([M_.fname,'.sparse.dynamic_g1']);
@@ -64,14 +66,14 @@ if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementari
                                                  dynamic_resid_function, dynamic_g1_function, y0, yT, ...
                                                  exogenousvariables, M_.params, steadystate, ...
                                                  M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, ...
-                                                 M_.maximum_lag, options_.periods, M_.endo_nbr, ...
+                                                 M_.maximum_lag, periods, M_.endo_nbr, ...
                                                  M_.dynamic_mcp_equations_reordering);
     eq_to_ignore=find(isfinite(lb) | isfinite(ub));
 
 else
     [y, check, res, ~, errorcode] = dynare_solve(@perfect_foresight_problem, z(:), ...
                                                options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, ...
-                                               options_, y0, yT, exogenousvariables, M_.params, steadystate, options_.periods, M_, options_);
+                                               options_, y0, yT, exogenousvariables, M_.params, steadystate, periods, M_, options_);
 end
 
 if all(imag(y)<.1*options_.dynatol.x)
@@ -82,9 +84,9 @@ else
     check = 1;
 end
 
-endogenousvariables(:, M_.maximum_lag+(1:options_.periods)) = reshape(y, M_.endo_nbr, options_.periods);
+endogenousvariables(:, M_.maximum_lag+(1:periods)) = reshape(y, M_.endo_nbr, periods);
 residuals=zeros(size(endogenousvariables));
-residuals(:, M_.maximum_lag+(1:options_.periods)) = reshape(res, M_.endo_nbr, options_.periods);
+residuals(:, M_.maximum_lag+(1:periods)) = reshape(res, M_.endo_nbr, periods);
 if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementarity problem
     residuals(eq_to_ignore,bsxfun(@le, endogenousvariables(eq_to_ignore,:), lb(eq_to_ignore)+eps) | bsxfun(@ge,endogenousvariables(eq_to_ignore,:),ub(eq_to_ignore)-eps))=0;
 end

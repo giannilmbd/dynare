@@ -7,7 +7,7 @@ function oo_=perfect_foresight_with_expectation_errors_setup(M_, options_, oo_)
 % OUTPUTS
 %   oo_                 [structure] storing the results
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -31,7 +31,7 @@ if ~isempty(oo_.initval_series)
     error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with histval_file/initval_file')
 end
 
-periods = options_.periods;
+periods = get_simulation_periods(options_);
 
 %% Initialize informational structures
 oo_.pfwee.terminal_info = NaN(M_.exo_nbr, periods); % 2nd dimension is informational time

@@ -52,7 +52,7 @@ if (~isempty(M_.learnt_shocks) || ~isempty(M_.learnt_endval)) && ~no_error_if_le
     error('A shocks(learnt_in=...) or endval(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
 end
 
-periods = options_.periods;
+[periods, first_simulation_period, last_simulation_period] = get_simulation_periods(options_);
 
 if options_.debug
     model_static = str2func([M_.fname,'.sparse.static_resid']);
@@ -274,15 +274,15 @@ if ~isempty(per_block_status)
     oo_.deterministic_simulation.block = per_block_status;
 end
 
-if isfield(oo_, 'initval_series') && ~isempty(oo_.initval_series)
-    initial_period = oo_.initval_series.dates(1)+(M_.orig_maximum_lag-1);
-elseif ~isdates(options_.initial_period) && isnan(options_.initial_period)
-    initial_period = dates(1,1);
-else
-    initial_period = options_.initial_period;
+if isempty(first_simulation_period)
+    if isfield(oo_, 'initval_series') && ~isempty(oo_.initval_series)
+        first_simulation_period = oo_.initval_series.dates(1)+(M_.orig_maximum_lag-1);
+    else
+        first_simulation_period = dates(1,1);
+    end
 end
 
-ts = dseries([transpose(oo_.endo_simul(1:M_.orig_endo_nbr,:)), oo_.exo_simul], initial_period, [M_.endo_names(1:M_.orig_endo_nbr); M_.exo_names]);
+ts = dseries([transpose(oo_.endo_simul(1:M_.orig_endo_nbr,:)), oo_.exo_simul], first_simulation_period - M_.maximum_lag, [M_.endo_names(1:M_.orig_endo_nbr); M_.exo_names]);
 
 if isfield(oo_, 'initval_series') && ~isempty(oo_.initval_series)
     names = ts.name;
@@ -319,6 +319,7 @@ success_counter = 0;
 iteration = 0;
 
 endo_simul = endoorig;
+periods = get_simulation_periods(options_);
 
 while step > options_.simul.homotopy_min_step_size
 
@@ -347,7 +348,7 @@ while step > options_.simul.homotopy_min_step_size
             if iteration == 1 && new_share == shareorig
                 % Nothing to do, at this point endo_simul(:, simperiods) == endoorig(:, simperiods)
             elseif M_.maximum_lead > 0
-                endo_simul(:, simperiods) = repmat(endo_simul(:, lastperiods(1)), 1, options_.periods);
+                endo_simul(:, simperiods) = repmat(endo_simul(:, lastperiods(1)), 1, periods);
             else
                 endo_simul(:, simperiods) = endobase(:, simperiods);
             end
@@ -555,6 +556,8 @@ function maxerror = recompute_maxerror(endo_simul, exo_simul, steady_state, M_, 
 
 function check_input_arguments(options_, M_, oo_)
 
+periods = get_simulation_periods(options_);
+
 if options_.stack_solve_algo < 0 || options_.stack_solve_algo > 7
     error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: stack_solve_algo must be between 0 and 7')
 end
@@ -567,10 +570,10 @@ if options_.block && ~options_.bytecode && options_.stack_solve_algo == 5
     error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: you can''t use stack_solve_algo = 5 without bytecode option')
 end
 
-if isempty(oo_.endo_simul) || any(size(oo_.endo_simul) ~= [ M_.endo_nbr, M_.maximum_lag+options_.periods+M_.maximum_lead ])
+if isempty(oo_.endo_simul) || any(size(oo_.endo_simul) ~= [ M_.endo_nbr, M_.maximum_lag+periods+M_.maximum_lead ])
 
     if options_.initval_file
-        fprintf('PERFECT_FORESIGHT_SOLVER: ''oo_.endo_simul'' has wrong size. Check whether your initval-file provides %d periods.',M_.maximum_endo_lag+options_.periods+M_.maximum_endo_lead)
+        fprintf('PERFECT_FORESIGHT_SOLVER: ''oo_.endo_simul'' has wrong size. Check whether your initval-file provides %d periods.',M_.maximum_endo_lag+periods+M_.maximum_endo_lead)
         error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: ''oo_.endo_simul'' has wrong size. Did you run ''perfect_foresight_setup'' ?')
     else
         error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: ''oo_.endo_simul'' has wrong size. Did you run ''perfect_foresight_setup'' ?')
@@ -578,9 +581,9 @@ if isempty(oo_.endo_simul) || any(size(oo_.endo_simul) ~= [ M_.endo_nbr, M_.maxi
 end
 
 if (M_.exo_nbr > 0) && ...
-        (isempty(oo_.exo_simul) || any(size(oo_.exo_simul) ~= [ M_.maximum_lag+options_.periods+M_.maximum_lead, M_.exo_nbr ]))
+        (isempty(oo_.exo_simul) || any(size(oo_.exo_simul) ~= [ M_.maximum_lag+periods+M_.maximum_lead, M_.exo_nbr ]))
     if options_.initval_file
-        fprintf('PERFECT_FORESIGHT_SOLVER: ''oo_.exo_simul'' has wrong size. Check whether your initval-file provides %d periods.',M_.maximum_endo_lag+options_.periods+M_.maximum_endo_lead)
+        fprintf('PERFECT_FORESIGHT_SOLVER: ''oo_.exo_simul'' has wrong size. Check whether your initval-file provides %d periods.',M_.maximum_endo_lag+periods+M_.maximum_endo_lead)
         error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: ''oo_.exo_simul'' has wrong size.')
     else
         error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: ''oo_.exo_simul'' has wrong size. Did you run ''perfect_foresight_setup'' ?')

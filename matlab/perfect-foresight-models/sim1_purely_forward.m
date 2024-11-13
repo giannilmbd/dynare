@@ -1,7 +1,7 @@
 function [endogenousvariables, success] = sim1_purely_forward(endogenousvariables, exogenousvariables, steadystate, M_, options_)
 % Performs deterministic simulation of a purely forward model
 
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -17,6 +17,8 @@ function [endogenousvariables, success] = sim1_purely_forward(endogenousvariable
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
+periods = get_simulation_periods(options_);
 
 if ismember(options_.solve_algo, [12,14])
     [funcs, feedback_vars_idxs] = setup_time_recursive_block_simul(M_);
@@ -35,7 +37,7 @@ end
 
 success = true;
 
-for it = options_.periods:-1:1
+for it = periods:-1:1
     yf = endogenousvariables(:,it+1); % Values at next period, also used as guess value for current period
     x = exogenousvariables(it,:);
     if ismember(options_.solve_algo, [12,14])

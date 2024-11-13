@@ -25,7 +25,7 @@ function [y, T, success, err, iter] = solve_two_boundaries_lbj(fh, y, x, steady_
 %   simulation of dynamic models with forward variables through the use
 %   of a relaxation algorithm. CEPREMAP. Couverture Orange. 9602.
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -46,7 +46,7 @@ sparse_rowval = M_.block_structure.block(blk).g1_sparse_rowval;
 sparse_colval = M_.block_structure.block(blk).g1_sparse_colval;
 sparse_colptr = M_.block_structure.block(blk).g1_sparse_colptr;
 
-periods = options_.periods;
+periods = get_simulation_periods(options_);
 
 % NB: notations are deliberately similar to those of sim1_lbj.m
 

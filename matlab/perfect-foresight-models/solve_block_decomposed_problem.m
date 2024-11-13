@@ -31,6 +31,7 @@ function [y, success, maxerror, per_block_status] = solve_block_decomposed_probl
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+periods = get_simulation_periods(options_);
 cutoff = 1e-15;
 
 switch options_.stack_solve_algo
@@ -55,7 +56,7 @@ if options_.verbosity
     skipline()
 end
 
-T=NaN(M_.block_structure.dyn_tmp_nbr, options_.periods+M_.maximum_lag+M_.maximum_lead);
+T=NaN(M_.block_structure.dyn_tmp_nbr, periods+M_.maximum_lag+M_.maximum_lead);
 
 maxerror = 0;
 nblocks = length(M_.block_structure.block);
@@ -71,9 +72,9 @@ for blk = 1:nblocks
     switch M_.block_structure.block(blk).Simulation_Type
         case {1, 2} % evaluate{Forward,Backward}
             if M_.block_structure.block(blk).Simulation_Type == 1
-                range = M_.maximum_lag+1:M_.maximum_lag+options_.periods;
+                range = M_.maximum_lag+1:M_.maximum_lag+periods;
             else
-                range = M_.maximum_lag+options_.periods:-1:M_.maximum_lag+1;
+                range = M_.maximum_lag+periods:-1:M_.maximum_lag+1;
             end
             for it_ = range
                 if it_ > 1 && it_ < size(y, 2)
@@ -97,7 +98,7 @@ for blk = 1:nblocks
         case {3, 4, 6, 7} % solve{Forward,Backward}{Simple,Complete}
             is_forward = M_.block_structure.block(blk).Simulation_Type == 3 || M_.block_structure.block(blk).Simulation_Type == 6;
             y_index = M_.block_structure.block(blk).variable(end-M_.block_structure.block(blk).mfs+1:end);
-            [y, T, success, maxblkerror, iter] = solve_one_boundary(fh_dynamic, y, exo_simul, M_.params, steady_state, T, y_index, M_.block_structure.block(blk).NNZDerivatives, options_.periods, M_.block_structure.block(blk).is_linear, blk, M_.maximum_lag, options_.simul.maxit, options_.dynatol.f, cutoff, options_.stack_solve_algo, is_forward, true, false, M_, options_);
+            [y, T, success, maxblkerror, iter] = solve_one_boundary(fh_dynamic, y, exo_simul, M_.params, steady_state, T, y_index, M_.block_structure.block(blk).NNZDerivatives, periods, M_.block_structure.block(blk).is_linear, blk, M_.maximum_lag, options_.simul.maxit, options_.dynatol.f, cutoff, options_.stack_solve_algo, is_forward, true, false, M_, options_);
         case {5, 8} % solveTwoBoundaries{Simple,Complete}
             if ismember(options_.stack_solve_algo, [1 6])
                 [y, T, success, maxblkerror, iter] = solve_two_boundaries_lbj(fh_dynamic, y, exo_simul, steady_state, T, blk, options_, M_);

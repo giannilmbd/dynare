@@ -2,7 +2,7 @@ function [endogenousvariables, success] = sim1_purely_static(endogenousvariables
 
 % Performs deterministic simulation of a purely static model
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -18,6 +18,8 @@ function [endogenousvariables, success] = sim1_purely_static(endogenousvariables
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
+periods = get_simulation_periods(options_);
 
 if ismember(options_.solve_algo, [12,14])
     [funcs, feedback_vars_idxs] = setup_time_recursive_block_simul(M_);
@@ -38,7 +40,7 @@ success = true;
 
 y = endogenousvariables(:,1);
 
-for it = 1:options_.periods
+for it = 1:periods
     x = exogenousvariables(it,:);
     if ismember(options_.solve_algo, [12,14])
         T = NaN(M_.block_structure.dyn_tmp_nbr);

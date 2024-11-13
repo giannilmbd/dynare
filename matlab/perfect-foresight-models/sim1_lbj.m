@@ -76,6 +76,7 @@ function [r, g1] = dynamicmodel(it_)
 end
 
 verbose = options_.verbosity;
+periods = get_simulation_periods(options_);
 
 if verbose
     printline(56)
@@ -86,13 +87,13 @@ h1 = clock;
 
 for iter = 1:options_.simul.maxit
     h2 = clock;
-    c = zeros(ny*options_.periods, nrc);
+    c = zeros(ny*periods, nrc);
     [d1, jacobian] = dynamicmodel(M_.maximum_lag+1);
     jacobian = [jacobian(:,iz), -d1];
     ic = 1:ny;
     icp = iyp;
     c (ic,:) = jacobian(:,is)\jacobian(:,isf1);
-    for it_ = M_.maximum_lag+(2:options_.periods)
+    for it_ = M_.maximum_lag+(2:periods)
         [d1, jacobian] = dynamicmodel(it_);
         jacobian = [jacobian(:,iz), -d1];
         jacobian(:,[isf nrs]) = jacobian(:,[isf nrs])-jacobian(:,isp)*c(icp,:);
@@ -100,8 +101,8 @@ for iter = 1:options_.simul.maxit
         icp = icp + ny;
         c (ic,:) = jacobian(:,is)\jacobian(:,isf1);
     end
-    c = back_subst_lbj(c, ny, iyf, options_.periods);
-    endogenousvariables(:,M_.maximum_lag+(1:options_.periods)) = endogenousvariables(:,M_.maximum_lag+(1:options_.periods))+c;
+    c = back_subst_lbj(c, ny, iyf, periods);
+    endogenousvariables(:,M_.maximum_lag+(1:periods)) = endogenousvariables(:,M_.maximum_lag+(1:periods))+c;
     err = max(max(abs(c)));
     if verbose
         fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err), num2str(etime(clock, h2)));

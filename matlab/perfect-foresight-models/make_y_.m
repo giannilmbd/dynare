@@ -10,7 +10,7 @@ function oo_=make_y_(M_, options_, oo_)
 % OUTPUTS
 % - oo_         [struct]   Updated dynare results structure
 
-% Copyright © 1996-2023 Dynare Team
+% Copyright © 1996-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -27,6 +27,8 @@ function oo_=make_y_(M_, options_, oo_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+periods = get_simulation_periods(options_);
+
 if isempty(oo_.steady_state)
     oo_.steady_state = zeros(M_.endo_nbr,1);
 end
@@ -34,9 +36,9 @@ end
 if isempty(oo_.initval_series)
     if isempty(M_.endo_histval)
         if isempty(oo_.initial_steady_state)
-            oo_.endo_simul = repmat(oo_.steady_state, 1, M_.maximum_lag+options_.periods+M_.maximum_lead);
+            oo_.endo_simul = repmat(oo_.steady_state, 1, M_.maximum_lag+periods+M_.maximum_lead);
         else
-            oo_.endo_simul = [repmat(oo_.initial_steady_state, 1, M_.maximum_lag) repmat(oo_.steady_state, 1,options_.periods+M_.maximum_lead)];
+            oo_.endo_simul = [repmat(oo_.initial_steady_state, 1, M_.maximum_lag) repmat(oo_.steady_state, 1,periods+M_.maximum_lead)];
         end
     else
         if ~isempty(oo_.initial_steady_state)
@@ -45,11 +47,11 @@ if isempty(oo_.initval_series)
         % the first NaNs take care of the case where there are lags > 1 on
         % exogenous variables
         oo_.endo_simul = [M_.endo_histval ...
-                          repmat(oo_.steady_state, 1, options_.periods+M_.maximum_lead)];
+                          repmat(oo_.steady_state, 1, periods+M_.maximum_lead)];
     end
 else
     y = oo_.initval_series{M_.endo_names{:}}.data;
-    oo_.endo_simul = y(M_.orig_maximum_lag - M_.maximum_lag + 1:M_.orig_maximum_lag + options_.periods + ...
+    oo_.endo_simul = y(M_.orig_maximum_lag - M_.maximum_lag + 1:M_.orig_maximum_lag + periods + ...
                        M_.maximum_lead, :)';
     if ~isempty(M_.endo_histval)
         if ~isempty(oo_.initial_steady_state)

@@ -31,8 +31,6 @@ steady_state_model;
   Consumption = exp(LoggedProductivity)*Capital^alpha-delta*Capital;
 end;
 
-set_time(1Q1);
-
 initval;
   LoggedProductivityInnovation = 0;
   LoggedProductivity = 10;
@@ -46,7 +44,7 @@ histval;
  LoggedProductivity(0)=10;
 end;
 
-perfect_foresight_setup(periods=200);
+perfect_foresight_setup(periods=200, first_simulation_period = 1Q2);
 perfect_foresight_solver;
 
 if ~oo_.deterministic_simulation.status

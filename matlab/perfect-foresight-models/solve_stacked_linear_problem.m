@@ -17,17 +17,19 @@ function [endogenousvariables, success] = solve_stacked_linear_problem(endogenou
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+periods = get_simulation_periods(options_);
+
 if M_.maximum_lag > 0
     y0 = endogenousvariables(:, M_.maximum_lag);
 else
     y0 = NaN(M_.endo_nbr, 1);
 end
 if M_.maximum_lead > 0
-    yT = endogenousvariables(:, M_.maximum_lag+options_.periods+1);
+    yT = endogenousvariables(:, M_.maximum_lag+periods+1);
 else
     yT = NaN(M_.endo_nbr, 1);
 end
-z = endogenousvariables(:,M_.maximum_lag+(1:options_.periods));
+z = endogenousvariables(:,M_.maximum_lag+(1:periods));
 
 % Evaluate the residuals and Jacobian of the dynamic model at the deterministic steady state.
 y3n = repmat(steadystate_y, 3, 1);
@@ -50,7 +52,7 @@ x = bsxfun(@minus, exogenousvariables, steadystate_x');
                                            options_, ...
                                            jacobian, y0-steadystate_y, yT-steadystate_y, ...
                                            x, M_.params, steadystate_y, ...
-                                           M_.maximum_lag, options_.periods, M_.endo_nbr);
+                                           M_.maximum_lag, periods, M_.endo_nbr);
 
 if all(imag(y)<.1*options_.dynatol.x)
     if ~isreal(y)
@@ -60,7 +62,7 @@ else
     check = 1;
 end
 
-endogenousvariables = [y0 bsxfun(@plus,reshape(y,M_.endo_nbr,options_.periods), steadystate_y) yT];
+endogenousvariables = [y0 bsxfun(@plus,reshape(y,M_.endo_nbr,periods), steadystate_y) yT];
 
 success = ~check;
 

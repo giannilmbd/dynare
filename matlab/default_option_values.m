@@ -329,6 +329,8 @@ options_.minimal_solving_periods = 1;
 options_.endogenous_terminal_period = false;
 options_.no_homotopy = false;
 options_.simul.endval_steady = false;
+options_.simul.first_simulation_period = dates();
+options_.simul.last_simulation_period = dates();
 
 options_.simul.homotopy_max_completion_share = 1;
 options_.simul.homotopy_min_step_size = 1e-3;

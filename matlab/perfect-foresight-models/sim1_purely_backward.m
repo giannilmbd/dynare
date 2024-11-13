@@ -2,7 +2,7 @@ function [endogenousvariables, success] = sim1_purely_backward(endogenousvariabl
 
 % Performs deterministic simulation of a purely backward model
 
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -18,6 +18,8 @@ function [endogenousvariables, success] = sim1_purely_backward(endogenousvariabl
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
+periods = get_simulation_periods(options_);
 
 if ismember(options_.solve_algo, [12,14])
     [funcs, feedback_vars_idxs] = setup_time_recursive_block_simul(M_);
@@ -36,7 +38,7 @@ end
 
 success = true;
 
-for it = M_.maximum_lag + (1:options_.periods)
+for it = M_.maximum_lag + (1:periods)
     y = endogenousvariables(:,it-1);        % Values at previous period, also used as guess value for current period
     x = exogenousvariables(it,:);
     if ismember(options_.solve_algo, [12,14])

@@ -36,7 +36,7 @@ function [endogenousvariables, success, err, iter] = sim1(endogenousvariables, e
 verbose = options_.verbosity && ~options_.noprint;
 
 ny = M_.endo_nbr;
-periods = options_.periods;
+periods = get_simulation_periods(options_);
 vperiods = periods*ones(1,options_.simul.maxit);
 
 if M_.maximum_lag > 0
@@ -141,7 +141,7 @@ end
 endogenousvariables(:, M_.maximum_lag+(1:periods)) = reshape(y, ny, periods);
 
 if options_.endogenous_terminal_period
-    periods = options_.periods;
+    periods = get_simulation_periods(options_);
     err = evaluate_max_dynamic_residual(str2func([M_.fname,'.sparse.dynamic_resid']), endogenousvariables, exogenousvariables, M_.params, steadystate, periods, M_.maximum_lag);
 end
 

@@ -44,7 +44,7 @@ function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(fh, y, x,
 
 Blck_size = M_.block_structure.block(Block_Num).mfs;
 y_index = M_.block_structure.block(Block_Num).variable(end-Blck_size+1:end);
-periods = options_.periods;
+periods = get_simulation_periods(options_);
 y_kmin = M_.maximum_lag;
 stack_solve_algo = options_.stack_solve_algo;
 

@@ -63,7 +63,7 @@ nx = M_.exo_nbr;
 
 maximum_lag = M_.maximum_lag;
 
-periods = options_.periods;
+periods = get_simulation_periods(options_);
 
 params = M_.params;
 
