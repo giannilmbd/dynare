@@ -8,7 +8,7 @@
 @#endif
 
 @#ifndef ALGO_SIR
-    @#define ALGO_SIR = 1
+    @#define ALGO_SIR = 0
 @#endif
 
 @#ifndef ALGO_APF
@@ -24,7 +24,7 @@
 @#endif
 
 @#ifndef ALGO_ONLINE
-    @#define ALGO_ONLINE = 0
+    @#define ALGO_ONLINE = 1
 @#endif
 
 @#ifndef MCMC
@@ -150,9 +150,12 @@ estimation(order=3,nograph,filter_algorithm=gf,proposal_approximation=montecarlo
 @#endif
 
 @#if ALGO_ONLINE
-  estimation(order=1,nograph,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
-  estimation(order=2,nograph,number_of_particles=10000,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
-  estimation(order=3,nograph,number_of_particles=10000,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
+%  estimation(order=1,nograph,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
+%  estimation(order=2,nograph,number_of_particles=10000,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
+%  estimation(order=3,nograph,number_of_particles=10000,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
+  estimation(order=1,posterior_sampling_method='online',posterior_sampler_options=('particles',1000));
+  estimation(order=2,posterior_sampling_method='online',posterior_sampler_options=('particles',1000));
+  estimation(order=3,posterior_sampling_method='online',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
 @#endif
 
 @#if MCMC
@@ -187,9 +190,7 @@ estimation(order=3,filter_algorithm=nlkf,number_of_particles=10000,proposal_appr
 @#endif
 
 @#if SMC
-%  estimation(order=1,nograph,posterior_sampling_method='hssmc');
-%  estimation(order=2,nograph,posterior_sampling_method='hssmc',filter_algorithm=nlkf,proposal_approximation=montecarlo);
-%  estimation(order=2,nograph,posterior_sampling_method='hssmc',number_of_particles=10000);
-%  estimation(order=3,nograph,posterior_sampling_method='hssmc',number_of_particles=10000,filter_algorithm=apf,resampling=none);%,posterior_sampler_options=('particles',1000));
-  estimation(order=3,nograph,posterior_sampling_method='hssmc',filter_algorithm=nlkf,proposal_approximation=montecarlo);
+  estimation(order=1,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
+  estimation(order=2,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
+  estimation(order=3,posterior_sampling_method='hssmc',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
 @#endif
