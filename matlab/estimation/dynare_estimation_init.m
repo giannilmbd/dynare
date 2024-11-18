@@ -30,7 +30,7 @@ function [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -204,8 +204,7 @@ if ~isempty(estim_params_) && ~(all(strcmp(fieldnames(estim_params_),'full_calib
     if options_.use_calibration_initialization
         try
             check_prior_bounds(xparam1,bounds,M_,estim_params_,options_,bayestopt_)
-        catch
-            e = lasterror();
+        catch e
             fprintf('Cannot use parameter values from calibration as they violate the prior bounds.')
             rethrow(e);
         end

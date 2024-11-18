@@ -15,7 +15,7 @@ function slaveParallel(whoiam,ThisMatlab)
 % OUTPUTS
 %   None
 
-% Copyright © 2006-2017 Dynare Team
+% Copyright © 2006-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -143,8 +143,7 @@ while (etime(clock,t0)<1200 && ~isempty(fslave)) || ~isempty(dir(['stayalive',in
 
             disp(['Job ',fname,' on CPU ',int2str(whoiam),' completed.']);
             t0 =clock; % Re-set waiting time of 20 mins
-        catch
-            theerror = lasterror;
+        catch theerror
             if strfind(theerror.message,'Master asked to break the job')
                 disp(['Job ',fname,' on CPU ',int2str(whoiam),' broken from master.']);
                 fOutputVar.message = theerror;
@@ -152,7 +151,7 @@ while (etime(clock,t0)<1200 && ~isempty(fslave)) || ~isempty(dir(['stayalive',in
                 delete(['P_',fname,'_',int2str(whoiam),'End.txt']);
             else
                 disp(['Job ',fname,' on CPU ',int2str(whoiam),' crashed.']);
-                fOutputVar.error = lasterror;
+                fOutputVar.error = theerror;
                 save([ fname,'_output_',int2str(whoiam),'.mat'],'fOutputVar' );
                 waitbarString = fOutputVar.error.message;
                 if Parallel(ThisMatlab).Local

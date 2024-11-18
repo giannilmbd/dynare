@@ -100,10 +100,9 @@ uprbnd = 1 + 1.e-6; %allow unit roots
 
 try % try to run AIM
     [bb, rts, ~, ~, ~, ~, aimcode] = SPAmalg(g1(:, 1:3*M_.endo_nbr), neq, 1, 1, condn, uprbnd);
-catch
-    err = lasterror;
+catch err
     disp(['Dynare AIM Solver error:' sprintf('%s; ID:%s',err.message, err.identifier)]);
-    rethrow(lasterror);
+    rethrow(err);
 end
 if aimcode==1 %if OK
     dr.ghx = bb(dr.order_var, dr.order_var(M_.nstatic+(1:M_.nspred)));

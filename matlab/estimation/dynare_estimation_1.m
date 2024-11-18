@@ -167,8 +167,7 @@ end
 
 try
     oo_ = initial_estimation_checks(objective_function,xparam1,dataset_,dataset_info,M_,estim_params_,options_,bayestopt_,bounds,oo_);
-catch % if check fails, provide info on using calibration if present
-    e = lasterror();
+catch e % if check fails, provide info on using calibration if present
     if estim_params_.full_calibration_detected %calibrated model present and no explicit starting values
         skipline(1);
         fprintf('ESTIMATION_CHECKS: There was an error in computing the likelihood for initial parameter values.\n')

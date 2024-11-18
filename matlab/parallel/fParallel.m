@@ -18,7 +18,7 @@ function fParallel(fblck,nblck,whoiam,ThisMatlab,fname)
 % OUTPUTS
 %   None
 %
-% Copyright © 2006-2017 Dynare Team
+% Copyright © 2006-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -92,8 +92,7 @@ try
     end
 
     disp(['fParallel ',int2str(whoiam),' completed.'])
-catch
-    theerror = lasterror;
+catch theerror
     if strfind(theerror.message,'Master asked to break the job')
         fOutputVar.message = theerror;
         save([ fname,'_output_',int2str(whoiam),'.mat'],'fOutputVar' )
