@@ -76,7 +76,7 @@ public:
   }
   /* Constructor using an initializer list, that gives the contents of the
      Symmetry. Typically used for symmetries of the form yⁿ, yⁿuᵐ, yⁿuᵐσᵏ */
-  Symmetry(std::initializer_list<int> init) : IntSequence(std::move(init))
+  Symmetry(std::initializer_list<int> init) : IntSequence(init)
   {
   }
   // Constructor of implied symmetry for a symmetry and an equivalence class
