@@ -20,6 +20,7 @@
 #ifndef DYNAMIC_ABSTRACT_CLASS_HH
 #define DYNAMIC_ABSTRACT_CLASS_HH
 
+#include <utility>
 #include <vector>
 
 #include "dynmex.h"
@@ -41,12 +42,12 @@ public:
   DynamicModelAC(int order_arg, const mxArray* dynamic_g1_sparse_rowval_mx_arg,
                  const mxArray* dynamic_g1_sparse_colval_mx_arg,
                  const mxArray* dynamic_g1_sparse_colptr_mx_arg,
-                 const std::vector<const mxArray*> dynamic_gN_sparse_indices_arg) :
+                 std::vector<const mxArray*> dynamic_gN_sparse_indices_arg) :
       order {order_arg},
       dynamic_g1_sparse_rowval_mx {dynamic_g1_sparse_rowval_mx_arg},
       dynamic_g1_sparse_colval_mx {dynamic_g1_sparse_colval_mx_arg},
       dynamic_g1_sparse_colptr_mx {dynamic_g1_sparse_colptr_mx_arg},
-      dynamic_gN_sparse_indices {dynamic_gN_sparse_indices_arg} {};
+      dynamic_gN_sparse_indices {move(dynamic_gN_sparse_indices_arg)} {};
   virtual ~DynamicModelAC() = default;
   virtual void eval(const Vector& y, const Vector& x, const Vector& params, const Vector& ySteady,
                     Vector& residual, const std::map<int, int>& dynToDynpp,

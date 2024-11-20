@@ -41,7 +41,7 @@ public:
                     const mxArray* dynamic_g1_sparse_rowval_mx_arg,
                     const mxArray* dynamic_g1_sparse_colval_mx_arg,
                     const mxArray* dynamic_g1_sparse_colptr_mx_arg,
-                    const std::vector<const mxArray*> dynamic_gN_sparse_indices_arg);
+                    std::vector<const mxArray*> dynamic_gN_sparse_indices_arg);
   void eval(const Vector& y, const Vector& x, const Vector& params, const Vector& ySteady,
             Vector& residual, const std::map<int, int>& dynToDynpp,
             TensorContainer<FSSparseTensor>& derivatives) noexcept(false) override;
