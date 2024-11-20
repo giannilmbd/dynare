@@ -46,7 +46,10 @@ DynamicModelDLL::DynamicModelDLL(const std::string& modName, int order_arg,
         "./"s +
 #endif
             "+"s + modName + "/+sparse/" + func_name + MEXEXT
+        // clang-format off
+        // As of Clang 16, the RemoveSemicolon option incorrectly removes the following semicolon
       };
+      // clang-format on
 
       mex_handle_t handle {load_mex(mex_filename)};
       if (handle)

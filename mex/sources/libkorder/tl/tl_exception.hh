@@ -62,8 +62,8 @@
 #define TL_RAISE(mes) throw TLException(__FILE__, __LINE__, mes)
 
 #define TL_RAISE_IF(expr, mes)                                                                     \
- if (TL_DEBUG >= TL_DEBUG_EXCEPTION && (expr))                                                     \
-  throw TLException(__FILE__, __LINE__, mes);
+  if (TL_DEBUG >= TL_DEBUG_EXCEPTION && (expr))                                                    \
+    throw TLException(__FILE__, __LINE__, mes);
 
 /* Primitive exception class containing file name, line number and message. */
 

@@ -87,7 +87,7 @@ public:
   explicit Permutation(const IntSequence& s) : permap(s.size())
   {
     computeSortingMap(s);
-  };
+  }
   Permutation(const Permutation& p1, const Permutation& p2) : permap(p2.permap)
   {
     p1.apply(permap);
