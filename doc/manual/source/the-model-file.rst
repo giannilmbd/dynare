@@ -2915,6 +2915,9 @@ Finding the steady state with Dynare nonlinear solver
        along. Iteration will cease when the attempted step size is smaller than
        ``tolx``. Default: ``eps^(2/3)``
 
+    .. option:: non_zero
+
+       See :opt:`non_zero`.
 
     .. _solvalg:
 
