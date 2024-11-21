@@ -61,13 +61,13 @@ if datafile
     [~,basename,extension] = fileparts(datafile);
     % Auto-detect extension if not provided
     if isempty(extension)
-        if exist([basename '.m'],'file')
+        if isfile([basename '.m'])
             extension = '.m';
-        elseif exist([basename '.mat'],'file')
+        elseif isfile([basename '.mat'])
             extension = '.mat';
-        elseif exist([basename '.xls'],'file')
+        elseif isfile([basename '.xls'])
             extension = '.xls';
-        elseif exist([basename '.xlsx'],'file')
+        elseif isfile([basename '.xlsx'])
             extension = '.xlsx';
         else
             error('%s_FILE: Can''t find datafile: %s.{m,mat,xls,xlsx}', caller, basename);
@@ -104,7 +104,7 @@ if error_flag
     error('%s_FILE: some variables are missing', caller)
 end
 
-if exist(sprintf('+%s/dynamic_set_auxiliary_series.m', M_.fname), 'file')
+if isfile(sprintf('+%s/dynamic_set_auxiliary_series.m', M_.fname))
     series = feval(sprintf('%s.dynamic_set_auxiliary_series', M_.fname), series, M_.params);
 end
 

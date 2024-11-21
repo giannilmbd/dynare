@@ -55,7 +55,7 @@ end
 %% Write file
 % Open
 filepath = [M_.fname filesep 'model' filesep subfolder];
-if ~exist(filepath, 'dir')
+if ~isfolder(filepath)
     mkdir(filepath)
 end
 

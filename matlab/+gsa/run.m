@@ -285,7 +285,7 @@ end
 
 if (options_gsa.load_stab || options_gsa.load_rmse || options_gsa.load_redform) && options_gsa.pprior
     filetoload=[OutputDirectoryName '/' fname_ '_prior.mat'];
-    if ~exist(filetoload,'file')
+    if ~isfile(filetoload)
         disp([filetoload,' not found!'])
         disp('You asked to load a non existent analysis')
         return
@@ -400,7 +400,7 @@ if options_gsa.rmse
             else
                 TmpDirectoryName = ([M_.dname filesep 'gsa' filesep 'mc']);
             end
-            if exist(TmpDirectoryName,'dir')
+            if isfolder(TmpDirectoryName)
                 mydelete([M_.fname '_filter_step_ahead*.mat'],[TmpDirectoryName filesep]);
                 mydelete([M_.fname '_inno*.mat'],[TmpDirectoryName filesep]);
                 mydelete([M_.fname '_smooth*.mat'],[TmpDirectoryName filesep]);

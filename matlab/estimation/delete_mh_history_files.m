@@ -24,7 +24,7 @@ mh_history_files = dir([BaseName '_mh_history_*.mat']);
 
 % Delete the mh-history files (old or new format) if any.
 if isequal(length(mh_history_files),0)
-    if exist([BaseName '_mh_history.mat'])
+    if isfile([BaseName '_mh_history.mat'])
         delete([BaseName '_mh_history.mat'])
     end
 else

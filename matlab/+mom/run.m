@@ -281,7 +281,7 @@ if options_mom_.mom.mom_nbr < length(xparam0)
 end
 skipline(2);
 % check if a _prior_restrictions.m file exists
-if exist([M_.fname '_prior_restrictions.m'],'file')
+if isfile([M_.fname '_prior_restrictions.m'])
     options_mom_.prior_restrictions.status = 1;
     options_mom_.prior_restrictions.routine = str2func([M_.fname '_prior_restrictions']);
 end

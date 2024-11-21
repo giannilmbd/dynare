@@ -33,7 +33,7 @@ if isempty(options_.ms.simulation_file_tag)
 end
 options_.ms.mh_file = ['simulation_' options_.ms.simulation_file_tag '.out'];
 
-if ~exist(options_.ms.mh_file,'file')
+if ~isfile(options_.ms.mh_file)
     error(['ERROR: Could not find Metropolis Hastings file: ' options_.ms.mh_file]);
 end
 end

@@ -27,7 +27,7 @@ function graph(M_, options_, options_occbin_, oo_, var_list)
 
 options_ = occbin.set_option(options_,options_occbin_,'graph.steady_state');
 
-if ~exist([M_.dname '/graphs'],'dir')
+if ~isfolder([M_.dname '/graphs'])
     mkdir(M_.dname,'graphs');
 end
 

@@ -41,7 +41,7 @@ end
 fullname = [basename extension];
 if ~strcmp(extension,'.m') %if not m-file
     error('The Posterior Function is not an m-file.')
-elseif ~exist(fullname,'file') %if m-file, but does not exist
+elseif ~isfile(fullname) %if m-file, but does not exist
     error(['The Posterior Function ', fullname ,' was not found. Check the spelling.']);
 end
 %Create function handle
@@ -68,7 +68,7 @@ elseif strcmpi(type,'prior')
             error('The prior distributions are not properly set up.')
         end
     end
-    if exist([M_.fname '_prior_restrictions.m'],"file")
+    if isfile([M_.fname '_prior_restrictions.m'])
         warning('prior_function currently does not support endogenous prior restrictions. They will be ignored. Consider using a posterior_function with nobs=1.')
     end
     Prior = dprior(bayestopt_, options_.prior_trunc);

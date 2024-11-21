@@ -31,7 +31,7 @@ if nargin<3
     inversionflag = false;
 end
 
-if exist(sprintf('+%s/dynamic_set_auxiliary_series.m', M_.fname), 'file')
+if isfile(sprintf('+%s/dynamic_set_auxiliary_series.m', M_.fname))
     dbase = feval(sprintf('%s.dynamic_set_auxiliary_series', M_.fname), dbase, M_.params);
 end
 

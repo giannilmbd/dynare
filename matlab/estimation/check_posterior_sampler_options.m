@@ -92,7 +92,7 @@ if init
                   case 'scale_file'
                     % load optimal_mh_scale parameter if previous run was with mode_compute=6
                     % will overwrite jscale from set_prior.m
-                    if exist(options_list{i,2},'file') || exist([options_list{i,2},'.mat'],'file')
+                    if isfile(options_list{i,2}) || isfile([options_list{i,2},'.mat'])
                         tmp = load(options_list{i,2},'Scale');
                         bayestopt_.mh_jscale = tmp.Scale;
                         options_.mh_jscale = tmp.Scale;
@@ -157,7 +157,7 @@ if init
                   case 'scale_file'
                     % load optimal_mh_scale parameter if previous run was with mode_compute=6
                     % will overwrite jscale from set_prior.m
-                    if exist(options_list{i,2},'file') || exist([options_list{i,2},'.mat'],'file')
+                    if isfile(options_list{i,2}) || isfile([options_list{i,2},'.mat'])
                         tmp = load(options_list{i,2},'Scale');
                         bayestopt_.mh_jscale = tmp.Scale;
                         options_.mh_jscale = tmp.Scale;

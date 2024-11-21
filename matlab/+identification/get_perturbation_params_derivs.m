@@ -448,10 +448,10 @@ if analytic_derivation_mode == -2
     clear dYss_g
 
 elseif (analytic_derivation_mode == 0 || analytic_derivation_mode == 1)
-    if ~exist(['+' fname filesep 'static_params_derivs.m'],'file')
+    if ~isfile(['+' fname filesep 'static_params_derivs.m'])
         error('For analytical parameter derivatives ''static_params_derivs.m'' file is needed, this can be created by putting identification(order=%d) into your mod file.',order)
     end
-    if ~exist(['+' fname filesep 'dynamic_params_derivs.m'],'file')
+    if ~isfile(['+' fname filesep 'dynamic_params_derivs.m'])
         error('For analytical parameter derivatives ''dynamic_params_derivs.m'' file is needed, this can be created by putting identification(order=%d) into your mod file.',order)
     end
     %% Analytical computation of Jacobian and Hessian (wrt selected model parameters) of steady state, i.e. dYss and d2Yss

@@ -311,7 +311,7 @@ elseif options_.solve_algo==10
 elseif options_.solve_algo == 11
     % PATH mixed complementary problem
     % PATH linear mixed complementary problem
-    if ~exist('mcppath')
+    if ~exist('mcppath','dir') %do not replace by isfolder as folder may be anywhere in search path
         error(['PATH can''t be provided with Dynare. You need to install it ' ...
                'yourself and add its location to MATLAB/Octave path before ' ...
                'running Dynare'])

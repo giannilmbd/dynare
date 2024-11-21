@@ -254,7 +254,7 @@ xlist = [xlist1, xlist2];
 
 % Print all cherry-picked models in one mod-file.
 [filepath, filename, fileext] = fileparts(ofile);
-if ~isempty(filepath) && ~exist(filepath, 'dir')
+if ~isempty(filepath) && ~isfolder(filepath)
     mkdir(filepath);
 end
 if isempty(filepath)

@@ -30,13 +30,13 @@ elseif isoctave
             warning('MEX files not available for 32-bit Octave')
         else
             tmp = [dynareroot '../mex/octave/win64/'];
-            if exist(tmp, 'dir')
+            if isfolder(tmp)
                 mexpath = tmp;
             end
         end
     end
     % Add generic Octave path (with higher priority than the previous ones)
-    if exist('mexpath')
+    if exist('mexpath','var')
         mexpath = { mexpath; [dynareroot '../mex/octave/'] };
     else
         mexpath = { [dynareroot '../mex/octave/'] };
@@ -48,25 +48,25 @@ else
     % Add win64 specific paths for Dynare Windows package
     if strcmp(computer, 'PCWIN64')
         tmp = [dynareroot '../mex/matlab/win64-9.8-25.1/'];
-        if exist(tmp, 'dir')
+        if isfolder(tmp)
             mexpath = tmp;
         end
     end
     % Add macOS paths for Dynare Mac package
     if strcmp(computer, 'MACI64')
         tmp = [dynareroot '../mex/matlab/maci64-9.8-25.1/'];
-        if exist(tmp, 'dir')
+        if isfolder(tmp)
             mexpath = tmp;
         end
     end
     if strcmp(computer, 'MACA64')
         tmp = [dynareroot '../mex/matlab/maca64-23.2-25.1/'];
-        if exist(tmp, 'dir')
+        if isfolder(tmp)
             mexpath = tmp;
         end
     end
     % Add generic MATLAB path (with higher priority than the previous ones)
-    if exist('mexpath')
+    if exist('mexpath','var')
         mexpath = { mexpath; [dynareroot '../mex/matlab/'] };
     else
         mexpath = { [dynareroot '../mex/matlab/'] };

@@ -58,7 +58,7 @@ mull_exp = 'Muller \w+\(\w+\) \= (\d+.\d+e\+\d+)';
 bridge_exp = 'Bridge \w+\(\w+\) \= (\d+.\d+e\+\d+)';
 bridge_mdd = -1; muller_mdd = -1;
 mdd_filename = ['mdd_t' num2str(options_.ms.proposal_type) '_' options_.ms.output_file_tag '.out'];
-if exist(mdd_filename,'file')
+if isfile(mdd_filename)
     mdd_fid = fopen(mdd_filename);
     tline = fgetl(mdd_fid);
     while ischar(tline)

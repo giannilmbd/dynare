@@ -46,15 +46,15 @@ var_size_01 = length(var_names_01);
 
 % Auto-detect extension if not provided
 if isempty(extension)
-    if exist([basename '.m'],'file')
+    if isfile([basename '.m'])
         extension = '.m';
-    elseif exist([basename '.mat'],'file')
+    elseif isfile([basename '.mat'])
         extension = '.mat';
-    elseif exist([basename '.xls'],'file')
+    elseif isfile([basename '.xls'])
         extension = '.xls';
-    elseif exist([basename '.xlsx'],'file')
+    elseif isfile([basename '.xlsx'])
         extension = '.xlsx';
-    elseif exist([basename '.csv'],'file')
+    elseif isfile([basename '.csv'])
         extension = '.csv';
     else
         error(['Can''t find datafile: ' basename '.{m,mat,xls,xlsx,csv}']);
@@ -63,7 +63,7 @@ end
 
 fullname = [basename extension];
 
-if ~exist(fullname)
+if ~isfile(fullname)
     error(['Can''t find datafile: ' fullname ]);
 end
 

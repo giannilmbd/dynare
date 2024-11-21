@@ -45,7 +45,7 @@ if isdime(options_) && options_.prior_trunc
     fprintf('%s: DIME requires no prior truncation. Resetting options_.prior_trunc=0.\n', dispString);
 end
 
-if ~exist([M_.dname filesep 'Output'],'dir')
+if ~isfolder([M_.dname filesep 'Output'])
     mkdir(M_.dname,'Output');
 end
 

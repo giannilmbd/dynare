@@ -48,10 +48,10 @@ end
 nvar = length(i_var);
 
 % create subdirectory <dname>/graphs if id doesn't exist
-if ~exist(dname, 'dir')
+if ~isfolder(dname)
     mkdir('.',dname);
 end
-if ~exist([dname '/graphs'],'dir')
+if ~isfolder([dname '/graphs'])
     mkdir(dname,'graphs');
 end
 

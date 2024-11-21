@@ -37,7 +37,7 @@ end
 oo_.pfwee.terminal_info = NaN(M_.exo_nbr, periods); % 2nd dimension is informational time
 oo_.pfwee.shocks_info = NaN(M_.exo_nbr, periods, periods); % 2nd dimension is real time, 3rd dimension is informational time
 
-if exist(options_.datafile, 'file')
+if isfile(options_.datafile)
     if ~isempty(M_.det_shocks) || ~isempty(M_.learnt_shocks) || ~isempty(oo_.initial_steady_state) || ~isempty(M_.learnt_endval)
         warning('perfect_foresight_with_expectation_errors_setup: since you passed the datafile option, the contents of shocks and endval blocks will be ignored')
     end

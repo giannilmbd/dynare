@@ -84,10 +84,10 @@ hh_fig=dyn_figure(options_.nodisplay,'Name',FigureName);
 bar(0:options_.mh_autocorrelation_function_size,autocor,'k');
 axis tight
 % create subdirectory <dname>/graphs if it doesn't exist
-if ~exist(M_.dname, 'dir')
+if ~isfolder(M_.dname)
     mkdir('.',M_.dname);
 end
-if ~exist([M_.dname filesep 'graphs'],'dir')
+if ~isfolder([M_.dname filesep 'graphs'])
     mkdir(M_.dname,'graphs');
 end
 

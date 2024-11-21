@@ -70,7 +70,7 @@ M_=myinputs.M_;
 if whoiam
     Parallel=myinputs.Parallel;
 end
-if ~exist(MetropolisFolder,'dir')
+if ~isfolder(MetropolisFolder)
     MetropolisFolder = CheckPath('metropolis',M_.dname);
 end
 

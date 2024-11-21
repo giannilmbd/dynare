@@ -285,7 +285,7 @@ end
 CheckPath('prior',M_.dname);
 
 % I save the prior definition if the prior has changed.
-if exist([ M_.dname '/prior/definition.mat'],'file')
+if isfile([ M_.dname '/prior/definition.mat'])
     old = load([M_.dname '/prior/definition.mat'],'bayestopt_');
     prior_has_changed = 0;
     if length(bayestopt_.p1)==length(old.bayestopt_.p1)

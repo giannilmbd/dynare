@@ -34,7 +34,7 @@ mh_history_files = dir([BaseName '_mh_history_*.mat']);
 
 % Consistency with older versions of Dynare.
 if isequal(length(mh_history_files),0)
-    if exist([BaseName '_mh_history.mat'],'file')
+    if isfile([BaseName '_mh_history.mat'])
         format_mh_history_file = 1; % old Dynare format
     else
         error(['Estimation::load_mh_file: I cannot find any mh-history file in ' MetropolisFolder '!'])

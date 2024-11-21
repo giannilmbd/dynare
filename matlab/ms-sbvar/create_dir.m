@@ -28,7 +28,7 @@ function create_dir(dirname)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if ~exist(dirname, 'dir')
+if ~isfolder(dirname)
     mkdir(dirname);
 end
 end

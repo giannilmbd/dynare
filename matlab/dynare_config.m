@@ -108,7 +108,7 @@ else
 end
 
 % Check if struct2array is available.
-if ~exist('struct2array')
+if ~(exist('struct2array','file')==2)
     p{end+1} = '/missing/struct2array';
 end
 

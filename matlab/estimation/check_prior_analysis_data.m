@@ -41,7 +41,7 @@ if nargout>1
 end
 
 %% Get information about prior draws files.
-if ~exist([ M_.dname '/prior/draws'],'dir')
+if ~isfolder([ M_.dname '/prior/draws'])
     disp('check_prior_analysis_data:: Can''t find any prior draws file!')
     return
 end

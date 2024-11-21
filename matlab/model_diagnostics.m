@@ -300,7 +300,7 @@ elseif options_.order >= 2
     [g1, T_order, T] = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, exo, M_.params, ...
                              dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
                              M_.dynamic_g1_sparse_colptr);
-    if exist(['+' M_.fname '/+sparse/dynamic_g2.m'],"file") || exist(['+' M_.fname '/+sparse/dynamic_g2.' mexext],"file")
+    if isfile(['+' M_.fname '/+sparse/dynamic_g2.m']) || isfile(['+' M_.fname '/+sparse/dynamic_g2.' mexext])
         g2_v = feval([M_.fname '.sparse.dynamic_g2'], dyn_endo_ss, exo, M_.params, dr.ys, T_order, T);
     end
 end

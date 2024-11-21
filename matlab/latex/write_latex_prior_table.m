@@ -54,7 +54,7 @@ ub=bounds.ub;
 
 PriorNames = { 'Beta' , 'Gamma' , 'Gaussian' , 'Inv. Gamma' , 'Uniform' , 'Inv. Gamma -- 2', '', 'Weibull' };
 
-if ~exist([M_.dname '/latex'],'dir')
+if ~isfolder([M_.dname '/latex'])
     mkdir(M_.dname,'latex');
 end
 fidTeX = fopen([M_.dname, '/latex/' M_.fname '_priors_table.tex'],'w+');

@@ -105,7 +105,7 @@ auxmodel = M_.(expectationmodel.auxiliary_model_type).(expectationmodel.auxiliar
 %
 % First print the list of parameters appearing in the VAR_EXPECTATION/PAC_EXPECTATION term.
 %
-if ~exist(sprintf('%s/model/%s', M_.fname, [expectationmodelkind '-expectations']), 'dir')
+if ~isfolder(sprintf('%s/model/%s', M_.fname, [expectationmodelkind '-expectations']))
     mkdir(sprintf('%s/model/%s', M_.fname, [expectationmodelkind '-expectations']))
 end
 
@@ -218,7 +218,7 @@ end
 %
 kind = [expectationmodelkind '_expectations'];
 ndir = sprintf('+%s/+%s/+%s', M_.fname, kind, expectationmodelname);
-if ~exist(ndir, 'dir')
+if ~isfolder(ndir)
     mkdir(sprintf('+%s/+%s/+%s', M_.fname, kind, expectationmodelname));
 end
 filename = sprintf('+%s/+%s/+%s/evaluate.m', M_.fname, kind, expectationmodelname);
@@ -253,7 +253,7 @@ end
 clear('expression');
 
 % Get coefficient values in the target (if any)
-if exist(sprintf('+%s/pac_target_coefficients.m', M_.fname), 'file')
+if isfile(sprintf('+%s/pac_target_coefficients.m', M_.fname))
     targetcoefficients = feval(sprintf('%s.pac_target_coefficients', M_.fname), expectationmodelname, M_.params);
 end
 

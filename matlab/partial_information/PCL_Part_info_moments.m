@@ -28,7 +28,7 @@ function oo_=PCL_Part_info_moments(M_, oo_, options_, varobs, dr, ivar)
 % and the jump variables x(t).
 % The jump variables have dimension NETA
 
-if ~exist([M_.dname '/Output'],'dir')
+if ~isfolder([M_.dname '/Output'])
     mkdir(M_.dname,'Output');
 end
 

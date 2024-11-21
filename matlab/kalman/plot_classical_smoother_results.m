@@ -33,7 +33,7 @@ n_varobs = length(options_.varobs);
 
 if ~options_.nograph
     [nbplt,nr,nc,~,~,nstar] = pltorg(M_.exo_nbr);
-    if ~exist([M_.dname '/graphs'],'dir')
+    if ~isfolder([M_.dname '/graphs'])
         mkdir(M_.dname,'graphs');
     end
     if options_.TeX && any(strcmp('eps',cellstr(options_.graph_format)))

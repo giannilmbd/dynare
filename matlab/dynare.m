@@ -73,7 +73,7 @@ dynareroot = dynare_config();
 if isoctave
     % The supported_octave_version.m file is not in git nor in the source
     % package, it is manually added in binary packages distributed on dynare.org
-    if exist('supported_octave_version', 'file') && ~strcmp(supported_octave_version, version)
+    if isfile('supported_octave_version') && ~strcmp(supported_octave_version, version)
         skipline()
         warning(['This version of Octave is not supported. Consider using version %s of '
                  'Octave from www.octave.org, otherwise precompiled MEX files may fail to load, '
@@ -139,7 +139,7 @@ end
 if contains(fname,filesep)
     fprintf('\nIt seems you are trying to call a .mod file not located in the "Current Folder". This is not possible (the %s symbol is not allowed in the name of the .mod file).\n', filesep)
     [pathtomodfile,basename] = fileparts(fname);
-    if exist(pathtomodfile,'dir')
+    if isfolder(pathtomodfile)
         filesindirectory = dir(pathtomodfile);
         filesindirectory = struct2cell(filesindirectory);
         filesindirectory = filesindirectory(1,:);
@@ -153,7 +153,7 @@ if contains(fname,filesep)
     error(['Dynare: can''t open ' fname, '.'])
 end
 
-if ~exist(fname,'file') || isequal(fname,'dir')
+if ~isfile(fname) || isequal(fname,'dir')
     fprintf('\nThe file %s could not be located in the "Current Folder". Check whether you typed in the correct filename\n',fname)
     fprintf('and whether the file is really located in the "Current Folder".\n')
     try
@@ -171,7 +171,7 @@ if ~isvarname(fname(1:end-4))
 end
 
 % pre-dynare-preprocessor-hook
-if exist(fname(1:end-4),'dir') && exist([fname(1:end-4) filesep 'hooks'],'dir') && exist([fname(1:end-4) filesep 'hooks/priorprocessing.m'],'file')
+if isfolder(fname(1:end-4)) && isfolder([fname(1:end-4) filesep 'hooks']) && isfile([fname(1:end-4) filesep 'hooks/priorprocessing.m'])
     run([fname(1:end-4) filesep 'hooks/priorprocessing'])
 end
 
@@ -188,7 +188,7 @@ fast = ismember('fast', varargin) || ismember('fast', file_opts);
 diary off
 if ~nolog
     logfile = [ fname(1:end-4) '.log' ];
-    if exist(logfile, 'file')
+    if isfile(logfile)
         delete(logfile)
     end
     diary(logfile)
@@ -237,7 +237,7 @@ end
 % For an instance of this bug, see:
 % https://forum.dynare.org/t/issue-with-dynare-preprocessor-4-6-1/15448/1
 if ~fast
-    if ispc && ~isoctave && exist(['+',fname(1:end-4)],'dir')
+    if ispc && ~isoctave && isfolder(['+',fname(1:end-4)])
         [~,~]=rmdir(['+', fname(1:end-4)],'s'); % output required to suppress triggering error
     end
 end
@@ -285,7 +285,7 @@ if onlyjson
 end
 
 % post-dynare-prerocessor-hook
-if exist(fname(1:end-4),'dir') && exist([fname(1:end-4) filesep 'hooks'],'dir') && exist([fname(1:end-4) filesep 'hooks/postprocessing.m'],'file')
+if isfolder(fname(1:end-4)) && isfolder([fname(1:end-4) filesep 'hooks']) && isfile([fname(1:end-4) filesep 'hooks/postprocessing.m'])
     run([fname(1:end-4) filesep 'hooks/postprocessing'])
 end
 

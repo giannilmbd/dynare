@@ -32,7 +32,7 @@ if isoctave
     confirm_recursive_rmdir(false, 'local')
 end
 
-if exist(dirname, 'dir')
+if isfolder(dirname)
     rmdir(dirname, 's');
 end
 end

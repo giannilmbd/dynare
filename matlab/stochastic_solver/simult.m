@@ -64,7 +64,7 @@ order = options_.order;
 replic = options_.simul_replic;
 
 if replic > 1
-    if ~exist([M_.dname '/Output'],'dir')
+    if ~isfolder([M_.dname '/Output'])
         mkdir(M_.dname,'Output');
     end
     fname = [M_.dname filesep 'Output' filesep M_.fname,'_simul'];

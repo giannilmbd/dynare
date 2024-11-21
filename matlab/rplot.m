@@ -38,10 +38,10 @@ if isempty(oo_.endo_simul)
 end
 
 % create subdirectory <dname>/graphs if it doesn't exist
-if ~exist(M_.dname, 'dir')
+if ~isfolder(M_.dname)
     mkdir('.',M_.dname);
 end
-if ~exist([M_.dname filesep 'graphs'],'dir')
+if ~isfolder([M_.dname filesep 'graphs'])
     mkdir(M_.dname,'graphs');
 end
 

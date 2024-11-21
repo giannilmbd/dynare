@@ -154,7 +154,7 @@ if ~isempty(bayestopt_) && any(bayestopt_.pshape==0) && any(bayestopt_.pshape~=0
     error('Estimation must be either fully ML or fully Bayesian. Maybe you forgot to specify a prior distribution.')
 end
 % Check if a _prior_restrictions.m file exists
-if exist([M_.fname '_prior_restrictions.m'],'file')
+if isfile([M_.fname '_prior_restrictions.m'])
     options_.prior_restrictions.status = 1;
     options_.prior_restrictions.routine = str2func([M_.fname '_prior_restrictions']);
 end
@@ -483,7 +483,7 @@ end
 estim_params_= get_matrix_entries_for_psd_check(M_,estim_params_);
 
 if options_.load_results_after_load_mh
-    if ~exist([M_.dname filesep 'Output' filesep M_.fname '_results.mat'],'file')
+    if ~isfile([M_.dname filesep 'Output' filesep M_.fname '_results.mat'])
         fprintf('\ndynare_estimation_init:: You specified the load_results_after_load_mh, but no _results.mat-file\n')
         fprintf('dynare_estimation_init:: was found. Results will be recomputed.\n')
         options_.load_results_after_load_mh=0;

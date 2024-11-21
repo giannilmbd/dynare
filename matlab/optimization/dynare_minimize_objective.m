@@ -814,7 +814,7 @@ switch minimizer_algorithm
 
   otherwise
     if ischar(minimizer_algorithm)
-        if exist(minimizer_algorithm)
+        if exist(minimizer_algorithm,'file') %do not replace by isfile, needs to be flexible
             opt_runtime_start = tic;
             [opt_par_values, fval, exitflag, output] = feval(minimizer_algorithm,objective_function,start_par_value,varargin{:});
             optimization_info.runtime = toc(opt_runtime_start);

@@ -35,7 +35,7 @@ function [options_, oo_]=set_ms_estimation_file(file_tag, options_, oo_)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 options_.ms.free_param_file = ['est_free_' file_tag '.out'];
-if ~exist(options_.ms.free_param_file,'file')
+if ~isfile(options_.ms.free_param_file)
     error(['ERROR: Could not find free parameter file: ' options_.ms.free_param_file]);
 else
     oo_.ms.maxparams = load(options_.ms.free_param_file);
@@ -43,7 +43,7 @@ else
 end
 
 options_.ms.VAR_parameters_file = [file_tag '.mat'];
-if ~exist(options_.ms.VAR_parameters_file,'file')
+if ~isfile(options_.ms.VAR_parameters_file)
     error(['ERROR: Could not find VAR parameters file: ' options_.ms.VAR_parameters_file]);
 else
     oo_.ms = load(options_.ms.VAR_parameters_file);

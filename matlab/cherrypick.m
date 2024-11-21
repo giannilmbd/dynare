@@ -44,7 +44,7 @@ if nargin<4 || isempty(noresids)
 end
 
 % Delete outfold subdirectory if it already exists
-if exist(outfold, 'dir')
+if isfolder(outfold)
     rmdir(outfold, 's');
 end
 
@@ -52,10 +52,10 @@ end
 mkdir(outfold);
 
 % Check that infile.mod and the related JSON output exist.
-if ~exist(sprintf('%s.mod', infile), 'file')
+if ~isfile(sprintf('%s.mod', infile))
     error('Cannot find %s.mod.', infile)
 end
-if ~exist(sprintf('%s/model/json', infile), 'dir')
+if ~isfolder(sprintf('%s/model/json', infile))
     error('Cannot find %s/model/json folder. Did you run %s.mod with the json option?', infile, infile);
 end
 

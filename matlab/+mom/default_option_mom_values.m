@@ -460,7 +460,7 @@ if strcmp(mom_method,'IRF_MATCHING') && do_bayesian_estimation
         warning('method_of_moments: You specified mh_tune_jscale, but the maximum number of iterations is smaller than the step size. No update will take place.')
     end
     if options_mom_.load_results_after_load_mh
-        if ~exist([options_mom_.dirname filesep 'method_of_moments' filesep fname '_mom_results.mat'],'file')
+        if ~isfile([options_mom_.dirname filesep 'method_of_moments' filesep fname '_mom_results.mat'])
             fprintf('\nYou specified the ''load_results_after_load_mh'' option, but no ''%s_mom_results.mat'' file\n',fname);
             fprintf('was found in the folder %s%smethod_of_moments.\n',options_mom_.dirname,filesep);
             fprintf('Results will be recomputed and option ''load_results_after_load_mh'' is reset to false.\n');

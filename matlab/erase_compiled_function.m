@@ -18,7 +18,7 @@ function erase_compiled_function(func)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if exist([func '.' mexext])
+if isfile([func '.' mexext])
     clear(func)
     delete([func '.' mexext])
 end

@@ -129,10 +129,10 @@ if isoctave
 end
 
 if ~options_.nograph
-    if ~exist(M_.dname, 'dir')
+    if ~isfolder(M_.dname)
         mkdir('.',M_.dname);
     end
-    if ~exist([M_.dname '/graphs'],'dir')
+    if ~isfolder([M_.dname '/graphs'])
         mkdir(M_.dname,'graphs');
     end
 

@@ -31,7 +31,7 @@ end
 DYNARE_FOLDER = strrep(which('dynare'),'dynare.m','');
 
 if writelistofroutinestobecleared
-    if ~exist('list_of_functions_to_be_cleared.m') || isolder(sprintf('%slist_of_functions_to_be_cleared.m', DYNARE_FOLDER), DYNARE_FOLDER)
+    if ~isfile('list_of_functions_to_be_cleared.m') || isolder(sprintf('%slist_of_functions_to_be_cleared.m', DYNARE_FOLDER), DYNARE_FOLDER)
         if isunix() || ismac()
             [~, output] = system(sprintf('grep -lr ^persistent %s', folder));
             list_of_files = strsplit(output);

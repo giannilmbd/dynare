@@ -87,9 +87,9 @@ options_.threads.k_order_perturbation = max(1, num_procs/2);
 options_.jacobian_flag = true;
 
 % steady state file
-if exist(['+' M_.fname '/steadystate.m'],'file')
+if isfile(['+' M_.fname '/steadystate.m'])
     options_.steadystate_flag = 2;
-elseif exist([M_.fname '_steadystate.m'],'file')
+elseif isfile([M_.fname '_steadystate.m'])
     options_.steadystate_flag = 1;
 else
     options_.steadystate_flag = 0;

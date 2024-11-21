@@ -39,7 +39,7 @@ else
     M_var_root = {'M_.endo', 'M_.exo', 'M_.exo_det', 'M_.param'};
 end
 
-if ~exist([M_.dname '/latex'],'dir')
+if ~isfolder([M_.dname '/latex'])
     mkdir(M_.dname,'latex');
 end
 fid = fopen([M_.dname, '/latex/' M_.fname '_latex_definitions.tex'], 'w');
