@@ -28,11 +28,12 @@ function oo_ = make_ex_(M_, options_, oo_)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 try
-    periods = get_simulation_periods(options_);
+    [periods, first_simulation_period] = get_simulation_periods(options_);
 catch ME
     if strcmp(ME.identifier, 'Dynare:periodsNotSet')
         % This function is called from dyn_forecast in some contexts where periods is not set
         periods = 0;
+        first_simulation_period = options_.simul.first_simulation_period;
     else
         rethrow(ME);
     end
@@ -91,11 +92,20 @@ end
 
 % Add temporary shocks
 if isfield(M_, 'det_shocks')
-    if ~isempty(M_.det_shocks) && any([M_.det_shocks.periods]==0) && ~M_.maximum_lag
-        error('make_ex_: The model does not have lags, so you cannot set values for period 0'); %leads are taken care of by preprocessor
-    end
     for i = 1:length(M_.det_shocks)
-        k = M_.det_shocks(i).periods + M_.maximum_lag;
+        if isa(M_.det_shocks(i).periods, 'numeric')
+            k = M_.det_shocks(i).periods + M_.maximum_lag;
+            if any(k == 0)
+                error('make_ex_: The model does not have lags, so you cannot set values for period 0');
+            end
+        else % dates
+            k = M_.det_shocks(i).periods - first_simulation_period + 1 + M_.maximum_lag;
+            if any(k <= 1)
+                %% Contrary to the numeric case, we don’t allow k=0 for the dates case, because it
+                %% was a design mistake to allow them here (histval should rather be used)
+                error('make_ex_: some shocks are set at a date before the first simulation period');
+            end
+        end
         ivar = M_.det_shocks(i).exo_id;
         v = M_.det_shocks(i).value;
         if ~M_.det_shocks(i).exo_det

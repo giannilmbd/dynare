@@ -47,19 +47,25 @@ if size(M_.lead_lag_incidence,2)-nnz(M_.lead_lag_incidence(M_.maximum_endo_lag+1
     error(mess)
 end
 
-periods = get_simulation_periods(options_);
+[periods, ~, last_simulation_period] = get_simulation_periods(options_);
 
-if ~isempty(M_.det_shocks) && periods < max([M_.det_shocks.periods])
-    % Some expected shocks happen after the terminal period.
-    mess = sprintf('\nPERFECT_FORESIGHT_SETUP: Problem with the declaration of the expected shocks:\n');
+if ~isempty(M_.det_shocks)
+    % Check whether some expected shocks happen after the terminal period.
+    mess = '';
     for i=1:length(M_.det_shocks)
-        if any(M_.det_shocks(i).periods > periods)
+        if isa(M_.det_shocks(i).periods, 'dates') && isempty(last_simulation_period)
+            error('PERFECT_FORESIGHT_SETUP: temporary shocks are specified using dates but neither first_simulation_period nor last_simulation_period option was passed')
+        end
+        if (isa(M_.det_shocks(i).periods, 'numeric') && any(M_.det_shocks(i).periods > periods)) ...
+               || (isa(M_.det_shocks(i).periods, 'dates') && any(M_.det_shocks(i).periods > last_simulation_period))
             mess = sprintf('%s\n   At least one expected value for %s has been declared after the terminal period.', mess, M_.exo_names{M_.det_shocks(i).exo_id});
         end
     end
-    disp(mess)
-    skipline()
-    error('PERFECT_FORESIGHT_SETUP: Please check the declaration of the shocks or increase the number of periods in the simulation.')
+    if ~isempty(mess)
+        disp(sprintf('\nPERFECT_FORESIGHT_SETUP: Problem with the declaration of the expected shocks:\n%s', mess));
+        skipline()
+        error('PERFECT_FORESIGHT_SETUP: Please check the declaration of the shocks or increase the number of periods in the simulation.')
+    end
 end
 
 if options_.simul.endval_steady && M_.maximum_lead == 0

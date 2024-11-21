@@ -31,7 +31,7 @@ if ~isempty(oo_.initval_series)
     error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with histval_file/initval_file')
 end
 
-periods = get_simulation_periods(options_);
+[periods, first_simulation_period] = get_simulation_periods(options_);
 
 %% Initialize informational structures
 oo_.pfwee.terminal_info = NaN(M_.exo_nbr, periods); % 2nd dimension is informational time
@@ -72,11 +72,27 @@ else
         warning('perfect_foresight_with_expectation_errors_setup: there is no shocks(learnt_in=...) or endval(learnt_in=...) block, and you did not pass the datafile option, so there is no point in using this command')
     end
 
+    %% Check that dates can be processed, if any
+    allperiods = {};
+    if ~isempty(M_.det_shocks)
+        allperiods = [allperiods, {M_.det_shocks.periods}];
+    end
+    if ~isempty(M_.learnt_shocks)
+        allperiods = [allperiods, {M_.learnt_shocks.periods}];
+    end
+    if any(cellfun(@(x) isa(x, 'dates'), allperiods)) && isempty(first_simulation_period)
+        error('perfect_foresight_with_expectations_error_setup: at least one periods statement is specified using a date but neither first_simulation_period nor last_simulation_period option was passed')
+    end
+
     %% Initialize information set at period 1 using “bare” shocks and endval blocks (or initval if there is no endval)
     oo_.pfwee.terminal_info(:, 1) = oo_.exo_steady_state;
     oo_.pfwee.shocks_info(:, :, 1) = repmat(oo_.exo_steady_state, 1, periods);
     for i = 1:length(M_.det_shocks)
-        prds = M_.det_shocks(i).periods;
+        if isa(M_.det_shocks(i).periods, 'numeric')
+            prds = M_.det_shocks(i).periods;
+        else % dates
+            prds = M_.det_shocks(i).periods - first_simulation_period + 1;
+        end
         exo_id = M_.det_shocks(i).exo_id;
         v = M_.det_shocks(i).value;
         if ~M_.det_shocks(i).exo_det
@@ -121,7 +137,11 @@ else
             for i = 1:length(idx)
                 j = idx(i);
                 exo_id = M_.learnt_shocks(j).exo_id;
-                prds = M_.learnt_shocks(j).periods;
+                if isa(M_.learnt_shocks(j).periods, 'numeric')
+                    prds = M_.learnt_shocks(j).periods;
+                else % dates
+                    prds = M_.learnt_shocks(j).periods - first_simulation_period + 1;
+                end
                 switch M_.learnt_shocks(j).type
                     case 'level'
                         oo_.pfwee.shocks_info(exo_id, prds, p) = M_.learnt_shocks(j).value;
