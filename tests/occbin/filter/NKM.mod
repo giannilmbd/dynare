@@ -417,6 +417,12 @@ varobs yg inom pi;
     legend('PKF','IF')
     occbin_write_regimes(smoother);
 
+    estimation(
+            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            mode_compute=0, nobs=120, first_obs=1,
+            mh_replic=10, plot_priors=0, smoother,
+            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+
 write_latex_dynamic_model;
 collect_latex_files;
 [status, cmdout]=system(['pdflatex -halt-on-error -interaction=nonstopmode ' M_.fname '_TeX_binder.tex']);

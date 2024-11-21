@@ -230,11 +230,27 @@ for b=fpar:B
             opts_local.occbin.simul.waitbar=0;
             opts_local.occbin.smoother.waitbar = 0;
             opts_local.occbin.smoother.linear_smoother=false; % speed-up
-            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_] = ...
-                occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
-            if oo_.occbin.smoother.error_flag(1)
-                message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
-                fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
+            if options_.occbin.smoother.inversion_filter
+                dataset_.data=Y';
+                [~, info, ~, ~, ~, ~, ~, ~, ~, ~, oo_.dr, alphahat, etahat] = ...
+                    occbin.IVF_posterior(deep,dataset_,[],options_,M_,estim_params_,bayestopt_,prior_bounds(bayestopt_,options_.prior_trunc),oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+                if info(1)
+                    message=get_error_message(info,opts_local);
+                    fprintf('\nprior_posterior_statistics: IVF smoother failed for one of the draws:\n%s\n',message)
+                else
+                    alphatilde = alphahat*nan;
+                    SteadyState=oo_.dr.ys;
+                    trend_coeff = zeros(length(options_.varobs_id),1);
+                    trend_addition=zeros(options_.number_of_observed_variables,gend);                    
+                end
+                %epsilonhat not available as no measurement error allowed
+            else
+                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_] = ...
+                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+                if oo_.occbin.smoother.error_flag(1)
+                    message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
+                    fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
+                end
             end
         else
             [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_] = ...
