@@ -39,7 +39,7 @@ function [oo_,M_,options_,bayestopt_,Smoothed_variables_declaration_order_deviat
 % [1] This function use persistent variables for the dataset and the description of the missing observations. Consequently, if this function
 %     is called more than once (by changing the value of parameters) the sample *must not* change.
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -127,13 +127,13 @@ else
 end
 if ~(options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter)
     if ~options_.occbin.smoother.status || (options_.occbin.smoother.status && oo_.occbin.smoother.error_flag==0)
-        [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty);
+        [oo_,yf]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty);
     end
 else
     if ~oo_.occbin.smoother.error_flag
         options_nk=options_.nk;
         options_.nk=[]; %unset options_.nk and reset it later
-        [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff);
+        [oo_,yf]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff);
         options_.nk=options_nk;
     else
         fprintf('\nIVF: smoother did not succeed. No results will be written to oo_.\n')
@@ -141,6 +141,10 @@ else
 end
 if nargout>4
     Smoothed_variables_declaration_order_deviation_form=atT(oo_.dr.inv_order_var(bayestopt_.smoother_var_list),:);
+end
+
+if ~options_.occbin.smoother.status || (options_.occbin.smoother.status && oo_.occbin.smoother.error_flag==0)
+    plot_classical_smoother_results(M_,oo_,options_,dataset_info,dataset_,estim_params_,yf)
 end
 
 %reset qz_criterium
