@@ -120,13 +120,10 @@ end
 options_=select_qz_criterium_value(options_);
 
 % Set options related to filtered variables.
-if  isequal(options_.filtered_vars,0) && ~isempty(options_.filter_step_ahead)
+if  isequal(options_.filtered_vars,0) && ~isempty(options_.filter_step_ahead) %require filtered var because filter_step_ahead was set
     options_.filtered_vars = 1;
 end
-if ~isequal(options_.filtered_vars,0) && isempty(options_.filter_step_ahead)
-    options_.filter_step_ahead = 1;
-end
-if ~isequal(options_.filtered_vars,0) && isequal(options_.filter_step_ahead,0)
+if ~isequal(options_.filtered_vars,0) && (isempty(options_.filter_step_ahead) || isequal(options_.filter_step_ahead,0)) %require filter_step_ahead because filtered_vars was requested
     options_.filter_step_ahead = 1;
 end
 if ~isequal(options_.filter_step_ahead,0)
@@ -533,12 +530,17 @@ if (options_.occbin.likelihood.status && options_.occbin.likelihood.inversion_fi
             error('IVF-filter: an observable is mapped to a zero variance shock.')
         end
     end
+    if ~isequal(M_.H,0)
+        error('IVF-filter: Measurement erros are not allowed with the inversion filter.')
+    end
 end
 
 if options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter
     if ~isempty(options_.nk)
-        fprintf('dynare_estimation_init: the inversion filter does not support filter_step_ahead. Disabling the option.\n')
+        fprintf('dynare_estimation_init: the inversion filter does not support filter_step_ahead and filtered_variables. Disabling the option.\n')
         options_.nk=[];
+        options_.filter_step_ahead=[];
+        options_.filtered_vars=0;
     end
     if options_.filter_covariance
         fprintf('dynare_estimation_init: the inversion filter does not support filter_covariance. Disabling the option.\n')
