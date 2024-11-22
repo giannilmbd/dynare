@@ -78,10 +78,13 @@ else
         allperiods = [allperiods, {M_.det_shocks.periods}];
     end
     if ~isempty(M_.learnt_shocks)
-        allperiods = [allperiods, {M_.learnt_shocks.periods}];
+        allperiods = [allperiods, {M_.learnt_shocks.periods, M_.learnt_shocks.learnt_in }];
+    end
+    if ~isempty(M_.learnt_endval)
+        allperiods = [allperiods, {M_.learnt_endval.learnt_in }];
     end
     if any(cellfun(@(x) isa(x, 'dates'), allperiods)) && isempty(first_simulation_period)
-        error('perfect_foresight_with_expectations_error_setup: at least one periods statement is specified using a date but neither first_simulation_period nor last_simulation_period option was passed')
+        error('perfect_foresight_with_expectations_error_setup: at least one periods statement or learnt_in option is specified using a date but neither first_simulation_period nor last_simulation_period option was passed')
     end
 
     %% Initialize information set at period 1 using “bare” shocks and endval blocks (or initval if there is no endval)
@@ -111,11 +114,17 @@ else
     end
 
     %% Construct information sets for subsequent informational periods
-    for p = 2:periods
-        oo_.pfwee.terminal_info(:, p) = oo_.pfwee.terminal_info(:, p-1);
-        oo_.pfwee.shocks_info(:, :, p) = oo_.pfwee.shocks_info(:, :, p-1);
+    % Since the learnt_in=… option with a dates object is never translated to a
+    % “bare” shocks or endval block by the preprocessor (contrary to
+    % learnt_in=1), the loop starts with p=1 to also handle dates objects
+    % in learnt_in option corresponding to the first period.
+    for p = 1:periods
+        if p > 1
+            oo_.pfwee.terminal_info(:, p) = oo_.pfwee.terminal_info(:, p-1);
+            oo_.pfwee.shocks_info(:, :, p) = oo_.pfwee.shocks_info(:, :, p-1);
+        end
         if ~isempty(M_.learnt_endval)
-            idx = find([M_.learnt_endval.learnt_in] == p);
+            idx = find(cellfun(@(x) (isa(x, 'numeric') && x == p) || (isa(x, 'dates') && x - first_simulation_period + 1 == p), {M_.learnt_endval.learnt_in}));
             for i = 1:length(idx)
                 j = idx(i);
                 exo_id = M_.learnt_endval(j).exo_id;
@@ -133,7 +142,7 @@ else
             end
         end
         if ~isempty(M_.learnt_shocks)
-            idx = find([M_.learnt_shocks.learnt_in] == p);
+            idx = find(cellfun(@(x) (isa(x, 'numeric') && x == p) || (isa(x, 'dates') && x - first_simulation_period + 1 == p), {M_.learnt_shocks.learnt_in}));
             for i = 1:length(idx)
                 j = idx(i);
                 exo_id = M_.learnt_shocks(j).exo_id;
