@@ -631,9 +631,9 @@ switch minimizer_algorithm
     end
   case 102
     if isoctave
-        error('Optimization algorithm 2 is not available under Octave')
+        error('Optimization algorithm 102 is not available under Octave')
     elseif ~user_has_matlab_license('GADS_Toolbox')
-        error('Optimization algorithm 2 requires the Global Optimization Toolbox')
+        error('Optimization algorithm 102 requires the Global Optimization Toolbox')
     end
     % Set default optimization options for simulannealbnd.
     if ~isoctave
