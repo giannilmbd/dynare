@@ -1,5 +1,5 @@
-function z = display_static_residuals(M_, options_, oo_,options_resid_)
-% function z = display_static_residuals(M_, options_, oo_,options_resid_)
+function z = display_static_residuals(M_, options_, oo_)
+% function z = display_static_residuals(M_, options_, oo_)
 %
 % Computes static residuals associated with the guess values.
 %
@@ -7,7 +7,6 @@ function z = display_static_residuals(M_, options_, oo_,options_resid_)
 %   M:              [structure] storing the model information
 %   options:        [structure] storing the options
 %   oo:             [structure] storing the results
-%   options_resid_:             options to resid
 %
 % OUTPUTS
 %    z:      residuals
@@ -31,8 +30,6 @@ function z = display_static_residuals(M_, options_, oo_,options_resid_)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-non_zero = (nargin > 3 && isfield(options_resid_, 'non_zero') && options_resid_.non_zero);
 
 tags  = M_.equations_tags;
 istag = 0;
@@ -104,7 +101,7 @@ if nargout == 0
             tg = tags(cell2mat(tags(:,1)) == i,2:3); % all tags for equation i
             ind = strmatch('name', cellstr( tg(:,1) ) );
         end
-        if ~(non_zero && tmp == 0)
+        if ~(options_.steady.non_zero && tmp == 0)
             if ~istag || length(ind) == 0
                 if ~isreal(z)
                     fprintf('Equation number %u: %g (imaginary part: %g)\n', i, real(tmp), imag(tmp));
@@ -120,7 +117,7 @@ if nargout == 0
             end
         end
     end
-    if non_zero && ~any_non_zero_residual
+    if options_.steady.non_zero && ~any_non_zero_residual
         disp('All residuals are zero')
     end
     skipline(2)

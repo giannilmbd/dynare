@@ -57,6 +57,7 @@ options_.trust_region_initial_step_bound_factor = 1;
 options_.dr_display_tol=1e-6;
 options_.dp.maxit = 3000;
 options_.steady.maxit = 50;
+options_.steady.non_zero = false;
 options_.simul.maxit = 50;
 options_.simul.robust_lin_solve = false;
 
