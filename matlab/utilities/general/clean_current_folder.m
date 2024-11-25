@@ -1,6 +1,6 @@
 function clean_current_folder()
 
-% Copyright © 2014-2017 Dynare Team
+% Copyright © 2014-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -22,20 +22,20 @@ a = dir('*.mod');
 
 for i = 1:length(a)
     [~,basename] = fileparts(a(i).name);
-    if exist([basename '.m'])
-        delete([basename '.m']);
-    end
-    if exist([basename '.log'])
+    if isfile([basename '.log'])
         delete([basename '.log']);
     end
-    if exist(basename,'dir')
+    if isfolder(basename)
         rmdir(basename,'s');
     end
-    if exist([basename '_steadystate.m'])
+    if isfolder(['+',basename])
+        [~,~]=rmdir(['+', basename],'s');
+    end
+    if isfile([basename '_steadystate.m'])
         movefile([basename '_steadystate.m'],['protect_' basename '_steadystate.m']);
     end
     delete([basename '_*'])
-    if exist(['protect_' basename '_steadystate.m'])
+    if isfile(['protect_' basename '_steadystate.m'])
         movefile(['protect_' basename '_steadystate.m'],[basename '_steadystate.m']);
     end
 end
