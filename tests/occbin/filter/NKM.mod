@@ -389,13 +389,22 @@ varobs yg inom pi;
     else
     disp('smoother redux successfully recovers full k-step ahead variables results!')
     end
+
+    //run PKF with MCMC
+    options_.smoother_redux=false;
+    estimation(
+        datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+        mode_compute=0, nobs=120, first_obs=1,
+        mh_replic=50, plot_priors=0, smoother,
+        consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+
     // use inversion filter (note that IF provides smoother together with likelihood)
     occbin_setup(likelihood_inversion_filter,smoother_inversion_filter);
             
     estimation(
             datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
-            mh_replic=0, plot_priors=0, smoother,
+            mh_replic=50, plot_priors=0, smoother,
             consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
             
     // show initial condition effect of IF
@@ -420,7 +429,7 @@ varobs yg inom pi;
     estimation(
             datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
-            mh_replic=10, plot_priors=0, smoother,
+            mh_replic=50, plot_priors=0, smoother,
             consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
 
 write_latex_dynamic_model;

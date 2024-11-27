@@ -141,9 +141,9 @@ if options_.filter_covariance
     filter_covariance=1;
 end
 
-smoothed_state_uncertainty=0;
+smoothed_state_uncertainty=false;
 if options_.smoothed_state_uncertainty
-    smoothed_state_uncertainty=1;
+    smoothed_state_uncertainty=true;
 end
 
 % Store the variable mandatory for local/remote parallel computing.
@@ -327,6 +327,9 @@ if options_.smoother
         varlist,'UpdatedVariables',DirectoryName, ...
         '_update',dispString);
     if smoothed_state_uncertainty
+        if isfield(oo_,'Smoother') && isfield(oo_.Smoother,'State_uncertainty')
+            oo_.Smoother=rmfield(oo_.Smoother,'State_uncertainty'); %needs to be removed as classical smoother field has a different format
+        end
         oo_=pm3(M_,options_,oo_,endo_nbr,endo_nbr,ifil(13),B,'State Uncertainty',...
             varlist,M_.endo_names_tex,M_.endo_names,...
             varlist,'StateUncertainty',DirectoryName,'_state_uncert',dispString);
