@@ -123,20 +123,11 @@ occbin_options.opts_simul = opts_simul; % this builds the opts_simul options fie
 occbin_options.opts_regime.binding_indicator = options_.occbin.smoother.init_binding_indicator;
 occbin_options.opts_regime.regime_history=options_.occbin.smoother.init_regime_history;
 
-error_indicator=false;
 options_.noprint = true;
 
-try
-    %blanket try-catch should be replaced be proper error handling, see https://git.dynare.org/Dynare/dynare/-/merge_requests/2226#note_20318
-    [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
-catch ME
-    error_indicator=true;
-    disp(ME.message)
-    for iter = 1:numel(ME.stack)
-        ME.stack(iter)
-    end
-    end
-if error_indicator || isempty(alphahat0)
+[alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0,~,error_indicator] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+
+if error_indicator(1) || isempty(alphahat0)
     if ~options_.occbin.smoother.linear_smoother || nargin~=12 %make sure linear smoother results are set before using them
         options_.occbin.smoother.status=false;
         [~,etahat,~,~,~,~,~,~,~,~,~,~,~,~,~,~,alphahat0] = ...

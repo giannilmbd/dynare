@@ -1,5 +1,5 @@
-function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0,d] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,varargin)
-% [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0,d] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,varargin)
+function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0,d,info] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,varargin)
+% [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0,d,info] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,varargin)
 % Estimation of the smoothed variables and innovations.
 %
 % INPUTS
@@ -41,6 +41,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %                                   the smoothed state for the initial
 %                                   period from the PKF
 %   o d             [integer]   number of diffuse periods
+%   o info          [1 by 4 double]   error code and penalty
 
 % Notes:
 %   m:  number of endogenous variables (M_.endo_nbr)
