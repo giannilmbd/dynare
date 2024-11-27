@@ -182,8 +182,7 @@ opts_simul.periods = size(opts_simul.SHOCKS,1);
 options_.occbin.simul=opts_simul;
 [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
 if out.error_flag
-    fprintf('Occbin smoother:: simulation within smoother did not converge.\n')
-    print_info(out.error_flag, options_.noprint, options_)
+    fprintf('Occbin smoother:: simulation within smoother did not converge.\n')    
     oo_.occbin.smoother.error_flag=321;
     return;
 end
@@ -246,7 +245,6 @@ while is_changed && maxiter>iter && ~is_periodic
     [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     if out.error_flag
         fprintf('Occbin smoother:: simulation within smoother did not converge.\n')
-        print_info(out.error_flag, false, options_)
         oo_.occbin.smoother.error_flag=321;
         return;
     end
