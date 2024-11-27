@@ -85,7 +85,7 @@ if  options_.occbin.smoother.linear_smoother && nargin==12
     oo_.occbin.linear_smoother.alphahat0=alphahat0;
     oo_.occbin.linear_smoother.state_uncertainty0=state_uncertainty0;
 
-    fprintf('\nOccbin: linear smoother done.\n')
+    disp_verbose('Occbin: linear smoother done.',options_.verbosity)
     options_.occbin.smoother.status=true;
 end
 % if init_mode
@@ -171,7 +171,7 @@ occbin_options.first_period_occbin_update = inf;
 opts_regime.binding_indicator=[];
 regime_history0 = regime_history;
 
-fprintf('Occbin smoother iteration 1.\n')
+disp_verbose('Occbin smoother iteration 1.',options_.verbosity)
 opts_simul.SHOCKS = [etahat(:,1:end)'; zeros(1,M_.exo_nbr)];
 opts_simul.exo_pos = 1:M_.exo_nbr;
 opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
@@ -180,7 +180,7 @@ opts_simul.periods = size(opts_simul.SHOCKS,1);
 options_.occbin.simul=opts_simul;
 [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
 if out.error_flag
-    fprintf('Occbin smoother:: simulation within smoother did not converge.\n')    
+    disp_verbose('Occbin smoother:: simulation within smoother did not converge.',options_.verbosity)    
     oo_.occbin.smoother.error_flag=321;
     return;
 end
@@ -223,7 +223,7 @@ end
 
 while is_changed && maxiter>iter && ~is_periodic
     iter=iter+1;
-    fprintf('Occbin smoother iteration %u.\n', iter)
+    disp_verbose(sprintf('Occbin smoother iteration %u.', iter),options_.verbosity)
     occbin_options.opts_regime.regime_history=regime_history;
     [alphahat,etahat,epsilonhat,~,SteadyState,trend_coeff,~,T0,R0,P,~,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0]...
         = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
@@ -242,7 +242,7 @@ while is_changed && maxiter>iter && ~is_periodic
     options_.occbin.simul=opts_simul;
     [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     if out.error_flag
-        fprintf('Occbin smoother:: simulation within smoother did not converge.\n')
+        disp_verbose('Occbin smoother:: simulation within smoother did not converge.',options_.verbosity)
         oo_.occbin.smoother.error_flag=321;
         return;
     end
@@ -387,22 +387,22 @@ if occbin_smoother_debug
 end
 
 if (maxiter==iter && is_changed) || is_periodic
-    disp('occbin.DSGE_smoother: smoother did not converge.')
-    fprintf('occbin.DSGE_smoother: The algorithm did not reach a fixed point for the smoothed regimes.\n')
+    disp_verbose('occbin.DSGE_smoother: smoother did not converge.',options_.verbosity)
+    disp_verbose('occbin.DSGE_smoother: The algorithm did not reach a fixed point for the smoothed regimes.',options_.verbosity)
     if is_periodic
         oo_.occbin.smoother.error_flag=0;
-        fprintf('occbin.DSGE_smoother: For the periods indicated above, regimes loops between the "regime_" and the "regime_new_" pattern displayed above.\n')
-        fprintf('occbin.DSGE_smoother: We provide smoothed shocks consistent with "regime_" in oo_.\n')
+        disp_verbose('occbin.DSGE_smoother: For the periods indicated above, regimes loops between the "regime_" and the "regime_new_" pattern displayed above.',options_.verbosity)
+        disp_verbose('occbin.DSGE_smoother: We provide smoothed shocks consistent with "regime_" in oo_.',options_.verbosity)
     else
-        fprintf('occbin.DSGE_smoother: The respective fields in oo_ will be left empty.\n')
+        disp_verbose('occbin.DSGE_smoother: The respective fields in oo_ will be left empty.',options_.verbosity)
         oo_.occbin.smoother=[];
         oo_.occbin.smoother.error_flag=322;
     end
 else
-    disp('occbin.DSGE_smoother: smoother converged.')
+    disp_verbose('occbin.DSGE_smoother: smoother converged.',options_.verbosity)
     oo_.occbin.smoother.error_flag=0;
     if occbin_smoother_fast && is_changed_start
-        disp('occbin.DSGE_smoother: WARNING: fast algo is used, regime duration was not forced to converge')
+        disp_verbose('occbin.DSGE_smoother: WARNING: fast algo is used, regime duration was not forced to converge',options_.verbosity)
     end
 end
 if (~is_changed || occbin_smoother_debug) && nargin==12
