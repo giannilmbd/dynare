@@ -137,8 +137,15 @@ catch ME
     end
     end
 if error_indicator || isempty(alphahat0)
-    etahat= oo_.occbin.linear_smoother.etahat;
-    alphahat0= oo_.occbin.linear_smoother.alphahat0;
+    if ~options_.occbin.smoother.linear_smoother || nargin~=12 %make sure linear smoother results are set before using them
+        options_.occbin.smoother.status=false;
+        [~,etahat,~,~,~,~,~,~,~,~,~,~,~,~,~,~,alphahat0] = ...
+            DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+         options_.occbin.smoother.status=true;
+    else
+        etahat= oo_.occbin.linear_smoother.etahat;
+        alphahat0= oo_.occbin.linear_smoother.alphahat0;
+    end
     base_regime = struct();
     if M_.occbin.constraint_nbr==1
         base_regime.regime = 0;
