@@ -35,7 +35,13 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %                                   about the smoothed state (decision-rule order)
 %   o oo_           [structure] storing the results
 %   o bayestopt_    [structure] describing the priors
-%
+%   o alphahat0     [double]  (m*1) matrix, smoothed endogenous variables
+%                              (a_{0}) for initial period from PKF
+%   o state_uncertainty0 [double] (K,K) matrix storing the uncertainty about 
+%                                   the smoothed state for the initial
+%                                   period from the PKF
+%   o d             [integer]   number of diffuse periods
+
 % Notes:
 %   m:  number of endogenous variables (M_.endo_nbr)
 %   T:  number of Time periods (options_.nobs)
@@ -74,9 +80,9 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-alphahat        = [];
-etahat  = [];
-epsilonhat      = [];
+alphahat      = [];
+etahat        = [];
+epsilonhat    = [];
 ahat          = [];
 SteadyState   = [];
 trend_coeff   = [];
@@ -86,8 +92,11 @@ R             = [];
 P             = [];
 PK            = [];
 decomp        = [];
-vobs            = length(options_.varobs);
+vobs          = length(options_.varobs);
 smpl          = size(Y,2);
+alphahat0     = [];
+state_uncertainty0 =[];
+d             = 0;
 
 if ~isempty(xparam1) %not calibrated model
     M_ = set_all_parameters(xparam1,estim_params_,M_);
