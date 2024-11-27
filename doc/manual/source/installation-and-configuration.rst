@@ -23,8 +23,16 @@ In order to run Dynare, you need one of the following:
 The following optional extensions are also useful to benefit from
 extra features, but are in no way required:
 
-* If under MATLAB: the Optimization Toolbox, the Statistics Toolbox,
-  the Control System Toolbox;
+* If under MATLAB: the 
+  * Optimization Toolbox (providing various optimizers 
+    like ``fminsearch``, ``fmincon``, or ``fminunc``, used in e.g. ``mode_compute``,
+    ``opt_algo`` or ``ALGO``), 
+  * Statistics Toolbox (for faster and sometimes more robust implementations of 
+    statistical distributions), 
+  * Global Optimization Toolbox (for ``particleswarm`` and ``simulannealbnd``, used in 
+    e.g. ``mode_compute``, ``opt_algo`` or ``ALGO``)
+  * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``options_.lyapunov_srs``)
+  * Parallel Computing Toolbox (to speed up the ``dime`` sampler)
 
 * If under Octave, the following `Octave-Forge`_ packages: ``optim``, ``io``,
   ``control``.
