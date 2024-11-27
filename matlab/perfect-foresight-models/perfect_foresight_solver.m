@@ -274,19 +274,8 @@ if ~isempty(per_block_status)
     oo_.deterministic_simulation.block = per_block_status;
 end
 
-if isempty(first_simulation_period)
-    if isfield(oo_, 'initval_series') && ~isempty(oo_.initval_series)
-        first_simulation_period = oo_.initval_series.dates(1)+(M_.orig_maximum_lag-1);
-    else
-        first_simulation_period = dates(1,1);
-    end
-end
-
-ts = dseries([transpose(oo_.endo_simul(1:M_.orig_endo_nbr,:)), oo_.exo_simul], first_simulation_period - M_.maximum_lag, [M_.endo_names(1:M_.orig_endo_nbr); M_.exo_names]);
-
-if isfield(oo_, 'initval_series') && ~isempty(oo_.initval_series)
-    names = ts.name;
-    ts = merge(oo_.initval_series{names{:}}, ts);
+if nargout > 1
+    ts = construct_simulation_dseries(oo_, M_, first_simulation_period);
 end
 
 oo_.gui.ran_perfect_foresight = oo_.deterministic_simulation.status;

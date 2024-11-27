@@ -1,4 +1,4 @@
-function oo_=perfect_foresight_with_expectation_errors_solver(M_, options_, oo_)
+function [oo_, ts] = perfect_foresight_with_expectation_errors_solver(M_, options_, oo_)
 % INPUTS
 %   M_                  [structure] describing the model
 %   options_            [structure] describing the options
@@ -28,7 +28,7 @@ if options_.pfwee.constant_simulation_length && ~isempty(options_.simul.last_sim
     error('Options constant_simulation_length and last_simulation_period cannot be used together')
 end
 
-periods = get_simulation_periods(options_);
+[periods, first_simulation_period] = get_simulation_periods(options_);
 
 % Retrieve initial paths built by pfwee_setup
 % (the versions in oo_ will be truncated before calling perfect_foresight_solver)
@@ -114,3 +114,7 @@ end
 % Set final paths
 oo_.endo_simul = endo_simul;
 oo_.exo_simul = exo_simul;
+
+if nargout > 1
+    ts = construct_simulation_dseries(oo_, M_, first_simulation_period);
+end
