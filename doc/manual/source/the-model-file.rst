@@ -4027,29 +4027,28 @@ speed-up on large models.
 .. matvar:: oo_.endo_simul
 
     |br| This variable stores the result of a deterministic simulation
-    (computed by ``perfect_foresight_solver`` or ``simul``) or of a
-    stochastic simulation (computed by ``stoch_simul`` with the
-    periods option or by ``extended_path``). The variables are
-    arranged row by row, in order of declaration (as in
-    ``M_.endo_names``). Note that this variable also contains initial
-    and terminal conditions, so it has more columns than the value of the
-    ``periods`` option: the first simulation period is in
-    column ``1+M_.maximum_lag``, and the total number of columns is
+    (computed by ``perfect_foresight_solver`` or
+    ``perfect_foresight_with_expectation_errors_solver``) or of a stochastic
+    simulation (computed by ``stoch_simul`` with the ``periods`` option or by
+    ``extended_path``). The variables are arranged row by row, in order of
+    declaration (as in ``M_.endo_names``). Note that this variable also
+    contains initial and terminal conditions, so it has more columns than the
+    value of the ``periods`` option: the first simulation period is in column
+    ``1+M_.maximum_lag``, and the total number of columns is
     ``M_.maximum_lag+periods+M_.maximum_lead``.
 
 .. matvar:: oo_.exo_simul
 
     |br| This variable stores the path of exogenous variables during a
-    simulation (computed by ``perfect_foresight_solver``, ``simul``,
-    ``stoch_simul`` or ``extended_path``). The variables are arranged
-    in columns, in order of declaration (as in
-    ``M_.exo_names``). Periods are in rows. Note that this convention
-    regarding columns and rows is the opposite of the convention for
-    ``oo_.endo_simul``! Also note that this variable also contains initial
-    and terminal conditions, so it has more rows than the value of the
-    ``periods`` option: the first simulation period is in row
-    ``1+M_.maximum_lag``, and the total number of rows is
-    ``M_.maximum_lag+periods+M_.maximum_lead``.
+    simulation (computed by ``perfect_foresight_solver``,
+    ``perfect_foresight_with_expectation_errors_solver``, ``stoch_simul`` or
+    ``extended_path``). The variables are arranged in columns, in order of
+    declaration (as in ``M_.exo_names``). Periods are in rows. Note that this
+    convention regarding columns and rows is the opposite of the convention for
+    ``oo_.endo_simul``! Also note that this variable also contains initial and
+    terminal conditions, so it has more rows than the value of the ``periods``
+    option: the first simulation period is in row ``1+M_.maximum_lag``, and the
+    total number of rows is ``M_.maximum_lag+periods+M_.maximum_lead``.
 
 .. matvar:: oo_.initial_steady_state
 
