@@ -54,7 +54,7 @@ below. Basic operations can be performed on dates:
 
     Has two functions: difference and subtraction. If the second
     argument is a date, calculates the difference between the first
-    date and the secmond date (e.g. ``1951Q2-1950Q1`` is equal to
+    date and the second date (e.g. ``1951Q2-1950Q1`` is equal to
     ``5``). If the second argument is an integer ``X``, subtracts
     ``X`` periods from the date (e.g. ``1951Q2-2`` is equal to
     ``1950Q4``).
@@ -69,7 +69,7 @@ below. Basic operations can be performed on dates:
 
     Can be used to create a range of dates. For instance, ``r =
     1950Q1:1951Q1`` creates a ``dates`` object with five elements:
-    ``1950Q1, 1950Q2, 1950Q3, 1950Q4`` and ``1951Q1``. By default the
+    ``1950Q1``, ``1950Q2``, ``1950Q3``, ``1950Q4`` and ``1951Q1``. By default the
     increment between each element is one period. This default can be
     changed using, for instance, the following instruction:
     ``1950Q1:2:1951Q1`` which will instantiate a ``dates`` object with
