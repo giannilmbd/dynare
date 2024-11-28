@@ -31,9 +31,14 @@ Dynare understands dates in a mod file. Users can declare annual, bi-annual,
 quarterly, or monthly dates using the following syntax::
 
     1990Y
+    1990A
     1990S2
+    1990H2
     1990Q4
     1990M11
+
+Note that there are two syntaxes for annual dates (`1990A` is equivalent to
+`1990Y`), and for bi-annual dates (`1990H2` is equivalent to `1990S2`).
 
 Behind the scene, Dynare’s preprocessor translates these expressions
 into instantiations of the MATLAB/Octave’s class ``dates`` described
