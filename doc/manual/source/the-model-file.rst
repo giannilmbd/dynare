@@ -4427,8 +4427,8 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
         By default, every time the information set changes, the simulation with
         the new information set is shorter than the previous one (because the
         terminal date is getting closer). When this option is set, every new
-        simulation has the same length (as specified by the `periods`` option
-        of :comm:`perfect_foresight_with_expectation_errors_setup`; as a
+        simulation has the same length (as specified by the ``periods`` option
+        of :comm:`perfect_foresight_with_expectation_errors_setup`); as a
         consequence, the simulated paths as stored in ``oo_.endo_simul`` will
         be longer when this option is set (if `s` is the last period in which
         the information set is modified, then they will contain `s+periods-1`
