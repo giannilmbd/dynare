@@ -2591,7 +2591,7 @@ blocks.
     group of three lines::
 
       var VARIABLE_NAME;
-      periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
       values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
     It is possible to specify shocks which last several periods and
@@ -2608,15 +2608,21 @@ blocks.
     arbitrary expressions are also allowed, but you have to enclose
     them inside parentheses.
 
-    The feasible range of ``periods`` is from 0 to the number of ``periods`` 
-    specified in ``perfect_foresight_setup``. 
+    The feasible range of ``periods``, when specified as integers, is from 0 to
+    the number of ``periods`` specified in :comm:`perfect_foresight_setup` or
+    :comm:`perfect_foresight_with_expectation_errors_setup`. Alternatively, it
+    is possible to use real dates if the ``first_simulation_period`` and/or
+    ``last_simulation_period`` option has been passed to the aforementioned
+    commands.
 
-    .. warning:: Note that the first endogenous simulation period is period 1. 
-        Thus, a shock value specified for the initial period 0 may conflict with
-        (i.e. may overwrite or be overwritten by) values for the 
-        initial period specified with ``initval`` or ``endval`` (depending on 
-        the exact context). Users should always verify the correct setting 
-        of ``oo_.exo_simul`` after ``perfect_foresight_setup``. 
+    .. warning:: Note that the first endogenous simulation period is period 1
+        (when specified as an integer). Thus, a shock value specified for the
+        initial period 0 may conflict with (i.e. may overwrite or be
+        overwritten by) values for the initial period specified with
+        ``initval`` or ``endval`` (depending on the exact context). Users
+        should always verify the correct setting of ``oo_.exo_simul`` after
+        ``perfect_foresight_setup`` or
+        ``perfect_foresight_with_expectation_errors_setup``.
 
     *Example* (with scalar values)
 
@@ -2650,6 +2656,21 @@ blocks.
         periods 1:3;
         values (xx);
         end;
+
+    *Example* (with dates)
+
+    ::
+
+        shocks;
+          var e;
+          periods 2023Q1;
+          values 0.5;
+
+          var u;
+          periods 2023Q2:2023Q4 2024Q1;
+          values 0 0.1;
+        end;
+
 
     |br| *In stochastic context*
 
@@ -3631,7 +3652,25 @@ speed-up on large models.
 
     .. option:: periods = INTEGER
 
-       Number of periods of the simulation.
+       Number of periods of the simulation. This option is mandatory, unless
+       both ``first_simulation_period`` and ``last_simulation_period`` options
+       are given.
+
+    .. option:: first_simulation_period = DATE
+
+       Assign a date to the first simulation period, i.e. the first period in
+       which endogenous variables are solved for. When this option is set, it
+       becomes possible to declare shocks using dates, and
+       :comm:`perfect_foresight_solver` returns the result of the simulation as
+       a time series object in :mvar:`Simulated_time_series`.
+
+    .. option:: last_simulation_period = DATE
+
+       Assign a date to the last simulation period, i.e. the last period in
+       which endogenous variables are solved for. When this option is set, it
+       becomes possible to declare shocks using dates, and
+       :comm:`perfect_foresight_solver` returns the result of the simulation as
+       a time series object in :mvar:`Simulated_time_series`.
 
     .. option:: datafile = FILENAME
 
@@ -4011,6 +4050,10 @@ speed-up on large models.
     The simulated endogenous variables are available in global matrix
     ``oo_.endo_simul``.
 
+    If any of the ``first_simulation_period`` or ``last_simulation_period``
+    option was passed to the preceding :comm:`perfect_foresight_setup` command,
+    a time series object containing both endogenous and exogenous variables is
+    stored in the workspace variable :mvar:`Simulated_time_series`.
 
 .. command:: simul ;
              simul (OPTIONS...);
@@ -4049,6 +4092,14 @@ speed-up on large models.
     terminal conditions, so it has more rows than the value of the ``periods``
     option: the first simulation period is in row ``1+M_.maximum_lag``, and the
     total number of rows is ``M_.maximum_lag+periods+M_.maximum_lead``.
+
+.. matvar:: Simulated_time_series
+
+     |br| This variable stores, as a :class:`dseries` object, the path of both
+     endogenous and exogenous variables after a deterministic simulation
+     (computed by ``perfect_foresight_solver`` or
+     ``perfect_foresight_with_expectation_errors_solver`` using the
+     ``first_simulation_period`` and/or ``last_simulation_period`` option).
 
 .. matvar:: oo_.initial_steady_state
 
@@ -4102,16 +4153,16 @@ Such a scenario can be solved by Dynare using the
 ``perfect_foresight_with_expectation_errors_solver`` commands, alongside ``shocks``
 and ``endval`` blocks which are given a special ``learnt_in`` option.
 
-.. block:: shocks(learnt_in=INTEGER) ;
-           shocks(learnt_in=INTEGER,overwrite) ;
+.. block:: shocks(learnt_in=INTEGER|DATE) ;
+           shocks(learnt_in=INTEGER|DATE, overwrite) ;
 
-    |br| The ``shocks(learnt_in=INTEGER)`` syntax can be used to specify temporary
+    |br| The ``shocks(learnt_in=INTEGER|DATE)`` syntax can be used to specify temporary
     shocks that are learnt in a specific period. It should contain one or more
     occurences of the following group of three lines, with the same semantics
     as a regular :bck:`shocks` block::
 
       var VARIABLE_NAME;
-      periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
       values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
     If the period in which information is learnt is greater or equal than 2,
@@ -4125,8 +4176,11 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
 
     The ``overwrite`` option says that this block cancels and replaces previous
     ``shocks`` and ``mshocks`` blocks that have the same ``learnt_in`` option.
+    Note that a block with an integer-valued ``learnt_in`` option never
+    overwrites a block with a date-valued ``learnt_in`` option, even if they
+    correspond to the same period.
 
-    Note that a ``shocks(learnt_in=1)`` block is equivalent to a regular
+    Also note that a ``shocks(learnt_in=1)`` block is equivalent to a regular
     :bck:`shocks` block.
 
     *Example*
@@ -4161,9 +4215,20 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
       - from the perspective of periods 4 (and following), ``x`` is expected to
         be equal to 1.3 in period 4, and to 2.8 in period 5.
 
-.. block:: endval(learnt_in=INTEGER) ;
+    *Example* (with dates)
 
-    |br| The ``endval(learnt_in=INTEGER)`` can be used to specify terminal
+    ::
+
+        shocks(learnt_in=2023Q1);
+          var x;
+          periods 2023Q1:2023Q2 2023Q3:2023Q4 2024Q1;
+          values 1 1.2 1.4;
+        end;
+
+
+.. block:: endval(learnt_in=INTEGER|DATE) ;
+
+    |br| The ``endval(learnt_in=INTEGER|DATE)`` can be used to specify terminal
     conditions that are learnt in a specific period.
 
     Note that an ``endval(learnt_in=1)`` block is equivalent to a regular
@@ -4217,16 +4282,25 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     the desired behaviour, a ``shocks(learnt_in=3)`` block will have to be
     added to reinstate the temporary shock.
 
-.. block:: mshocks(learnt_in=INTEGER) ;
-           mshocks(learnt_in=INTEGER,OPTIONS...) ;
+    *Example* (with a date)
 
-    |br| The ``mshocks(learnt_in=INTEGER)`` syntax can be used to specify temporary
+    ::
+
+        endval(learnt_in = 2024Q1);
+          x = 1.1;
+        end;
+
+
+.. block:: mshocks(learnt_in=INTEGER|DATE) ;
+           mshocks(learnt_in=INTEGER|DATE,OPTIONS...) ;
+
+    |br| The ``mshocks(learnt_in=INTEGER|DATE)`` syntax can be used to specify temporary
     shocks that are learnt in a specific period, specified in a multiplicative
     way. It should contain one or more occurences of the following group of
     three lines, with the same semantics as a regular :bck:`mshocks` block::
 
       var VARIABLE_NAME;
-      periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
       values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
     As in the regular :bck:`mshocks` block (without the ``learnt_in`` option),
@@ -4246,7 +4320,10 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     .. option:: overwrite
 
        This block cancels and replaces previous ``shocks`` and ``mshocks``
-       blocks that have the same ``learnt_in`` option.
+       blocks that have the same ``learnt_in`` option. Note that a block with
+       an integer-valued ``learnt_in`` option never overwrites a block with a
+       date-valued ``learnt_in`` option, even if they correspond to the same
+       period.
 
     .. option:: relative_to_initval
 
@@ -4268,6 +4345,17 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     if there is an ``endval`` block, the terminal steady state as anticipated
     from the perspective of period 2 is used (as specified in the relevant
     ``endval(learnt_in=…`` block)).
+
+    *Example* (with dates)
+
+    ::
+
+        mshocks(learnt_in=2024Q2);
+          var x;
+          periods 2024Q3:2024Q4;
+          values 1.1;
+        end;
+
 
 .. command:: perfect_foresight_with_expectation_errors_setup ;
              perfect_foresight_with_expectation_errors_setup (OPTIONS...);
@@ -4294,6 +4382,14 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     .. option:: periods = INTEGER
 
        Number of periods of the simulation.
+
+    .. option:: first_simulation_period = DATE
+
+       Same meaning as the eponymous option of :comm:`perfect_foresight_setup`.
+
+    .. option:: last_simulation_period = DATE
+
+       Same meaning as the eponymous option of :comm:`perfect_foresight_setup`.
 
     .. option:: datafile = FILENAME
 
@@ -4431,7 +4527,9 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
         consequence, the simulated paths as stored in ``oo_.endo_simul`` will
         be longer when this option is set (if `s` is the last period in which
         the information set is modified, then they will contain `s+periods-1`
-        periods, excluding initial and terminal conditions).
+        periods, excluding initial and terminal conditions). Note that this
+        option is not available if ``last_simulation_period`` option has been
+        passed to :comm:`perfect_foresight_with_expectation_errors_setup`.
 
     *Output*
 
@@ -4439,6 +4537,12 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     ``oo_.endo_simul``. The terminal steady state values corresponding to the
     last period of the information set are available in ``oo_.steady_state``
     and ``oo_.exo_steady_state``.
+
+    If any of the ``first_simulation_period`` or ``last_simulation_period``
+    option was passed to the preceding
+    :comm:`perfect_foresight_with_expectation_errors_setup` command, a time
+    series object containing both endogenous and exogenous variables is stored
+    in the workspace variable :mvar:`Simulated_time_series`.
 
 .. matvar:: oo_.pfwee.shocks_info
 
