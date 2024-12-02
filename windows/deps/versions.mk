@@ -19,7 +19,7 @@ MATLAB64_VERSION = 20231122
 
 # pacman -Ss mingw-w64-x86_64-boost
 # (also used by the preprocessor CI, so it can be updated there also)
-MINGW64_BOOST_VERSION = 1.85.0-2
+MINGW64_BOOST_VERSION = 1.86.0-7
 
 # pacman -Ss mingw-w64-x86_64-gsl
 MINGW64_GSL_VERSION = 2.8-1
@@ -27,25 +27,25 @@ MINGW64_GSL_VERSION = 2.8-1
 # pacman -Ss mingw-w64-x86_64-matio
 MINGW64_MATIO_VERSION = 1.5.27-1
 
-# Dependency of matio (and of the MinGW compiler)
+# Dependency of matio and libssh2 (and of the MinGW compiler)
 # pacman -Ss mingw-w64-x86_64-zlib
 MINGW64_ZLIB_VERSION = 1.3.1-1
 
 # Dependency of matio
 # pacman -Ss mingw-w64-x86_64-hdf5
-MINGW64_HDF5_VERSION = 1.14.3-2
+MINGW64_HDF5_VERSION = 1.14.5-1
 
 # Dependency of HDF5 (provides szip library)
 # pacman -Ss mingw-w64-x86_64-libaec
 MINGW64_LIBAEC_VERSION = 1.1.3-2
 
-# Dependency of HDF5
+# Dependency of HDF5 and libssh2
 # pacman -Ss mingw-w64-x86_64-openssl
-MINGW64_OPENSSL_VERSION = 3.3.1-1
+MINGW64_OPENSSL_VERSION = 3.4.0-1
 
 # Dependency of HDF5
 # pacman -Ss mingw-w64-x86_64-curl
-MINGW64_CURL_VERSION = 8.8.0-10
+MINGW64_CURL_VERSION = 8.11.0-2
 
 # Dependency of curl (and of the MinGW compiler)
 # pacman -Ss mingw-w64-x86_64-zstd
@@ -53,11 +53,11 @@ MINGW64_ZSTD_VERSION = 1.5.6-2
 
 # Dependency of curl
 # pacman -Ss mingw-w64-x86_64-brotli
-MINGW64_BROTLI_VERSION = 1.1.0-1
+MINGW64_BROTLI_VERSION = 1.1.0-4
 
 # Dependency of curl
 # pacman -Ss mingw-w64-x86_64-libpsl
-MINGW64_LIBPSL_VERSION = 0.21.5-2
+MINGW64_LIBPSL_VERSION = 0.21.5-3
 
 # Dependency of curl and of libpsl
 # pacman -Ss mingw-w64-x86_64-libidn2
@@ -65,15 +65,15 @@ MINGW64_LIBIDN2_VERSION = 2.3.7-2
 
 # Dependency of curl
 # pacman -Ss mingw-w64-x86_64-libssh2
-MINGW64_LIBSSH2_VERSION = 1.11.0-2
+MINGW64_LIBSSH2_VERSION = 1.11.1-1
 
 # Dependency of curl
 # pacman -Ss mingw-w64-x86_64-nghttp2
-MINGW64_NGHTTP2_VERSION = 1.61.0-2
+MINGW64_NGHTTP2_VERSION = 1.63.0-1
 
 # Dependency of curl
 # pacman -Ss mingw-w64-x86_64-nghttp3
-MINGW64_NGHTTP3_VERSION = 1.4.0-1
+MINGW64_NGHTTP3_VERSION = 1.6.0-1
 
 # Dependency of libpsl and libunistring (and of the MinGW compiler)
 # pacman -Ss mingw-w64-x86_64-libiconv
@@ -86,29 +86,31 @@ MINGW64_LIBUNISTRING_VERSION = 1.2-1
 ## MinGW packages for the embedded compiler
 
 # pacman -Ss mingw-w64-x86_64-gcc$
-MINGW64_GCC_VERSION = 14.1.0-3
+MINGW64_GCC_VERSION = 14.2.0-2
 
+# Dependency of gcc, isl, mpc and mpfr
 # pacman -Ss mingw-w64-x86_64-gmp
 MINGW64_GMP_VERSION = 6.3.0-2
 
 # pacman -Ss mingw-w64-x86_64-binutils
-MINGW64_BINUTILS_VERSION = 2.42-2
+MINGW64_BINUTILS_VERSION = 2.43.1-1
 
 # pacman -Ss mingw-w64-x86_64-headers-git
-MINGW64_HEADERS_VERSION = 12.0.0.r81.g90abf784a-1
+MINGW64_HEADERS_VERSION = 12.0.0.r406.gc0313ec33-1
 
 # pacman -Ss mingw-w64-x86_64-crt-git
-MINGW64_CRT_VERSION = 12.0.0.r81.g90abf784a-1
+MINGW64_CRT_VERSION = 12.0.0.r406.gc0313ec33-1
 
 # pacman -Ss mingw-w64-x86_64-winpthreads-git
-MINGW64_WINPTHREADS_VERSION = 12.0.0.r81.g90abf784a-1
+MINGW64_WINPTHREADS_VERSION = 12.0.0.r406.gc0313ec33-1
 
 # pacman -Ss mingw-w64-x86_64-isl
-MINGW64_ISL_VERSION = 0.26-1
+MINGW64_ISL_VERSION = 0.27-1
 
 # pacman -Ss mingw-w64-x86_64-mpc
 MINGW64_MPC_VERSION = 1.3.1-2
 
+# Dependency of mpc
 # pacman -Ss mingw-w64-x86_64-mpfr
 MINGW64_MPFR_VERSION = 4.2.1-2
 
