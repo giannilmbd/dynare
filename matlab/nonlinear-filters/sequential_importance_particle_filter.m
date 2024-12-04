@@ -19,11 +19,6 @@ function [LIK,lik] = sequential_importance_particle_filter(ReducedForm,Y,start,P
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-persistent init_flag
-persistent mf0 mf1
-persistent number_of_particles number_of_state_variables
-persistent sample_size number_of_observed_variables number_of_structural_innovations
-
 % Set default value for start
 if isempty(start)
     start = 1;
@@ -39,17 +34,11 @@ state_variables_steady_state = ReducedForm.state_variables_steady_state;
 
 order = options_.order;
 
-% Set persistent variables (if needed).
-if isempty(init_flag)
-    mf0 = ReducedForm.mf0;
-    mf1 = ReducedForm.mf1;
-    sample_size = size(Y,2);
-    number_of_state_variables = length(mf0);
-    number_of_observed_variables = length(mf1);
-    number_of_structural_innovations = length(ReducedForm.Q);
-    number_of_particles = ParticleOptions.number_of_particles;
-    init_flag = 1;
-end
+sample_size = size(Y,2);
+number_of_state_variables = length(ReducedForm.mf0);
+number_of_observed_variables = length(ReducedForm.mf1);
+number_of_structural_innovations = length(ReducedForm.Q);
+number_of_particles = ParticleOptions.number_of_particles;
 
 if ReducedForm.use_k_order_solver
     dr = ReducedForm.dr;
@@ -89,10 +78,6 @@ lik  = NaN(sample_size,1);
 % Get initial condition for the state vector.
 StateVectorMean = ReducedForm.StateVectorMean;
 StateVectorVarianceSquareRoot = chol(ReducedForm.StateVectorVariance)';%reduced_rank_cholesky(ReducedForm.StateVectorVariance)';
-if pruning
-    StateVectorMean_ = StateVectorMean;
-    StateVectorVarianceSquareRoot_ = StateVectorVarianceSquareRoot;
-end
 
 % Get the rank of StateVectorVarianceSquareRoot
 state_variance_rank = size(StateVectorVarianceSquareRoot,2);
@@ -110,11 +95,11 @@ if pruning
     if order == 2
         StateVectors_ = StateVectors;
         state_variables_steady_state_ = state_variables_steady_state;
-        mf0_ = mf0;
+        mf0_ = ReducedForm.mf0;
     elseif order == 3
         StateVectors_ = repmat(StateVectors,3,1);
         state_variables_steady_state_ = repmat(state_variables_steady_state,3,1);
-        mf0_ = repmat(mf0,1,3); 
+        mf0_ = repmat(ReducedForm.mf0,1,3); 
         mask2 = number_of_state_variables+1:2*number_of_state_variables;
         mask3 = 2*number_of_state_variables+1:3*number_of_state_variables;
         mf0_(mask2) = mf0_(mask2)+size(ghx,1);
@@ -151,7 +136,7 @@ for t=1:sample_size
         end
     end
     %PredictedObservedMean = tmp(mf1,:)*transpose(weights);
-    PredictionError = bsxfun(@minus,Y(:,t),tmp(mf1,:));
+    PredictionError = bsxfun(@minus,Y(:,t),tmp(ReducedForm.mf1,:));
     %dPredictedObservedMean = bsxfun(@minus,tmp(mf1,:),PredictedObservedMean);
     %PredictedObservedVariance = bsxfun(@times,dPredictedObservedMean,weights)*dPredictedObservedMean' + H;
     %PredictedObservedVariance = H;
@@ -167,15 +152,15 @@ for t=1:sample_size
     weights = wtilde/sum(wtilde);
     if (ParticleOptions.resampling.status.generic && neff(weights)<ParticleOptions.resampling.threshold*sample_size) || ParticleOptions.resampling.status.systematic
         if pruning
-            temp = resample([tmp(mf0,:)' tmp_(mf0_,:)'],weights',ParticleOptions);
+            temp = resample([tmp(ReducedForm.mf0,:)' tmp_(mf0_,:)'],weights',ParticleOptions);
             StateVectors = temp(:,1:number_of_state_variables)';
             StateVectors_ = temp(:,number_of_state_variables+1:end)';
         else
-            StateVectors = resample(tmp(mf0,:)',weights',ParticleOptions)';
+            StateVectors = resample(tmp(ReducedForm.mf0,:)',weights',ParticleOptions)';
         end
         weights = ones(1,number_of_particles)/number_of_particles;
     elseif ParticleOptions.resampling.status.none
-        StateVectors = tmp(mf0,:);
+        StateVectors = tmp(ReducedForm.mf0,:);
         if pruning
             StateVectors_ = tmp_(mf0_,:);
         end

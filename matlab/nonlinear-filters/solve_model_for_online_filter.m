@@ -1,5 +1,7 @@
 function [info, M_, options_, oo_, ReducedForm] = ...
     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_)
+% [info, M_, options_, oo_, ReducedForm] = ...
+%     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_)
 
 % Solves the dsge model for an particular parameters set.
 %
@@ -11,6 +13,7 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % - M_                       [struct]     Model description.
 % - estim_params_            [struct]     Estimated parameters.
 % - bayestopt_               [struct]     Prior definition.
+% - bounds                   [struct]     Prior bounds.
 % - oo_                      [struct]     Dynare results.
 %
 % OUTPUTS
@@ -20,7 +23,7 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % - oo_                      [struct]     Dynare results.
 % - ReducedForm              [struct]     Reduced form model.
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -36,8 +39,6 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-persistent init_flag restrict_variables_idx state_variables_idx mf0 mf1 number_of_state_variables
 
 info = 0;
 
@@ -140,14 +141,11 @@ end
 dr = oo_.dr;
 
 % Set persistent variables (first call).
-if isempty(init_flag)
-    mf0 = bayestopt_.mf0;
-    mf1 = bayestopt_.mf1;
-    restrict_variables_idx  = dr.restrict_var_list;
-    state_variables_idx = restrict_variables_idx(mf0);
-    number_of_state_variables = length(mf0);
-    init_flag = true;
-end
+mf0 = bayestopt_.mf0;
+mf1 = bayestopt_.mf1;
+restrict_variables_idx  = dr.restrict_var_list;
+state_variables_idx = restrict_variables_idx(mf0);
+number_of_state_variables = length(mf0);
 
 
 % Return reduced form model.
@@ -174,7 +172,6 @@ if nargout>4
         ReducedForm.ghuu = zeros(size(restrict_variables_idx,1),n_shocks^2);
         ReducedForm.ghxu = zeros(size(restrict_variables_idx,1),n_states*n_shocks);
         ReducedForm.constant = ReducedForm.steadystate;
-%        ReducedForm.ghs2 = dr.ghs2(restrict_variables_idx,:);
     end
     ReducedForm.state_variables_steady_state = dr.ys(dr.order_var(state_variables_idx));
     ReducedForm.Q = Q;
