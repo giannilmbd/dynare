@@ -1772,6 +1772,7 @@ mod_and_m_tests = [
                 'particle/benchmark.m',
                 'particle/mysample.m'] },
   { 'test' : [ 'particle/first_spec.mod',
+               'particle/first_spec_hssmc.mod',
                'particle/local_state_space_iteration_k_test.mod',
                'particle/local_state_space_iteration_3_test.mod' ],
     'extra' : [ 'particle/first_spec_common.inc' ] },
