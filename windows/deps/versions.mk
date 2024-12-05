@@ -116,3 +116,7 @@ MINGW64_MPFR_VERSION = 4.2.1-2
 
 # pacman -Ss mingw-w64-x86_64-windows-default-manifest
 MINGW64_WINDOWS_DEFAULT_MANIFEST_VERSION = 6.4-4
+
+# Dependency of binutils
+# pacman -Ss mingw-w64-x86_64-gettext-runtime
+MINGW64_GETTEXT_RUNTIME_VERSION = 0.22.5-2
