@@ -104,13 +104,13 @@ If you want a certain version (e.g. 5.x) , then add `--single-branch --branch 5.
 
 If you want to compile for MATLAB, please run the following (after adapting the path to MATLAB):
 ```sh
-meson setup -Dmatlab_path=/usr/local/MATLAB/R2023b -Dbuildtype=debugoptimized build-matlab
+meson setup -Dmatlab_path=/usr/local/MATLAB/R2023b --buildtype=debugoptimized build-matlab
 ```
 The build directory will thus be `build-matlab`.
 
 Or for Octave:
 ```sh
-meson setup -Dbuild_for=octave -Dbuildtype=debugoptimized build-octave
+meson setup -Dbuild_for=octave --buildtype=debugoptimized build-octave
 ```
 The build directory will thus be `build-octave`.
 
@@ -273,7 +273,7 @@ Now use the following commands if using MATLAB (adapt them for Octave, see above
 cd /home/$USER/dynare
 git clone --recurse-submodules https://git.dynare.org/dynare/dynare.git unstable
 cd unstable
-meson setup -Dmatlab_path=/usr/local/MATLAB/R2023b -Dfortran_args="[ '-B', '/home/$USER/dynare/slicot']" -Dbuildtype=debugoptimized build-matlab
+meson setup -Dmatlab_path=/usr/local/MATLAB/R2023b -Dfortran_args="[ '-B', '/home/$USER/dynare/slicot']" --buildtype=debugoptimized build-matlab
 meson compile -C build-matlab
 ```
 
@@ -318,7 +318,7 @@ cd dynare
 ```
 - Configure Dynare from the source directory (adjust `matlab_path` if you use a different version than R2024a):
 ```sh
-meson setup -Dmatlab_path=/usr/local/MATLAB/R2024a -Dbuildtype=debugoptimized build-matlab  
+meson setup -Dmatlab_path=/usr/local/MATLAB/R2024a --buildtype=debugoptimized build-matlab
 ```
 - Compile:
 ```sh
@@ -362,7 +362,7 @@ cd dynare
 ```
 - Configure Dynare from the source directory:
 ```sh
-meson setup -Dmatlab_path=<…> -Dbuildtype=debugoptimized -Dprefer_static=true -Dfortran_args="['-B','/usr/local/lib']" build-matlab
+meson setup -Dmatlab_path=<…> --buildtype=debugoptimized --prefer-static -Dfortran_args="['-B','/usr/local/lib']" build-matlab
 ```
 where the path of MATLAB is specified. Note that you should use
 the MSYS2 notation and not put spaces in the MATLAB path, so you probably want
@@ -520,7 +520,7 @@ If you want a certain version (e.g. 5.x) , then add `--single-branch --branch 5.
 ```sh
 export BUILDDIR=build-matlab
 export MATLABPATH=/Applications/MATLAB_R2023b.app
-arch -$ARCH meson setup --native-file macOS/homebrew-native-$ARCH.ini -Dmatlab_path=$MATLABPATH -Dbuildtype=debugoptimized -Dfortran_args="['-B','$DYNAREDIR/slicot/lib']" $BUILDDIR
+arch -$ARCH meson setup --native-file macOS/homebrew-native-$ARCH.ini -Dmatlab_path=$MATLABPATH --buildtype=debugoptimized -Dfortran_args="['-B','$DYNAREDIR/slicot/lib']" $BUILDDIR
 ```
 where you need to adapt the path to MATLAB.
 Similarly, if you want to compile for Octave, replace the `-Dmatlab_path` option by `-Dbuild_for=octave`, and change the build directory to `build-octave`.
