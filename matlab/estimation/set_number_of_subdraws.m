@@ -57,6 +57,11 @@ else
         posterior = load(sprintf('%s/hssmc/particles-%u-%u.mat', M_.dname, length(pfiles), length(pfiles)));
         NumberOfDraws = size(posterior.particles,2);
         NumberOfDrawsPerChain=NumberOfDraws;
+    elseif isonline(options_)
+        % Load draws from the posterior distribution
+        posterior = load(sprintf('%s/online/parameters_particles_final.mat', M_.dname));
+        NumberOfDraws = size(posterior.param,2);
+        NumberOfDrawsPerChain=NumberOfDraws;
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', M_.dname, filesep(), 'dime', filesep()));
         tune = posterior.tune;

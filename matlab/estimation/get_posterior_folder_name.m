@@ -36,6 +36,8 @@ else
         folder_name='hssmc';
     elseif isdime(options_)
         folder_name='dime';
+    elseif isonline(options_)
+        folder_name='online';
     else
         error('get_posterior_folder_name:: case should not happen. Please contact the developers')
     end

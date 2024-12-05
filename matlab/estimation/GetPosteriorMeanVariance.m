@@ -36,6 +36,12 @@ if issmc(options_)
         mean = sum(posterior.particles, 2)/length(posterior.tlogpostkernel);
         % Compute the posterior covariance
         variance = (posterior.particles-mean)*(posterior.particles-mean)'/length(posterior.tlogpostkernel);
+    elseif isonline(options_)
+        posterior = load(sprintf('%s/online/parameters_particles_final.mat', M_.dname));
+        % Compute the posterior mean
+        mean = sum(posterior.param, 2)/size(posterior.param, 2);
+        % Compute the posterior covariance
+        variance = (posterior.param-mean)*(posterior.param-mean)'/size(posterior.param, 2);
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', M_.dname, filesep(), 'dime', filesep()));
         tune = posterior.tune;

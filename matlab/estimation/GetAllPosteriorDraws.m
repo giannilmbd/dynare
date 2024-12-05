@@ -51,6 +51,18 @@ if issmc(options_)
         else
             draws = posterior.tlogpostkernel;
         end
+    elseif isonline(options_)
+        % Load draws from the posterior distribution
+        posterior = load(sprintf('%s/online/parameters_particles_final.mat', dname));
+        if column>0 || strcmp(column,'all')
+            if strcmp(column,'all')
+                draws = transpose(posterior.param);
+            else
+                draws = transpose(posterior.param(column,:));
+            end
+        else
+            draws=NaN(size(posterior.param,2),1);
+        end
     elseif isdime(options_)
         posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
         tune = posterior.tune;
