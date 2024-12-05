@@ -12,7 +12,7 @@ function tf = contains(string, pattern, varargin)
 % OUTPUT
 % - tf   [logical]
 %
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,7 +62,7 @@ end
 
 tf = false(size(string));
 for ii = 1:numel(pattern)
-    idx = regexp(string, pattern{ii});
+    idx = regexp(string, regexptranslate('escape', pattern{ii}));
     for jj = 1:numel(string)
         tf(jj) = tf(jj) || ~isempty(idx{jj});
     end
