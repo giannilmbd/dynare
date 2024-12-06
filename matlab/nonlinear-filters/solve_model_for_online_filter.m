@@ -1,7 +1,7 @@
-function [info, M_, options_, oo_, ReducedForm] = ...
-    solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_)
-% [info, M_, options_, oo_, ReducedForm] = ...
-%     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_)
+function [info, M_, ReducedForm] = ...
+    solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
+% [info, M_, ReducedForm] = ...
+%     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr , endo_steady_state, exo_steady_state, exo_det_steady_state)
 
 % Solves the dsge model for an particular parameters set.
 %
@@ -14,13 +14,14 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % - estim_params_            [struct]     Estimated parameters.
 % - bayestopt_               [struct]     Prior definition.
 % - bounds                   [struct]     Prior bounds.
-% - oo_                      [struct]     Dynare results.
+% - dr                       [structure]  Reduced form model.
+% - endo_steady_state        [vector]     steady state value for endogenous variables
+% - exo_steady_state         [vector]     steady state value for exogenous variables
+% - exo_det_steady_state     [vector]     steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - info                     [integer]    scalar, nonzero if any problem occur when computing the reduced form.
 % - M_                       [struct]     M_ description.
-% - options_                 [struct]     Dynare options.
-% - oo_                      [struct]     Dynare results.
 % - ReducedForm              [struct]     Reduced form model.
 
 % Copyright © 2013-2024 Dynare Team
@@ -40,21 +41,23 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-info = zeros(4,1);
+info        = zeros(4,1);
 
 %----------------------------------------------------
 % 1. Get the structural parameters & define penalties
 %----------------------------------------------------
 
+% Ensure that xparam1 is a column vector.
+% (Don't do the transformation if xparam1 is empty, otherwise it would become a
+%  0×1 matrix, which create issues with older MATLABs when comparing with [] in
+%  check_bounds_and_definiteness_estimation)
 if ~isempty(xparam1)
     xparam1 = xparam1(:);
 end
 
 M_ = set_all_parameters(xparam1,estim_params_,M_);
 
-
 [~,info,~,Q,H]=check_bounds_and_definiteness_estimation(xparam1, M_, estim_params_, bounds);
-
 if info(1)    
     return
 end
@@ -68,19 +71,16 @@ M_.H = H;
 %------------------------------------------------------------------------------
 
 warning('off', 'MATLAB:nearlySingularMatrix')
-[oo_.dr, info, M_.params] = ...
-    compute_decision_rules(M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+[dr, info, M_.params] = ...
+    compute_decision_rules(M_, options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 warning('on', 'MATLAB:nearlySingularMatrix')
 
 if info(1)~=0
-    if nargout==5
+    if nargout==3
         ReducedForm = 0;
     end
     return
 end
-
-% Get decision rules and transition equations.
-dr = oo_.dr;
 
 % Set persistent variables (first call).
 mf0 = bayestopt_.mf0;
@@ -91,7 +91,7 @@ number_of_state_variables = length(mf0);
 
 
 % Return reduced form model.
-if nargout>4
+if nargout>2
     ReducedForm.ghx = dr.ghx(restrict_variables_idx,:);
     ReducedForm.ghu = dr.ghu(restrict_variables_idx,:);
     ReducedForm.steadystate = dr.ys(dr.order_var(restrict_variables_idx));
@@ -133,16 +133,11 @@ if setinitialcondition
         StateVectorVariance = StateVectorVariance(mf0,mf0);
       case 2% Initial state vector covariance is a monte-carlo based estimate of the ergodic variance (consistent with a k-order Taylor-approximation of the model).
         StateVectorMean = ReducedForm.state_variables_steady_state;%.constant(mf0);
-        old_DynareOptionsperiods = options_.periods;
         options_.periods = 5000;
-        old_DynareOptionspruning =  options_.pruning;
         options_.pruning = options_.particle.pruning;
         y_ = simult(dr.ys, dr, M_, options_);
         y_ = y_(dr.order_var(state_variables_idx),2001:options_.periods);
         StateVectorVariance = cov(y_');
-        options_.periods = old_DynareOptionsperiods;
-        options_.pruning = old_DynareOptionspruning;
-        clear('old_DynareOptionsperiods','y_');
       case 3% Initial state vector covariance is a diagonal matrix.
         StateVectorMean = ReducedForm.state_variables_steady_state;%.constant(mf0);
         StateVectorVariance = options_.particle.initial_state_prior_std*eye(number_of_state_variables);
