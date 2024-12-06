@@ -40,81 +40,23 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-info = 0;
+info = zeros(4,1);
 
 %----------------------------------------------------
 % 1. Get the structural parameters & define penalties
 %----------------------------------------------------
 
-% Test if some parameters are smaller than the lower bound of the prior domain.
-if any(xparam1<bounds.lb)
-    info = 41;
+if ~isempty(xparam1)
+    xparam1 = xparam1(:);
+end
+
+M_ = set_all_parameters(xparam1,estim_params_,M_);
+
+
+[~,info,~,Q,H]=check_bounds_and_definiteness_estimation(xparam1, M_, estim_params_, bounds);
+
+if info(1)    
     return
-end
-
-% Test if some parameters are greater than the upper bound of the prior domain.
-if any(xparam1>bounds.ub)
-    info = 42;
-    return
-end
-
-% Get the diagonal elements of the covariance matrices for the structural innovations (Q) and the measurement error (H).
-Q = M_.Sigma_e;
-H = M_.H;
-for i=1:estim_params_.nvx
-    k =estim_params_.var_exo(i,1);
-    Q(k,k) = xparam1(i)*xparam1(i);
-end
-offset = estim_params_.nvx;
-if estim_params_.nvn
-    for i=1:estim_params_.nvn
-        H(i,i) = xparam1(i+offset)*xparam1(i+offset);
-    end
-    offset = offset+estim_params_.nvn;
-else
-    H = zeros(size(dataset_.data, 2));
-end
-
-% Get the off-diagonal elements of the covariance matrix for the structural innovations. Test if Q is positive definite.
-if estim_params_.ncx
-    for i=1:estim_params_.ncx
-        k1 =estim_params_.corrx(i,1);
-        k2 =estim_params_.corrx(i,2);
-        Q(k1,k2) = xparam1(i+offset)*sqrt(Q(k1,k1)*Q(k2,k2));
-        Q(k2,k1) = Q(k1,k2);
-    end
-    % Try to compute the cholesky decomposition of Q (possible iff Q is positive definite)
-    [~, testQ] = chol(Q);
-    if testQ
-        % The variance-covariance matrix of the structural innovations is not definite positive.
-        info = 43;
-        return
-    end
-    offset = offset+estim_params_.ncx;
-end
-
-% Get the off-diagonal elements of the covariance matrix for the measurement errors. Test if H is positive definite.
-if estim_params_.ncn
-    corrn_observable_correspondence = estim_params_.corrn_observable_correspondence;
-    for i=1:estim_params_.ncn
-        k1 = corrn_observable_correspondence(i,1);
-        k2 = corrn_observable_correspondence(i,2);
-        H(k1,k2) = xparam1(i+offset)*sqrt(H(k1,k1)*H(k2,k2));
-        H(k2,k1) = H(k1,k2);
-    end
-    % Try to compute the cholesky decomposition of H (possible iff H is positive definite)
-    [~, testH] = chol(H);
-    if testH
-        % The variance-covariance matrix of the measurement errors is not definite positive.
-        info = 44;
-        return
-    end
-    offset = offset+estim_params_.ncn;
-end
-
-% Update estimated structural parameters in Mode.params.
-if estim_params_.np > 0
-    M_.params(estim_params_.param_vals(:,1)) = xparam1(offset+1:end);
 end
 
 % Update M_.Sigma_e and M_.H.
