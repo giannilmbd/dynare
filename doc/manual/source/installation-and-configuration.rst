@@ -31,7 +31,7 @@ extra features, but are in no way required:
     statistical distributions), 
   * Global Optimization Toolbox (for ``particleswarm`` and ``simulannealbnd``, used in 
     e.g. ``mode_compute``, ``opt_algo`` or ``ALGO``)
-  * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``options_.lyapunov_srs``)
+  * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``lyapunov=square_root_solver``)
   * Parallel Computing Toolbox (to speed up the ``dime`` sampler)
 
 * If under Octave, the following `Octave-Forge`_ packages: ``optim``, ``io``,
