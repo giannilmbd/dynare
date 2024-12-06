@@ -360,11 +360,7 @@ for t=1:sample_size
     end
     save(sprintf('%s%sparameters_particles-%u.mat', SimulationFolder, filesep(), t), 'xparam');
 
-    str = sprintf(' Lower Bound (95%%) \t Mean \t\t\t Upper Bound (95%%)');
-    for l=1:size(xparam,1)
-        str = sprintf('%s\n %5.4f \t\t %7.5f \t\t %5.4f', str, lb95_xparam(l,t), mean_xparam(l,t), ub95_xparam(l,t));
-    end
-    disp(str)
+    dyntable(options_,'', {'Parameter'; 'Lower Bound (95%)';'Mean';'Upper Bound (95%)'}, bayestopt_.name, [lb95_xparam(:,t), mean_xparam(:,t), ub95_xparam(:,t)], cellofchararraymaxlength(bayestopt_.name)+2, 10, 6)
     disp('')
 
 end
