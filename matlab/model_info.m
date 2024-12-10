@@ -279,7 +279,6 @@ function print_line(names,var_index,lead_lag,M_)
         end
     else
         aux_index=find([M_.aux_vars(:).endo_index]==var_index);
-        aux_type=M_.aux_vars(aux_index).type;
         if lead_lag==0
             str = subst_auxvar(var_index, [], M_);
         else
