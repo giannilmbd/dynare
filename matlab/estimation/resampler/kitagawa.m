@@ -1,15 +1,16 @@
-function indices = kitagawa(weights, noise)
-
+function indices = kitagawa(weights, noise, m)
+% function indices = kitagawa(weights, noise, m)
 % Return indices for resampling.
 %
 % INPUTS
-% - weights   [double]    n×1 vector of partcles' weights.
+% - weights   [double]    n×1 vector of particles' weights.
 % - noise     [double]    scalar, uniform random deviates in [0,1]
+% - m         [integer]   scalar, number of particles to resample 
 %
 % OUTPUTS
-% - indices   [integer]   n×1 vector of indices in [1:n]
+% - indices   [integer]   m×1 vector of indices in [1:n]
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -26,7 +27,11 @@ function indices = kitagawa(weights, noise)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-n= length(weights);
+if nargin<3
+    n = length(weights);
+else 
+    n = m ;
+end 
 
 if nargin<2, noise = rand; end
 
