@@ -65,7 +65,7 @@ Bibliography
 * Koopman, S. J. and J. Durbin (2003): “Filtering and Smoothing of State Vector for Diffuse State Space Models,” *Journal of Time Series Analysis*, 24(1), 85–98.
 * Kuntsevich, Alexei V. and Franz Kappel (1997): “SolvOpt - The solver for local nonlinear optimization problems (version 1.1, Matlab, C, FORTRAN)”, University of Graz, Graz, Austria.
 * Laffargue, Jean-Pierre (1990): “Résolution d’un modèle macroéconomique avec anticipations rationnelles”, *Annales d’Économie et Statistique*, 17, 97–119.
-* Liu, Jane and Mike West (2001): “Combined parameter and state estimation in simulation-based filtering”, in *Sequential Monte Carlo Methods in Practice*, Eds. Doucet, Freitas and Gordon, Springer Verlag.
+* Liu, Jane and Mike West (2001): “Combined parameter and state estimation in simulation-based filtering”, in *Sequential Monte Carlo Methods in Practice*, Eds. Doucet, Freitas and Gordon, Springer Verlag, Chapter 10, 197-223.
 * Murray, Lawrence M., Emlyn M. Jones and John Parslow (2013): “On Disturbance State-Space Models and the Particle Marginal Metropolis-Hastings Sampler”, *SIAM/ASA Journal on Uncertainty Quantification*, 1, 494–521.
 * Mutschler, Willi (2015): “Identification of DSGE models - The effect of higher-order approximation and pruning“, *Journal of Economic Dynamics & Control*, 56, 34-54.
 * Mutschler, Willi (2018): “Higher-order statistics for DSGE models”, *Econometrics and Statistics*, 6(C), 44-56.
