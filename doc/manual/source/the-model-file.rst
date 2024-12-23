@@ -86,10 +86,10 @@ observed:
   (see :ref:`macro-exp`);
 * VARIABLE_NAME (sometimes VAR_NAME) indicates a variable name
   starting with an alphabetical character and can’t contain:
-  ‘()+-\*/^=!;:@#.’ or accentuated characters;
+  ``()+-\*/^=!;:@#.`` or accentuated characters;
 * PARAMETER_NAME (sometimes PARAM_NAME) indicates a parameter name
   starting with an alphabetical character and can’t contain:
-  ‘()+-\*/^=!;:@#.’ or accentuated characters;
+  ``()+-\*/^=!;:@#.`` or accentuated characters;
 * LATEX_NAME (sometimes TEX_NAME) indicates a valid
   LaTeX expression in math mode (not including the
   dollar signs);
