@@ -9534,7 +9534,7 @@ Method of moments specific blocks
     * the first column contains the names of the endogenous variables
     * the second column contains the names of the exogenous variables
     * the third column contains a nested cell array that contains
-    the list of horizons, values and weights.
+      the list of horizons, values and weights.
 
 
 .. block:: matched_irfs_weights ;
