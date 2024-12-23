@@ -99,12 +99,12 @@ observed:
   extension or if the filename contains a non-alphanumeric character;
 * QUOTED_STRING indicates an arbitrary string enclosed between (single)
   quotes;
-* DATE indicates a time period which can be either a year (e.g. `2024Y` or
-  `2024A`), a half-year (`2024S1` or `2024H1`), a quarter (`2024Q2`) or a month
-  (`2024M3`) (see :ref:`dates in a mod file`). Optionally, the time period can
+* DATE indicates a time period which can be either a year (e.g. ``2024Y`` or
+  ``2024A``), a half-year (``2024S1`` or ``2024H1``), a quarter (``2024Q2``) or a month
+  (``2024M3``) (see :ref:`dates in a mod file`). Optionally, the time period can
   be followed by a plus sign and a number of periods, in which case the date is
-  shifted accordingly (e.g. `2023Q1+6` is accepted and is equivalent to
-  `2024Q3`).
+  shifted accordingly (e.g. ``2023Q1+6`` is accepted and is equivalent to
+  ``2024Q3``).
 
 
 .. _var-decl:
