@@ -54,7 +54,7 @@ are introduced by ``/*`` and terminated by ``*/``.
     */
 
 Note that these comment marks should not be used in native MATLAB code regions
-where the `%` should be preferred instead to introduce a comment. In a
+where the ``%`` should be preferred instead to introduce a comment. In a
 ``verbatim`` block, see :ref:`verbatim`, this would result in a crash since
 ``//`` is not a valid MATLAB statement).
 
