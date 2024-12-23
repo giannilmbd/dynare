@@ -24,6 +24,7 @@ The following optional extensions are also useful to benefit from
 extra features, but are in no way required:
 
 * If under MATLAB: the 
+
   * Optimization Toolbox (providing various optimizers 
     like ``fminsearch``, ``fmincon``, or ``fminunc``, used in e.g. ``mode_compute``,
     ``opt_algo`` or ``ALGO``), 
