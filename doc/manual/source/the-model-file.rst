@@ -6934,13 +6934,10 @@ observed variables.
 
            ``11``
 
-                This is not strictly speaking an optimization
-                algorithm. The (estimated) parameters are treated as
-                state variables and estimated jointly with the
-                original state variables of the model using a
-                nonlinear filter. The algorithm implemented in Dynare
-                is described in *Liu and West (2001)*, and works with
-                ``k`` order local approximations of the model.
+                Currently not in use. The Liu and West (2020) filter that 
+                used to be available under this option value is now triggered with 
+                ``posterior_sampling_method='online'``.
+                
 
            ``12``
 
@@ -7641,6 +7638,15 @@ observed variables.
                Instructs Dynare to use the Dynamic Striated Metropolis Hastings
                sampler proposed by *Waggoner, Wu and Zha (2016)* instead of the
                standard Random-Walk Metropolis-Hastings.
+
+           ``'online'``
+            
+                Instructs Dynare to treat the (estimated) parameters as
+                state variables and estimate them jointly with the
+                original state variables of the model using a
+                nonlinear filter. The algorithm implemented in Dynare
+                is described in *Liu and West (2001)*, and works with
+                ``k`` order local approximations of the model.
 
     .. option:: posterior_sampler_options = (NAME, VALUE, ...)
 
@@ -8503,7 +8509,8 @@ observed variables.
 
            ``'liu_west_delta'``
 
-               Set the value for delta for the Liu/West online filter. Default: ``0.99``.
+               Set the value for delta for the Liu/West online filter (``posterior_sampling_method='online'``). 
+               Default: ``0.99``.
 
            ``'unscented_alpha'``
 
