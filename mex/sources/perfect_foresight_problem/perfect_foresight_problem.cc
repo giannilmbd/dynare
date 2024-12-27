@@ -220,7 +220,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                                                      g1_sparse_rowval_mx, g1_sparse_colval_mx,
                                                      g1_sparse_colptr_mx, linear, compute_jacobian);
 
-      // Main computing loop
+    // Main computing loop
 #pragma omp for
     for (mwIndex T = 0; T < periods; T++)
       {

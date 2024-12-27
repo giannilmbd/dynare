@@ -267,7 +267,9 @@ class _column_iter : public _matrix_iter<_TRef, _TPtr>
 
 public:
   _column_iter(_TPtr base, int ds, bool r, int rw) :
-      _matrix_iter<_TRef, _TPtr>(base, ds, r), row(rw) {};
+      _matrix_iter<_TRef, _TPtr>(base, ds, r), row(rw)
+  {
+  }
   _Self&
   operator++() override
   {
@@ -298,8 +300,9 @@ class _row_iter : public _matrix_iter<_TRef, _TPtr>
   int col;
 
 public:
-  _row_iter(_TPtr base, int ds, bool r, int cl) :
-      _matrix_iter<_TRef, _TPtr>(base, ds, r), col(cl) {};
+  _row_iter(_TPtr base, int ds, bool r, int cl) : _matrix_iter<_TRef, _TPtr>(base, ds, r), col(cl)
+  {
+  }
   _Self&
   operator++() override
   {

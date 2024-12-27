@@ -47,7 +47,9 @@ public:
       dynamic_g1_sparse_rowval_mx {dynamic_g1_sparse_rowval_mx_arg},
       dynamic_g1_sparse_colval_mx {dynamic_g1_sparse_colval_mx_arg},
       dynamic_g1_sparse_colptr_mx {dynamic_g1_sparse_colptr_mx_arg},
-      dynamic_gN_sparse_indices {move(dynamic_gN_sparse_indices_arg)} {};
+      dynamic_gN_sparse_indices {move(dynamic_gN_sparse_indices_arg)}
+  {
+  }
   virtual ~DynamicModelAC() = default;
   virtual void eval(const Vector& y, const Vector& x, const Vector& params, const Vector& ySteady,
                     Vector& residual, const std::map<int, int>& dynToDynpp,

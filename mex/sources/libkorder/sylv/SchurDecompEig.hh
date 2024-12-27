@@ -33,7 +33,9 @@ public:
   SchurDecompEig(const SqSylvMatrix& m) : SchurDecomp(m)
   {
   }
-  SchurDecompEig(const QuasiTriangular& tr) : SchurDecomp(tr) {};
+  SchurDecompEig(const QuasiTriangular& tr) : SchurDecomp(tr)
+  {
+  }
   SchurDecompEig(QuasiTriangular& tr) : SchurDecomp(tr)
   {
   }

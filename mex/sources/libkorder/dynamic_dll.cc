@@ -40,16 +40,11 @@ DynamicModelDLL::DynamicModelDLL(const std::string& modName, int order_arg,
   for (int o {0}; o <= order; o++)
     {
       std::string func_name {"dynamic_"s + (o == 0 ? "resid" : "g"s + std::to_string(o))};
-      std::string mex_filename
-      {
+      std::string mex_filename {
 #if !defined(__CYGWIN32__) && !defined(_WIN32)
-        "./"s +
+          "./"s +
 #endif
-            "+"s + modName + "/+sparse/" + func_name + MEXEXT
-        // clang-format off
-        // As of Clang 16, the RemoveSemicolon option incorrectly removes the following semicolon
-      };
-      // clang-format on
+          "+"s + modName + "/+sparse/" + func_name + MEXEXT};
 
       mex_handle_t handle {load_mex(mex_filename)};
       if (handle)

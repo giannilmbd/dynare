@@ -53,7 +53,6 @@ extern "C"
 #else
 _Noreturn
 #endif
-    void
-    msExit(int status);
+    void msExit(int status);
 
 #endif
