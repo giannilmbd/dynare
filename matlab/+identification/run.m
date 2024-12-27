@@ -485,7 +485,7 @@ if iload <=0
             kk=0;
             while kk<50 && info(1)
                 kk=kk+1;
-                params = Prior.draw();
+                params = Prior.draw()'; %column vector is expected
                 options_ident.tittxt = 'Random_prior_params'; %title text for graphs and figures
                 % perform identification analysis
                 [ide_moments_point, ide_spectrum_point, ide_minimal_point, ide_hess_point, ide_reducedform_point, ide_dynamic_point, ~, info, error_indicator_point] = ...
