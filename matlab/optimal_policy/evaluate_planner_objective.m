@@ -265,12 +265,14 @@ else
         oo_.var(isnan(oo_.var)) = options_.huge_number;
 
         Ey = oo_.mean;
-        Eyhat = Ey - ys(dr.order_var(nstatic+(1:nspred)));
 
-        Eyhatyhat = oo_.var(:);
         Euu = M_.Sigma_e(:);
-
-        EU = U + Uy*gy*Eyhat + 0.5*(Uyygygy*Eyhatyhat + Uyygugu*Euu);
+        EU = U + 0.5*Uyygugu*Euu;
+        if M_.maximum_endo_lag
+            Eyhat = Ey - ys(dr.order_var(nstatic+(1:nspred)));
+            Eyhatyhat = oo_.var(:);
+            EU=EU + Uy*gy*Eyhat + 0.5*Uyygygy*Eyhatyhat;
+        end
         EW = EU/(1-beta);
         planner_objective_value.unconditional = EW;
 
