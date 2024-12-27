@@ -1069,6 +1069,7 @@ mod_and_m_tests = [
                'discretionary_policy/dennis_1_estim.mod',
                'discretionary_policy/dennis_1_estim_MoM.mod' ] },
   { 'test' : [ 'discretionary_policy/Gali_discretion.mod' ] },
+  { 'test' : [ 'discretionary_policy/NK_discretion_forward.mod' ] },
   { 'test' : [ 'discretionary_policy/Gali_2015_chapter_3.mod',
                'discretionary_policy/Gali_2015_chapter_3_nonlinear.mod' ] },
   { 'test' : [ 'histval_initval_file/ramst_data_generate.mod',
