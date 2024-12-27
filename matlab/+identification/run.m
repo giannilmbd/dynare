@@ -504,7 +504,10 @@ if iload <=0
         else
             % found a (random) point that solves the model
             fprintf('Found a random draw from the priors that solves the model:\n');
-            disp(params);
+            labels = name;
+            headers = {'Name', 'Value'};
+            lh = cellofchararraymaxlength(labels)+2;
+            dyntable(options_, 'Feasible draw', headers, labels, params', lh, 10, 6);
             fprintf('Identification now continues for this draw.');
             parameters = 'Random_prior_params';
             parameters_TeX = 'Random prior parameter draw';
