@@ -142,7 +142,7 @@ TestRunnable::quasi_solve(bool trans, const std::string& mname, const std::strin
   xx.add(1.0, x);
   double norm = xx.getNorm();
   std::cout << "\terror norm = " << norm << std::endl;
-  return (norm < eps_norm);
+  return norm < eps_norm;
 }
 
 bool
@@ -174,7 +174,7 @@ TestRunnable::mult_kron(bool trans, const std::string& mname, const std::string&
   c.add(-1.0, v);
   double norm = c.getNorm();
   std::cout << "\terror norm = " << norm << std::endl;
-  return (norm < eps_norm);
+  return norm < eps_norm;
 }
 
 bool
@@ -208,7 +208,7 @@ TestRunnable::level_kron(bool trans, const std::string& mname, const std::string
   x.add(-1, c);
   double norm = x.getNorm();
   std::cout << "\terror norm = " << norm << std::endl;
-  return (norm < eps_norm);
+  return norm < eps_norm;
 }
 
 bool
@@ -241,7 +241,7 @@ TestRunnable::kron_power(const std::string& m1name, const std::string& m2name,
   x.add(-1, c);
   double norm = x.getNorm();
   std::cout << "\terror norm = " << norm << std::endl;
-  return (norm < eps_norm);
+  return norm < eps_norm;
 }
 
 bool
@@ -282,7 +282,7 @@ TestRunnable::lin_eval(const std::string& m1name, const std::string& m2name,
   double norm1 = x1.getNorm();
   double norm2 = x2.getNorm();
   std::cout << "\terror norm1 = " << norm1 << "\n\terror norm2 = " << norm2 << '\n';
-  return (norm1 * norm1 + norm2 * norm2 < eps_norm * eps_norm);
+  return norm1 * norm1 + norm2 * norm2 < eps_norm * eps_norm;
 }
 
 bool
@@ -323,7 +323,7 @@ TestRunnable::qua_eval(const std::string& m1name, const std::string& m2name,
   double norm1 = x1.getNorm();
   double norm2 = x2.getNorm();
   std::cout << "\terror norm1 = " << norm1 << "\n\terror norm2 = " << norm2 << std::endl;
-  return (norm1 * norm1 + norm2 * norm2 < 100 * eps_norm * eps_norm); // relax norm
+  return norm1 * norm1 + norm2 * norm2 < 100 * eps_norm * eps_norm; // relax norm
 }
 
 bool
@@ -362,7 +362,7 @@ TestRunnable::tri_sylv(const std::string& m1name, const std::string& m2name,
   double max = dcheck.getMax();
   double xmax = v.getMax();
   std::cout << "\trel. error max = " << max / xmax << std::endl;
-  return (norm < xnorm * eps_norm);
+  return norm < xnorm * eps_norm;
 }
 
 bool
@@ -388,8 +388,8 @@ TestRunnable::gen_sylv(const std::string& aname, const std::string& bname, const
   gs.check(mmd.getData());
   const SylvParams& pars = gs.getParams();
   pars.print("\t");
-  return (*(pars.mat_err1) < eps_norm && *(pars.mat_errI) < eps_norm && *(pars.mat_errF) < eps_norm
-          && *(pars.vec_err1) < eps_norm && *(pars.vec_errI) < eps_norm);
+  return *(pars.mat_err1) < eps_norm && *(pars.mat_errI) < eps_norm && *(pars.mat_errF) < eps_norm
+         && *(pars.vec_err1) < eps_norm && *(pars.vec_errI) < eps_norm;
 }
 
 bool
@@ -424,7 +424,7 @@ TestRunnable::eig_bubble(const std::string& aname, int from, int to)
             << "\tabs. error∞ = " << normInf << std::endl
             << "\trel. error1 = " << norm1 / onorm1 << std::endl
             << "\trel. error∞ = " << normInf / onormInf << std::endl;
-  return (norm1 < eps_norm * onorm1 && normInf < eps_norm * onormInf);
+  return norm1 < eps_norm * onorm1 && normInf < eps_norm * onormInf;
 }
 
 bool
@@ -463,7 +463,7 @@ TestRunnable::block_diag(const std::string& aname, double log10norm)
   std::cout << "\terror Q·Q⁻¹:" << std::endl
             << "\tabs. error1 = " << nor1 << std::endl
             << "\tabs. error∞ = " << norInf << std::endl;
-  return (norm1 < eps_norm * pow(10, log10norm) * onorm1);
+  return norm1 < eps_norm * pow(10, log10norm) * onorm1;
 }
 
 bool
@@ -503,7 +503,7 @@ TestRunnable::iter_sylv(const std::string& m1name, const std::string& m2name,
   double max = dcheck.getMax();
   double xmax = v.getMax();
   std::cout << "\trel. error max = " << max / xmax << std::endl;
-  return (cnorm < xnorm * eps_norm);
+  return cnorm < xnorm * eps_norm;
 }
 
 /**********************************************************/

@@ -306,7 +306,7 @@ Diagonal::print() const
 bool
 Diagonal::isZero(double p)
 {
-  return (std::abs(p) < EPS);
+  return std::abs(p) < EPS;
 }
 
 QuasiTriangular::const_col_iter

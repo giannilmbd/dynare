@@ -117,7 +117,7 @@ IntSequence::lessEq(const IntSequence& s) const
   int i = 0;
   while (i < size() && operator[](i) <= s[i])
     i++;
-  return (i == size());
+  return i == size();
 }
 
 bool
@@ -128,7 +128,7 @@ IntSequence::less(const IntSequence& s) const
   int i = 0;
   while (i < size() && operator[](i) < s[i])
     i++;
-  return (i == size());
+  return i == size();
 }
 
 void

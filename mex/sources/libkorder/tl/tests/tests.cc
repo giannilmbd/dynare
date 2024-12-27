@@ -450,7 +450,7 @@ TestRunnable::folded_contraction(int r, int nv, int dim)
             << "\terror normMax:     " << v.getMax() << '\n'
             << "\terror norm1:       " << v.getNorm1() << '\n';
 
-  return (v.getMax() < 1.e-10);
+  return v.getMax() < 1.e-10;
 }
 
 bool
@@ -485,7 +485,7 @@ TestRunnable::unfolded_contraction(int r, int nv, int dim)
             << "\terror normMax:     " << v.getMax() << '\n'
             << "\terror norm1:       " << v.getNorm1() << '\n';
 
-  return (v.getMax() < 1.e-10);
+  return v.getMax() < 1.e-10;
 }
 
 bool
@@ -542,7 +542,7 @@ TestRunnable::poly_eval(int r, int nv, int maxdim)
             << "\tfolded horner error norm max:    " << max_fh << '\n'
             << "\tunfolded horner error norm max:  " << max_uh << '\n';
 
-  return (max_ft + max_fh + max_uh < 1.0e-10);
+  return max_ft + max_fh + max_uh < 1.0e-10;
 }
 
 /****************************************************/

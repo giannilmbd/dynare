@@ -8,6 +8,12 @@
 #  https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 # Effective configuration can be obtained with:
 #  clang-format --dump-config
+
+# The RemoveParentheses and RemoveSemicolon option are not permanently set,
+# because the clang-format manual (as of version 19) states that these
+# options can lead to incorrect formatting and thus their result should be
+# carefully reviewed.
+
 Language: Cpp
 Standard: c++20
 ColumnLimit: 100
@@ -23,7 +29,8 @@ InsertNewlineAtEOF: true
 PackConstructorInitializers: NextLine
 PPIndentWidth: 1
 PointerAlignment: Left
-RemoveSemicolon: true
+# RemoveParentheses: ReturnStatement
+# RemoveSemicolon: true
 SpaceAfterTemplateKeyword: false
 SpaceBeforeParens: ControlStatements
 SpaceBeforeCpp11BracedList: true

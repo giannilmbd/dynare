@@ -42,7 +42,7 @@ private:
   static bool
   zeroPad(const SchurDecompZero& kdecomp)
   {
-    return ((kdecomp.getZeroCols() * 3 < kdecomp.getDim() * 2) || (kdecomp.getZeroCols() < 10));
+    return (kdecomp.getZeroCols() * 3 < kdecomp.getDim() * 2) || (kdecomp.getZeroCols() < 10);
   }
 
 public:

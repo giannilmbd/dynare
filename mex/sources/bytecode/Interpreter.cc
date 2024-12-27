@@ -2198,7 +2198,7 @@ Interpreter::complete(int beg_t)
     }
   mxFree(save_code);
   mxFree(diff);
-  return (beg_t);
+  return beg_t;
 }
 
 void

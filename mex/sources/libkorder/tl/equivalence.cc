@@ -57,7 +57,7 @@ OrdSequence::operator==(const OrdSequence& s) const
   while (i < length() && operator[](i) == s[i])
     i++;
 
-  return (i == length());
+  return i == length();
 }
 
 /* The first add() adds a given integer to the class, the second

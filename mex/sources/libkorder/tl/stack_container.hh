@@ -208,8 +208,7 @@ public:
   isZero(int i, const Symmetry& s) const override
   {
     TL_RAISE_IF(i < 0 || i >= numStacks(), "Wrong index to stack in StackContainer::isZero.");
-    return (getType(i, s) == itype::zero
-            || (getType(i, s) == itype::matrix && !conts[i]->check(s)));
+    return getType(i, s) == itype::zero || (getType(i, s) == itype::matrix && !conts[i]->check(s));
   }
 
   [[nodiscard]] const _Ttype&

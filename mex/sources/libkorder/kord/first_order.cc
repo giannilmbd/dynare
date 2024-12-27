@@ -35,8 +35,8 @@ std::mutex FirstOrder::mut;
 lapack_int
 FirstOrder::order_eigs(const double* alphar, const double* alphai, const double* beta)
 {
-  return (*alphar * *alphar + *alphai * *alphai
-          < *beta * *beta * qz_criterium_global * qz_criterium_global);
+  return *alphar * *alphar + *alphai * *alphai
+         < *beta * *beta * qz_criterium_global * qz_criterium_global;
 }
 
 /* Here we solve the linear approximation. The result are the matrices
