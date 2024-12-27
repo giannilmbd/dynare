@@ -88,6 +88,7 @@ end;
 
 steady;
 check;
+model_info;
 
 perfect_foresight_setup(periods=500);
 perfect_foresight_solver;

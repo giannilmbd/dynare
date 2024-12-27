@@ -59,8 +59,8 @@ if ~isempty(aux_index)
             % Expectation operator
             str = sprintf('%s', M_.aux_vars(aux_index).orig_expr);
             return
-        case 6
-            % Ramsey's multipliers
+        case {5,6}
+            % differentiate_forward_vars and Ramsey multipliers
             if ~isempty(aux_lead_lag)
                 str = sprintf('%s(%d)', M_.endo_names{M_.aux_vars(aux_index).endo_index}, aux_lead_lag);
             else
