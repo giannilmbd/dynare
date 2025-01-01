@@ -1678,6 +1678,37 @@ The dseries class
                 1973Q4 | -0.03705 | -0.35899  | 0.85838   | -1.4675  | -2.1666  | -0.62032
 
 
+    .. dseriesmethod:: fill_(name, v)
+
+       |br| Assign the value ``v`` to the variable ``name`` in a
+       dseries object. If ``name`` is a character row array, it should
+       correspond to an existing variable within the dseries
+       object. When ``v`` is a scalar, its value will be applied to
+       all periods uniformly. If ``v`` is a vector, its length must
+       match the number of observations in the dseries object.You can
+       invoke this method for a batch of variables by providing a 1 by
+       n cell array of character row arrays as the first argument. When
+       "v" is a row vector with n elements, the method will be applied
+       uniformly across all periods. If "v" is a matrix, it must have
+       n columns, and the number of rows should correspond to the
+       number of periods.
+
+       *Example*
+
+            ::
+
+                >> ts = dseries(rand(3,3));
+                >> ts.fill_({'Variable_1', 'Variable_3'}, [1 3]);
+                >> ts
+
+                ts is a dseries object:
+
+                   | Variable_1 | Variable_2 | Variable_3
+                1Y | 1          | 0.91338    | 3
+                2Y | 1          | 0.63236    | 3
+                3Y | 1          | 0.09754    | 3
+
+
     .. dseriesmethod:: f = firstdate (A)
 
        |br| Returns the first period in ``dseries`` object ``A``.
@@ -1711,7 +1742,67 @@ The dseries class
                      4
 
 
-    .. dseriesmethod:: D = horzcat (A, B[, ...])
+    .. dseriesmethod:: l = ge (A, B)
+                       l = gt (A, B)
+
+       |br| Overloads the ``gt`` (>) and ``ge`` (>=) binary operators. Returns a logical array.
+
+       *Example*
+
+           ::
+
+                >> ts = dseries(randn(3,1))
+
+                ts is a dseries object:
+
+                   | Variable_1
+                1Y | -1.2075
+                2Y | 0.71724
+                3Y | 1.6302
+
+                >> ts>1
+
+                ans =
+
+                  3x1 logical array
+
+                   0
+                   0
+                   1
+
+                >> ds = dseries(randn(3,1))
+
+                ds is a dseries object:
+
+                   | Variable_1
+                1Y | 0.48889
+                2Y | 1.0347
+                3Y | 0.72689
+
+                >> ds>ts
+
+                ans =
+
+                  3x1 logical array
+
+                   1
+                   1
+                   0
+
+
+    .. dseriesmethod:: B = hdiff (A)
+                       hdiff_ ()
+
+       |br| Computes bi-annual differences.
+
+
+    .. dseriesmethod:: B = hgrowth (A)
+                       hgrowth_ ()
+
+       |br| Computes bi-annual growth rates.
+
+
+   .. dseriesmethod:: D = horzcat (A, B[, ...])
 
         |br| Overloads the ``horzcat`` MATLAB/Octave’s method for
         ``dseries`` objects. Returns a ``dseries`` object ``D``
@@ -1976,6 +2067,55 @@ The dseries class
        observations in ``dseries`` object ``A``. Output argument ``f`` is a
        structure, each field name is the name of a variable in ``A``, each field
        content is a singleton ``date`` object.
+
+
+    .. dseriesmethod:: l = le (A, B)
+                       l = lt (A, B)
+
+       |br| Overloads the ``gt`` (<) and ``ge`` (<=) binary operators. Returns a logical array.
+
+       *Example*
+
+           ::
+
+                >> ts = dseries(randn(3,1))
+
+                ts is a dseries object:
+
+                   | Variable_1
+                1Y | -1.2075
+                2Y | 0.71724
+                3Y | 1.6302
+
+                >> ts<1
+
+                ans =
+
+                  3x1 logical array
+
+                   1
+                   1
+                   0
+
+                >> ds = dseries(randn(3,1))
+
+                ds is a dseries object:
+
+                   | Variable_1
+                1Y | 0.48889
+                2Y | 1.0347
+                3Y | 0.72689
+
+                >> ds<ts
+
+                ans =
+
+                  3x1 logical array
+
+                   0
+                   0
+                   1
+
 
     .. dseriesmethod:: B = lead (A[, p])
                        lead_ (A[, p])
