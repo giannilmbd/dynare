@@ -240,7 +240,7 @@ end
 
 % check for external draws, i.e. set pdraws0 for a gsa analysis
 if options_ident.gsa_sample_file
-    GSAFolder = checkpath('gsa',dname);
+    GSAFolder = CheckPath('gsa',dname);
     if options_ident.gsa_sample_file==1
         load([GSAFolder,filesep,fname,'_prior'],'lpmat','lpmat0','istable');
     elseif options_ident.gsa_sample_file==2
