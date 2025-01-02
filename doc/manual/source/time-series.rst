@@ -268,6 +268,39 @@ The dates class
             do4 = dates('Q',1950, 1);
             do5 = dates('D',1973, 1, 25);
 
+    |br|
+
+    A ``dates`` object with multiple elements can be considered a one-dimensional array of dates. Standard array operations can be applied to a ``dates`` object:
+
+     - square brackets can be used to concatenate dates objects::
+
+         >> A = dates('1938Q4');
+         >> B = dates('1945Q3');
+         >> C = [A, B];
+
+     - semicolons can be used to create ranges of dates::
+
+         >> A = dates('2009Q2');
+         >> B = A:A+2;
+         >> B
+
+         B = <dates: 2009Q2, 2009Q3, 2009Q4>
+
+     - objects can be indexed by an integer or a vector of integer::
+
+         >> B(1)
+
+         ans = <dates: 2009Q2>
+
+         >> B(end)
+
+         ans = <dates: 2009Q4>
+
+         >> B(1:2)
+
+         ans = <dates: 2009Q2, 2009Q3>
+
+    |br|
 
     A list of the available methods, by alphabetical order, is given
     below. Note that by default the methods do not allow in place
