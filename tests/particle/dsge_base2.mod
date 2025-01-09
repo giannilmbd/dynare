@@ -24,15 +24,19 @@
 @#endif
 
 @#ifndef ALGO_ONLINE
-    @#define ALGO_ONLINE = 1
+    @#define ALGO_ONLINE = 0
 @#endif
 
 @#ifndef MCMC
     @#define MCMC = 0
 @#endif
 
-@#ifndef SMC
-    @#define SMC = 0
+@#ifndef HSSMC
+    @#define HSSMC = 0
+@#endif
+
+@#ifndef DSMH
+    @#define DSMH = 1
 @#endif
 
 @#include "dsge_base.inc"
@@ -119,8 +123,14 @@ estimation(order=3,nograph,filter_algorithm=gf,proposal_approximation=montecarlo
 estimation(order=3,filter_algorithm=nlkf,number_of_particles=10000,proposal_approximation=montecarlo,resampling=none,silent_optimizer,mode_compute=0,cova_compute=0,MCMC_jumping_covariance=prior_variance,mh_init_scale_factor=0.01);
 @#endif
 
-@#if SMC
+@#if HSSMC
   estimation(order=1,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
-  estimation(order=2,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
-  estimation(order=3,posterior_sampling_method='hssmc',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
+%  estimation(order=2,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
+%  estimation(order=3,posterior_sampling_method='hssmc',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
+@#endif
+
+@#if DSMH
+  estimation(order=1,posterior_sampling_method='dsmh',posterior_sampler_options=('particles',200));
+%  estimation(order=2,posterior_sampling_method='dsmh',posterior_sampler_options=('particles',1000));
+%  estimation(order=3,posterior_sampling_method='dsmh',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
 @#endif
