@@ -51,6 +51,18 @@ if issmc(options_)
         else
             draws = posterior.tlogpostkernel;
         end
+    elseif isdsmh(options_)
+        % Load draws from the posterior distribution
+        posterior = load(sprintf('%s/dsmh/parameters_particles_final.mat', dname));
+        if column>0 || strcmp(column,'all')
+            if strcmp(column,'all')
+                draws = transpose(posterior.particles);
+            else
+                draws = transpose(posterior.particles(column,:));
+            end
+        else
+            draws = posterior.tlogpostkernel;
+        end
     elseif isonline(options_)
         % Load draws from the posterior distribution
         posterior = load(sprintf('%s/online/parameters_particles_final.mat', dname));

@@ -405,20 +405,18 @@ end
 % Run SMC sampler.
 %
 
-if isonline(options_)
+if issmc(options_)
     [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
     options_.posterior_sampler_options.current_options = posterior_sampler_options;
-    online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_);
-elseif ishssmc(options_)
-    [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
-    options_.posterior_sampler_options.current_options = posterior_sampler_options;
-    oo_.MarginalDensity.hssmc = hssmc(objective_function, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
-elseif isdime(options_)
-    [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options([], M_.fname, M_.dname, options_, bounds, bayestopt_);
-    options_.posterior_sampler_options.current_options = posterior_sampler_options;
-    dime(objective_function, xparam1, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
-elseif isdsmh(options_)
-    dsmh(objective_function, xparam1, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+    if isonline(options_)
+        online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_, bayestopt_, oo_);
+    elseif ishssmc(options_)
+        oo_.MarginalDensity.hssmc = hssmc(objective_function, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
+    elseif isdime(options_)
+        dime(objective_function, xparam1, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+    elseif isdsmh(options_)
+        oo_.MarginalDensity.dsmh = dsmh(objective_function, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
+    end 
 end
 
 %
@@ -482,7 +480,7 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
             oo_.lprob = trace_plot_dime(options_, M_);
         end
         % Estimation of the marginal density from the Mh draws:
-        if ishssmc(options_) || isonline(options_) || isdime(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
+        if isdsmh(options_) || ishssmc(options_) || isonline(options_) || isdime(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             if ~issmc(options_)
                 [~, oo_] = marginal_density(M_, options_, estim_params_, oo_, bayestopt_);
             end

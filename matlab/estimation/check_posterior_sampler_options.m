@@ -482,34 +482,34 @@ if init
               options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
               for i=1:rows(options_list)
                   switch options_list{i,1}
-                      case 'proposal_distribution'
-                          if ~(strcmpi(options_list{i,2}, 'rand_multivariate_student') || ...
-                               strcmpi(options_list{i,2}, 'rand_multivariate_normal'))
-                              error(['initial_estimation_checks:: the proposal_distribution option to estimation takes either ' ...
-                                         'rand_multivariate_student or rand_multivariate_normal as options']);
-                          else
-                              posterior_sampler_options.proposal_distribution=options_list{i,2};
-                          end
-                      case 'student_degrees_of_freedom'
-                          if options_list{i,2} <= 0
-                              error('initial_estimation_checks:: the student_degrees_of_freedom takes a positive integer argument');
-                          else
-                              posterior_sampler_options.student_degrees_of_freedom=options_list{i,2};
-                          end
-                      case 'save_tmp_file'
-                          posterior_sampler_options.save_tmp_file = options_list{i,2};
-                      case 'number_of_particles'
+                      case 'H'
+                          posterior_sampler_options.H = options_list{i,2};
+                      case 'N'
+                          posterior_sampler_options.N = options_list{i,2};
+                      case 'G'
+                          posterior_sampler_options.G = options_list{i,2};
+                      case 'K'
+                          posterior_sampler_options.K = options_list{i,2};
+                      case 'lambda1'
+                          posterior_sampler_options.lambda1 = options_list{i,2};
+                      case 'tau'
+                          posterior_sampler_options.tau = options_list{i,2};
+                      case 'particles'
                           posterior_sampler_options.particles = options_list{i,2};
+                      case 'alpha0'
+                          posterior_sampler_options.alpha0 = options_list{i,2};
+                      case 'alpha1'
+                          posterior_sampler_options.alpha1 = options_list{i,2};
                       otherwise
-                          warning(['rwmh_sampler: Unknown option (' options_list{i,1} ')!'])
+                          warning(['dsmh: Unknown option (' options_list{i,1} ')!'])
                   end
-                  end
+              end
           end
-          
+
           options_.mode_compute = 0;
           options_.cova_compute = 0;
           options_.mh_replic = 0;
-          options_.mh_posterior_mode_estimation = true;
+          options_.mh_posterior_mode_estimation = false;
               
       otherwise
           error('check_posterior_sampler_options:: Unknown posterior_sampling_method option %s ',posterior_sampler_options.posterior_sampling_method);

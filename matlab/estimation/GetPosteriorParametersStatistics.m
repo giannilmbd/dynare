@@ -52,6 +52,9 @@ skipline()
 if ishssmc(options_) 
     dprintf('Log data density is %f.', oo_.MarginalDensity.hssmc);
     hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
+elseif isdsmh(options_) 
+    dprintf('Log data density is %f.', oo_.MarginalDensity.dsmh);
+    hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 elseif isonline(options_)
     hpd_draws = num_draws;
 elseif isdime(options_)
@@ -83,7 +86,7 @@ if estim_params_.np % estimated structural parameters
     disp(tit2)
     ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
     for i=1:estim_params_.np
-        if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh) || ishssmc(options_) || isonline(options_)
+        if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh) || ishssmc(options_) || isdsmh(options_) || isonline(options_)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
             name = bayestopt_.name{ip};
