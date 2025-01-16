@@ -113,5 +113,7 @@ T=H(dr.order_var,dr.order_var);
 dr.ghu=G(dr.order_var,:);
 if M_.maximum_endo_lag
     Selection=M_.lead_lag_incidence(1,dr.order_var)>0;%select state variables
+else
+    Selection=[];
 end
 dr.ghx=T(:,Selection);
