@@ -12623,8 +12623,9 @@ Performing sensitivity analysis
         If equal to ``0``, ANOVA mapping (Type I error) If equal to
         ``1``, Screening analysis (Type II error). If equal to ``2``,
         Analytic derivatives (similar to Type II error, only valid
-        when identification=1). Default: ``1`` when
-        ``identification=1``, ``0`` otherwise.
+        when identification=1). The ANOVA mapping requires the SS-ANOVA-R MATLAB 
+        Toolbox available at https://joint-research-centre.ec.europa.eu/system/files/2025-01/ss_anova_recurs.zip 
+        Default: ``1`` when ``identification=1``, ``0`` otherwise.
 
     .. option:: morris_nliv = INTEGER
 
