@@ -1,5 +1,7 @@
-function [info, M_, options_, oo_, ReducedForm] = ...
-    solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_)
+function [info, M_, ReducedForm] = ...
+    solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
+% [info, M_, ReducedForm] = ...
+%     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr , endo_steady_state, exo_steady_state, exo_det_steady_state)
 
 % Solves the dsge model for an particular parameters set.
 %
@@ -11,16 +13,18 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % - M_                       [struct]     Model description.
 % - estim_params_            [struct]     Estimated parameters.
 % - bayestopt_               [struct]     Prior definition.
-% - oo_                      [struct]     Dynare results.
+% - bounds                   [struct]     Prior bounds.
+% - dr                       [structure]  Reduced form model.
+% - endo_steady_state        [vector]     steady state value for endogenous variables
+% - exo_steady_state         [vector]     steady state value for exogenous variables
+% - exo_det_steady_state     [vector]     steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - info                     [integer]    scalar, nonzero if any problem occur when computing the reduced form.
 % - M_                       [struct]     M_ description.
-% - options_                 [struct]     Dynare options.
-% - oo_                      [struct]     Dynare results.
 % - ReducedForm              [struct]     Reduced form model.
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,83 +41,25 @@ function [info, M_, options_, oo_, ReducedForm] = ...
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-persistent init_flag restrict_variables_idx state_variables_idx mf0 mf1 number_of_state_variables
-
-info = 0;
+info        = zeros(4,1);
 
 %----------------------------------------------------
 % 1. Get the structural parameters & define penalties
 %----------------------------------------------------
 
-% Test if some parameters are smaller than the lower bound of the prior domain.
-if any(xparam1<bounds.lb)
-    info = 41;
+% Ensure that xparam1 is a column vector.
+% (Don't do the transformation if xparam1 is empty, otherwise it would become a
+%  0×1 matrix, which create issues with older MATLABs when comparing with [] in
+%  check_bounds_and_definiteness_estimation)
+if ~isempty(xparam1)
+    xparam1 = xparam1(:);
+end
+
+M_ = set_all_parameters(xparam1,estim_params_,M_);
+
+[~,info,~,Q,H]=check_bounds_and_definiteness_estimation(xparam1, M_, estim_params_, bounds);
+if info(1)    
     return
-end
-
-% Test if some parameters are greater than the upper bound of the prior domain.
-if any(xparam1>bounds.ub)
-    info = 42;
-    return
-end
-
-% Get the diagonal elements of the covariance matrices for the structural innovations (Q) and the measurement error (H).
-Q = M_.Sigma_e;
-H = M_.H;
-for i=1:estim_params_.nvx
-    k =estim_params_.var_exo(i,1);
-    Q(k,k) = xparam1(i)*xparam1(i);
-end
-offset = estim_params_.nvx;
-if estim_params_.nvn
-    for i=1:estim_params_.nvn
-        H(i,i) = xparam1(i+offset)*xparam1(i+offset);
-    end
-    offset = offset+estim_params_.nvn;
-else
-    H = zeros(size(dataset_.data, 2));
-end
-
-% Get the off-diagonal elements of the covariance matrix for the structural innovations. Test if Q is positive definite.
-if estim_params_.ncx
-    for i=1:estim_params_.ncx
-        k1 =estim_params_.corrx(i,1);
-        k2 =estim_params_.corrx(i,2);
-        Q(k1,k2) = xparam1(i+offset)*sqrt(Q(k1,k1)*Q(k2,k2));
-        Q(k2,k1) = Q(k1,k2);
-    end
-    % Try to compute the cholesky decomposition of Q (possible iff Q is positive definite)
-    [~, testQ] = chol(Q);
-    if testQ
-        % The variance-covariance matrix of the structural innovations is not definite positive.
-        info = 43;
-        return
-    end
-    offset = offset+estim_params_.ncx;
-end
-
-% Get the off-diagonal elements of the covariance matrix for the measurement errors. Test if H is positive definite.
-if estim_params_.ncn
-    corrn_observable_correspondence = estim_params_.corrn_observable_correspondence;
-    for i=1:estim_params_.ncn
-        k1 = corrn_observable_correspondence(i,1);
-        k2 = corrn_observable_correspondence(i,2);
-        H(k1,k2) = xparam1(i+offset)*sqrt(H(k1,k1)*H(k2,k2));
-        H(k2,k1) = H(k1,k2);
-    end
-    % Try to compute the cholesky decomposition of H (possible iff H is positive definite)
-    [~, testH] = chol(H);
-    if testH
-        % The variance-covariance matrix of the measurement errors is not definite positive.
-        info = 44;
-        return
-    end
-    offset = offset+estim_params_.ncn;
-end
-
-% Update estimated structural parameters in Mode.params.
-if estim_params_.np > 0
-    M_.params(estim_params_.param_vals(:,1)) = xparam1(offset+1:end);
 end
 
 % Update M_.Sigma_e and M_.H.
@@ -125,33 +71,27 @@ M_.H = H;
 %------------------------------------------------------------------------------
 
 warning('off', 'MATLAB:nearlySingularMatrix')
-[oo_.dr, info, M_.params] = ...
-    compute_decision_rules(M_, options_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+[dr, info, M_.params] = ...
+    compute_decision_rules(M_, options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 warning('on', 'MATLAB:nearlySingularMatrix')
 
 if info(1)~=0
-    if nargout==5
+    if nargout==3
         ReducedForm = 0;
     end
     return
 end
 
-% Get decision rules and transition equations.
-dr = oo_.dr;
-
 % Set persistent variables (first call).
-if isempty(init_flag)
-    mf0 = bayestopt_.mf0;
-    mf1 = bayestopt_.mf1;
-    restrict_variables_idx  = dr.restrict_var_list;
-    state_variables_idx = restrict_variables_idx(mf0);
-    number_of_state_variables = length(mf0);
-    init_flag = true;
-end
+mf0 = bayestopt_.mf0;
+mf1 = bayestopt_.mf1;
+restrict_variables_idx  = dr.restrict_var_list;
+state_variables_idx = restrict_variables_idx(mf0);
+number_of_state_variables = length(mf0);
 
 
 % Return reduced form model.
-if nargout>4
+if nargout>2
     ReducedForm.ghx = dr.ghx(restrict_variables_idx,:);
     ReducedForm.ghu = dr.ghu(restrict_variables_idx,:);
     ReducedForm.steadystate = dr.ys(dr.order_var(restrict_variables_idx));
@@ -174,7 +114,6 @@ if nargout>4
         ReducedForm.ghuu = zeros(size(restrict_variables_idx,1),n_shocks^2);
         ReducedForm.ghxu = zeros(size(restrict_variables_idx,1),n_states*n_shocks);
         ReducedForm.constant = ReducedForm.steadystate;
-%        ReducedForm.ghs2 = dr.ghs2(restrict_variables_idx,:);
     end
     ReducedForm.state_variables_steady_state = dr.ys(dr.order_var(state_variables_idx));
     ReducedForm.Q = Q;
@@ -194,16 +133,11 @@ if setinitialcondition
         StateVectorVariance = StateVectorVariance(mf0,mf0);
       case 2% Initial state vector covariance is a monte-carlo based estimate of the ergodic variance (consistent with a k-order Taylor-approximation of the model).
         StateVectorMean = ReducedForm.state_variables_steady_state;%.constant(mf0);
-        old_DynareOptionsperiods = options_.periods;
         options_.periods = 5000;
-        old_DynareOptionspruning =  options_.pruning;
         options_.pruning = options_.particle.pruning;
         y_ = simult(dr.ys, dr, M_, options_);
         y_ = y_(dr.order_var(state_variables_idx),2001:options_.periods);
         StateVectorVariance = cov(y_');
-        options_.periods = old_DynareOptionsperiods;
-        options_.pruning = old_DynareOptionspruning;
-        clear('old_DynareOptionsperiods','y_');
       case 3% Initial state vector covariance is a diagonal matrix.
         StateVectorMean = ReducedForm.state_variables_steady_state;%.constant(mf0);
         StateVectorVariance = options_.particle.initial_state_prior_std*eye(number_of_state_variables);

@@ -41,7 +41,7 @@ SimulationFolder = CheckPath('online', M_.dname);
 bounds = prior_bounds(bayestopt_, options_.prior_trunc); % Reset bounds as lb and ub must only be operational during mode-finding
 
 % initialization of state particles
-[~, M_, options_, oo_, ReducedForm] = solve_model_for_online_filter(true, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_);
+[~, ~, ReducedForm] = solve_model_for_online_filter(true, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
 
 order = options_.order;
 mf0 = ReducedForm.mf0;
@@ -80,7 +80,7 @@ for i=1:number_of_particles
     info = 12042009;
     while info
         candidate = Prior.draw();
-        [info, M_, options_, oo_] = solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_);
+        [info] = solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
         if ~info
             xparam(:,i) = candidate(:);
         end
@@ -117,8 +117,8 @@ for t=1:sample_size
     tau_tilde = zeros(1,number_of_particles);
     for i=1:number_of_particles
         % model resolution
-        [info, M_, options_, oo_, ReducedForm] = ...
-            solve_model_for_online_filter(false, fore_xparam(:,i), dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_);
+        [info, M_, ReducedForm] = ...
+            solve_model_for_online_filter(false, fore_xparam(:,i), dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
         if ~info(1)
             steadystate = ReducedForm.steadystate;
             state_variables_steady_state = ReducedForm.state_variables_steady_state;
@@ -211,8 +211,8 @@ for t=1:sample_size
             candidate = xparam(:,i) + chol_sigma_bar*randn(number_of_parameters, 1);
             if all(candidate>=bounds.lb) && all(candidate<=bounds.ub)
                 % model resolution for new parameters particles
-                [info, M_, options_, oo_, ReducedForm] = ...
-                    solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_) ;
+                [info, M_, ReducedForm] = ...
+                    solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
                 if ~info(1)
                     xparam(:,i) = candidate ;
                     steadystate = ReducedForm.steadystate;
@@ -359,12 +359,7 @@ for t=1:sample_size
         end 
     end
     save(sprintf('%s%sparameters_particles-%u.mat', SimulationFolder, filesep(), t), 'xparam');
-
-    str = sprintf(' Lower Bound (95%%) \t Mean \t\t\t Upper Bound (95%%)');
-    for l=1:size(xparam,1)
-        str = sprintf('%s\n %5.4f \t\t %7.5f \t\t %5.4f', str, lb95_xparam(l,t), mean_xparam(l,t), ub95_xparam(l,t));
-    end
-    disp(str)
+    dyntable(options_,'', {'Parameter'; 'Lower Bound (95%)';'Mean';'Upper Bound (95%)'}, bayestopt_.name, [lb95_xparam(:,t), mean_xparam(:,t), ub95_xparam(:,t)], cellofchararraymaxlength(bayestopt_.name)+2, 10, 6)
     disp('')
 
 end
