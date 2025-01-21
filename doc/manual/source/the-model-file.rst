@@ -7052,9 +7052,9 @@ observed variables.
 
     .. option:: prior_trunc = DOUBLE
 
-       Probability of extreme values of the prior density that is
+       Probability of extreme values of the prior density in each tail that is
        ignored when computing bounds for the parameters. Default:
-       ``1e-32``.
+       ``1e-10``.
 
     .. option:: huge_number = DOUBLE
 
