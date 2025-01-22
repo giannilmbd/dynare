@@ -95,7 +95,10 @@ while info_period <= periods
         homotopy_completion_share = oo_.deterministic_simulation.homotopy_completion_share;
         options_.simul.homotopy_max_completion_share = homotopy_completion_share;
     elseif oo_.deterministic_simulation.homotopy_completion_share ~= homotopy_completion_share
-        error('perfect_foresight_solver_with_expectation_errors: could not find a solution for information available at period %d with the same homotopy completion share as period 1\n', info_period)
+        %% NB: in the following message, we don’t use the %.3f formatter because it may round the
+        %% share to a greater number, which would lead to an incorrect suggestion
+        error('perfect_foresight_solver_with_expectation_errors: could not find a solution for information available at period %d with the same homotopy completion share as period 1; a possible solution is to retry the simulation with homotopy_max_completion_share=%s\n', ...
+              info_period, num2str(floor(oo_.deterministic_simulation.homotopy_completion_share*1000)/1000))
     end
 
     endo_simul(:, info_period:end) = oo_.endo_simul;
