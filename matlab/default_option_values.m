@@ -12,7 +12,7 @@ function options_ = default_option_values(M_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2018-2024 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -195,8 +195,7 @@ ep.use_bytecode = 0;
 % Initialization of the perfect foresight equilibrium paths
 % * init=0, previous solution is used.
 % * init=1, a path generated with the first order reduced form is used.
-% * init=2, mix of cases 0 and 1.
-ep.init = 0;
+ep.use_first_order_solution_as_initial_guess = false;
 % Maximum number of iterations for the deterministic solver.
 ep.maxit = 500;
 % Number of periods for the perfect foresight model.

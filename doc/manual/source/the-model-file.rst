@@ -5309,6 +5309,13 @@ which is described below.
        rate or a model with irreversible investment). For specifying the
        necessary complementarity conditions, see :opt:`lmmcp`.
 
+    .. option:: use_first_order_solution
+
+       Utilize the model simulation based on a first-order local
+       approximation as the initial guess for the nonlinear solver in
+       each period. If this is not applied, solution in previous
+       period is used.
+
 
 Typology and ordering of variables
 ----------------------------------

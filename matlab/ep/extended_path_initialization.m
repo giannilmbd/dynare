@@ -16,7 +16,7 @@ function [initial_conditions, innovations, pfm, ep, verbosity, options_, oo_] = 
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2016-2024 Dynare Team
+% Copyright © 2016-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -71,7 +71,7 @@ options_.stack_solve_algo = ep.stack_solve_algo;
 
 % Compute the first order reduced form if needed.
 dr = struct();
-if ep.init
+if ep.use_first_order_solution_as_initial_guess
     options_.order = 1;
     oo_.dr=set_state_space(dr,M_);
     [oo_.dr,info,M_.params] = resol(0,M_,options_,oo_.dr,oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
