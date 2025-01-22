@@ -3896,7 +3896,7 @@ speed-up on large models.
        ``homotopy_marginal_linearization_fallback`` option. It is typically
        used in situations where it is known that homotopy will fail to go
        beyond a certain point, so as to save computing time, while at the same
-       time getting an approximate solution.
+       time getting an approximate solution. Default: ``1``.
 
     .. option:: homotopy_exclude_varexo = (VARIABLE_NAME...)
 
