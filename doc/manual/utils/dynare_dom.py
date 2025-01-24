@@ -242,7 +242,7 @@ class DynSimpleObject(ObjectDescription):
                 self.state_machine.reporter.warning(
                     'duplicate object description of %s, ' % fullname +
                     'other instance in ' +
-                    self.env.doc2path(objects[fullname][0]), line=self.lineno)
+                    str(self.env.doc2path(objects[fullname][0])), line=self.lineno)
             objects[fullname] = self.env.docname, self.objtype
 
         indextext = self.get_index_text(fullname,name_obj)
