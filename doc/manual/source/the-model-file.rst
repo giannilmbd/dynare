@@ -3868,6 +3868,11 @@ speed-up on large models.
        the homotopy procedure has been able to find a solution, then the approximate
        solution returned is :math:`\frac{y(s^*)-y(0)}{s^*}`.
 
+       If linearization is triggered, the variable
+       :mvar:`oo_.deterministic_simulation.homotopy_linearization` is set, and
+       the simulation corresponding to share :math:`s^*` is stored in
+       :mvar:`oo_.deterministic_simulation.sim1`.
+
     .. option:: homotopy_marginal_linearization_fallback [= DOUBLE]
 
        Whenever the homotopy procedure is not able to find a solution for 100%
@@ -3886,6 +3891,13 @@ speed-up on large models.
        :math:`y(s^*)+(1-s^*)\frac{y(s^*)-y(s^*-\epsilon)}{\epsilon}`. The value
        of :math:`\epsilon` is ``0.01`` by default, but can be modified by
        passing some other value to the option.
+
+       If marginal linearization is triggered, the variable
+       :mvar:`oo_.deterministic_simulation.homotopy_marginal_linearization` is
+       set. Moreover, the simulation corresponding to share :math:`s^*` is
+       stored in :mvar:`oo_.deterministic_simulation.sim1`, and the one
+       corresponding to share :math:`s^*-\epsilon` is stored in
+       :mvar:`oo_.deterministic_simulation.sim2`.
 
     .. option:: homotopy_max_completion_share = DOUBLE
 
@@ -4048,12 +4060,15 @@ speed-up on large models.
     *Output*
 
     The simulated endogenous variables are available in global matrix
-    ``oo_.endo_simul``.
+    :mvar:`oo_.endo_simul`.
 
     If any of the ``first_simulation_period`` or ``last_simulation_period``
     option was passed to the preceding :comm:`perfect_foresight_setup` command,
     a time series object containing both endogenous and exogenous variables is
     stored in the workspace variable :mvar:`Simulated_time_series`.
+
+    The variable :mvar:`oo_.deterministic_simulation.status` indicates whether
+    the simulation was successful or not.
 
 .. command:: simul ;
              simul (OPTIONS...);
@@ -4131,6 +4146,42 @@ speed-up on large models.
     computed on the model *after* the transformations related to auxiliary
     variables, so in practice it is either 1 or 0 (the latter value corresponds
     to a purely backward or static model).
+
+.. matvar:: oo_.deterministic_simulation.status
+
+    |br| Set to ``true`` by the :comm:`perfect_foresight_solver` command if the
+    simulation succeeded, otherwise set to ``false``.
+
+.. matvar:: oo_.deterministic_simulation.homotopy_linearization
+
+    |br| Set to ``true`` by the :comm:`perfect_foresight_solver` command if
+    linearization has been used to compute an approximate solution.
+
+.. matvar:: oo_.deterministic_simulation.homotopy_marginal_linearization
+
+    |br| Set to ``true`` by the :comm:`perfect_foresight_solver` command if
+    marginal linearization has been used to compute an approximate solution.
+
+.. matvar:: oo_.deterministic_simulation.sim1
+
+    |br| Set by the :comm:`perfect_foresight_solver` command if either
+    linearization or marginal linearization has been used to compute an
+    approximate solution. This structure contains the simulation corresponding
+    to the greatest share of the shocks for which an exact solution could be
+    computed. The subfield ``homotopy_completion_share`` contains that share.
+    The subfields ``endo_simul``, ``exo_simul``, ``steady_state`` and
+    ``exo_steady_state`` respectively contain the path of endogenous, the path
+    of exogenous, the steady state of endogenous and the steady state of
+    exogenous for that simulation (with the same conventions as the fields of
+    of the same name in ``oo_``).
+
+.. matvar:: oo_.deterministic_simulation.sim2
+
+    |br| Set by the :comm:`perfect_foresight_solver` command if marginal
+    linearization has been used to compute an approximate solution. This
+    structure contains the simulation corresponding to a share marginally
+    smaller that the one in :mvar:`oo_.deterministic_simulation.sim1`. The
+    subfields are the same as in :mvar:`oo_.deterministic_simulation.sim1`.
 
 Perfect foresight with expectation errors
 -----------------------------------------
