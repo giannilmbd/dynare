@@ -485,7 +485,7 @@ if iload <=0
             kk=0;
             while kk<50 && info(1)
                 kk=kk+1;
-                params = Prior.draw();
+                params = Prior.draw()'; %column vector is expected
                 options_ident.tittxt = 'Random_prior_params'; %title text for graphs and figures
                 % perform identification analysis
                 [ide_moments_point, ide_spectrum_point, ide_minimal_point, ide_hess_point, ide_reducedform_point, ide_dynamic_point, ~, info, error_indicator_point] = ...
@@ -504,7 +504,10 @@ if iload <=0
         else
             % found a (random) point that solves the model
             fprintf('Found a random draw from the priors that solves the model:\n');
-            disp(params);
+            labels = name;
+            headers = {'Name', 'Value'};
+            lh = cellofchararraymaxlength(labels)+2;
+            dyntable(options_, 'Feasible draw', headers, labels, params', lh, 10, 6);
             fprintf('Identification now continues for this draw.');
             parameters = 'Random_prior_params';
             parameters_TeX = 'Random prior parameter draw';

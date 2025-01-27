@@ -297,6 +297,15 @@ if info(1) == 0 %no errors in solution
                 options_.analytic_derivation     = -2; %this sets asy_Hess=1 in dsge_likelihood.m                
                 [info, oo_, options_, M_] = stoch_simul(M_, options_, oo_, options_.varobs);
                 dataset_ = dseries(oo_.endo_simul(options_.varobs_id,100+1:end)',dates('1Q1'), options_.varobs); %get information on moments
+                % set info on missing data
+                if dataset_info.missing.state
+                    [dataset_info.missing.aindex, dataset_info.missing.number_of_observations, dataset_info.missing.no_more_missing_observations, dataset_info.missing.vindex] = ...
+                        describe_missing_data(dataset_.data);
+                else
+                    dataset_info.missing.aindex = num2cell(transpose(repmat(1:dataset_.vobs,dataset_.nobs,1)),1);
+                    dataset_info.missing.no_more_missing_observations = 1;
+                end
+
                 derivatives_info.no_DLIK = 1;
                 bounds = prior_bounds(bayestopt_, options_.prior_trunc); %reset bounds as lb and ub must only be operational during mode-finding 
                 %note that for order>1 we do not provide any information on DT,DYss,DOM in derivatives_info, such that dsge_likelihood creates an error. Therefore the computation will be based on simulated_moment_uncertainty for order>1.
