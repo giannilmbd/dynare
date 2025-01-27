@@ -237,6 +237,14 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
     optimizer_vec = [options_.mode_compute;num2cell(options_.additional_optimizer_steps)];
     for optim_iter = 1:length(optimizer_vec)
         current_optimizer = optimizer_vec{optim_iter};
+        if isnumeric(current_optimizer)
+            if current_optimizer==5
+                if options_.analytic_derivation
+                    old_analytic_derivation = options_.analytic_derivation;
+                    options_.analytic_derivation=-1; %force analytic outer product gradient hessian for each iteration
+                end
+            end
+        end
         [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info] = dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
         fprintf('\nFinal value of minus the log posterior (or likelihood):%f \n', fval);
 
@@ -244,6 +252,9 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
             if current_optimizer==5
                 newratflag = new_rat_hess_info.newratflag;
                 new_rat_hess_info = new_rat_hess_info.new_rat_hess_info;
+                if options_.analytic_derivation
+                    options_.analytic_derivation = old_analytic_derivation;
+                end
             elseif current_optimizer==6 %save scaling factor
                 save([M_.dname filesep 'Output' filesep M_.fname '_optimal_mh_scale_parameter.mat'],'Scale');
                 options_.mh_jscale = Scale;
