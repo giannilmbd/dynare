@@ -173,12 +173,12 @@ if get_option('build_for') == 'matlab'
   umfpack_dep = declare_dependency(link_args : '-lmwumfpack', dependencies : blas_dep)
   ut_dep = declare_dependency(link_args : '-lut')
 
-  # Workaround for Meson bug https://github.com/mesonbuild/meson/issues/12757
-  # Use the C compiler as a fallback for detecting SLICOT under Linux with
-  # prefer_static=true (but still try the Fortran compiler to honour the -B
-  # option in fortran_args, as documented). Needed for building the MATLAB
-  # Online package.
-  if get_option('prefer_static') and host_machine.system() == 'linux'
+  if meson.version().version_compare('<1.7.0') and get_option('prefer_static') and host_machine.system() == 'linux'
+    # Workaround for Meson bug https://github.com/mesonbuild/meson/issues/12757 (fixed in 1.7.0)
+    # Use the C compiler as a fallback for detecting SLICOT under Linux with
+    # prefer_static=true (but still try the Fortran compiler to honour the -B
+    # option in fortran_args, as documented). Needed for building the MATLAB
+    # Online package.
     slicot_dep_tmp = fortran_compiler.find_library('slicot64_pic', required : false)
     if not slicot_dep_tmp.found()
       slicot_dep_tmp = c_compiler.find_library('slicot64_pic')
