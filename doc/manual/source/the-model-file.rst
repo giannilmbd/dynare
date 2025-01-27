@@ -11731,9 +11731,9 @@ the :comm:`bvar_forecast` command.
             oo_.conditional_forecast.uncond.FORECAST_MOMENT.VARIABLE_NAME
 
 
-    .. matvar:: forecasts.instruments
+    .. matvar:: oo_.conditional_forecast.instruments
 
-        Variable set by the ``conditional_forecast command``. Stores
+        Variable set by the ``conditional_forecast`` command. Stores
         the names of the exogenous instruments.
 
 
