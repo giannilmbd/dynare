@@ -277,8 +277,6 @@ switch minimizer_algorithm
         prior_information.p2=NaN(n_params,1);
     end
     if options_.analytic_derivation
-        old_analytic_derivation = options_.analytic_derivation;
-        options_.analytic_derivation=-1; %force analytic outer product gradient hessian for each iteration
         analytic_grad=1;
         crit = options_.newrat.tolerance.f_analytic;
         newratflag = 0; %analytical Hessian
@@ -340,9 +338,6 @@ switch minimizer_algorithm
     [opt_par_values,hessian_mat,~,fval,~,new_rat_hess_info] = newrat(objective_function,start_par_value,bounds,analytic_grad,crit,nit,0,Verbose,Save_files,hess_info,prior_information.p2,options_.gradient_epsilon,parameter_names,varargin{:});    %hessian_mat is the plain outer product gradient Hessian
     new_rat_hess_info.new_rat_hess_info = new_rat_hess_info;
     new_rat_hess_info.newratflag = newratflag;
-    if options_.analytic_derivation 
-        options_.analytic_derivation = old_analytic_derivation;
-    end
   case 6
     if isempty(prior_information) %Inf will be reset
         prior_information.p2=Inf(n_params,1);
