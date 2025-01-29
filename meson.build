@@ -823,6 +823,7 @@ mod_and_m_tests = [
   { 'test' : [ 'estimation/slice/fs2000_slice.mod' ],
     'extra' : [ 'estimation/fsdat_simul.m' ] },
   { 'test' : [ 'analytic_derivatives/fs2000_analytic_derivation.mod' ] },
+  { 'test' : [ 'analytic_derivatives/fs2000_analytic_derivation_newrat.mod' ] },
   { 'test' : [ 'analytic_derivatives/BrockMirman_PertParamsDerivs.mod' ],
     'extra' : [ 'analytic_derivatives/nBrockMirmanSYM.mat' ] },
   { 'test' : [ 'analytic_derivatives/burnside_3_order_PertParamsDerivs.mod' ] },
