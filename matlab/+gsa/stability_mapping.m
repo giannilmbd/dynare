@@ -92,6 +92,10 @@ xparam1=[];
 [~,~,~,lb,ub] = set_prior(estim_params_,M_,options_); %Prepare bounds
 if ~isempty(bayestopt_) && any(bayestopt_.pshape > 0)
     % Set prior bounds
+    if options_.prior_trunc==0
+        fprintf('\nstability_mapping: GSA with priors requires bounded support. Setting options_.prior_trunc=1e-10.\n')
+        options_.prior_trunc=1e-10;
+    end
     bounds = prior_bounds(bayestopt_, options_.prior_trunc);
     bounds.lb = max(bounds.lb,lb);
     bounds.ub = min(bounds.ub,ub);

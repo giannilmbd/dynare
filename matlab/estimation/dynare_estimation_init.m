@@ -117,6 +117,14 @@ if isequal(options_.diffuse_filter,1) || (options_.kalman_algo>2)
     end
 end
 
+if strcmp('slice',options_.posterior_sampler_options.posterior_sampling_method)
+    if options_.prior_trunc==0
+        fprintf('\ndynare_estimation_init: slice requires bounded support. Setting options_.prior_trunc=1e-10.\n')
+        options_.prior_trunc=1e-10;
+    end
+end
+
+
 options_=select_qz_criterium_value(options_);
 
 % Set options related to filtered variables.
