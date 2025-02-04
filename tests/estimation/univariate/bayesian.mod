@@ -47,7 +47,7 @@ s2df = 1;
 // form expression for the joint posterior marginal distribution of β, a Gibbs
 // sampling algorithm is used (the prior for β and the inverse of σ² are independent).
 
-gibbslength = 1000000; // Set the number of iterations in Gibbs 
+gibbslength = 300000; // Set the number of iterations in Gibbs 
 burnin = 10000;        // Set the number of iterations to be discarded (try to remove the effects of the initial condition).
 steps = 10;            // Do not record all iterations (try to remove the dependence between the draws).
 
