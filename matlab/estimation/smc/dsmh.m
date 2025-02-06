@@ -76,30 +76,16 @@ zhat = 0 ;
 % The DSMH starts here
 dprintf('#Iter.       lambda         ESS                 c     Accept. rate       scale      resample    seconds')
 for i=2:opts.H
-    resampled_particle_swarm = false;
     t0 = tic;
     % Step 1: sort the densities and compute IS weights
     [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1, loglik,param) ;
     [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param, tlogpost_iminus1, loglik, lambda, i, zhat, ESS) ;
-    % resample if necessary?
-    if (2*ESS(i) < opts.particles) %
-        resampled_particle_swarm = true;
-        iresample = kitagawa(weights);
-        param = param(:,iresample);
-        loglik = loglik(iresample);
-        tlogpost_i = tlogpost_i(iresample);
-        weights = ones(opts.particles, 1)/opts.particles;
-    end
     % Step 2: tune c_i
     [c,acpt] = tune_c(funobj, param, tlogpost_i, lambda, i, c, Omegachol, weights, mh_bounds, opts, Prior) ;
     % Step 3: Metropolis step
     [param,tlogpost_iminus1,loglik] = mutation_DSMH(funobj, param, tlogpost_i, tlogpost_iminus1, loglik, lambda, i, c, MM, Omegachol, weights, mh_bounds, opts, Prior) ;
     tt = toc(t0) ;
-    if resampled_particle_swarm
-        dprintf('%3u          %5.4f     %9.5E         %5.4f        %5.4f        %+5.4f        %3s       %5.2f', i, lambda(i), ESS(i), c, acpt, zhat, 'yes', tt)
-    else
-        dprintf('%3u          %5.4f     %9.5E         %5.4f        %5.4f        %+5.4f        %3s       %5.2f', i, lambda(i), ESS(i), c, acpt, zhat, 'no', tt)
-    end
+    dprintf('%3u          %5.4f     %9.5E         %5.4f        %5.4f        %+5.4f        %3s       %5.2f', i, lambda(i), ESS(i), c, acpt, zhat, 'no', tt)
     %save(sprintf('%s%sparticles-%u-%u.mat', SimulationFolder, filesep(), i, opts.H), 'param', 'tlogpost', 'loglik')
 end
 
