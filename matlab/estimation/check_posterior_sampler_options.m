@@ -506,6 +506,9 @@ if init
               end
           end
 
+          if posterior_sampler_options.particles<posterior_sampler_options.N*posterior_sampler_options.G
+              error('check_posterior_sampler_options:: DSMH requires particles to be at least than N*G = %u ',posterior_sampler_options.N*posterior_sampler_options.G);             
+          end
           options_.mode_compute = 0;
           options_.cova_compute = 0;
           options_.mh_replic = 0;
