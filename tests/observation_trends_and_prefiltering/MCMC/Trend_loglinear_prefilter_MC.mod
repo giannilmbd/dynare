@@ -7,7 +7,7 @@ estimation(order=1,datafile='Trend_loglinear_prefilter_MC_Exp_AR1_trend_data_wit
     mode_compute=4,silent_optimizer,first_obs=1,loglinear,smoother,forecast=100,prefilter=1,
     mcmc_jumping_covariance='Trend_loglinear_prefilter_MC_MCMC_jump_covar_prefilter',
     filtered_vars, filter_step_ahead = [1,2,4],
-    mh_nblocks=1,mh_jscale=1e-4) P_obs Y_obs junk2;
+    mh_nblocks=1,mh_jscale=1e-4,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
     
 load('Trend_loglinear_prefilter_MC_Exp_AR1_trend_data_with_constant');
 @#include "../Trend_load_data_common.inc" 

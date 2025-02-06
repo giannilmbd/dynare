@@ -105,7 +105,7 @@ varobs y l i ;
 %datatomfile('mysample')
 %return;
 
-data(file='./mysample.m',first_obs=801Y,nobs=200); %no measurement errors added in the simulated data
+data(file='./mysample.m',first_obs=801Y,nobs=50); %no measurement errors added in the simulated data
 
 @#if LINEAR_KALMAN
 	estimation(nograph,order=1,mode_compute=8,silent_optimizer,mh_replic=0,additional_optimizer_steps=[8 4],mode_check);
@@ -155,7 +155,7 @@ estimation(order=3,nograph,filter_algorithm=gf,proposal_approximation=montecarlo
 %  estimation(order=3,nograph,number_of_particles=10000,mode_compute=11,mh_replic=0,particle_filter_options=('liu_west_delta',0.9));
   estimation(order=1,posterior_sampling_method='online',posterior_sampler_options=('particles',1000));
   estimation(order=2,posterior_sampling_method='online',posterior_sampler_options=('particles',1000));
-  estimation(order=3,posterior_sampling_method='online',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
+  estimation(order=3,posterior_sampling_method='online',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=100,posterior_sampler_options=('particles',100));
 @#endif
 
 @#if MCMC

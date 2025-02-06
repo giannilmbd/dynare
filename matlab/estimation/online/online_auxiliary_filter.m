@@ -31,6 +31,7 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 
 % Set seed for randn().
 options_ = set_dynare_seed_local_options(options_,'default');
+options_.verbosity=0; %particularly suppress warning messages during k_order_pert within the loop
 pruning = options_.particle.pruning;
 variance_update = true;
 online_opt = options_.posterior_sampler_options.current_options;
@@ -78,10 +79,10 @@ xparam = zeros(number_of_parameters,number_of_particles);
 Prior = dprior(bayestopt_, options_.prior_trunc);
 for i=1:number_of_particles
     info = 12042009;
-    while info
+    while info(1)
         candidate = Prior.draw();
         [info] = solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
-        if ~info
+        if ~info(1)
             xparam(:,i) = candidate(:);
         end
     end
