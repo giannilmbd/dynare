@@ -7112,7 +7112,7 @@ observed variables.
 
        Probability of extreme values of the prior density in each tail that is
        ignored when computing bounds for the parameters. Default:
-       ``1e-10``.
+       ``1e-10`` for ``posterior_sampling_method=slice`` and ``0`` otherwise .
 
     .. option:: huge_number = DOUBLE
 
