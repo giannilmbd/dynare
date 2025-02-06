@@ -78,5 +78,6 @@ if ~oo_.deterministic_simulation.status
    error('Perfect foresight simulation failed')
 end
 
+dsample 2 50;
 rplot Consumption;
 rplot Capital;
