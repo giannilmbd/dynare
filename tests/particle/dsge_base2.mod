@@ -8,7 +8,7 @@
 @#endif
 
 @#ifndef ALGO_SIR
-    @#define ALGO_SIR = 0
+    @#define ALGO_SIR = 1
 @#endif
 
 @#ifndef ALGO_APF
@@ -36,7 +36,7 @@
 @#endif
 
 @#ifndef DSMH
-    @#define DSMH = 1
+    @#define DSMH = 0
 @#endif
 
 @#include "dsge_base.inc"
@@ -53,9 +53,9 @@
 @#endif
 
 @#if ALGO_SIR
-	estimation(order=2,nograph,number_of_particles=10000,mh_replic=0,mode_compute=8,cova_compute=0);
-	estimation(order=2,nograph,number_of_particles=10000,mh_replic=0,silent_optimizer,mode_compute=8,additional_optimizer_steps=[8 8],cova_compute=0);
-	estimation(order=3,nograph,number_of_particles=10000,mh_replic=0,silent_optimizer,mode_compute=8,additional_optimizer_steps=[8 8],cova_compute=0);
+	estimation(order=2,nograph,number_of_particles=1000,mh_replic=0,mode_compute=8,cova_compute=0);
+%	estimation(order=2,nograph,number_of_particles=1000,mh_replic=0,silent_optimizer,mode_compute=8,additional_optimizer_steps=[8 8],cova_compute=0);
+%	estimation(order=3,nograph,number_of_particles=100,mh_replic=0,mode_file='dsge_base2/Output/dsge_base2_mode.mat',mode_compute=8,cova_compute=0);
 @#endif
 
 @#if ALGO_APF
@@ -121,16 +121,4 @@ estimation(order=3,nograph,filter_algorithm=gf,proposal_approximation=montecarlo
       stderr i, 0.0001;
   end;  
 estimation(order=3,filter_algorithm=nlkf,number_of_particles=10000,proposal_approximation=montecarlo,resampling=none,silent_optimizer,mode_compute=0,cova_compute=0,MCMC_jumping_covariance=prior_variance,mh_init_scale_factor=0.01);
-@#endif
-
-@#if HSSMC
-  estimation(order=1,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
-%  estimation(order=2,posterior_sampling_method='hssmc',posterior_sampler_options=('particles',1000));
-%  estimation(order=3,posterior_sampling_method='hssmc',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
-@#endif
-
-@#if DSMH
-  estimation(order=1,posterior_sampling_method='dsmh',posterior_sampler_options=('particles',200));
-%  estimation(order=2,posterior_sampling_method='dsmh',posterior_sampler_options=('particles',1000));
-%  estimation(order=3,posterior_sampling_method='dsmh',filter_algorithm=nlkf,proposal_approximation=montecarlo,number_of_particles=500,posterior_sampler_options=('particles',500));
 @#endif
