@@ -78,5 +78,22 @@ end;
 
 conditional_forecast(parameter_set=calibration, controlled_varexo=(e_a,e_m));
 
-plot_conditional_forecast(periods=10) gy_obs gp_obs;
+results_1=struct2array(oo_.conditional_forecast.cond.Mean);
 
+plot_conditional_forecast(periods=10) gy_obs gp_obs;
+xx=[0.01 -0.02 0 0 0];
+conditional_forecast_paths;
+var gy_obs;
+periods  1:5;
+values   (xx);
+var gp_obs;
+periods 1:5;
+values  0.05;
+end;
+
+conditional_forecast(parameter_set=calibration, controlled_varexo=(e_a,e_m));
+results_2=struct2array(oo_.conditional_forecast.cond.Mean);
+
+if max(max(abs(results_1-results_2)))>1e-10
+    error('Interface wrong')
+end
