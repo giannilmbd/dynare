@@ -97,22 +97,22 @@ plot(id, zeros(1,length(id)), 'or')
 hold off
 
 figure(4)
-plot(endogenousvariables.i,'-k','linewidth',2)
+plot(endogenousvariables(1Y:100Y).i,'-k','linewidth',2)
 hold on
-plot(SimulatedData.i(1Y:100Y),'--r','linewidth',2)
+plot(SimulatedData(1Y:100Y).i,'--r','linewidth',2)
 hold off
 title('Nominal interest rate')
 
 figure(5)
-plot(endogenousvariables.y,'-k','linewidth',2)
+plot(endogenousvariables(1Y:100Y).y,'-k','linewidth',2)
 hold on
-plot(SimulatedData.y(1Y:100Y),'--r','linewidth',2)
+plot(SimulatedData(1Y:100Y).y,'--r','linewidth',2)
 hold off
 title('Output gap')
 
 figure(6)
-plot(endogenousvariables.pi,'-k','linewidth',2)
+plot(endogenousvariables(1Y:100Y).pi,'-k','linewidth',2)
 hold on
-plot(SimulatedData.pi(1Y:100Y),'--r','linewidth',2)
+plot(SimulatedData(1Y:100Y).pi,'--r','linewidth',2)
 hold off
 title('Inflation gap')
