@@ -1,4 +1,4 @@
-Announcement for Dynare 6.3
+Announcement for Dynare 6.3 (on 2025-02-19)
 ===========================================
 
 We are pleased to announce the release of Dynare 6.3.
@@ -15,20 +15,31 @@ the Windows package requires version 9.4.0 specifically).
 Here is a list of the problems identified in version 6.2 and that have been
 fixed in version 6.3:
 
-* OccBin with option `smoother_inversion_filter` would crash the MCMC estimation if the `filtered_variables` or `filter_step_ahead` options were used
-* OccBin with option `smoother_inversion_filter` would use the PKF if `mh_replic>0`
-* OccBin with option `smoothed_state_uncertainty` would crash Dynare if the MCMC smoother was run after the classical one
-* OccBin's smoother would crash when encountering an internal error due to the output of the linear smoother not having been computed
+* OccBin with option `smoother_inversion_filter` would crash the MCMC
+  estimation if the `filtered_variables` or `filter_step_ahead` options were
+  used
+* OccBin with option `smoother_inversion_filter` would use the PKF if
+  `mh_replic>0`
+* OccBin with option `smoothed_state_uncertainty` would crash Dynare if the
+  MCMC smoother was run after the classical one
+* OccBin's smoother would crash when encountering an internal error due to the
+  output of the linear smoother not having been computed
 * Calling `model_info` with `differentiate_forward_vars` would crash
-* The `identification` command would compute the asymptotic Hessian via simulation instead of via moments as intended
-* The `identification` command would crash during prior sampling if the initial draw did not solve the model
+* The `identification` command would compute the asymptotic Hessian via
+  simulation instead of via moments as intended
+* The `identification` command would crash during prior sampling if the initial
+  draw did not solve the model
 * The `gsa_sample_file` was broken
-* Optimization algorithm `mode_compute=5` (`newrat`) would crash with `analytic_derivation`
-* `discretionary_policy` would crash if the model was purely forward-looking
+* Optimization algorithm `mode_compute=5` (`newrat`) would crash with
+  `analytic_derivation`
+* The `discretionary_policy` command would crash if the model was purely
+  forward-looking
 * The `dsample` command would crash
 * The `conditional_forecast_paths` block did not accept vector inputs
-* For MCMC chains with fewer than 6000 draws, the default number of `sub_draws` used to compute posterior moments was incorrect
-* Bi-annual dates (e.g. `2024S1` or `2024H1`) were not accepted within Dynare statements
+* For MCMC chains with fewer than 6000 draws, the default number of `sub_draws`
+  used to compute posterior moments was incorrect
+* Bi-annual dates (e.g. `2024S1` or `2024H1`) were not accepted within Dynare
+  statements
 * Plotting `dseries` did not correctly show dates on the x-axis
 
 
