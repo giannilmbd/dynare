@@ -36,6 +36,10 @@ function [ts,oo_] = extended_path(initialconditions, samplesize, exogenousvariab
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+if ~isempty(M_.perfect_foresight_controlled_paths)
+    error('extended_path command is not compatible with perfect_foresight_controlled_paths block')
+end
+
 [initialconditions, innovations, pfm, options_, oo_] = ...
     extended_path_initialization(initialconditions, samplesize, exogenousvariables, options_, M_, oo_);
 

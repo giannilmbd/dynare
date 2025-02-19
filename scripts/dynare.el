@@ -1,7 +1,7 @@
 ;;; dynare.el --- major mode for editing Dynare mod files
 
 ;; Copyright © 2010 Yannick Kalantzis
-;; Copyright © 2019-2024 Dynare Team
+;; Copyright © 2019-2025 Dynare Team
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@
   '("stderr" "values" "periods" "scales" "restriction" "exclusion"
     "upper_cholesky" "lower_cholesky" "equation" "bind" "relax" "error_bind"
     "error_relax" "add" "multiply" "target" "auxname_target_nonstationary"
-    "component" "growth" "auxname" "kind" "weights")
+    "component" "growth" "auxname" "kind" "weights" "exogenize" "endogenize")
   "Dynare statements-like keywords.")
 
 ;; Those keywords that makes the lexer enter the DYNARE_BLOCK start condition
@@ -106,7 +106,7 @@
       "conditional_forecast_paths" "svar_identification" "moment_calibration"
       "irf_calibration" "ramsey_constraints" "generate_irfs" "matched_moments"
       "occbin_constraints" "model_replace" "pac_target_info" "matched_irfs"
-      "matched_irfs_weights" "verbatim")
+      "matched_irfs_weights" "perfect_foresight_controlled_paths" "verbatim")
     "Dynare block keywords."))
 
 ;; Mathematical functions and operators used in model equations (see "hand_side" in Bison file)

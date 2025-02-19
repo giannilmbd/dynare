@@ -1,4 +1,4 @@
-function [y, success, maxerror, iter, per_block_status] = perfect_foresight_solver_core(y, exo_simul, steady_state, exo_steady_state, M_, options_)
+function [y, success, maxerror, iter, per_block_status, exo_simul] = perfect_foresight_solver_core(y, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period, M_, options_)
 
 % Core function calling solvers for perfect foresight model
 %
@@ -7,6 +7,9 @@ function [y, success, maxerror, iter, per_block_status] = perfect_foresight_solv
 % - exo_simul           [matrix] path of exogenous
 % - steady_state        [vector] steady state of endogenous variables
 % - exo_steady_state    [vector] steady state of exogenous variables
+% - controlled_paths_by_period [struct] describes flips between endos and exos, typically
+%                          extracted from perfect_foresight_controlled_paths block;
+%                          Can be an empty array if no such flip is requested
 % - M_                  [struct] contains a description of the model.
 % - options_            [struct] contains various options.
 %
@@ -73,6 +76,25 @@ if options_.endogenous_terminal_period
     end
 end
 
+if ~isempty(controlled_paths_by_period)
+    assert(nargout >= 6); % Ensure modified exos are used
+    if ~ismember(options_.stack_solve_algo, [0 1 2 3 6])
+        error('perfect_foresight_controlled_paths is only available with stack_solve_algo option equal to 0, 1, 2, 3 or 6')
+    end
+    if options_.bytecode
+        error('perfect_foresight_controlled_paths is not available with the bytecode option')
+    end
+    if options_.block
+        error('perfect_foresight_controlled_paths is not available with the block option')
+    end
+    if options_.linear
+        error('perfect_foresight_controlled_paths is not available with the linear option')
+    end
+    if M_.maximum_endo_lead == 0 || M_.maximum_endo_lag == 0
+        error('perfect_foresight_controlled_paths is not available with purely backward, purely forward or static models')
+    end
+end
+
 
 if options_.linear && ismember(options_.stack_solve_algo, [0 7]) && ~options_.block ...
         && ~options_.bytecode && M_.maximum_endo_lead > 0 && M_.maximum_endo_lag > 0
@@ -124,10 +146,10 @@ else
                 if options_.linear_approximation
                     [y, success, maxerror] = sim1_linear(y, exo_simul, steady_state, exo_steady_state, M_, options_);
                 else
-                    [y, success, maxerror, iter] = sim1(y, exo_simul, steady_state, M_, options_);
+                    [y, success, maxerror, iter, exo_simul] = sim1(y, exo_simul, steady_state, controlled_paths_by_period, M_, options_);
                 end
               case {1 6}
-                [y, success, maxerror, iter] = sim1_lbj(y, exo_simul, steady_state, M_, options_);
+                [y, success, maxerror, iter, exo_simul] = sim1_lbj(y, exo_simul, steady_state, controlled_paths_by_period, M_, options_);
               case 7
                 if options_.linear_approximation
                     if options_.solve_algo == 10 || options_.solve_algo == 11

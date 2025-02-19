@@ -278,7 +278,7 @@ License: GPL-3+
 
 Files: scripts/dynare.el
 Copyright: 2010 Yannick Kalantzis
-           2019-2024 Dynare Team
+           2019-2025 Dynare Team
 License: GPL-3+
 
 Files: mex/sources/gensylv/gensylv.cc

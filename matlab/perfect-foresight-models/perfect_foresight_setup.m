@@ -78,3 +78,15 @@ end
 
 oo_ = make_ex_(M_,options_,oo_);
 oo_ = make_y_(M_,options_,oo_);
+
+if isempty(M_.perfect_foresight_controlled_paths)
+    oo_.deterministic_simulation.controlled_paths_by_period = [];
+else
+    for i=1:length(M_.perfect_foresight_controlled_paths)
+        learnt_in = M_.perfect_foresight_controlled_paths(i).learnt_in;
+        if ~isa(learnt_in, 'numeric') || ~isequal(learnt_in, 1)
+            error('A perfect_foresight_controlled_paths(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
+        end
+    end
+    oo_.deterministic_simulation.controlled_paths_by_period = controlled_paths_by_period(M_, options_);
+end

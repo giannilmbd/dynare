@@ -76,7 +76,7 @@ if order == 0
     oo_.steady_state = steady_state;
     options_.solve_algo = solve_algo;
     options_.stack_solve_algo = stack_solve_algo;
-    [endogenousvariablespaths, info_convergence] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, M_, options_);
+    [endogenousvariablespaths, info_convergence] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, [], M_, options_);
 else
     % Stochastic Extended Path
     switch(algo)

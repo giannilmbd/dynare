@@ -4616,6 +4616,144 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     the terminal condition for exogenous indexed ``k``, as anticipated from
     period ``s``, is stored in ``oo_.pfwee.terminal_info(k,s)``.
 
+
+Controlling the path of endogenous variables
+--------------------------------------------
+
+In the usual perfect foresight problem, the user controls the path of exogenous
+variables for the simulation periods and the initial and terminal
+conditions for endogenous variables, while Dynare solves for the path of
+endogenous variables for the simulation periods.
+
+However, Dynare offers the possibility of controlling the value of some
+endogenous variables for some simulation periods (in which case some exogenous
+variables must be left free and are thus solved for by Dynare, to avoid
+over-determination of the problem). This exercise is called “conditional
+forecasting” in some contexts (even though one may argue that this is not
+really forecasting, since perfect foresight by the agents is assumed; for the
+stochastic case, see the :comm:`conditional_forecast` command).
+
+The description of controlled endogenous variables is done using the
+``perfect_foresight_controlled_paths`` block. The information given therein is
+then processed by the :comm:`perfect_foresight_setup` (or
+:comm:`perfect_foresight_with_expectation_errors_setup`) command, so
+that the next :comm:`perfect_foresight_solver` (or
+:comm:`perfect_foresight_with_expectation_errors_solver`) command
+computes the simulation with controlled paths. In particular,
+:mvar:`oo_.exo_simul` will contain the computed value of exogenous variables
+that have been left free.
+
+.. block:: perfect_foresight_controlled_paths ;
+           perfect_foresight_controlled_paths(OPTIONS...);
+
+    |br| This block is used to tell the perfect foresight solver that the value
+    of some endogenous variables will be controlled (in other words, they will
+    be exogenized). It also gives the period(s) for which this control applies,
+    the value(s) imposed to the endogenous variable(s), and the exogenous
+    variable(s) that are left free at the same period(s) (in other words,
+    those exogenous are endogenized).
+
+    The block should contain one or more occurrences of the following
+    group of four lines::
+
+      exogenize ENDOGENOUS_NAME;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
+      values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
+      endogenize EXOGENOUS_NAME;
+
+    Note that it is possible to have both
+    ``perfect_foresight_controlled_paths`` and regular :bck:`shocks` blocks in
+    the same ``.mod`` file (assuming of course that taken together they do not
+    impose inconsistent constraints).
+
+    The ``perfect_foresight_controlled_paths`` block requires that the
+    :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` option be equal to
+    either ``0``, ``1``, ``2``, ``3`` or ``6``, and is incompatible with the
+    :opt:`block`, :opt:`linear` and :opt:`bytecode` options of the :bck:`model`
+    block.
+
+    *Options*
+
+    .. option:: learnt_in = INTEGER | DATE
+
+       Used in conjunction with
+       :comm:`perfect_foresight_with_expectation_errors_setup` and
+       :comm:`perfect_foresight_with_expectation_errors_solver` commands,
+       specifies the period or date at which this controlled paths block is
+       learnt by agents.
+
+    *Example (perfect foresight)*
+
+        ::
+
+            var c k;
+            varexo x z;
+
+            ...
+
+            shocks;
+              var x;
+              periods 1;
+              values 1.2;
+            end;
+
+            perfect_foresight_controlled_paths;
+              exogenize c;
+              periods 2 4:5;
+              values 1.6 1.7;
+              endogenize x;
+
+              exogenize k;
+              periods 7:9;
+              values 13;
+              endogenize z;
+            end;
+
+	    perfect_foresight_setup(periods = 100);
+	    perfect_foresight_solver;
+
+        In this example, the exogenous variable ``x`` is equal to 1.2 in
+        period 1, but in periods 2, 4 and 5 it will be endogenized so that
+        endogenous variable `c` is equal to 1.6 in period 2 and then 1.7 in
+        periods 4 and 5. Similarly, the exogenous variable ``z`` will be
+        endogenized in periods 7 to 9 so that the endogenous variable ``k`` is
+        equal to 13 over the same periods.
+
+    *Example (perfect foresight with expectation errors)*
+
+        ::
+
+            var c;
+            varexo x;
+
+            ...
+
+            perfect_foresight_controlled_paths;
+              exogenize c;
+              periods 2002Y 2003Y:2005Y;
+              values 1.6 1.7;
+              endogenize x;
+            end;
+
+            perfect_foresight_controlled_paths(learnt_in=2004Y);
+              exogenize c;
+              periods 2004Y:2005Y;
+              values 1.8;
+              endogenize x;
+            end;
+
+            perfect_foresight_with_expectation_errors_setup(periods = 30,
+                first_simulation_period = 2001Y);
+            perfect_foresight_with_expectation_errors_solver;
+
+        In this example, agents in year 2001 (at beginning of the simulation)
+        compute their plan under the assumption that the endogenous variable
+        ``c`` will be equal to 1.6 in year 2002 and 1.7 from years 2003 to
+        2005, and that exogenous variable ``x`` will behave so as to fulfill
+        that constraint. Then, when 2004 arrives, they recompute their plan
+        under the assumption that ``c`` will be equal to 1.8 in years 2004 and
+        2005 (and again that ``x`` will be endogenized accordingly).
+
 .. _stoch-sol:
 
 Stochastic solution and simulation

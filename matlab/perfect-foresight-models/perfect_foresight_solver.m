@@ -149,7 +149,10 @@ if completed_share == 1
     if options_.simul.endval_steady
         oo_.steady_state = steady_state;
     end
-    % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock
+    % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock, except if controlled paths
+    if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+        oo_.exo_simul = exo_simul;
+    end
 
     if ~options_.noprint
         fprintf('Perfect foresight solution found.\n\n')
@@ -169,7 +172,10 @@ elseif options_.simul.homotopy_linearization_fallback && completed_share > 0
         % This is not a true steady state, but it is the closest we can get to
         oo_.steady_state = oo_.endo_simul(:, end);
     end
-    % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock (although with an approximation)
+    % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock (although with an approximation), except if controlled paths
+    if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+        oo_.exo_simul = exobase + (exo_simul - exobase)/completed_share;
+    end
 
     maxerror = recompute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
 
@@ -201,9 +207,9 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
         fprintf('%s\n\n', repmat('*', 1, 80))
     end
     extra_simul_time_counter = tic;
-    [extra_success, extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state] = create_scenario(M_,options_,oo_,extra_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, steady_state, exo_steady_state);
+    [extra_success, extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state, extra_controlled_paths_by_period] = create_scenario(M_,options_,oo_,extra_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, exo_simul, steady_state, exo_steady_state);
     if extra_success
-        [extra_endo_simul, extra_success] = perfect_foresight_solver_core(extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state, M_, options_);
+        [extra_endo_simul, extra_success, ~, ~, ~, extra_exo_simul] = perfect_foresight_solver_core(extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state, extra_controlled_paths_by_period, M_, options_);
     end
     if ~extra_success
         if ~options_.noprint
@@ -228,7 +234,10 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
             % This is not a true steady state, but it is the closest we can get to
             oo_.steady_state = oo_.endo_simul(:, end);
         end
-        % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock (although with an approximation)
+        % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock (although with an approximation), except if controlled paths
+        if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+            oo_.exo_simul = exo_simul + (exo_simul - extra_exo_simul)*(1-completed_share)/options_.simul.homotopy_marginal_linearization_fallback;
+        end
 
         maxerror = recompute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
 
@@ -299,6 +308,7 @@ success_counter = 0;
 iteration = 0;
 
 endo_simul = endoorig;
+exo_simul = exoorig;
 periods = get_simulation_periods(options_);
 
 while step > options_.simul.homotopy_min_step_size
@@ -306,6 +316,7 @@ while step > options_.simul.homotopy_min_step_size
     iteration = iteration+1;
 
     saved_endo_simul = endo_simul;
+    saved_exo_simul = exo_simul;
 
     new_share = completed_share + step; % Try this share, and see if it succeeds
 
@@ -316,7 +327,7 @@ while step > options_.simul.homotopy_min_step_size
 
     iter_time_counter = tic;
 
-    [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state] = create_scenario(M_,options_,oo_,new_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, steady_state, exo_steady_state);
+    [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period] = create_scenario(M_,options_,oo_,new_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, exo_simul, steady_state, exo_steady_state);
 
     if steady_success
         % At the first iteration, use the initial guess given by
@@ -332,10 +343,21 @@ while step > options_.simul.homotopy_min_step_size
             else
                 endo_simul(:, simperiods) = endobase(:, simperiods);
             end
+
+            % Also handle initial guess in exo_simul when there are controlled paths:
+            % first try the initial guess given by perfect_foresight_setup or the user,
+            % afterwards use the base scenario
+            if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+                if iteration == 1 && new_share == shareorig
+                    % Nothing to do, at this point exo_simul(:, simperiods) == exoorig(:, simperiods)
+                else
+                    exo_simul(simperiods,:) = exobase(simperiods,:);
+                end
+            end
         end
 
         % Solve for the paths of the endogenous variables.
-        [endo_simul, success, maxerror, solver_iter, per_block_status] = perfect_foresight_solver_core(endo_simul, exo_simul, steady_state, exo_steady_state, M_, options_);
+        [endo_simul, success, maxerror, solver_iter, per_block_status, exo_simul] = perfect_foresight_solver_core(endo_simul, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period, M_, options_);
     else
         success = false;
         maxerror = NaN;
@@ -378,6 +400,7 @@ while step > options_.simul.homotopy_min_step_size
         end
     else
         endo_simul = saved_endo_simul;
+        exo_simul = saved_exo_simul;
         success_counter = 0;
         step = step / 2;
         if ~options_.noprint
@@ -411,7 +434,7 @@ end
 fprintf('\n')
 
 
-function [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state] = create_scenario(M_,options_,oo_,share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, steady_state, exo_steady_state)
+function [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period] = create_scenario(M_,options_,oo_,share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, exo_simul, steady_state, exo_steady_state)
 % For a given share, comutes the exogenous path and also the initial and
 % terminal conditions for the endogenous path (but do not modify the initial
 % guess for endogenous)
@@ -424,12 +447,13 @@ function [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state]
 %   shareorig        [double]    the share to which endoorig and exoorig correspond (typically 100%, except for perfect_foresight_with_expectation_errors_solver with homotopy and marginal linearization)
 %   endoorig         [matrix]    path of endogenous corresponding to shareorig of the shock (only initial and terminal conditions are used)
 %   exoorig          [matrix]    path of exogenous corresponding to shareorig of the shock
-%   endobase         [matrix]    path of endogenous corresponding to 0% of the shock (only initial and terminal conditions are used)
+%   endobase         [matrix]    path of endogenous corresponding to 0% of the shock (only initial and terminal conditions are used, except if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
 %   exobase          [matrix]    path of exogenous corresponding to 0% of the shock
 %   initperiods      [vector]    period indices of initial conditions
 %   lastperiods      [vector]    period indices of terminal conditions
 %   recompute_final_steady_state [boolean] self-explanatory
 %   endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial and terminal conditions are not used)
+%   exo_simul        [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
 %   steady_state     [vector]    steady state of endogenous, only used if terminal steady state is *not* recomputed by the function
 %   exo_steady_state [vector]    steady state of exogenous, only used if terminal steady state is *not* recomputed by the function
 %
@@ -439,6 +463,9 @@ function [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state]
 %   exo_simul        [matrix]    path of exogenous corresponding to the scenario
 %   steady_state     [vector]    steady state of endogenous corresponding to the scenario (equal to the input if terminal steady state not recomputed)
 %   exo_steady_state [vector]    steady state of exogenous corresponding to the scenario (equal to the input if terminal steady state not recomputed)
+%   controlled_paths_by_period [struct] flips between endos and exos corresponding to the scenario
+
+saved_exo_simul = exo_simul; % For guess value of controlled paths
 
 % Compute convex combination for the path of exogenous
 exo_simul = exoorig*share/shareorig + exobase*(1-share/shareorig);
@@ -507,6 +534,26 @@ if recompute_final_steady_state
 else
     % The terminal condition is not a steady state, compute a convex combination
     endo_simul(:, lastperiods) = share/shareorig*endoorig(:, lastperiods)+(1-share/shareorig)*endobase(:, lastperiods);
+end
+
+controlled_paths_by_period = oo_.deterministic_simulation.controlled_paths_by_period;
+if ~isempty(controlled_paths_by_period)
+    for p = 1:length(controlled_paths_by_period)
+        if isempty(controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        controlled_paths_by_period(p).values = controlled_paths_by_period(p).values*share + endobase(controlled_paths_by_period(p).exogenize_id,p)'*(1-share);
+
+        % Handle guess values for endogenized exos
+        exo_ids = controlled_paths_by_period(p).endogenize_id;
+        if ~isempty(options_.simul.homotopy_exclude_varexo)
+            [is_excluded, excluded_exo_ids] = ismember(options_.simul.homotopy_exclude_varexo, M_.exo_names{exo_ids});
+            if any(is_excluded)
+                error('Exogenous %s cannot be in the homotopy_exclude_varexo option and a perfect_foresight_controlled_paths block at the same time', M_.exo_names{excluded_exo_ids(1)})
+            end
+        end
+        exo_simul(length(initperiods)+p,exo_ids) = saved_exo_simul(length(initperiods)+p,exo_ids);
+    end
 end
 
 

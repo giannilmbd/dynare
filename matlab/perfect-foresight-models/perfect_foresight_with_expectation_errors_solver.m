@@ -28,6 +28,10 @@ if options_.pfwee.constant_simulation_length && ~isempty(options_.simul.last_sim
     error('Options constant_simulation_length and last_simulation_period cannot be used together')
 end
 
+if options_.pfwee.constant_simulation_length && ~all(cellfun(@(x) isempty(x), {oo_.pfwee.controlled_paths_by_period.endogenize_id}))
+    error('Options constant_simulation_length is incompatible with perfect_foresight_controlled_paths block')
+end
+
 [periods, first_simulation_period] = get_simulation_periods(options_);
 
 % Retrieve initial paths built by pfwee_setup
@@ -69,6 +73,11 @@ while info_period <= periods
     oo_.exo_simul(M_.maximum_lag+(1:periods-info_period+1), :) = oo_.pfwee.shocks_info(:, info_period:end, info_period)';
     oo_.exo_simul(M_.maximum_lag+periods-info_period+2:end, :) = repmat(oo_.exo_steady_state', sim_length+M_.maximum_lead-(periods-info_period+1), 1);
 
+    oo_.deterministic_simulation.controlled_paths_by_period = oo_.pfwee.controlled_paths_by_period(info_period:end, info_period);
+    if all(cellfun(@(x) isempty(x), {oo_.deterministic_simulation.controlled_paths_by_period.endogenize_id}))
+        oo_.deterministic_simulation.controlled_paths_by_period = []; % Expected by pf_solver when there is no controlled var
+    end
+
     options_.periods = sim_length;
     % The following two options are reset to empty, so as to avoid an inconsistency with periods
     options_.simul.first_simulation_period = dates();
@@ -108,7 +117,8 @@ while info_period <= periods
     increment = 1;
     while info_period+increment <= periods && ...
           all(oo_.pfwee.terminal_info(:, info_period) == oo_.pfwee.terminal_info(:, info_period+increment)) && ...
-          all(all(oo_.pfwee.shocks_info(:, info_period+increment:end, info_period) == oo_.pfwee.shocks_info(:, info_period+increment:end, info_period+increment)))
+          all(all(oo_.pfwee.shocks_info(:, info_period+increment:end, info_period) == oo_.pfwee.shocks_info(:, info_period+increment:end, info_period+increment))) && ...
+          isequal(oo_.pfwee.controlled_paths_by_period(info_period+increment:end, info_period), oo_.pfwee.controlled_paths_by_period(info_period+increment:end, info_period+increment))
         increment = increment + 1;
     end
     info_period = info_period + increment;

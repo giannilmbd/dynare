@@ -1,6 +1,6 @@
 function [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, algo, method, debug)
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -35,7 +35,7 @@ if ismember(method, [1, 2])
         oo_.endo_simul(:,1) = oo_.steady_state + weight*(endo_simul0(:,1) - oo_.steady_state);
         oo_.exo_simul = bsxfun(@plus, weight*exo_simul, (1-weight)*transpose(oo_.exo_steady_state));
         if order==0
-            [endo_simul_new, success] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, M_, options_);
+            [endo_simul_new, success] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, [], M_, options_);
         else
             switch(algo)
               case 0
@@ -102,7 +102,7 @@ if isequal(method, 3) || (isequal(method, 2) && noconvergence)
         oo_.endo_simul = endo_simul;
         oo_.exo_simul = bsxfun(@plus, weight*exo_simul, (1-weight)*transpose(oo_.exo_steady_state));
         if order==0
-            [endo_simul_new, success] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, M_, options_);
+            [endo_simul_new, success] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, [], M_, options_);
         else
             switch(algo)
               case 0

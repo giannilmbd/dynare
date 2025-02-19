@@ -1,4 +1,4 @@
-function [endogenousvariables, success, err, iter] = sim1(endogenousvariables, exogenousvariables, steadystate, M_, options_)
+function [endogenousvariables, success, err, iter, exogenousvariables] = sim1(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
 % [endogenousvariables, success, err, iter] = sim1(endogenousvariables, exogenousvariables, steadystate, M_, options_)
 % Performs deterministic simulations with lead or lag of one period, using
 % a basic Newton solver on sparse matrices.
@@ -6,8 +6,9 @@ function [endogenousvariables, success, err, iter] = sim1(endogenousvariables, e
 %
 % INPUTS
 %   - endogenousvariables [double] N*(T+M_.maximum_lag+M_.maximum_lead) array, paths for the endogenous variables (initial condition + initial guess + terminal condition).
-%   - exogenousvariables  [double] T*M array, paths for the exogenous variables.
+%   - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables.
 %   - steadystate         [double] N*1 array, steady state for the endogenous variables.
+%   - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths block
 %   - M_                  [struct] contains a description of the model.
 %   - options_            [struct] contains various options.
 % OUTPUTS
@@ -15,8 +16,10 @@ function [endogenousvariables, success, err, iter] = sim1(endogenousvariables, e
 %   - success             [logical] Whether a solution was found
 %   - err                 [double] ∞-norm of the residual
 %   - iter                [integer] Number of iterations
+%   - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables
+%                                  (may be modified if perfect_foresight_controlled_paths present)
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,6 +41,22 @@ verbose = options_.verbosity && ~options_.noprint;
 ny = M_.endo_nbr;
 periods = get_simulation_periods(options_);
 vperiods = periods*ones(1,options_.simul.maxit);
+
+if ~isempty(controlled_paths_by_period)
+    for p = 1:periods
+        if isempty(controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        endogenousvariables(controlled_paths_by_period(p).exogenize_id, p+M_.maximum_lag) = controlled_paths_by_period(p).values;
+    end
+
+    if options_.debug
+        error('Debugging not available with perfect_foresight_controlled_paths')
+    end
+    if options_.endogenous_terminal_period
+        error('The endogenous_terminal_period option not available with perfect_foresight_controlled_paths')
+    end
+end
 
 if M_.maximum_lag > 0
     y0 = endogenousvariables(:, M_.maximum_lag);
@@ -70,6 +89,11 @@ for iter = 1:options_.simul.maxit
     [res, A] = perfect_foresight_problem(y, y0, yT, exogenousvariables, M_.params, steadystate, periods, M_, options_);
     % A is the stacked Jacobian with period x equations alongs the rows and
     % periods times variables (in declaration order) along the columns
+
+    if ~isempty(controlled_paths_by_period)
+        A = controlled_paths_substitute_stacked_jacobian(A, y, y0, yT, exogenousvariables, steadystate, controlled_paths_by_period, M_);
+    end
+
     if options_.debug && iter==1
         [row,col]=find(A);
         row=setdiff(1:periods*ny,row);
@@ -132,10 +156,22 @@ for iter = 1:options_.simul.maxit
     end
     if any(isnan(dy)) || any(isinf(dy))
         if verbose
-            display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint);
+            display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint || ~isempty(controlled_paths_by_period));
         end
     end
     y = y + dy;
+
+    if ~isempty(controlled_paths_by_period)
+        for p = 1:periods
+            endogenize_id = controlled_paths_by_period(p).endogenize_id;
+            exogenize_id = controlled_paths_by_period(p).exogenize_id;
+            if isempty(endogenize_id)
+                continue
+            end
+            y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
+            exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + dy(exogenize_id+(p-1)*M_.endo_nbr)';
+        end
+    end
 end
 
 endogenousvariables(:, M_.maximum_lag+(1:periods)) = reshape(y, ny, periods);
@@ -154,7 +190,7 @@ if stop
             skipline()
             fprintf('Total time of simulation: %g.\n', etime(clock,h1))
             disp('Simulation terminated with NaN or Inf in the residuals or endogenous variables.')
-            display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint);
+            display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint || ~isempty(controlled_paths_by_period));
             disp('There is most likely something wrong with your model. Try model_diagnostics or another simulation method.')
             printline(105)
         end

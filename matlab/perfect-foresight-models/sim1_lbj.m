@@ -1,4 +1,4 @@
-function [endogenousvariables, success, err, iter] = sim1_lbj(endogenousvariables, exogenousvariables, steadystate, M_, options_)
+function [endogenousvariables, success, err, iter, exogenousvariables] = sim1_lbj(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
 
 % Performs deterministic simulations with lead or lag on one period using the historical LBJ algorithm
 %
@@ -10,6 +10,8 @@ function [endogenousvariables, success, err, iter] = sim1_lbj(endogenousvariable
 %   success             [logical]       Whether a solution was found
 %   err                 [double]        ∞-norm of Δendogenousvariables
 %   iter                [integer]       Number of iterations
+%   exogenousvariables  [matrix]        All exogenous variables of the model
+%                                       (may be modified if perfect_foresight_controlled_paths present)
 %
 % ALGORITHM
 %   Laffargue, Boucekkine, Juillard (LBJ)
@@ -20,7 +22,7 @@ function [endogenousvariables, success, err, iter] = sim1_lbj(endogenousvariable
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -72,6 +74,19 @@ function [r, g1] = dynamicmodel(it_)
         [r, T_order, T] = dynamic_resid(y3n, x, M_.params, steadystate);
         g1_sparse = dynamic_g1(y3n, x, M_.params, steadystate, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, T_order, T);
         g1 = full(g1_sparse(:, find(lead_lag_incidence')));
+
+        if ~isempty(controlled_paths_by_period)
+            p = it_ - M_.maximum_lag;
+            if p > 1 && ~isempty(controlled_paths_by_period(p-1).exogenize_id)
+                g1(:,nonzeros(lead_lag_incidence(1,controlled_paths_by_period(p-1).exogenize_id))) = 0;
+            end
+            if ~isempty(controlled_paths_by_period(p).exogenize_id)
+                g1(:,nyp+controlled_paths_by_period(p).exogenize_id) = g1_sparse(:,3*ny+controlled_paths_by_period(p).endogenize_id);
+            end
+            if p < periods && ~isempty(controlled_paths_by_period(p+1).exogenize_id)
+                g1(:,nonzeros(lead_lag_incidence(3,controlled_paths_by_period(p+1).exogenize_id))) = 0;
+            end
+        end
     end
 end
 
@@ -81,6 +96,15 @@ periods = get_simulation_periods(options_);
 if verbose
     printline(56)
     fprintf('MODEL SIMULATION :\n')
+end
+
+if ~isempty(controlled_paths_by_period)
+    for p = 1:periods
+        if isempty(controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        endogenousvariables(controlled_paths_by_period(p).exogenize_id,p+M_.maximum_lag) = controlled_paths_by_period(p).values;
+    end
 end
 
 h1 = clock;
@@ -103,6 +127,19 @@ for iter = 1:options_.simul.maxit
     end
     c = back_subst_lbj(c, ny, iyf, periods);
     endogenousvariables(:,M_.maximum_lag+(1:periods)) = endogenousvariables(:,M_.maximum_lag+(1:periods))+c;
+
+    if ~isempty(controlled_paths_by_period)
+        for p = 1:periods
+            endogenize_id = controlled_paths_by_period(p).endogenize_id;
+            exogenize_id = controlled_paths_by_period(p).exogenize_id;
+            if isempty(endogenize_id)
+                continue
+            end
+            endogenousvariables(exogenize_id,p+M_.maximum_lag) = controlled_paths_by_period(p).values;
+            exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + c(exogenize_id,p)';
+        end
+    end
+
     err = max(max(abs(c)));
     if verbose
         fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err), num2str(etime(clock, h2)));

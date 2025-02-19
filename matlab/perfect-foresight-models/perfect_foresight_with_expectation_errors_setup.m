@@ -68,8 +68,8 @@ if exist(options_.datafile, 'file')
     end
 else
     %% No datafile option given, use the contents of shocks and endval blocks
-    if isempty(M_.learnt_shocks) && isempty(M_.learnt_endval)
-        warning('perfect_foresight_with_expectation_errors_setup: there is no shocks(learnt_in=...) or endval(learnt_in=...) block, and you did not pass the datafile option, so there is no point in using this command')
+    if isempty(M_.learnt_shocks) && isempty(M_.learnt_endval) && (isempty(M_.perfect_foresight_controlled_paths) || all(cellfun(@(x) (isa(x, 'numeric') && x == 1), {M_.perfect_foresight_controlled_paths.learnt_in})))
+        warning('perfect_foresight_with_expectation_errors_setup: there is no shocks(learnt_in=...), endval(learnt_in=...), or perfect_foresight_controlled_paths(learnt_in=...) block, and you did not pass the datafile option, so there is no point in using this command')
     end
 
     %% Check that dates can be processed, if any
@@ -166,6 +166,12 @@ else
             end
         end
     end
+end
+
+% Handle controlled paths
+oo_.pfwee.controlled_paths_by_period = struct('exogenize_id', cell(periods, periods), 'endogenize_id', cell(periods, periods), 'values', cell(periods, periods), 'learnt_in', cell(periods, periods)); % 1st dimension of cells is real time, 2nd is informational time
+for p = 1:periods
+    oo_.pfwee.controlled_paths_by_period(:, p) = controlled_paths_by_period(M_, options_, p);
 end
 
 % Build initial paths for endos and exos (only initial conditions are set, the rest is NaN)
