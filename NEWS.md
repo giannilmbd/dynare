@@ -9,8 +9,8 @@ The Windows, macOS, MATLAB online and source packages are available for
 download at [the Dynare website](https://www.dynare.org/download/).
 
 This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
-24.2 (R2024b), and with GNU Octave versions ranging from 7.1.0 to 9.2.0 (NB:
-the Windows package requires version 9.2.0 specifically).
+24.2 (R2024b), and with GNU Octave versions ranging from 7.1.0 to 9.4.0 (NB:
+the Windows package requires version 9.4.0 specifically).
 
 Here is a list of the problems identified in version 6.2 and that have been
 fixed in version 6.3:
