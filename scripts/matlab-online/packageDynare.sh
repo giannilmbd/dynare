@@ -2,7 +2,7 @@
 set -exo pipefail
 
 # Creates a dynare-X.Y.mltbx in the current repository, using the settings below.
-# Needs to be run from Ubuntu 22.04 LTS, with the needed packages installed.
+# Needs to be run from Ubuntu 24.04 LTS, with the needed packages installed.
 
 X13ASVER=1-1-b61
 MATLABPATH=/opt/MATLAB/R2024b
