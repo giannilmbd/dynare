@@ -260,7 +260,7 @@ Copyright: 2000-2022 Frank Schorfheide
 License: CC-BY-SA-4.0
 
 Files: doc/*.rst doc/*.tex doc/*.svg doc/*.pdf doc/*.bib
-Copyright: 1996-2022 Dynare Team
+Copyright: 1996-2025 Dynare Team
 License: GFDL-NIV-1.3+
 
 Files: doc/dr.tex doc/dr.bib
