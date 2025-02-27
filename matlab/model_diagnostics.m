@@ -160,6 +160,7 @@ for b=1:nb
                                     'evaluate', 'static', 'block_decomposed', ['block=' ...
                                 int2str(b)]);
         end
+        n_vars_jacob=size(jacob,2);
     else
         if options_.block
             T = NaN(M_.block_structure_stat.tmp_nbr, 1);
