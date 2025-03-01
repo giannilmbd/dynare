@@ -109,6 +109,7 @@ if info==0
         newstart = regx(1).regimestart(end);
         diffstart = newstart-oldstart;
         regname = 'regimestart';
+        reg_string = 'regime';
     else
         newstart1 = regx(1).regimestart1(end);
         newstart2 = regx(1).regimestart2(end);
@@ -118,10 +119,12 @@ if info==0
         switch diffregime
             case 1
                 regname = 'regimestart1';
+                reg_string = 'regime1';
             case 2
                 regname = 'regimestart2';
+                reg_string = 'regime2';
+        end
     end
-end
 end
 if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation
     guess_regime = [base_regime base_regime];
@@ -132,9 +135,15 @@ if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use
         % we reduce length until the converged regime does not change
 
         guess_regime(1).(regname)(end) = regx2(1).(regname)(end)-1;
-        if guess_regime(1).(regname)(end-1)==guess_regime(1).(regname)(end)
-            guess_regime(1).(regname)(end-1) = guess_regime(1).(regname)(end-1)-1;
-        end
+        if guess_regime(1).(regname)(end)==1
+            % make sure we enforce base regime
+            guess_regime(1).(regname)=guess_regime(1).(regname)(end);
+            guess_regime(1).(reg_string)=0;
+        else
+            if guess_regime(1).(regname)(end-1)==guess_regime(1).(regname)(end)
+                guess_regime(1).(regname)(end-1) = guess_regime(1).(regname)(end-1)-1;
+            end
+        end        
         if is_multivariate
             [ax2, a1x2, Px2, P1x2, vx2, Tx2, Rx2, Cx2, regx2, info2, M_2, likx2, etahat2, alphahat2, V2] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
         else
