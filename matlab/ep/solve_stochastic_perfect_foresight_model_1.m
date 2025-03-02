@@ -1,6 +1,6 @@
-function [errorflag, endo_simul, errorcode, y] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, Options, pfm, order, varargin)
+function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, options_, M_, pfm)
 
-% Copyright © 2012-2022 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -17,87 +17,73 @@ function [errorflag, endo_simul, errorcode, y] = solve_stochastic_perfect_foresi
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if nargin < 6
-    homotopy_parameter = 1;
-else
-    homotopy_parameter = varargin{1};
+update_pfm_struct = false;
+update_options_struct = false;
+
+if nargout>4
+    update_pfm_struct = true;
 end
 
-flag = 0;
-err = 0;
-
-EpOptions = Options.ep;
-
-params = pfm.params;
-steady_state = pfm.steady_state;
-ny = pfm.ny;
-periods = pfm.periods;
-dynamic_model = pfm.dynamic_model;
-lead_lag_incidence = pfm.lead_lag_incidence;
-nyp = pfm.nyp;
-nyf = pfm.nyf;
-i_cols_1 = pfm.i_cols_1;
-i_cols_A1 = pfm.i_cols_A1;
-i_cols_j = pfm.i_cols_j;
-i_cols_T = nonzeros(lead_lag_incidence(1:2,:)');
-hybrid_order = pfm.hybrid_order;
-dr = pfm.dr;
-nodes = pfm.nodes;
-weights = pfm.weights;
-nnodes = pfm.nnodes;
-
-maxit = pfm.maxit_;
-tolerance = pfm.tolerance;
-verbose = pfm.verbose;
-
-number_of_shocks = size(exo_simul,2);
-
-% make sure that there is a node equal to zero
-% and permute nodes and weights to have zero first
-k = find(sum(abs(nodes),2) < 1e-12);
-if ~isempty(k)
-    nodes = [nodes(k,:); nodes(1:k-1,:); nodes(k+1:end,:)];
-    weights = [weights(k); weights(1:k-1); weights(k+1:end)];
-else
-    error('there is no nodes equal to zero')
+if nargout>5
+    update_options_struct = true;
 end
-if hybrid_order > 0
-    if hybrid_order == 2
-        h_correction = 0.5*dr.ghs2(dr.inv_order_var);
+
+
+if update_pfm_struct
+
+    periods = pfm.periods;
+
+    order = pfm.stochastic_order;
+
+    ny = pfm.ny;
+    lead_lag_incidence = pfm.lead_lag_incidence;
+    i_cols_1 = pfm.i_cols_1;
+    i_cols_j = pfm.i_cols_j;
+    i_cols_T = nonzeros(lead_lag_incidence(1:2,:)');
+
+    nodes = pfm.nodes;
+    weights = pfm.weights;
+    nnodes = pfm.nnodes;
+
+    % Make sure that there is a node equal to zero and permute nodes and weights to have zero first
+    k = find(sum(abs(nodes),2) < 1e-12);
+    if ~isempty(k)
+        nodes = [nodes(k,:); nodes(1:k-1,:); nodes(k+1:end,:)];
+        weights = [weights(k); weights(1:k-1); weights(k+1:end)];
+    else
+        error('there is no nodes equal to zero')
     end
-else
-    h_correction = 0;
-end
 
-if verbose
-    disp (' -----------------------------------------------------');
-    disp ('MODEL SIMULATION :');
-    fprintf('\n');
-end
+    pfm.nodes = nodes;
+    pfm.weights = weights;
 
-% Each column of Y represents a different world
-% The upper right cells are unused
-% The first row block is ny x 1
-% The second row block is ny x nnodes
-% The third row block is ny x nnodes^2
-% and so on until size ny x nnodes^order
-world_nbr = pfm.world_nbr;
-Y = endo_simul(:,2:end-1);
-Y = repmat(Y,1,world_nbr);
-pfm.y0 = endo_simul(:,1);
+    if pfm.hybrid_order > 0
+        if pfm.hybrid_order == 2
+            pfm.h_correction = 0.5*pfm.dr.ghs2(pfm.dr.inv_order_var);
+        end
+    else
+        pfm.h_correction = 0;
+    end
 
-% The columns of A map the elements of Y such that
-% each block of Y with ny rows are unfolded column wise
-% number of blocks
-block_nbr = pfm.block_nbr;
-% dimension of the problem
-dimension = ny*block_nbr;
-pfm.dimension = dimension;
-if order == 0
-    i_upd_r = (1:ny*periods)';
-    i_upd_y = i_upd_r + ny;
-else
-    i_upd_r = zeros(dimension,1);
+    % Each column of Y represents a different world
+    % The upper right cells are unused
+    % The first row block is ny x 1
+    % The second row block is ny x nnodes
+    % The third row block is ny x nnodes^2
+    % and so on until size ny x nnodes^order
+    world_nbr = pfm.world_nbr;
+    % Y = endo_simul(:,2:end-1);
+    pfm.Y = repmat(endo_simul(:), 1, world_nbr);
+    pfm.y0 = endo_simul(:,1);
+
+    % The columns of A map the elements of Y such that
+    % each block of Y with ny rows are unfolded column wise
+    % number of blocks
+    block_nbr = pfm.block_nbr;
+    % dimension of the problem
+    dimension = ny*block_nbr;
+    pfm.dimension = dimension;
+    i_upd_r = zeros(dimension, 1);
     i_upd_y = i_upd_r;
     i_upd_r(1:ny) = (1:ny);
     i_upd_y(1:ny) = ny+(1:ny);
@@ -116,32 +102,36 @@ else
         n1 = n2+1;
         n2 = n2+ny;
     end
-end
-icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ...
-       find(lead_lag_incidence(3,:))+2*world_nbr*ny]';
-h1 = clock;
-pfm.order = order;
-pfm.world_nbr = world_nbr;
-pfm.nodes = nodes;
-pfm.nnodes = nnodes;
-pfm.weights = weights;
-pfm.h_correction = h_correction;
-pfm.i_rows = 1:ny;
-i_cols = find(lead_lag_incidence');
-pfm.i_cols = i_cols;
-pfm.nyp = nyp;
-pfm.nyf = nyf;
-pfm.hybrid_order = hybrid_order;
-pfm.i_cols_1 = i_cols_1;
-pfm.i_cols_h = i_cols_j;
-pfm.icA = icA;
-pfm.i_cols_T = i_cols_T;
-pfm.i_upd_r = i_upd_r;
-pfm.i_upd_y = i_upd_y;
+    icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ...
+           find(lead_lag_incidence(3,:))+2*world_nbr*ny]';
 
-Options.steady.maxit = 100;
-y = repmat(steady_state,block_nbr,1);
-Options.solve_algo = Options.ep.solve_algo;
-Options.steady.maxit = Options.ep.maxit;
-[y, errorflag, ~, ~, errorcode] = dynare_solve(@ep_problem_2, y, Options.simul.maxit, Options.dynatol.f, Options.dynatol.x, Options, exo_simul, pfm);
-endo_simul(:,2) = y(1:ny);
+    pfm.i_rows = 1:ny;
+    pfm.i_cols = find(lead_lag_incidence');
+    pfm.i_cols_1 = i_cols_1;
+    pfm.i_cols_h = i_cols_j;
+    pfm.icA = icA;
+    pfm.i_cols_T = i_cols_T;
+    pfm.i_upd_r = i_upd_r;
+    pfm.i_upd_y = i_upd_y;
+
+end
+
+y = repmat(pfm.steady_state, pfm.block_nbr, 1);
+
+if update_options_struct
+    % Set algorithm
+    options_.solve_algo = options_.ep.solve_algo;
+    options_.simul.maxit = options_.ep.maxit;
+    [lb, ub] = feval(sprintf('%s.dynamic_complementarity_conditions', M_.fname), pfm.params);
+    pfm.eq_index = M_.dynamic_mcp_equations_reordering;
+    if options_.ep.solve_algo == 10
+        options_.lmmcp.lb = repmat(lb, pfm.block_nbr, 1);
+        options_.lmmcp.ub = repmat(ub, pfm.block_nbr, 1);
+    elseif options_.ep.solve_algo == 11
+        options_.mcppath.lb = repmat(lb, pfm.block_nbr, 1);
+        options_.mcppath.ub = repmat(ub, pfm.block_nbr, 1);
+    end
+end
+
+[y, errorflag, ~, ~, errorcode] = dynare_solve(@ep_problem_2, y, options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, options_, exo_simul, pfm);
+endo_simul(:,2) = y(1:pfm.ny);

@@ -72,4 +72,6 @@ end;
 
 steady(nocheck);
 
-Simulations = extended_path_mc([], 2, 2, [], options_, M_, oo_);
+options_.ep.stack_solve_algo=0;
+
+Simulations = extended_path_mc([], 10, 2, [], options_, M_, oo_);

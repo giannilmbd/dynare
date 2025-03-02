@@ -5,7 +5,7 @@ function pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
 %  o options_               [struct]    Dynare's options structure
 %  o oo_                    [struct]    Dynare's results structure
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

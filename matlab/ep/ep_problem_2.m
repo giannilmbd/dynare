@@ -1,37 +1,37 @@
-function [res,A,info] = ep_problem_2(y,x,pm)
+function [res,A,info] = ep_problem_2(y, x, pfm)
 
-info = 0;
-res = [];
+info = false;
 A = [];
 
-dynamic_model = pm.dynamic_model;
-ny = pm.ny;
-params = pm.params;
-steady_state = pm.steady_state;
-order = pm.order;
-nodes = pm.nodes;
-nnodes = pm.nnodes;
-weights = pm.weights;
-h_correction = pm.h_correction;
-dimension = pm.dimension;
-world_nbr = pm.world_nbr;
-nnzA = pm.nnzA;
-periods = pm.periods;
-i_rows = pm.i_rows';
-i_cols = pm.i_cols;
-nyp = pm.nyp;
-nyf = pm.nyf;
-hybrid_order = pm.hybrid_order;
-i_cols_1 = pm.i_cols_1;
-i_cols_j = pm.i_cols_j;
-icA = pm.icA;
-i_cols_T = pm.i_cols_T;
-eq_index = pm.eq_index;
+dynamic_model = pfm.dynamic_model;
+ny = pfm.ny;
+params = pfm.params;
+steady_state = pfm.steady_state;
+order = pfm.stochastic_order;
+nodes = pfm.nodes;
+nnodes = pfm.nnodes;
+weights = pfm.weights;
+h_correction = pfm.h_correction;
+dimension = pfm.dimension;
+world_nbr = pfm.world_nbr;
+nnzA = pfm.nnzA;
+periods = pfm.periods;
+i_rows = pfm.i_rows';
+i_cols = pfm.i_cols;
+nyp = pfm.nyp;
+nyf = pfm.nyf;
+hybrid_order = pfm.hybrid_order;
+i_cols_1 = pfm.i_cols_1;
+i_cols_j = pfm.i_cols_j;
+icA = pfm.icA;
+i_cols_T = pfm.i_cols_T;
+eq_index = pfm.eq_index;
+
+
 
 i_cols_p = i_cols(1:nyp);
 i_cols_s = i_cols(nyp+(1:ny));
 i_cols_f = i_cols(nyp+ny+(1:nyf));
-i_cols_A = i_cols;
 i_cols_Ap0 = i_cols_p;
 i_cols_As = i_cols_s;
 i_cols_Af0 = i_cols_f - ny;
@@ -39,10 +39,11 @@ i_hc = i_cols_f - 2*ny;
 
 nzA = cell(periods,world_nbr);
 res = zeros(ny,periods,world_nbr);
-Y = zeros(ny*(periods+2),world_nbr);
-Y(1:ny,1) = pm.y0;
+Y = pfm.Y; %zeros(ny*(periods+2),world_nbr);
+Y(1:ny,1) = pfm.y0;
 Y(end-ny+1:end,:) = repmat(steady_state,1,world_nbr);
-Y(pm.i_upd_y) = y;
+Y(pfm.i_upd_y) = y;
+
 offset_r0 = 0;
 for i = 1:order+1
     i_w_p = 1;
@@ -81,7 +82,7 @@ for i = 1:order+1
                 if hybrid_order == 2 && (k > 1 || i == order)
                     z = [Y(i_cols_p,1);
                          Y(i_cols_s,1);
-                         Y(i_cols_f,k1)+h_correction(i_hc)];
+                             Y(i_cols_f,k1)+h_correction(i_hc)];
                 else
                     z = [Y(i_cols_p,1);
                          Y(i_cols_s,1);
@@ -192,4 +193,4 @@ if nargout > 1
     iA = [nzA{:}]';
     A = sparse(iA(:,1),iA(:,2),iA(:,3),dimension,dimension);
 end
-res = res(pm.i_upd_r);
+res = res(pfm.i_upd_r);

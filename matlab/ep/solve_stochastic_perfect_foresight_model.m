@@ -33,6 +33,16 @@ nyf = pfm.nyf;
 i_cols_1 = pfm.i_cols_1;
 i_cols_j = pfm.i_cols_j;
 i_cols_T = nonzeros(lead_lag_incidence(1:2,:)');
+hybrid_order = pfm.hybrid_order;
+if hybrid_order > 0
+    if hybrid_order == 2
+        h_correction = 0.5*pfm.dr.ghs2(pfm.dr.inv_order_var);
+    end
+else
+    h_correction = 0;
+end
+%h_correction = pfm.h_correction;
+
 
 maxit = pfm.maxit_;
 tolerance = pfm.tolerance;
@@ -122,6 +132,7 @@ for iter = 1:maxit
     i_cols_Ap = i_cols_p;
     i_cols_As = i_cols_s;
     i_cols_Af = i_cols_f - ny;
+    i_hc = i_cols_f - 2*ny;
     for i = 1:order+1
         i_w_p = 1;
         for j = 1:nnodes^(i-1)
@@ -148,9 +159,16 @@ for iter = 1:maxit
                     i_cols_Af = i_cols_Af + ny;
                 end
             else
-                y = [Y(i_cols_p,i_w_p);
-                     Y(i_cols_s,j);
-                     Y(i_cols_f,j)];
+                % i==order+1
+                if hybrid_order==2
+                    y = [Y(i_cols_p,i_w_p);
+                         Y(i_cols_s,j);
+                         Y(i_cols_f,j)+h_correction(i_hc)];
+                else
+                    y = [Y(i_cols_p,i_w_p);
+                         Y(i_cols_s,j);
+                         Y(i_cols_f,j)];
+                end
                 [d1,jacobian] = dynamic_model(y,innovation,params,steady_state,i+1);
                 if i == 1
                     % in first period we don't keep track of

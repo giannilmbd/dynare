@@ -34,6 +34,7 @@ end
 set_dynare_seed('default');
 stoch_simul(order=1,irf=0,periods=201);
 y_perturbation_1 = oo_.endo_simul(1,:)';
+e_1 = oo_.exo_simul;
 
 set_dynare_seed('default');
 stoch_simul(order=2,irf=0,periods=201);
@@ -48,16 +49,31 @@ options_.simul.maxit = 100;
 set_dynare_seed('default');
 ytrue=exact_solution(M_,oo_, 800);
 
-
+/*
 set_dynare_seed('default');
 options_.ep.stochastic.order = 0;
-ts = extended_path([], 200, [], options_, M_, oo_);
+ts = extended_path([], 200, e_1, options_, M_, oo_);
+*/
+
 
 set_dynare_seed('default');
-options_.ep.stochastic.order = 2;
-options_.ep.stochastic.IntegrationAlgorithm='Stroud-Cubature-3';//'Unscented'; //'Tensor-Gaussian-Quadrature';
+options_.ep.stochastic.order = 1;
+options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';//'Stroud-Cubature-3';//'Unscented'; //;
 options_.ep.stochastic.quadrature.nodes = 3;
-ts1_4 = extended_path([], 200, [], options_, M_, oo_);
+options_.ep.stochastic.algo = 0;
+options_.ep.stochastic.hybrid_order = 2;
+ts1 = extended_path([], 200, e_1, options_, M_, oo_);
+
+
+set_dynare_seed('default');
+options_.ep.stochastic.order = 1;
+options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';//'Stroud-Cubature-3';//'Unscented'; //'Tensor-Gaussian-Quadrature';
+options_.ep.stochastic.quadrature.nodes = 3;
+options_.ep.stochastic.algo = 1;
+options_.ep.stochastic.hybrid_order = 2;
+ts1_ = extended_path([], 200, e_1, options_, M_, oo_);
+
+return
 
 set_dynare_seed('default');
 options_.ep.stochastic.order = 4;

@@ -1,4 +1,4 @@
-function [initial_conditions, innovations, pfm, ep, verbosity, options_, oo_] = extended_path_initialization(initial_conditions, sample_size, exogenousvariables, options_, M_, oo_)
+function [initial_conditions, innovations, pfm, options_, oo_] = extended_path_initialization(initial_conditions, sample_size, exogenousvariables, options_, M_, oo_)
 % [initial_conditions, innovations, pfm, ep, verbosity, options_, oo_] = extended_path_initialization(initial_conditions, sample_size, exogenousvariables, options_, M_, oo_)
 % Initialization of the extended path routines.
 %
@@ -36,8 +36,7 @@ function [initial_conditions, innovations, pfm, ep, verbosity, options_, oo_] = 
 ep  = options_.ep;
 
 % Set verbosity levels.
-options_.verbosity = ep.verbosity;
-verbosity = ep.verbosity+ep.debug;
+options_.verbosity = ep.verbosity+ep.debug;
 
 % Set maximum number of iterations for the deterministic solver.
 options_.simul.maxit = ep.maxit;
@@ -114,25 +113,28 @@ end
 pfm.nnzA = M_.NNZDerivatives(1);
 
 % setting up integration nodes if order > 0
-if ep.stochastic.order > 0
+if ep.stochastic.order>0
     [nodes,weights,nnodes] = setup_integration_nodes(options_.ep,pfm);
     pfm.nodes = nodes;
     pfm.weights = weights;
     pfm.nnodes = nnodes;
     % compute number of blocks
-    [block_nbr,pfm.world_nbr] = get_block_world_nbr(ep.stochastic.algo,nnodes,ep.stochastic.order,ep.periods);
+    [pfm.block_nbr, pfm.world_nbr] = get_block_world_nbr(ep.stochastic.algo,nnodes,ep.stochastic.order,ep.periods);
 else
     block_nbr = ep.periods;
 end
 
 % set boundaries if mcp
-[lb, ub] = feval(sprintf('%s.dynamic_complementarity_conditions', M_.fname), M_.params);
-pfm.eq_index = M_.dynamic_mcp_equations_reordering;
-if options_.ep.solve_algo == 10
-    options_.lmmcp.lb = repmat(lb,block_nbr,1);
-    options_.lmmcp.ub = repmat(ub,block_nbr,1);
-elseif options_.ep.solve_algo == 11
-    options_.mcppath.lb = repmat(lb,block_nbr,1);
-    options_.mcppath.ub = repmat(ub,block_nbr,1);
+if ~ep.stochastic.order
+    [lb, ub] = feval(sprintf('%s.dynamic_complementarity_conditions', M_.fname), M_.params);
+    pfm.eq_index = M_.dynamic_mcp_equations_reordering;
+    if options_.ep.solve_algo == 10
+        options_.lmmcp.lb = repmat(lb, ep.periods, 1);
+        options_.lmmcp.ub = repmat(ub, ep.periods, 1);
+    elseif options_.ep.solve_algo == 11
+        options_.mcppath.lb = repmat(lb, ep.periods, 1);
+        options_.mcppath.ub = repmat(ub, ep.periods, 1);
+    end
+else
+    % For SEP, boundaries are set in solve_stochastic_perfect_foresight_model_{0,1}.m
 end
-pfm.block_nbr = block_nbr;

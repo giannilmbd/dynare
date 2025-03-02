@@ -72,12 +72,13 @@ end;
 
 steady(nocheck);
 
-options_.ep.verbosity = 0;
 
 options_.ep.stochastic.order = 0;
+options_.ep.stack_solve_algo=0;
 ts0 = extended_path([], 10, [], options_, M_, oo_);
 
 options_.ep.stochastic.order = 1;
+
 options_.ep.stochastic.nodes = 3;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 ts1_3 = extended_path([], 10, [], options_, M_, oo_);

@@ -1,5 +1,5 @@
 function Simulations = extended_path_mc(initialconditions, samplesize, replic, exogenousvariables, options_, M_, oo_)
-% Simulations = extended_path_mc(initialconditions, samplesize, replic, exogenousvariables, options_, M_, oo_)
+
 % Stochastic simulation of a non linear DSGE model using the Extended Path method (Fair and Taylor 1983). A time
 % series of size T  is obtained by solving T perfect foresight models.
 %
@@ -36,7 +36,7 @@ function Simulations = extended_path_mc(initialconditions, samplesize, replic, e
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-[initialconditions, innovations, pfm, ep, ~, options_, oo_] = ...
+[initialconditions, innovations, pfm, options_, oo_] = ...
     extended_path_initialization(initialconditions, samplesize, exogenousvariables, options_, M_, oo_);
 
 % Check the dimension of the first input argument
@@ -64,12 +64,12 @@ data = NaN(size(initialconditions, 1), samplesize+1, replic);
 vexo = NaN(innovations.effective_number_of_shocks, samplesize+1, replic);
 info = NaN(replic, 1);
 
-if ep.parallel
+if options_.ep.parallel
     % Use the Parallel toolbox.
     parfor i=1:replic
         innovations_ = innovations;
         oo__ = oo_;
-        [shocks, spfm_exo_simul, innovations_, oo__] = extended_path_shocks(innovations_, ep, exogenousvariables(:,:,i), samplesize, M_, options_, oo__);
+        [shocks, spfm_exo_simul, innovations_, oo__] = extended_path_shocks(innovations_, exogenousvariables(:,:,i), samplesize, M_, options_, oo__);
         endogenous_variables_paths = NaN(M_.endo_nbr,samplesize+1);
         endogenous_variables_paths(:,1) = initialconditions(:,1);
         exogenous_variables_paths = NaN(innovations_.effective_number_of_shocks,samplesize+1);
@@ -80,12 +80,21 @@ if ep.parallel
             t = t+1;
             spfm_exo_simul(2,:) = shocks(t-1,:);
             exogenous_variables_paths(:,t) = shocks(t-1,:);
-            [endogenous_variables_paths(:,t), info_convergence] = extended_path_core(ep.periods, M_.endo_nbr, M_.exo_nbr, innovations_.positive_var_indx, ...
-                                                                                     spfm_exo_simul, ep.use_first_order_solution_as_initial_guess, endogenous_variables_paths(:,t-1), ...
-                                                                                     oo__.steady_state, ...
-                                                              ep.verbosity, ep.stochastic.order, ...
-                                                              M_, pfm,ep.stochastic.algo, ep.solve_algo, ep.stack_solve_algo, ...
-                                                              options_.lmmcp, options_, oo__);
+            if t>2
+                % Set initial guess for the solver (using the solution of the
+                % previous period problem).
+                initialguess = [endogenousvariablespaths(:, 2:end), oo_.steady_state];
+            else
+                initialguess = [];
+            end
+            [endogenous_variables_paths(:,t), info_convergence, endogenousvariablespaths] = extended_path_core(innovations.positive_var_indx, ...
+                                                                                                               spfm_exo_simul, ...
+                                                                                                               endogenous_variables_paths(:,t-1), ...
+                                                                                                               pfm, ...
+                                                                                                               M_, ...
+                                                                                                               options_, ...
+                                                                                                               oo__, ...
+                                                                                                               initialguess);
             if ~info_convergence
                 msg = sprintf('No convergence of the (stochastic) perfect foresight solver (in period %s, iteration %s)!', int2str(t), int2str(i));
                 warning(msg)
@@ -99,7 +108,7 @@ if ep.parallel
 else
     % Sequential approach.
     for i=1:replic
-        [shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innovations, ep, exogenousvariables(:,:,i), samplesize, M_, options_, oo_);
+        [shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innovations, exogenousvariables(:,:,i), samplesize, M_, options_, oo_);
         endogenous_variables_paths = NaN(M_.endo_nbr,samplesize+1);
         endogenous_variables_paths(:,1) = initialconditions(:,1);
         exogenous_variables_paths = NaN(innovations.effective_number_of_shocks,samplesize+1);
@@ -109,12 +118,21 @@ else
             t = t+1;
             spfm_exo_simul(2,:) = shocks(t-1,:);
             exogenous_variables_paths(:,t) = shocks(t-1,:);
-            [endogenous_variables_paths(:,t), info_convergence] = extended_path_core(ep.periods, M_.endo_nbr, M_.exo_nbr, innovations.positive_var_indx, ...
-                                                                                     spfm_exo_simul, ep.use_first_order_solution_as_initial_guess, endogenous_variables_paths(:,t-1), ...
-                                                                                     oo_.steady_state, ...
-                                                              ep.verbosity, ep.stochastic.order, ...
-                                                              M_, pfm,ep.stochastic.algo, ep.solve_algo, ep.stack_solve_algo, ...
-                                                              options_.lmmcp, options_, oo_);
+            if t>2
+                % Set initial guess for the solver (using the solution of the
+                % previous period problem).
+                initialguess = [endogenousvariablespaths(:, 2:end), oo_.steady_state];
+            else
+                initialguess = [];
+            end
+            [endogenous_variables_paths(:,t), info_convergence, endogenousvariablespaths] = extended_path_core(innovations.positive_var_indx, ...
+                                                                                                               spfm_exo_simul, ...
+                                                                                                               endogenous_variables_paths(:,t-1), ...
+                                                                                                               pfm, ...
+                                                                                                               M_, ...
+                                                                                                               options_, ...
+                                                                                                               oo_, ...
+                                                                                                               initialguess);
             if ~info_convergence
                 msg = sprintf('No convergence of the (stochastic) perfect foresight solver (in period %s, iteration %s)!', int2str(t), int2str(i));
                 warning(msg)

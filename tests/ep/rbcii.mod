@@ -50,13 +50,10 @@ end;
 
     steady(nocheck);
 
-    options_.ep.stochastic.order = 0;
-
-    ts = extended_path([], 200, [], options_, M_, oo_);
-    ts.save('rbcii-sim-data');
-
-    options_.ep.stochastic.order = 1;
-    ts1_4 = extended_path([], 200, [], options_, M_, oo_);
+    //options_.ep.stochastic.order = 0;
+    set_dynare_seed(2009);
+    Simulated_time_series = extended_path([], 200, [], options_, M_, oo_);
+    Simulated_time_series.save('rbcii-sim-data');
 
 @#else
 

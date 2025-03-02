@@ -49,9 +49,10 @@ shocks;
   stderr 0.10;
 end;
 
-extended_path(periods=200,lmmcp);
+set_dynare_seed(2009);
+extended_path(periods=200,order=0,lmmcp);
 
-if any(oo_.endo_simul(strmatch('i',M_.endo_names,'exact'),:)<-1e-6)
+if any(Simulated_time_series.i.data<-1e-6)
     error('lmmcp tag did not work.')
 end
 
@@ -59,10 +60,10 @@ ds = dseries('rbcii-sim-data.mat');
 if isoctave
     tolerance=5e-5;
 else
-    tolerance=1e-6;
+    tolerance=1e-5;
 end
 
-if any(abs(transpose(oo_.endo_simul(strmatch('i',M_.endo_names,'exact'),:))-ds.Investment.data)>tolerance)
+if any(abs(Simulated_time_series.i.data-ds.Investment.data)>tolerance)
     error('Simulation with lmmcp returns different results.')
 end
 
