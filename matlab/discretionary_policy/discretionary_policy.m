@@ -35,6 +35,9 @@ origorder = options_.order;
 options_.order = 1;
 [info, oo_, options_, M_] = stoch_simul(M_, options_, oo_, var_list);
 
+if info(1)
+    return;
+end
 oo_.steady_state = oo_.dr.ys;
 
 if ~options_.noprint
