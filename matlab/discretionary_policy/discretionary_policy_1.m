@@ -42,6 +42,7 @@ if options_.steadystate_flag
     [ys,M_.params,info] = evaluate_steady_state_file(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_, ...
                                                     options_,~options_.steadystate.nocheck);
     if info(1)
+        params=M_.params;
         return;
     end
 else
