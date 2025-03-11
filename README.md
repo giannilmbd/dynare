@@ -362,7 +362,7 @@ cd dynare
 ```
 - Configure Dynare from the source directory:
 ```sh
-meson setup -Dmatlab_path=<…> --buildtype=debugoptimized --prefer-static -Dfortran_args="['-B','/usr/local/lib']" build-matlab
+meson setup -Dmatlab_path=<…> --buildtype=debugoptimized --prefer-static -Dfortran_args="['-B','C:/msys64/usr/local/lib']" build-matlab
 ```
 where the path of MATLAB is specified. Note that you should use
 the MSYS2 notation and not put spaces in the MATLAB path, so you probably want
