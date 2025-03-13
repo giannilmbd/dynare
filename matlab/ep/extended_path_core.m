@@ -41,7 +41,7 @@ stack_solve_algo = ep.stack_solve_algo;
 if init% Compute first order solution (Perturbation)...
     endo_simul = simult_(M_,options_,initial_conditions,oo_.dr,exo_simul(2:end,:),1);
 else
-    if nargin==19 && ~isempty(initialguess)
+    if nargin==8 && ~isempty(initialguess)
         % Note that the first column of initialguess should be equal to initial_conditions.
         endo_simul = initialguess;
     else
