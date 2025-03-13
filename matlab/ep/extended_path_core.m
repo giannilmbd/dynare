@@ -1,11 +1,12 @@
-function [y, info_convergence, endogenousvariablespaths, pfm, options_] = extended_path_core(positive_var_indx, ...
+function [y1, info_convergence, endogenousvariablespaths, y, pfm, options_] = extended_path_core(positive_var_indx, ...
                                                                                              exo_simul, ...
                                                                                              initial_conditions ,...
                                                                                              pfm, ...
                                                                                              M_, ...
                                                                                              options_, ...
                                                                                              oo_, ...
-                                                                                             initialguess)
+                                                                                             initialguess, ...
+                                                                                             y)
 
 % Copyright © 2016-2025 Dynare Team
 %
@@ -41,12 +42,16 @@ stack_solve_algo = ep.stack_solve_algo;
 if init% Compute first order solution (Perturbation)...
     endo_simul = simult_(M_,options_,initial_conditions,oo_.dr,exo_simul(2:end,:),1);
 else
-    if nargin==8 && ~isempty(initialguess)
+    if nargin>7 && ~isempty(initialguess)
         % Note that the first column of initialguess should be equal to initial_conditions.
         endo_simul = initialguess;
     else
         endo_simul = [initial_conditions repmat(steady_state,1,periods+1)];
     end
+end
+
+if nargin~=9
+    y = [];
 end
 
 oo_.endo_simul = endo_simul;
@@ -77,17 +82,17 @@ else
     switch(algo)
       case 0
         % Full tree of future trajectories.
-        if nargout>3
-            [flag, endogenousvariablespaths, errorcode, ~, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, options_, M_, pfm);
+        if nargout>4
+            [flag, endogenousvariablespaths, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm);
         else
-            [flag, endogenousvariablespaths, errorcode] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, options_, M_, pfm);
+            [flag, endogenousvariablespaths, errorcode, y] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm);
         end
       case 1
         % Sparse tree of future histories.
-        if nargout>3
-            [flag, endogenousvariablespaths, errorcode, ~, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, options_, M_, pfm);
+        if nargout>4
+            [flag, endogenousvariablespaths, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm);
         else
-            [flag, endogenousvariablespaths, errorcode] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, options_, M_, pfm);
+            [flag, endogenousvariablespaths, errorcode, y] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm);
         end
     end
     info_convergence = ~flag;
@@ -98,7 +103,7 @@ if ~info_convergence && ~options_.no_homotopy
 end
 
 if info_convergence
-    y = endogenousvariablespaths(:,2);
+    y1 = endogenousvariablespaths(:,2);
 else
-    y = NaN(size(endo_nbr,1));
+    y1 = NaN(size(endo_nbr,1));
 end

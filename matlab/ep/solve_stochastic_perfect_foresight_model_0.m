@@ -1,4 +1,4 @@
-function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, options_, M_, pfm)
+function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm)
 
 % Copyright © 2025 Dynare Team
 %
@@ -148,7 +148,9 @@ end
 
 pfm.Y = repmat(endo_simul(:),1,pfm.world_nbr);
 
-y = repmat(pfm.steady_state, pfm.dimension/pfm.ny, 1);
+if isempty(y)
+    y = repmat(pfm.steady_state, pfm.dimension/pfm.ny, 1);
+end
 
 if update_options_struct
     % Set algorithm
