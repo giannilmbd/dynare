@@ -78,7 +78,6 @@ if update_pfm_struct
     [~, jacobian] = dynamic_model(z, exo_simul, pfm.params, pfm.steady_state, 2);
 
     world_nbr = nnodes^order;
-    Y = repmat(endo_simul(:),1,world_nbr);
 
     % The columns of A map the elements of Y such that
     % each block of Y with ny rows are unfolded column wise
@@ -142,11 +141,12 @@ if update_pfm_struct
     pfm.i_cols_T = i_cols_T;
     pfm.i_upd_r = i_upd_r;
     pfm.i_upd_y = i_upd_y;
-    pfm.Y = Y;
 
     pfm.dimension = dimension;
 
 end
+
+pfm.Y = repmat(endo_simul(:),1,pfm.world_nbr);
 
 y = repmat(pfm.steady_state, pfm.dimension/pfm.ny, 1);
 

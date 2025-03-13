@@ -39,7 +39,7 @@ i_hc = i_cols_f - 2*ny;
 
 nzA = cell(periods,world_nbr);
 res = zeros(ny,periods,world_nbr);
-Y = pfm.Y; %zeros(ny*(periods+2),world_nbr);
+Y = zeros(ny*(periods+2),world_nbr);
 Y(1:ny,1) = pfm.y0;
 Y(end-ny+1:end,:) = repmat(steady_state,1,world_nbr);
 Y(pfm.i_upd_y) = y;

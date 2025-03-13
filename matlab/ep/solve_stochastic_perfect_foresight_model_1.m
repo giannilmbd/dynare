@@ -72,9 +72,6 @@ if update_pfm_struct
     % The third row block is ny x nnodes^2
     % and so on until size ny x nnodes^order
     world_nbr = pfm.world_nbr;
-    % Y = endo_simul(:,2:end-1);
-    pfm.Y = repmat(endo_simul(:), 1, world_nbr);
-    pfm.y0 = endo_simul(:,1);
 
     % The columns of A map the elements of Y such that
     % each block of Y with ny rows are unfolded column wise
@@ -132,6 +129,8 @@ if update_options_struct
         options_.mcppath.ub = repmat(ub, pfm.block_nbr, 1);
     end
 end
+
+pfm.y0 = endo_simul(:,1);
 
 [y, errorflag, ~, ~, errorcode] = dynare_solve(@ep_problem_2, y, options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, options_, exo_simul, pfm);
 endo_simul(:,2) = y(1:pfm.ny);
