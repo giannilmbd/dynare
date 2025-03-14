@@ -1,4 +1,20 @@
-function [res,A,info] = ep_problem_1(y, x, pfm)
+function [res, A, info] = ep_problem_1(y, x, pfm)
+
+% Evaluate the residuals and stacked jacobian of a stochastic perfect
+% foresight, considering sequences of future innovations in a sparse tree.
+%
+% INPUTS:
+% - y      [double]   m×1 vector (endogenous variables in all periods and future worlds).
+% - x      [double]   q×1 vector of exogenous variables.
+% - pfm    [struct]   Definition of the perfect foresight model to be solved.
+%
+% OUTPUTS:
+% - res    [double]   m×1 vector, residuals of the stacked equations.
+% - A      [double]   m×m sparse matrix, jacobian of the stacked equations.
+% - info   [logical]  scalar
+%
+% REMARKS:
+% [1] The structure pfm holds the given initial condition for the states (pfm.y0) and the terminal condition
 
 info = false;
 A = [];
