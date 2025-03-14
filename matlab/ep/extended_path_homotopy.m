@@ -40,7 +40,7 @@ if ismember(method, [1, 2])
             switch(algo)
               case 0
                 [flag, endo_simul_new] = ...
-                    solve_stochastic_perfect_foresight_model(endo_simul, exo_simul, pfm, ep.stochastic.quadrature.nodes, ep.stochastic.order);
+                    solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, pfm, ep.stochastic.quadrature.nodes, ep.stochastic.order);
               case 1
                 [flag, endo_simul_new] = ...
                     solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, options_, pfm, ep.stochastic.order);
@@ -107,7 +107,7 @@ if isequal(method, 3) || (isequal(method, 2) && noconvergence)
             switch(algo)
               case 0
                 [flag, endo_simul_new] = ...
-                    solve_stochastic_perfect_foresight_model(endo_simul, exo_simul, pfm, ep.stochastic.quadrature.nodes, ep.stochastic.order);
+                    solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, pfm, ep.stochastic.quadrature.nodes, ep.stochastic.order);
               case 1
                 [flag, endo_simul_new] = ...
                     solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, options_, pfm, ep.stochastic.order);
