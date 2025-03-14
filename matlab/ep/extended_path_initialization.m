@@ -113,6 +113,11 @@ else
     pfm.dr = [];
 end
 
+% Deactivate homotopy with SEP
+if ep.stochastic.order>0
+    options_.no_homotopy = true;
+end
+
 % number of nonzero derivatives
 pfm.nnzA = M_.NNZDerivatives(1);
 
