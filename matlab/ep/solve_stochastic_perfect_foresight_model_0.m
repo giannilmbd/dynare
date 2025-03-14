@@ -166,6 +166,6 @@ if update_options_struct
     end
 end
 
-[y, errorflag, ~, ~, errorcode] = dynare_solve(@ep_problem_1, y, options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, options_, exo_simul, pfm);
+[y, errorflag, ~, ~, errorcode] = dynare_solve(@ep_problem_0, y, options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, options_, exo_simul, pfm);
 
 endo_simul(:,2) = y(1:ny);
