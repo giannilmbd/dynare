@@ -79,7 +79,7 @@ for i = 1:order+1
                 else
                     k1 = (nnodes-1)*(i-1)+k;
                 end
-                if hybrid_order == 2 && (k > 1 || i == order)
+                if hybrid_order && (k > 1 || i == order)
                     z = [Y(i_cols_p,1);
                          Y(i_cols_s,1);
                              Y(i_cols_f,k1)+h_correction(i_hc)];

@@ -62,17 +62,17 @@ if update_pfm_struct
     pfm.nodes = nodes;
     pfm.weights = weights;
 
-    hybrid_order = pfm.hybrid_order;
-    dr = pfm.dr;
-    if hybrid_order > 0
-        if hybrid_order == 2
-            h_correction = 0.5*dr.ghs2(dr.inv_order_var);
+    if pfm.hybrid_order>0
+        if pfm.hybrid_order==2
+            pfm.h_correction = 0.5*pfm.dr.ghs2(dr.inv_order_var);
+        elseif pfm.hybrid_order>2
+            pfm.h_correction = pfm.dr.g_0(pfm.dr.inv_order_var);
+        else
+            pfm.h_correction = 0;
         end
     else
-        h_correction = 0;
+        pfm.h_correction = 0;
     end
-
-    pfm.h_correction = h_correction;
 
     z = endo_simul(lead_lag_incidence_t(:)>0);
     [~, jacobian] = dynamic_model(z, exo_simul, pfm.params, pfm.steady_state, 2);
@@ -134,7 +134,6 @@ if update_pfm_struct
     pfm.order = order;
     pfm.world_nbr = world_nbr;
 
-    pfm.hybrid_order = hybrid_order;
     pfm.i_cols_1 = i_cols_1;
     pfm.i_cols_h = i_cols_j;
     pfm.icA = icA;

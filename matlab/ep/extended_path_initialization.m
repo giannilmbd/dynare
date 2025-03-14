@@ -100,7 +100,11 @@ end
 
 % hybrid correction
 pfm.hybrid_order = ep.stochastic.hybrid_order;
-if pfm.hybrid_order
+if pfm.hybrid_order==1
+    warning('extended_path:: hybrid=1 is equivalent to hybrid=0 (option value must be an integer greater than 1 to be effective).')
+end
+
+if pfm.hybrid_order>1
     oo_.dr = set_state_space(oo_.dr, M_);
     options = options_;
     options.order = pfm.hybrid_order;

@@ -43,7 +43,7 @@ for i = 1:order+1
         end
         if i <= order
             for k=1:nnodes
-                if hybrid_order==2 && i==order
+                if hybrid_order && i==order
                     z = [Y(i_cols_p,i_w_p);
                          Y(i_cols_s,j);
                          Y(i_cols_f,(j-1)*nnodes+k)+h_correction(i_hc)];
