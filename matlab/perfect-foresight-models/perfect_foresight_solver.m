@@ -1,13 +1,10 @@
-function [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, no_error_if_learnt_in_is_present, marginal_linearization_previous_raw_sims)
+function [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, marginal_linearization_previous_raw_sims)
 % Computes deterministic simulations
 %
 % INPUTS
 %   M_                  [structure] describing the model
 %   options_            [structure] describing the options
 %   oo_                 [structure] storing the results
-%   no_error_if_learnt_in_is_present [boolean, optional]
-%       if true, then do not error out if a shocks(learnt_in=…) or endval(learnt_in=…)
-%       block is present
 %   marginal_linearization_previous_raw_sims [struct, optional]
 %       if not empty, contains the two simulations used to compute the extrapolation by marginal
 %       linearization in a previous informational period, in the context of
@@ -23,7 +20,7 @@ function [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, no_error_if_learn
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -43,13 +40,7 @@ function [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, no_error_if_learn
 check_input_arguments(options_, M_, oo_);
 
 if nargin < 4
-    no_error_if_learnt_in_is_present = false;
-end
-if nargin < 5
     marginal_linearization_previous_raw_sims = [];
-end
-if (~isempty(M_.learnt_shocks) || ~isempty(M_.learnt_endval)) && ~no_error_if_learnt_in_is_present
-    error('A shocks(learnt_in=...) or endval(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
 end
 
 [periods, first_simulation_period, last_simulation_period] = get_simulation_periods(options_);

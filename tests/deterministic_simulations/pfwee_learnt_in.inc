@@ -112,12 +112,13 @@ perfect_foresight_with_expectation_errors_solver;
 pfwee_simul = oo_.endo_simul;
 
 // Now compute the solution by hand to verify the results
+verbatim;
+
 oo_.steady_state = orig_steady_state;
 oo_.exo_steady_state = orig_exo_steady_state;
 
-perfect_foresight_setup;
-
-verbatim;
+oo_ = make_ex_(M_,options_,oo_);
+oo_ = make_y_(M_,options_,oo_);
 
 @#if dates
 % Reset {first,last}_simulation_period since we’re going to manipulate options_.periods
@@ -132,7 +133,7 @@ oo_.exo_simul(4:end,1) = 1.05;
 oo_.exo_steady_state = 1.05;
 oo_.steady_state = evaluate_steady_state(oo_.steady_state, oo_.exo_steady_state, M_, options_, true);
 oo_.endo_simul(:, end) = oo_.steady_state;
-oo_=perfect_foresight_solver(M_, options_, oo_, true);
+oo_=perfect_foresight_solver(M_, options_, oo_);
 
 % Information arriving in period 2 (temp shock now + permanent shock in future)
 oo_.exo_simul(3,1) = 1.3;
@@ -145,7 +146,7 @@ saved_endo = oo_.endo_simul(:, 1);
 saved_exo = oo_.exo_simul(1, :);
 oo_.endo_simul = oo_.endo_simul(:, 2:end);
 oo_.exo_simul = oo_.exo_simul(2:end, :);
-oo_=perfect_foresight_solver(M_, options_, oo_, true);
+oo_=perfect_foresight_solver(M_, options_, oo_);
 oo_.endo_simul = [ saved_endo oo_.endo_simul ];
 oo_.exo_simul = [ saved_exo; oo_.exo_simul ];
 
@@ -162,7 +163,7 @@ saved_endo = oo_.endo_simul(:, 1:2);
 saved_exo = oo_.exo_simul(1:2, :);
 oo_.endo_simul = oo_.endo_simul(:, 3:end);
 oo_.exo_simul = oo_.exo_simul(3:end, :);
-oo_=perfect_foresight_solver(M_, options_, oo_, true);
+oo_=perfect_foresight_solver(M_, options_, oo_);
 oo_.endo_simul = [ saved_endo oo_.endo_simul ];
 oo_.exo_simul = [ saved_exo; oo_.exo_simul ];
 
@@ -178,7 +179,7 @@ saved_endo = oo_.endo_simul(:, 1:5);
 saved_exo = oo_.exo_simul(1:5, :);
 oo_.endo_simul = oo_.endo_simul(:, 6:end);
 oo_.exo_simul = oo_.exo_simul(6:end, :);
-oo_=perfect_foresight_solver(M_, options_, oo_, true);
+oo_=perfect_foresight_solver(M_, options_, oo_);
 oo_.endo_simul = [ saved_endo oo_.endo_simul ];
 oo_.exo_simul = [ saved_exo; oo_.exo_simul ];
 

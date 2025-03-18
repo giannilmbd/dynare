@@ -14,7 +14,7 @@ function oo_=perfect_foresight_setup(M_, options_, oo_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -70,6 +70,10 @@ end
 
 if options_.simul.endval_steady && M_.maximum_lead == 0
     error('PERFECT_FORESIGHT_SETUP: Option endval_steady cannot be used on a purely backward or static model.')
+end
+
+if ~isempty(M_.learnt_shocks) || ~isempty(M_.learnt_endval)
+    error('A shocks(learnt_in=...) or endval(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
 end
 
 oo_ = make_ex_(M_,options_,oo_);

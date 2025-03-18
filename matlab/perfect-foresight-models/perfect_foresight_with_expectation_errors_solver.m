@@ -7,7 +7,7 @@ function [oo_, ts] = perfect_foresight_with_expectation_errors_solver(M_, option
 % OUTPUTS
 %   oo_                 [structure] storing the results
 
-% Copyright © 2021-2024 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -85,7 +85,7 @@ while info_period <= periods
         marginal_linearization_previous_raw_sims = [];
     end
 
-    oo_= perfect_foresight_solver(M_, options_, oo_, true, marginal_linearization_previous_raw_sims);
+    oo_= perfect_foresight_solver(M_, options_, oo_, marginal_linearization_previous_raw_sims);
 
     if ~oo_.deterministic_simulation.status
         error('perfect_foresight_with_expectation_errors_solver: failed to compute solution for information available at period %d\n', info_period)
