@@ -97,7 +97,7 @@ License: GPL-3+
 
 Files: matlab/optimization/cmaes.m
 Copyright: 2001-2012 Nikolaus Hansen
-           2012-2017 Dynare Team
+           2012-2023 Dynare Team
 License: GPL-3+
 
 Files: matlab/optimization/solvopt.m
@@ -173,7 +173,7 @@ Comment: The author gave authorization to redistribute
 Files: matlab/+gsa/Morris_Measure_Groups.m
        matlab/+gsa/Sampling_Function_2.m
 Copyright: 2005 European Commission
-           2012-2013 Dynare Team
+           2012-2023 Dynare Team
 License: GPL-3+
 Comment: Written by Jessica Cariboni and Francesca Campolongo
  Joint Research Centre, The European Commission,
@@ -220,14 +220,14 @@ License: GPL-3+
 
 Files: matlab/missing/stats/quantile.m
 Copyright: 2014-2016 Christopher Hummersone
-           2016-2017 Dynare Team
+           2016-2023 Dynare Team
 License: GPL-3+
 
 Files: matlab/missing/stats/corr.m
 Copyright: 1993-1996 Kurt Hornik
            1996-2015 John W. Eaton
            2013-2015 Julien Bect
-           2016-2017 Dynare Team
+           2016-2023 Dynare Team
 License: GPL-3+
 
 Files: matlab/lmmcp/catstruct.m
@@ -278,14 +278,14 @@ License: GPL-3+
 
 Files: scripts/dynare.el
 Copyright: 2010 Yannick Kalantzis
-           2019-2023 Dynare Team
+           2019-2024 Dynare Team
 License: GPL-3+
 
 Files: mex/sources/gensylv/gensylv.cc
        mex/sources/libkorder/kord/* mex/sources/libkorder/sylv/*
        mex/sources/libkorder/tl/* mex/sources/libkorder/utils/*
 Copyright: 2004-2011 Ondra Kamenik
-           2019-2023 Dynare Team
+           2019-2025 Dynare Team
 License: GPL-3+
 
 Files: mex/sources/sobol/sobol.f08
@@ -294,11 +294,11 @@ Copyright: 2004-2009 John Burkardt
 License: LGPL-3+
 
 Files: preprocessor/doc/macroprocessor/*
-Copyright: 2008-2021 Dynare Team
+Copyright: 2008-2024 Dynare Team
 License: CC-BY-SA-4.0
 
 Files: preprocessor/doc/preprocessor/*
-Copyright: 2007-2019 Dynare Team
+Copyright: 2007-2023 Dynare Team
 License: CC-BY-SA-4.0
 
 Files: contrib/ms-sbvar/utilities_dw/*
