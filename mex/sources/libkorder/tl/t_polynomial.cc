@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -19,39 +19,6 @@
  */
 
 #include "t_polynomial.hh"
-#include "kron_prod.hh"
-
-// PowerProvider::getNext() unfolded code
-/* This method constructs unfolded ‘ut’ of higher dimension, deleting
-   the previous. */
-
-const URSingleTensor&
-PowerProvider::getNext(dummy<URSingleTensor>)
-{
-  if (ut)
-    {
-      auto ut_new = std::make_unique<URSingleTensor>(nv, ut->dimen() + 1);
-      KronProd::kronMult(ConstVector(origv), ConstVector(ut->getData()), ut_new->getData());
-      ut = std::move(ut_new);
-    }
-  else
-    {
-      ut = std::make_unique<URSingleTensor>(nv, 1);
-      ut->getData() = origv;
-    }
-  return *ut;
-}
-
-// PowerProvider::getNext() folded code
-/* This method just constructs next unfolded ‘ut’ and creates folded ‘ft’. */
-
-const FRSingleTensor&
-PowerProvider::getNext(dummy<FRSingleTensor>)
-{
-  getNext<URSingleTensor>();
-  ft = std::make_unique<FRSingleTensor>(*ut);
-  return *ft;
-}
 
 UTensorPolynomial::UTensorPolynomial(const FTensorPolynomial& fp) :
     TensorPolynomial<UFSTensor, UGSTensor, URSingleTensor>(fp.nrows(), fp.nvars())

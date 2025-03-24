@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -55,6 +55,7 @@
 #define T_POLYNOMIAL_HH
 
 #include "fs_tensor.hh"
+#include "kron_prod.hh"
 #include "pascal_triangle.hh"
 #include "rfs_tensor.hh"
 #include "t_container.hh"
@@ -89,33 +90,48 @@ public:
   {
   }
 
-  /*
-    We need to select getNext() implementation at compile type depending on a
-    type parameter.
-
-    Unfortunately full specialization is not possible at class scope. This may
-    be a bug in GCC 6. See:
-    https://stackoverflow.com/questions/49707184/explicit-specialization-in-non-namespace-scope-does-not-compile-in-gcc
-
-    Apply the workaround suggested in:
-    https://stackoverflow.com/questions/3052579/explicit-specialization-in-non-namespace-scope
-  */
-  template<typename T>
-  struct dummy
-  {
-    using type = T;
-  };
-
   template<class T>
+  const T& getNext();
+
+  // PowerProvider::getNext() unfolded code
+  /* This method constructs unfolded ‘ut’ of higher dimension, deleting
+     the previous.
+
+     Ideally we would like to use a full-specialization of the template, but this is not
+     possible due to a GCC bug, so we use a workaround using std::same_as concept.
+     See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282 */
+  template<std::same_as<URSingleTensor> T>
   const T&
   getNext()
   {
-    return getNext(dummy<T>());
+    if (ut)
+      {
+        auto ut_new = std::make_unique<URSingleTensor>(nv, ut->dimen() + 1);
+        KronProd::kronMult(ConstVector(origv), ConstVector(ut->getData()), ut_new->getData());
+        ut = std::move(ut_new);
+      }
+    else
+      {
+        ut = std::make_unique<URSingleTensor>(nv, 1);
+        ut->getData() = origv;
+      }
+    return *ut;
   }
 
-private:
-  const URSingleTensor& getNext(dummy<URSingleTensor>);
-  const FRSingleTensor& getNext(dummy<FRSingleTensor>);
+  // PowerProvider::getNext() folded code
+  /* This method just constructs next unfolded ‘ut’ and creates folded ‘ft’.
+
+     Ideally we would like to use a full-specialization of the template, but this is not
+     possible due to a GCC bug, so we use a workaround using std::same_as concept.
+     See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85282 */
+  template<std::same_as<FRSingleTensor> T>
+  const T&
+  getNext()
+  {
+    getNext<URSingleTensor>();
+    ft = std::make_unique<FRSingleTensor>(*ut);
+    return *ft;
+  }
 };
 
 /* The tensor polynomial is basically a tensor container which is more
