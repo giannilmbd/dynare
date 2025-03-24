@@ -161,6 +161,10 @@ if (any(bayestopt_.pshape  >0 ) && options_.mh_replic) && options_.mh_nblck<1
     error('initial_estimation_checks:: Bayesian estimation cannot be conducted with mh_nblocks=0.')
 end
 
+if options_.mh_drop<0 || options_.mh_drop>=1
+    error('initial_estimation_checks:: mh_drop must be in [0,1).')    
+end
+
 % check and display warnings if steady-state solves static model (except if diffuse_filter == 1) and if steady-state changes estimated parameters
 [oo_.steady_state] = check_steady_state_changes_parameters(M_,estim_params_,oo_,options_, [options_.diffuse_filter==0 options_.diffuse_filter==0] );
 
