@@ -32,6 +32,12 @@ endval(learnt_in = 5);
   LoggedProductivityInnovation = 1;
 end;
 
+shocks(learnt_in = 3);
+  var LoggedProductivityInnovation;
+  periods 4;
+  values 0.2;
+end;
+
 perfect_foresight_with_expectation_errors_setup(periods=200);
 perfect_foresight_with_expectation_errors_solver(homotopy_max_completion_share = 0.8, homotopy_marginal_linearization_fallback, steady_solve_algo = 13);
 

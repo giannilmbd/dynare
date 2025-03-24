@@ -75,11 +75,11 @@ while info_period <= periods
     options_.simul.last_simulation_period = dates();
 
     if info_period > 1 && homotopy_completion_share < 1 && options_.simul.homotopy_marginal_linearization_fallback > 0
-        marginal_linearization_previous_raw_sims.sim1.endo_simul = oo_.deterministic_simulation.sim1.endo_simul(:, info_period:end);
-        marginal_linearization_previous_raw_sims.sim1.exo_simul = oo_.deterministic_simulation.sim1.exo_simul(info_period:end, :);
+        marginal_linearization_previous_raw_sims.sim1.endo_simul = oo_.deterministic_simulation.sim1.endo_simul(:, increment+1:end);
+        marginal_linearization_previous_raw_sims.sim1.exo_simul = oo_.deterministic_simulation.sim1.exo_simul(increment+1:end, :);
         marginal_linearization_previous_raw_sims.sim1.homotopy_completion_share = oo_.deterministic_simulation.sim1.homotopy_completion_share;
-        marginal_linearization_previous_raw_sims.sim2.endo_simul = oo_.deterministic_simulation.sim2.endo_simul(:, info_period:end);
-        marginal_linearization_previous_raw_sims.sim2.exo_simul = oo_.deterministic_simulation.sim2.exo_simul(info_period:end, :);
+        marginal_linearization_previous_raw_sims.sim2.endo_simul = oo_.deterministic_simulation.sim2.endo_simul(:, increment+1:end);
+        marginal_linearization_previous_raw_sims.sim2.exo_simul = oo_.deterministic_simulation.sim2.exo_simul(increment+1:end, :);
         marginal_linearization_previous_raw_sims.sim2.homotopy_completion_share = oo_.deterministic_simulation.sim2.homotopy_completion_share;
     else
         marginal_linearization_previous_raw_sims = [];
