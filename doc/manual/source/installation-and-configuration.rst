@@ -100,6 +100,18 @@ Debian, Ubuntu and Linux Mint).
 On macOS
 --------
 
+.. warning::
+
+   Installing into ``/Applications/dynare`` might fail if you have older versions of Dynare already installed in ``/Applications/Dynare``.
+   To fix this, modify the ownership by executing the following command in Terminal.app::
+
+     sudo chown -R "$USER":staff /Applications/Dynare
+
+   Alternatively, you can modify the installation path in the automated installed using *Customize* and *Location*.
+   After installation, the folder will contain several sub-directories, among which are ``matlab``, ``mex``, and ``doc``.
+   Several versions of Dynare can coexist (by default in ``/Applications/Dynare``),
+   as long as you correctly adjust your path settings (see :ref:`words-warning`).
+
 With MATLAB
 ^^^^^^^^^^^
 
@@ -109,15 +121,6 @@ and follow the instructions.
 This installation does not require administrative privileges.
 If for some reason admin rights are requested, use *Change Install Location* and select *Install for me only*.
 The default installation directory is ``/Applications/Dynare/x.y-arch``.
-Installing into ``/Applications/dynare`` might fail if you have older versions of Dynare already installed in ``/Applications/Dynare``.
-To fix this, modify the ownership by executing the following command in Terminal.app::
-
-  sudo chown -R "$USER":staff /Applications/Dynare
-
-Alternatively, you can modify the installation path in the automated installed using *Customize* and *Location*.
-After installation, the folder will contain several sub-directories, among which are ``matlab``, ``mex``, and ``doc``.
-Several versions of Dynare can coexist (by default in ``/Applications/Dynare``),
-as long as you correctly adjust your path settings (see :ref:`words-warning`).
 
 It is recommended to install the Xcode Command Line Tools (this is an Apple product)
 and GCC via Homebrew_ (see :ref:`prerequisites-macos`).
@@ -141,6 +144,8 @@ Finally, at the Octave prompt, install some add-ons (you only have to do it
 once)::
 
   octave:1> pkg install -forge io statistics control struct optim
+
+If you want to use the `x13` functionality of `dseries`, you also need to build the `x13as` binary. [#fx13]_
 
 On FreeBSD
 ----------
@@ -334,3 +339,8 @@ Dynare unusable.
 .. _Dynare wiki: https://git.dynare.org/Dynare/dynare/wikis
 .. _Octave-Forge: https://octave.sourceforge.io/
 .. _Homebrew: https://brew.sh
+
+
+.. rubric:: Footnotes
+
+.. [#fx13] See the instructions at `<https://forum.dynare.org/t/missing-installation-package/27350/4>`__.
