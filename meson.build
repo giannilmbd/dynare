@@ -199,7 +199,11 @@ else # Octave build
 
   octave_incflags = run_command(mkoctfile_exe, '-p', 'INCFLAGS', check : true).stdout().split()
   octlibdir = run_command(mkoctfile_exe, '-p', 'OCTLIBDIR', check : true).stdout().strip()
-  octave_libs = run_command(mkoctfile_exe, '-p', 'OCTAVE_LIBS', check : true).stdout().split()
+  if octave_version.version_compare('<10')
+    octave_libs = run_command(mkoctfile_exe, '-p', 'OCTAVE_LIBS', check : true).stdout().split()
+  else
+    octave_libs = run_command(mkoctfile_exe, '-p', 'LIBOCTMEX', check : true).stdout().split()
+  endif
 
   octave_link_args = []
 
