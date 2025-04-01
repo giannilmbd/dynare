@@ -17,7 +17,7 @@ function [y, success, maxerror, iter, per_block_status] = perfect_foresight_solv
 % - iter                [integer] Number of iterations of the underlying nonlinear solver (empty for non-iterative methods)
 % - per_block_status    [struct] In the case of block decomposition, provides per-block solver status information (empty if no block decomposition)
 
-% Copyright © 2015-2024 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -43,15 +43,39 @@ end
 
 periods = get_simulation_periods(options_);
 
-if options_.linear_approximation && ~(isequal(options_.stack_solve_algo,0) || isequal(options_.stack_solve_algo,7))
-    error('perfect_foresight_solver: Option linear_approximation is only available with option stack_solve_algo equal to 0 or 7.')
+if options_.linear_approximation
+    if ~ismember(options_.stack_solve_algo, [0 7])
+        error('perfect_foresight_solver: option linear_approximation is only available with stack_solve_algo option equal to 0 or 7')
+    end
+    if options_.block
+        error('perfect_foresight_solver: option linear_approximation is not available with the block option')
+    end
+    if options_.bytecode
+        error('perfect_foresight_solver: option linear_approximation is not available with the bytecode option')
+    end
+    if M_.maximum_endo_lead == 0 || M_.maximum_endo_lag == 0
+        error('perfect_foresight_solver: option linear_approximation is not available with purely backward, purely forward or static models')
+    end
 end
 
-if options_.endogenous_terminal_period && options_.stack_solve_algo ~= 0
-    error('perfect_foresight_solver: option endogenous_terminal_period is only available with option stack_solve_algo equal to 0')
+if options_.endogenous_terminal_period
+    if options_.stack_solve_algo ~= 0
+        error('perfect_foresight_solver: option endogenous_terminal_period is only available with stack_solve_algo option equal to 0')
+    end
+    if options_.block
+        error('perfect_foresight_solver: option endogenous_terminal_period is not available with the block option')
+    end
+    if options_.bytecode
+        error('perfect_foresight_solver: option endogenous_terminal_period is not available with the bytecode option')
+    end
+    if M_.maximum_endo_lead == 0 || M_.maximum_endo_lag == 0
+        error('perfect_foresight_solver: option endogenous_terminal_period is not available with purely backward, purely forward or static models')
+    end
 end
 
-if options_.linear && (isequal(options_.stack_solve_algo, 0) || isequal(options_.stack_solve_algo, 7))
+
+if options_.linear && ismember(options_.stack_solve_algo, [0 7]) && ~options_.block ...
+        && ~options_.bytecode && M_.maximum_endo_lead > 0 && M_.maximum_endo_lag > 0
     options_.linear_approximation = true;
 end
 
@@ -98,22 +122,16 @@ else
             switch options_.stack_solve_algo
               case {0 2 3}
                 if options_.linear_approximation
-                    if ismember(options_.stack_solve_algo, [2 3])
-                        error('Invalid value of stack_solve_algo option!')
-                    end
                     [y, success, maxerror] = sim1_linear(y, exo_simul, steady_state, exo_steady_state, M_, options_);
                 else
                     [y, success, maxerror, iter] = sim1(y, exo_simul, steady_state, M_, options_);
                 end
               case {1 6}
-                if options_.linear_approximation
-                    error('Invalid value of stack_solve_algo option!')
-                end
                 [y, success, maxerror, iter] = sim1_lbj(y, exo_simul, steady_state, M_, options_);
               case 7
                 if options_.linear_approximation
                     if options_.solve_algo == 10 || options_.solve_algo == 11
-                        warning('Since you are requesting an MCP solver, you should not specify your model as model(linear)!')
+                        warning('Since you are requesting an MCP solver, you should not specify your model as model(linear) or use the linear_approximation option!')
                     end
                     [y, success] = solve_stacked_linear_problem(y, exo_simul, steady_state, exo_steady_state, M_, options_);
                 else

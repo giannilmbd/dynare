@@ -4015,7 +4015,7 @@ speed-up on large models.
        shooting and relaxation approaches. Note that round off errors
        are more important with this mixed strategy (user should check
        the reported value of the maximum absolute error). Only
-       available with option ``stack_solve_algo==0``.
+       available with ``stack_solve_algo`` option equal to ``0``.
 
 
     .. option:: linear_approximation
@@ -4024,8 +4024,8 @@ speed-up on large models.
        model. The model must be stationary and a steady state 
        needs to be provided. Linearization is conducted about the 
        last defined steady state, which can derive from ``initval``,
-       ``endval`` or a subsequent ``steady``. Only available with option
-       ``stack_solve_algo==0`` or ``stack_solve_algo==7``.
+       ``endval`` or a subsequent ``steady``. Only available with
+       ``stack_solve_algo`` option equal to ``0`` or ``7``.
 
     .. option:: steady_solve_algo = INTEGER
 
