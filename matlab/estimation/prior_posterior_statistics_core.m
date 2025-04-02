@@ -76,7 +76,7 @@ naK=myinputs.naK;
 horizon=myinputs.horizon;
 iendo=myinputs.iendo;
 IdObs=myinputs.IdObs; %index of observables
-if horizon
+if horizon && ~options_.occbin.smoother.status
     i_last_obs=myinputs.i_last_obs;
     MAX_nforc1=myinputs.MAX_nforc1;
     MAX_nforc2=myinputs.MAX_nforc2;
@@ -168,7 +168,7 @@ if run_smoother
     stock_smoothed_constant=NaN(endo_nbr,gend,MAX_n_smoothed_constant);
     stock_smoothed_trend=NaN(endo_nbr,gend,MAX_n_smoothed_trend);
     stock_trend_coeff = zeros(endo_nbr,MAX_n_trend_coeff);
-    if horizon
+    if horizon && ~options_.occbin.smoother.status
         stock_forcst_mean= NaN(endo_nbr,horizon,MAX_nforc1);
         stock_forcst_point = NaN(endo_nbr,horizon,MAX_nforc2);
         if ~isequal(M_.H,0)
@@ -328,7 +328,7 @@ for b=fpar:B
                 end
             end
         end
-        if horizon
+        if horizon && ~options_.occbin.smoother.status
             yyyy = alphahat(iendo,i_last_obs);
             yf = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
             if options_.prefilter
@@ -563,7 +563,7 @@ dyn_waitbar_close(h);
 
 
 function yf=simulate_posterior_forecasts(y0,dr,horizon,stochastic_indicator,Sigma_e,n)
-% function yf=forcst2(y0,horizon,dr,n)
+% function yf=simulate_posterior_forecasts(y0,horizon,dr,n)
 %
 % computes forecasts based on first order model solution, given shocks
 % drawn from the shock distribution, but not including measurement error
