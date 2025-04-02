@@ -1627,6 +1627,7 @@ mod_and_m_tests = [
                'deprecated/ramst.mod' ] },
   { 'test' : [ 'deterministic_simulations/ramst_pf_controlled_paths.mod',
                'deterministic_simulations/ramst_pf_controlled_paths_lbj.mod',
+               'deterministic_simulations/ramst_pf_controlled_paths_ssa7.mod',
                'deterministic_simulations/ramst_pf_controlled_paths_check.mod' ],
     'extra' : [ 'deterministic_simulations/ramst_pf_controlled_paths_common.inc'] },
   { 'test' : [ 'deterministic_simulations/ramst_pfwee_controlled_paths.mod' ],

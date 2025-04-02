@@ -78,8 +78,11 @@ end
 
 if ~isempty(controlled_paths_by_period)
     assert(nargout >= 6); % Ensure modified exos are used
-    if ~ismember(options_.stack_solve_algo, [0 1 2 3 6])
-        error('perfect_foresight_controlled_paths is only available with stack_solve_algo option equal to 0, 1, 2, 3 or 6')
+    if ~ismember(options_.stack_solve_algo, [0 1 2 3 6 7])
+        error('perfect_foresight_controlled_paths is only available with stack_solve_algo option equal to 0, 1, 2, 3, 6 or 7')
+    end
+    if options_.stack_solve_algo == 7 && ismember(options_.solve_algo, [10, 11])
+        error('perfect_foresight_controlled_paths is not available for mixed-complementarity problems (LMMCP or PATH solvers)')
     end
     if options_.bytecode
         error('perfect_foresight_controlled_paths is not available with the bytecode option')
@@ -157,7 +160,7 @@ else
                     end
                     [y, success] = solve_stacked_linear_problem(y, exo_simul, steady_state, exo_steady_state, M_, options_);
                 else
-                    [y, success, maxerror] = solve_stacked_problem(y, exo_simul, steady_state, M_, options_);
+                    [y, success, maxerror, exo_simul] = solve_stacked_problem(y, exo_simul, steady_state, controlled_paths_by_period, M_, options_);
                 end
               otherwise
                 error('Invalid value of stack_solve_algo option!')

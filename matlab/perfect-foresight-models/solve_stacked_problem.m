@@ -1,20 +1,23 @@
-function [endogenousvariables, success, maxerror] = solve_stacked_problem(endogenousvariables, exogenousvariables, steadystate, M_, options_)
+function [endogenousvariables, success, maxerror, exogenousvariables] = solve_stacked_problem(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
 % [endogenousvariables, success, maxerror] = solve_stacked_problem(endogenousvariables, exogenousvariables, steadystate, M_, options_)
 % Solves the perfect foresight model using dynare_solve
 %
 % INPUTS
-% - endogenousvariables [double] N*T array, paths for the endogenous variables (initial guess).
-% - exogenousvariables  [double] T*M array, paths for the exogenous variables.
+% - endogenousvariables [double] N*(T+M_.maximum_lag+M_.maximum_lead) array, paths for the endogenous variables (initial guess).
+% - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables.
 % - steadystate         [double] N*1 array, steady state for the endogenous variables.
+%   - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths block
 % - M_                   [struct] contains a description of the model.
 % - options_             [struct] contains various options.
 %
 % OUTPUTS
-% - endogenousvariables [double] N*T array, paths for the endogenous variables (solution of the perfect foresight model).
+% - endogenousvariables [double] N*(T+M_.maximum_lag+M_.maximum_lead) array, paths for the endogenous variables (solution of the perfect foresight model).
 % - success             [logical] Whether a solution was found
 % - maxerror            [double] 1-norm of the residual
+% - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables
+%                                (may be modified if perfect_foresight_controlled_paths present)
 
-% Copyright © 2015-2024 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -46,6 +49,7 @@ end
 z = endogenousvariables(:,M_.maximum_lag+(1:periods));
 
 if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementarity problem
+    assert(isempty(controlled_paths_by_period))
     [lb, ub] = feval(sprintf('%s.dynamic_complementarity_conditions', M_.fname), M_.params);
     if options_.linear_approximation
         lb = lb - steadystate_y;
@@ -70,10 +74,29 @@ if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementari
                                                  M_.dynamic_mcp_equations_reordering);
     eq_to_ignore=find(isfinite(lb) | isfinite(ub));
 
-else
+elseif isempty(controlled_paths_by_period)
     [y, check, res, ~, errorcode] = dynare_solve(@perfect_foresight_problem, z(:), ...
                                                options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, ...
                                                options_, y0, yT, exogenousvariables, M_.params, steadystate, periods, M_, options_);
+else % controlled paths
+    for p = 1:periods
+        if isempty(controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        z(controlled_paths_by_period(p).exogenize_id,p) = exogenousvariables(p+M_.maximum_lag,controlled_paths_by_period(p).endogenize_id);
+    end
+
+    [y, check, res, ~, errorcode] = dynare_solve(@controlled_paths_wrapper, z(:), ...
+                                                 options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, ...
+                                                 options_, y0, yT, exogenousvariables, M_.params, steadystate, periods, controlled_paths_by_period, M_, options_);
+
+    for p = 1:periods
+        if isempty(controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        exogenousvariables(p+M_.maximum_lag,controlled_paths_by_period(p).endogenize_id) = y(controlled_paths_by_period(p).exogenize_id+(p-1)*M_.endo_nbr);
+        y(controlled_paths_by_period(p).exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
+    end
 end
 
 if all(imag(y)<.1*options_.dynatol.x)
@@ -95,4 +118,25 @@ success = ~check;
 
 if ~success && options_.debug
     dprintf('solve_stacked_problem: Nonlinear solver routine failed with errorcode=%i.', errorcode)
+end
+
+end
+
+
+function [res, A] = controlled_paths_wrapper(z, y0, yT, exogenousvariables, params, steadystate, periods, controlled_paths_by_period, M_, options_)
+
+y = z;
+
+for p = 1:periods
+    if isempty(controlled_paths_by_period(p).exogenize_id)
+        continue
+    end
+    exogenousvariables(p+M_.maximum_lag,controlled_paths_by_period(p).endogenize_id) = z(controlled_paths_by_period(p).exogenize_id+(p-1)*M_.endo_nbr);
+    y(controlled_paths_by_period(p).exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
+end
+
+[res, A] = perfect_foresight_problem(y, y0, yT, exogenousvariables, params, steadystate, periods, M_, options_);
+
+A = controlled_paths_substitute_stacked_jacobian(A, y, y0, yT, exogenousvariables, steadystate, controlled_paths_by_period, M_);
+
 end
