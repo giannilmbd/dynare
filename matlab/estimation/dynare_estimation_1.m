@@ -520,7 +520,11 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                 if error_flag
                     error('%s: I cannot compute the posterior IRFs!',dispString)
                 end
-                oo_=PosteriorIRF('posterior',options_,estim_params_,oo_,M_,bayestopt_,dataset_,dataset_info,dispString);
+                if options_.occbin.likelihood.status
+                    fprintf('%s: the bayesian_irf option is not compatible with the use of OccBin.',dispString)
+                else
+                    oo_=PosteriorIRF('posterior',options_,estim_params_,oo_,M_,bayestopt_,dataset_,dataset_info,dispString);
+                end                
             end
             if options_.moments_varendo
                 if error_flag
@@ -549,7 +553,11 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                         end
                     end
                 end
-                oo_ = compute_moments_varendo('posterior',options_,M_,oo_,estim_params_,var_list_);
+                if options_.occbin.likelihood.status
+                    fprintf('%s: the moments_varendo option is not compatible with the use of OccBin.',dispString)
+                else
+                    oo_ = compute_moments_varendo('posterior',options_,M_,oo_,estim_params_,var_list_);
+                end
             end
             if options_.smoother || ~isempty(options_.filter_step_ahead) || options_.forecast
                 if error_flag

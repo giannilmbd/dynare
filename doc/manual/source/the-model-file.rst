@@ -7718,7 +7718,7 @@ observed variables.
        Triggers the computation of the posterior distribution of
        IRFs. The length of the IRFs are controlled by the ``irf``
        option. Results are stored in ``oo_.PosteriorIRF.dsge`` (see
-       below for a description of this variable).
+       below for a description of this variable). Not compatible with OccBin.
 
     .. option:: relative_irf
 
@@ -8066,7 +8066,7 @@ observed variables.
        stored in ``oo_.PosteriorTheoreticalMoments`` (see
        :mvar:`oo_.PosteriorTheoreticalMoments`). The number of lags in
        the autocorrelation function is controlled by the ``ar``
-       option.
+       option. Not compatible with OccBin.
 
     .. option:: contemporaneous_correlation
 
@@ -8151,7 +8151,7 @@ observed variables.
        the posterior mode. If a Metropolis-Hastings is computed, the
        distribution of forecasts is stored in variables
        ``oo_.PointForecast`` and ``oo_.MeanForecast``. See
-       :ref:`fore`, for a description of these variables.
+       :ref:`fore`, for a description of these variables. Not compatible with OccBin.
 
     .. option:: tex
 
