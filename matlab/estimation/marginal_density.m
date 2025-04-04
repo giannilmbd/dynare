@@ -3,10 +3,11 @@ function [marginal,oo_] = marginal_density(M_, options_, estim_params_, oo_, bay
 % Computes the marginal density
 %
 % INPUTS
+%   M_               [structure]    Dynare model structure
 %   options_         [structure]    Dynare options structure
 %   estim_params_    [structure]    Dynare estimation parameter structure
-%   M_               [structure]    Dynare model structure
 %   oo_              [structure]    Dynare results structure
+%   bayestopt_       [structure]    describing the priors
 %   outputFolderName [string]       name of folder with results
 %
 % OUTPUTS
@@ -16,7 +17,7 @@ function [marginal,oo_] = marginal_density(M_, options_, estim_params_, oo_, bay
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -64,7 +65,7 @@ if ~isfield(oo_,'posterior_mode') || (options_.mh_replic && isequal(options_.pos
 end
 
 % save the posterior mean and the inverse of the covariance matrix
-% (usefull if the user wants to perform some computations using
+% (useful if the user wants to perform some computations using
 % the posterior mean instead of the posterior mode ==> ).
 parameter_names = bayestopt_.name;
 save([M_.dname filesep outputFolderName filesep M_.fname '_mean.mat'],'xparam1','hh','parameter_names','SIGMA');

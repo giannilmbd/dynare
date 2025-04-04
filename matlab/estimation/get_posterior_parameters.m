@@ -7,7 +7,9 @@ function xparam = get_posterior_parameters(type,M_,estim_params_,oo_,options_,fi
 %   o type              [char]     = 'mode' or 'mean'.
 %   o M_:               [structure] Dynare structure describing the model.
 %   o estim_params_:    [structure] Dynare structure describing the estimated parameters.
-%   o field_1           [char]     optional field like 'mle_'.
+%   o oo_:              [structure] Dynare results structure
+%   o options_:         [structure] Dynare options structure
+%   o field_1           [char]      optional field like 'mle_'.
 %
 % OUTPUTS
 %   o xparam     vector of estimated parameters
@@ -15,7 +17,7 @@ function xparam = get_posterior_parameters(type,M_,estim_params_,oo_,options_,fi
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2018 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -75,8 +77,6 @@ for i=1:ncn
     xparam(m) = oo_.([field1 type]).measurement_errors_corr.([name1 '_' name2]);
     m = m+1;
 end
-
-FirstDeep = m;
 
 for i=1:np
     name1 = M_.param_names{estim_params_.param_vals(i,1)};
