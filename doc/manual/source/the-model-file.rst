@@ -3037,14 +3037,16 @@ Finding the steady state with Dynare nonlinear solver
                 ``perfect_foresight_solver`` command with purely backward,
                 forward or static models, or with routines for semi-structural
                 models, and it must *not* be combined with option ``block`` of
-                the ``model`` block. Also note that for those models, the block
-                decomposition is performed as if ``mfs=3`` had been passed to
-                the ``model`` block, and the decomposition is slightly
-                different because it is computed in a time-recursive fashion
-                (*i.e.* in such a way that the simulation is meant to be done
-                with the outer loop on periods and the inner loop on blocks;
-                while for models with both leads and lags, the outer loop is on
-                blocks and the inner loop is on periods).
+                the :bck:`model` block or :comm:`model_options` command. Also
+                note that for those models, the block decomposition is
+                performed as if ``mfs=3`` had been passed to the :bck:`model`
+                block or :comm:`model_options` command, and the decomposition
+                is slightly different because it is computed in a
+                time-recursive fashion (*i.e.* in such a way that the
+                simulation is meant to be done with the outer loop on periods
+                and the inner loop on blocks; while for models with both leads
+                and lags, the outer loop is on blocks and the inner loop is on
+                periods).
 
            ``14``
 
@@ -3560,14 +3562,15 @@ Getting information about the model
 
     |br| Prints the equations and the Jacobian matrix of the dynamic
     model stored in the bytecode binary format file. Can only be used
-    in conjunction with the ``bytecode`` option of the ``model``
-    block.
+    in conjunction with the ``bytecode`` option of the :bck:`model`
+    block or :comm:`model_options` command.
 
 .. command:: print_bytecode_static_model ;
 
     |br| Prints the equations and the Jacobian matrix of the static model
     stored in the bytecode binary format file. Can only be used in
-    conjunction with the ``bytecode`` option of the ``model`` block.
+    conjunction with the ``bytecode`` option of the :bck:`model`
+    block or :comm:`model_options` command.
 
 
 .. _det-simul:
@@ -3825,9 +3828,9 @@ speed-up on large models.
 
        See :ref:`solve_algo <solvalg>`. Allows selecting the solver
        used with ``stack_solve_algo=7``. Also used for purely backward, forward
-       and static models (when neither the ``block`` nor the ``bytecode`` option
-       of the ``model`` block is specified); for those models, the values
-       ``12`` and ``14`` are especially relevant.
+       and static models (when neither the ``block`` nor the ``bytecode``
+       option of the :bck:`model` block or :comm:`model_options` command is specified);
+       for those models, the values ``12`` and ``14`` are especially relevant.
 
     .. option:: no_homotopy
 
@@ -4670,7 +4673,7 @@ that have been left free.
     :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` option be equal to
     either ``0``, ``1``, ``2``, ``3`` or ``6``, and is incompatible with the
     :opt:`block`, :opt:`linear` and :opt:`bytecode` options of the :bck:`model`
-    block.
+    block and :comm:`model_options` command.
 
     *Options*
 
@@ -5480,7 +5483,7 @@ which is described below.
        agents believe that there will no more shocks after period
        :math:`t+S`. This is an experimental feature and can be quite
        slow. A non-zero value is not compatible with the ``bytecode``
-       option of the ``model`` block.
+       option of the :bck:`model` block or :comm:`model_options` command.
        Default: ``0``.
 
     .. option:: hybrid
@@ -12472,7 +12475,7 @@ Optimal policy under discretion
     You must ensure that your objective is quadratic. Regarding the model, it must
     either be linear or solved at first order with an analytical steady state provided.
     In the first case, you should set the ``linear`` option of the
-    ``model`` block.
+    :bck:`model` block or :comm:`model_options` command.
 
     It is possible to use the :comm:`estimation` command after the
     ``discretionary_policy`` command, in order to estimate the model with
