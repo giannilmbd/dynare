@@ -1385,6 +1385,7 @@ mod_and_m_tests = [
   { 'test' : [ 'deterministic_simulations/Irreversible_investment.mod',
                'deterministic_simulations/Irreversible_investment_leadlag.mod' ] },
   { 'test' : [ 'deterministic_simulations/linear_state_space_arma.mod' ] },
+  { 'test' : [ 'deterministic_simulations/linear_state_space_arma_condpaths.mod' ] },
   { 'test' : [ 'deterministic_simulations/purely_forward/ar1.mod' ] },
   { 'test' : [ 'deterministic_simulations/purely_forward/nk.mod' ] },
   { 'test' : [ 'deterministic_simulations/purely_backward/ar1.mod' ] },

@@ -1,12 +1,13 @@
-function [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, M_, options_)
+function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, controlled_paths_by_period, M_, options_)
 % [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, M_, options_)
 % Solves a linear approximation of a perfect foresight model using sparse matrix.
 %
 % INPUTS
-% - endogenousvariables [double] N*T array, paths for the endogenous variables (initial guess).
+% - endogenousvariables [double] N*T array, paths for the endogenous variables (initial condition + initial guess + terminal condition).
 % - exogenousvariables  [double] T*M array, paths for the exogenous variables.
 % - steadystate_y       [double] N*1 array, steady state for the endogenous variables.
 % - steadystate_x       [double] M*1 array, steady state for the exogenous variables.
+% - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths block
 % - M_                  [struct] contains a description of the model.
 % - options_            [struct] contains various options.
 %
@@ -14,6 +15,8 @@ function [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, 
 % - endogenousvariables [double] N*T array, paths for the endogenous variables (solution of the perfect foresight model).
 % - success             [logical] Whether a solution was found
 % - ERR                 [double] ∞-norm of the residual
+% - exogenousvariables  [double] T*M array, paths for the exogenous variables
+%                                (may be modified if perfect_foresight_controlled_paths present)
 %
 % NOTATIONS
 % - N is the number of endogenous variables.
@@ -39,7 +42,7 @@ function [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, 
 % to center the variables around the deterministic steady state to solve the
 % perfect foresight model.
 
-% Copyright © 2015-2024 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -66,6 +69,19 @@ maximum_lag = M_.maximum_lag;
 periods = get_simulation_periods(options_);
 
 params = M_.params;
+
+if ~isempty(controlled_paths_by_period)
+    for p = 1:periods
+        if isempty(controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        endogenousvariables(controlled_paths_by_period(p).exogenize_id, p+M_.maximum_lag) = controlled_paths_by_period(p).values;
+    end
+
+    if options_.debug
+        error('Debugging not available with perfect_foresight_controlled_paths')
+    end
+end
 
 if verbose
     skipline()
@@ -125,6 +141,10 @@ h2 = clock;
 
 [res, A] = linear_perfect_foresight_problem(Y, jacobian, y0, yT, exogenousvariables, params, steadystate_y, maximum_lag, periods, ny);
 
+if ~isempty(controlled_paths_by_period)
+    A = controlled_paths_substitute_stacked_jacobian(A, Y, y0, yT, exogenousvariables, steadystate_y, controlled_paths_by_period, M_);
+end
+
 % Evaluation of the maximum residual at the initial guess (steady state for the endogenous variables).
 err = max(abs(res));
 
@@ -141,7 +161,8 @@ end
 
 % Try to update the vector of endogenous variables.
 try
-    Y =  Y - A\res;
+    dY = -A\res;
+    Y = Y + dY;
 catch
     % Normally, because the model is linear, the solution of the perfect foresight model should
     % be obtained in one Newton step. This is not the case if the model is singular.
@@ -152,6 +173,18 @@ catch
         disp('Singularity problem! The jacobian matrix of the stacked model cannot be inverted.')
     end
     return
+end
+
+if ~isempty(controlled_paths_by_period)
+    for p = 1:periods
+        endogenize_id = controlled_paths_by_period(p).endogenize_id;
+        exogenize_id = controlled_paths_by_period(p).exogenize_id;
+        if isempty(endogenize_id)
+            continue
+        end
+        Y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
+        exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + dY(exogenize_id+(p-1)*M_.endo_nbr)';
+    end
 end
 
 YY = reshape([y0; Y; yT], ny, periods+2);

@@ -90,9 +90,6 @@ if ~isempty(controlled_paths_by_period)
     if options_.block
         error('perfect_foresight_controlled_paths is not available with the block option')
     end
-    if options_.linear
-        error('perfect_foresight_controlled_paths is not available with the linear option')
-    end
     if M_.maximum_endo_lead == 0 || M_.maximum_endo_lag == 0
         error('perfect_foresight_controlled_paths is not available with purely backward, purely forward or static models')
     end
@@ -147,7 +144,7 @@ else
             switch options_.stack_solve_algo
               case {0 2 3}
                 if options_.linear_approximation
-                    [y, success, maxerror] = sim1_linear(y, exo_simul, steady_state, exo_steady_state, M_, options_);
+                    [y, success, maxerror, exo_simul] = sim1_linear(y, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period, M_, options_);
                 else
                     [y, success, maxerror, iter, exo_simul] = sim1(y, exo_simul, steady_state, controlled_paths_by_period, M_, options_);
                 end

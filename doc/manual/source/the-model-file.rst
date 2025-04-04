@@ -4672,8 +4672,8 @@ that have been left free.
     The ``perfect_foresight_controlled_paths`` block requires that the
     :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` option be equal to
     either ``0``, ``1``, ``2``, ``3``, ``6`` or ``7``, and is incompatible with
-    the :opt:`block`, :opt:`linear` and :opt:`bytecode` options of the
-    :bck:`model` block and :comm:`model_options` command.
+    the :opt:`block` and :opt:`bytecode` options of the :bck:`model` block and
+    :comm:`model_options` command.
 
     *Options*
 
