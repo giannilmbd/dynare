@@ -72,8 +72,6 @@ end
 
 y = reshape(endogenousvariables(:, M_.maximum_lag+(1:periods)), ny*periods, 1);
 
-stop = false;
-
 if verbose
     skipline()
     printline(56)
@@ -82,8 +80,10 @@ if verbose
 end
 
 h1 = clock;
+iter = 1;
+converged = false;
 
-for iter = 1:options_.simul.maxit
+while ~(converged || iter > options_.simul.maxit)
     h2 = clock;
 
     [res, A] = perfect_foresight_problem(y, y0, yT, exogenousvariables, M_.params, steadystate, periods, M_, options_);
@@ -142,36 +142,37 @@ for iter = 1:options_.simul.maxit
         end
         skipline()
     end
+    if err < options_.dynatol.f
+        converged = true;
+    else
+        if options_.simul.robust_lin_solve
+            dy = -lin_solve_robust(A, res, verbose, options_);
+        else
+            dy = -lin_solve(A, res, verbose, options_);
+        end
+        if any(isnan(dy)) || any(isinf(dy))
+            if verbose
+                display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint || ~isempty(controlled_paths_by_period));
+            end
+        end
+        y = y + dy;
+
+        if ~isempty(controlled_paths_by_period)
+            for p = 1:periods
+                endogenize_id = controlled_paths_by_period(p).endogenize_id;
+                exogenize_id = controlled_paths_by_period(p).exogenize_id;
+                if isempty(endogenize_id)
+                    continue
+                end
+                y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
+                exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + dy(exogenize_id+(p-1)*M_.endo_nbr)';
+            end
+        end
+    end
     if verbose
         fprintf('Iter: %d,\t err. = %g,\t time = %g\n', iter, err, etime(clock,h2));
     end
-    if err < options_.dynatol.f
-        stop = true;
-        break
-    end
-    if options_.simul.robust_lin_solve
-        dy = -lin_solve_robust(A, res, verbose, options_);
-    else
-        dy = -lin_solve(A, res, verbose, options_);
-    end
-    if any(isnan(dy)) || any(isinf(dy))
-        if verbose
-            display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint || ~isempty(controlled_paths_by_period));
-        end
-    end
-    y = y + dy;
-
-    if ~isempty(controlled_paths_by_period)
-        for p = 1:periods
-            endogenize_id = controlled_paths_by_period(p).endogenize_id;
-            exogenize_id = controlled_paths_by_period(p).exogenize_id;
-            if isempty(endogenize_id)
-                continue
-            end
-            y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
-            exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + dy(exogenize_id+(p-1)*M_.endo_nbr)';
-        end
-    end
+    iter = iter + 1;
 end
 
 endogenousvariables(:, M_.maximum_lag+(1:periods)) = reshape(y, ny, periods);
@@ -181,7 +182,7 @@ if options_.endogenous_terminal_period
     err = evaluate_max_dynamic_residual(str2func([M_.fname,'.sparse.dynamic_resid']), endogenousvariables, exogenousvariables, M_.params, steadystate, periods, M_.maximum_lag);
 end
 
-if stop
+if converged
     % initial or terminal observations may contain
     % harmless NaN or Inf. We test only values computed above
     if any(any(isnan(y))) || any(any(isinf(y)))
@@ -202,7 +203,7 @@ if stop
         end
         success = true; % Convergency obtained.
     end
-elseif ~stop
+else
     if verbose
         skipline();
         fprintf('Total time of simulation: %g.\n', etime(clock,h1))
