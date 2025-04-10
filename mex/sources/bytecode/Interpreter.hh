@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2024 Dynare Team
+ * Copyright © 2007-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -224,16 +224,8 @@ private:
   void simple_bksub();
   // Computes Aᵀ where A is are sparse. The result is sparse.
   static mxArray* Sparse_transpose(const mxArray* A_m);
-  // Computes Aᵀ·B where A and B are sparse. The result is sparse.
-  static mxArray* Sparse_mult_SAT_SB(const mxArray* A_m, const mxArray* B_m);
-  // Computes Aᵀ·B where A is sparse and B is dense. The result is sparse.
-  static mxArray* Sparse_mult_SAT_B(const mxArray* A_m, const mxArray* B_m);
   // Computes Aᵀ·B where A is sparse and B is dense. The result is dense.
   static mxArray* mult_SAT_B(const mxArray* A_m, const mxArray* B_m);
-  // Computes A−B where A and B are sparse. The result is sparse.
-  static mxArray* Sparse_subtract_SA_SB(const mxArray* A_m, const mxArray* B_m);
-  // Computes A−B where A and B are dense. The result is dense.
-  static mxArray* subtract_A_B(const mxArray* A_m, const mxArray* B_m);
 
   void compute_block_time(int my_Per_u_, bool evaluate, bool no_derivatives);
   bool compute_complete(bool no_derivatives);
