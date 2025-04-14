@@ -300,6 +300,11 @@ options_.analytic_derivation=options_ident.analytic_derivation;
     % 1: analytic derivation of gradient and hessian of likelihood in dsge_likelihood.m, only works for stationary models, i.e. kalman_algo<3
 options_ = set_default_option(options_,'datafile','');
 options_.mode_compute = 0;
+if strcmp('slice',options_.posterior_sampler_options.posterior_sampling_method)
+    if strfind(options_.posterior_sampler_options.sampling_opt,'slice_initialize_with_mode'',1')
+        options_.posterior_sampler_options.sampling_opt=strrep(options_.posterior_sampler_options.sampling_opt,'slice_initialize_with_mode'',1','slice_initialize_with_mode'',0') % reset option to prevent crash in check_posterior_sampler_options.m if mode_compute is set to 0, see https://git.dynare.org/Dynare/dynare/-/issues/1957
+    end
+end
 options_.plot_priors = 0;
 options_.smoother = 1;
 options_.options_ident = [];
