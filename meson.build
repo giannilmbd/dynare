@@ -730,6 +730,10 @@ alias_target('doc',
 ### Tests implemented as .mod or .m (both integration and unit tests)
 
 mod_and_m_tests = [
+  { 'test' : [ 'hank/ks.mod' ],
+    'extra': [ 'hank/ks_ar1_ss.mat',
+               'hank/ks_iid_ss.mat',
+               'hank/expect_error.m' ] },
   { 'test' : [ 'decision_rules/first_order/walsh.mod' ],
     'extra' : [ 'decision_rules/first_order/+matlab/+namespace/y_k.m'] },
   { 'test' : [ 'occbin/model_irrcap_twoconstraints/dynrbc.mod',
