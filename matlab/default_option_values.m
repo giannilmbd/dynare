@@ -358,6 +358,11 @@ options_.k_order_solver = false; % by default do not use k_order_perturbation bu
 options_.partial_information = false;
 options_.conditional_variance_decomposition = [];
 
+% Heterogeneous agents
+options_.hank.tol_check_sum = 1e-6;
+options_.hank.nowarningredundant = true;
+options_.hank.nowarningdgrids = true;
+
 % Ramsey policy
 options_.ramsey_policy = false;
 options_.instruments = {};
