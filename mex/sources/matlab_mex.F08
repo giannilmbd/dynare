@@ -34,7 +34,7 @@
 !   warnings when the function may not be evaluated depending on the branch
 !   (-Wfunction-elimination)
 
-! Copyright © 2019-2023 Dynare Team
+! Copyright © 2019-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -311,6 +311,14 @@ module matlab_mat
        use iso_c_binding
        type(c_ptr), intent(in), value :: array_ptr
      end function mxArrayToString_internal
+
+
+     !! Memory management
+
+     subroutine mxFree(ptr) bind(c, name="mxFree"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in) :: ptr
+     end subroutine mxFree
   end interface
 contains
   ! Some helper functions to make the interface more Fortran-ish
@@ -402,13 +410,16 @@ contains
     type(c_ptr), intent(in) :: pm
     character(kind=c_char, len=:), allocatable :: mxArrayToString
     character(kind=c_char), dimension(:), pointer, contiguous :: chararray
+    type(c_ptr) :: ptr
     integer :: i
-    call c_f_pointer(mxArrayToString_internal(pm), chararray, [ mxGetNumberOfElements(pm) ])
+    ptr = mxArrayToString_internal(pm)
+    call c_f_pointer(ptr, chararray, [ mxGetNumberOfElements(pm) ])
     ! Convert the character array into a character scalar (of length > 1)
     allocate(character(kind=c_char, len=size(chararray)) :: mxArrayToString)
     do i=1,size(chararray)
        mxArrayToString(i:i) = chararray(i)
     end do
+    call mxFree(ptr)
   end function mxArrayToString
 end module matlab_mat
 
