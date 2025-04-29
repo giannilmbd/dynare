@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2024 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -47,6 +48,7 @@ public:
 
   // Used to store error messages (as exceptions cannot cross the OpenMP boundary)
   static std::string error_msg;
+  static std::mutex error_mtx; // Guard for access in OpenMP context
 
   DynamicModelCaller(bool linear_arg, bool compute_jacobian_arg) :
       linear {linear_arg}, compute_jacobian {compute_jacobian_arg}

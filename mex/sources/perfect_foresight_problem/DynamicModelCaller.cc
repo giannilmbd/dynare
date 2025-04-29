@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2024 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -26,6 +26,7 @@
 using namespace std::literals::string_literals;
 
 std::string DynamicModelCaller::error_msg;
+std::mutex DynamicModelCaller::error_mtx;
 
 #if !defined(_WIN32) && !defined(__CYGWIN32__)
 void* DynamicModelDllCaller::resid_mex {nullptr};
@@ -210,12 +211,14 @@ DynamicModelMatlabCaller::eval(double* resid)
                                               funcname.c_str())};
     if (exception)
       {
+        std::lock_guard lk {error_mtx};
         error_msg = "An error occurred when calling " + funcname;
         return; // Avoid manipulating null pointers in plhs, see #1832
       }
 
     if (!mxIsDouble(plhs[0]) || mxIsSparse(plhs[0]))
       {
+        std::lock_guard lk {error_mtx};
         error_msg = "Residuals should be a dense array of double floats";
         return;
       }
@@ -249,6 +252,7 @@ DynamicModelMatlabCaller::eval(double* resid)
                                                 funcname.c_str())};
       if (exception)
         {
+          std::lock_guard lk {error_mtx};
           error_msg = "An error occurred when calling " + funcname;
           return; // Avoid manipulating null pointers in plhs, see #1832
         }
@@ -261,6 +265,7 @@ DynamicModelMatlabCaller::eval(double* resid)
 
       if (!mxIsDouble(plhs[0]) || !mxIsSparse(plhs[0]))
         {
+          std::lock_guard lk {error_mtx};
           error_msg = "Jacobian should be a sparse array of double floats";
           return;
         }
