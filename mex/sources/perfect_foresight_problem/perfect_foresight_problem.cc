@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2024 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -205,6 +205,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     DynamicModelDllCaller::load_dll(basename);
 
   DynamicModelCaller::error_msg.clear();
+  DynamicModelCaller::error_id.clear();
 
   /* Parallelize the main loop, if use_dll and no external function (to avoid
      parallel calls to MATLAB) */
@@ -282,7 +283,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   /* Mimic a try/catch using a global string, since exceptions are not allowed
      to cross OpenMP boundary */
   if (!DynamicModelCaller::error_msg.empty())
-    mexErrMsgTxt(DynamicModelCaller::error_msg.c_str());
+    mexErrMsgIdAndTxt(DynamicModelCaller::error_id.c_str(), DynamicModelCaller::error_msg.c_str());
 
   if (compute_jacobian)
     {

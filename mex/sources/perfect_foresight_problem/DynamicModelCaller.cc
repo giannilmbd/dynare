@@ -26,6 +26,7 @@
 using namespace std::literals::string_literals;
 
 std::string DynamicModelCaller::error_msg;
+std::string DynamicModelCaller::error_id;
 std::mutex DynamicModelCaller::error_mtx;
 
 #if !defined(_WIN32) && !defined(__CYGWIN32__)
@@ -39,6 +40,44 @@ DynamicModelDllCaller::dynamic_tt_fct DynamicModelDllCaller::residual_tt_fct {nu
     DynamicModelDllCaller::g1_tt_fct {nullptr};
 DynamicModelDllCaller::dynamic_fct DynamicModelDllCaller::residual_fct {nullptr},
     DynamicModelDllCaller::g1_fct {nullptr};
+
+void
+DynamicModelCaller::setErrMsg(std::string msg)
+{
+  std::lock_guard lk {error_mtx};
+  error_msg = move(msg);
+  error_id.clear();
+}
+
+void
+DynamicModelCaller::setMException(const mxArray* exception)
+{
+  const mxArray* message_mx {nullptr};
+  const mxArray* identifier_mx {nullptr};
+  if (mxIsClass(exception, "MException"))
+    {
+      message_mx = mxGetProperty(exception, 0, "message");
+      identifier_mx = mxGetProperty(exception, 0, "identifier");
+    }
+  else if (mxIsStruct(exception)) // For Octave
+    {
+      message_mx = mxGetField(exception, 0, "message");
+      identifier_mx = mxGetField(exception, 0, "identifier");
+    }
+  else
+    mexErrMsgTxt("Exception of incorrect type");
+
+  if (!message_mx || !mxIsChar(message_mx) || !identifier_mx || !mxIsChar(identifier_mx))
+    mexErrMsgTxt("Exception object malformed");
+
+  char* message = mxArrayToString(message_mx);
+  char* identifier = mxArrayToString(identifier_mx);
+  std::lock_guard lk {error_mtx};
+  error_msg = message;
+  error_id = identifier;
+  mxFree(message);
+  mxFree(identifier);
+}
 
 void
 DynamicModelDllCaller::load_dll(const std::string& basename)
@@ -211,15 +250,13 @@ DynamicModelMatlabCaller::eval(double* resid)
                                               funcname.c_str())};
     if (exception)
       {
-        std::lock_guard lk {error_mtx};
-        error_msg = "An error occurred when calling " + funcname;
+        setMException(exception);
         return; // Avoid manipulating null pointers in plhs, see #1832
       }
 
     if (!mxIsDouble(plhs[0]) || mxIsSparse(plhs[0]))
       {
-        std::lock_guard lk {error_mtx};
-        error_msg = "Residuals should be a dense array of double floats";
+        setErrMsg("Residuals should be a dense array of double floats");
         return;
       }
 
@@ -252,8 +289,7 @@ DynamicModelMatlabCaller::eval(double* resid)
                                                 funcname.c_str())};
       if (exception)
         {
-          std::lock_guard lk {error_mtx};
-          error_msg = "An error occurred when calling " + funcname;
+          setMException(exception);
           return; // Avoid manipulating null pointers in plhs, see #1832
         }
 
@@ -265,8 +301,7 @@ DynamicModelMatlabCaller::eval(double* resid)
 
       if (!mxIsDouble(plhs[0]) || !mxIsSparse(plhs[0]))
         {
-          std::lock_guard lk {error_mtx};
-          error_msg = "Jacobian should be a sparse array of double floats";
+          setErrMsg("Residuals should be a dense array of double floats");
           return;
         }
 

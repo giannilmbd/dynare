@@ -48,6 +48,7 @@ public:
 
   // Used to store error messages (as exceptions cannot cross the OpenMP boundary)
   static std::string error_msg;
+  static std::string error_id;
   static std::mutex error_mtx; // Guard for access in OpenMP context
 
   DynamicModelCaller(bool linear_arg, bool compute_jacobian_arg) :
@@ -61,6 +62,8 @@ public:
      Only copies non-zero elements, according to g1_sparse_{rowval,colval,colptr}. */
   virtual void copy_jacobian_column(mwIndex col, double* dest) const = 0;
   virtual void eval(double* resid) = 0;
+  static void setErrMsg(std::string msg);
+  static void setMException(const mxArray* exception);
 };
 
 class DynamicModelDllCaller : public DynamicModelCaller
