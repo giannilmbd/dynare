@@ -209,7 +209,15 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
     extra_simul_time_counter = tic;
     [extra_success, extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state, extra_controlled_paths_by_period] = create_scenario(M_,options_,oo_,extra_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, exo_simul, steady_state, exo_steady_state);
     if extra_success
-        [extra_endo_simul, extra_success, ~, ~, ~, extra_exo_simul] = perfect_foresight_solver_core(extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state, extra_controlled_paths_by_period, M_, options_);
+        try
+            [extra_endo_simul, extra_success, ~, ~, ~, extra_exo_simul] = perfect_foresight_solver_core(extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state, extra_controlled_paths_by_period, M_, options_);
+        catch ME
+            if is_numerical_exception(ME)
+                extra_success = false;
+            else
+                rethrow ME
+            end
+        end
     end
     if ~extra_success
         if ~options_.noprint
@@ -357,7 +365,19 @@ while step > options_.simul.homotopy_min_step_size
         end
 
         % Solve for the paths of the endogenous variables.
-        [endo_simul, success, maxerror, solver_iter, per_block_status, exo_simul] = perfect_foresight_solver_core(endo_simul, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period, M_, options_);
+        try
+            [endo_simul, success, maxerror, solver_iter, per_block_status, exo_simul] = perfect_foresight_solver_core(endo_simul, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period, M_, options_);
+        catch ME
+            % Catch some numerical-related exceptions, and treat them as failure for the current homotopy step
+            if is_numerical_exception(ME)
+                success = false;
+                maxerror = NaN;
+                solver_iter = [];
+                per_block_status = [];
+            else
+                rethrow ME
+            end
+        end
     else
         success = false;
         maxerror = NaN;
@@ -616,3 +636,14 @@ if (M_.exo_nbr > 0) && ...
         error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: ''oo_.exo_simul'' has wrong size. Did you run ''perfect_foresight_setup'' ?')
     end
 end
+
+
+function r = is_numerical_exception(ME)
+% Deals with:
+% - erf and erfc (under MATLAB, because under Octave they accept complex inputs)
+% - normpdf and normcdf (under MATLAB, from missing/stats/; and under Octave from the statistics package)
+
+r = (~isoctave && (strcmp(ME.identifier, 'MATLAB:erf:notFullReal') ...
+                   || strcmp(ME.identifier, 'MATLAB:erfc:notFullReal'))) ...
+    || (isoctave && (strcmp(ME.message, 'normcdf: X, MU, and SIGMA must not be complex.') ...
+                     || strcmp(ME.message, 'normpdf: X, MU, and SIGMA must not be complex.')))
