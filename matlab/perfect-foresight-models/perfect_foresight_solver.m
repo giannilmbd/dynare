@@ -567,7 +567,7 @@ if ~isempty(controlled_paths_by_period)
         % Handle guess values for endogenized exos
         exo_ids = controlled_paths_by_period(p).endogenize_id;
         if ~isempty(options_.simul.homotopy_exclude_varexo)
-            [is_excluded, excluded_exo_ids] = ismember(options_.simul.homotopy_exclude_varexo, M_.exo_names{exo_ids});
+            [is_excluded, excluded_exo_ids] = ismember(options_.simul.homotopy_exclude_varexo, M_.exo_names(exo_ids));
             if any(is_excluded)
                 error('Exogenous %s cannot be in the homotopy_exclude_varexo option and a perfect_foresight_controlled_paths block at the same time', M_.exo_names{excluded_exo_ids(1)})
             end
