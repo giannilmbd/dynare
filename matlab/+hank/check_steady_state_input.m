@@ -268,9 +268,9 @@ function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
    % Copy `ss.pol.values` in `out_ss`
    out_ss.pol.values = ss.pol.values;
    % Check the permutation of state variables for policy functions
-   [out_ss.pol.states] = check_permutation(pol, 'states', 'ss.pol', state_symbs);
+   out_ss.pol.states = check_permutation(pol, 'states', 'ss.pol', state_symbs);
    % Check the permutation of shock variables for policy functions
-   [out_ss.pol.shocks] = check_permutation(pol, 'shocks', 'ss.pol', shock_symbs);
+   out_ss.pol.shocks = check_permutation(pol, 'shocks', 'ss.pol', shock_symbs);
    %% Distribution
    % Check that the field `ss.d` exists 
    check_isfield('d', ss, 'ss.d');
@@ -305,7 +305,7 @@ function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
          d_grids_symbs_in_states = ismember(d_grids_symbs, state_symbs);
          if ~all(d_grids_symbs_in_states)
             if ~options_.hank.nowarningredundant
-               warning('In the steady-state input `ss.d.states`, the following specification for the states grids in the distribution structure are not useful: %s', strjoin(d_grids_symbs(~d_grids_symbs_in_states)));
+               warning('In the steady-state input `ss.d.states`, the following specification for the states grids in the distribution structure are not useful: %s.', strjoin(d_grids_symbs(~d_grids_symbs_in_states)));
             end
             d_grids_symbs = d_grids_symbs(d_grids_symbs_in_states);
          end
@@ -333,18 +333,18 @@ function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
    end
    % Check the internal size compatibility of the distribution histogram
    if size(d.hist,1) ~= sizes.N_e
-      error('Misspecified steady-state input `ss`: the number of rows of the histogram matrix `ss.d.hist` is not consistent with the sizes of shocks grids `ss.shocks.grids`');
+      error('Misspecified steady-state input `ss`: the number of rows of the histogram matrix `ss.d.hist` is not consistent with the sizes of shocks grids `ss.shocks.grids`.');
    end
    sizes.d.N_a = prod(structfun(@(x) x, sizes.d.states));
    if size(d.hist,2) ~= sizes.d.N_a
-      error('Misspecified steady-state input `ss`: the number of columns of the histogram matrix `ss.d.hist` is not consistent with the sizes of states grids `ss.d.grids`/`ss.pol.grids`');
+      error('Misspecified steady-state input `ss`: the number of columns of the histogram matrix `ss.d.hist` is not consistent with the sizes of states grids `ss.d.grids`/`ss.pol.grids`.');
    end
    % Copy `ss.d.hist` in `out_ss` 
    out_ss.d.hist = ss.d.hist;
    % Check the permutation of state variables in the distribution
-   [out_ss.d.states] = check_permutation(d, 'states', 'ss.d', state_symbs);
+   out_ss.d.states = check_permutation(d, 'states', 'ss.d', state_symbs);
    % Check the permutation of shock variables in the distribution
-   [out_ss.d.shocks] = check_permutation(d, 'shocks', 'ss.d', shock_symbs);
+   out_ss.d.shocks = check_permutation(d, 'shocks', 'ss.d', shock_symbs);
    %% Aggregate variables
    % Check that the field `ss.agg` exists
    check_isfield('agg', ss, 'ss.agg');

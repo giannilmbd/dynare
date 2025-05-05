@@ -27,7 +27,7 @@
 % DESCRIPTION
 % Checks whether `f` is a structure.
 % If not, throws an error indicating that the field `f_name` should be a structure.
-function [] = check_isstruct(f, f_name)
+function check_isstruct(f, f_name)
    if ~isstruct(f)
       error('Misspecified steady-state input `ss`: the `%s` field should be a structure.', f_name);
    end

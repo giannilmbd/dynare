@@ -33,12 +33,12 @@
 % corresponding field in `f`. If an optional `eq` argument is provided, the
 % output of `fun` is compared to `eq`. Throws a descriptive error listing all
 % fields that do not satisfy the validation criteria.
-function [] = check_fun(f, f_name, symbs, fun, text, eq)
+function check_fun(f, f_name, symbs, fun, text, eq)
    elt_check = cellfun(@(s) fun(f.(s)), symbs);
    if nargin == 6
       elt_check = elt_check == eq;
    end
    if ~all(elt_check)
-      error('Misspecified steady-state input `ss`: the following fields in `%s` %s: %s', f_name, text, strjoin(symbs(~elt_check)));
+      error('Misspecified steady-state input `ss`: the following fields in `%s` %s: %s.', f_name, text, strjoin(symbs(~elt_check)));
    end
 end

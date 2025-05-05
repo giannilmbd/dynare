@@ -31,7 +31,7 @@
 % permutation (i.e., a cell array of character vectors or a string array).
 % If the field is missing, returns the default order given by `symbs`.
 % Throws an error if the specified variables are not consistent with `symbs`.
-function [out_order] = check_permutation(s, f_name, s_name, symbs)
+function out_order = check_permutation(s, f_name, s_name, symbs)
    if ~isfield(s, f_name)
       out_order = symbs;
    else
@@ -41,7 +41,7 @@ function [out_order] = check_permutation(s, f_name, s_name, symbs)
       end
       err_var = setdiff(f, symbs);
       if ~isempty(err_var)
-         error('Misspecified steady-state input `ss`: the set of variables of the `%s.%s` field is not consistent with the information in M_ and the other fields in the steady-state structure `ss`. Problematic variables: %s', s_name, f_name, strjoin(err_var));
+         error('Misspecified steady-state input `ss`: the set of variables of the `%s.%s` field is not consistent with the information in M_ and the other fields in the steady-state structure `ss`. Problematic variables: %s.', s_name, f_name, strjoin(err_var));
       end
       out_order = f;
    end
