@@ -162,6 +162,7 @@ test_old_matlab:
     paths:
       - build-old-matlab/meson-logs/testlog.txt
     when: always
+  needs: []
   when: manual
 
 test_octave:
