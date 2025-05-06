@@ -142,6 +142,20 @@ pkg_macOS_arm64:
     expire_in: 3 days
   needs: [ "build_doc" ]
 
+pkg_matlab_online:
+  stage: pkg
+  script:
+    - meson rewrite kwargs set project / version "$VERSION"
+    - cd scripts/matlab-online && ./packageDynare.sh
+  tags:
+    - matlab-online
+  artifacts:
+    paths:
+      - scripts/matlab-online/*.mltbx
+    expire_in: 3 days
+  needs: []
+  when: manual
+
 test_matlab:
   stage: test
   script:
