@@ -6,6 +6,7 @@ Bibliography
 
 * Abramowitz, Milton and Irene A. Stegun (1964): “Handbook of Mathematical Functions”, Courier Dover Publications.
 * Adjemian, Stéphane, Matthieu Darracq Parriès and Stéphane Moyen (2008): “Towards a monetary policy evaluation framework”, *European Central Bank Working Paper*, 942.
+* Adjemian, Stéphane and Michel Juillard (2025): “Stochastic Extended Path”, *Dynare Working Papers*, 84, CEPREMAP.
 * Aguiar, Mark and Gopinath, Gita (2004): “Emerging Market Business Cycles: The Cycle is the Trend,” *NBER* Working Paper, 10734.
 * Amisano, Gianni and Tristani, Oreste (2010): “Euro area inflation persistence in an estimated nonlinear DSGE model”, *Journal of Economic Dynamics and Control*, 34(10), 1837–1858.
 * Andreasen, Martin M., Jesús Fernández-Villaverde, and Juan Rubio-Ramírez (2018): “The Pruned State-Space System for Non-Linear DSGE Models: Theory and Empirical Applications,” *Review of Economic Studies*, 85(1), 1-49.
