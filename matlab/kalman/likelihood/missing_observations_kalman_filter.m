@@ -72,6 +72,8 @@ if isequal(H,0)
     H = zeros(pp,pp);
 end
 
+P=tril(P)+transpose(tril(P,-1)); % make sure P is symmetric
+
 % Get sample size.
 smpl = last-start+1;
 
