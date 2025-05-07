@@ -78,9 +78,8 @@ P=tril(P)+transpose(tril(P,-1)); % make sure P is symmetric
 smpl = last-start+1;
 
 % Initialize some variables.
-dF   = 1;
 isqvec = false;
-if ndims(Q)>2
+if ~ismatrix(Q)
     Qvec = Q;
     Q=Q(:,:,1);
     isqvec = true;
