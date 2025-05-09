@@ -64,9 +64,8 @@ function [dLIK,dlik,a,Pstar] = missing_observations_kalman_filter_d(data_index,n
 smpl = last-start+1;
 
 % Initialize some variables.
-dF   = 1;
 isqvec = false;
-if ndims(Q)>2
+if ~ismatrix(Q)
     Qvec = Q;
     Q=Q(:,:,1);
     isqvec = true;
@@ -75,7 +74,6 @@ QQ   = R*Q*transpose(R);   % Variance of R times the vector of structural innova
 t    = start;              % Initialization of the time index.
 dlik = zeros(smpl,1);      % Initialization of the vector gathering the densities.
 dLIK = Inf;                % Default value of the log likelihood.
-oldK = Inf;
 
 if isequal(H,0)
     H = zeros(pp,pp);
