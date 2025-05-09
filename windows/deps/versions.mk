@@ -33,11 +33,11 @@ MINGW64_ZLIB_VERSION = 1.3.1-1
 
 # Dependency of matio
 # pacman -Ss mingw-w64-x86_64-hdf5
-MINGW64_HDF5_VERSION = 1.14.5-2
+MINGW64_HDF5_VERSION = 1.14.6-3
 
 # Dependency of HDF5 (provides szip library)
 # pacman -Ss mingw-w64-x86_64-libaec
-MINGW64_LIBAEC_VERSION = 1.1.3-3
+MINGW64_LIBAEC_VERSION = 1.1.3-4
 
 # Dependency of HDF5 and libssh2
 # pacman -Ss mingw-w64-x86_64-openssl
