@@ -112,6 +112,7 @@ On macOS
    Several versions of Dynare can coexist (by default in ``/Applications/Dynare``),
    as long as you correctly adjust your path settings (see :ref:`words-warning`).
 
+
 With MATLAB
 ^^^^^^^^^^^
 
@@ -124,6 +125,10 @@ The default installation directory is ``/Applications/Dynare/x.y-arch``.
 
 It is recommended to install the Xcode Command Line Tools (this is an Apple product)
 and GCC via Homebrew_ (see :ref:`prerequisites-macos`).
+
+To deinstall Dynare, simply delete the folder where you installed the program. The package installer does 
+not put any files anywhere else in the system.
+
 
 With Octave
 ^^^^^^^^^^^

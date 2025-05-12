@@ -959,6 +959,15 @@ The model is declared inside a ``model`` block:
 
         MODEL_EXPRESSION;
 
+    .. warning::
+
+        In Dynare, only equality signs can delineate the left and right-hand side of an 
+        equation. If Dynare encounters an expression like ``a>=b``, this will therefore not 
+        define an inequality constraint. Rather, it is interpreted as the homogenous equation
+        `(a>=b)=0;`, i.e., the Boolean `(a>=b)` must evaluate to 0. Inequality constraints 
+        in Dynare instead need to be set up either via OccBin or as mixed complementarity problems.
+
+
     |br| Inside the model block, Dynare allows the creation of
     *model-local variables*, which constitute a simple way to share a
     common expression between several equations. The syntax consists
