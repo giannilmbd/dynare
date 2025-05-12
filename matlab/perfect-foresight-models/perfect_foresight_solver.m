@@ -215,7 +215,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
             if is_numerical_exception(ME)
                 extra_success = false;
             else
-                rethrow ME
+                rethrow(ME)
             end
         end
     end
@@ -375,7 +375,7 @@ while step > options_.simul.homotopy_min_step_size
                 solver_iter = [];
                 per_block_status = [];
             else
-                rethrow ME
+                rethrow(ME)
             end
         end
     else
@@ -646,4 +646,4 @@ function r = is_numerical_exception(ME)
 r = (~isoctave && (strcmp(ME.identifier, 'MATLAB:erf:notFullReal') ...
                    || strcmp(ME.identifier, 'MATLAB:erfc:notFullReal'))) ...
     || (isoctave && (strcmp(ME.message, 'normcdf: X, MU, and SIGMA must not be complex.') ...
-                     || strcmp(ME.message, 'normpdf: X, MU, and SIGMA must not be complex.')))
+                     || strcmp(ME.message, 'normpdf: X, MU, and SIGMA must not be complex.')));
