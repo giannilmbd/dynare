@@ -188,10 +188,13 @@ by the ``dynare`` command.
         Instructs Dynare to no create a logfile of this run in
         ``FILENAME.log.`` The default is to create the logfile.
 
-    .. option:: output=second|third
+    .. option:: output=first|second|third
 
        Instructs the preprocessor to output derivatives of the dynamic model at
-       least up to the given order.
+       least up to the given order. The `first` option is useful in
+       larger models when debugging steady state computation, because it allows
+       overriding the default computation and output of dynamic second order derivatives 
+       in case of the mod-file not containing commands for further computations.
 
     .. option:: language=matlab|julia
 
