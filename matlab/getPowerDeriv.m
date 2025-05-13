@@ -44,18 +44,18 @@ return % --*-- Unit tests --*--
 
 %@test:1
 x=getPowerDeriv(2,3,1);
-t(1)=all(abs(x-3*4)<1e-10)
+t(1)=all(abs(x-3*4)<1e-10);
 x=getPowerDeriv(0,2,2);
-t(2)=all(abs(x-2)<1e-10)
+t(2)=all(abs(x-2)<1e-10);
 x=getPowerDeriv(0,2,3); %special case evaluates to 0
-t(3)=all(abs(x-0)<1e-10)
+t(3)=all(abs(x-0)<1e-10);
 x=getPowerDeriv(1e-13,2,3-1e-13); %0 within tolerance
-t(4)=all(abs(x-0)<1e-10)
+t(4)=all(abs(x-0)<1e-10);
 x=getPowerDeriv(0,0,1);
-t(5)=all(abs(x-0)<1e-10)
+t(5)=all(abs(x-0)<1e-10);
 x=getPowerDeriv(0,0,0);
 t(6)=all(abs(x-1)<1e-10);
 x=getPowerDeriv(0,1/3,1); %derivative evaluating to Inf due to division by 0
-t(7)= isinf(x)
+t(7)= isinf(x);
 T = all(t);
 %@eof:1
