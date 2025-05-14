@@ -215,4 +215,18 @@ shocks;
 end;
 
 perfect_foresight_setup(periods=20);
-perfect_foresight_solver(no_homotopy, stack_solve_algo = @{stack_solve_algo});
+perfect_foresight_solver(no_homotopy, stack_solve_algo = @{stack_solve_algo}
+@#if length(preconditioner) > 0
+, preconditioner = @{preconditioner}
+@#endif
+@#if preconditioner == "iterstack"
+@# if !(block && stack_solve_algo == 3)
+// Ensure that problem is not too small for iterstack, and also that there is a “residual” in the block diagonal matrix (since 3 does not divide 20)
+, iterstack_nperiods = 3
+@# else
+// For some reason iterstack can’t solve this model with block decomposition + BiCGStab
+// Hence do the equivalent of a full LU
+, iterstack_nperiods = 20
+@# endif
+@#endif
+);

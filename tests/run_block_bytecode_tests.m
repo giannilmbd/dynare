@@ -1,4 +1,4 @@
-% Copyright © 2011-2024 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -111,32 +111,43 @@ for blockFlag = 0:1
             end
         end
         for i = 1:length(stack_solve_algos)
-            try
-                old_path = path;
-                clear oo_ % Ensure that oo_.endo_simul won’t be overwritten when loading wsMat
-                save wsMat
-                run_ls2003(blockFlag, storageFlag, default_solve_algo, stack_solve_algos(i))
-                load wsMat
-                path(old_path);
-                % Test against the reference simulation path
-                load('test.mat','y_ref');
-                diff = oo_.endo_simul - y_ref;
-                if max(max(abs(diff))) > options_.dynatol.x
-                    failedBlock{size(failedBlock,2)+1} = ['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ')'];
-                    if isoctave
-                        exception.message = 'ERROR: simulation path differs from the reference path';
-                    else
-                        exception = MException('Dynare:simerr', 'ERROR: simulation path difers from the reference path');
+            if ismember(stack_solve_algos(i), [2 3])
+                if storageFlag ~= 2
+                    preconditioners = {'umfiter', 'iterstack', 'ilu'};
+                else % bytecode
+                    preconditioners = {'ilu'};
+                end
+            else
+                preconditioners = {''};
+            end
+            for j = 1:length(preconditioners)
+                try
+                    old_path = path;
+                    clear oo_ % Ensure that oo_.endo_simul won’t be overwritten when loading wsMat
+                    save wsMat
+                    run_ls2003(blockFlag, storageFlag, default_solve_algo, stack_solve_algos(i), preconditioners{j})
+                    load wsMat
+                    path(old_path);
+                    % Test against the reference simulation path
+                    load('test.mat','y_ref');
+                    diff = oo_.endo_simul - y_ref;
+                    if max(max(abs(diff))) > options_.dynatol.x
+                        failedBlock{size(failedBlock,2)+1} = ['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ',' preconditioners{j} ')'];
+                        if isoctave
+                            exception.message = 'ERROR: simulation path differs from the reference path';
+                        else
+                            exception = MException('Dynare:simerr', 'ERROR: simulation path difers from the reference path');
+                        end
+                        printTestError(['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ',' preconditioners{j} ')'], exception);
+                        clear exception
                     end
-                    printTestError(['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ')'], exception);
+                catch exception
+                    load wsMat
+                    path(old_path);
+                    failedBlock{size(failedBlock,2)+1} = ['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ',' preconditioners{j} ')'];
+                    printTestError(['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ',' preconditioners{j} ')'], exception);
                     clear exception
                 end
-            catch exception
-                load wsMat
-                path(old_path);
-                failedBlock{size(failedBlock,2)+1} = ['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ')'];
-                printTestError(['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ')'], exception);
-                clear exception
             end
         end
     end

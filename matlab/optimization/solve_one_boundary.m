@@ -40,7 +40,7 @@ function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, s
 % ALGORITHM
 %   Newton with LU or GMRES or BicGstab for dynamic block
 
-% Copyright © 1996-2023 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -59,11 +59,8 @@ function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, s
 
 Blck_size=size(y_index_eq,2);
 correcting_factor=0.01;
-ilu_setup.type='crout';
-ilu_setup.droptol=1e-10;
 max_resa=1e100;
 lambda = 1; % Length of Newton step
-reduced = 0;
 if is_forward
     incr = 1;
     start = y_kmin+1;
@@ -141,7 +138,6 @@ for it_=start:incr:finish
                         end
                     elseif lambda>1e-8
                         lambda=lambda/2;
-                        reduced = 1;
                         if verbose
                             disp(['reducing the path length: lambda=' num2str(lambda,'%f')])
                         end
@@ -192,7 +188,9 @@ for it_=start:incr:finish
                                     M_.block_structure.block(Block_Num).g1_sparse_rowval, ...
                                     M_.block_structure.block(Block_Num).g1_sparse_colval, ...
                                     M_.block_structure.block(Block_Num).g1_sparse_colptr, T(:, it_));
-            elseif (is_dynamic && (stack_solve_algo==1 || stack_solve_algo==0 || stack_solve_algo==6)) || (~is_dynamic && options_.solve_algo==6)
+            elseif (is_dynamic && (ismember(stack_solve_algo, [0 1 6]) || ...
+                                   (ismember(stack_solve_algo, [2 3]) && strcmp(options_.simul.preconditioner, 'iterstack')))) ... % Iterstack does not make sense for one boundary problems
+                   || (~is_dynamic && options_.solve_algo==6)
                 if verbose && ~is_dynamic
                     disp('steady: Sparse LU ')
                 end
@@ -203,64 +201,43 @@ for it_=start:incr:finish
                 else
                     y(y_index_eq) = ya;
                 end
-            elseif (stack_solve_algo==2 && is_dynamic) || (options_.solve_algo==7 && ~is_dynamic)
-                flag1=1;
-                if verbose && ~is_dynamic
-                    disp('steady: GMRES ')
+            elseif is_dynamic && ismember(stack_solve_algo, [2 3])
+                if strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0
+                    [L, U, P, Q] = lu(g1);
+                    zc = L\(P*r);
+                    zb = U\zc;
+                elseif strcmp(options_.simul.preconditioner, 'ilu')
+                    [L, U, P] = ilu(g1, options_.simul.ilu);
+                    Q = speye(size(g1));
                 end
-                while flag1>0
-                    [L1, U1]=ilu(g1,ilu_setup);
-                    [dx,flag1] = gmres(g1,-r,Blck_size,1e-6,Blck_size,L1,U1);
-                    if  flag1>0 || reduced
-                        if verbose
-                            if flag1==1
-                                disp(['Error in simul: No convergence inside GMRES after ' num2str(iter,'%6d') ' iterations, in block' num2str(Block_Num,'%3d')])
-                            elseif(flag1==2)
-                                disp(['Error in simul: Preconditioner is ill-conditioned, in block' num2str(Block_Num,'%3d')])
-                            elseif(flag1==3)
-                                disp(['Error in simul: GMRES stagnated (Two consecutive iterates were the same.), in block' num2str(Block_Num,'%3d')])
-                            end
-                        end
-                        ilu_setup.droptol = ilu_setup.droptol/10;
-                        reduced = 0;
+                if ~(strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0)
+                    [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, g1, r);
+                    if stack_solve_algo==2
+                        [zb, flag] = gmres(P*g1*Q, P*r, gmres_restart, iter_tol, iter_maxit, L, U);
                     else
-                        ya = ya + lambda*dx;
-                        if is_dynamic
-                            y(y_index_eq, it_) = ya;
-                        else
-                            y(y_index_eq) = ya';
-                        end
+                        [zb, flag] = bicgstab(P*g1*Q, P*r, iter_tol, iter_maxit, L, U);
+                    end
+                    iter_solver_error_flag(flag)
+                end
+                ya = ya - lambda*Q*zb;
+                y(y_index_eq, it_) = ya;
+            elseif ~is_dynamic && ismember(options_.solve_algo, [7 8])
+                if verbose
+                    if options_.solve_algo == 7
+                        disp('steady: GMRES ')
+                    else
+                        disp('steady: BiCGStab')
                     end
                 end
-            elseif (stack_solve_algo==3 && is_dynamic) || (options_.solve_algo==8 && ~is_dynamic)
-                flag1=1;
-                if verbose && ~is_dynamic
-                    disp('steady: BiCGStab')
+                %% Should be the same options as in newton_solve.m and bytecode/Interpreter.cc (static case)
+                [L, U] = ilu(g1, options_.steady.ilu);
+                if options_.solve_algo == 7
+                    zb = gmres(g1, r, [], [], [], L, U);
+                else
+                    zb = bicgstab(g1, r, [], [], L, U);
                 end
-                while flag1>0
-                    [L1, U1]=ilu(g1,ilu_setup);
-                    [dx,flag1] = bicgstab(g1,-r,1e-6,Blck_size,L1,U1);
-                    if flag1>0 || reduced
-                        if verbose
-                            if(flag1==1)
-                                disp(['Error in simul: No convergence inside BiCGStab after ' num2str(iter,'%6d') ' iterations, in block' num2str(Block_Num,'%3d')])
-                            elseif(flag1==2)
-                                disp(['Error in simul: Preconditioner is ill-conditioned, in block' num2str(Block_Num,'%3d')])
-                            elseif(flag1==3)
-                                disp(['Error in simul: BiCGStab stagnated (Two consecutive iterates were the same.), in block' num2str(Block_Num,'%3d')])
-                            end
-                        end
-                        ilu_setup.droptol = ilu_setup.droptol/10;
-                        reduced = 0;
-                    else
-                        ya = ya + lambda*dx;
-                        if is_dynamic
-                            y(y_index_eq, it_) = ya;
-                        else
-                            y(y_index_eq) = ya';
-                        end
-                    end
-                end
+                ya = ya - lambda*zb;
+                y(y_index_eq) = ya;
             else
                 if is_dynamic
                     error(['options_.stack_solve_algo = ' num2str(stack_solve_algo) ' not implemented'])

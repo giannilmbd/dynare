@@ -25,7 +25,7 @@ function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(fh, y, x,
 % ALGORITHM
 %   Newton with LU or GMRES or BiCGStab
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -57,11 +57,8 @@ verbose = options_.verbosity;
 cvg=false;
 iter=0;
 correcting_factor=0.01;
-ilu_setup.droptol=1e-10;
-ilu_setup.type = 'ilutp';
 max_resa=1e100;
 lambda = 1; % Length of Newton step (unused for stack_solve_algo=4)
-reduced = 0;
 while ~(cvg || iter > options_.simul.maxit)
     r = NaN(Blck_size, periods);
     g1a = spalloc(Blck_size*periods, Blck_size*periods, M_.block_structure.block(Block_Num).NNZDerivatives*periods);
@@ -81,7 +78,6 @@ while ~(cvg || iter > options_.simul.maxit)
             g1a((it_-y_kmin-1)*Blck_size+(1:Blck_size), (it_-y_kmin-2)*Blck_size+(1:3*Blck_size)) = g1;
         end
     end
-    preconditioner = 2;
     ya = reshape(y(y_index, y_kmin+(1:periods)), 1, periods*Blck_size)';
     ra = reshape(r, periods*Blck_size, 1);
     b=-ra+g1a*ya;
@@ -98,7 +94,7 @@ while ~(cvg || iter > options_.simul.maxit)
     end
     if ~cvg
         if iter>0
-            if ~isreal(max_res) || isnan(max_res) || (max_resa<max_res && iter>1)
+            if ~isreal(max_res) || isnan(max_res) %|| (max_resa<max_res && iter>1)
                 if verbose && ~isreal(max_res)
                     disp(['Variable ' M_.endo_names{max_indx} ' (' int2str(max_indx) ') returns an undefined value']);
                 end
@@ -128,7 +124,6 @@ while ~(cvg || iter > options_.simul.maxit)
                     end
                 elseif lambda>1e-8 && stack_solve_algo ~= 4
                     lambda=lambda/2;
-                    reduced = 1;
                     if verbose
                         disp(['reducing the path length: lambda=' num2str(lambda,'%f')]);
                     end
@@ -155,102 +150,34 @@ while ~(cvg || iter > options_.simul.maxit)
         g1aa=g1a;
         ba=b;
         max_resa=max_res;
-        if stack_solve_algo==0
+        if stack_solve_algo==0 || (ismember(stack_solve_algo, [2 3]) && strcmp(options_.simul.preconditioner, 'iterstack') ...
+                                   && options_.simul.iterstack_nperiods == 0 && options_.simul.iterstack_nlu == 0 && size(g1a, 1) < options_.simul.iterstack_maxlu) % Fallback to LU if block too small for iterstack
             dx = g1a\b- ya;
             ya = ya + lambda*dx;
             y(y_index, y_kmin+(1:periods))=reshape(ya',length(y_index),periods);
-        elseif stack_solve_algo==2
-            flag1=1;
-            while flag1>0
-                if preconditioner==2
-                    [L1, U1]=ilu(g1a,ilu_setup);
-                elseif preconditioner==3
-                    Size = Blck_size;
-                    gss1 =  g1a(Size + 1: 2*Size,Size + 1: 2*Size) + g1a(Size + 1: 2*Size,2*Size+1: 3*Size);
-                    [L1, U1]=lu(gss1);
-                    L(1:Size,1:Size) = L1;
-                    U(1:Size,1:Size) = U1;
-                    gss2 = g1a(Size + 1: 2*Size,1: Size) + g1a(Size + 1: 2*Size,Size+1: 2*Size) + g1a(Size + 1: 2*Size,2*Size+1: 3*Size);
-                    [L2, U2]=lu(gss2);
-                    L(Size+1:(periods-1)*Size,Size+1:(periods-1)*Size) = kron(eye(periods-2), L2);
-                    U(Size+1:(periods-1)*Size,Size+1:(periods-1)*Size) = kron(eye(periods-2), U2);
-                    gss2 = g1a(Size + 1: 2*Size,1: Size) + g1a(Size + 1: 2*Size,Size+1: 2*Size);
-                    [L3, U3]=lu(gss2);
-                    L((periods-1)*Size+1:periods*Size,(periods-1)*Size+1:periods*Size) = L3;
-                    U((periods-1)*Size+1:periods*Size,(periods-1)*Size+1:periods*Size) = U3;
-                    L1 = L;
-                    U1 = U;
-                elseif preconditioner==4
-                    Size = Blck_size;
-                    gss1 =  g1a(1: 3*Size, 1: 3*Size);
-                    [L, U] = lu(gss1);
-                    L1 = kron(eye(ceil(periods/3)),L);
-                    U1 = kron(eye(ceil(periods/3)),U);
-                    L1 = L1(1:periods * Size, 1:periods * Size);
-                    U1 = U1(1:periods * Size, 1:periods * Size);
-                end
-                [za,flag1] = gmres(g1a,b,Blck_size,1e-6,Blck_size*periods,L1,U1);
-                if (flag1>0 || reduced)
-                    if verbose
-                        if flag1==1
-                            disp(['Error in simul: No convergence inside GMRES after ' num2str(periods*10,'%6d') ' iterations, in block ' num2str(Blck_size,'%3d')]);
-                        elseif flag1==2
-                            disp(['Error in simul: Preconditioner is ill-conditioned, in block ' num2str(Blck_size,'%3d')]);
-                        elseif flag1==3
-                            disp(['Error in simul: GMRES stagnated (Two consecutive iterates were the same.), in block ' num2str(Blck_size,'%3d')]);
-                        end
-                    end
-                    ilu_setup.droptol = ilu_setup.droptol/10;
-                    reduced = 0;
-                else
-                    dx = za - ya;
-                    ya = ya + lambda*dx;
-                    y(y_index, y_kmin+(1:periods))=reshape(ya',length(y_index),periods);
-                end
+        elseif ismember(stack_solve_algo, [2, 3])
+            if strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0
+                [L, U, P, Q] = lu(g1a);
+                zc = L\(P*b);
+                zb = U\zc;
+            elseif strcmp(options_.simul.preconditioner, 'iterstack')
+                [L, U, P, Q] = iterstack_preconditioner(g1a, options_);
+            elseif strcmp(options_.simul.preconditioner, 'ilu')
+                [L, U, P] = ilu(g1a, options_.simul.ilu);
+                Q = speye(size(g1a));
             end
-        elseif stack_solve_algo==3
-            flag1=1;
-            while flag1>0
-                if preconditioner==2
-                    [L1, U1]=ilu(g1a,ilu_setup);
-                    [za,flag1] = bicgstab(g1a,b,1e-7,Blck_size*periods,L1,U1);
-                elseif preconditioner==3
-                    Size = Blck_size;
-                    gss0 = g1a(Size + 1: 2*Size,1: Size) + g1a(Size + 1: 2*Size,Size+1: 2*Size) + g1a(Size + 1: 2*Size,2*Size+1: 3*Size);
-                    [L1, U1]=lu(gss0);
-                    P1 = eye(size(gss0));
-                    Q1 = eye(size(gss0));
-                    L = kron(eye(periods),L1);
-                    U = kron(eye(periods),U1);
-                    P = kron(eye(periods),P1);
-                    Q = kron(eye(periods),Q1);
-                    [za,flag1] = bicgstab1(g1a,b,1e-7,Blck_size*periods,L,U, P, Q);
+            if ~(strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0)
+                [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, g1a, b);
+                if stack_solve_algo == 2
+                    [zb, flag] = gmres(P*g1a*Q, P*b, gmres_restart, iter_tol, iter_maxit, L, U);
                 else
-                    Size = Blck_size;
-                    gss0 = g1a(Size + 1: 2*Size,1: Size) + g1a(Size + 1: 2*Size,Size+1: 2*Size) + g1a(Size + 1: 2*Size,2*Size+1: 3*Size);
-                    [L1, U1]=lu(gss0);
-                    L1 = kron(eye(periods),L1);
-                    U1 = kron(eye(periods),U1);
-                    [za,flag1] = bicgstab(g1a,b,1e-7,Blck_size*periods,L1,U1);
+                    [zb, flag] = bicgstab(P*g1a*Q, P*b, iter_tol, iter_maxit, L, U);
                 end
-                if flag1>0 || reduced
-                    if verbose
-                        if flag1==1
-                            disp(['Error in simul: No convergence inside BICGSTAB after ' num2str(periods*10,'%6d') ' iterations, in block ' num2str(Blck_size,'%3d')]);
-                        elseif flag1==2
-                            disp(['Error in simul: Preconditioner is ill-conditioned, in block ' num2str(Blck_size,'%3d')]);
-                        elseif flag1==3
-                            disp(['Error in simul: GMRES stagnated (Two consecutive iterates were the same.), in block ' num2str(Blck_size,'%3d')]);
-                        end
-                    end
-                    ilu_setup.droptol = ilu_setup.droptol/10;
-                    reduced = 0;
-                else
-                    dx = za - ya;
-                    ya = ya + lambda*dx;
-                    y(y_index, y_kmin+(1:periods))=reshape(ya',length(y_index),periods);
-                end
+                iter_solver_error_flag(flag)
             end
+            dx = Q*zb - ya;
+            ya = ya + lambda*dx;
+            y(y_index, y_kmin+(1:periods))=reshape(ya',length(y_index),periods);
         elseif stack_solve_algo==4
             stpmx = 100 ;
             stpmax = stpmx*max([sqrt(ya'*ya);size(y_index,2)]);

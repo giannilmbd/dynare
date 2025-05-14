@@ -1,6 +1,6 @@
-function run_ls2003(block, storage, solve_algo, stack_solve_algo)
+function run_ls2003(block, storage, solve_algo, stack_solve_algo, preconditioner)
 
-% Copyright © 2010-2013 Dynare Team
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -17,17 +17,23 @@ function run_ls2003(block, storage, solve_algo, stack_solve_algo)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-  disp(['TEST: ls2003 (block=' num2str(block) ', bytecode=' ...
-        num2str(storage==2) ', use_dll=' num2str(storage==1) ...
-        ', solve_algo=' num2str(solve_algo) ...
-        ', stack_solve_algo=' num2str(stack_solve_algo) ')...']);
+  if nargin < 5
+      preconditioner = '';
+  end
+
+  fprintf('TEST: ls2003 (block=%d, bytecode=%d, use_dll=%d, solve_algo=%d, stack_solve_algo=%d', block, storage==2, storage==1, solve_algo, stack_solve_algo)
+  if ~isempty(preconditioner)
+      fprintf(', preconditioner=%s', preconditioner)
+  end
+  fprintf(')...\n')
   fid = fopen('ls2003_tmp.mod', 'w');
   assert(fid > 0);
   fprintf(fid, ['@#define block = %d\n@#define bytecode = %d\n' ...
       '@#define use_dll = %d\n' ...
       '@#define solve_algo = %d\n@#define stack_solve_algo = %d\n' ...
+      '@#define preconditioner = "%s"\n' ...
       '@#include \"ls2003.mod\"\n'], block, storage==2, storage==1, ...
-      solve_algo, stack_solve_algo);
+      solve_algo, stack_solve_algo, preconditioner);
   fclose(fid);
   dynare('ls2003_tmp.mod','console')
 end

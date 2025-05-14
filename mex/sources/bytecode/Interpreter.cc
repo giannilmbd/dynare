@@ -30,6 +30,54 @@
 
 #include "Interpreter.hh"
 
+void
+iter_solver_opts_t::set_static_values(const mxArray* options_)
+{
+  // Should be the same options as in newton_solve.m and solve_one_boundary.m (static case)
+  iter_tol = mxCreateDoubleMatrix(0, 0, mxREAL);
+  iter_maxit = mxCreateDoubleMatrix(0, 0, mxREAL);
+  gmres_restart = mxCreateDoubleMatrix(0, 0, mxREAL);
+
+  int field {mxGetFieldNumber(options_, "steady")};
+  if (field < 0)
+    mexErrMsgTxt("steady is not a field of options_");
+  mxArray* steady {mxGetFieldByNumber(options_, 0, field)};
+
+  field = mxGetFieldNumber(steady, "ilu");
+  if (field < 0)
+    mexErrMsgTxt("ilu is not a field of options_.steady");
+  ilu = mxGetFieldByNumber(steady, 0, field);
+}
+
+void
+iter_solver_opts_t::set_dynamic_values(const mxArray* options_)
+{
+  int field {mxGetFieldNumber(options_, "simul")};
+  if (field < 0)
+    mexErrMsgTxt("simul is not a field of options_");
+  mxArray* simul {mxGetFieldByNumber(options_, 0, field)};
+
+  field = mxGetFieldNumber(simul, "iter_tol");
+  if (field < 0)
+    mexErrMsgTxt("iter_tol is not a field of options_.simul");
+  iter_tol = mxGetFieldByNumber(simul, 0, field);
+
+  field = mxGetFieldNumber(simul, "iter_maxit");
+  if (field < 0)
+    mexErrMsgTxt("iter_maxit is not a field of options_.simul");
+  iter_maxit = mxGetFieldByNumber(simul, 0, field);
+
+  field = mxGetFieldNumber(simul, "gmres_restart");
+  if (field < 0)
+    mexErrMsgTxt("gmres_restart is not a field of options_.simul");
+  gmres_restart = mxGetFieldByNumber(simul, 0, field);
+
+  field = mxGetFieldNumber(simul, "ilu");
+  if (field < 0)
+    mexErrMsgTxt("ilu is not a field of options_.simul");
+  ilu = mxGetFieldByNumber(simul, 0, field);
+}
+
 Interpreter::Interpreter(Evaluate& evaluator_arg, double* params_arg, double* y_arg, double* ya_arg,
                          double* x_arg, double* steady_y_arg, double* direction_arg, int y_size_arg,
                          int nb_row_x_arg, int periods_arg, int y_kmin_arg, int y_kmax_arg,
@@ -38,11 +86,13 @@ Interpreter::Interpreter(Evaluate& evaluator_arg, double* params_arg, double* y_
                          int solve_algo_arg, bool print_arg,
                          const mxArray* GlobalTemporaryTerms_arg, bool steady_state_arg,
                          bool block_decomposed_arg, int col_x_arg, int col_y_arg,
-                         const BasicSymbolTable& symbol_table_arg, int verbosity_arg) :
+                         const BasicSymbolTable& symbol_table_arg, int verbosity_arg,
+                         iter_solver_opts_t iter_solver_opts_arg) :
     symbol_table {symbol_table_arg},
     steady_state {steady_state_arg},
     block_decomposed {block_decomposed_arg},
     evaluator {evaluator_arg},
+    iter_solver_opts {iter_solver_opts_arg},
     minimal_solving_periods {minimal_solving_periods_arg},
     y_size {y_size_arg},
     y_kmin {y_kmin_arg},
@@ -60,7 +110,6 @@ Interpreter::Interpreter(Evaluate& evaluator_arg, double* params_arg, double* y_
   start_compare = 0;
   restart = 0;
   IM_i.clear();
-  lu_inc_tol = 1e-10;
   Symbolic = nullptr;
   Numeric = nullptr;
   params = params_arg;
@@ -2260,65 +2309,6 @@ Interpreter::simple_bksub()
     }
 }
 
-mxArray*
-Interpreter::mult_SAT_B(const mxArray* A_m, const mxArray* B_m)
-{
-  size_t n_A = mxGetN(A_m);
-  mwIndex* A_i = mxGetIr(A_m);
-  mwIndex* A_j = mxGetJc(A_m);
-  double* A_d = mxGetPr(A_m);
-  size_t n_B = mxGetN(B_m);
-  double* B_d = mxGetPr(B_m);
-  mxArray* C_m = mxCreateDoubleMatrix(n_A, n_B, mxREAL);
-  double* C_d = mxGetPr(C_m);
-  for (int j = 0; j < static_cast<int>(n_B); j++)
-    for (unsigned int i = 0; i < n_A; i++)
-      {
-        double sum = 0;
-        size_t nze_A = A_j[i];
-        while (nze_A < static_cast<unsigned int>(A_j[i + 1]))
-          {
-            size_t i_A = A_i[nze_A];
-            sum += A_d[nze_A++] * B_d[i_A];
-          }
-        C_d[j * n_A + i] = sum;
-      }
-  return C_m;
-}
-
-mxArray*
-Interpreter::Sparse_transpose(const mxArray* A_m)
-{
-  size_t n_A = mxGetN(A_m);
-  size_t m_A = mxGetM(A_m);
-  mwIndex* A_i = mxGetIr(A_m);
-  mwIndex* A_j = mxGetJc(A_m);
-  size_t total_nze_A = A_j[n_A];
-  double* A_d = mxGetPr(A_m);
-  mxArray* C_m = mxCreateSparse(n_A, m_A, total_nze_A, mxREAL);
-  mwIndex* C_i = mxGetIr(C_m);
-  mwIndex* C_j = mxGetJc(C_m);
-  double* C_d = mxGetPr(C_m);
-  unsigned int nze_C = 0, nze_A = 0;
-  ranges::fill_n(C_j, m_A + 1, 0);
-  map<pair<mwIndex, unsigned int>, double> B2;
-  for (unsigned int i = 0; i < n_A; i++)
-    while (nze_A < static_cast<unsigned int>(A_j[i + 1]))
-      {
-        C_j[A_i[nze_A] + 1]++;
-        B2[{A_i[nze_A], i}] = A_d[nze_A];
-        nze_A++;
-      }
-  for (unsigned int i = 0; i < m_A; i++)
-    C_j[i + 1] += C_j[i];
-  for (auto& [key, val] : B2)
-    {
-      C_d[nze_C] = val;
-      C_i[nze_C++] = key.second;
-    }
-  return C_m;
-}
-
 void
 Interpreter::compute_block_time(int my_Per_u_, bool evaluate, bool no_derivatives)
 {
@@ -2750,24 +2740,19 @@ void
 Interpreter::Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundaries, mxArray* x0_m)
 {
   size_t n = mxGetM(A_m);
-  std::array field_names {"droptol", "type"};
-  std::array dims {static_cast<mwSize>(1)};
-  mxArray* Setup
-      = mxCreateStructArray(dims.size(), dims.data(), field_names.size(), field_names.data());
-  mxSetFieldByNumber(Setup, 0, 0, mxCreateDoubleScalar(lu_inc_tol));
-  mxSetFieldByNumber(Setup, 0, 1, mxCreateString("ilutp"));
+
   std::array<mxArray*, 2> lhs0;
-  std::array rhs0 {A_m, Setup};
+  std::array rhs0 {A_m, iter_solver_opts.ilu};
   if (mexCallMATLAB(lhs0.size(), lhs0.data(), rhs0.size(), rhs0.data(), "ilu"))
     throw FatalException("In GMRES, the incomplete LU decomposition (ilu) has failed");
   mxArray* L1 = lhs0[0];
   mxArray* U1 = lhs0[1];
-  /*[za,flag1] = gmres(g1a,b,Blck_size,1e-6,Blck_size*periods,L1,U1);*/
+
   std::array rhs {A_m,
                   b_m,
-                  mxCreateDoubleScalar(size),
-                  mxCreateDoubleScalar(1e-6),
-                  mxCreateDoubleScalar(static_cast<double>(n)),
+                  iter_solver_opts.gmres_restart,
+                  iter_solver_opts.iter_tol,
+                  iter_solver_opts.iter_maxit,
                   L1,
                   U1,
                   x0_m};
@@ -2776,28 +2761,24 @@ Interpreter::Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundari
   mxArray* z = lhs[0];
   mxArray* flag = lhs[1];
   double flag1 {mxGetScalar(flag)};
-  mxDestroyArray(rhs0[1]);
-  mxDestroyArray(rhs[2]);
-  mxDestroyArray(rhs[3]);
-  mxDestroyArray(rhs[4]);
   mxDestroyArray(rhs[5]);
   mxDestroyArray(rhs[6]);
+
   if (flag1 > 0)
     {
       if (flag1 == 1)
-        mexWarnMsgTxt(
+        mexErrMsgTxt(
             ("Error in bytecode: No convergence inside GMRES, in block " + to_string(block_num + 1))
                 .c_str());
       else if (flag1 == 2)
-        mexWarnMsgTxt(("Error in bytecode: Preconditioner is ill-conditioned, in block "
-                       + to_string(block_num + 1))
-                          .c_str());
+        mexErrMsgTxt(("Error in bytecode: Preconditioner is ill-conditioned, in block "
+                      + to_string(block_num + 1))
+                         .c_str());
       else if (flag1 == 3)
-        mexWarnMsgTxt(("Error in bytecode: GMRES stagnated (Two consecutive iterates were the "
-                       "same.), in block "
-                       + to_string(block_num + 1))
-                          .c_str());
-      lu_inc_tol /= 10;
+        mexErrMsgTxt(("Error in bytecode: GMRES stagnated (Two consecutive iterates were the "
+                      "same.), in block "
+                      + to_string(block_num + 1))
+                         .c_str());
     }
   else
     {
@@ -2819,6 +2800,7 @@ Interpreter::Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundari
             y[eq + it_ * y_size] += slowc * yy;
           }
     }
+
   mxDestroyArray(A_m);
   mxDestroyArray(b_m);
   mxDestroyArray(x0_m);
@@ -2828,143 +2810,42 @@ Interpreter::Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundari
 
 void
 Interpreter::Solve_Matlab_BiCGStab(mxArray* A_m, mxArray* b_m, bool is_two_boundaries,
-                                   mxArray* x0_m, int preconditioner)
+                                   mxArray* x0_m)
 {
-  /* precond = 0  => Jacobi
-     precond = 1  => Incomplet LU decomposition*/
   size_t n = mxGetM(A_m);
-  mxArray *L1 = nullptr, *U1 = nullptr, *Diag = nullptr;
 
-  if (preconditioner == 0)
-    {
-      std::array<mxArray*, 1> lhs0;
-      std::array rhs0 {A_m, mxCreateDoubleScalar(0)};
-      mexCallMATLAB(lhs0.size(), lhs0.data(), rhs0.size(), rhs0.data(), "spdiags");
-      mxArray* tmp = lhs0[0];
-      double* tmp_val = mxGetPr(tmp);
-      Diag = mxCreateSparse(n, n, n, mxREAL);
-      mwIndex* Diag_i = mxGetIr(Diag);
-      mwIndex* Diag_j = mxGetJc(Diag);
-      double* Diag_val = mxGetPr(Diag);
-      for (size_t i = 0; i < n; i++)
-        {
-          Diag_val[i] = tmp_val[i];
-          Diag_j[i] = i;
-          Diag_i[i] = i;
-        }
-      Diag_j[n] = n;
-    }
-  else if (preconditioner == 1)
-    {
-      /*[L1, U1] = ilu(g1a=;*/
-      std::array field_names {"type", "droptol"};
-      const int type {0}, droptol {1};
-      std::array dims {static_cast<mwSize>(1)};
-      mxArray* Setup
-          = mxCreateStructArray(dims.size(), dims.data(), field_names.size(), field_names.data());
-      mxSetFieldByNumber(Setup, 0, type, mxCreateString("ilutp"));
-      mxSetFieldByNumber(Setup, 0, droptol, mxCreateDoubleScalar(lu_inc_tol));
-      std::array<mxArray*, 2> lhs0;
-      std::array rhs0 {A_m, Setup};
-      if (mexCallMATLAB(lhs0.size(), lhs0.data(), rhs0.size(), rhs0.data(), "ilu"))
-        throw FatalException {"In BiCGStab, the incomplete LU decomposition (ilu) has failed"};
-      L1 = lhs0[0];
-      U1 = lhs0[1];
-      mxDestroyArray(Setup);
-    }
-  double flags = 2;
-  mxArray* z = nullptr;
-  if (steady_state) /*Octave BicStab algorihtm involves a 0 division in case of a preconditionner
-                       equal to the LU decomposition of A matrix*/
-    {
-      mxArray* res = mult_SAT_B(Sparse_transpose(A_m), x0_m);
-      double* resid = mxGetPr(res);
-      double* b = mxGetPr(b_m);
-      for (int i = 0; i < static_cast<int>(n); i++)
-        resid[i] = b[i] - resid[i];
-      std::array<mxArray*, 1> lhs;
-      std::array rhs {L1, res};
-      mexCallMATLAB(lhs.size(), lhs.data(), rhs.size(), rhs.data(), "mldivide");
-      std::array rhs2 {U1, lhs[0]};
-      mexCallMATLAB(lhs.size(), lhs.data(), rhs2.size(), rhs2.data(), "mldivide");
-      z = lhs[0];
-      double* phat = mxGetPr(z);
-      double* x0 = mxGetPr(x0_m);
-      for (int i = 0; i < static_cast<int>(n); i++)
-        phat[i] = x0[i] + phat[i];
+  std::array<mxArray*, 2> lhs0;
+  std::array rhs0 {A_m, iter_solver_opts.ilu};
+  if (mexCallMATLAB(lhs0.size(), lhs0.data(), rhs0.size(), rhs0.data(), "ilu"))
+    throw FatalException {"In BiCGStab, the incomplete LU decomposition (ilu) has failed"};
+  mxArray* L1 = lhs0[0];
+  mxArray* U1 = lhs0[1];
 
-      /*Check the solution*/
-      res = mult_SAT_B(Sparse_transpose(A_m), z);
-      resid = mxGetPr(res);
-      double cum_abs = 0;
-      for (int i = 0; i < static_cast<int>(n); i++)
-        {
-          resid[i] = b[i] - resid[i];
-          cum_abs += fabs(resid[i]);
-        }
-      if (cum_abs > 1e-7)
-        flags = 2;
-      else
-        flags = 0;
-      mxDestroyArray(res);
-    }
-
-  if (flags == 2)
-    {
-      if (preconditioner == 0)
-        {
-          /*[za,flag1] = bicgstab(g1a,b,1e-6,Blck_size*periods,L1,U1);*/
-          std::array rhs {A_m, b_m, mxCreateDoubleScalar(1e-6),
-                          mxCreateDoubleScalar(static_cast<double>(n)), Diag};
-          std::array<mxArray*, 2> lhs;
-          mexCallMATLAB(lhs.size(), lhs.data(), rhs.size(), rhs.data(), "bicgstab");
-          z = lhs[0];
-          mxArray* flag = lhs[1];
-          flags = mxGetScalar(flag);
-          mxDestroyArray(flag);
-          mxDestroyArray(rhs[2]);
-          mxDestroyArray(rhs[3]);
-          mxDestroyArray(rhs[4]);
-        }
-      else if (preconditioner == 1)
-        {
-          /*[za,flag1] = bicgstab(g1a,b,1e-6,Blck_size*periods,L1,U1);*/
-          std::array rhs {A_m,
-                          b_m,
-                          mxCreateDoubleScalar(1e-6),
-                          mxCreateDoubleScalar(static_cast<double>(n)),
-                          L1,
-                          U1,
-                          x0_m};
-          std::array<mxArray*, 2> lhs;
-          mexCallMATLAB(lhs.size(), lhs.data(), rhs.size(), rhs.data(), "bicgstab");
-          z = lhs[0];
-          mxArray* flag = lhs[1];
-          flags = mxGetScalar(flag);
-          mxDestroyArray(flag);
-          mxDestroyArray(rhs[2]);
-          mxDestroyArray(rhs[3]);
-          mxDestroyArray(rhs[4]);
-          mxDestroyArray(rhs[5]);
-        }
-    }
+  std::array rhs {A_m, b_m, iter_solver_opts.iter_tol, iter_solver_opts.iter_maxit, L1, U1, x0_m};
+  std::array<mxArray*, 2> lhs;
+  mexCallMATLAB(lhs.size(), lhs.data(), rhs.size(), rhs.data(), "bicgstab");
+  mxArray* z = lhs[0];
+  mxArray* flag = lhs[1];
+  double flags {mxGetScalar(flag)};
+  mxDestroyArray(flag);
+  mxDestroyArray(rhs[4]);
+  mxDestroyArray(rhs[5]);
 
   if (flags > 0)
     {
       if (flags == 1)
-        mexWarnMsgTxt(("Error in bytecode: No convergence inside BiCGStab, in block "
-                       + to_string(block_num + 1))
-                          .c_str());
+        mexErrMsgTxt(("Error in bytecode: No convergence inside BiCGStab, in block "
+                      + to_string(block_num + 1))
+                         .c_str());
       else if (flags == 2)
-        mexWarnMsgTxt(("Error in bytecode: Preconditioner is ill-conditioned, in block "
-                       + to_string(block_num + 1))
-                          .c_str());
+        mexErrMsgTxt(("Error in bytecode: Preconditioner is ill-conditioned, in block "
+                      + to_string(block_num + 1))
+                         .c_str());
       else if (flags == 3)
-        mexWarnMsgTxt(("Error in bytecode: BiCGStab stagnated (Two consecutive iterates were the "
-                       "same.), in block "
-                       + to_string(block_num + 1))
-                          .c_str());
-      lu_inc_tol /= 10;
+        mexErrMsgTxt(("Error in bytecode: BiCGStab stagnated (Two consecutive iterates were the "
+                      "same.), in block "
+                      + to_string(block_num + 1))
+                         .c_str());
     }
   else
     {
@@ -2986,6 +2867,7 @@ Interpreter::Solve_Matlab_BiCGStab(mxArray* A_m, mxArray* b_m, bool is_two_bound
             y[eq + it_ * y_size] += slowc * yy;
           }
     }
+
   mxDestroyArray(A_m);
   mxDestroyArray(b_m);
   mxDestroyArray(x0_m);
@@ -3941,7 +3823,6 @@ Interpreter::Simulate_One_Boundary()
   mxArray *b_m = nullptr, *A_m = nullptr, *x0_m = nullptr;
   SuiteSparse_long *Ap = nullptr, *Ai = nullptr;
   double *Ax = nullptr, *b = nullptr;
-  int preconditioner = 1;
 
   try_at_iteration = 0;
   Clear_u();
@@ -4010,14 +3891,10 @@ Interpreter::Simulate_One_Boundary()
               mexPrintf("MODEL STEADY STATE: (method=Sparse LU)\n");
               break;
             case 7:
-              mexPrintf(preconditioner_print_out("MODEL STEADY STATE: (method=GMRES)\n",
-                                                 preconditioner, true)
-                            .c_str());
+              mexPrintf("MODEL STEADY STATE: (method=GMRES with 'ilu' preconditioner)\n");
               break;
             case 8:
-              mexPrintf(preconditioner_print_out("MODEL STEADY STATE: (method=BiCGStab)\n",
-                                                 preconditioner, true)
-                            .c_str());
+              mexPrintf("MODEL STEADY STATE: (method=BiCGStab with 'ilu' preconditioner)\n");
               break;
             }
         }
@@ -4087,7 +3964,7 @@ Interpreter::Simulate_One_Boundary()
       else if ((solve_algo == 7 && steady_state) || (stack_solve_algo == 2 && !steady_state))
         Solve_Matlab_GMRES(A_m, b_m, false, x0_m);
       else if ((solve_algo == 8 && steady_state) || (stack_solve_algo == 3 && !steady_state))
-        Solve_Matlab_BiCGStab(A_m, b_m, false, x0_m, preconditioner);
+        Solve_Matlab_BiCGStab(A_m, b_m, false, x0_m);
       else if ((solve_algo == 6 && steady_state)
                || ((stack_solve_algo == 0 || stack_solve_algo == 1 || stack_solve_algo == 4
                     || stack_solve_algo == 6)
@@ -4204,43 +4081,12 @@ Interpreter::Simulate_Newton_One_Boundary(bool forward)
   mxFree(r);
 }
 
-string
-Interpreter::preconditioner_print_out(string s, int preconditioner, bool ss)
-{
-  int n = s.length();
-  string tmp = ", preconditioner=";
-  switch (preconditioner)
-    {
-    case 0:
-      if (ss)
-        tmp.append("Jacobi on static jacobian");
-      else
-        tmp.append("Jacobi on dynamic jacobian");
-      break;
-    case 1:
-      if (ss)
-        tmp.append("incomplete lutp on static jacobian");
-      else
-        tmp.append("incomplete lu0 on dynamic jacobian");
-      break;
-    case 2:
-      tmp.append("incomplete lutp on dynamic jacobian");
-      break;
-    case 3:
-      tmp.append("lu on static jacobian");
-      break;
-    }
-  s.insert(n - 2, tmp);
-  return s;
-}
-
 void
 Interpreter::Simulate_Newton_Two_Boundaries(
     bool cvg, const vector_table_conditional_local_type& vector_table_conditional_local)
 {
   double top = 0.5;
   double bottom = 0.1;
-  int preconditioner = 2;
   if (start_compare == 0)
     start_compare = y_kmin;
   u_count_alloc_save = u_count_alloc;
@@ -4394,15 +4240,11 @@ Interpreter::Simulate_Newton_Two_Boundaries(
               break;
             case 2:
               mexPrintf(
-                  preconditioner_print_out("MODEL SIMULATION: (method=GMRES on stacked system)\n",
-                                           preconditioner, false)
-                      .c_str());
+                  "MODEL SIMULATION: (method=GMRES on stacked system with 'ilu' preconditioner)\n");
               break;
             case 3:
-              mexPrintf(preconditioner_print_out(
-                            "MODEL SIMULATION: (method=BiCGStab on stacked system)\n",
-                            preconditioner, false)
-                            .c_str());
+              mexPrintf("MODEL SIMULATION: (method=BiCGStab on stacked system with 'ilu' "
+                        "preconditioner)\n");
               break;
             case 4:
               mexPrintf("MODEL SIMULATION: (method=Sparse LU solver with optimal path length on "
@@ -4460,7 +4302,7 @@ Interpreter::Simulate_Newton_Two_Boundaries(
       else if (stack_solve_algo == 2)
         Solve_Matlab_GMRES(A_m, b_m, true, x0_m);
       else if (stack_solve_algo == 3)
-        Solve_Matlab_BiCGStab(A_m, b_m, true, x0_m, 1);
+        Solve_Matlab_BiCGStab(A_m, b_m, true, x0_m);
       else if (stack_solve_algo == 5)
         Solve_ByteCode_Symbolic_Sparse_GaussianElimination(symbolic);
     }

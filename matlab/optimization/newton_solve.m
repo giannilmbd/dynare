@@ -1,4 +1,4 @@
-function [x, errorflag, errorcode] = newton_solve(func, x, jacobian_flag, gstep, tolf, tolx, maxit, solve_algo, varargin)
+function [x, errorflag, errorcode] = newton_solve(func, x, jacobian_flag, gstep, tolf, tolx, maxit, solve_algo, ilu_opts, varargin)
 
 % Solves systems of non linear equations of several variables using a Newton solver, with three
 % variants for the inner linear solver:
@@ -17,13 +17,14 @@ function [x, errorflag, errorcode] = newton_solve(func, x, jacobian_flag, gstep,
 %    tolx             tolerance for solution variation
 %    maxit            maximum number of iterations
 %    solve_algo       from options_
+%    ilu_opts         structure of options for ilu
 %    varargin:        list of extra arguments to the function
 %
 % OUTPUTS
 %    x:               results
 %    errorflag=true:  the model can not be solved
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -103,9 +104,8 @@ for it = 1:maxit
     if solve_algo == 6
         p = fjac\fvec;
     else
-        ilu_setup.type = 'ilutp';
-        ilu_setup.droptol = 1e-10;
-        [L1, U1] = ilu(fjac, ilu_setup);
+        % Should be the same options as in solve_one_boundary.m and bytecode/Interpreter.cc (static case)
+        [L1, U1] = ilu(fjac, ilu_opts);
         if solve_algo == 7
             p = gmres(fjac, fvec, [], [], [], L1, U1);
         elseif solve_algo == 8

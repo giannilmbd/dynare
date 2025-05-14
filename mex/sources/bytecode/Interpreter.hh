@@ -69,6 +69,19 @@ constexpr double mem_increasing_factor = 1.1;
 
 constexpr int NO_ERROR_ON_EXIT {0}, ERROR_ON_EXIT {1};
 
+// Stores various options for iterative solvers (GMRES, BiCGStab), from options_.simul
+struct iter_solver_opts_t
+{
+  const char* preconditioner;
+  mxArray* iter_tol;
+  mxArray* iter_maxit;
+  mxArray* gmres_restart;
+  mxArray* ilu;
+
+  void set_static_values(const mxArray* options_);
+  void set_dynamic_values(const mxArray* options_);
+};
+
 class Interpreter
 {
 private:
@@ -110,7 +123,7 @@ private:
   int iter;
   int start_compare;
   int restart;
-  double lu_inc_tol;
+  iter_solver_opts_t iter_solver_opts;
 
   SuiteSparse_long *Ap_save, *Ai_save;
   double *Ax_save, *b_save;
@@ -199,13 +212,11 @@ private:
                                      double* b);
 
   void Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundaries, mxArray* x0_m);
-  void Solve_Matlab_BiCGStab(mxArray* A_m, mxArray* b_m, bool is_two_boundaries, mxArray* x0_m,
-                             int precond);
+  void Solve_Matlab_BiCGStab(mxArray* A_m, mxArray* b_m, bool is_two_boundaries, mxArray* x0_m);
   void Check_and_Correct_Previous_Iteration();
   bool Simulate_One_Boundary();
   bool solve_linear(bool do_check_and_correct);
   void solve_non_linear();
-  string preconditioner_print_out(string s, int preconditioner, bool ss);
   bool compare(int* save_op, int* save_opa, int* save_opaa, int beg_t, long nop4);
   void Insert(int r, int c, int u_index, int lag_index);
   void Delete(int r, int c);
@@ -222,10 +233,6 @@ private:
   int complete(int beg_t);
   void bksub(int tbreak, int last_period);
   void simple_bksub();
-  // Computes Aᵀ where A is are sparse. The result is sparse.
-  static mxArray* Sparse_transpose(const mxArray* A_m);
-  // Computes Aᵀ·B where A is sparse and B is dense. The result is dense.
-  static mxArray* mult_SAT_B(const mxArray* A_m, const mxArray* B_m);
 
   void compute_block_time(int my_Per_u_, bool evaluate, bool no_derivatives);
   bool compute_complete(bool no_derivatives);
@@ -240,7 +247,8 @@ public:
               int stack_solve_algo_arg, int solve_algo_arg, bool print_arg,
               const mxArray* GlobalTemporaryTerms_arg, bool steady_state_arg,
               bool block_decomposed_arg, int col_x_arg, int col_y_arg,
-              const BasicSymbolTable& symbol_table_arg, int verbosity_arg);
+              const BasicSymbolTable& symbol_table_arg, int verbosity_arg,
+              iter_solver_opts_t iter_solver_opts_arg);
   pair<bool, vector<int>>
   extended_path(const string& file_name, bool evaluate, int block, int nb_periods,
                 const vector<s_plan>& sextended_path,

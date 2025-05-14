@@ -22,7 +22,7 @@ function [x, errorflag, fvec, fjac, errorcode] = dynare_solve(f, x, maxit, tolf,
 %        -10  -> System of equation ill-behaved at the initial guess (Inf, Nans or complex numbers).
 %        -11  -> Initial guess is a solution of the system of equations.
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -294,7 +294,7 @@ elseif options_.solve_algo==3
     end
     [fvec, fjac] = feval(f, x, varargin{:});
 elseif ismember(options_.solve_algo, [6 7 8])
-    [x, errorflag, errorcode] = newton_solve(f, x, jacobian_flag, options_.gstep, tolf, tolx, maxit, options_.solve_algo, varargin{:});
+    [x, errorflag, errorcode] = newton_solve(f, x, jacobian_flag, options_.gstep, tolf, tolx, maxit, options_.solve_algo, options_.steady.ilu, varargin{:});
     [fvec, fjac] = feval(f, x, varargin{:});
 elseif options_.solve_algo==10
     % LMMCP

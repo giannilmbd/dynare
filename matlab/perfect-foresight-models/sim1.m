@@ -82,6 +82,7 @@ end
 h1 = clock;
 iter = 1;
 converged = false;
+umfiter_precond = [];
 
 while ~(converged || iter > options_.simul.maxit)
     h2 = clock;
@@ -148,7 +149,8 @@ while ~(converged || iter > options_.simul.maxit)
         if options_.simul.robust_lin_solve
             dy = -lin_solve_robust(A, res, verbose, options_);
         else
-            dy = -lin_solve(A, res, verbose, options_);
+            [mdy, umfiter_precond] = lin_solve(A, res, verbose, options_, umfiter_precond);
+            dy = -mdy;
         end
         if any(isnan(dy)) || any(isinf(dy))
             if verbose
@@ -217,7 +219,8 @@ if verbose
     skipline();
 end
 
-function x = lin_solve(A, b, verbose, options_)
+function [x, umfiter_precond] = lin_solve(A, b, verbose, options_, umfiter_precond)
+
 if norm(b) < sqrt(eps) % then x = 0 is a solution
     x = 0;
     return
@@ -226,16 +229,39 @@ end
 if options_.stack_solve_algo == 0
     x = A\b;
 else
-    ilu_setup.type = 'ilutp';
-    ilu_setup.droptol = 1e-10;
-    [L1, U1] = ilu(A, ilu_setup);
-    if options_.stack_solve_algo == 2
-        x = gmres(A, b, [], [], [], L1, U1);
-    elseif options_.stack_solve_algo == 3
-        x = bicgstab(A, b, [], [], L1, U1);
-    else
-        error('sim1: invalid value for options_.stack_solve_algo')
+    if strcmp(options_.simul.preconditioner, 'umfiter')
+        if isempty(umfiter_precond)
+            [L, U, P, Q] = lu(A);
+        else
+            L = umfiter_precond.L;
+            U = umfiter_precond.U;
+            P = umfiter_precond.P;
+            Q = umfiter_precond.Q;
+        end
+    elseif strcmp(options_.simul.preconditioner, 'iterstack')
+        [L, U, P, Q] = iterstack_preconditioner(A, options_);
+    elseif strcmp(options_.simul.preconditioner, 'ilu')
+        [L, U, P] = ilu(A, options_.simul.ilu);
+        Q = speye(size(A));
     end
+
+    if strcmp(options_.simul.preconditioner, 'umfiter') && isempty(umfiter_precond)
+        z = L\(P*b);
+        y = U\z;
+        umfiter_precond = struct('L', L, 'U', U, 'P', P, 'Q', Q);
+    else
+        [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, A, b);
+        if options_.stack_solve_algo == 2
+            [y, flag] = gmres(P*A*Q, P*b, gmres_restart, iter_tol, iter_maxit, L, U);
+        elseif options_.stack_solve_algo == 3
+            [y, flag] = bicgstab(P*A*Q, P*b, iter_tol, iter_maxit, L, U);
+        else
+            error('sim1: invalid value for options_.stack_solve_algo')
+        end
+        iter_solver_error_flag(flag)
+    end
+
+    x = Q*y;
 end
 x(~isfinite(x)) = 0;
 relres = norm(b - A*x) / norm(b);

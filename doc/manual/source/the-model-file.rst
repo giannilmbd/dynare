@@ -3785,13 +3785,20 @@ speed-up on large models.
 
                Use a Newton algorithm with a Generalized Minimal Residual
                (GMRES) solver at each iteration, applied on the stacked system
-               of all equations in all periods.
+               of all equations in all periods. The following options can be
+               used to control the behaviour of the algorithm:
+               :opt:`preconditioner <preconditioner = OPTION>`, :opt:`iter_tol
+               <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`,
+               :opt:`gmres_restart <gmres_restart = INTEGER>`.
 
            ``3``
 
                Use a Newton algorithm with a Stabilized Bi-Conjugate Gradient
                (BiCGStab) solver at each iteration, applied on the stacked
-               system of all equations in all periods.
+               system of all equations in all periods. The following options
+               can be used to control the behaviour of the algorithm:
+               :opt:`preconditioner <preconditioner = OPTION>`, :opt:`iter_tol
+               <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`.
 
            ``4``
 
@@ -3831,6 +3838,109 @@ speed-up on large models.
 
                trigger the computation of the solution with a trust
                region algorithm.
+
+    .. option:: preconditioner = OPTION
+
+       When :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` is equal to
+       ``2`` or ``3``, this option specifies which preconditioner will be used
+       in combination with the iterative sparse linear solver (either GMRES or
+       BiCGStab). Possible values for OPTION are:
+
+           ``umfiter``
+
+               At the first iteration of the nonlinear Newton solver, compute
+               the full LU decomposition with complete pivoting of the linear
+               system (and use it to solve that first iteration rather than
+               using the iterative solver). This LU decomposition is then used
+               as the preconditioner in further Newton iterations. Inspired
+               from TROLL’s option with the same name.
+
+           ``iterstack``
+
+               Compute the LU decomposition with complete pivoting for only a
+               few simulation periods within the stacked Jacobian (which is a
+               block tridiagonal matrix). Then repeat that LU decomposition
+               over the block diagonal to construct a preconditioner for the
+               linear system with all simulation periods. If the total number
+               of simulations periods is not a multiple of the number of
+               periods used for the small LU, then an additional LU is computed
+               for the remainder. The following options can be used to control
+               the construction of this preconditioner:
+               :opt:`iterstack_maxlu <iterstack_maxlu = INTEGER>`,
+               :opt:`iterstack_nperiods <iterstack_nperiods = INTEGER>`,
+               :opt:`iterstack_nlu <iterstack_nlu = INTEGER>`,
+               :opt:`iterstack_relu <iterstack_relu = DOUBLE>`.
+               Inspired from TROLL’s solver with the same name.
+
+           ``ilu``
+
+               Use an incomple LU decomposition as the preconditioner,
+               recomputed at every iteration of the nonlinear Newton solver.
+
+       |br| Default value is ``umfiter``.
+
+    .. option:: iter_tol = DOUBLE
+
+       When :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` is equal to
+       ``2`` or ``3``, this option controls the relative tolerance of the
+       iterative linear solver (either GMRES or BiCGStab). It corresponds to
+       the ``tol`` option of the ``gmres`` and ``bicgstab`` MATLAB/Octave
+       functions. Note that the perfect foresight solver uses an *absolute*
+       tolerance for determining convergence, so this option should be used
+       with care, and the default is meant to suit most situations.
+       Default: the value of the :opt:``tolf <tolf = DOUBLE>`` option, divided
+       by 10 times the infinite norm of the right-hand side of the linear system.
+
+    .. option:: iter_maxit = INTEGER
+
+       When :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` is equal to
+       ``2`` or ``3``, this option controls the maximum number of iterations of
+       the iterative linear solver (either GMRES or BiCGStab). It corresponds
+       to the ``maxit`` option of the ``gmres`` and ``bicgstab`` MATLAB/Octave
+       functions. It should not be confused with the :opt:`maxit <maxit = INTEGER>`
+       option, which controls the (outer) nonlinear Newton loop, while
+       ``iter_maxit`` controls the (inner) linear loop. Default: ``500``.
+
+    .. option:: gmres_restart = INTEGER
+
+       When :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` is equal to
+       ``2``, this option controls the number of iterations before restart of
+       the GMRES algorithm. It corresponds to the ``restart`` option of the
+       ``gmres`` MATLAB/Octave function. Default: ``100``.
+
+    .. option:: iterstack_maxlu = INTEGER
+
+       When :opt:`preconditioner <preconditioner = OPTION>` is equal to
+       ``iterstack``, controls the maximum size of the matrix for which the
+       small LU will computed. The actual size of the matrix will be determined
+       by the largest number of periods that, multiplied by the number of
+       equations, is less than the value of the option. Note that when combined
+       with block decomposition (see :opt:`block`), blocks for which the
+       whole stacked system is less than this option will be solved using a
+       regular LU decomposition instead of the iterative linear solver.
+       Default: ``20000``.
+
+    .. option:: iterstack_nperiods = INTEGER
+
+       When :opt:`preconditioner <preconditioner = OPTION>` is equal to
+       ``iterstack``, controls the number of periods used for the small LU.
+       If nonzero, this option overrides the :opt:`iterstack_maxlu <iterstack_maxlu = INTEGER>`
+       and :opt:`iterstack_nlu <iterstack_nlu = INTEGER>` options. Default: ``0``.
+
+    .. option:: iterstack_nlu = INTEGER
+
+       When :opt:`preconditioner <preconditioner = OPTION>` is equal to
+       ``iterstack``, specifies the number of times that the small LU should be
+       repeated in the large preconditioner. If nonzero, this option overrides
+       the :opt:`iterstack_maxlu <iterstack_maxlu = INTEGER>` option. Default:
+       ``0``.
+
+    .. option:: iterstack_relu = DOUBLE
+
+       When :opt:`preconditioner <preconditioner = OPTION>` is equal to
+       ``iterstack``, controls the relative position of the small LU within the
+       whole stacked system. Must be a number between ``0`` and ``1``. Default:
+       ``0.5``.
 
     .. option:: robust_lin_solve
 

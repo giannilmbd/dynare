@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2024 Dynare Team
+ * Copyright © 2007-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <type_traits>
 
 #include "ErrorHandling.hh"
@@ -480,6 +481,34 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
       }
   }()};
 
+  iter_solver_opts_t iter_solver_opts;
+  if (steady_state)
+    iter_solver_opts.set_static_values(options_);
+  else
+    {
+      if (stack_solve_algo == 2 || stack_solve_algo == 3)
+        {
+          // Check that a preconditioner other than 'ilu' has not been requested
+          int field {mxGetFieldNumber(options_, "simul")};
+          if (field < 0)
+            mexErrMsgTxt("simul is not a field of options_");
+          mxArray* simul {mxGetFieldByNumber(options_, 0, field)};
+          field = mxGetFieldNumber(simul, "preconditioner");
+          if (field < 0)
+            mexErrMsgTxt("preconditioner is not a field of options_.simul");
+          mxArray* preconditioner {mxGetFieldByNumber(simul, 0, field)};
+          if (!mxIsChar(preconditioner))
+            mexErrMsgTxt("options_.simul.preconditioner should be a character array");
+          char* preconditioner_str {mxArrayToString(preconditioner)};
+          if (std::strcmp(preconditioner_str, "ilu"))
+            mexErrMsgTxt(
+                "The 'bytecode' option is not compatible with a preconditioner other than 'ilu'");
+          mxFree(preconditioner_str);
+        }
+
+      iter_solver_opts.set_dynamic_values(options_);
+    }
+
   field = mxGetFieldNumber(M_, "fname");
   if (field < 0)
     mexErrMsgTxt("fname is not a field of M_");
@@ -549,7 +578,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                           static_cast<int>(col_x),
                           static_cast<int>(col_y),
                           symbol_table,
-                          verbosity};
+                          verbosity,
+                          iter_solver_opts};
   bool r;
   vector<int> blocks;
 

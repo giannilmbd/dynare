@@ -14,7 +14,7 @@ function [y, success, maxerror, per_block_status] = solve_block_decomposed_probl
 %   maxerror         [double]    ∞-norm of the residual
 %   per_block_status [struct]    vector structure with per-block information about convergence
 
-% Copyright © 2020-2024 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -40,9 +40,9 @@ switch options_.stack_solve_algo
     case {1,6}
         mthd='LBJ with LU solver';
     case 2
-        mthd='GMRES on stacked system';
+        mthd=sprintf('GMRES on stacked system with ''%s'' preconditioner', options_.simul.preconditioner);
     case 3
-        mthd='BiCGStab on stacked system';
+        mthd=sprintf('BiCGStab on stacked system with ''%s'' preconditioner', options_.simul.preconditioner);
     case 4
         mthd='Sparse LU solver with optimal path length on stacked system';
     case 7
