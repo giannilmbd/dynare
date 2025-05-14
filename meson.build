@@ -611,7 +611,7 @@ endif
 
 dynare_manual_html = custom_target('dynare-manual.html',
                                    output : 'dynare-manual.html', input : sphinx_src,
-                                   command : [ sphinx_build_exe, '-b', 'html', sphinx_defines,
+                                   command : [ sphinx_build_exe, '-n', '-b', 'html', sphinx_defines,
                                                '-d', '@PRIVATE_DIR@',
                                                meson.current_source_dir() / 'doc/manual/source',
                                                '@OUTPUT@' ],

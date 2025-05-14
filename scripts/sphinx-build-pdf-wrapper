@@ -18,7 +18,7 @@ shift 4
 # -D options are passed, presumably due to a bug in sphinx-build.
 # See: https://bugs.debian.org/933347
 
-"$sphinx_build_exe" -b latex "$@" "$source_dir" "$private_dir"
+"$sphinx_build_exe" -n -b latex "$@" "$source_dir" "$private_dir"
 
 make -C "$private_dir" all-pdf
 
