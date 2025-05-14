@@ -2990,8 +2990,9 @@ Finding the steady state with Dynare nonlinear solver
            ``5``
 
                 Newton algorithm with a sparse Gaussian elimination (SPE)
-                solver at each iteration (requires ``bytecode`` option, see
-                :ref:`model-decl`).
+                solver at each iteration. This algorithm requires the
+                :opt:`bytecode` option. The :ref:`markowitz <steady_markowitz>`
+                option can be used to control the behaviour of the algorithm.
 
            ``6``
 
@@ -3804,8 +3805,11 @@ speed-up on large models.
                Use the Laffargue-Boucekkine-Juillard (LBJ) algorithm proposed
                in *Juillard (1996)* on top of a sparse Gaussian elimination
                (SPE) solver. The latter takes advantage of the similarity of
-               the Jacobian across periods when searching for the pivots
-               (requires ``bytecode`` option, see :ref:`model-decl`).
+               the Jacobian across periods when searching for the pivots. This
+               algorithm requires the :opt:`bytecode` option. The following
+               options can be used to control the behaviour of the algorithm:
+               :ref:`markowitz <dynamic_markowitz>`,
+               :opt:`minimal_solving_periods <minimal_solving_periods = INTEGER>`.
 
            ``6``
 
@@ -3928,11 +3932,13 @@ speed-up on large models.
        procedure, *i.e.* which must be kept at their value corresponding to
        100% of the shock during all homotopy iterations.
 
+    .. _dynamic_markowitz:
+
     .. option:: markowitz = DOUBLE
 
-       Value of the Markowitz criterion, used to select the
-       pivot. Only used when ``stack_solve_algo = 5``. Default:
-       ``0.5``.
+       Value of the Markowitz criterion, used to select the pivot (see
+       :ref:`markowitz <steady_markowitz>` for more details). Only used when
+       ``stack_solve_algo = 5``. Default: ``0.5``.
 
     .. option:: minimal_solving_periods = INTEGER
 
