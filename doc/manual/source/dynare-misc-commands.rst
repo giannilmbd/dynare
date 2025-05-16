@@ -324,3 +324,43 @@ Dynare misc commands
       will produce plots for ``2/b*cumsum(x/y(-1)-1)``, where ``x`` and
       ``y`` are variables in dseries objects ``toto`` and ``noddy``, in
       the same figure.
+
+.. command:: set_dynare_threads(NAME_OF_MEX_FILE,INTEGER);
+
+    A NAME_OF_MEX_FILE and INTEGER pair that can be used to set the number of 
+    parallel threads employed during the execution of .mex files. To get the number
+    of logical cores `n` available, you can run ``n=numprocs``.
+
+    Available NAME_OF_MEX_FILE options are:
+
+        ``'sparse_hessian_times_B_kronecker_C'``
+
+            .mex file used during computation of second-order solutions and in 
+            `identification`. Default number of threads: number of logical cores. 
+
+        ``'local_state_space_iteration_2'``
+
+            .mex file used during nonlinear filtering at `order=2` without 
+            `k_order_solver` or with `pruning`. Default number of threads: 
+            number of logical cores.
+
+        ``'local_state_space_iteration_3'``
+
+            .mex file used during nonlinear filtering at `order=3` without 
+            `k_order_solver` or with `pruning`. Default number of threads: 
+            number of logical cores.
+
+        ``'local_state_space_iteration_k'``
+
+            .mex file used during nonlinear filtering at `order>3` (without `pruning`) 
+            or at `order=3` with `k_order_solver` and without `pruning`. Default number of threads: 1.
+
+        ``'perfect_foresight_problem'``
+        
+            .mex file used during perfect foresight simulations. Default number of threads: 
+            number of logical cores.
+
+        ``'k_order_perturbation'``
+
+            .mex file used for perturbation solutions with `k_order_solver`. Default number of threads: 
+            half the number of logical cores, but at least 1.

@@ -1,4 +1,5 @@
 function set_dynare_threads(mexname,n)
+% function set_dynare_threads(mexname,n)
 % This function sets the number of threads used by some MEX files using
 % OpenMP features or any other parallel library.
 %
@@ -8,8 +9,9 @@ function set_dynare_threads(mexname,n)
 %
 % OUTPUTS
 %  none.
+% Documented standalone function, not to be removed
 
-% Copyright © 2009-2019 Dynare Team
+% Copyright © 2009-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
