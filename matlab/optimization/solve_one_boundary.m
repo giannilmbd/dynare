@@ -110,7 +110,7 @@ for it_=start:incr:finish
         if ~cvg
             if iter>0
                 if ~isreal(max_res) || isnan(max_res) || (max_resa<max_res && iter>1)
-                    if isnan(max_res) || (max_resa<max_res && iter>0)
+                    if isnan(max_res) || (max_resa<max_res && iter>1)
                         detJ=det(g1a);
                         if(abs(detJ)<1e-7)
                             max_factor=max(max(abs(g1a)));
@@ -125,8 +125,8 @@ for it_=start:incr:finish
                                     disp('    trying to correct the Jacobian matrix:')
                                     disp(['    correcting_factor=' num2str(correcting_factor,'%f') ' max(Jacobian)=' num2str(full(max_factor),'%f')])
                                 end
-                                dx = - r/(g1+correcting_factor*speye(Blck_size));
-                                y(y_index_eq, it_)=ya_save+lambda*dx;
+                                dx = (g1+correcting_factor*speye(Blck_size))\r;
+                                y(y_index_eq, it_)=ya_save-lambda*dx;
                                 continue
                             else
                                 if verbose
