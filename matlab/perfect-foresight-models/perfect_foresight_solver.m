@@ -455,7 +455,7 @@ fprintf('\n')
 
 
 function [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period] = create_scenario(M_,options_,oo_,share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, lastperiods, recompute_final_steady_state, endo_simul, exo_simul, steady_state, exo_steady_state)
-% For a given share, comutes the exogenous path and also the initial and
+% For a given share, computes the exogenous path and also the initial and
 % terminal conditions for the endogenous path (but do not modify the initial
 % guess for endogenous)
 %
