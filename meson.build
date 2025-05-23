@@ -1451,6 +1451,7 @@ mod_and_m_tests = [
     'extra' : [ 'deterministic_simulations/pfwee_homotopy.inc' ] },
   { 'test' : [ 'deterministic_simulations/pfwee_homotopy_marglin_condpaths.mod' ],
     'extra' : [ 'deterministic_simulations/pfwee_homotopy.inc' ] },
+  { 'test' : [ 'deterministic_simulations/pfwee_marginal_linearization.mod' ] },
   { 'test' : [ 'deterministic_simulations/lbj/rbc.mod' ] },
   { 'test' : [ 'lmmcp/rbc.mod' ] },
   { 'test' : [ 'lmmcp/sw_lmmcp.mod',

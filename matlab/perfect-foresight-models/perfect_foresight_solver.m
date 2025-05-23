@@ -154,7 +154,16 @@ if isempty(marginal_linearization_previous_raw_sims)
 else
     shareorig = marginal_linearization_previous_raw_sims.sim1.homotopy_completion_share;
     endoorig = marginal_linearization_previous_raw_sims.sim1.endo_simul;
-    exoorig = marginal_linearization_previous_raw_sims.sim1.exo_simul;
+    exoorig = shareorig*oo_.exo_simul + (1-shareorig)*exobase;
+    if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+        for p = 1:length(oo_.deterministic_simulation.controlled_paths_by_period)
+            if isempty(oo_.deterministic_simulation.controlled_paths_by_period(p).exogenize_id)
+                continue
+            end
+            exo_ids = oo_.deterministic_simulation.controlled_paths_by_period(p).endogenize_id;
+            exoorig(length(initperiods)+p,exo_ids) = marginal_linearization_previous_raw_sims.sim1.exo_simul(length(initperiods)+p,exo_ids);
+        end
+    end
 end
 [completed_share, endo_simul, exo_simul, steady_state, exo_steady_state, iteration, maxerror, solver_iter, per_block_status] = homotopy_loop(M_,options_,oo_,options_.simul.homotopy_max_completion_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, simperiods, lastperiods, recompute_final_steady_state, oo_.steady_state, oo_.exo_steady_state);
 
@@ -214,7 +223,16 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
     else
         shareorig = marginal_linearization_previous_raw_sims.sim2.homotopy_completion_share;
         endoorig = marginal_linearization_previous_raw_sims.sim2.endo_simul;
-        exoorig = marginal_linearization_previous_raw_sims.sim2.exo_simul;
+        exoorig = shareorig*oo_.exo_simul + (1-shareorig)*exobase;
+        if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+            for p = 1:length(oo_.deterministic_simulation.controlled_paths_by_period)
+                if isempty(oo_.deterministic_simulation.controlled_paths_by_period(p).exogenize_id)
+                    continue
+                end
+                exo_ids = oo_.deterministic_simulation.controlled_paths_by_period(p).endogenize_id;
+                exoorig(length(initperiods)+p,exo_ids) = marginal_linearization_previous_raw_sims.sim2.exo_simul(length(initperiods)+p,exo_ids);
+            end
+        end
     end
     extra_share = completed_share - options_.simul.homotopy_marginal_linearization_fallback;
     if ~options_.noprint
