@@ -295,7 +295,8 @@ function [completed_share, endo_simul, exo_simul, steady_state, exo_steady_state
 %   options_         [structure] describing the options
 %   share            [double]    the share of the shock that we want to simulate
 %   simperiods       [vector]    period indices of simulation periods (between initial and terminal conditions)
-%   endoorig         [matrix]    path of endogenous corresponding to 100% of the shock (also possibly used as guess value for first iteration if relevant)
+%   endoorig         [matrix]    path of endogenous corresponding to shareorig of the shock (also possibly used as guess value for first iteration if relevant)
+%   exoorig          [matrix]    path of exogenous corresponding to shareorig of the shock (also possibly used as guess value for first iteration if controlled paths)
 %   …                            other inputs have the same meaning as in the create_scenario function
 %
 % OUTPUTS
@@ -465,14 +466,14 @@ function [steady_success, endo_simul, exo_simul, steady_state, exo_steady_state,
 %   oo_              [structure] storing the results
 %   share            [double]    the share of the shock that we want to simulate
 %   shareorig        [double]    the share to which endoorig and exoorig correspond (typically 100%, except for perfect_foresight_with_expectation_errors_solver with homotopy and marginal linearization)
-%   endoorig         [matrix]    path of endogenous corresponding to shareorig of the shock (only initial and terminal conditions are used)
+%   endoorig         [matrix]    path of endogenous corresponding to shareorig of the shock (only initial and terminal conditions are used, and the latter only if recompute_final_steady_state=false)
 %   exoorig          [matrix]    path of exogenous corresponding to shareorig of the shock
 %   endobase         [matrix]    path of endogenous corresponding to 0% of the shock (only initial and terminal conditions are used, except if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
 %   exobase          [matrix]    path of exogenous corresponding to 0% of the shock
 %   initperiods      [vector]    period indices of initial conditions
 %   lastperiods      [vector]    period indices of terminal conditions
 %   recompute_final_steady_state [boolean] self-explanatory
-%   endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial and terminal conditions are not used)
+%   endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
 %   exo_simul        [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
 %   steady_state     [vector]    steady state of endogenous, only used if terminal steady state is *not* recomputed by the function
 %   exo_steady_state [vector]    steady state of exogenous, only used if terminal steady state is *not* recomputed by the function
