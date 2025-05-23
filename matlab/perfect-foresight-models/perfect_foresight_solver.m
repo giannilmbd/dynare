@@ -98,6 +98,21 @@ if options_.simul.homotopy_max_completion_share < 1 && ~options_.simul.homotopy_
     error('perfect_foresight_solver: Option homotopy_max_completion_share has a value less than 1, so you must also specify either homotopy_linearization_fallback or homotopy_marginal_linearization_fallback')
 end
 
+if ~isempty(oo_.deterministic_simulation.controlled_paths_by_period)
+    for p = 1:length(oo_.deterministic_simulation.controlled_paths_by_period)
+        if isempty(oo_.deterministic_simulation.controlled_paths_by_period(p).exogenize_id)
+            continue
+        end
+        exo_ids = oo_.deterministic_simulation.controlled_paths_by_period(p).endogenize_id;
+        if ~isempty(options_.simul.homotopy_exclude_varexo)
+            [is_excluded, excluded_exo_ids] = ismember(options_.simul.homotopy_exclude_varexo, M_.exo_names(exo_ids));
+            if any(is_excluded)
+                error('Exogenous %s cannot be in the homotopy_exclude_varexo option and a perfect_foresight_controlled_paths block at the same time', M_.exo_names{excluded_exo_ids(1)})
+            end
+        end
+    end
+end
+
 initperiods = 1:M_.maximum_lag;
 simperiods = M_.maximum_lag+(1:periods);
 lastperiods = M_.maximum_lag+periods+(1:M_.maximum_lead);
@@ -567,12 +582,6 @@ if ~isempty(controlled_paths_by_period)
 
         % Handle guess values for endogenized exos
         exo_ids = controlled_paths_by_period(p).endogenize_id;
-        if ~isempty(options_.simul.homotopy_exclude_varexo)
-            [is_excluded, excluded_exo_ids] = ismember(options_.simul.homotopy_exclude_varexo, M_.exo_names(exo_ids));
-            if any(is_excluded)
-                error('Exogenous %s cannot be in the homotopy_exclude_varexo option and a perfect_foresight_controlled_paths block at the same time', M_.exo_names{excluded_exo_ids(1)})
-            end
-        end
         exo_simul(length(initperiods)+p,exo_ids) = saved_exo_simul(length(initperiods)+p,exo_ids);
     end
 end
