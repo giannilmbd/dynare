@@ -46,6 +46,31 @@ end
 
 periods = get_simulation_periods(options_);
 
+if options_.simul.check_jacobian_singularity
+    if options_.block
+        warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with the block model-option and will be ignored.')
+    else
+        if options_.linear && options_.stack_solve_algo==0
+            warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with the linear model-option when stack_solve_algo=0 and will be ignored.')
+        end
+    end
+    if options_.bytecode
+        warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with bytecode and will be ignored.')
+    end
+    if options_.linear_approximation
+        warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with the linear_approximation option and will be ignored.')
+    end
+    if options_.lmmcp.status
+        warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with the lmmcp option and will be ignored.')
+    end
+    if M_.maximum_endo_lead == 0 || M_.maximum_endo_lag == 0
+        warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with purely backward or forward models and will be ignored.')
+    end
+    if ~ismember(options_.stack_solve_algo,[0 2 3])
+        warning('perfect_foresight_solver: check_jacobian_singularity is only compatible with stack_solve_algo=[0,2,3] and will be ignored.')
+    end
+end
+
 if options_.linear_approximation
     if ~ismember(options_.stack_solve_algo, [0 7])
         error('perfect_foresight_solver: option linear_approximation is only available with stack_solve_algo option equal to 0 or 7')

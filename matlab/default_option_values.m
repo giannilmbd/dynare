@@ -352,6 +352,7 @@ options_.simul.homotopy_linearization_fallback = false;
 options_.simul.homotopy_marginal_linearization_fallback = 0; % Size of the step used for the marginal linearization; 0 means disabled
 options_.simul.homotopy_exclude_varexo = [];
 
+options_.simul.check_jacobian_singularity = false;
 % Options used by perfect_foresight_* commands when they compute the steady
 % state corresponding to a terminal condition
 options_.simul.steady_solve_algo = options_.solve_algo;
