@@ -116,6 +116,8 @@ while ~(converged || iter > options_.simul.maxit)
                 end
             end            
         end
+    end
+    if iter==1 && options_.simul.check_jacobian_singularity
         check_Jacobian_for_singularity(full(A),M_.endo_names,options_);
     end
     if options_.endogenous_terminal_period && iter > 1
@@ -419,6 +421,8 @@ if rank_jacob < size(jacob,1)
             fprintf('Equation %5u, period %5u\n',equation(ii),period(ii))
         end
     end
+else
+    disp(['sim1:  The Jacobian of the dynamic model has full rank.'])    
 end
 
 

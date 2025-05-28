@@ -3947,6 +3947,16 @@ speed-up on large models.
        Triggers the use of a robust linear solver for the default
        ``stack_solve_algo=0``.
 
+    .. option:: check_jacobian_singularity
+
+       Triggers a check of the dynamic Jacobian for singularity during the first iteration. 
+       Useful for detecting pathologies in the model specification. Available only for
+       ``stack_solve_algo=0,2,3``. Neither compatible with the i) ``block``,``bytecode``, and ``linear``
+       ``model`` or ``model_options`` options nor ii) the ``linear_approximation`` and ``lmmcp`` options, 
+       nor iii) with purely forward or backward models.
+       Due to computational intensity and high memory requirements, 
+       it is strongly recommended to conduct this test with ``periods=1''.
+
     .. option:: solve_algo
 
        See :ref:`solve_algo <solvalg>`. Allows selecting the solver
