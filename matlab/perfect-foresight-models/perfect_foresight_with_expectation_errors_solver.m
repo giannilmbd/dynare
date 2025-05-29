@@ -44,6 +44,14 @@ if M_.maximum_lead > 0
     options_.simul.endval_steady = true;
 end
 
+% When there is no regular endval block (or endval(learnt_in=1) block), ensure
+% that the initial steady state is stored, so that the correct “base” scenario is
+% constructed in the homotopy loop (see perfect_foresight_solver.m)
+if isempty(oo_.initial_steady_state)
+    oo_.initial_steady_state = oo_.steady_state;
+    oo_.initial_exo_steady_state = oo_.exo_steady_state;
+end
+
 % Start main loop around informational periods
 info_period = 1;
 increment = 0;
