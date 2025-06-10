@@ -5953,7 +5953,7 @@ All of these elements are discussed in the following.
     ::
 
         occbin_constraints;
-        name 'ELB'; bind inom <= iss-1e8; relax inom > iss+1e-8;
+        name 'ELB'; bind inom <= iss-1e-8; relax inom > iss+1e-8;
         end;
 
     The ``error_bind`` and ``error_relax`` options are optional and allow specifying
