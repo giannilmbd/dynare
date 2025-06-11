@@ -245,6 +245,9 @@ else # Octave build
     # interleaved API is requested.
     octave_defs += '-DMX_HAS_INTERLEAVED_COMPLEX=1'
   endif
+  if octave_version.version_compare('>=10')
+    octave_defs += '-DOCTAVE_MEX_SOVERSION=1'
+  endif
 
   mex_kwargs = { 'name_prefix' : '',
                  'name_suffix' : 'mex',
@@ -259,7 +262,10 @@ else # Octave build
   if octave_version.version_compare('>=' + octave_minimal_version_for_interleaved_api)
     # Mimic the behaviour of mkoctfile which compiles in a similar source file
     # when interleaved API is requested.
-    mex_kwargs += { 'sources' : 'mex/sources/octave_interleaved.c' }
+    mex_kwargs += { 'sources' : [ 'mex/sources/octave_interleaved.c' ] }
+  endif
+  if octave_version.version_compare('>=10')
+    mex_kwargs += { 'sources' : mex_kwargs['sources'] + [ 'mex/sources/octave_mex_soversion.c' ] }
   endif
 
   # The -L argument is useful when cross-compiling.
