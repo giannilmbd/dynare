@@ -101,6 +101,7 @@ MINGW64_HEADERS_VERSION = 12.0.0.r679.g71699efcb-1
 # pacman -Ss mingw-w64-x86_64-crt-git
 MINGW64_CRT_VERSION = 12.0.0.r679.g71699efcb-1
 
+# NB: Renamed to mingw-w64-x86_64-winpthreads recently!
 # pacman -Ss mingw-w64-x86_64-winpthreads-git
 MINGW64_WINPTHREADS_VERSION = 12.0.0.r679.g71699efcb-1
 
