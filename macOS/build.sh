@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright © 2019-2024 Dynare Team
+# Copyright © 2019-2025 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -38,7 +38,7 @@ else
     path_remove PATH /opt/homebrew/bin
     MATLAB_ARCH=maci64
 fi
-MATLAB_PATH=/Applications/"$PKG_ARCH"/MATLAB_R2024b.app
+MATLAB_PATH=/Applications/"$PKG_ARCH"/MATLAB_R2025a.app
 
 # Append texbin to PATH to access latexmk and friends
 path_prepend PATH /Library/TeX/texbin
@@ -117,9 +117,9 @@ mkdir -p \
       "$PKGFILES"/scripts \
       "$PKGFILES"/contrib/ms-sbvar/TZcode
 if [[ "$PKG_ARCH" == x86_64 ]]; then
-    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-24.2
+    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-25.1
 else
-    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-24.2
+    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-25.1
 fi      
 
 cp -p  "$ROOTDIR"/NEWS.md                                            "$PKGFILES"
@@ -138,9 +138,9 @@ mkdir -p                                                             "$PKGFILES"
 ln -sf ../../preprocessor/dynare-preprocessor                        "$PKGFILES"/matlab/preprocessor64/dynare_m
 
 if [[ "$PKG_ARCH" == x86_64 ]]; then
-    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-24.2
+    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-25.1
 else
-    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-24.2
+    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-25.1
 fi
 
 cp -p  "$ROOTDIR"/scripts/dynare.el                                  "$PKGFILES"/scripts

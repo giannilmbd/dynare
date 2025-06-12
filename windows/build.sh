@@ -5,7 +5,7 @@
 # The binaries are cross compiled for Windows (64-bit), Octave and MATLAB
 # (all supported versions).
 
-# Copyright © 2017-2024 Dynare Team
+# Copyright © 2017-2025 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -119,8 +119,8 @@ cp -p windows/README.txt "$ZIPDIR"
 cp -pr windows/deps/mingw64 "$ZIPDIR"
 mkdir -p "$ZIPDIR"/contrib/ms-sbvar/TZcode
 cp -pr contrib/ms-sbvar/TZcode/MatlabFiles "$ZIPDIR"/contrib/ms-sbvar/TZcode
-mkdir -p "$ZIPDIR"/mex/matlab/win64-9.5-24.2
-cp -p build-win-matlab/*.mexw64 "$ZIPDIR"/mex/matlab/win64-9.5-24.2
+mkdir -p "$ZIPDIR"/mex/matlab/win64-9.5-25.1
+cp -p build-win-matlab/*.mexw64 "$ZIPDIR"/mex/matlab/win64-9.5-25.1
 mkdir -p "$ZIPDIR"/mex/octave/win64
 cp -p build-win-octave/*.mex "$ZIPDIR"/mex/octave/win64
 mkdir "$ZIPDIR"/preprocessor
