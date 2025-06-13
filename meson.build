@@ -172,6 +172,7 @@ if get_option('build_for') == 'matlab'
   lapack_dep = declare_dependency(link_args : '-lmwlapack', dependencies : blas_dep)
   umfpack_dep = declare_dependency(link_args : '-lmwumfpack', dependencies : blas_dep)
   ut_dep = declare_dependency(link_args : '-lut')
+  extra_octave_dep = []
 
   if meson.version().version_compare('<1.7.0') and get_option('prefer_static') and host_machine.system() == 'linux'
     # Workaround for Meson bug https://github.com/mesonbuild/meson/issues/12757 (fixed in 1.7.0)
@@ -220,13 +221,12 @@ else # Octave build
     octave_link_args += '-Wl,-Bsymbolic'
   endif
 
-  # Determine whether to link MEX files against the Octave libraries. mkoctfile
-  # no longer does this by default but in practice it is needed for Windows and
-  # macOS.
-  if host_machine.system() == 'windows' or host_machine.system() == 'darwin'
-    # Under Windows, --enable-link-all-dependencies is hardcoded in src/mkoctfile.cc.in.
-    # Under macOS, the Homebrew formula passes --enable-link-all-dependencies
-    # to the configure script.
+  # Determine whether to link MEX files against the Octave libraries. Octave <
+  # 10 is not doing this by default but in practice it is needed for Windows
+  # and macOS (under Windows, --enable-link-all-dependencies is hardcoded in
+  # src/mkoctfile.cc.in; under macOS, the Homebrew formula passes
+  # --enable-link-all-dependencies to the configure script).
+  if octave_version.version_compare('>=10') or (host_machine.system() == 'windows' or host_machine.system() == 'darwin')
     octave_link_args += [ '-L' + octlibdir ] + octave_libs
   endif
 
@@ -291,6 +291,13 @@ else # Octave build
 
   # This library does not exist under Octave
   ut_dep = []
+
+  # Extra Octave libraries (needed in particular when using the OCTAVE_QUIT macro)
+  if octave_version.version_compare('>=10')
+    extra_octave_dep = declare_dependency(link_args : [ '-L' + octlibdir ] + run_command(mkoctfile_exe, '-p', 'OCTAVE_LIBS', check : true).stdout().split())
+  else
+    extra_octave_dep = []
+  endif
 
   # First look for libslicot, then if needed fallback on libslicot_pic
   slicot_dep_tmp = fortran_compiler.find_library('slicot', required : false)
@@ -366,7 +373,7 @@ bytecode_src = [ 'mex/sources/bytecode/bytecode.cc',
                  'mex/sources/bytecode/Evaluate.cc',
                  'mex/sources/bytecode/BasicSymbolTable.cc' ]
 preprocessor_headers_dep = declare_dependency(include_directories : include_directories('preprocessor/src'))
-shared_module('bytecode', bytecode_src, kwargs : mex_kwargs, dependencies : [ umfpack_dep, ut_dep, preprocessor_headers_dep ])
+shared_module('bytecode', bytecode_src, kwargs : mex_kwargs, dependencies : [ umfpack_dep, ut_dep, extra_octave_dep, preprocessor_headers_dep ])
 
 shared_module('sparse_hessian_times_B_kronecker_C', 'mex/sources/kronecker/sparse_hessian_times_B_kronecker_C.cc',
               kwargs : mex_kwargs, dependencies : openmp_dep)
@@ -552,7 +559,7 @@ ms_sbvar_lib = static_library('ms_sbvar', ms_sbvar_src,
                               kwargs : static_library_kwargs + { 'c_args' : static_library_kwargs.get('c_args') + ms_sbvar_defs,
                                                                  'cpp_args' : static_library_kwargs.get('cpp_args') + ms_sbvar_defs,
                                                                  'include_directories' : static_library_kwargs.get('include_directories') + ms_sbvar_incdir },
-                              dependencies : [ blas_dep, lapack_dep, gsl_dep, matio_dep, ut_dep ])
+                              dependencies : [ blas_dep, lapack_dep, gsl_dep, matio_dep, ut_dep, extra_octave_dep ])
 
 # NB: in the following, mex_top_level.cc is put as extra source and not in ms_sbvar_lib,
 # to ensure that mexFunction() is present in the MEX
