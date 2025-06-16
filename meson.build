@@ -161,7 +161,8 @@ if get_option('build_for') == 'matlab'
                  'link_args' : [ export_link_arg, '-L' + (matlab_path / 'bin' / matlab_arch), '-lmx', '-lmex', '-lmat' ],
                  'link_depends' : export_file,
                  'install' : true,
-                 'install_dir' : 'lib/dynare/mex/matlab' }
+                 'install_dir' : 'lib/dynare/mex/matlab',
+                 'sources' : [] }
 
   # For unit tests
   exe_rpath = matlab_path / 'bin' / matlab_arch
@@ -263,6 +264,8 @@ else # Octave build
     # Mimic the behaviour of mkoctfile which compiles in a similar source file
     # when interleaved API is requested.
     mex_kwargs += { 'sources' : [ 'mex/sources/octave_interleaved.c' ] }
+  else
+    mex_kwargs += { 'sources' : [] }
   endif
   if octave_version.version_compare('>=10')
     mex_kwargs += { 'sources' : mex_kwargs['sources'] + [ 'mex/sources/octave_mex_soversion.c' ] }
@@ -567,7 +570,7 @@ mex_ms_sbvar_kwargs = mex_kwargs + { 'c_args' : mex_kwargs.get('c_args') + ms_sb
                                      'cpp_args' : mex_kwargs.get('cpp_args') + ms_sbvar_defs,
                                      'include_directories' : mex_kwargs.get('include_directories') + ms_sbvar_incdir,
                                      'link_with' : ms_sbvar_lib,
-                                     'sources' : 'mex/sources/ms-sbvar/mex_top_level.cc' }
+                                     'sources' : mex_kwargs['sources'] + [ 'mex/sources/ms-sbvar/mex_top_level.cc' ] }
 ms_sbvar_create_init_file_src = [ 'contrib/ms-sbvar/switch_dw/state_space/sbvar/create_init_file.c',
                                   'contrib/ms-sbvar/switch_dw/state_space/sbvar/VARio_matlab.c' ]
 shared_module('ms_sbvar_create_init_file', ms_sbvar_create_init_file_src, kwargs : mex_ms_sbvar_kwargs, dependencies : matio_dep)
