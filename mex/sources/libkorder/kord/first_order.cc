@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -177,7 +177,7 @@ FirstOrder::solve(const TwoDMatrix& fd)
   lapack_int info;
   lapack_int sdim2 = sdim;
   {
-    std::lock_guard<std::mutex> lk {mut};
+    std::lock_guard lk {mut};
     qz_criterium_global = qz_criterium;
     dgges("N", "V", "S", order_eigs, &n, matE.getData().base(), &lda, matD.getData().base(), &ldb,
           &sdim2, alphar.base(), alphai.base(), beta.base(), vsl.getData().base(), &ldvsl,

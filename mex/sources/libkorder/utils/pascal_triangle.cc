@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -94,7 +94,7 @@ ensure(int n, int k)
   // Add along n
   if (n > max_n())
     {
-      std::lock_guard<std::mutex> lk {mut};
+      std::lock_guard lk {mut};
       tr[0].prolongFirst(n);
       for (int i = 2; i <= max_k(); i++)
         tr[i - 1].prolong(tr[i - 2]);
@@ -102,7 +102,7 @@ ensure(int n, int k)
 
   if (k > max_k())
     {
-      std::lock_guard<std::mutex> lk {mut};
+      std::lock_guard lk {mut};
       for (int i = max_k() + 1; i <= k; i++)
         {
           tr.emplace_back();

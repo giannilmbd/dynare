@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -43,7 +43,7 @@ int detach_thread_group::max_parallel_threads = default_threads_number();
 void
 detach_thread_group::run()
 {
-  std::unique_lock<std::mutex> lk {mut_cv};
+  std::unique_lock lk {mut_cv};
   auto it = tlist.begin();
   while (it != tlist.end())
     {
@@ -51,7 +51,7 @@ detach_thread_group::run()
       std::thread th {[&, it] {
         // The ‘it’ variable is captured by value, because otherwise the iterator may move
         (*it)->operator()(mut_threads);
-        std::unique_lock<std::mutex> lk2 {mut_cv};
+        std::lock_guard lk2 {mut_cv};
         counter--;
         /* First notify the thread waiting on the condition variable, then
            unlock the mutex. We must do these two operations in that order,
@@ -61,7 +61,6 @@ detach_thread_group::run()
            bring the counter down to zero).
            For that reason, we cannot use std::notify_all_at_thread_exit() */
         cv.notify_one();
-        lk2.unlock();
       }};
       th.detach();
       ++it;

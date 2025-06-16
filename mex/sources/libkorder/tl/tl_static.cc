@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2024 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -55,7 +55,7 @@ init(int dim, int nvar)
     throw TLException(__FILE__, __LINE__,
                       "Problem too large, you should decrease the approximation order");
 
-  std::lock_guard<std::mutex> lk {mut};
+  std::lock_guard lk {mut};
   ebundle.generateUpTo(dim);
   pbundle.generateUpTo(dim);
 

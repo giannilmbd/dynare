@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -127,7 +127,7 @@ WorkerFoldMAASparse1::operator()(std::mutex& mut)
                   {
                     FPSTensor fps(out.getDims(), it, slice, kp);
                     {
-                      std::unique_lock<std::mutex> lk {mut};
+                      std::lock_guard lk {mut};
                       fps.addTo(out);
                     }
                   }
@@ -305,7 +305,7 @@ FoldedStackContainer::multAndAddStacks(const IntSequence& coor, const FGSTensor&
                       kp.optimizeOrder();
                     FPSTensor fps(out.getDims(), it, sort_per, ug, kp);
                     {
-                      std::unique_lock<std::mutex> lk {mut};
+                      std::lock_guard lk {mut};
                       fps.addTo(out);
                     }
                   }
@@ -342,7 +342,7 @@ FoldedStackContainer::multAndAddStacks(const IntSequence& coor, const GSSparseTe
                     KronProdStack<FGSTensor> kp(sp, coor);
                     FPSTensor fps(out.getDims(), it, sort_per, g, kp);
                     {
-                      std::unique_lock<std::mutex> lk {mut};
+                      std::lock_guard lk {mut};
                       fps.addTo(out);
                     }
                   }
@@ -479,7 +479,7 @@ WorkerUnfoldMAASparse1::operator()(std::mutex& mut)
                   {
                     UPSTensor ups(out.getDims(), it, slice, kp);
                     {
-                      std::unique_lock<std::mutex> lk {mut};
+                      std::lock_guard lk {mut};
                       ups.addTo(out);
                     }
                   }
@@ -600,7 +600,7 @@ UnfoldedStackContainer::multAndAddStacks(const IntSequence& fi, const UGSTensor&
                       kp.optimizeOrder();
                     UPSTensor ups(out.getDims(), it, sort_per, g, kp);
                     {
-                      std::unique_lock<std::mutex> lk {mut};
+                      std::lock_guard lk {mut};
                       ups.addTo(out);
                     }
                   }
