@@ -10,7 +10,7 @@ function lprobs_sample = trace_plot_dime(options_, M_)
 % SPECIAL REQUIREMENTS
 % None.
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -48,9 +48,13 @@ hh_fig = dyn_figure(options_.nodisplay,'Name','DIME Convergence Diagnostics');
 hold on
 lines_tune = plot(1:niter-tune, lprobs(1:end-tune,:), 'Color', '#D95319');
 lines_sample = plot(niter-tune:niter, lprobs(end-tune:end,:), 'Color', '#0072BD');
-for i = 1:nchain
-    lines_tune(i).Color(4) = min(1,10/nchain);
-    lines_sample(i).Color(4) = min(1,10/nchain);
+if ~isoctave
+    % Set the transparency (alpha channel) of line objects (undocumented MATLAB feature)
+    % See https://fr.mathworks.com/matlabcentral/discussions/ideas/833472-add-alpha-capability-to-line-class
+    for i = 1:nchain
+        lines_tune(i).Color(4) = min(1,10/nchain);
+        lines_sample(i).Color(4) = min(1,10/nchain);
+    end
 end
 ylim([llim, ulim])
 hold off
