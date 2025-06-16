@@ -44,28 +44,23 @@ void
 detach_thread_group::run()
 {
   std::unique_lock lk {mut_cv};
+  std::vector<std::jthread> ths;
   auto it = tlist.begin();
   while (it != tlist.end())
     {
       counter++;
-      std::thread th {[&, it] {
+      ths.emplace_back([&, it] {
         // The ‘it’ variable is captured by value, because otherwise the iterator may move
         (*it)->operator()(mut_threads);
-        std::lock_guard lk2 {mut_cv};
-        counter--;
-        /* First notify the thread waiting on the condition variable, then
-           unlock the mutex. We must do these two operations in that order,
-           otherwise there is a possibility of having the main process
-           destroying the condition variable before the thread tries to
-           notify it (if all other threads terminate at the same time and
-           bring the counter down to zero).
-           For that reason, we cannot use std::notify_all_at_thread_exit() */
+        {
+          std::lock_guard lk2 {mut_cv};
+          counter--;
+        }
         cv.notify_one();
-      }};
-      th.detach();
+      });
       ++it;
       cv.wait(lk, [&] { return counter < max_parallel_threads; });
     }
-  cv.wait(lk, [&] { return counter == 0; });
+  lk.unlock();
 }
 }
