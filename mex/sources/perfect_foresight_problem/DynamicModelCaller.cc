@@ -301,7 +301,7 @@ DynamicModelMatlabCaller::eval(double* resid)
 
       if (!mxIsDouble(plhs[0]) || !mxIsSparse(plhs[0]))
         {
-          setErrMsg("Residuals should be a dense array of double floats");
+          setErrMsg("Jacobian should be a dense array of double floats");
           return;
         }
 
