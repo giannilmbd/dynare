@@ -139,14 +139,6 @@ public:
   }
   void copy_jacobian_column(mwIndex col, double* dest) const override;
   void eval(double* resid) override;
-  class Exception
-  {
-  public:
-    const std::string msg;
-    Exception(std::string msg_arg) : msg {std::move(msg_arg)}
-    {
-    }
-  };
 };
 
 template<bool sparse>
