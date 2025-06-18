@@ -55,8 +55,8 @@ cd ..
 
 common_meson_opts=(--buildtype=release --cross-file windows/mingw-cross.ini)
 
-# Create Windows 64-bit DLL binaries for MATLAB ≥ R2018b
-meson setup --cross-file windows/mingw-cross-matlab.ini -Dmatlab_path=/tmp/windeps/matlab64/R2018b \
+# Create Windows 64-bit DLL binaries for MATLAB ≥ R2020a
+meson setup --cross-file windows/mingw-cross-matlab.ini -Dmatlab_path=/tmp/windeps/matlab64/R2020a \
       "${common_meson_opts[@]}" build-win-matlab
 meson compile -v -C build-win-matlab
 
@@ -119,8 +119,8 @@ cp -p windows/README.txt "$ZIPDIR"
 cp -pr windows/deps/mingw64 "$ZIPDIR"
 mkdir -p "$ZIPDIR"/contrib/ms-sbvar/TZcode
 cp -pr contrib/ms-sbvar/TZcode/MatlabFiles "$ZIPDIR"/contrib/ms-sbvar/TZcode
-mkdir -p "$ZIPDIR"/mex/matlab/win64-9.5-25.1
-cp -p build-win-matlab/*.mexw64 "$ZIPDIR"/mex/matlab/win64-9.5-25.1
+mkdir -p "$ZIPDIR"/mex/matlab/win64-9.8-25.1
+cp -p build-win-matlab/*.mexw64 "$ZIPDIR"/mex/matlab/win64-9.8-25.1
 mkdir -p "$ZIPDIR"/mex/octave/win64
 cp -p build-win-octave/*.mex "$ZIPDIR"/mex/octave/win64
 mkdir "$ZIPDIR"/preprocessor

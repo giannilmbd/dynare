@@ -7,7 +7,7 @@ function H = build_two_dim_hessian(sparse_indices, g2_v, neq, nvar)
 % – neq is the number of equations (equal to number of rows of the output matrix)
 % – nvar is the number of variables (the output matrix will have nvar² columns)
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,12 +47,6 @@ for k = 1:length(g2_v)
         g2_v(next_sym_idx) = g2_v(k);
         next_sym_idx = next_sym_idx + 1;
     end
-end
-
-%% On MATLAB < R2020a, sparse() does not accept int32 indices
-if ~isoctave && matlab_ver_less_than('9.8')
-    g2_i = double(g2_i);
-    g2_j = double(g2_j);
 end
 
 H = sparse(g2_i, g2_j, g2_v, neq, nvar*nvar);

@@ -69,7 +69,7 @@ common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static -Dfort
                    -Dc_link_args="[ '-Wl,-ld_classic', '-L$QUADMATH_DIR' ]" -Dcpp_link_args="[ '-Wl,-ld_classic', '-L$QUADMATH_DIR' ]" -Dfortran_link_args="[ '-Wl,-ld_classic', '-L$QUADMATH_DIR' ]" \
                    --native-file macOS/homebrew-native-$PKG_ARCH.ini)
 
-# Build for MATLAB ⩾ R2018b (x86_64) and MATLAB ⩾ R2023b (arm64)
+# Build for MATLAB ⩾ R2020a (x86_64) and MATLAB ⩾ R2023b (arm64)
 arch -"$PKG_ARCH" meson setup "${common_meson_opts[@]}" -Dmatlab_path="$MATLAB_PATH" build-macOS-matlab --wipe
 arch -"$PKG_ARCH" meson compile -v -C build-macOS-matlab
 
@@ -117,7 +117,7 @@ mkdir -p \
       "$PKGFILES"/scripts \
       "$PKGFILES"/contrib/ms-sbvar/TZcode
 if [[ "$PKG_ARCH" == x86_64 ]]; then
-    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-25.1
+    mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.8-25.1
 else
     mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-25.1
 fi      
@@ -138,7 +138,7 @@ mkdir -p                                                             "$PKGFILES"
 ln -sf ../../preprocessor/dynare-preprocessor                        "$PKGFILES"/matlab/preprocessor64/dynare_m
 
 if [[ "$PKG_ARCH" == x86_64 ]]; then
-    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.5-25.1
+    cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.8-25.1
 else
     cp -L  "$ROOTDIR"/build-macOS-matlab/*.mex"$MATLAB_ARCH"         "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-25.1
 fi

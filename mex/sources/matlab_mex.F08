@@ -8,7 +8,7 @@
 ! Things to be aware of when adding new interfaces this file:
 !
 ! — The tricky part is to deal with API versioning.
-!   For MATLAB ⩾ R2018b, all versions share the same API (embodied in API_VER
+!   For MATLAB ⩾ R2020a, all versions share the same API (embodied in API_VER
 !   define), but in the past the API would differ across function, so there
 !   was an API_VER2 define for those.
 !   For each function, the information can be retrieved from either matrix.h or

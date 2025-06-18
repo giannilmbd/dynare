@@ -70,7 +70,6 @@ function [ide_moments, ide_spectrum, ide_minimal, ide_hess, ide_reducedform, ide
 %   * identification.checks_via_subsets
 %   * isoctave
 %   * identification.get_jacobians (previously getJJ)
-%   * matlab_ver_less_than
 %   * prior_bounds
 %   * resol
 %   * set_all_parameters

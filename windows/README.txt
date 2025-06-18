@@ -21,7 +21,7 @@ Note: Dynare comes with an automated uninstaller, which you can run from the
 Using Dynare with MATLAB®
 ─────────────────────────
 
-Dynare works on top of MATLAB®, any version ranging from 9.5 (R2018b) to 25.1
+Dynare works on top of MATLAB®, any version ranging from 9.8 (R2020a) to 25.1
 (R2025a). Only 64-bit versions are supported.
 
 To use Dynare, you just have to add the ‘matlab’ subdirectory of your Dynare

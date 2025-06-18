@@ -25,7 +25,7 @@ function plot(M_, params, idemoments, idehess, idemodel, idelre, advanced, tittx
 % SPECIAL REQUIREMENTS
 %    None
 
-% Copyright © 2008-2023 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,8 +62,7 @@ if SampleSize == 1
     subplot(211)
     mmm = (idehess.ide_strength_dMOMENTS);
     [~, is] = sort(mmm);
-    if ~all(isnan(idehess.ide_strength_dMOMENTS_prior)) ...
-       && ~(nparam == 1 && ~isoctave && matlab_ver_less_than('9.7')) % MATLAB < R2019b does not accept bar(1, [2 3])
+    if ~all(isnan(idehess.ide_strength_dMOMENTS_prior))
         bar(1:nparam,log([idehess.ide_strength_dMOMENTS(:,is)' idehess.ide_strength_dMOMENTS_prior(:,is)']))
     else
         bar(1:nparam,log(idehess.ide_strength_dMOMENTS(:,is)'))
@@ -113,8 +112,7 @@ if SampleSize == 1
     end
 
     subplot(212)
-    if ~all(isnan(idehess.deltaM_prior)) ...
-       && ~(nparam == 1 && ~isoctave && matlab_ver_less_than('9.7')) % MATLAB < R2019b does not accept bar(1, [2 3])
+    if ~all(isnan(idehess.deltaM_prior))
         bar(1:nparam, log([idehess.deltaM(is) idehess.deltaM_prior(is)]))
     else
         bar(1:nparam, log([idehess.deltaM(is)]))
