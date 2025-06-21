@@ -4,6 +4,8 @@
 
 SetCompressor /SOLID lzma
 
+ManifestDPIAware true
+
 Name "Dynare ${VERSION}"
 
 OutFile "dynare-${VERSION}-win.exe"
