@@ -85,7 +85,11 @@ filename = [OutputDirectoryName '/' M_.fname '_' LaTeXtitle '.tex'];
 fidTeX = fopen(filename,'w');
 
 stack = dbstack;
-fprintf(fidTeX, ['%% ' datestr(now,0) ', created by ' stack(2).file]);
+filename=stack(2).file;
+if isoctave
+    [~, filename] = fileparts (filename);
+end
+fprintf(fidTeX, ['%% ' datestr(now,0) ', created by ' filename]);
 fprintf(fidTeX, ' \n');
 fprintf(fidTeX, ' \n');
 fprintf(fidTeX, '\\begin{center}\n');

@@ -43,7 +43,11 @@ if options_.particle.status
             options_.qz_criterium = 1+1e-6;
         else
             if options_.qz_criterium <= 1
-                fprintf('\n%s:: You set nonlinear_filter_initialization equal to 3, it is assumed that you try to estimate a non stationary model. Resetting it to 1+1e-6.\n', stack(2).file)
+                filename=stack(2).file;
+                if isoctave
+                    [~, filename] = fileparts (filename);
+                end
+                fprintf('\n%s:: You set nonlinear_filter_initialization equal to 3, it is assumed that you try to estimate a non stationary model. Resetting it to 1+1e-6.\n', filename)
                 options_.qz_criterium = 1+1e-6;
             end
         end
