@@ -91,10 +91,17 @@
 function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
    %% Checks
    % Retrieve variables information from M_
-   state_symbs = M_.heterogeneity(1).endo_names(M_.heterogeneity(1).state_var);
-   pol_symbs= M_.heterogeneity(1).endo_names;
-   inn_symbs = M_.heterogeneity(1).exo_names;
+   H_ = M_.heterogeneity(1);
+   state_symbs = H_.endo_names(H_.state_var);
+   inn_symbs = H_.exo_names;
    agg_symbs = M_.endo_names(1:M_.orig_endo_nbr);
+   required_pol_symbs = H_.endo_names(1:H_.orig_endo_nbr);
+   mult_symbs = {};
+   for i = 1:numel(H_.aux_vars)
+      if (H_.aux_vars(i).type == 15)
+         mult_symbs{end+1} = H_.endo_names{H_.aux_vars(i).endo_index};
+      end
+   end
    % Initialize output variables
    sizes = struct;
    out_ss = struct;
@@ -139,7 +146,7 @@ function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
    if flag_ar1
       % Check that the grids specification for AR(1) shocks and the
       % var(heterogeneity=) statement are compatible
-      check_consistency(shock_symbs, pol_symbs, 'ss.shocks.grids', 'M_.heterogeneity(1).endo_names');
+      check_consistency(shock_symbs, required_pol_symbs, 'ss.shocks.grids', 'M_.heterogeneity(1).endo_names');
       % Check that shocks.Pi is a structure
       check_isstruct(shocks.Pi, 'ss.shocks.Pi');
       % Check that the grids specification for individual AR(1) shocks, the
@@ -170,10 +177,11 @@ function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
       check_fun(shocks.Pi, 'ss.shocks.Pi', shock_symbs, @(x) all(abs(sum(x,2)-1) < options_.hank.tol_check_sum), 'have row sums different from 1.')
       % Remove AR(1) shock processes from state and policy variables
       state_symbs = setdiff(state_symbs, shock_symbs);
-      pol_symbs = setdiff(pol_symbs, shock_symbs);
+      required_pol_symbs = setdiff(required_pol_symbs, shock_symbs);
       % Copy relevant shock-related elements in out_ss 
       out_ss.shocks.Pi = ss.shocks.Pi;
    end
+   relevant_pol_symbs = [required_pol_symbs; mult_symbs];
    % Case of discretized i.i.d gaussian innovations
    if flag_gh
       % Check that shocks.w is a structure
@@ -258,13 +266,21 @@ function [out_ss, sizes] = check_steady_state_input(M_, options_, ss)
    % Check that `ss.pol.values` is a struct
    check_isstruct(pol.values, 'ss.pol.values');
    % Check the missing and redundant variables in `ss.pol.values`
-   check_missingredundant(pol.values, 'ss.pol.values', pol_symbs, options_.hank.nowarningredundant);
+   check_missingredundant(pol.values, 'ss.pol.values', required_pol_symbs, true);
+   pol_values = fieldnames(pol.values);
+   pol_values_in_relevant_pol_symbs = ismember(pol_values, relevant_pol_symbs);
+   if ~options_.hank.nowarningredundant
+      if ~all(pol_values_in_relevant_pol_symbs)
+         warning('Steady-state input `ss`. The following fields are redundant in `%s`: %s.', 'ss.pol.values', strjoin(pol_values(~pol_values_in_relevant_pol_symbs)));
+      end
+   end
+   provided_relevant_pol_symbs = pol_values(pol_values_in_relevant_pol_symbs);
    % Check that `ss.pol.values` values are dense real matrices
-   check_fun(pol.values, 'ss.pol.values', pol_symbs, @(x) isnumeric(x) && isreal(x) && ismatrix(x) && ~issparse(x), 'are not dense real matrices'); 
+   check_fun(pol.values, 'ss.pol.values', provided_relevant_pol_symbs, @(x) isnumeric(x) && isreal(x) && ismatrix(x) && ~issparse(x), 'are not dense real matrices');
    % Check the internal size compatibility of `ss.pol.values`
-   sizes.n_pol = numel(pol_symbs);
-   check_fun(pol.values, 'ss.pol.values', pol_symbs, @(x) size(x,1), 'have a number of rows that is not consistent with the sizes of `ss.shocks.grids` elements', sizes.N_e);
-   check_fun(pol.values, 'ss.pol.values', pol_symbs, @(x) size(x,2), 'have a number of columns that is not consistent with the sizes of `ss.pol.grids` elements', sizes.pol.N_a);
+   sizes.n_pol = H_.endo_nbr;
+   check_fun(pol.values, 'ss.pol.values', provided_relevant_pol_symbs, @(x) size(x,1), 'have a number of rows that is not consistent with the sizes of `ss.shocks.grids` elements', sizes.N_e);
+   check_fun(pol.values, 'ss.pol.values', provided_relevant_pol_symbs, @(x) size(x,2), 'have a number of columns that is not consistent with the sizes of `ss.pol.grids` elements', sizes.pol.N_a);
    % Copy `ss.pol.values` in `out_ss`
    out_ss.pol.values = ss.pol.values;
    % Check the permutation of state variables for policy functions
