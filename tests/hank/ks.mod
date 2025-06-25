@@ -466,6 +466,23 @@ verbatim;
         fprintf('❌ Unexpected error from initialize_steady_state: %s\n', ME.message);
     end
 
+    % Check the steady-state residuals
+    try
+        [F,G] = hank.compute_steady_state_residuals(M_, oo_);
+        disp('✔ Computation of the steady state residuals succeeded!');
+        if (max(abs(G))>1e-4)
+            testFailed = testFailed+1;
+            fprintf('❌ : Steady-state aggregate residuals are big!');
+        end
+        if (max(abs(F(:)),[],"omitnan")>5e-4)
+            testFailed = testFailed+1;
+            fprintf('❌ : Steady-state heterogeneous residuals are big!');
+        end
+    catch ME
+        testFailed = testFailed+1;
+        fprintf('❌ Unexpected error from compute_steady_state_residuals: %s\n', ME.message);
+    end
+
     skipline()
     disp('*** TESTING: hank.check_steady_state_input.m - Discretized i.i.d case ***');
     load 'ks_iid_ss.mat';
