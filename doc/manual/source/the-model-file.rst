@@ -6816,9 +6816,9 @@ observed variables.
 
     .. option:: nobs = INTEGER
 
-       The number of observations following :opt:`first_obs <first_obs
-       = [INTEGER1:INTEGER2]>` to be used. Default: all observations
-       in the file after ``first_obs``.
+       The number of observations following :opt:`first_obs
+       <first_obs = [INTEGER1:INTEGER2]>` to be used. Default: all
+       observations in the file after ``first_obs``.
 
     .. option:: nobs = [INTEGER1:INTEGER2]
 
@@ -6859,8 +6859,8 @@ observed variables.
 
     .. option:: presample = INTEGER
 
-       The number of observations after :opt:`first_obs <first_obs =
-       [INTEGER1:INTEGER2]>` to be skipped before evaluating the
+       The number of observations after :opt:`first_obs
+       <first_obs = [INTEGER1:INTEGER2]>` to be skipped before evaluating the
        likelihood. These presample observations do not enter the
        likelihood, but are used as a training sample for starting the
        Kalman filter iterations. This option is incompatible with
@@ -7467,8 +7467,7 @@ observed variables.
        A list of NAME and VALUE pairs. Can be used to set options for
        the optimization routines. The set of available options depends
        on the selected optimization routine (i.e. on the value of
-       option :opt:`mode_compute <mode_compute = INTEGER |
-       FUNCTION_NAME>`):
+       option :opt:`mode_compute <mode_compute = INTEGER | FUNCTION_NAME>`):
 
            ``1, 3, 7, 12, 13``
 
@@ -8151,8 +8150,9 @@ observed variables.
 
                   Specifies the mode-finder run in every iteration for
                   every block of the TaRB Metropolis-Hastings
-                  algorithm. See :opt:`mode_compute <mode_compute =
-                  INTEGER | FUNCTION_NAME>`. Default: ``4``.
+                  algorithm. See :opt:`mode_compute
+                  <mode_compute = INTEGER | FUNCTION_NAME>`.
+                  Default: ``4``.
 
                   ``optim = (NAME, VALUE,...)``
 
@@ -8482,14 +8482,15 @@ observed variables.
 
     .. option:: irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )
 
-        See :opt:`irf_shocks <irf_shocks = ( VARIABLE_NAME [[,]
-        VARIABLE_NAME ...] )>`. Only used if :opt:`bayesian_irf` is
-        passed.
+        See :opt:`irf_shocks
+        <irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )>`.
+        Only used if :opt:`bayesian_irf` is passed.
 
     .. option:: irf_plot_threshold = DOUBLE
 
-       See :opt:`irf_plot_threshold <irf_plot_threshold =
-       DOUBLE>`. Only used if :opt:`bayesian_irf` is passed.
+       See :opt:`irf_plot_threshold
+       <irf_plot_threshold = DOUBLE>`.
+       Only used if :opt:`bayesian_irf` is passed.
 
     .. option:: aim_solver
 
@@ -8663,9 +8664,10 @@ observed variables.
 
        Percentage of MCMC draws at the beginning and end of the MCMC
        chain taken to compute the *Geweke (1992,1999)* convergence
-       diagnostics (requires :opt:`mh_nblocks=1 <mh_nblocks =
-       INTEGER>`) after discarding the first :opt:`mh_drop = DOUBLE
-       <mh_drop>` percent of draws as a burnin. Default: [0.2 0.5].
+       diagnostics (requires :opt:`mh_nblocks=1
+       <mh_nblocks = INTEGER>`) after discarding
+       the first :opt:`mh_drop <mh_drop = DOUBLE>` percent of draws
+       as a burnin. Default: [0.2 0.5].
 
     .. option:: raftery_lewis_diagnostics
 
@@ -8736,17 +8738,16 @@ observed variables.
 
                Resampling if and only if the effective sample size is
                below a certain level defined by
-               :opt:`resampling_threshold <resampling_threshold =
-               DOUBLE>` * :opt:`number_of_particles
-               <number_of_particles = INTEGER>`.
+               :opt:`resampling_threshold <resampling_threshold = DOUBLE>`
+               * :opt:`number_of_particles <number_of_particles = INTEGER>`.
 
     .. option:: resampling_threshold = DOUBLE
 
        A real number between zero and one. The resampling step is
        triggered as soon as the effective number of particles is less
        than this number times the total number of particles (as set by
-       :opt:`number_of_particles <number_of_particles =
-       INTEGER>`). This option is effective if and only if option
+       :opt:`number_of_particles <number_of_particles = INTEGER>`).
+       This option is effective if and only if option
        :opt:`resampling <resampling = OPTION>` has value ``generic``.
 
     .. option:: resampling_method = OPTION
@@ -9029,8 +9030,8 @@ observed variables.
 
                Inverse Hessian matrix at the mode or MCMC jumping
                covariance matrix when used with the
-               :opt:`MCMC_jumping_covariance <mcmc_jumping_covariance
-               = OPTION>` option.
+               :opt:`MCMC_jumping_covariance <mcmc_jumping_covariance = OPTION>`
+               option.
 
            ``log_density``
 
@@ -9587,8 +9588,8 @@ observed variables.
             <geweke_interval = [DOUBLE DOUBLE]>` and weighting them with
             their relative precision. It is a vector containing the
             results under the iid assumption followed by the ones using
-            the ``taper_steps`` option (see :opt:`taper_steps <taper_steps
-            = [INTEGER1 INTEGER2 ...]>`).
+            the ``taper_steps`` option (see :opt:`taper_steps
+            <taper_steps = [INTEGER1 INTEGER2 ...]>`).
 
         ``pooled_nse``
 
@@ -9909,7 +9910,7 @@ Method of moments specific blocks
 
     *Output*
 
-    Dynare translates the :bck:`matched_irfs_weigths` block into a cell array
+    Dynare translates the :bck:`matched_irfs_weights` block into a cell array
     ``M_.matched_irfs_weights`` where:
 
     * the first column contains the names of the first endogenous variables
@@ -11065,8 +11066,8 @@ Shock Decomposition
           contributions.
         * Real-time conditional shock decomposition of the difference
           between the real-time historical shock decomposition and the
-          forecast shock decomposition. If :opt:`vintage <vintage =
-          INTEGER>` is equal to ``0``, it computes the effect of
+          forecast shock decomposition. If :opt:`vintage
+          <vintage = INTEGER>` is equal to ``0``, it computes the effect of
           shocks realizing in period :math:`T`, i.e. decomposes
           :math:`Y(T\vert T)-Y(T\vert T-1)`. Put differently, it
           conducts a :math:`1`-period ahead shock decomposition from
@@ -11884,15 +11885,16 @@ the :comm:`bvar_forecast` command.
 
            y_{u,t} = T_{u,c}y_{c,t-1} + T_{u,u}y_{u,t-1} +  R_{u,c}\varepsilon_{c,t} + R_{u,u}\varepsilon_{u,t}    
 
-    By iterating over these two blocks of equations, we can build a forecast for
-    all the endogenous variables in the system conditional on paths for a subset of the
-    endogenous variables. If the distribution of the free innovations
-    :math:`\varepsilon_{u,t}` is provided (*i.e.* some of them have positive
-    variances) this exercise is replicated (the number of replication is
-    controlled by the option :opt:`replic` described below) by drawing different
-    sequences of free innovations. The result is a predictive distribution for
-    the uncontrolled endogenous variables, :math:`y_{u,t}`, that Dynare will use to report
-    confidence bands around the point conditional forecast.
+    By iterating over these two blocks of equations, we can build a forecast
+    for all the endogenous variables in the system conditional on paths for a
+    subset of the endogenous variables. If the distribution of the free
+    innovations :math:`\varepsilon_{u,t}` is provided (*i.e.* some of them have
+    positive variances) this exercise is replicated (the number of replication
+    is controlled by the option :opt:`replic <replic = INTEGER>` described
+    below) by drawing different sequences of free innovations. The result is a
+    predictive distribution for the uncontrolled endogenous variables,
+    :math:`y_{u,t}`, that Dynare will use to report confidence bands around the
+    point conditional forecast.
 
     A few things need to be noted. First, the controlled
     exogenous variables are set to zero for the uncontrolled periods. This implies
@@ -13975,8 +13977,8 @@ below.
         vector of size equal ``number_of_regimes``, it specifies the
         average duration of the associated regimes
         (``1:number_of_regimes``) in this chain. An absorbing state
-        can be specified through the :opt:`restrictions <restrictions
-        = [[ROW VECTOR OF 3 DOUBLES],[ROW VECTOR OF 3 DOUBLES],...]>`
+        can be specified through the :opt:`restrictions
+        <restrictions = [[ROW VECTOR OF 3 DOUBLES],[ROW VECTOR OF 3 DOUBLES],...]>`
         option.
 
     .. option:: restrictions = [[ROW VECTOR OF 3 DOUBLES],[ROW VECTOR OF 3 DOUBLES],...]
@@ -14666,8 +14668,8 @@ below.
 
     .. option:: error_band_percentiles = [DOUBLE1 ...]
 
-        See :opt:`error_band_percentiles <error_band_percentiles =
-        [DOUBLE1 ...]>`.
+        See :opt:`error_band_percentiles
+        <error_band_percentiles = [DOUBLE1 ...]>`.
 
     .. option:: shock_draws = INTEGER
 
@@ -14744,8 +14746,8 @@ below.
 
     .. option:: error_band_percentiles = [DOUBLE1 ...]
 
-        See :opt:`error_band_percentiles <error_band_percentiles =
-        [DOUBLE1 ...]>`.
+        See :opt:`error_band_percentiles
+        <error_band_percentiles = [DOUBLE1 ...]>`.
 
     .. option:: shock_draws = INTEGER
 

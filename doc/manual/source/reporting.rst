@@ -19,8 +19,7 @@ paper. Though Dynare provides a subset of options available through
 using the options available in the ``PGFPLOTS/TikZ`` manual. You can
 either do this manually or by passing the options to
 :opt:`miscTikzAxisOptions <miscTikzAxisOptions, STRING>` or
-:opt:`graphMiscTikzAddPlotOptions <graphMiscTikzAddPlotOptions,
-STRING>`.
+:opt:`graphMiscTikzAddPlotOptions <graphMiscTikzAddPlotOptions, STRING>`.
 
 Reports are created and modified by calling methods on class
 objects. The objects are hierarchical, with the following order (from
@@ -245,17 +244,18 @@ and a clarifying example.
 
         Whether or not to display the legend.
 
-        Unless you use the :opt:`graphLegendName <graphLegendName,
-        STRING>` option, the name displayed in the legend is the tex
+        Unless you use the :opt:`graphLegendName <graphLegendName, STRING>`
+        option, the name displayed in the legend is the tex
         name associated with the ``dseries``. You can modify this tex
-        name by using :dsermeth:`tex_rename <B =
-        tex_rename>`. Default: ``false``.
+        name by using :dsermeth:`tex_rename <B = tex_rename>`.
+        Default: ``false``.
 
     .. option:: legendAt, NUMERICAL_VECTOR
 
         The coordinates for the legend location. If this option is
-        passed, it overrides the :opt:`legendLocation <legendLocation,
-        OPTION>` option. Must be of size ``2``. Default: ``empty``.
+        passed, it overrides the :opt:`legendLocation
+        <legendLocation, OPTION>` option. Must be of size ``2``.
+        Default: ``empty``.
 
     .. option:: showLegendBox, BOOLEAN
 
@@ -397,8 +397,8 @@ and a clarifying example.
 
     .. option:: xTicks, NUMERICAL_VECTOR
 
-        Used only in conjunction with :opt:`xTickLabels <xTickLabels,
-        CELL_ARRAY_STRINGS | `ALL'>`, this option denotes the
+        Used only in conjunction with :opt:`xTickLabels
+        <xTickLabels, CELL_ARRAY_STRINGS | `ALL'>`, this option denotes the
         numerical position of the label along the x-axis. The
         positions begin at ``1``. Default: the indices associated with
         the first and last dates of the ``dseries`` and, if passed,
@@ -541,8 +541,9 @@ and a clarifying example.
 
         Whether or not to write a CSV file containing the data
         displayed in the table. The file will be saved in the
-        directory specified by :opt:`tableDirName <tableDirName,
-        FILENAME>` with the same base name as specified by
+        directory specified by :opt:`tableDirName
+        <tableDirName, FILENAME>` with the same base name as
+        specified by
         :opt:`tableName <tableName, STRING>` with the ending
         ``.csv``. Default: ``false``.
 
@@ -702,9 +703,10 @@ and a clarifying example.
     .. option:: tableShowMarkers, BOOLEAN
 
         In a Table, if ``true``, surround each cell with brackets and
-        color it according to :opt:`tableNegColor <tableNegColor,
-        LATEX_COLOR>` and :opt:`tablePosColor <tablePosColor,
-        LATEX_COLOR>`. No effect for graphs. Default: ``false``.
+        color it according to :opt:`tableNegColor
+        <tableNegColor, LATEX_COLOR>` and :opt:`tablePosColor
+        <tablePosColor, LATEX_COLOR>`. No effect for graphs.
+        Default: ``false``.
 
     .. option:: tableAlignRight, BOOLEAN
 
@@ -730,8 +732,8 @@ and a clarifying example.
     .. option:: tablePrecision, INTEGER
 
         The number of decimal places to report in the table
-        data. Default: the value set by :opt:`precision <precision,
-        INTEGER>`.
+        data. Default: the value set by :opt:`precision
+        <precision, INTEGER>`.
 
     .. option:: tablePosColor, LATEX_COLOR
 
@@ -812,8 +814,8 @@ and a clarifying example.
 
     |br| Compiles the report written by ``write`` into a ``pdf``
     file. If the report has not already been written (determined by
-    the existence of the file specified by :opt:`filename <fileName,
-    FILENAME>`, ``write`` is called.
+    the existence of the file specified by :opt:`filename
+    <fileName, FILENAME>`, ``write`` is called.
 
     *Options*
 
@@ -829,8 +831,8 @@ and a clarifying example.
 
         Print the compiler output to the screen. Useful for debugging
         your code as the :math:`\text{\LaTeX}` compiler hangs if there is a
-        problem. Default: the value of :opt:`showOutput <showOutput,
-        BOOLEAN>`.
+        problem. Default: the value of :opt:`showOutput
+        <showOutput, BOOLEAN>`.
 
     .. option:: showReport, BOOLEAN
 
