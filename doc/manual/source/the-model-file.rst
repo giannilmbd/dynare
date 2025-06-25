@@ -174,7 +174,7 @@ for declaring variables and parameters are described below.
         The expression used to detrend an endogenous variable. All
         trend variables, endogenous variables and parameters
         referenced in MODEL_EXPR must already have been declared by
-        the ``trend_var, log_trend_var, var`` and ``parameters``
+        the ``trend_var``, ``log_trend_var``, ``var`` and ``parameters``
         commands. The deflator is assumed to be multiplicative; for an
         additive deflator, use ``log_deflator``.
         This option can be used together with the ``log`` option (the latter
@@ -964,7 +964,7 @@ The model is declared inside a ``model`` block:
         In Dynare, only equality signs can delineate the left and right-hand side of an 
         equation. If Dynare encounters an expression like ``a>=b``, this will therefore not 
         define an inequality constraint. Rather, it is interpreted as the homogenous equation
-        `(a>=b)=0;`, i.e., the Boolean `(a>=b)` must evaluate to 0. Inequality constraints 
+        ``(a>=b)=0;``, i.e., the Boolean ``(a>=b)`` must evaluate to 0. Inequality constraints
         in Dynare instead need to be set up either via OccBin or as mixed complementarity problems.
 
 
@@ -1297,7 +1297,7 @@ equations using the ``write_latex_static_model`` command.
     the variable names, as LaTeX subscripts.
 
     Compiling the TeX file requires the following LaTeX
-    packages: ``geometry, fullpage, breqn``.
+    packages: ``geometry``, ``fullpage``, ``breqn``.
 
     *Options*
 
@@ -1789,7 +1789,7 @@ in this case ``initval`` is used to specify the terminal conditions.
         ``k`` inherited from :math:`t=0` as well as the current and
         future values for technology ``x``, the values for ``c`` and
         ``x`` at time :math:`t=0` play no role. The same applies to
-        the choice of ``c,k`` at time :math:`t=200`, which does not
+        the choice of ``c``,``k`` at time :math:`t=200`, which does not
         depend on ``k`` at :math:`t=201`. As the Euler equation shows,
         that choice only depends on current capital as well as future
         consumption ``c`` and technology ``x``, but not on future
@@ -3951,11 +3951,11 @@ speed-up on large models.
 
        Triggers a check of the dynamic Jacobian for singularity during the first iteration. 
        Useful for detecting pathologies in the model specification. Available only for
-       ``stack_solve_algo=0,2,3``. Neither compatible with the i) ``block``,``bytecode``, and ``linear``
+       ``stack_solve_algo`` equal to ``0``, ``2`` or ``3``. Neither compatible with the i) ``block``,``bytecode``, and ``linear``
        ``model`` or ``model_options`` options nor ii) the ``linear_approximation`` and ``lmmcp`` options, 
        nor iii) with purely forward or backward models.
        Due to computational intensity and high memory requirements, 
-       it is strongly recommended to conduct this test with ``periods=1''.
+       it is strongly recommended to conduct this test with ``periods=1``.
 
     .. option:: solve_algo
 
