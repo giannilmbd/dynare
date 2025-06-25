@@ -1037,8 +1037,7 @@ The model is declared inside a ``model`` block:
         Instructs the preprocessor to create dynamic loadable
         libraries (DLL) containing the model equations and
         derivatives, instead of writing those in M-files. You need a
-        working compilation environment, i.e. a working ``mex``
-        command (see :ref:`compil-install` for more details).
+        working compilation environment, (see :ref:`compil-install` for more details).
         Using this option can result in
         faster simulations or estimations, at the expense of some
         initial compilation time. Alternatively, this option can be
