@@ -457,6 +457,15 @@ verbatim;
         fprintf('❌ Unexpected error from redundant agg field: %s\n', ME.message);
     end
 
+    % Test the initialize_steady_state routine
+    try
+        oo_ = hank.initialize_steady_state(M_, options_, oo_, base_struct);
+        disp('✔ Initialization of the steady state succeeded!');
+    catch ME
+        testFailed = testFailed+1;
+        fprintf('❌ Unexpected error from initialize_steady_state: %s\n', ME.message);
+    end
+
     skipline()
     disp('*** TESTING: hank.check_steady_state_input.m - Discretized i.i.d case ***');
     load 'ks_iid_ss.mat';
@@ -852,4 +861,5 @@ verbatim;
     if testFailed > 0
         error('Some unit tests associated with the routine `hank.check_steady_state_input` failed!');
     end
+
 end;

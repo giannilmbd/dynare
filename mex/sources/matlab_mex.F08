@@ -79,9 +79,35 @@ module matlab_mat
   integer, parameter :: mwSignedIndex = c_intptr_t
   integer, parameter :: mxLogical = c_bool
   integer, parameter :: mxComplexity = c_int
+  integer, parameter :: mxClassID = c_int
 
   integer(mxComplexity), parameter :: mxREAL = 0
   integer(mxComplexity), parameter :: mxCOMPLEX = 1
+
+  integer(mxClassID), parameter :: mxUNKNOWN_CLASS = 0
+  integer(mxClassID), parameter :: mxCELL_CLASS = 1
+  integer(mxClassID), parameter :: mxSTRUCT_CLASS = 2
+  integer(mxClassID), parameter :: mxLOGICAL_CLASS = 3
+  integer(mxClassID), parameter :: mxCHAR_CLASS = 4
+  integer(mxClassID), parameter :: mxVOID_CLASS = 5
+  integer(mxClassID), parameter :: mxDOUBLE_CLASS = 6
+  integer(mxClassID), parameter :: mxSINGLE_CLASS = 7
+  integer(mxClassID), parameter :: mxINT8_CLASS = 8
+  integer(mxClassID), parameter :: mxUINT8_CLASS = 9
+  integer(mxClassID), parameter :: mxINT16_CLASS = 10
+  integer(mxClassID), parameter :: mxUINT16_CLASS = 11
+  integer(mxClassID), parameter :: mxINT32_CLASS = 12
+  integer(mxClassID), parameter :: mxUINT32_CLASS = 13
+  integer(mxClassID), parameter :: mxINT64_CLASS = 14
+  integer(mxClassID), parameter :: mxUINT64_CLASS = 15
+  integer(mxClassID), parameter :: mxFUNCTION_CLASS = 16
+  integer(mxClassID), parameter :: mxOPAQUE_CLASS = 17
+  integer(mxClassID), parameter :: mxOBJECT_CLASS = 18
+#if defined(_LP64) || defined(_WIN64)
+  integer(mxClassID), parameter :: mxINDEX_CLASS = mxUINT64_CLASS
+#else
+  integer(mxClassID), parameter :: mxINDEX_CLASS = mxUINT32_CLASS
+#endif
 
   interface
      !! mxArray attributes
@@ -129,6 +155,14 @@ module matlab_mat
        use iso_c_binding
        real(c_double), intent(in), value :: value
      end function mxCreateDoubleScalar
+
+     type(c_ptr) function mxCreateNumericMatrix(m, n, ClassID, ComplexFlag) bind(c, name="mxCreateNumericMatrix"//API_VER_INTERLEAVED)
+       use iso_c_binding
+       import :: mwSize, mxClassID, mxComplexity
+       integer(mwSize), intent(in), value :: m, n
+       integer(mxClassID), intent(in), value :: ClassID
+       integer(mxComplexity), intent(in), value :: ComplexFlag
+     end
 
      ! Noncomplex Float
      pure logical(c_bool) function mxIsScalar(array_ptr) bind(c, name="mxIsScalar"//API_VER)
