@@ -144,6 +144,11 @@ pkg_macOS_arm64:
 
 pkg_matlab_online:
   stage: pkg
+  rules:
+    - if: '$CI_PROJECT_NAMESPACE == "Dynare" && $CI_COMMIT_REF_NAME == "master"'
+      when: on_success
+    - when: manual
+      allow_failure: true
   script:
     - meson rewrite kwargs set project / version "$VERSION"
     - cd scripts/matlab-online && ./packageDynare.sh
@@ -154,7 +159,6 @@ pkg_matlab_online:
       - scripts/matlab-online/*.mltbx
     expire_in: 3 days
   needs: []
-  when: manual
 
 test_matlab:
   stage: test
@@ -255,6 +259,7 @@ deploy_snapshot_unstable:
     - sign_windows
     - pkg_macOS_arm64
     - pkg_macOS_x86_64
+    - pkg_matlab_online
   script:
     - cp build-src/meson-dist/*.tar.xz /srv/www.dynare.org/snapshot/source/ && ln -sf *.tar.xz /srv/www.dynare.org/snapshot/source/dynare-latest-src.tar.xz
     - f=(windows/exe-signed/*) && cp ${f[0]} /srv/www.dynare.org/snapshot/windows/ && ln -sf ${f[0]##*/} /srv/www.dynare.org/snapshot/windows/dynare-latest-win.exe
@@ -262,5 +267,6 @@ deploy_snapshot_unstable:
     - f=(windows/zip/*) && cp ${f[0]} /srv/www.dynare.org/snapshot/windows-zip/ && ln -sf ${f[0]##*/} /srv/www.dynare.org/snapshot/windows-zip/dynare-latest-win.zip
     - f=(macOS/pkg/*-arm64.pkg) && cp ${f[0]} /srv/www.dynare.org/snapshot/macos-arm64/ && ln -sf ${f[0]##*/} /srv/www.dynare.org/snapshot/macos-arm64/dynare-latest-macos-arm64.pkg
     - f=(macOS/pkg/*-x86_64.pkg) && cp ${f[0]} /srv/www.dynare.org/snapshot/macos-x86_64/ && ln -sf ${f[0]##*/} /srv/www.dynare.org/snapshot/macos-x86_64/dynare-latest-macos-x86_64.pkg
+    - f=(scripts/matlab-online/*.mltbx) && cp ${f[0]} /srv/www.dynare.org/snapshot/matlab-online/ && ln -sf ${f[0]##*/} /srv/www.dynare.org/snapshot/matlab-online/dynare-latest.mltbx
     - ~/update-snapshot-list.sh
     - curl -X POST -F token="$WEBSITE_PIPELINE_TRIGGER_TOKEN" -F ref=master https://git.dynare.org/api/v4/projects/40/trigger/pipeline
