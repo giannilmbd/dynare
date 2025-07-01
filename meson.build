@@ -587,6 +587,11 @@ ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_op
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/dw_csminwel.c' ]
 shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs, dependencies : [ gsl_dep, matio_dep ])
 
+hank_src = [
+   'mex/sources/hank/utils/interpolation.f08'
+] + mex_blas_fortran_iface
+hank_lib = static_library('hank', hank_src, kwargs : static_library_kwargs)
+shared_module('find_bracket_linear_weight',  'mex/sources/hank/find_bracket_linear_weight/mexFunction.F08', kwargs : mex_kwargs, link_with : hank_lib)
 
 ### Documentation
 

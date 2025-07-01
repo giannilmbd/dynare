@@ -29,7 +29,7 @@
 % DESCRIPTION
 % Checks that all elements of `f1` are included in `f2`. If not, throws a descriptive error 
 % mentioning the missing variables and the corresponding structure names for easier debugging.
-function [] = check_consistency(f1, f2, f1_name, f2_name)
+function check_consistency(f1, f2, f1_name, f2_name)
    f1_in_f2 = ismember(f1,f2);
    if ~all(f1_in_f2)
       error('Misspecified steady-state input `ss`: the following variables are mentioned in `%s`, but are missing in `%s`: %s', f1_name, f2_name, strjoin(f1(~f1_in_f2)));

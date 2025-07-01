@@ -30,7 +30,7 @@
 % Checks whether the field `f` exists in the structure `s`.
 % If not, throws an error indicating the missing field.
 % If provided, `details` is appended to the error message for additional context.
-function [] = check_isfield(f, s, f_name, details)
+function check_isfield(f, s, f_name, details)
    if nargin < 4
       details = '';
    end

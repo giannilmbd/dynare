@@ -32,16 +32,16 @@
 % Throws an error if any expected field is missing.
 % If `nowarningredundant` is false, checks if `f` contains fields not listed
 % in `symbs`, and issues a warning if redundant fields are found.
-function [] = check_missingredundant(f, f_name, symbs, nowarningredundant)
+function check_missingredundant(f, f_name, symbs, nowarningredundant)
    fields = fieldnames(f);
    symbs_in_fields = ismember(symbs, fields);
    if ~all(symbs_in_fields)
-      error('Misspecified steady-state input `ss`. The following fields are missing in `%s`: %s', f_name, strjoin(symbs(~symbs_in_fields)));
+      error('Misspecified steady-state input `ss`. The following fields are missing in `%s`: %s.', f_name, strjoin(symbs(~symbs_in_fields)));
    end
    if ~nowarningredundant
       fields_in_symbs = ismember(fields, symbs);
       if ~all(fields_in_symbs)
-         warning('Steady-state input `ss`. The following fields are redundant in `%s`: %s', f_name, strjoin(fields(~fields_in_symbs)));
+         warning('Steady-state input `ss`. The following fields are redundant in `%s`: %s.', f_name, strjoin(fields(~fields_in_symbs)));
       end
    end
 end

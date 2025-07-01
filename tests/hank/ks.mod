@@ -80,7 +80,7 @@ verbatim;
         if ~(sizes.n_e == numel(fieldnames(base_struct.shocks.grids)) && ...
              sizes.n_a == numel(fieldnames(base_struct.pol.grids)) && ...
              sizes.N_e == numel(base_struct.shocks.grids.e) && ...
-             sizes.n_pol == numel(fieldnames(base_struct.pol.values)) && ...
+             sizes.n_pol == M_.heterogeneity(1).endo_nbr && ...
              sizes.agg == numel(fieldnames(base_struct.agg)) && ...
              sizes.shocks.e == numel(base_struct.shocks.grids.e) && ...
              sizes.pol.N_a == numel(base_struct.pol.grids.a) && ...
@@ -457,6 +457,32 @@ verbatim;
         fprintf('❌ Unexpected error from redundant agg field: %s\n', ME.message);
     end
 
+    % Test the initialize_steady_state routine
+    try
+        oo_ = hank.initialize_steady_state(M_, options_, oo_, base_struct);
+        disp('✔ Initialization of the steady state succeeded!');
+    catch ME
+        testFailed = testFailed+1;
+        fprintf('❌ Unexpected error from initialize_steady_state: %s\n', ME.message);
+    end
+
+    % Check the steady-state residuals
+    try
+        [F,G] = hank.compute_steady_state_residuals(M_, oo_);
+        disp('✔ Computation of the steady state residuals succeeded!');
+        if (max(abs(G))>1e-4)
+            testFailed = testFailed+1;
+            fprintf('❌ : Steady-state aggregate residuals are big!');
+        end
+        if (max(abs(F(:)),[],"omitnan")>5e-4)
+            testFailed = testFailed+1;
+            fprintf('❌ : Steady-state heterogeneous residuals are big!');
+        end
+    catch ME
+        testFailed = testFailed+1;
+        fprintf('❌ Unexpected error from compute_steady_state_residuals: %s\n', ME.message);
+    end
+
     skipline()
     disp('*** TESTING: hank.check_steady_state_input.m - Discretized i.i.d case ***');
     load 'ks_iid_ss.mat';
@@ -469,7 +495,7 @@ verbatim;
         if ~(sizes.n_e == numel(fieldnames(base_struct.shocks.grids)) && ...
              sizes.n_a == numel(fieldnames(base_struct.pol.grids)) && ...
              sizes.N_e == numel(base_struct.shocks.grids.eps_e) && ...
-             sizes.n_pol == numel(fieldnames(base_struct.pol.values)) && ...
+             sizes.n_pol == M_.heterogeneity(1).endo_nbr && ...
              sizes.agg == numel(fieldnames(base_struct.agg)) && ...
              sizes.shocks.eps_e == numel(base_struct.shocks.grids.eps_e) && ...
              sizes.pol.N_a == N_a && sizes.pol.states.a == numel(base_struct.pol.grids.a) && ...
@@ -816,6 +842,17 @@ verbatim;
         fprintf('❌ Unexpected error from redundant pol.values field: %s\n', ME.message);
     end
 
+    % pol.values contains valid optional multiplier field (e.g. MULT_L_a)
+    ss = base_struct;
+    ss.pol.values.MULT_L_a = 0.1 * ones(size(ss.pol.values.a));
+    try
+        [out_ss, sizes] = hank.check_steady_state_input(M_, options_, ss);
+        disp('✔ Optional multiplier MULT_L_a accepted in pol.values (no redundant variable warning expected)');
+    catch ME
+        testFailed = testFailed + 1;
+        fprintf('❌ Unexpected error when supplying pol.values.MULT_L_a: %s\n', ME.message);
+    end
+
     % d.grids contains redundant field (not a declared state)
     ss = base_struct;
     ss.d.grids.not_a_state = [0;1;2];  % not in M_.heterogeneity.state_var
@@ -841,4 +878,5 @@ verbatim;
     if testFailed > 0
         error('Some unit tests associated with the routine `hank.check_steady_state_input` failed!');
     end
+
 end;
