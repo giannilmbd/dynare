@@ -273,7 +273,7 @@ Now use the following commands if using MATLAB (adapt them for Octave, see above
 cd /home/$USER/dynare
 git clone --recurse-submodules https://git.dynare.org/dynare/dynare.git unstable
 cd unstable
-meson setup -Dmatlab_path=/usr/local/MATLAB/R2023b -Dfortran_args="[ '-B', '/home/$USER/dynare/slicot']" --buildtype=debugoptimized build-matlab
+meson setup -Dmatlab_path=/usr/local/MATLAB/R2023b -Dfortran_args="[ '-B', '/home/$USER/dynare/slicot/lib']" --buildtype=debugoptimized build-matlab
 meson compile -C build-matlab
 ```
 
