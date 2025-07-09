@@ -52,26 +52,20 @@ function dr=set_state_space(dr,M_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-max_lead = M_.maximum_endo_lead;
-max_lag = M_.maximum_endo_lag;
-endo_nbr = M_.endo_nbr;
-lead_lag_incidence = M_.lead_lag_incidence;
-klen = max_lag + max_lead + 1;
-
-fwrd_var = find(lead_lag_incidence(max_lag+2:end,:))';
-if max_lag > 0
-    pred_var = find(lead_lag_incidence(1,:))';
+fwrd_var = find(M_.lead_lag_incidence(M_.maximum_endo_lag+2:end,:))';
+if M_.maximum_endo_lag > 0
+    pred_var = find(M_.lead_lag_incidence(1,:))';
     both_var = intersect(pred_var,fwrd_var);
     pred_var = setdiff(pred_var,both_var);
     fwrd_var = setdiff(fwrd_var,both_var);
-    stat_var = setdiff([1:endo_nbr]',union(union(pred_var,both_var),fwrd_var));  % static variables
+    stat_var = setdiff([1:M_.endo_nbr]',union(union(pred_var,both_var),fwrd_var));  % static variables
 else
     pred_var = [];
     both_var = [];
-    stat_var = setdiff([1:endo_nbr]',fwrd_var);
+    stat_var = setdiff([1:M_.endo_nbr]',fwrd_var);
 end
 
-dr.order_var = [ stat_var(:); pred_var(:); both_var(:); fwrd_var(:)];
-dr.inv_order_var(dr.order_var) = 1:endo_nbr;
+dr.order_var = [stat_var(:); pred_var(:); both_var(:); fwrd_var(:)];
+dr.inv_order_var(dr.order_var) = 1:M_.endo_nbr;
 
 dr.transition_auxiliary_variables = [];
