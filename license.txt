@@ -384,6 +384,10 @@ Files: contrib/ms-sbvar/TZcode/MatlabFiles/qplot2.m
 Copyright: 1997-2012 Clark A. Burdick
 License: GPL-3+
 
+Files: matlab/+waitbar/multi.m
+Copyright: 2007-2025 The MathWorks, Inc.
+License: BSD-2-clause
+
 License: BSD-2-clause
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are
