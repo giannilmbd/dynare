@@ -55,8 +55,10 @@ contains
   ! C <- alpha*op(A)*op(B) + beta*C
   subroutine matmul_add(opA, opB, alpha, A, B, beta, C)
      character, intent(in) :: opA, opB
-     real(real64), dimension(:,:), intent(in) :: A, B      
-     real(real64), dimension(:,:), intent(inout) :: C 
+     ! The arrays used in BLAS/LAPACK calls are required to be contiguous, to
+     ! avoid temporary copies before calling BLAS/LAPACK.
+     real(real64), dimension(:,:), contiguous, intent(in) :: A, B
+     real(real64), dimension(:,:), contiguous, intent(inout) :: C
      real(real64), intent(in) :: alpha, beta
      integer(blint) :: m, n, k, lda, ldb
      if (opA == "N") then
