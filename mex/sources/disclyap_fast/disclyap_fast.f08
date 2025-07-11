@@ -103,16 +103,13 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
   n_bl = int(n, blint)
   do
-     ! We don't use matmul() for the time being because -fuse-external-blas does
-     ! not work as expected under gfortran 8
-
      ! Ptmp = A0·P0
-     call dgemm("N", "N", n_bl, n_bl, n_bl, 1._real64, A0, n_bl, P0, n_bl, 0._real64, Ptmp, n_bl)
+     call matmul_add("N", "N", 1._real64, A0, P0, 0._real64, Ptmp)
      ! P1 = P0+Ptmp·A0ᵀ
      P1 = P0
-     call dgemm("N", "T", n_bl, n_bl, n_bl, 1._real64, Ptmp, n_bl, A0, n_bl, 1._real64, P1, n_bl)
+     call matmul_add("N", "T", 1._real64, Ptmp, A0, 1._real64, P1)
      ! A1 = A0·A0
-     call dgemm("N", "N", n_bl, n_bl, n_bl, 1._real64, A0, n_bl, A0, n_bl, 0._real64, A1, n_bl)
+     call matmul_add("N", "N", 1._real64, A0, A0, 0._real64, A1)
 
      matd = maxval(abs(P1-P0))
 

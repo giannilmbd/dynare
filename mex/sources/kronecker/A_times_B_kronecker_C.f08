@@ -86,9 +86,7 @@ contains
        ka = 1
        do i = 1,mB
           ! D(:,kd:kd+nC-1) += B(i,j)·A(:,ka:ka+mC-1)·C
-          call dgemm("N", "N", int(mA, blint), int(nC, blint), int(mC, blint), B(i,j), &
-               A(:,ka:ka+mC-1), int(mA, blint), C, int(mC, blint), 1._real64, &
-               D(:,kd:kd+nC-1), int(mA, blint))
+          call matmul_add("N", "N", B(i,j), A(:,ka:ka+mC-1), C, 1._real64, D(:,kd:kd+nC-1))
           ka = ka + mC
        end do
        kd = kd + nC
@@ -104,9 +102,7 @@ contains
        ka = 1
        do i = 1,mB
           ! D(:,kd:kd+nB-1) += B(i,j)·A(:,ka:ka+mB-1)·B
-          call dgemm("N", "N", int(mA, blint), int(nB, blint), int(mB, blint), B(i,j), &
-               A(:,ka:ka+mB-1), int(mA, blint), B, int(mB, blint), 1._real64, &
-               D(:,kd:kd+nB-1), int(mA, blint))
+          call matmul_add("N", "N", B(i,j), A(:,ka:ka+mB-1), B, 1._real64, D(:,kd:kd+nB-1))
           ka = ka + mB
        end do
        kd = kd + nB
