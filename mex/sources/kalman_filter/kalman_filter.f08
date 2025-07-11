@@ -1,4 +1,4 @@
-! Copyright © 2023 Dynare Team
+! Copyright © 2023-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -265,7 +265,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       ! v <- Y(:,t) - Z*a
       if (Zflag) then
          v = Y(:,t)
-         call dgemv("N", p, m, -1._real64, Z, p, a_iter, 1_blint, 1._real64, v, 1_blint)
+         call matvecmul_add("N", -1._real64, Z, a_iter, 1._real64, v)
          ! F <- Z*P*Z' + H
          ! (i) tmp <- P*Z'
          call matmul_add("N", "T", 1._real64, P_iter, Z, 0._real64, tmp_m_p)
@@ -309,7 +309,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       call dgetri(p, lu, p, ipiv, work_inv, lwork, info)
 
       ! Density of each observation
-      call dgemv("N", p, p, 1._real64, lu, p, v, 1_blint, 0._real64, tmp_v, 1_blint)
+      call matvecmul_add("N", 1._real64, lu, v, 0._real64, tmp_v)
       likk(s) = log_dF
       do i=1,p
          likk(s) = likk(s)+v(i)*tmp_v(i)
@@ -362,9 +362,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
 
       ! Compute a_{t+1} = T*(a+Kv)
       ! (i) a <- a+Kv
-      call dgemv("N", m, p, 1._real64, K, m, v, 1_blint, 1._real64, a_iter, 1_blint)
+      call matvecmul_add("N", 1._real64, K, v, 1._real64, a_iter)
       ! (ii) a_next <- T*tmp_v
-      call dgemv("N", m, m, 1._real64, TT, m, a_iter, 1_blint, 0._real64, a_next, 1_blint)
+      call matvecmul_add("N", 1._real64, TT, a_iter, 0._real64, a_next)
       
       ! Check the wedge between gain matrices
       steady_flag = (norm(K-old_K, "M") <= riccati_tol)

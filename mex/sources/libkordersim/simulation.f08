@@ -2,7 +2,7 @@
 !
 ! A first step is to get the associated 
 
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -71,14 +71,6 @@ contains
    !    end do
    ! end subroutine contract
 
-   ! With DGEMV   
-   ! Modifies y such that y := alpha*A*x + beta*y, where alpha, beta are scalars,
-   ! x and y are vectors, A is a m-by-n matrix
-   subroutine mult_vec(alpha, A, x, beta, y)
-      real(real64), intent(in) :: alpha, beta, x(:), A(:,:)
-      real(real64), intent(inout) :: y(:)
-      call dgemv("N", int(size(A,1), blint), int(size(A,2), blint), alpha, A, int(size(A,1), blint), x, 1_blint, beta, y, 1_blint)
-   end subroutine mult_vec
 
    ! Horner evaluation of the polynomial with coefficients stored in udr at the point dyu
    subroutine eval(h, dyu, udr, ny, nvar, order)
@@ -101,7 +93,7 @@ contains
          end if
       end do
       h(0)%m = udr(0)%m
-      call mult_vec(1.0_real64, h(1)%m, dyu, 1.0_real64, h(0)%m(:,1))
+      call matvecmul_add("N", 1.0_real64, h(1)%m, dyu, 1.0_real64, h(0)%m(:,1))
    end subroutine eval
 
    ! Contracts the unfolded tensor t with respect to the vector x and stores the
@@ -113,7 +105,7 @@ contains
       real(real64), dimension(nrows, nvar**(d-1)), intent(inout) :: c
       integer :: i
       do i=1,nvar**(d-1)
-         call mult_vec(1.0_real64, t(:,(i-1)*nvar+1:i*nvar), x, 0.0_real64, c(:,i)) 
+         call matvecmul_add("N", 1.0_real64, t(:,(i-1)*nvar+1:i*nvar), x, 0.0_real64, c(:,i))
       end do
    end subroutine contract
 

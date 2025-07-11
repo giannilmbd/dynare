@@ -97,4 +97,18 @@ contains
                 int(size(B, 1), blint), beta, C, int(size(C, 1), blint))
   end subroutine
 
+  ! Matrix/vector product update using blas DGEMV
+  ! y <- alpha*op(A)*x + beta*y
+  subroutine matvecmul_add(op, alpha, A, x, beta, y)
+    character, intent(in) :: op
+    real(real64), intent(in) :: alpha, beta
+    ! The arrays used in BLAS/LAPACK calls are required to be contiguous, to
+    ! avoid temporary copies before calling BLAS/LAPACK.
+    real(real64), contiguous, intent(in) :: x(:), A(:,:)
+    real(real64), contiguous, intent(inout) :: y(:)
+
+    call dgemv(op, int(size(A, 1), blint), int(size(A, 2), blint), alpha, A, &
+         int(size(A, 1), blint), x, 1_blint, beta, y, 1_blint)
+  end subroutine matvecmul_add
+
 end module blas

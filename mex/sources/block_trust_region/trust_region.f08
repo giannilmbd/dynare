@@ -2,7 +2,7 @@
 !
 ! Implementation heavily inspired from the hybrj function from MINPACK
 
-! Copyright © 2019-2023 Dynare Team
+! Copyright © 2019-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -179,7 +179,7 @@ contains
          ! First, compute w = fvec + fjac·p
          associate (n => int(size(x), blint))
            w = fvec
-           call dgemv("N", n, n, 1._real64, fjac, n, p, 1_blint, 1._real64, w, 1_blint)
+           call matvecmul_add("N", 1._real64, fjac, p, 1._real64, w)
          end associate
          associate (t => norm2(w))
            if (t < fn) then
@@ -332,8 +332,8 @@ contains
            real(real64) :: snm, alpha
 
            ! s = rᵀ·b ./ d
-           ! Alternatively, could use: s = matmul(transpose(r), b) / d
-           call dgemv("T", n, n, 1._real64, r, n, b, 1_blint, 0._real64, s, 1_blint)
+           ! Equivalent to s = matmul(transpose(r), b) / d, but more efficient
+           call matvecmul_add("T", 1._real64, r, b, 0._real64, s)
            s = s / d
            associate (sn => norm2(s))
              if (sn > 0) then
@@ -342,8 +342,7 @@ contains
 
                 ! Get the line minimizer in s direction
                 ! t = r·s
-                ! Alternatively, could use tn => norm2(matmul(r, s))
-                call dgemv("N", n, n, 1._real64, r, n, s, 1_blint, 0._real64, t, 1_blint)
+                call matvecmul_add("N", 1._real64, r, s, 0._real64, t)
                 associate (tn => norm2(t))
                   snm = sn / tn**2
                   if (snm < delta) then
