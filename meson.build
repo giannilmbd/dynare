@@ -350,14 +350,15 @@ endif
 # For use when creating intermediate static libraries to be incorporated in MEX files
 static_library_kwargs = mex_kwargs + { 'name_prefix' : [], 'name_suffix' : [], 'link_args' : [], 'pic' : true, 'install' : false }
 
-mex_blas_fortran_iface = [ 'mex/sources/matlab_mex.F08', 'mex/sources/blas_lapack.F08' ]
+mex_fortran_iface = [ 'mex/sources/matlab_mex.F08' ]
+blas_fortran_iface = [ 'mex/sources/blas.F08' ]
+lapack_fortran_iface = [ 'mex/sources/lapack.F08' ]
 pthread_fortran_iface = [ 'mex/sources/pthread.F08' ]
 
 
 ## Various core MEX
 
-shared_module('mjdgges', [ 'mex/sources/mjdgges/mjdgges.F08' ] + mex_blas_fortran_iface, kwargs : mex_kwargs, dependencies : lapack_dep)
-
+shared_module('mjdgges', [ 'mex/sources/mjdgges/mjdgges.F08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface, kwargs : mex_kwargs, dependencies : lapack_dep)
 shared_module('num_procs', 'mex/sources/num_procs/num_procs.cc', kwargs : mex_kwargs)
 
 perfect_foresight_problem_src = [ 'mex/sources/perfect_foresight_problem/perfect_foresight_problem.cc',
@@ -367,7 +368,7 @@ shared_module('perfect_foresight_problem', perfect_foresight_problem_src, kwargs
 block_trust_region_src = [ 'mex/sources/block_trust_region/dulmage_mendelsohn.f08',
                            'mex/sources/block_trust_region/matlab_fcn_closure.F08',
                            'mex/sources/block_trust_region/trust_region.f08',
-                           'mex/sources/block_trust_region/mexFunction.f08' ] + mex_blas_fortran_iface
+                           'mex/sources/block_trust_region/mexFunction.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface
 shared_module('block_trust_region', block_trust_region_src, kwargs : mex_kwargs, dependencies : lapack_dep)
 
 bytecode_src = [ 'mex/sources/bytecode/bytecode.cc',
@@ -381,21 +382,16 @@ shared_module('bytecode', bytecode_src, kwargs : mex_kwargs, dependencies : [ um
 shared_module('sparse_hessian_times_B_kronecker_C', 'mex/sources/kronecker/sparse_hessian_times_B_kronecker_C.cc',
               kwargs : mex_kwargs, dependencies : openmp_dep)
 
-# TODO: A_times_B_kronecker_C does not depend on LAPACK, but since the
-# interfaces to both BLAS and LAPACK are in the same source file, the
-# dependency must be added. Think about splitting into two files.
-# NB: The problem does not appear with libkordersim because since it is a library,
-# the LAPACK stuff is never pulled in.
-shared_module('A_times_B_kronecker_C', [ 'mex/sources/kronecker/A_times_B_kronecker_C.f08' ] + mex_blas_fortran_iface,
+shared_module('A_times_B_kronecker_C', [ 'mex/sources/kronecker/A_times_B_kronecker_C.f08' ] + mex_fortran_iface + blas_fortran_iface,
+              kwargs : mex_kwargs, dependencies : blas_dep)
+
+shared_module('cycle_reduction', [ 'mex/sources/cycle_reduction/mexFunction.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface,
               kwargs : mex_kwargs, dependencies : [ blas_dep, lapack_dep ])
 
-shared_module('cycle_reduction', [ 'mex/sources/cycle_reduction/mexFunction.f08' ] + mex_blas_fortran_iface,
+shared_module('logarithmic_reduction', [ 'mex/sources/logarithmic_reduction/mexFunction.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface,
               kwargs : mex_kwargs, dependencies : [ blas_dep, lapack_dep ])
 
-shared_module('logarithmic_reduction', [ 'mex/sources/logarithmic_reduction/mexFunction.f08' ] + mex_blas_fortran_iface,
-              kwargs : mex_kwargs, dependencies : [ blas_dep, lapack_dep ])
-
-shared_module('disclyap_fast', [ 'mex/sources/disclyap_fast/disclyap_fast.f08' ] + mex_blas_fortran_iface,
+shared_module('disclyap_fast', [ 'mex/sources/disclyap_fast/disclyap_fast.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface,
               kwargs : mex_kwargs, dependencies : [ blas_dep, lapack_dep ])
 
 qmc_sequence_src = [ 'mex/sources/sobol/qmc_sequence.cc',
@@ -421,7 +417,7 @@ shared_module('qmc_sequence', qmc_sequence_src, kwargs : qmc_sequence_mex_kwargs
 
 shared_module('kalman_steady_state', 'mex/sources/kalman_steady_state/kalman_steady_state.cc', kwargs : mex_kwargs, dependencies : slicot_dep)
 
-shared_module('kalman_filter_mex', [ 'mex/sources/kalman_filter/kalman_filter.f08' ] + mex_blas_fortran_iface,
+shared_module('kalman_filter_mex', [ 'mex/sources/kalman_filter/kalman_filter.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface,
               kwargs : mex_kwargs, dependencies : [ blas_dep, lapack_dep ])
 
 ## k-order simulation stuff
@@ -431,7 +427,7 @@ kordersim_src = [ 'mex/sources/libkordersim/pascal.f08',
                   'mex/sources/libkordersim/partitions.f08',
                   'mex/sources/libkordersim/tensors.f08',
                   'mex/sources/libkordersim/simulation.f08',
-                  'mex/sources/libkordersim/struct.f08' ] + mex_blas_fortran_iface + pthread_fortran_iface
+                  'mex/sources/libkordersim/struct.f08' ] + mex_fortran_iface + blas_fortran_iface + pthread_fortran_iface
 kordersim_lib = static_library('kordersim', kordersim_src, kwargs : static_library_kwargs, dependencies : [ blas_dep, pthread_fortran_dep ])
 
 shared_module('folded_to_unfolded_dr', 'mex/sources/folded_to_unfolded_dr/mexFunction.f08', kwargs : mex_kwargs, link_with : kordersim_lib)
@@ -587,11 +583,9 @@ ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_op
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/dw_csminwel.c' ]
 shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs, dependencies : [ gsl_dep, matio_dep ])
 
-hank_src = [
-   'mex/sources/hank/utils/interpolation.f08'
-] + mex_blas_fortran_iface
+hank_src = [ 'mex/sources/hank/utils/interpolation.f08' ]
 hank_lib = static_library('hank', hank_src, kwargs : static_library_kwargs)
-shared_module('find_bracket_linear_weight',  'mex/sources/hank/find_bracket_linear_weight/mexFunction.F08', kwargs : mex_kwargs, link_with : hank_lib)
+shared_module('find_bracket_linear_weight', [ 'mex/sources/hank/find_bracket_linear_weight/mexFunction.F08' ] + mex_fortran_iface, kwargs : mex_kwargs, link_with : hank_lib)
 
 ### Documentation
 
