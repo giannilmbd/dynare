@@ -169,7 +169,7 @@ by the ``dynare`` command.
 
     .. option:: linemacro
 
-        Instructs the macro preprocessor include ``@#line`` directives
+        Instructs the macro preprocessor to include ``@#line`` directives
         specifying the line on which macro directives were encountered and
         expanded from. Only useful in conjunction with :opt:`savemacro
         <savemacro[=FILENAME]>`.
