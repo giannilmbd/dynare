@@ -60,22 +60,18 @@ contains
      real(real64), dimension(:,:), contiguous, intent(in) :: A, B
      real(real64), dimension(:,:), contiguous, intent(inout) :: C
      real(real64), intent(in) :: alpha, beta
-     integer(blint) :: m, n, k, lda, ldb
+     integer(blint) :: m, n, k
      if (opA == "N") then
         m = int(size(A,1), blint)
         k = int(size(A,2), blint)
-        lda = m
      else
         m = int(size(A,2), blint)
         k = int(size(A,1), blint)
-        lda = k
      end if 
      if (opB == "N") then
         n = int(size(B,2), blint)        
-        ldb = k
      else
         n = int(size(B,1), blint)
-        ldb = n
      end if
 #ifdef DEBUG
      if ( (opA /= "N") .and. (opA /= "T") .and. (opA /= "C") ) then
@@ -97,8 +93,8 @@ contains
                  &of C"
      end if
 #endif
-     call dgemm(opA, opB, m, n, k, alpha, A, lda, B, &
-               ldb, beta, C, m)
+     call dgemm(opA, opB, m, n, k, alpha, A, int(size(A, 1), blint), B, &
+                int(size(B, 1), blint), beta, C, int(size(C, 1), blint))
   end subroutine
 
 end module blas
