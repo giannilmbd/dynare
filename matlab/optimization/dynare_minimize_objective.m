@@ -502,7 +502,6 @@ switch minimizer_algorithm
     elseif ~user_has_matlab_license('GADS_Toolbox')
         error('Option mode_compute=12 requires the Global Optimization Toolbox')
     end
-    [LB, UB] = set_bounds_to_finite_values(bounds, options_.huge_number);
     tmp = transpose([fieldnames(options_.particleswarm), struct2cell(options_.particleswarm)]);
     particleswarmOptions = optimoptions(@particleswarm);
     particleswarmOptions = optimoptions(particleswarmOptions, tmp{:});
@@ -529,27 +528,53 @@ switch minimizer_algorithm
         particleswarmOptions.SwarmSize = eval(particleswarmOptions.SwarmSize);
     end
     if isempty(particleswarmOptions.InitialSwarmMatrix)
+        fprintf('particleswarm: inititalizing swarm matrix...')
         particleswarmOptions.InitialSwarmMatrix = zeros(particleswarmOptions.SwarmSize, numberofvariables);
         p = 1;
         FVALS = zeros(particleswarmOptions.SwarmSize, 1);
         while p<=particleswarmOptions.SwarmSize
-            candidate = rand(numberofvariables, 1).*(UB-LB)+LB;
+            if p == 1 % first particle exactly at initial values (has been checked already)
+                candidate = start_par_value;
+            else
+                candidate = zeros(numberofvariables, 1);
+                for i = 1:numberofvariables
+                    % compute local "delta" around the start
+                    param_range = bounds(i,2) - bounds(i,1);
+                    if isfinite(param_range)
+                        % for bounded parameters use 10% of range
+                        param_delta = 0.1 * param_range;
+                    else
+                        % for unbounded parameters use 20% of initial parameter value
+                        param_delta = 0.2 * abs(start_par_value(i));
+                        if param_delta == 0
+                            param_delta = 0.1; % if initial parameter value is zero
+                        end
+                    end
+                    % uniform draw in [start - delta, start + delta]
+                    candidate(i) = start_par_value(i) + (2*rand - 1) * param_delta;
+                    % enforce hard bounds
+                    candidate(i) = max(candidate(i), bounds(i,1));
+                    candidate(i) = min(candidate(i), bounds(i,2));
+                end
+            end
             [fval, ~, exit_flag] = objfun(candidate);
-            if exit_flag
+            if exit_flag && ~isinf(fval)
                 particleswarmOptions.InitialSwarmMatrix(p,:) = transpose(candidate);
                 FVALS(p) = fval;
                 p = p + 1;
             end
         end
+        fprintf('done!\n');
     end
-    % Set penalty to the worst value of the objective function.
+    % particleswarm errors if objective function is inf, so we use penalized objective function
+    % and set the base penalty to the worst value of the objective function in the InitialSwarmMatrix
     TMP = [particleswarmOptions.InitialSwarmMatrix, FVALS];
     TMP = sortrows(TMP, length(start_par_value)+1);
     penalty = TMP(end,end);
     % Define penalized objective.
     objfun = @(x) penalty_objective_function(x, objective_function, penalty, varargin{:});
     % Minimize the penalized objective (note that the penalty is not updated).
-    [opt_par_values, fval, exitflag] = particleswarm(objfun, length(start_par_value), LB, UB, particleswarmOptions);
+    [opt_par_values, fval, exitflag] = particleswarm(objfun, length(start_par_value), bounds(:,1), bounds(:,2), particleswarmOptions);
     opt_par_values = opt_par_values(:);
   case 13
     % Matlab's lsqnonlin (Optimization toolbox needed).
@@ -670,11 +695,11 @@ if isfield(options_,'occbin') && ((options_.occbin.smoother.status && options_.o
     warning('on','MATLAB:nearlySingularMatrix')
 end
 
-end
+end % dynare_minimize_objective
 
-function [LB, UB]=set_bounds_to_finite_values(bounds, huge_number)
-LB=bounds(:,1);
-LB(isinf(LB))=-huge_number;
-UB=bounds(:,2);
-UB(isinf(UB))=huge_number;
+function [LB, UB] = set_bounds_to_finite_values(bounds, huge_number)
+LB = bounds(:,1);
+LB(isinf(LB)) = -huge_number;
+UB = bounds(:,2);
+UB(isinf(UB)) = huge_number;
 end
