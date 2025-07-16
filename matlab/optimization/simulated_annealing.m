@@ -1,6 +1,6 @@
-function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_draws, t, vm] = ...
+function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_draws, t, vm, message] = ...
     simulated_annealing(fcn,x,optim,lb,ub,varargin)
-% function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_draws, t, vm] = ...
+% function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_draws, t, vm, message] = ...
 %     simulated_annealing(fcn,x,optim,lb,ub,varargin)
 %
 % Implements the continuous simulated annealing global optimization
@@ -141,6 +141,7 @@ function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_
 %            a trial point is randomly selected between LB and UB.
 %    t:     On output, the final temperature.
 %    vm:    Final step length vector
+%    message: The termination message.
 %
 % Algorithm:
 %  This routine implements the continuous simulated annealing global
@@ -163,7 +164,7 @@ function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_
 % Copyright © 1995 E.G.Tsionas
 % Copyright © 1995-2002 Thomas Werner
 % Copyright © 2002-2015 Giovanni Lombardo
-% Copyright © 2015-2017 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -190,18 +191,21 @@ n_accepted_draws=0;
 n_out_of_bounds_draws=0;
 n_total_draws=0;
 exitflag=99;
+message='something wrong';
 xopt=x;
 nacp=zeros(n,1);
 fstar=1e20*ones(optim.neps,1);
 %* If the initial temperature is not positive, notify the user and abort. *
 if(t<=0.0)
-    fprintf('\nThe initial temperature is not positive. Reset the variable t\n');
+    message='The initial temperature is not positive. Reset the variable t';
+    fprintf('\n%s\n',message);
     exitflag=3;
     return
 end
 %*  If the initial value is out of bounds, notify the user and abort. *
 if(sum(x>ub)+sum(x<lb)>0)
-    fprintf('\nInitial condition out of bounds\n');
+    message = 'Initial condition out of bounds';
+    fprintf('\n%s\n',message);
     exitflag=2;
     return
 end
@@ -276,9 +280,8 @@ while (1>0)
                 end
                 %*  If too many function evaluations occur, terminate the algorithm. *
                 if(n_total_draws>=optim.MaxIter)
-                    fprintf('Too many function evaluations; consider\n');
-                    fprintf('increasing optim.MaxIter or optim.TolFun or decreasing\n');
-                    fprintf('optim.nt or optim.rt. These results are likely to be poor\n');
+                    message = 'Too many function evaluations; consider increasing optim.MaxIter or optim.TolFun or decreasing optim.nt or optim.rt. These results are likely to be poor';
+                    fprintf('\n%s\n',message);
                     if(optim.maximizer_indicator==0)
                         fopt=-fopt;
                     end
@@ -380,8 +383,9 @@ while (1>0)
         if(optim.maximizer_indicator==0)
             fopt=-fopt;
         end
+        message = 'SA achieved termination criteria.';
         if(optim.verbosity >=1)
-            fprintf('SA achieved termination criteria.exitflag=0\n');
+            fprintf('%s\n',message);
         end
         return
     end

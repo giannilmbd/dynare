@@ -51,14 +51,15 @@ function [X,FVAL,EXITFLAG,OUTPUT] = simpsa(FUN,X0,LB,UB,OPTIONS,varargin)
 %   the simplexes that were evaluated in OUTPUT.SIMPLEX and the best one in
 %   OUTPUT.SIMPLEX_BEST, the costs associated with each simplex in OUTPUT.COSTS and
 %   from the best simplex at that iteration in OUTPUT.COST_BEST, the amount of time
-%   needed in OUTPUT.TIME and the options used in OUTPUT.OPTIONS.
+%   needed in OUTPUT.TIME, the options used in OUTPUT.OPTIONS and the termination
+%   message in OUTPUT.MESSAGE.
 %
 %   See also SIMPSASET, SIMPSAGET
 
 
 % Copyright © 2005 Henning Schmidt, FCC, henning@fcc.chalmers.se
 % Copyright © 2006 Brecht Donckels, BIOMATH, brecht.donckels@ugent.be
-% Copyright © 2013-2017 Dynare Team.
+% Copyright © 2013-2025 Dynare Team.
 %
 % This file is part of Dynare.
 %
@@ -115,6 +116,7 @@ global NDIM nFUN_EVALS TEMP YBEST PBEST
 % set EXITFLAG to default value
 
 EXITFLAG = -2;
+OUTPUT.MESSAGE = 'something wrong';
 
 % determine number of variables to be optimized
 
@@ -252,9 +254,6 @@ while 1
     % store information on what step the algorithm just did
     ALGOSTEP = 'initial simplex';
 
-    % add NDIM+1 to number of function evaluations
-    nFUN_EVALS = nFUN_EVALS + NDIM;
-
     % note:
     %  dimensions of matrix P: (NDIM+1) x NDIM
     %  dimensions of vector Y: (NDIM+1) x 1
@@ -334,33 +333,29 @@ while 1
         %% 4. no convergence,but maximum time has been reached
 
         if (abs(max(Y)-min(Y)) < OPTIONS.TOLFUN) && (TEMP_LOOP_NUMBER ~= 1)
-            if strcmp(OPTIONS.DISPLAY,'iter')
-                disp('Change in the objective function value less than the specified tolerance (TOLFUN).')
-            end
+            OUTPUT.MESSAGE = 'Change in the objective function value less than the specified tolerance (TOLFUN).';
+            disp(OUTPUT.MESSAGE)
             EXITFLAG = 1;
             break
         end
 
         if (max(max(abs(P(2:NDIM+1,:)-P(1:NDIM,:)))) < OPTIONS.TOLX) && (TEMP_LOOP_NUMBER ~= 1)
-            if strcmp(OPTIONS.DISPLAY,'iter')
-                disp('Change in X less than the specified tolerance (TOLX).')
-            end
+            OUTPUT.MESSAGE = 'Change in X less than the specified tolerance (TOLX).';
+            disp(OUTPUT.MESSAGE)
             EXITFLAG = 2;
             break
         end
 
         if (nITERATIONS >= OPTIONS.MAX_ITER_TOTAL*NDIM) || (nFUN_EVALS >= OPTIONS.MAX_FUN_EVALS*NDIM*(NDIM+1))
-            if strcmp(OPTIONS.DISPLAY,'iter')
-                disp('Maximum number of function evaluations or iterations reached.');
-            end
+            OUTPUT.MESSAGE = 'Maximum number of function evaluations (MAX_FUN_EVALS*NDIM*(NDIM+1)) or iterations (MAX_ITER_TOTAL*NDIM) reached.';
+            disp(OUTPUT.MESSAGE);
             EXITFLAG = 0;
             break
         end
 
         if toc/60 > OPTIONS.MAX_TIME
-            if strcmp(OPTIONS.DISPLAY,'iter')
-                disp('Exceeded maximum time.');
-            end
+            OUTPUT.MESSAGE = 'Exceeded maximum time.';
+            disp(OUTPUT.MESSAGE);
             EXITFLAG = -1;
             break
         end

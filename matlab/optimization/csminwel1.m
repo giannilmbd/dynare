@@ -1,5 +1,5 @@
-function [fh,xh,gh,H,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,Verbose,Save_files,varargin)
-%[fhat,xhat,ghat,H,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,Verbose,Save_files,varargin)
+function [fh,xh,gh,H,itct,fcount,retcodeh,message] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,Verbose,Save_files,varargin)
+% [fh,xh,gh,H,itct,fcount,retcodeh,message] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,Verbose,Save_files,varargin)
 % Inputs:
 %   fcn:    [string]        string naming the objective function to be minimized
 %   x0:     [npar by 1]     initial value of the parameter vector
@@ -37,12 +37,15 @@ function [fh,xh,gh,H,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,m
 %                               5: largest step still improving too fast
 %                               6: smallest step still improving too slow, reversed gradient
 %                               7: warning: possible inaccuracy in H matrix
+%                               8: warning: iteration count termination
+%                              -1: bad initial parameter
+%   message [string]        message upon termination
 %
 % Original file downloaded from:
 % http://sims.princeton.edu/yftp/optimize/mfiles/csminwel.m
 %
 % Copyright © 1993-2007 Christopher Sims
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -95,14 +98,18 @@ end
 %end
 
 [f0,cost_flag,arg1] = penalty_objective_function(x0,fcn,penalty,varargin{:});
+fcount = fcount + 1;
 
 if ~cost_flag
-    disp_verbose('Bad initial parameter.',Verbose)
+    message = 'Bad initial parameter.';
+    disp_verbose(message,Verbose)
+    retcodeh = -1;
     return
 end
 
 if NumGrad
-    [g, badg]=get_num_grad(method,fcn,penalty,f0,x0,epsilon,varargin{:});
+    [g, badg, fcg]=get_num_grad(method,fcn,penalty,f0,x0,epsilon,varargin{:});
+    fcount = fcount + fcg;
 elseif grad_fun_provided
     [g,badg] = grad(x0,varargin{:});
 else
@@ -127,12 +134,14 @@ while ~done
             wall1=1; badg1=1;
         else
             if NumGrad
-                [g1, badg1]=get_num_grad(method,fcn,penalty,f1,x1,epsilon,varargin{:});
+                [g1, badg1, fcg]=get_num_grad(method,fcn,penalty,f1,x1,epsilon,varargin{:});
+                fcount = fcount + fcg;
             elseif grad_fun_provided
                 [g1, badg1] = grad(x1,varargin{:});
             else
                 [~,cost_flag,g1] = penalty_objective_function(x1,fcn,penalty,varargin{:});
                 badg1 = ~cost_flag;
+                fcount = fcount + 1;
             end
             wall1=badg1;
             % g1
@@ -150,12 +159,14 @@ while ~done
                     wall2=1; badg2=1;
                 else
                     if NumGrad
-                        [g2, badg2]=get_num_grad(method,fcn,penalty,f2,x2,epsilon,varargin{:});
+                        [g2, badg2,fcg]=get_num_grad(method,fcn,penalty,f2,x2,epsilon,varargin{:});
+                        fcount = fcount + fcg;
                     elseif grad_fun_provided
                         [g2, badg2] = grad(x2,varargin{:});
                     else
                         [~,cost_flag,g2] = penalty_objective_function(x1,fcn,penalty,varargin{:});
                         badg2 = ~cost_flag;
+                        fcount = fcount + 1;
                     end
                     wall2=badg2;
                     % g2
@@ -181,12 +192,14 @@ while ~done
                             badg3=1;
                         else
                             if NumGrad
-                                [g3, badg3]=get_num_grad(method,fcn,penalty,f3,x3,epsilon,varargin{:});
+                                [g3, badg3, fcg]=get_num_grad(method,fcn,penalty,f3,x3,epsilon,varargin{:});
+                                fcount = fcount + fcg;
                             elseif grad_fun_provided
                                 [g3, badg3] = grad(x3,varargin{:});
                             else
                                 [~,cost_flag,g3] = penalty_objective_function(x1,fcn,penalty,varargin{:});
                                 badg3 = ~cost_flag;
+                                fcount = fcount + 1;
                             end
                             % g3
                             if Save_files
@@ -233,12 +246,14 @@ while ~done
         badgh=1;
         if nogh %recompute gradient
             if NumGrad
-                [gh, badgh]=get_num_grad(method,fcn,penalty,fh,xh,epsilon,varargin{:});
+                [gh, badgh, fcg]=get_num_grad(method,fcn,penalty,fh,xh,epsilon,varargin{:});
+                fcount = fcount + fcg;
             elseif grad_fun_provided
                 [gh, badgh] = grad(xh,varargin{:});
             else
                 [~,cost_flag,gh] = penalty_objective_function(x1,fcn,penalty,varargin{:});
                 badgh = ~cost_flag;
+                fcount = fcount + 1;
             end
         end
     end
@@ -253,29 +268,35 @@ while ~done
     if itct > nit
         disp_verbose('iteration count termination',Verbose)
         done = 1;
+        retcodeh = 8;
     elseif stuck
         disp_verbose('improvement < crit termination',Verbose)
         done = 1;
     end
     rc=retcodeh;
+    if rc ==0
+        message = 'normal step';
+        %do nothing, just a normal step
+    elseif rc == 1
+        message = 'zero gradient';
+    elseif rc == 6
+        message = 'smallest step still improving too slow, reversed gradient';
+    elseif rc == 5
+        message = 'largest step still improving too fast';
+    elseif (rc == 4) || (rc==2)
+        message = 'back and forth on step length never finished';
+    elseif rc == 3
+        message = 'smallest step still improving too slow';
+    elseif rc == 7
+        message = 'warning: possible inaccuracy in H matrix';
+    elseif rc == 8
+        message = 'warning: iteration count termination';
+    else
+        message = 'Unaccounted Case, please contact the developers';
+        error(message);
+    end
     if Verbose || done
-        if rc ==0
-            %do nothing, just a normal step
-        elseif rc == 1
-            disp_verbose('zero gradient',Verbose)
-        elseif rc == 6
-            disp_verbose('smallest step still improving too slow, reversed gradient',Verbose)
-        elseif rc == 5
-            disp_verbose('largest step still improving too fast',Verbose)
-        elseif (rc == 4) || (rc==2)
-            disp_verbose('back and forth on step length never finished',Verbose)
-        elseif rc == 3
-            disp_verbose('smallest step still improving too slow',Verbose)
-        elseif rc == 7
-            disp_verbose('warning: possible inaccuracy in H matrix',Verbose)
-        else
-            error('Unaccounted Case, please contact the developers')
-        end
+        disp_verbose(message,Verbose)
     end
 
     f=fh;
@@ -286,18 +307,23 @@ end
 
 end
 
-function [g, badg]=get_num_grad(method,fcn,penalty,f0,x0,epsilon,varargin)
+function [g, badg, fcg]=get_num_grad(method,fcn,penalty,f0,x0,epsilon,varargin)
 switch method
   case 2
     [g,badg] = numgrad2(fcn, f0, x0, penalty, epsilon, varargin{:});
+    fcg = length(x0);
   case 3
     [g,badg] = numgrad3(fcn, f0, x0, penalty, epsilon, varargin{:});
+    fcg = 2*length(x0);
   case 5
     [g,badg] = numgrad5(fcn, f0, x0, penalty, epsilon, varargin{:});
+    fcg = 4*length(x0);
   case 13
     [g,badg] = numgrad3_(fcn, f0, x0, penalty, epsilon, varargin{:});
+    fcg = 2*length(x0);
   case 15
     [g,badg] = numgrad5_(fcn, f0, x0, penalty, epsilon, varargin{:});
+    fcg = 4*length(x0);
   otherwise
     error('csminwel1: Unknown method for gradient evaluation!')
 end

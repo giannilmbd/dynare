@@ -1,5 +1,5 @@
-function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
-% function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,new_rat_hess_info,varargin)
+function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_info,optimization_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
+% [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_info,optimization_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
 % Calls a minimizer
 %
 % INPUTS
@@ -11,22 +11,23 @@ function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_i
 %   parameter_names     [n_params by 1] cell array          strings containing the parameters names
 %   prior_information   [MATLAB structure]                  Dynare prior information structure (bayestopt_) provided for algorithm 6
 %   Initial_Hessian     [n_params by n_params] matrix       initial Hessian matrix provided for algorithm 6
-%   new_rat_hess_info   [MATLAB structure]                  step size info used by algorithm 5
 %   varargin            [cell array]                        Input arguments for objective function
 %
 % OUTPUTS
 %   opt_par_values      [n_params by 1] vector of doubles   optimal parameter values minimizing the objective
 %   fval                [scalar double]                     value of the objective function at the minimum
-%   exitflag            [scalar double]                     return code of the respective optimizer
+%   exitflag             [scalar double]                     return code of the respective optimizer
 %   hessian_mat         [n_params by n_params] matrix       Hessian matrix at the mode returned by optimizer
 %   options_            [MATLAB structure]                  Dynare options structure (to return options set by algorithms 5)
-%   Scale               [scalar double]                     scaling parameter returned by algorith 6
+%   Scale               [scalar double]                     scaling parameter returned by algorithm 6
+%   new_rat_hess_info   [MATLAB structure]                  step size info used by algorithm 5
+%   optimization_info   [MATLAB structure]                  optimization information on runtime, iterations, function count, exitflag, and message
 %
 % SPECIAL REQUIREMENTS
 %   none.
 %
 %
-% Copyright © 2014-2023 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -65,6 +66,7 @@ opt_par_values=NaN(size(start_par_value));
 new_rat_hess_info=[];
 
 switch minimizer_algorithm
+
   case 1
     if isoctave && ~user_has_octave_forge_package('optim', '1.6')
         error('Optimization algorithm 1 is not available, you need to install the optim Forge package, version 1.6 or above')
@@ -104,29 +106,35 @@ switch minimizer_algorithm
             optim_options = optimset(optim_options,'display','off');            
         end
     end
+    opt_runtime_start = tic;
     if options_.analytic_derivation || (isfield(options_,'mom') && options_.mom.analytic_jacobian==1) %use wrapper
         func = @(x) analytic_gradient_wrapper(x,objective_function,varargin{:});
         if ~isoctave
-            [opt_par_values,fval,exitflag,~,~,~,hessian_mat] = ...
+            [opt_par_values,fval,exitflag,output,~,~,hessian_mat] = ...
                 fmincon(func,start_par_value,[],[],[],[],bounds(:,1),bounds(:,2),[],optim_options);
         else
             % Under Octave, use a wrapper, since fmincon() does not have an 11th
             % arg. Also, only the first 4 output arguments are available.
-            [opt_par_values,fval,exitflag] = ...
+            [opt_par_values,fval,exitflag,output] = ...
                 fmincon(func,start_par_value,[],[],[],[],bounds(:,1),bounds(:,2),[],optim_options);
         end
     else
         if ~isoctave
-            [opt_par_values,fval,exitflag,~,~,~,hessian_mat] = ...
+            [opt_par_values,fval,exitflag,output,~,~,hessian_mat] = ...
                 fmincon(objective_function,start_par_value,[],[],[],[],bounds(:,1),bounds(:,2),[],optim_options,varargin{:});
         else
             % Under Octave, use a wrapper, since fmincon() does not have an 11th
             % arg. Also, only the first 4 output arguments are available.
             func = @(x) objective_function(x,varargin{:});
-            [opt_par_values,fval,exitflag] = ...
+            [opt_par_values,fval,exitflag,output] = ...
                 fmincon(func,start_par_value,[],[],[],[],bounds(:,1),bounds(:,2),[],optim_options);
-        end    
+        end
     end
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.iterations;
+    optimization_info.funcCount = output.funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(output.message, newline, ' ');
     
   case 2
     %simulating annealing
@@ -177,8 +185,18 @@ switch minimizer_algorithm
     end
     sa_options.initial_step_length= sa_options.initial_step_length*ones(npar,1); %bring step length to correct vector size
     sa_options.step_length_c= sa_options.step_length_c*ones(npar,1); %bring step_length_c to correct vector size
-    [opt_par_values, fval,exitflag] =...
+    opt_runtime_start = tic;
+    [opt_par_values, fval, exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_draws, ~, ~, message] = ...
         simulated_annealing(objective_function,start_par_value,sa_options,LB,UB,varargin{:});
+    optimization_info.runtime = toc(opt_runtime_start);
+    if ~options_.silent_optimizer
+        fprintf('Accepted draws = %d\nTotal draws = %d\nOut of bounds draws = %d\n', n_accepted_draws, n_total_draws, n_out_of_bounds_draws);
+    end
+    optimization_info.iterations = n_total_draws;
+    optimization_info.funcCount = n_total_draws;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = message;
+
   case 3
     if isoctave && ~user_has_octave_forge_package('optim')
         error('Optimization algorithm 3 requires the optim package')
@@ -205,26 +223,33 @@ switch minimizer_algorithm
             optim_options = optimset(optim_options,'display','off');            
         end
     end
+    opt_runtime_start = tic;
     if options_.analytic_derivation || (isfield(options_,'mom') && options_.mom.analytic_jacobian==1)
         if ~isoctave
             optim_options = optimoptions(optim_options,'GradObj','on');
             func = @(x) analytic_gradient_wrapper(x,objective_function,varargin{:});
-            [opt_par_values,fval,exitflag] = fminunc(func,start_par_value,optim_options);
+            [opt_par_values,fval,exitflag,output] = fminunc(func,start_par_value,optim_options);
         else
             optim_options = optimset(optim_options,'GradObj','on');
             % Under Octave, use a wrapper, since fminunc() does not have a 4th arg
             func = @(x) analytic_gradient_wrapper(x,objective_function,varargin{:});
-            [opt_par_values,fval,exitflag] = fminunc(func,start_par_value,optim_options);
+            [opt_par_values,fval,exitflag,output] = fminunc(func,start_par_value,optim_options);
         end
     else
         if ~isoctave
-            [opt_par_values,fval,exitflag] = fminunc(objective_function,start_par_value,optim_options,varargin{:});
+            [opt_par_values,fval,exitflag,output] = fminunc(objective_function,start_par_value,optim_options,varargin{:});
         else
             % Under Octave, use a wrapper, since fminunc() does not have a 4th arg
             func = @(x) objective_function(x,varargin{:});
-            [opt_par_values,fval,exitflag] = fminunc(func,start_par_value,optim_options);
+            [opt_par_values,fval,exitflag,output] = fminunc(func,start_par_value,optim_options);
         end
     end
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.iterations;
+    optimization_info.funcCount = output.funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(output.message, newline, ' ');
+
   case 4
     % Set default options.
     H0 = 1e-4*eye(n_params);
@@ -269,9 +294,16 @@ switch minimizer_algorithm
         analytic_grad=[];
     end
     % Call csminwell.
-    [fval,opt_par_values,~,inverse_hessian_mat,~,~,exitflag] = ...
+    opt_runtime_start = tic;
+    [fval,opt_par_values,~,inverse_hessian_mat,iterations,funcCount,exitflag,message] = ...
         csminwel1(objective_function, start_par_value, H0, analytic_grad, crit, nit, numgrad, epsilon, Verbose, Save_files, varargin{:});
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = iterations;
+    optimization_info.funcCount = funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = message;
     hessian_mat=inv(inverse_hessian_mat);
+
   case 5
     if isempty(prior_information) %mr_hessian requires it, but can be NaN
         prior_information.p2=NaN(n_params,1);
@@ -335,15 +367,30 @@ switch minimizer_algorithm
     hess_info.robust=robust;
     % here we force 7th input argument (flagg) to be 0, since outer product
     % gradient Hessian is handled in dynare_estimation_1
-    [opt_par_values,hessian_mat,~,fval,~,new_rat_hess_info] = newrat(objective_function,start_par_value,bounds,analytic_grad,crit,nit,0,Verbose,Save_files,hess_info,prior_information.p2,options_.gradient_epsilon,parameter_names,varargin{:});    %hessian_mat is the plain outer product gradient Hessian
+    opt_runtime_start = tic;
+    [opt_par_values,hessian_mat,~,fval,~,new_rat_hess_info,iterations,funcCount,exitflag,message] = ...
+        newrat(objective_function,start_par_value,bounds,analytic_grad,crit,nit,0,Verbose,Save_files,hess_info,prior_information.p2,options_.gradient_epsilon,parameter_names,varargin{:});    %hessian_mat is the plain outer product gradient Hessian
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = iterations;
+    optimization_info.funcCount = funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(message, newline, ' ');
     new_rat_hess_info.new_rat_hess_info = new_rat_hess_info;
     new_rat_hess_info.newratflag = newratflag;
+
   case 6
     if isempty(prior_information) %Inf will be reset
         prior_information.p2=Inf(n_params,1);
     end
-    [opt_par_values, hessian_mat, Scale, fval] = gmhmaxlik(objective_function, start_par_value, ...
-                                                      Initial_Hessian, options_.mh_jscale, bounds, prior_information.p2, options_.gmhmaxlik, options_.optim_opt, varargin{:});
+    opt_runtime_start = tic;
+    [opt_par_values, hessian_mat, Scale, fval, funcCount] = ...
+        gmhmaxlik(objective_function, start_par_value, Initial_Hessian, options_.mh_jscale, bounds, prior_information.p2, options_.gmhmaxlik, options_.optim_opt, varargin{:});
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = NaN;
+    optimization_info.funcCount = funcCount;
+    optimization_info.exitflag = 1;
+    optimization_info.message = 'Optimization successful, no meaningful message.';
+
   case 7
     % MATLAB's simplex (Optimization toolbox needed).
     if isoctave && ~user_has_octave_forge_package('optim')
@@ -358,14 +405,21 @@ switch minimizer_algorithm
     if options_.silent_optimizer
         optim_options = optimset(optim_options,'display','off');
     end
+    opt_runtime_start = tic;
     if ~isoctave
-        [opt_par_values,fval,exitflag] = fminsearch(objective_function,start_par_value,optim_options,varargin{:});
+        [opt_par_values,fval,exitflag,output] = fminsearch(objective_function,start_par_value,optim_options,varargin{:});
     else
         % Under Octave, use a wrapper, since fminsearch() does not have a
         % 4th arg.
         func = @(x) objective_function(x,varargin{:});
-        [opt_par_values,fval,exitflag] = fminsearch(func,start_par_value,optim_options);
+        [opt_par_values,fval,exitflag,output] = fminsearch(func,start_par_value,optim_options);
     end
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.iterations;
+    optimization_info.funcCount = output.funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(output.message, newline, ' ');
+
   case 8
     % Dynare implementation of the simplex algorithm.
     simplexOptions = options_.simplex;
@@ -395,7 +449,15 @@ switch minimizer_algorithm
     if options_.silent_optimizer
         simplexOptions.verbosity = 0;
     end
-    [opt_par_values,fval,exitflag] = simplex_optimization_routine(objective_function,start_par_value,simplexOptions,parameter_names,varargin{:});
+    opt_runtime_start = tic;
+    [opt_par_values,fval,exitflag,iterations,funcCount,message] = ...
+        simplex_optimization_routine(objective_function,start_par_value,simplexOptions,parameter_names,varargin{:});
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = iterations;
+    optimization_info.funcCount = funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = message;
+
   case 9
     % Set defaults
     H0 = (bounds(:,2)-bounds(:,1))*0.2;
@@ -448,9 +510,23 @@ switch minimizer_algorithm
     end
     warning('off','CMAES:NonfinitenessRange');
     warning('off','CMAES:InitialSigma');
-    [~, ~, ~, ~, ~, BESTEVER] = cmaes(func2str(objective_function),start_par_value,H0,cmaesOptions,varargin{:});
+    opt_runtime_start = tic;
+    [~, ~, ~, message, output, BESTEVER] = cmaes(func2str(objective_function),start_par_value,H0,cmaesOptions,varargin{:});
+    optimization_info.runtime = toc(opt_runtime_start);
+    if strcmp(message,'tolfun') || strcmp(message,'tolx')
+        exitflag = 1;
+    elseif strcmp(message,'warnconditioncov')
+        exitflag = 2;
+    else
+        exitflag = -1;
+    end
+    optimization_info.iterations = output.countiter;
+    optimization_info.funcCount = output.evals + 1; % need to add one more for initial function evaluation
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = message;
     opt_par_values=BESTEVER.x;
     fval=BESTEVER.f;
+
   case 10
     simpsaOptions = options_.simpsa;
     if ~isempty(options_.optim_opt)
@@ -489,13 +565,22 @@ switch minimizer_algorithm
     simpsaOptionsList = options2cell(simpsaOptions);
     simpsaOptions = simpsaset(simpsaOptionsList{:});
     [LB, UB]=set_bounds_to_finite_values(bounds, options_.huge_number);
-    [opt_par_values, fval, exitflag] = simpsa(func2str(objective_function),start_par_value,LB,UB,simpsaOptions,varargin{:});
+    opt_runtime_start = tic;
+    [opt_par_values, fval, exitflag, output] = ...
+        simpsa(func2str(objective_function),start_par_value,LB,UB,simpsaOptions,varargin{:});
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.nITERATIONS;
+    optimization_info.funcCount = output.nFUN_EVALS;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = output.MESSAGE;
+
   case 11
     % waiting for validation 
     %    options_.cova_compute = 0;
     %    subvarargin = [varargin(1), varargin(3:6), varargin(8)];
     %    opt_par_values = online_auxiliary_filter(start_par_value, subvarargin{:});
-    warning('Online particle filter is no more available with mode_compute=11; use posterior_sampler with option online')
+    warning('Online particle filter is no more available with mode_compute=11; use posterior_sampler with option online');
+
   case 12
     if isoctave
         error('Option mode_compute=12 is not available under Octave')
@@ -572,10 +657,18 @@ switch minimizer_algorithm
     TMP = sortrows(TMP, length(start_par_value)+1);
     penalty = TMP(end,end);
     % Define penalized objective.
+    opt_runtime_start = tic;
     objfun = @(x) penalty_objective_function(x, objective_function, penalty, varargin{:});
     % Minimize the penalized objective (note that the penalty is not updated).
-    [opt_par_values, fval, exitflag] = particleswarm(objfun, length(start_par_value), bounds(:,1), bounds(:,2), particleswarmOptions);
+    [opt_par_values, fval, exitflag, output] = particleswarm(objfun, length(start_par_value), bounds(:,1), bounds(:,2), particleswarmOptions);
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.iterations;
+    optimization_info.funcCount = output.funccount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(output.message, '\n', ' ');
+    optimization_info.rngstate = output.rngstate;
     opt_par_values = opt_par_values(:);
+
   case 13
     % MATLAB's lsqnonlin (Optimization toolbox needed).
     if ~isfield(options_,'mom')
@@ -601,6 +694,7 @@ switch minimizer_algorithm
     if options_.silent_optimizer
         optim_options.Display='off';
     end
+    opt_runtime_start = tic;
     if options_.analytic_derivation || (isfield(options_,'mom') && options_.mom.analytic_jacobian==1)
         if isoctave
             optim_options.Jacobian = 'on';
@@ -608,17 +702,23 @@ switch minimizer_algorithm
             optim_options.SpecifyObjectiveGradient = true;
         end
         func = @(x) analytic_gradient_wrapper(x,objective_function,varargin{:});
-        [opt_par_values,~,fval,exitflag] = ...
+        [opt_par_values,~,fval,exitflag,output] = ...
             lsqnonlin(func,start_par_value,bounds(:,1),bounds(:,2),optim_options);
     else
         if ~isoctave
-            [opt_par_values,~,fval,exitflag] = lsqnonlin(objective_function,start_par_value,bounds(:,1),bounds(:,2),optim_options,varargin{:});
+            [opt_par_values,~,fval,exitflag,output] = lsqnonlin(objective_function,start_par_value,bounds(:,1),bounds(:,2),optim_options,varargin{:});
         else
             % Under Octave, use a wrapper, since lsqnonlin() does not have a 6th arg
             func = @(x)objective_function(x,varargin{:});
-            [opt_par_values,~,fval,exitflag] = lsqnonlin(func,start_par_value,bounds(:,1),bounds(:,2),optim_options);
+            [opt_par_values,~,fval,exitflag,output] = lsqnonlin(func,start_par_value,bounds(:,1),bounds(:,2),optim_options);
         end
-    end    
+    end
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.iterations;
+    optimization_info.funcCount = output.funcCount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(output.message, newline, ' ');
+
   case 101
     solveoptoptions = options_.solveopt;
     if ~isempty(options_.optim_opt)
@@ -645,12 +745,23 @@ switch minimizer_algorithm
     if options_.silent_optimizer
         solveoptoptions.verbosity = 0;
     end
+    opt_runtime_start = tic;
     if options_.analytic_derivation || (isfield(options_,'mom') && options_.mom.analytic_jacobian==1)
         func = @(x) analytic_gradient_wrapper(x,objective_function,varargin{:});
-        [opt_par_values,fval]=solvopt(start_par_value,func,1,[],[],solveoptoptions);
+        [opt_par_values,fval,exitflag,n_f_evals,n_grad_evals,~,~,iterations,message]=solvopt(start_par_value,func,1,[],[],solveoptoptions);
+        n_grad_evals = n_grad_evals - 1; % remove double count of the initial function evaluation with analytic gradient
     else
-        [opt_par_values,fval]=solvopt(start_par_value,objective_function,[],[],[],solveoptoptions,varargin{:});
+        [opt_par_values,fval,exitflag,n_f_evals,n_grad_evals,~,~,iterations,message]=solvopt(start_par_value,objective_function,[],[],[],solveoptoptions,varargin{:});
     end
+    if exitflag > 0 % positive numbers are equal to number of iterations
+      exitflag = 1;
+    end
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = iterations;
+    optimization_info.funcCount = n_f_evals + n_grad_evals;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = message;
+
   case 102
     if isoctave
         error('Optimization algorithm 102 is not available under Octave')
@@ -678,11 +789,37 @@ switch minimizer_algorithm
         end
     end
     func = @(x)objective_function(x,varargin{:});
-    [opt_par_values,fval,exitflag] = simulannealbnd(func,start_par_value,bounds(:,1),bounds(:,2),optim_options);
+    opt_runtime_start = tic;
+    [opt_par_values,fval,exitflag,output] = simulannealbnd(func,start_par_value,bounds(:,1),bounds(:,2),optim_options);
+    optimization_info.runtime = toc(opt_runtime_start);
+    optimization_info.iterations = output.iterations;
+    optimization_info.funcCount = output.funccount;
+    optimization_info.exitflag = exitflag;
+    optimization_info.message = strrep(output.message, newline, ' ');
+    optimization_info.rngstate = output.rngstate;
+
   otherwise
     if ischar(minimizer_algorithm)
         if exist(minimizer_algorithm)
-            [opt_par_values, fval, exitflag] = feval(minimizer_algorithm,objective_function,start_par_value,varargin{:});
+            opt_runtime_start = tic;
+            [opt_par_values, fval, exitflag, output] = feval(minimizer_algorithm,objective_function,start_par_value,varargin{:});
+            optimization_info.runtime = toc(opt_runtime_start);
+            if isfield(output, 'iterations')
+                optimization_info.iterations = output.iterations;
+            else
+                optimization_info.iterations = [];
+            end
+            if isfield(output, 'funcCount')
+                optimization_info.funcCount = output.funcCount;
+            else
+                optimization_info.funcCount = [];
+            end
+            optimization_info.exitflag = exitflag;
+            if isfield(output, 'message')
+                optimization_info.message = strrep(output.message, newline, ' ');
+            else
+                optimization_info.message = [];
+            end
         else
             error('No minimizer with the provided name detected.')
         end

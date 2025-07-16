@@ -1,5 +1,5 @@
-function [opt_par_values,fval,exitflag]=optimizer_function_wrapper(objective_function_handle,start_par_value,varargin)
-% function [opt_par_values,fval,exitflag]=optimizer_function_wrapper(objective_function_handle,start_par_value,varargin)
+function [opt_par_values,fval,exitflag,output]=optimizer_function_wrapper(objective_function_handle,start_par_value,varargin)
+% function [opt_par_values,fval,exitflag,output]=optimizer_function_wrapper(objective_function_handle,start_par_value,varargin)
 % Demonstrates how to invoke external optimizer for mode_computation
 
 %set options of optimizer
@@ -12,6 +12,6 @@ analytic_grad=[];
 Verbose=1;
 Save_files=1;
 %call optimizer
-[fval,opt_par_values,grad,hessian_mat,itct,fcount,exitflag] = ...
+[fval,opt_par_values,grad,hessian_mat,output.iterations,output.funcCount,exitflag,output.message] = ...
     csminwel1(objective_function_handle, start_par_value, H0, analytic_grad, crit, nit, numgrad, epsilon, Verbose,Save_files, varargin{:});
 end

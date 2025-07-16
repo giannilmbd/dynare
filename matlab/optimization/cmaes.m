@@ -158,7 +158,7 @@ function [xmin, ...      % minimum search point of last iteration
                             %
 
 % Copyright © 2001-2012 Nikolaus Hansen,
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -1455,6 +1455,7 @@ while irun <= myeval(opts.Restarts) % for-loop does not work with resume
 
         % Keep overall best solution
         out.evals = counteval;
+        out.countiter = countiter;
         out.solutions.evals = counteval;
         out.solutions.mean.x = xmean;
         out.solutions.mean.f = fmean;

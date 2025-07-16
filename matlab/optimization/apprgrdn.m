@@ -1,5 +1,6 @@
-function g = apprgrdn(x,f,fun,deltax,obj,varargin)
-% g = apprgrdn(x,f,fun,deltax,obj,varargin)
+function [g,fcount] = apprgrdn(x,f,fun,deltax,obj,varargin)
+% [g,fcount] = apprgrdn(x,f,fun,deltax,obj,varargin)
+%
 % Performs the finite difference approximation of the gradient <g> at a
 % point <x> used in solveopt
 %
@@ -11,13 +12,16 @@ function g = apprgrdn(x,f,fun,deltax,obj,varargin)
 % obj       flag indicating whether the gradient of the objective
 %           function (1) or the constraint function (0) is to be calculated.
 %
+% Outputs:
+% g:        gradient
+% fcount:   number of function evaluations
 % Modified by Giovanni Lombardo and Johannes Pfeifer to accommodate Dynare
 % structure
 %
 %
 % Copyright © 1997-2008, Alexei Kuntsevich and Franz Kappel
 % Copyright © 2008-2015 Giovanni Lombardo
-% Copyright © 2015-2017 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -34,6 +38,7 @@ function g = apprgrdn(x,f,fun,deltax,obj,varargin)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+fcount = 0;
 n=max(size(x)); ee=ones(size(x));
 di=abs(x); idx=find(di<5e-15); di(idx)=5e-15*ee(idx);
 di=deltax.*di;
@@ -50,11 +55,13 @@ g=NaN(n,1);
 for i=1:n
     y(i)=x(i)+di(i);
     fi=feval(fun,y,varargin{:});
+    fcount = fcount + 1;
     if obj
         if fi==f
             for j=1:3
                 di(i)=di(i)*10;  y(i)=x(i)+di(i);
                 fi=feval(fun,y,varargin{:});
+                fcount = fcount + 1;
                 if fi~=f
                     break
                 end
@@ -66,6 +73,7 @@ for i=1:n
         if ~isempty(idx) && any(idx==i)
             y(i)=x(i)-di(i);
             fi=feval(fun,y,varargin{:});
+            fcount = fcount + 1;
             g(i)=.5*(g(i)+(f-fi)/di(i));
         end
     end

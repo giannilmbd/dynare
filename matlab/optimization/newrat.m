@@ -1,5 +1,5 @@
-function [xparam1, hh, gg, fval, igg, hess_info] = newrat(func0, x, bounds, analytic_derivation, ftol0, nit, flagg, Verbose, Save_files, hess_info, prior_std, gradient_epsilon, parameter_names, varargin)
-%  [xparam1, hh, gg, fval, igg, hess_info] = newrat(func0, x, bounds, analytic_derivation, ftol0, nit, flagg, Verbose, Save_files, hess_info, gradient_epsilon, parameter_names, varargin)
+function [xparam1, hh, gg, fval, igg, hess_info, jit, fcount, exitflag, message] = newrat(func0, x, bounds, analytic_derivation, ftol0, nit, flagg, Verbose, Save_files, hess_info, prior_std, gradient_epsilon, parameter_names, varargin)
+%  [xparam1, hh, gg, fval, igg, hess_info, jit, fcount, exitflag, message] = newrat(func0, x, bounds, analytic_derivation, ftol0, nit, flagg, Verbose, Save_files, hess_info, gradient_epsilon, parameter_names, varargin)
 %
 %  Optimiser with outer product gradient and with sequences of univariate steps
 %  uses Chris Sims subroutine for line search
@@ -44,8 +44,12 @@ function [xparam1, hh, gg, fval, igg, hess_info] = newrat(func0, x, bounds, anal
 % - fval                    function value
 % - igg                     inverted outer product Hessian
 % - hess_info               structure with updated step length
+% - jit                     number of iterations
+% - fcount                  number of function evaluations
+% - exitflag                exit flag
+% - message                 message upon termination
 
-% Copyright © 2004-2017 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -64,7 +68,7 @@ function [xparam1, hh, gg, fval, igg, hess_info] = newrat(func0, x, bounds, anal
 
 % initialize variable penalty
 penalty = 1e8;
-
+fcount = 0;
 icount=0;
 nx=length(x);
 xparam1=x;
@@ -82,10 +86,13 @@ if ischar(func0)
 end
 
 [fval0,exit_flag,gg,hh]=penalty_objective_function(x,func0,penalty,varargin{:});
+fcount = fcount + 1;
 fval=fval0;
 if ~exit_flag
     igg=NaN(nx);
-    disp_verbose('Bad initial parameter.',Verbose)
+    message = 'Bad initial parameter.';
+    disp_verbose(message,Verbose)
+    exitflag = -2;
     return
 end
 
@@ -94,7 +101,8 @@ end
 outer_product_gradient=1;
 if isempty(hh)
     penalty=fval0;
-    [dum, gg, htol0, igg, hhg, h1, hess_info]=mr_hessian(x,func0,penalty,flagit,htol,hess_info,bounds,prior_std,Save_files,varargin{:});
+    [dum, gg, htol0, igg, hhg, h1, hess_info, fc]=mr_hessian(x,func0,penalty,flagit,htol,hess_info,bounds,prior_std,Save_files,varargin{:});
+    fcount = fcount + fc;
     if isempty(dum)
         outer_product_gradient=0;
         igg = 1e-4*eye(nx);
@@ -144,6 +152,9 @@ if Save_files
 end
 ig=ones(nx,1);
 ggx=zeros(nx,1);
+message = '';
+exitflag = -3;
+
 while norm(gg)>gtol && check==0 && jit<nit
     jit=jit+1;
     tic1 = tic;
@@ -151,9 +162,11 @@ while norm(gg)>gtol && check==0 && jit<nit
     penalty = fval0(icount);
     disp_verbose(' ',Verbose)
     disp_verbose(['Iteration ',num2str(icount)],Verbose)
-    [fval,x0] = csminit1(func0,xparam1,penalty,fval0(icount),gg,0,H,Verbose,varargin{:});
+    [fval,x0,fc] = csminit1(func0,xparam1,penalty,fval0(icount),gg,0,H,Verbose,varargin{:});
+    fcount = fcount + fc;
     if igrad
-        [fval1,x01] = csminit1(func0,x0,penalty,fval,gg,0,inx,Verbose,varargin{:});
+        [fval1,x01,fc] = csminit1(func0,x0,penalty,fval,gg,0,inx,Verbose,varargin{:});
+        fcount = fcount + fc;
         if (fval-fval1)>1
             disp_verbose('Gradient step!!',Verbose)
         else
@@ -173,21 +186,25 @@ while norm(gg)>gtol && check==0 && jit<nit
         end
         iggx=eye(length(gg));
         iggx(ig_pos,ig_pos) = inv( hhx(ig_pos,ig_pos) );
-        [~,x0] = csminit1(func0,x0,penalty,fval,ggx,0,iggx,Verbose,varargin{:});
+        [~,x0,fc] = csminit1(func0,x0,penalty,fval,ggx,0,iggx,Verbose,varargin{:});
+        fcount = fcount + fc;
     end
     if not(isequal(x0 , check_bounds(x0,bounds)))
         x0 = check_bounds(x0,bounds);
         [fvala,exit_flag]=penalty_objective_function(x0,func0,penalty,varargin{:});
+        fcount = fcount + 1;
         if exit_flag==1
             penalty=fvala;
         else
             disp_verbose('last step exited with bad status!',Verbose)
         end
     end
-    [fvala, x0, ig] = mr_gstep(h1,x0,bounds,func0,penalty,htol0,Verbose,Save_files,gradient_epsilon, parameter_names, hess_info.robust, varargin{:});
+    [fvala, x0, ig, fc] = mr_gstep(h1,x0,bounds,func0,penalty,htol0,Verbose,Save_files,gradient_epsilon, parameter_names, hess_info.robust, varargin{:});
+    fcount = fcount + fc;
     if not(isequal(x0 , check_bounds(x0,bounds)))
         x0 = check_bounds(x0,bounds);
         [fvala,exit_flag]=penalty_objective_function(x0,func0,penalty,varargin{:});
+        fcount = fcount + 1;
         if exit_flag==1
             penalty=fvala;
         else
@@ -202,7 +219,8 @@ while norm(gg)>gtol && check==0 && jit<nit
     if (fval0(icount)-fval)<ftol && flagit==0
         disp_verbose('Try diagonal Hessian',Verbose)
         ihh=diag(1./(diag(hhg)));
-        [fval2,x0] = csminit1(func0,x0,penalty,fval,gg,0,ihh,Verbose,varargin{:});
+        [fval2,x0,fc] = csminit1(func0,x0,penalty,fval,gg,0,ihh,Verbose,varargin{:});
+        fcount = fcount + fc;
         x0 = check_bounds(x0,bounds);
         if (fval-fval2)>=ftol
             disp_verbose('Diagonal Hessian successful',Verbose)
@@ -212,7 +230,8 @@ while norm(gg)>gtol && check==0 && jit<nit
     if (fval0(icount)-fval)<ftol && flagit==0
         disp_verbose('Try gradient direction',Verbose)
         ihh0=inx.*1.e-4;
-        [fval3,x0] = csminit1(func0,x0,penalty,fval,gg,0,ihh0,Verbose,varargin{:});
+        [fval3,x0,fc] = csminit1(func0,x0,penalty,fval,gg,0,ihh0,Verbose,varargin{:});
+        fcount = fcount + fc;
         x0 = check_bounds(x0,bounds);
         if (fval-fval3)>=ftol
             disp_verbose('Gradient direction successful',Verbose)
@@ -223,17 +242,20 @@ while norm(gg)>gtol && check==0 && jit<nit
     x(:,icount+1)=xparam1;
     fval0(icount+1)=fval;
     if (fval0(icount)-fval)<ftol
-        disp_verbose('No further improvement is possible!',Verbose)
+        message = 'No further improvement is possible!';
+        disp_verbose(message,Verbose)
         check=1;
         if analytic_derivation
             [~,~,gg,hh]=penalty_objective_function(xparam1,func0,penalty,varargin{:});
+            fcount = fcount + 1;
             hhg=hh;
             H = inv(hh);
         else
             if flagit==2
                 hh=hh0;
             elseif flagg>0
-                [dum, gg, htol0, igg, hhg, h1, hess_info]=mr_hessian(xparam1,func0,penalty,flagg,htol_base,hess_info,bounds,prior_std,Save_files,varargin{:});
+                [dum, gg, htol0, igg, hhg, h1, hess_info, fc]=mr_hessian(xparam1,func0,penalty,flagg,htol_base,hess_info,bounds,prior_std,Save_files,varargin{:});
+                fcount = fcount + fc;
                 if flagg==2
                     hh = reshape(dum,nx,nx);
                     ee=eig(hh);
@@ -272,7 +294,8 @@ while norm(gg)>gtol && check==0 && jit<nit
                     save('m1.mat','x','fval0','nig')
                 end
             end
-            [dum, gg, htol0, igg, hhg, h1, hess_info]=mr_hessian(xparam1,func0,penalty,flagit,htol,hess_info,bounds,prior_std,Save_files,varargin{:});
+            [dum, gg, htol0, igg, hhg, h1, hess_info, fc]=mr_hessian(xparam1,func0,penalty,flagit,htol,hess_info,bounds,prior_std,Save_files,varargin{:});
+            fcount = fcount + fc;
             if isempty(dum)
                 outer_product_gradient=0;
             end
@@ -301,6 +324,7 @@ while norm(gg)>gtol && check==0 && jit<nit
             end
         elseif analytic_derivation
             [~,~,gg,hh]=penalty_objective_function(xparam1,func0,penalty,varargin{:});
+            fcount = fcount + 1;
             hhg=hh;
             H = inv(hh);
         end
@@ -330,16 +354,22 @@ end
 
 if jit==nit
     skipline()
-    disp_verbose('Maximum number of iterations reached',Verbose)
+    message = strcat(message, 'Maximum number of iterations reached.');
+    disp_verbose('Maximum number of iterations reached',Verbose);
+    exitflag = 0;
     skipline()
 end
 
 if norm(gg)<=gtol
-    disp_verbose('Estimation ended:',Verbose)
-    disp_verbose(['Gradient norm < ', num2str(gtol)],Verbose)
+    message = strcat(message, sprintf('Estimation ended: Gradient norm < %s', num2str(gtol)));
+    disp_verbose('Estimation ended:',Verbose);
+    disp_verbose(['Gradient norm < ', num2str(gtol)],Verbose);
+    exitflag = -1;
 end
 if check==1
-    disp_verbose('Estimation successful.',Verbose)
+    message = strcat(message, 'Estimation successful.');
+    exitflag = 1;
+    disp_verbose(message,Verbose)
 end
 
 return

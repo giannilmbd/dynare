@@ -1,5 +1,5 @@
-function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bounds,options,iScale,info,MeanPar,VarCov,varargin)
-
+function [PostMod,PostVar,Scale,PostMean,fcount] = gmhmaxlik_core(ObjFun,xparam1,mh_bounds,options,iScale,info,MeanPar,VarCov,varargin)
+% [PostMod,PostVar,Scale,PostMean,fcount] = gmhmaxlik_core(ObjFun,xparam1,mh_bounds,options,iScale,info,MeanPar,VarCov,varargin)
 % (Dirty) Global minimization routine of (minus) a likelihood (or posterior density) function.
 %
 % INPUTS
@@ -20,6 +20,7 @@ function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bou
 %   o Scale      [double]   scalar specifying the scale parameter that should be used in
 %                           an eventual metropolis-hastings algorithm.
 %   o PostMean   [double]   (p*1) vector, evaluation of the posterior mean.
+%   o fcount     [integer]  scalar, number of function evaluations.
 %
 % ALGORITHM
 %   Metropolis-Hastings with an constantly updated covariance matrix for
@@ -56,7 +57,7 @@ function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bou
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -73,6 +74,7 @@ function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bou
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+fcount = 0;
 npar = length(xparam1);
 
 NumberOfIterations = options.number;
@@ -90,6 +92,7 @@ j = 1; jj  = 1;
 isux = 0; jsux = 0; test = 0;
 ix2 = ModePar;% initial condition!
 ilogpo2 = - feval(ObjFun,ix2,varargin{:});% initial posterior density
+fcount = fcount + 1;
 mlogpo2 = ilogpo2;
 try
     dd = transpose(chol(CovJump));
@@ -100,6 +103,7 @@ while j<=MaxNumberOfTuningSimulations
     proposal = iScale*dd*randn(npar,1) + ix2;
     if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
         logpo2 = - feval(ObjFun,proposal,varargin{:});
+        fcount = fcount + 1;
     else
         logpo2 = -inf;
     end
@@ -145,11 +149,13 @@ set(hh_fig,'Name','Estimation of the posterior covariance...'),
 j = 1;
 isux = 0;
 ilogpo2 = - feval(ObjFun,ix2,varargin{:});
+fcount = fcount + 1;
 while j<= NumberOfIterations
     j = j+1;
     proposal = iScale*dd*randn(npar,1) + ix2;
     if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
         logpo2 = - feval(ObjFun,proposal,varargin{:});
+        fcount = fcount + 1;
     else
         logpo2 = -inf;
     end
@@ -188,11 +194,13 @@ if strcmpi(info,'LastCall')
     isux = 0; jsux = 0;
     test = 0;
     ilogpo2 = - feval(ObjFun,ix2,varargin{:});% initial posterior density
+    fcount = fcount + 1;
     dd = transpose(chol(CovJump));
     while j<=MaxNumberOfTuningSimulations
         proposal = iScale*dd*randn(npar,1) + ix2;
         if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
             logpo2 = - feval(ObjFun,proposal,varargin{:});
+            fcount = fcount + 1;
         else
             logpo2 = -inf;
         end
@@ -241,6 +249,7 @@ if strcmpi(info,'LastCall')
             proposal = iScale*dd*randn(npar,1) + ModePar;
             if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
                 logpo2 = - feval(ObjFun,proposal,varargin{:});
+                fcount = fcount + 1;
             else
                 logpo2 = -inf;
             end
