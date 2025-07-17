@@ -74,7 +74,7 @@ if ncx
     for i=1:ncx
         k1 = estim_params_.corrx(i,1);
         k2 = estim_params_.corrx(i,2);
-        NAME = [M_.exo_names{k1} '_' M_.exo_names{k2}];
+        name = [M_.exo_names{k1} '_' M_.exo_names{k2}];
         oo_.([field_name '_mode']).shocks_corr.(name) = xparam1(ip);
         oo_.([field_name '_std_at_mode']).shocks_corr.(name) = stdh(ip);
         ip = ip+1;
@@ -86,7 +86,7 @@ if ncn
     for i=1:ncn
         k1 = estim_params_.corrn(i,1);
         k2 = estim_params_.corrn(i,2);
-        NAME = [M_.endo_names{k1} '_' M_.endo_names{k2}];
+        name = [M_.endo_names{k1} '_' M_.endo_names{k2}];
         oo_.([field_name '_mode']).measurement_errors_corr.(name) = xparam1(ip);
         oo_.([field_name '_std_at_mode']).measurement_errors_corr.(name) = stdh(ip);
         ip = ip+1;
