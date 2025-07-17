@@ -6,7 +6,7 @@ function inv = norminv (x, m, s)
 %
 %  INV = norminv(X) is equivalent to INV = norminv(X, 0, 1)
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/norminv.m
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 

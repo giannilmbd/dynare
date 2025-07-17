@@ -1,5 +1,5 @@
 function [options_, oo_]=ms_variance_decomposition(M_, options_, oo_)
-% function [options_, oo_]=ms_variance_decomposition(M_, options_, oo_)
+% [options_, oo_]=ms_variance_decomposition(M_, options_, oo_)
 % Markov-switching SBVAR: Variance Decomposition
 %
 % INPUTS
@@ -49,7 +49,7 @@ opt = [opt ' -thin ' num2str(options_.ms.thinning_factor)];
 if options_.ms.regimes
     opt = [opt ' -regimes'];
 elseif options_.ms.regime
-    % regime-1 since regime is 0-indexed in C but 1-indexed in Matlab
+    % regime-1 since regime is 0-indexed in C but 1-indexed in MATLAB
     opt = [opt ' -regime ' num2str(options_.ms.regime-1)];
 elseif options_.ms.filtered_probabilities
     opt = [opt ' -filtered'];

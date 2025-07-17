@@ -1,15 +1,15 @@
 function myoutput = mcmc_diagnostics_core(myinputs,fpar,npar,whoiam, ThisMatlab)
 % function myoutput = mcmc_diagnostics_core(myinputs,fpar,npar,whoiam, ThisMatlab)
 % Computes the Brooks/Gelman (1998) convergence diagnostics, both the
-% parameteric and the non-parameteric versions
+% parametric and the non-parametric versions
 %
 % PARALLEL CONTEXT
 % Core functionality for MCMC Diagnostics, which can be parallelized.
-% See also the comment in posterior_sampler_core.m funtion.
+% See also the comment in posterior_sampler_core.m function.
 %
 %
 % INPUTS
-%   See See the comment in posterior_sampler_core.m funtion.
+%   See See the comment in posterior_sampler_core.m function.
 
 % OUTPUTS
 % o myoutput  [struc]
@@ -19,7 +19,7 @@ function myoutput = mcmc_diagnostics_core(myinputs,fpar,npar,whoiam, ThisMatlab)
 %                               3nd column: within sequence variance
 %                               4nd column: sum of within sequence variances; used to compute mean within sequence variances
 %                               5nd column: within sequence kurtosis
-%                               6nd column: sum of within sequence kurtoses; used to compute mean within sequence kurtoses
+%                               6nd column: sum of within sequence kurtosis; used to compute mean within sequence kurtosis
 %               Averaging to compute mean moments is done in mcmc_diagnostics
 %
 % ALGORITHM

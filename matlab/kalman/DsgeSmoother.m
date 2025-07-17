@@ -8,7 +8,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %   o Y             [double]   (n*T) matrix of data.
 %   o data_index    [cell]      1*smpl cell of column vectors of indices.
 %   o missing_value 1 if missing values, 0 otherwise
-%   o M_            [structure] decribing the model
+%   o M_            [structure] describing the model
 %   o oo_           [structure] storing the results
 %   o options_      [structure] describing the options
 %   o bayestopt_    [structure] describing the priors
@@ -46,7 +46,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 % Notes:
 %   m:  number of endogenous variables (M_.endo_nbr)
 %   T:  number of Time periods (options_.nobs)
-%   r:  number of strucural shocks (M_.exo_nbr)
+%   r:  number of structural shocks (M_.exo_nbr)
 %   n:  number of observables (length(options_.varobs))
 %   K:  maximum forecast horizon (max(options_.nk))
 %
@@ -515,7 +515,7 @@ else
             tstart = 1;
         else
             % we enter here in the first occbin smoother iteration
-            % occbin kalman update is not yet able to accommodate diffuse steps!
+            % occbin Kalman update is not yet able to accommodate diffuse steps!
             tstart=d+2; 
         end
         for k=2:gend+1
@@ -711,7 +711,7 @@ function a=set_Kalman_smoother_starting_values(a,M_,oo_,options_)
 %
 % INPUTS
 %   o a             [double]   (p*1) vector of states
-%   o M_            [structure] decribing the model
+%   o M_            [structure] describing the model
 %   o oo_           [structure] storing the results
 %   o options_      [structure] describing the options
 %

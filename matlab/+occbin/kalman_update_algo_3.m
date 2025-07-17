@@ -20,13 +20,13 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % - RR              [N by N_exo by 2]       shock impact matrix at t-1:t
 % - CC              [N by 2]                state space constant state transition matrix at t-1:t
 % - regimes0        [structure]             regime info at t-1:t
-% - M_              [structure]             Matlab's structure describing the model (M_).
-% - options_        [structure]             Matlab's structure describing the current options (options_).
+% - M_              [structure]             MATLAB's structure describing the model (M_).
+% - options_        [structure]             MATLAB's structure describing the current options (options_).
 % - dr                   [structure]        Reduced form model.
 % - endo_steady_state    [vector]           steady state value for endogenous variables
 % - exo_steady_state     [vector]           steady state value for exogenous variables
 % - exo_det_steady_state [vector]           steady state value for exogenous deterministic variables
-% - occbin_options_ [structure]             Matlab's structure describing the Occbin options.
+% - occbin_options_ [structure]             MATLAB's structure describing the OccBin options.
 % - kalman_tol      [double]                tolerance for reciprocal condition number
 % - nk              [double]                number of forecasting periods
 % 
@@ -43,7 +43,7 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % - CC              [N by 2]                state space constant state transition matrix at t-1:t
 % - regimes_        [structure]             regime info at t-1:t
 % - error_flag      [structure]             error flag
-% - M_              [structure]             Matlab's structure describing the model (M_).
+% - M_              [structure]             MATLAB's structure describing the model (M_).
 % - alphahat:                               smoothed variables (a_{t|T})
 % - etahat:                                 smoothed shocks
 % - TT              [N by N by 2]           state transition matrix at t-1:t

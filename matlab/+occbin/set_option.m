@@ -1,14 +1,14 @@
 function options_=set_option(options_,options_occbin_,fieldname)
 % function options_=set_option(options_,options_occbin_,fieldname)
-% Set local option for Occbin
+% Set local option for OccBin
 %
 % Inputs:
-% - options_            [structure]     Matlab's structure containing the options
-% - options_occbin_     [structure]     Matlab's structure containing Occbin options
+% - options_            [structure]     MATLAB's structure containing the options
+% - options_occbin_     [structure]     MATLAB's structure containing OccBin options
 % - fieldname           [string]        name of the options field to set 
 %
 % Outputs:
-% - options_            [structure]     Matlab's structure containing the options
+% - options_            [structure]     MATLAB's structure containing the options
 
 % Copyright © 2021 Dynare Team
 %

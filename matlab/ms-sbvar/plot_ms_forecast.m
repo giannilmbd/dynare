@@ -1,6 +1,6 @@
 function plot_ms_forecast(M_, options_, forecast, figure_name)
 % function plot_ms_forecast(M_, options_, forecast, figure_name)
-% plots the forecast from the output from a ms-sbvar
+% plots the forecast from the output from a MS-SBVAR
 %
 % INPUTS
 %    M_:          (struct)    model structure

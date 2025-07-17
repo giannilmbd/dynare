@@ -2,10 +2,10 @@ function graph(M_, options_, options_occbin_, oo_, var_list)
 % function graph(M_, options_, options_occbin_, oo_, var_list)
 %
 % Inputs:
-% - M_                  [structure]     Matlab's structure describing the model
-% - options_            [structure]     Matlab's structure containing the options
-% - options_occbin_     [structure]     Matlab's structure containing Occbin options
-% - oo_                 [structure]     Matlab's structure containing the results
+% - M_                  [structure]     MATLAB's structure describing the model
+% - options_            [structure]     MATLAB's structure containing the options
+% - options_occbin_     [structure]     MATLAB's structure containing OccBin options
+% - oo_                 [structure]     MATLAB's structure containing the results
 % - var_list            [char]          list of the variables to plot 
 
 % Copyright © 2021-2023 Dynare Team
@@ -69,7 +69,7 @@ if number_of_plots_to_draw_exo>0
         if ~isempty(temp_index)
             exo_index(ii)=temp_index;
         else
-            error('%s was not part of the shocks for Occbin.', var_list{i_var_exo(ii)});
+            error('%s was not part of the shocks for OccBin.', var_list{i_var_exo(ii)});
         end
     end
     data_to_plot(:,end+1:end+number_of_plots_to_draw_exo,1)=[oo_.occbin.simul.shocks_sequence(:,exo_index); zeros(nperiods-size(oo_.occbin.simul.shocks_sequence,1),number_of_plots_to_draw_exo)];
@@ -79,7 +79,7 @@ end
 [nbplt,nr,nc,lr,lc,nstar] = pltorg(number_of_plots_to_draw_endo+number_of_plots_to_draw_exo);
 
 for fig = 1:nbplt
-    hh_fig = dyn_figure(options_.nodisplay,'Name',['Occbin simulated paths, figure ' int2str(fig)]);
+    hh_fig = dyn_figure(options_.nodisplay,'Name',['OccBin simulated paths, figure ' int2str(fig)]);
     for plt = 1:nstar
         if fig==nbplt && ~lr==0
             subplot(lr,lc,plt);

@@ -1,10 +1,11 @@
 function [z,zss]=dyn2vec(M_, oo_, options_, s1, s2)
 % function [z,zss]=dyn2vec(M_, oo_, options_, s1, s2)
-% Takes Dynare variables from oo_.endo_simul and copies them into matlab global vectors
+% Takes Dynare variables from oo_.endo_simul and copies them into MATLAB
+% base workspace
 %
 % INPUTS
 %    s1:    subset of variables to be saved
-%    s2:    optional parameter, copies Dynare variables (s1) in matlab ones (s2)
+%    s2:    optional parameter, copies Dynare variables (s1) in MATLAB ones (s2)
 %
 % OUTPUTS
 %    z:     subset of oo_.endo_simul

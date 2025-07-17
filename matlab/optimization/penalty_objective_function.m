@@ -5,8 +5,8 @@ function [fval, exit_flag, arg1, arg2] = penalty_objective_function(x, fcn, base
 % INPUTS
 % - x             [double]    n*1 vector of instrument values.
 % - fcn           [fhandle]   objective function.
-% - base_penalty  [double]    scalar, base of the penality (typically the value of the objective at the previous iteration).
-% - varagin       [cell]      additional parameters for fcn.
+% - base_penalty  [double]    scalar, base value of the penalty (typically the value of the objective at the previous iteration).
+% - varargin      [cell]     additional parameters for fcn.
 %
 % OUTPUTS
 % - fval          [double]    scalar, value of the objective function at x.

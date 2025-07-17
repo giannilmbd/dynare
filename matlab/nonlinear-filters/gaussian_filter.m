@@ -17,11 +17,11 @@ function [LIK,lik] = gaussian_filter(ReducedForm, Y, start, ParticleOptions, Thr
 % since predictive and filtered densities are unimodal.
 %
 % INPUTS
-%    Reduced_Form     [structure] Matlab's structure describing the reduced form model.
+%    Reduced_Form     [structure] MATLAB's structure describing the reduced form model.
 %    Y                [double]    matrix of original observed variables.
 %    start            [double]    structural parameters.
-%    ParticleOptions  [structure] Matlab's structure describing options concerning particle filtering.
-%    ThreadsOptions   [structure] Matlab's structure.
+%    ParticleOptions  [structure] MATLAB's structure describing options concerning particle filtering.
+%    ThreadsOptions   [structure] MATLAB's structure.
 %
 % OUTPUTS
 %    LIK        [double]    scalar, likelihood
@@ -30,7 +30,7 @@ function [LIK,lik] = gaussian_filter(ReducedForm, Y, start, ParticleOptions, Thr
 % REFERENCES
 %
 % NOTES
-%   The vector "lik" is used to evaluate the jacobian of the likelihood.
+%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
 % Copyright © 2009-2019 Dynare Team
 %

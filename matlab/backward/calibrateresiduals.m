@@ -7,12 +7,12 @@ function [residuals, info] = calibrateresiduals(dbase, info, M_)
 %
 % INPUTS
 % - dbase       [dseries]   Object containing all the endogenous and observed exogenous variables.
-% - info        [struct]    Informations about the residuals.
+% - info        [struct]    Information about the residuals.
 % - M_          [struct]    M_ as produced by the preprocessor.
 %
 % OUTPUTS
 % - residuals   [dseries]   Object containing the identified residuals.
-% - info        [struct]    Informations about the residuals.
+% - info        [struct]    Information about the residuals.
 %
 % REMARKS
 % The first two input arguments are the output of checkdatabaseforinversion

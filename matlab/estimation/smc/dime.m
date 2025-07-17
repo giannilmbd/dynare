@@ -11,7 +11,7 @@ function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_
 % - init_x                  [double]   p×1 vector of parameters to be estimated (initial values, not used).
 % - mh_bounds               [double]   p×2 matrix defining lower and upper bounds for the parameters.
 % - dataset_                [dseries]  sample
-% - dataset_info            [struct]   informations about the dataset
+% - dataset_info            [struct]   information about the dataset
 % - options_                [struct]   Dynare's options
 % - M_                      [struct]   model description
 % - estim_params_           [struct]   estimated parameters
@@ -133,7 +133,7 @@ function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_
             q(xchnge,:) = xcand;
             factors(xchnge) = lprop_old - lprop_new;
 
-            % Metropolis-Hasings 
+            % Metropolis-Hastings 
             newlprob = log_prob_fun(funobj, Prior, bounds, opts.parallel, q);
             lnpdiff = factors + newlprob - lprob(idcur);
             accepted = lnpdiff > log(rand(cursize,1));
@@ -197,7 +197,7 @@ end
 
 function nbounds = check_bounds(Prior, bounds)
 
-    % ensure that prior is continous at bounds
+    % ensure that prior is continuous at bounds
     nbounds = bounds;
     prior_at_mean = Prior.density(Prior.mean);
     dim = length(Prior.mean);

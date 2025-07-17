@@ -1,10 +1,10 @@
 function myoutput=prior_posterior_statistics_core(myinputs,fpar,B,whoiam, ThisMatlab)
 % PARALLEL CONTEXT
 % Core functionality for prior_posterior.m function, which can be parallelized.
-% See also the comment in posterior_sampler_core.m funtion.
+% See also the comment in posterior_sampler_core.m function.
 %
 % INPUTS
-%   See the comment in posterior_sampler_core.m funtion.
+%   See the comment in posterior_sampler_core.m function.
 %
 % OUTPUTS
 % o myoutput  [struc]

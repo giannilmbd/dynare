@@ -4,8 +4,8 @@ function irf_shocks_indx=getIrfShocksIndx(M_, options_)
 % generation using the irf_shocks-command
 %
 % Inputs:
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
+% - M_            [structure]     MATLAB's structure describing the model
+% - options_      [structure]     MATLAB's structure describing the current options
 % Outputs:
 % - irf_shocks_indx: [1 by n_irf_shocks] vector storing the indices
 %

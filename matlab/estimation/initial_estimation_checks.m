@@ -6,7 +6,7 @@ function oo_ = initial_estimation_checks(objective_function,xparam1,dataset_,dat
 %   objective_function  [function handle] of the objective function
 %   xparam1             [vector] of parameters to be estimated
 %   dataset_            [dseries] object storing the dataset
-%   dataset_info        [structure] storing informations about the sample.
+%   dataset_info        [structure] storing information about the sample.
 %   M_                  [structure] describing the model
 %   estim_params_       [structure] characterizing parameters to be estimated
 %   options_            [structure] describing the options
@@ -78,22 +78,22 @@ end
 
 if options_.occbin.likelihood.status || options_.occbin.smoother.status
     if options_.prefilter
-        error('initial_estimation_checks:: Occbin is incompatible with the prefilter option due to the sample mean generally not corresponding to the steady state with an occasionally binding constraint.')
+        error('initial_estimation_checks:: OccBin is incompatible with the prefilter option due to the sample mean generally not corresponding to the steady state with an occasionally binding constraint.')
     end
     if ~options_.occbin.likelihood.inversion_filter && (options_.kalman_algo==2 || options_.kalman_algo==4)
-        error('initial_estimation_checks:: Occbin is incompatible with the selected univariate Kalman filter.')        
+        error('initial_estimation_checks:: OccBin is incompatible with the selected univariate Kalman filter.')        
     end
     if options_.fast_kalman_filter
-        error('initial_estimation_checks:: Occbin is incompatible with the fast Kalman filter.')        
+        error('initial_estimation_checks:: OccBin is incompatible with the fast Kalman filter.')        
     end
     if options_.bayesian_irf
-        error('initial_estimation_checks:: Occbin is incompatible with the bayesian_irf option.')                
+        error('initial_estimation_checks:: OccBin is incompatible with the bayesian_irf option.')                
     end
     if options_.moments_varendo
-        error('initial_estimation_checks:: Occbin is incompatible with the moments_varendo option.')                
+        error('initial_estimation_checks:: OccBin is incompatible with the moments_varendo option.')                
     end
     if options_.forecast
-        error('initial_estimation_checks:: Occbin is incompatible with the forecast option.')
+        error('initial_estimation_checks:: OccBin is incompatible with the forecast option.')
     end
 end
 

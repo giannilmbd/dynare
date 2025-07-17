@@ -138,7 +138,7 @@ if ncn
         k1 = estim_params_.corrn(i,1);
         k2 = estim_params_.corrn(i,2);
         bayestopt_.name(baseid+i) = {sprintf('corr %s, %s', M_.endo_names{k1}, M_.endo_names{k2})};
-        % find correspondence to varobs to construct H in set_all_paramters
+        % find correspondence to varobs to construct H in set_all_parameters
         obsi1 = strmatch(M_.endo_names{k1}, options_.varobs, 'exact');
         obsi2 = strmatch(M_.endo_names{k2}, options_.varobs, 'exact');
         % save correspondence

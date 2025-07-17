@@ -1,6 +1,6 @@
 function aggregate(ofile, dynopt, rootfolder, varargin)
 
-% Agregates cherry-picked models.
+% Aggregates cherry-picked models.
 
 % Copyright © 2019-2023 Dynare Team
 %
@@ -35,7 +35,7 @@ if ~isempty(dynopt)
         end
         firstline = sprintf('%s %s', firstline, '+--');
     else
-        error('Second argument has to be a cell array (list of options for dynare preprocessor).')
+        error('Second argument has to be a cell array (list of options for Dynare preprocessor).')
     end
 else
     firstline = '';

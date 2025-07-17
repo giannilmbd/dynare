@@ -1,15 +1,15 @@
 function [M_, options_] = setup(M_,options_, options_occbin_)
 % function [M_, options_] = setup(M_, options_, options_occbin_)
-% Sets up run of Occbin: creates shock matrix, sets options
+% Sets up run of OccBin: creates shock matrix, sets options
 %
 % INPUT:
-% - M_                  [structure]     Matlab's structure describing the model
-% - options_            [structure]     Matlab's structure containing the options
-% - options_occbin_     [structure]     Matlab's structure containing Occbin options
+% - M_                  [structure]     MATLAB's structure describing the model
+% - options_            [structure]     MATLAB's structure containing the options
+% - options_occbin_     [structure]     MATLAB's structure containing OccBin options
 %
 % OUTPUT:
-% - M_                  [structure]     Matlab's structure describing the model
-% - options_occbin_     [structure]     Matlab's structure containing Occbin options
+% - M_                  [structure]     MATLAB's structure describing the model
+% - options_occbin_     [structure]     MATLAB's structure containing OccBin options
 
 % Copyright © 2021 Dynare Team
 %

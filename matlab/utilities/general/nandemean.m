@@ -10,13 +10,13 @@ function c = nandemean(x)
 %! @strong{Inputs}
 %! @table @var
 %! @item x
-%! Matlab matrix (T-by-N).
+%! MATLAB matrix (T-by-N).
 %! @end table
 %! @sp 2
 %! @strong{Outputs}
 %! @table @var
 %! @item c
-%! Matlab matrix (T-by-N). The demeaned x matrix.
+%! MATLAB matrix (T-by-N). The demeaned x matrix.
 %! @end table
 %! @sp 2
 %! @strong{This function is called by:}

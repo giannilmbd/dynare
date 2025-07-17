@@ -40,7 +40,7 @@ nvar = length(ivar);
 
 folder_name=get_posterior_folder_name(options_);
 
-% Get informations about the _posterior_draws files.
+% Get information about the _posterior_draws files.
 if strcmpi(type,'posterior')
     CorrFileNumber = length(dir([M_.dname filesep folder_name filesep M_.fname '_PosteriorCorrelations*']));
 elseif strcmpi(type,'prior')

@@ -3,9 +3,9 @@ function irfs = irf(M_,oo_,options_)
 % Calls a minimizer
 %
 % INPUTS
-% - M_                  [structure]     Matlab's structure describing the model
-% - oo_                 [structure]     Matlab's structure containing the results
-% - options_            [structure]     Matlab's structure describing the current options
+% - M_                  [structure]     MATLAB's structure describing the model
+% - oo_                 [structure]     MATLAB's structure containing the results
+% - options_            [structure]     MATLAB's structure describing the current options
 %
 % OUTPUTS
 % - irfs                [structure]     IRF results

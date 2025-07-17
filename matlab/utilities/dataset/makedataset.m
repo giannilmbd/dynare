@@ -12,7 +12,7 @@ function [dataset_, dataset_info, newdatainterface] = makedataset(options_, init
 % =======
 %
 %     dataset_       [dseries]  The dataset.
-%     dataset_info   [struct]   Various informations about the dataset (descriptive statistics and missing observations).
+%     dataset_info   [struct]   Various information about the dataset (descriptive statistics and missing observations).
 %
 % EXAMPLE
 % =======
@@ -144,14 +144,14 @@ if options_.loglinear && ~options_.logdata
     dataset_ = dataset_.log();
 end
 
-% Test if an initial period (different from its default value) is explicitely defined in the datafile.
+% Test if an initial period (different from its default value) is explicitly defined in the datafile.
 if isequal(dataset_.init, dates(1,1))
     dataset_default_initial_period = 1;
 else
     dataset_default_initial_period = 0;
 end
 
-%  Test if an initial period (different from its default value) is explicitely defined in the mod file with the set_time command.
+%  Test if an initial period (different from its default value) is explicitly defined in the mod file with the set_time command.
 if ~isdates(options_.initial_period) && isnan(options_.initial_period)
     set_time_default_initial_period = 1;
 else

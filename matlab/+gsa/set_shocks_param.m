@@ -2,11 +2,11 @@ function M_=set_shocks_param(M_,estim_params_,xparam1)
 % function M_=set_shocks_param(M_,estim_params_,xparam1)
 % Set the structural and measurement error variances and covariances
 % Inputs
-%  - M_                     [structure]     Matlab's structure describing the model
+%  - M_                     [structure]     MATLAB's structure describing the model
 %  - estim_params_          [structure]     characterizing parameters to be estimated
 %  - xparam1                [double]        parameter vector
 % Outputs:
-%  - M_                     [structure]     Matlab's structure describing the model
+%  - M_                     [structure]     MATLAB's structure describing the model
 %
 % Notes: closely follows set_all_parameters.m
 

@@ -4,7 +4,7 @@ function inv = stdnormal_inv (x)
 %  For each component of X, compute the quantile (the inverse of the
 %  CDF) at X of the standard normal distribution.
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/stdnormal_inv.m
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 

@@ -105,7 +105,7 @@ if ismember('simulate', varargin) % Prior simulations (BK).
     disp(['BK indeterminacy share                = ' num2str(results.bk.indeterminacy_share)])
     disp(['BK unstability share                  = ' num2str(results.bk.unstability_share)])
     disp(['BK singularity share                  = ' num2str(results.bk.singularity_share)])
-    disp(['Complex jacobian share                = ' num2str(results.jacobian.problem_share)])
+    disp(['Complex Jacobian share                = ' num2str(results.jacobian.problem_share)])
     disp(['mjdgges crash share                   = ' num2str(results.dll.problem_share)])
     disp(['Steady state problem share            = ' num2str(results.ss.problem_share)])
     disp(['Complex steady state share            = ' num2str(results.ss.complex_share)])

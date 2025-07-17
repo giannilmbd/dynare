@@ -1,5 +1,5 @@
 function [fh,xh,gh,H,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,Verbose,Save_files,varargin)
-%[fhat,xhat,ghat,Hhat,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,varargin)
+%[fhat,xhat,ghat,H,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,method,epsilon,Verbose,Save_files,varargin)
 % Inputs:
 %   fcn:    [string]        string naming the objective function to be minimized
 %   x0:     [npar by 1]     initial value of the parameter vector
@@ -17,7 +17,7 @@ function [fh,xh,gh,H,itct,fcount,retcodeh] = csminwel1(fcn,x0,H0,grad,crit,nit,m
 %
 %        Note that if the program ends abnormally, it is possible to retrieve the current x,
 %        f, and H from the files g1.mat and H.mat that are written at each iteration and at each
-%        hessian update, respectively.  (When the routine hits certain kinds of difficulty, it
+%        Hessian update, respectively.  (When the routine hits certain kinds of difficulty, it
 %        writes g2.mat and g3.mat as well. If all were written at about the same time, any of them
 %        may be a decent starting point. One can also start from the one with best function value.)
 %
@@ -86,7 +86,7 @@ end
 %tailstr = ')';
 %stailstr = [];
 % Lines below make the number of Pi's optional.  This is inefficient, though, and precludes
-% use of the matlab compiler.  Without them, we use feval and the number of Pi's must be
+% use of the MATLAB compiler.  Without them, we use feval and the number of Pi's must be
 % changed with the editor for each application.  Places where this is required are marked
 % with ARGLIST comments
 %for i=nargin-6:-1:1

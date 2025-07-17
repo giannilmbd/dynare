@@ -8,15 +8,20 @@ function  [par, logpost, accepted, neval] = posterior_sampler_iteration(TargetFu
 %   last_draw:              parameter vector in last iteration
 %   last_posterior:         value of the posterior in last iteration
 %   sampler_options:        posterior sampler options
-%   dataset_:               the dataset after required transformation
-%   dataset_info:           Various informations about the dataset (descriptive statistics and missing observations).
-%   options_:               structure storing the options
-%   M_:                     structure storing the model information
-%   estim_params_:          structure storing information about estimated parameters
-%   bayestopt_:             structure storing information about priors
-%   mh_bounds:              structure containing prior bounds
-%   oo_:                    structure storing the results
-%
+%   varargin, usually containing:
+%       dataset_:               the dataset after required transformation
+%       dataset_info:           Various information about the dataset (descriptive statistics and missing observations).
+%       options_:               structure storing the options
+%       M_:                     structure storing the model information
+%       estim_params_:          structure storing information about estimated parameters
+%       bayestopt_:             structure storing information about priors
+%       mh_bounds:              structure containing prior bounds
+%       dr                  [structure]     Reduced form model.
+%       endo_steady_state   [vector]        steady state value for endogenous variables
+%       exo_steady_state    [vector]        steady state value for exogenous variables
+%       exo_det_steady_state [vector]       steady state value for exogenous deterministic variables
+%       derivatives_info    [structure]     derivative info for identification
+% 
 % OUTPUTS
 %   par:                    last accepted parameter vector
 %   logpost:                value of the posterior after current iteration

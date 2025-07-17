@@ -22,9 +22,9 @@ function dsmh(TargetFun, xparam1, mh_bounds, dataset_, dataset_info, options_, M
 % The most computationally intensive part of this function may be executed
 % in parallel. The code suitable to be executed in
 % parallel on multi core or cluster machine (in general a 'for' cycle)
-% has been removed from this function and been placed in the posterior_sampler_core.m funtion.
+% has been removed from this function and been placed in the posterior_sampler_core.m function.
 %
-% The DYNARE parallel packages comprise a i) set of pairs of Matlab functions that can be executed in
+% The DYNARE parallel packages comprise a i) set of pairs of MATLAB functions that can be executed in
 % parallel and called name_function.m and name_function_core.m and ii) a second set of functions used
 % to manage the parallel computations.
 %
@@ -68,7 +68,7 @@ for i=2:options_.posterior_sampler_options.dsmh.H
     disp('');
     disp('Tempered iteration');
     disp(i) ;
-    % Step 1: sort the densities and compute IS weigths
+    % Step 1: sort the densities and compute IS weights
     [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1,loglik,param) ;
     [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param,tlogpost_iminus1,loglik,lambda,i,zhat,ESS) ;
     % Step 2: tune c_i
@@ -116,11 +116,6 @@ bandwidth = 0;                    % Rule of thumb optimal bandwidth parameter.
 kernel_function = 'gaussian';     % Gaussian kernel for Fast Fourier Transform approximation.
 
 plt = 1 ;
-%for plt = 1:nbplt,
-if TeX
-    NAMES = [];
-    TeXNAMES = [];
-end
 hh_fig = dyn_figure(options_.nodisplay,'Name','Parameters Densities');
 for k=1:npar %min(nstar,npar-(plt-1)*nstar)
     subplot(ceil(sqrt(npar)),floor(sqrt(npar)),k)

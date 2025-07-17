@@ -162,7 +162,7 @@ end
 
 dyn_waitbar_close(hh_fig);
 
-% Get informations about BK conditions and other things...
+% Get information about BK conditions and other things...
 results.bk.indeterminacy_share = count_bk_indeterminacy/loop_indx;
 results.bk.unstability_share = count_bk_unstability/loop_indx;
 results.bk.singularity_share = count_bk_singularity/loop_indx;

@@ -4,13 +4,13 @@ function [fval,info,exit_flag,DLIK,Hess,ys,trend_coeff,M_,options_,bayestopt_,dr
 %
 % INPUTS
 % - xparam1                 [double]              n×1 vector, estimated parameters.
-% - dataset_                [struct]              Matlab's structure containing the dataset
-% - dataset_info            [struct]              Matlab's structure describing the dataset
-% - options_                [struct]              Matlab's structure describing the options
-% - M_                      [struct]              Matlab's structure describing the M_
-% - estim_params_           [struct]              Matlab's structure describing the estimated_parameters
-% - bayestopt_              [struct]              Matlab's structure describing the priors
-% - BoundsInfo              [struct]              Matlab's structure specifying the bounds on the paramater values
+% - dataset_                [struct]              MATLAB's structure containing the dataset
+% - dataset_info            [struct]              MATLAB's structure describing the dataset
+% - options_                [struct]              MATLAB's structure describing the options
+% - M_                      [struct]              MATLAB's structure describing the M_
+% - estim_params_           [struct]              MATLAB's structure describing the estimated_parameters
+% - bayestopt_              [struct]              MATLAB's structure describing the priors
+% - BoundsInfo              [struct]              MATLAB's structure specifying the bounds on the parameter values
 % - dr                      [structure]           Reduced form model.
 % - endo_steady_state       [vector]              steady state value for endogenous variables
 % - exo_steady_state        [vector]              steady state value for exogenous variables
@@ -18,7 +18,7 @@ function [fval,info,exit_flag,DLIK,Hess,ys,trend_coeff,M_,options_,bayestopt_,dr
 %
 % OUTPUTS
 % - fval                    [double]              scalar, value of the likelihood or posterior kernel.
-% - info                    [integer]             4×1 vector, informations resolution of the model and evaluation of the likelihood.
+% - info                    [integer]             4×1 vector, information on whether solution and likelihood could be computed
 % - exit_flag               [integer]             scalar, equal to 1 (no issues when evaluating the likelihood) or 0 (not able to evaluate the likelihood).
 % - DLIK                    [double]              Empty array.
 % - Hess                    [double]              Empty array.
@@ -109,7 +109,7 @@ end
 % Define a vector of indices for the observed variables. Is this really usefull?...
 bayestopt_.mf = bayestopt_.mf1;
 
-% Get needed informations for kalman filter routines.
+% Get needed information for Kalman filter routines.
 start = options_.presample+1;
 Y = transpose(dataset_.data);
 

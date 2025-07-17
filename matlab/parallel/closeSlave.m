@@ -1,8 +1,8 @@
 function closeSlave(Parallel,TmpFolder,partial)
 % PARALLEL CONTEXT
-% In parallel context, this utility closes all remote matlab instances
+% In parallel context, this utility closes all remote MATLAB instances
 % called by masterParallel when strategy (1) is active i.e. always open (which leaves
-% open remote matlab instances).
+% open remote MATLAB instances).
 %
 % INPUTS
 %  o Parallel [struct vector]   copy of options_.parallel.

@@ -3,10 +3,10 @@ function c = options2cell(o)
 % Converts an option structure as a cell of NAME and VALUE pairs.
 %
 % INPUTS
-%  o o       matlab's structure holding a set of options (each field name is the name of an option and the associated content is the value of the option).
+%  o o       MATLAB's structure holding a set of options (each field name is the name of an option and the associated content is the value of the option).
 %
 % OUTPUTS
-%  o c       matlab's cell row array of the form {NAME1, VALUE1, NAME2, VALUE2, NAME3, VALUE3, ...}.
+%  o c       MATLAB's cell row array of the form {NAME1, VALUE1, NAME2, VALUE2, NAME3, VALUE3, ...}.
 
 % Copyright © 2013-2017 Dynare Team.
 %

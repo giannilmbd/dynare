@@ -6,7 +6,7 @@ function cdf = normcdf (x, m, s)
 %
 %  CDF = normcdf(X) is equivalent to CDF = normcdf(X, 0, 1)
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/normcdf.m
 % Original author: TT <Teresa.Twaroch@ci.tuwien.ac.at>
 

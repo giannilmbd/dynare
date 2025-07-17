@@ -3,7 +3,7 @@ function objects = get_variables_and_parameters_in_expression(expr)
 % Returns the variables and parameters appearing in an expression.
 %
 % INPUTS
-% - expr       [char]             1×m char array, dynare model expression (typically RHS or LHS of an equation).
+% - expr       [char]             1×m char array, Dynare model expression (typically RHS or LHS of an equation).
 %
 % OUTPUTS
 % - objects    [cell]             cell of row char arrays, names of the variables and parameters in expr.

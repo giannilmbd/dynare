@@ -3,8 +3,8 @@ function display_unconditional_variance_decomposition(M_,options_,oo_,ivar,stati
 % This function displays the unconditional variance decomposition 
 %
 % INPUTS
-%   M_                  [struct]        Matlab's structure describing the Model (initialized by dynare, see @ref{M_}).          
-%   options_            [struct]        Matlab's structure describing the options (initialized by dynare, see @ref{options_}).
+%   M_                  [struct]        MATLAB's structure describing the Model
+%   options_            [struct]        MATLAB's structure describing the options
 %   oo_                 [struct]        structure describing the Model
 %   i_var               [double]        Index of requested variables in declaration order
 %   stationary_vars     [double]        index of stationary vars in requested output

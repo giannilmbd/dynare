@@ -5,7 +5,7 @@ function pdf = betapdf (x, a, b)
 %  mean of the distribution is A/(A+B) and variance is
 %  A*B/(A+B)^2/(A+B+1) ).
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/betapdf.m
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 % Modified by Michel Juillard <michel.juillard@mjui.fr> for large values of a and b

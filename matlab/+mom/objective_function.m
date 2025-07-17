@@ -22,11 +22,11 @@ function [fval, info, exit_flag, df, junk_hessian, Q, model_moments, model_momen
 %  - fval:                         [double]  value of the quadratic form of the moment difference (except for lsqnonlin, where this is done implicitly)
 %  - info:                         [vector]  information on error codes and penalties
 %  - exit_flag:                    [double]  flag for exit status (0 if error, 1 if no error)
-%  - df:                           [matrix]  analytical jacobian of the moment difference (wrt paramters), currently for GMM only
+%  - df:                           [matrix]  analytical Jacobian of the moment difference (wrt parameters), currently for GMM only
 %  - junk_hessian:                 [matrix]  empty matrix required for optimizer interface (Hessian would typically go here)
 %  - Q:                            [double]  value of the quadratic form of the moment difference
 %  - model_moments:                [vector]  model moments
-%  - model_moments_params_derivs:  [matrix]  analytical jacobian of the model moments wrt estimated parameters (currently for GMM only)
+%  - model_moments_params_derivs:  [matrix]  analytical Jacobian of the model moments wrt estimated parameters (currently for GMM only)
 %  - irf_model_varobs:             [matrix]  model IRFs for observable variables (used for plotting matched IRfs in mom.run)
 % -------------------------------------------------------------------------
 % This function is called by
@@ -151,7 +151,7 @@ if strcmp(options_mom_.mom.mom_method,'GMM')
         if ~isempty(estim_params_.var_exo)
             indpstderr = estim_params_.var_exo(:,1); % values correspond to varexo declaration order, row number corresponds to order in estimated_params
         end
-        indpcorr=[]; % initialize matrix for corr paramters
+        indpcorr=[]; % initialize matrix for corr parameters
         if ~isempty(estim_params_.corrx)
             indpcorr = estim_params_.corrx(:,1:2); % values correspond to varexo declaration order, row number corresponds to order in estimated_params
         end

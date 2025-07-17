@@ -13,7 +13,7 @@ function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, s
 %   y_index_eq          [vector of int] The index of the endogenous variables of
 %                                       the block
 %   nze                 [integer]       number of non-zero elements in the
-%                                       jacobian matrix
+%                                       Jacobian matrix
 %   periods             [integer]       number of simulation periods
 %   is_linear           [logical]       whether the block is linear
 %   Block_Num           [integer]       block number
@@ -21,7 +21,7 @@ function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, s
 %   maxit_              [integer]       maximum number of iteration in Newton
 %   solve_tolf          [double]        convergence criteria
 %   cutoff              [double]        cutoff to correct the direction in Newton in case
-%                                       of singular jacobian matrix
+%                                       of singular Jacobian matrix
 %   stack_solve_algo    [integer]       linear solver method used in the Newton algorithm
 %   is_forward          [logical]       Whether the block has to be solved forward
 %                                       If false, the block is solved backward
@@ -130,7 +130,7 @@ for it_=start:incr:finish
                                 continue
                             else
                                 if verbose
-                                    disp('The singularity of the jacobian matrix could not be corrected')
+                                    disp('The singularity of the Jacobian matrix could not be corrected')
                                 end
                                 success = false;
                                 return

@@ -1,21 +1,21 @@
 function n = ndim(x)
-% Report the number of non singleton dimensions of a matlab array.
+% Report the number of non singleton dimensions of a MATLAB array.
 
 %@info:
 %! @deftypefn {Function File} {@var{n} =} ndim (@var{x})
 %! @anchor{ndim}
-%! This function reports the number of non singleton dimensions of a matlab array.
+%! This function reports the number of non singleton dimensions of a MATLAB array.
 %!
 %! @strong{Inputs}
 %! @table @var
 %! @item x
-%! Matlab array.
+%! MATLAB array.
 %! @end table
 %!
 %! @strong{Outputs}
 %! @table @var
 %! @item n
-%! Integer scalar. The number of non singleton dimensions of a matlab array.
+%! Integer scalar. The number of non singleton dimensions of a MATLAB array.
 %! @end table
 %!
 %! @strong{This function is called by:}

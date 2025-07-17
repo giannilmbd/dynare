@@ -5,17 +5,17 @@ function oo_=display_estimation_results_table(xparam1,stdh,M_,options_,estim_par
 % INPUTS
 %   o xparam1       [double]   (p*1) vector of estimate parameters.
 %   o stdh          [double]   (p*1) vector of estimate parameters.
-%   o M_                        Matlab's structure describing the Model (initialized by dynare, see @ref{M_}).
-%   o estim_params_             Matlab's structure describing the estimated_parameters (initialized by dynare, see @ref{estim_params_}).
-%   o options_                  Matlab's structure describing the options (initialized by dynare, see @ref{options_}).
-%   o bayestopt_                Matlab's structure describing the priors (initialized by dynare, see @ref{bayesopt_}).
-%   o oo_                       Matlab's structure gathering the results (initialized by dynare, see @ref{oo_}).
+%   o M_                        MATLAB's structure describing the Model
+%   o estim_params_             MATLAB's structure describing the estimated_parameters
+%   o options_                  MATLAB's structure describing the options
+%   o bayestopt_                MATLAB's structure describing the priors
+%   o oo_                       MATLAB's structure gathering the results
 %   o pnames        [string]    Cell of strings storing the names for prior distributions
 %   o table_title   [string]    Title of the Table
 %   o field_name    [string]    String storing the name of the fields for oo_ where the parameters are stored
 %
 % OUTPUTS
-%   o oo_                       Matlab's structure gathering the results
+%   o oo_                       MATLAB's structure gathering the results
 %
 % SPECIAL REQUIREMENTS
 %   None.

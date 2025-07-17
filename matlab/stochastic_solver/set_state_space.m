@@ -14,16 +14,16 @@ function dr=set_state_space(dr,M_)
 %! @sp 1
 %! @table @ @var
 %! @item dr
-%! Matlab's structure describing decision and transition rules.
+%! MATLAB's structure describing decision and transition rules.
 %! @item M_
-%! Matlab's structure describing the model (initialized by dynare, see @ref{M_})
+%! MATLAB's structure describing the model
 %! @end table
 %! @sp 2
 %! @strong{Outputs}
 %! @sp 1
 %! @table @ @var
 %! @item dr
-%! Matlab's structure describing decision and transition rules.
+%! MATLAB's structure describing decision and transition rules.
 %! @end table
 %! @sp 2
 %! @strong{This function is called by:}

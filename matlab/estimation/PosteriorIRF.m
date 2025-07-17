@@ -21,9 +21,9 @@ function oo_=PosteriorIRF(type,options_,estim_params_,oo_,M_,bayestopt_,dataset_
 %   None
 
 % PARALLEL CONTEXT
-% This funtion has been parallelized in two different points. Then we have two core
+% This function has been parallelized in two different points. Then we have two core
 % functions associated with it(the _core1 and _core2).
-% See also the comments posterior_sampler.m funtion.
+% See also the comments posterior_sampler.m function.
 
 % Copyright © 2006-2024 Dynare Team
 %

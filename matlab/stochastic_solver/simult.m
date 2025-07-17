@@ -13,11 +13,11 @@ function [y_out,exo_simul] =simult(y0, dr,M_,options_)
 %! @item y0
 %! Vector of doubles, initial conditions.
 %! @item dr
-%! Matlab's structure describing decision and transition rules.
+%! MATLAB's structure describing decision and transition rules.
 %! @item M_
-%! Matlab's structure describing the model (initialized by dynare, see @ref{M_})
+%! MATLAB's structure describing the model
 %! @item options_
-%! Matlab's structure describing the current options (initialized by dynare, see @ref{options_}).
+%! MATLAB's structure describing the current options
 %! @end table
 %! @sp 2
 %! @strong{Outputs}
@@ -84,7 +84,7 @@ for i=1:replic
         exo_simul(:,i_exo_var) = randn(nxs,options_.periods)'*chol_S;
     end
     y_ = simult_(M_,options_,y0,dr,exo_simul,order);
-    % elimninating initial value
+    % eliminating initial value
     y_ = y_(:,2:end);
     if replic > 1
         fwrite(fh,y_,'float64');

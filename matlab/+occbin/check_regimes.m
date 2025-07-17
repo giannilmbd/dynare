@@ -6,8 +6,8 @@ function [TT, RR, CC, regime_history] = check_regimes(TT, RR, CC, opts_regime, M
 % - RR            [N by N_exo]      shock impact matrix of state space
 % - CC            [N by 1]          constant of state space
 % - opts_regime_  [structure]       structure describing the regime
-% - M_            [structure]       Matlab's structure describing the model
-% - options_      [structure]       Matlab's structure describing the current options
+% - M_            [structure]       MATLAB's structure describing the model
+% - options_      [structure]       MATLAB's structure describing the current options
 % - dr                  [structure]     Reduced form model.
 % - endo_steady_state   [vector]        steady state value for endogenous variables
 % - exo_steady_state    [vector]        steady state value for exogenous variables

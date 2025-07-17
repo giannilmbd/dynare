@@ -2,8 +2,8 @@ function plot_regimes(regimes,M_,options_)
 % plot_regimes(regimes,M_,options_)
 % Inputs: 
 % - regimes     	[structure]     OccBin regime information
-% - M_              [structure]     Matlab's structure describing the model
-% - options_        [structure]     Matlab's structure containing the options
+% - M_              [structure]     MATLAB's structure describing the model
+% - options_        [structure]     MATLAB's structure containing the options
 
 % Copyright © 2021-2023 Dynare Team
 %

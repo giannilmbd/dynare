@@ -7,14 +7,14 @@ function [x, errorflag, errorcode] = solve1(func, x, j1, j2, jacobian_flag, gste
 %    x:               guess values
 %    j1:              equations index for which the model is solved
 %    j2:              unknown variables index
-%    jacobian_flag=true: jacobian given by the 'func' function
-%    jacobian_flag=false: jacobian obtained numerically
+%    jacobian_flag=true: Jacobian given by the 'func' function
+%    jacobian_flag=false: Jacobian obtained numerically
 %    gstep            increment multiplier in numerical derivative
 %                     computation
 %    tolf             tolerance for residuals
 %    tolx             tolerance for solution variation
 %    maxit            maximum number of iterations
-%    fake             unused argument (compatibity with trust_region).
+%    fake             unused argument (compatibility with trust_region).
 %    debug            debug flag
 %    varargin:        list of extra arguments to the function
 %

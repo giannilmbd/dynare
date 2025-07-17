@@ -29,7 +29,7 @@ BaseName = [MetropolisFolder filesep ModelName];
 % Get the list of all the mh_history files.
 mh_history_files = dir([BaseName '_mh_history_*.mat']);
 
-% Check the existence of mh-files (assuming version 2, ie dynare version greater than 4.3.x).
+% Check the existence of mh-files (assuming version 2, i.e., Dynare version greater than 4.3.x).
 if isequal(length(mh_history_files),0)
     error(['update_last_mh_history_file: I cannot find any mh-history file in ' MetropolisFolder '!'])
 end

@@ -6,7 +6,7 @@ function pdf = normpdf (x, m, s)
 %
 %  PDF = normpdf(X) is equivalent to PDF = normpdf(X, 0, 1)
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/normpdf.m
 % Original author: TT <Teresa.Twaroch@ci.tuwien.ac.at>
 

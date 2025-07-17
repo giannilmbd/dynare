@@ -19,7 +19,7 @@ function oo_=prior_posterior_statistics(type,dataset_,dataset_info,M_,oo_,option
 %    none
 %
 % PARALLEL CONTEXT
-% See the comments in the posterior_sampler.m funtion.
+% See the comments in the posterior_sampler.m function.
 
 
 % Copyright © 2005-2024 Dynare Team
@@ -302,7 +302,7 @@ if ~isnumeric(options_.parallel)
     leaveSlaveOpen = options_.parallel_info.leaveSlaveOpen;
     if options_.parallel_info.leaveSlaveOpen == 0
         % Commenting for testing!!!
-        options_.parallel_info.leaveSlaveOpen = 1; % Force locally to leave open remote matlab sessions (repeated pm3 calls)
+        options_.parallel_info.leaveSlaveOpen = 1; % Force locally to leave open remote MATLAB sessions (repeated pm3 calls)
     end
 end
 

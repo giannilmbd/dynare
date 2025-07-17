@@ -1,11 +1,11 @@
 function [LIK, likk, a] = kalman_filter_ss(Y,start,last,a,T,K,iF,log_dF,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,D2a,D2T,D2Yss)
-% Computes the likelihood of a stationnary state space model (steady state kalman filter).
+% Computes the likelihood of a stationary state space model (steady state Kalman filter).
 
 %@info:
 %! @deftypefn {Function File} {[@var{LIK},@var{likk},@var{a},@var{P} ] =} kalman_filter_ss (@var{Y}, @var{start}, @var{last}, @var{a}, @var{P}, @var{kalman_tol}, @var{riccati_tol},@var{presample},@var{T},@var{Q},@var{R},@var{H},@var{Z},@var{mm},@var{pp},@var{rr},@var{Zflag},@var{diffuse_periods})
 %! @anchor{kalman_filter}
 %! @sp 1
-%! Computes the likelihood of a stationary state space model, given initial condition for the states (mean), the steady state kalman gain and the steady state inveverted covariance matrix of the prediction errors.
+%! Computes the likelihood of a stationary state space model, given initial condition for the states (mean), the steady state Kalman gain and the steady state inveverted covariance matrix of the prediction errors.
 %! @sp 2
 %! @strong{Inputs}
 %! @sp 1
@@ -21,11 +21,11 @@ function [LIK, likk, a] = kalman_filter_ss(Y,start,last,a,T,K,iF,log_dF,Z,pp,Zfl
 %! @item T
 %! Matrix (mm*mm) of doubles, transition matrix of the state equation.
 %! @item K
-%! Matrix (mm*@var{pp}) of doubles, steady state kalman gain.
+%! Matrix (mm*@var{pp}) of doubles, steady state Kalman gain.
 %! @item iF
 %! Matrix (@var{pp}*@var{pp}) of doubles, inverse of the steady state covariance matrix of the prediction errors.
 %! @item dF
-%! Double scalar, determinant of the steady state covariance matrix of teh prediction errors.
+%! Double scalar, determinant of the steady state covariance matrix of the prediction errors.
 %! @item Z
 %! Matrix (@var{pp}*mm) of doubles or vector of integers, matrix relating the states to the observed variables or vector of indices (depending on the value of @var{Zflag}).
 %! @item pp
@@ -132,7 +132,7 @@ end
 % Adding constant determinant of F (prediction error covariance matrix)
 likk = likk + log_dF;
 
-% Add log-likelihhod constants and divide by two
+% Add log-likelihood constants and divide by two
 likk = .5*(likk + pp*log(2*pi));
 
 % Sum the observation's densities (minus the likelihood)

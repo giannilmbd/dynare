@@ -1,9 +1,9 @@
 function forecast(nlags)
 % function forecast(nlags)
-% builds forecats for a bvar model
+% builds forecasts for a BVAR model
 %
 % INPUTS
-%    nlags:     number of lags for the bvar
+%    nlags:     number of lags for the BVAR
 %
 % OUTPUTS
 %    none
@@ -41,7 +41,7 @@ sims_with_shocks = NaN(options_.forecast, ny, options_.bvar_replic);
 S_inv_upper_chol = chol(inv(posterior.S));
 
 % Option 'lower' of chol() not available in old versions of
-% Matlab, so using transpose
+% MATLAB, so using transpose
 XXi_lower_chol = chol(posterior.XXi)';
 
 k = ny*nlags+nx;
@@ -58,7 +58,7 @@ while d <= options_.bvar_replic
     Sigma = rand_inverse_wishart(ny, posterior.df, S_inv_upper_chol);
 
     % Option 'lower' of chol() not available in old versions of
-    % Matlab, so using transpose
+    % MATLAB, so using transpose
     Sigma_lower_chol = chol(Sigma)';
 
     Phi = rand_matrix_normal(k, ny, posterior.PhiHat, Sigma_lower_chol, XXi_lower_chol);

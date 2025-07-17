@@ -1,6 +1,6 @@
 %
 % prodmom.m		Date: 4/29/2006
-% This Matlab program computes the product moment of X_{i_1}^{nu_1}X_{i_2}^{nu_2}...X_{i_m}^{nu_m},
+% This MATLAB program computes the product moment of X_{i_1}^{nu_1}X_{i_2}^{nu_2}...X_{i_m}^{nu_m},
 % where X_{i_j} are elements from X ~ N(0_n,V).  
 % V only needs to be positive semidefinite.
 % V: variance-covariance matrix of X

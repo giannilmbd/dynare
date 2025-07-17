@@ -1,10 +1,10 @@
 function check_hessian_at_the_mode(hessian_xparam1, xparam1, M_, estim_params_, options_, bounds)
 % check_hessian_at_the_mode(hessian_xparam1, xparam1, M_, estim_params_, options_, bounds)
 % -------------------------------------------------------------------------
-% This function checks whether the hessian matrix at the mode is positive definite.
+% This function checks whether the Hessian matrix at the mode is positive definite.
 % -------------------------------------------------------------------------
 % INPUTS
-%  o hessian_xparam1:        [matrix] hessian matrix at the mode
+%  o hessian_xparam1:        [matrix] Hessian matrix at the mode
 %  o xparam1:                [vector] vector of parameter values at the mode
 %  o M_:                     [structure] information about model
 %  o estim_params_:          [structure] information about estimated parameters
@@ -12,7 +12,7 @@ function check_hessian_at_the_mode(hessian_xparam1, xparam1, M_, estim_params_, 
 %  o bounds:                 [structure] information about bounds
 % -------------------------------------------------------------------------
 % OUTPUTS
-%   none, displays a warning message if the hessian matrix is not positive definite
+%   none, displays a warning message if the Hessian matrix is not positive definite
 % -------------------------------------------------------------------------
 % This function is called by
 %  o dynare_estimation_1.m
@@ -41,7 +41,7 @@ catch
     tol_bounds = 1.e-10;
     skipline()
     disp('OPTIMIZATION PROBLEM!')
-    disp(' (minus) the hessian matrix at the "mode" is not positive definite!')
+    disp(' (minus) the Hessian matrix at the "mode" is not positive definite!')
     disp('=> variance of the estimated parameters are not positive.')
     disp('You should try to change the initial values of the parameters using')
     disp('the estimated_params_init block, or use another optimization routine.')

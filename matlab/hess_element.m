@@ -1,15 +1,15 @@
 function d=hess_element(func,element1,element2,args)
 % function d=hess_element(func,element1,element2,args)
-% returns an entry of the finite differences approximation to the hessian of func
+% returns an entry of the finite differences approximation to the Hessian of func
 %
 % INPUTS
 %    func       [function name]    string with name of the function
-%    element1   [int]              the indices showing the element within the hessian that should be returned
+%    element1   [int]              the indices showing the element within the Hessian that should be returned
 %    element2   [int]
 %    args       [cell array]       arguments provided to func
 %
 % OUTPUTS
-%    d          [double]           the (element1,element2) entry of the hessian
+%    d          [double]           the (element1,element2) entry of the Hessian
 %
 % SPECIAL REQUIREMENTS
 %    none

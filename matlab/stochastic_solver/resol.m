@@ -4,8 +4,8 @@ function [dr, info, params] = resol(check_flag, M_, options_, dr_in, endo_steady
 %
 % INPUTS
 % - check_flag    [integer]       scalar, equal to 0 if all the approximation is required, equal to 1 if only the eigenvalues are to be computed.
-% - M_            [structure]     Matlab's structure describing the model
-% - options_      [structure]     Matlab's structure describing the current options
+% - M_            [structure]     MATLAB's structure describing the model
+% - options_      [structure]     MATLAB's structure describing the current options
 % - dr_in         [structure]     model information structure
 % - endo_steady_state       [vector]     steady state value for endogenous variables
 % - exo_steady_state        [vector]     steady state value for exogenous variables
@@ -25,7 +25,7 @@ function [dr, info, params] = resol(check_flag, M_, options_, dr_in, endo_steady
 %   info(1)=3     ->    Blanchard & Kahn conditions are not satisfied: no stable equilibrium.
 %   info(1)=4     ->    Blanchard & Kahn conditions are not satisfied: indeterminacy.
 %   info(1)=5     ->    Blanchard & Kahn conditions are not satisfied: indeterminacy due to rank failure.
-%   info(1)=6     ->    The jacobian evaluated at the deterministic steady state is complex.
+%   info(1)=6     ->    The Jacobian evaluated at the deterministic steady state is complex.
 %   info(1)=19    ->    The steadystate routine has thrown an exception (inconsistent deep parameters).
 %   info(1)=20    ->    Cannot find the steady state, info(2) contains the sum of square residuals (of the static equations).
 %   info(1)=21    ->    The steady state is complex, info(2) contains the sum of square of imaginary parts of the steady state.

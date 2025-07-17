@@ -14,7 +14,7 @@ function myoutput = posterior_sampler_core(myinputs,fblck,nblck,whoiam, ThisMatl
 %                                    allows us to distinguish between them. Then it is the index number of this CPU among all CPUs in the
 %                                    cluster.
 %   o ThisMatlab         [integer]   Allows us to distinguish between the
-%                                    'main' Matlab, the slave Matlab worker, local Matlab, remote Matlab,
+%                                    'main' MATLAB, the slave MATLAB worker, local MATLAB, remote MATLAB,
 %                                     ... Then it is the index number of this slave machine in the cluster.
 % OUTPUTS
 %   o myoutput  [struc]
@@ -33,7 +33,7 @@ function myoutput = posterior_sampler_core(myinputs,fblck,nblck,whoiam, ThisMatl
 %   None.
 %
 % PARALLEL CONTEXT
-% See the comments in the posterior_sampler.m funtion.
+% See the comments in the posterior_sampler.m function.
 
 
 % Copyright © 2006-2023 Dynare Team
@@ -119,8 +119,8 @@ for curr_block = fblck:nblck
     block_iter=block_iter+1;
     try
         % This will not work if the master uses a random number generator not
-        % available in the slave (different Matlab version or
-        % Matlab/Octave cluster). Therefore the trap.
+        % available in the slave (different MATLAB version or
+        % MATLAB/Octave cluster). Therefore the trap.
         %
         % Set the random number generator type (the seed is useless but needed by the function)
         if ~isoctave

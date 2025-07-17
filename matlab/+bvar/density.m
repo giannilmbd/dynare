@@ -1,9 +1,9 @@
 function density(maxnlags)
 % function density(maxnlags)
-% computes the density of a bayesian var
+% computes the density of a Bayesian VAR
 %
 % INPUTS
-%    maxnlags:      maximum number of lags in the bvar
+%    maxnlags:      maximum number of lags in the BVAR
 %
 % OUTPUTS
 %    none

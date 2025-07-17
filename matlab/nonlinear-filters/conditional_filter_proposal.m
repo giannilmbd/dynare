@@ -5,7 +5,7 @@ function [ProposalStateVector, Weights, flag] = conditional_filter_proposal(Redu
 % for the state errors and the Kalman filter
 %
 % INPUTS
-% - ReducedForm                    [structure]    Matlab's structure describing the reduced form model.
+% - ReducedForm                    [structure]    MATLAB's structure describing the reduced form model.
 % - y                              [double]       p×1 vector, current observation (p is the number of observed variables).
 % - StateVectors
 % - SampleWeights

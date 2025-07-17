@@ -143,7 +143,7 @@ if prior.df < ny
     error('Too few degrees of freedom in the inverse-Wishart part of prior distribution. You should increase training sample size.')
 end
 
-% Add forecast informations
+% Add forecast information
 if nargout >= 5
     forecast_data.xdata = ones(options_.forecast, nx);
     forecast_data.initval = ydata(end-nlags+1:end, :);

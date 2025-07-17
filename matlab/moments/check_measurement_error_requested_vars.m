@@ -4,8 +4,8 @@ function [ME_present,observable_pos_requested_vars,index_subset,index_observable
 % the indices of the affected variables
 %
 % INPUTS
-%   M_                  [struct]        Matlab's structure describing the Model
-%   options_            [struct]        Matlab's structure describing the options
+%   M_                  [struct]        MATLAB's structure describing the Model
+%   options_            [struct]        MATLAB's structure describing the options
 %   i_var :             [double]        Index of requested variables in declaration order
 %
 % OUTPUTS

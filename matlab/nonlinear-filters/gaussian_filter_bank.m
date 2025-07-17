@@ -7,7 +7,7 @@ function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean,
 % This proposal is a gaussian distribution calculated à la Kalman
 %
 % INPUTS
-%    reduced_form_model     [structure] Matlab's structure describing the reduced form model.
+%    reduced_form_model     [structure] MATLAB's structure describing the reduced form model.
 %                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
 %                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
 %                                       reduced_form_model.state.dr        [structure] output of resol.m.
@@ -20,7 +20,7 @@ function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean,
 % REFERENCES
 %
 % NOTES
-%   The vector "lik" is used to evaluate the jacobian of the likelihood.
+%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
 % Copyright © 2009-2022 Dynare Team
 %

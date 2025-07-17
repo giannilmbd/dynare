@@ -1,7 +1,7 @@
 function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
 
 % function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
-% Computes the diffuse kalman smoother without measurement error, in the case of a non-singular var-cov matrix.
+% Computes the diffuse Kalman smoother without measurement error, in the case of a non-singular var-cov matrix.
 %
 % INPUTS
 %    a_initial:mm*1 vector of initial (predicted) states
@@ -176,7 +176,7 @@ while rank(Pinf(:,:,t+1),diffuse_kalman_tol) && t<smpl
         Finf = ZZ*Pinf(:,:,t)*ZZ';                                          % (5.7) in DK (2012)
         if rcond(Finf) < diffuse_kalman_tol                                 %F_{\infty,t} = 0
             if ~all(abs(Finf(:)) < diffuse_kalman_tol)                      %rank-deficient but not rank 0
-                % The univariate diffuse kalman filter should be used.
+                % The univariate diffuse Kalman filter should be used.
                 alphahat = Inf;
                 return
             else                                                            %rank of F_{\infty,t} is 0
@@ -184,7 +184,7 @@ while rank(Pinf(:,:,t+1),diffuse_kalman_tol) && t<smpl
                 Fstar(di,di,t)  = ZZ*Pstar(:,:,t)*ZZ' + H(di,di);             % (5.7) in DK (2012)
                 if rcond(Fstar(di,di,t)) < kalman_tol                         %F_{*} is singular
                     if ~all(all(abs(Fstar(di,di,t))<kalman_tol))
-                        % The univariate diffuse kalman filter should be used.
+                        % The univariate diffuse Kalman filter should be used.
                         alphahat = Inf;
                         return
                     else %rank 0

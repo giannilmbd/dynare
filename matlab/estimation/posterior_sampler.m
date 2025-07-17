@@ -17,7 +17,7 @@ function posterior_sampler(TargetFun,ProposalFun,xparam1,sampler_options,mh_boun
 %   o estim_params_     [structure] estimated parameters structure
 %   o bayestopt_        [structure] prior specification structure
 %   o oo_               [structure] output structure
-%   o dispString        [string]    string prependening the messages printed to the command window
+%   o dispString        [string]    string prefacing the messages printed to the command window
 %
 % SPECIAL REQUIREMENTS
 %   None.
@@ -26,9 +26,9 @@ function posterior_sampler(TargetFun,ProposalFun,xparam1,sampler_options,mh_boun
 % The most computationally intensive part of this function may be executed
 % in parallel. The code suitable to be executed in
 % parallel on multi core or cluster machine (in general a 'for' cycle)
-% has been removed from this function and been placed in the posterior_sampler_core.m funtion.
+% has been removed from this function and been placed in the posterior_sampler_core.m function.
 %
-% The DYNARE parallel packages comprise a i) set of pairs of Matlab functions that can be executed in
+% The DYNARE parallel packages comprise a i) set of pairs of MATLAB functions that can be executed in
 % parallel and called name_function.m and name_function_core.m and ii) a second set of functions used
 % to manage the parallel computations.
 %
@@ -70,14 +70,14 @@ record=load_last_mh_history_file(MetropolisFolder, ModelName);
 % First run in serial mode, and then comment the follow line.
 %   save('recordSerial.mat','-struct', 'record');
 
-% For parallel runs after serial runs with the abobe line active.
+% For parallel runs after serial runs with the above line active.
 %   TempRecord=load('recordSerial.mat');
 %   record.Seeds=TempRecord.Seeds;
 
 
 
 % Snapshot of the current state of computing. It necessary for the parallel
-% execution (i.e. to execute in a corretct way a portion of code remotely or
+% execution (i.e. to execute in a correct way a portion of code remotely or
 % on many cores). The mandatory variables for local/remote parallel
 % computing are stored in the localVars struct.
 

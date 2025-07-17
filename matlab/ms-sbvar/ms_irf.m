@@ -3,7 +3,7 @@ function [options_, oo_]=ms_irf(varlist, M_, options_, oo_)
 % Markov-switching SBVAR: Impulse Response Function
 %
 % INPUTS
-%    varlist:     (chararray) list of selected endogenous variables
+%    varlist:     (char array) list of selected endogenous variables
 %    M_:          (struct)    model structure
 %    options_:    (struct)    options
 %    oo_:         (struct)    results
@@ -50,7 +50,7 @@ opt = [opt ' -thin ' num2str(options_.ms.thinning_factor)];
 if options_.ms.regimes
     opt = [opt ' -regimes'];
 elseif options_.ms.regime
-    % regime-1 since regime is 0-indexed in C but 1-indexed in Matlab
+    % regime-1 since regime is 0-indexed in C but 1-indexed in MATLAB
     opt = [opt ' -regime ' num2str(options_.ms.regime-1)];
 elseif options_.ms.filtered_probabilities
     opt = [opt ' -filtered'];

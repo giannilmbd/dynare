@@ -1,5 +1,5 @@
 function block = get_internal_doc_block(fname,fpath)
-% Extract doc sections from matlab's routine.
+% Extract doc sections from MATLAB's routine.
 
 % Copyright © 2011-2017 Dynare Team
 %
@@ -23,14 +23,14 @@ function block = get_internal_doc_block(fname,fpath)
 % Default output
 block = [];
 
-% Open the matlab file.
+% Open the MATLAB file.
 mid = fopen([fpath '/' fname '.m'],'r');
 
-% Read the matlab file.
+% Read the MATLAB file.
 file = textscan(mid,'%s','delimiter','\n');
 file = file{1};
 
-% Close the matlab file.
+% Close the MATLAB file.
 fclose(mid);
 
 % Locate the test blocks.

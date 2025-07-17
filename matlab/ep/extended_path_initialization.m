@@ -41,7 +41,7 @@ options_.verbosity = ep.verbosity+ep.debug;
 % Set maximum number of iterations for the deterministic solver.
 options_.simul.maxit = ep.maxit;
 
-% Prepare a structure needed by the matlab implementation of the perfect foresight model solver
+% Prepare a structure needed by the MATLAB implementation of the perfect foresight model solver
 pfm = setup_stochastic_perfect_foresight_model_solver(M_, options_, oo_);
 
 % Check that the user did not use varexo_det
@@ -79,7 +79,7 @@ if ep.use_first_order_solution_as_initial_guess
     end
 end
 
-% Do not use a minimal number of perdiods for the perfect foresight solver (with bytecode and blocks)
+% Do not use a minimal number of periods for the perfect foresight solver (with bytecode and blocks)
 options_.minimal_solving_period = options_.ep.periods;
 
 % Set the covariance matrix of the structural innovations.

@@ -11,7 +11,7 @@ function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, fie
 % - oo_             [struct]  Estimation and simulation results.
 %
 % OUTPUTS
-% - oo_                       Matlab's structure gathering the results
+% - oo_                       MATLAB's structure gathering the results
 %
 % SPECIAL REQUIREMENTS
 %   None.

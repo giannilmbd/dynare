@@ -15,10 +15,10 @@ function [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,
 
 % OUTPUTS
 %   dataset_:       the dataset after required transformation
-%   dataset_info:   Various informations about the dataset (descriptive statistics and missing observations).
+%   dataset_info:   Various information about the dataset (descriptive statistics and missing observations).
 %   xparam1:        initial value of estimated parameters as returned by
 %                   set_prior() or loaded from mode-file
-%   hh:             hessian matrix at the loaded mode (or empty matrix)
+%   hh:             Hessian matrix at the loaded mode (or empty matrix)
 %   M_:             structure storing the model information
 %   options_:       structure storing the options
 %   oo_:            structure storing the results
@@ -102,7 +102,7 @@ if options_.analytic_derivation && options_.fast_kalman_filter
            'for fast_kalman_filter'])
 end
 
-% fast kalman filter is only available with kalman_algo == 0,1,3
+% fast Kalman filter is only available with kalman_algo == 0,1,3
 if options_.fast_kalman_filter && ~ismember(options_.kalman_algo, [0,1,3])
     error(['estimation option conflict: fast_kalman_filter is only available ' ...
                'with kalman_algo = 0, 1 or 3'])
@@ -269,7 +269,7 @@ else% Yes!
     end
 end
 
-% Get informations about the variables of the model.
+% Get information about the variables of the model.
 dr = set_state_space(oo_.dr,M_);
 oo_.dr = dr;
 nstatic = M_.nstatic;          % Number of static variables.
@@ -313,7 +313,7 @@ end
 
 % Define union of observed and state variables
 k2 = union(var_obs_index_dr,[M_.nstatic+1:M_.nstatic+M_.nspred]', 'rows');
-% Set restrict_state to postion of observed + state variables in expanded state vector.
+% Set restrict_state to position of observed + state variables in expanded state vector.
 oo_.dr.restrict_var_list = k2;
 % set mf0 to positions of state variables in restricted state vector for likelihood computation.
 [~,bayestopt_.mf0] = ismember([M_.nstatic+1:M_.nstatic+M_.nspred]',k2);
@@ -361,7 +361,7 @@ if options_.analytic_derivation
                 disp('The steadystate file changed the values for the following parameters: '),
                 disp(char(M_local.param_names(find(params(~isnan(params))-M_local.params(~isnan(params))))))
             end
-            disp('The derivatives of jacobian and steady-state will be computed numerically'),
+            disp('The derivatives of Jacobian and steady-state will be computed numerically'),
             disp('(re-set options_.analytic_derivation_mode= -2)'),
             options_.analytic_derivation_mode= -2;
         end

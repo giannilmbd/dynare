@@ -1,7 +1,7 @@
 function InitializeComputationalEnvironment()
 
 % PARALLEL CONTEXT
-% In a parallel context, this function is used to Initialize the computational enviroment according with
+% In a parallel context, this function is used to Initialize the computational environment according with
 % the user request.
 %
 % INPUTS

@@ -27,7 +27,7 @@ if ~isempty(pathtocXDHdrXnqo5KwwVpTRuc6OprAW)
     cd(pathtocXDHdrXnqo5KwwVpTRuc6OprAW);
 end
 
-% We evaluate the matlab script defining the data. All the variables in the
+% We evaluate the MATLAB script defining the data. All the variables in the
 % variables defined in this script are loaded in the current workspace.
 eval(cXDHdrXnqo5KwwVpTRuc6OprAW);
 

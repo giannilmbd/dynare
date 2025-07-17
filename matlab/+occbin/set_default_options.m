@@ -1,14 +1,14 @@
 function options_occbin_ = set_default_options(options_occbin_,M_,flag)
 % function options_occbin_ = set_default_options(options_occbin_,M_,flag)
-% Sets default options for Occbin
+% Sets default options for OccBin
 %
 % INPUTS
-% - options_occbin_ [structure]     Matlab's structure describing the current options
-% - M_              [structure]     Matlab's structure describing the model
-% - flag            [cell]          govern what/how much to initialize
+% - options_occbin_ [structure]     MATLAB's structure describing the current options
+% - M_              [structure]     MATLAB's structure describing the model
+% - flag            [cell]          governs what/how much to initialize
 %
 % OUTPUTS
-% - options_occbin_ [structure]     Matlab's structure describing the current options
+% - options_occbin_ [structure]     MATLAB's structure describing the current options
 
 % Copyright © 2021 Dynare Team
 %

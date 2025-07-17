@@ -5,7 +5,7 @@ function inv = gaminv (x, a, b)
 %  with parameters A and B (i.e. mean of the distribution is A*B
 %  and variance is A*B^2).
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/gaminv.m
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 

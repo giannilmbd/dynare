@@ -1,6 +1,6 @@
 function print_bytecode_static_model()
 % function print_bytecode_static_model()
-% print the model and jacobian from the bytecode format for the static model
+% print the model and Jacobian from the bytecode format for the static model
 %
 % INPUTS
 %   none

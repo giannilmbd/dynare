@@ -18,7 +18,7 @@ function [X, info] = cycle_reduction(A0, A1, A2, cvg_tol, max_it, ch)
 %! @item cvg_tol
 %! Scalar double, tolerance parameter.
 %! @item ch
-%! Any matlab object, if not empty the solution is checked.
+%! Any MATLAB object, if not empty the solution is checked.
 %! @end table
 %! @sp 1
 %! @strong{Outputs}

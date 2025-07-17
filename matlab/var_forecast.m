@@ -9,7 +9,7 @@ function y = var_forecast(name, h, y, fcv)
 % returns the h-step-ahead VAR(order) forecast for fcv
 
 % example calling:
-% In Matlab:
+% In MATLAB:
 % >> autoregressive_matrices{1} = [0.5000    0.1000; 0.4000    0.5000];
 % >> autoregressive_matrices{2} = [0         0     ; 0.2500    0     ];
 % >> mu                         = [0.0200; 0.0300];
@@ -20,7 +20,7 @@ function y = var_forecast(name, h, y, fcv)
 % ...
 % var(model_name=m1,order=2) a c;
 
-% From Matlab backend:
+% From MATLAB backend:
 % >> yt   = [0.0600;    33.0000;    0.0300;    22.0000];
 % >> ytm1 = [0.0550;    11.0000;    0.0300;    88.0000];
 % >> var_forecast('m1', 1, [yt ytm1])

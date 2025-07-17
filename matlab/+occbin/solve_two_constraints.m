@@ -2,9 +2,9 @@ function [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_,
 % function [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_, solve_DM)
 %
 % INPUT: 
-% - M_                  [structure]     Matlab's structure describing the model (M_).
+% - M_                  [structure]     MATLAB's structure describing the model
 % - dr                  [structure]     decision rules for the model
-% - opts_simul          [structure]     Matlab's structure containing the Occbin options (opts_simul).
+% - opts_simul          [structure]     MATLAB's structure containing the OccBin options (opts_simul).
 % - solve_DM            [double]        indicator on whether to recompute decision rules
 %
 % OUTPUT:
@@ -17,7 +17,7 @@ function [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_,
 %                                           - T: [n_vars by n_vars by n_shock_period] array of transition matrices
 %                                           - R: [n_vars by n_exo by n_shock_period] array of shock response matrices
 %                                           - C: [n_vars by n_shock_period] array of constants
-% - error_flag          [integer]       1 if a problem was encoutered, 0 otherwise
+% - error_flag          [integer]       1 if a problem was encountered, 0 otherwise
 
 % Original authors: Luca Guerrieri and Matteo Iacoviello 
 % Original file downloaded from:
@@ -25,7 +25,7 @@ function [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_,
 % Adapted for Dynare by Dynare Team.
 %
 % This code is in the public domain and may be used freely.
-% However the authors would appreciate acknowledgement of the source by
+% However the authors would appreciate acknowledgment of the source by
 % citation of any of the following papers:
 %
 % Luca Guerrieri and Matteo Iacoviello (2015): "OccBin: A toolkit for solving
@@ -124,8 +124,8 @@ else
 end
 
 if opts_simul_.waitbar
-    hh_fig = dyn_waitbar(0,'Occbin: Solving the model');
-    set(hh_fig,'Name','Occbin: Solving the model.');
+    hh_fig = dyn_waitbar(0,'OccBin: Solving the model');
+    set(hh_fig,'Name','OccBin: Solving the model.');
 end
 
 for shock_period = 1:n_shocks_periods
@@ -363,7 +363,7 @@ for shock_period = 1:n_shocks_periods
         if max_iter>opts_simul_.algo_truncation
             disp_verbose(['occbin solver: period ' int2str(shock_period) ':'],opts_simul_.debug)
             if is_periodic
-                disp_verbose('Occbin solver loops between two regimes.',opts_simul_.debug)
+                disp_verbose('OccBin solver loops between two regimes.',opts_simul_.debug)
                 if periodic_solution
                     disp_verbose(['Max error:' num2str(min_err) '.'],opts_simul_.debug)
                 else

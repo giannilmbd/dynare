@@ -5,7 +5,7 @@ function cdf = betacdf (x, a, b)
 %  mean of the distribution is A/(A+B) and variance is
 %  A*B/(A+B)^2/(A+B+1) ).
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/betacdf.m
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 

@@ -11,7 +11,7 @@ function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(fh, y, x,
 %   T                   [matrix]        Temporary terms
 %   Block_Num           [integer]       block number
 %   cutoff              [double]        cutoff to correct the direction in Newton in case
-%                                       of singular jacobian matrix
+%                                       of singular Jacobian matrix
 %   options_             [structure]     storing the options
 %   M_                   [structure]     Model description
 %
@@ -117,7 +117,7 @@ while ~(cvg || iter > options_.simul.maxit)
                             y(y_index, y_kmin+(1:periods))=reshape((ya_save+lambda*dx)',length(y_index),periods);
                             continue
                         else
-                            disp('The singularity of the jacobian matrix could not be corrected');
+                            disp('The singularity of the Jacobian matrix could not be corrected');
                             success = false;
                             return
                         end

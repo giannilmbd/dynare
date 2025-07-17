@@ -3,9 +3,9 @@ function [eigenvalues_,result,info] = check(M_, options_, oo_)
 % Checks determinacy conditions by computing the generalized eigenvalues.
 %
 % INPUTS
-% - M_            [structure]     Matlab's structure describing the model
-% - options_      [structure]     Matlab's structure describing the current options
-% - oo_           [structure]     Matlab's structure containing the results
+% - M_            [structure]     MATLAB's structure describing the model
+% - options_      [structure]     MATLAB's structure describing the current options
+% - oo_           [structure]     MATLAB's structure containing the results
 %
 % OUTPUTS
 % - eigenvalues_  [double]        vector, eigenvalues.

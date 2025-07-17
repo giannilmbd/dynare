@@ -4,14 +4,14 @@ function dynInfo(fun)
 %! @deftypefn {Function File} dynInfo (@var{fun})
 %! @anchor{dynInfo}
 %! @sp 1
-%! Displays internal documentation of matlab/octave routine @var{fun}.m.
+%! Displays internal documentation of MATLAB/Octave routine @var{fun}.m.
 %! @sp 2
 %!
 %! @strong{Inputs}
 %! @sp 1
 %! @table @ @var
 %! @item fun
-%! string, name of the matlab/octave routine for which internal documentation is needed.
+%! string, name of the MATLAB/Octave routine for which internal documentation is needed.
 %! @end table
 %! @sp 2
 %!
@@ -75,7 +75,7 @@ if strcmp(ext(2:end),'m')
         disp('No documentation for this routine!')
     end
 else
-    disp('Not a known matlab/octave routine!')
+    disp('Not a known MATLAB/Octave routine!')
 end
 
 if rm_path

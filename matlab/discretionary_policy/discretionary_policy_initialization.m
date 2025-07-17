@@ -1,11 +1,11 @@
 function M_=discretionary_policy_initialization(M_,options_)
 % function M_=discretionary_policy_initialization(M_,options_)
 % INPUTS
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
+% - M_            [structure]     MATLAB's structure describing the model
+% - options_      [structure]     MATLAB's structure describing the current options
 %
 % OUTPUTS
-% - M_            [structure]     Matlab's structure describing the model (M_).
+% - M_            [structure]     MATLAB's structure describing the model
 
 % Copyright © 2020 Dynare Team
 %

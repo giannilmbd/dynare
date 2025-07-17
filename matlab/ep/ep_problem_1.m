@@ -1,6 +1,6 @@
 function [res, A, info] = ep_problem_1(y, x, pfm)
 
-% Evaluate the residuals and stacked jacobian of a stochastic perfect
+% Evaluate the residuals and stacked Jacobian of a stochastic perfect
 % foresight, considering sequences of future innovations in a sparse tree.
 %
 % INPUTS:
@@ -10,7 +10,7 @@ function [res, A, info] = ep_problem_1(y, x, pfm)
 %
 % OUTPUTS:
 % - res    [double]   m×1 vector, residuals of the stacked equations.
-% - A      [double]   m×m sparse matrix, jacobian of the stacked equations.
+% - A      [double]   m×m sparse matrix, Jacobian of the stacked equations.
 % - info   [logical]  scalar
 %
 % REMARKS:

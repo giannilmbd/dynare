@@ -12,7 +12,7 @@ function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,numbe
 %    a                            [double]    pp*1 vector, levels of the predicted initial state variables (E_{0}(alpha_1)).
 %    P                            [double]    pp*pp matrix, covariance matrix of the initial state vector.
 %    kalman_tol                   [double]    scalar, tolerance parameter (rcond).
-%    riccati_tol                  [double]    scalar, tolerance parameter (riccati iteration).
+%    riccati_tol                  [double]    scalar, tolerance parameter (Riccati iteration).
 %    presample                    [integer]   scalar, presampling if strictly positive.
 %    T                            [double]    mm*mm transition matrix of the state equation.
 %    Q                            [double]    rr*rr covariance matrix of the structural innovations.
@@ -24,14 +24,14 @@ function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,numbe
 %    rr                           [integer]   scalar, number of structural innovations.
 %
 % OUTPUTS
-%    LIK        [double]    scalar, MINUS loglikelihood
+%    LIK        [double]    scalar, MINUS log-likelihood
 %    lik        [double]    vector, density of observations in each period.
 %    a          [double]    mm*1 vector, current estimate of the state vector tomorrow (E_{T}(alpha_{T+1})).
 %    P          [double]    mm*mm matrix, covariance matrix of the states.
 %
 %
 % NOTES
-%   The vector "lik" is used to evaluate the jacobian of the likelihood.
+%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
 % Copyright © 2004-2023 Dynare Team
 %
@@ -266,14 +266,14 @@ while notsteady && t<=last
             RR01 = cat(3,R,RR(:,:,1));
             CC01 = zeros(size(CC,1),2);
             CC01(:,2) = CC(:,1);
-            % insert here kalman update engine
+            % insert here Kalman update engine
             [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx] = occbin.kalman_update_engine(a00, a10, P00, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, d_index, M_, dr, endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options);
 %            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regimes_(t:t+2), info, M_, likx] = occbin.kalman_update_algo_1(a00, a10, P00, P10, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), M_, dr, endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options);
         else
             if isqvec
                 Qt = Qvec(:,:,t-1:t+1);
             end
-            % insert here kalman update engine
+            % insert here Kalman update engine
             [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx] = occbin.kalman_update_engine(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),base_regime,d_index,M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
 %            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regimes_(t:t+2), info, M_, likx] = occbin.kalman_update_algo_1(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
         end

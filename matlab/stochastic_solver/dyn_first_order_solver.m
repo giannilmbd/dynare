@@ -4,13 +4,13 @@ function [dr, info] = dyn_first_order_solver(g1, M_, dr, options_, task)
 %
 % INPUTS
 % - g1            [double]    sparse Jacobian of the dynamic model
-% - M_            [struct]    Matlab's structre describing the model
-% - dr            [struct]    Matlab's structure describing the reduced form model.
-% - options_      [struct]    Matlab's structure containing the current state of the options
+% - M_            [struct]    MATLAB's structure describing the model
+% - dr            [struct]    MATLAB's structure describing the reduced form model.
+% - options_      [struct]    MATLAB's structure containing the current state of the options
 % - task          [integer]   scalar, if task = 0 then decision rules are computed and if task = 1 then only eigenvales are computed.
 %
 % OUTPUTS
-% - dr            [struct]    Matlab's structure describing the reduced form model.
+% - dr            [struct]    MATLAB's structure describing the reduced form model.
 % - info          [integer]   scalar, error code. Possible values are:
 %
 %                                     info=0 -> no error,

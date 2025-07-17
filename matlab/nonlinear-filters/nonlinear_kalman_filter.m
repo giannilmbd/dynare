@@ -12,16 +12,16 @@ function [LIK,lik] = nonlinear_kalman_filter(ReducedForm, Y, start, ParticleOpti
 % following observation.
 % Pros: The use of nodes is much faster than Monte-Carlo Gaussian particle and standard particles
 % filters since it treats a lesser number of particles.
-% Cons: 1. Application a linear projection formulae in a nonlinear context.
-% 2. Parameter estimations may be biaised if the model is truly non-gaussian since predictive and
+% Cons: 1. Application a linear projection formula in a nonlinear context.
+% 2. Parameter estimations may be biased if the model is truly non-gaussian since predictive and
 % filtered densities are unimodal.
 %
 % INPUTS
-%    Reduced_Form     [structure] Matlab's structure describing the reduced form model.
+%    Reduced_Form     [structure] MATLAB's structure describing the reduced form model.
 %    Y                [double]    matrix of original observed variables.
 %    start            [double]    structural parameters.
-%    ParticleOptions  [structure] Matlab's structure describing options concerning particle filtering.
-%    ThreadsOptions   [structure] Matlab's structure.
+%    ParticleOptions  [structure] MATLAB's structure describing options concerning particle filtering.
+%    ThreadsOptions   [structure] MATLAB's structure.
 %
 % OUTPUTS
 %    LIK        [double]    scalar, likelihood
@@ -30,7 +30,7 @@ function [LIK,lik] = nonlinear_kalman_filter(ReducedForm, Y, start, ParticleOpti
 % REFERENCES
 %
 % NOTES
-%   The vector "lik" is used to evaluate the jacobian of the likelihood.
+%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
 % Copyright © 2009-2022 Dynare Team
 %

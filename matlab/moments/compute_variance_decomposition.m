@@ -6,8 +6,8 @@ function var_decomp=compute_variance_decomposition(M_,options_,var_stationary,A,
 % Theoretical HP-filtering and band-pass filtering is available as an option
 %
 % INPUTS
-%   M_                      [structure]     Global dynare's structure, description of the DSGE model.
-%   options_                [structure]     Global dynare's structure.
+%   M_                      [structure]     Dynare model structure, description of the DSGE model.
+%   options_                [structure]     Dynare options structure.
 %   var_stationary          [double]        unconditional variance of stationary
 %                                           variables
 %   A                       [double]        State transition matrix

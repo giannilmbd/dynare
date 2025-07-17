@@ -30,7 +30,7 @@ if ~(isdseries(initialconditions) || isempty(initialconditions))
     error('First input argument must be a dseries object or an empty array!')
 end
 
-% If initialconditions is empty instantiates a dseries object with the informations available in M_.endo_histval.
+% If initialconditions is empty instantiates a dseries object with the information available in M_.endo_histval.
 if isempty(initialconditions)
     yinitdata = zeros(M_.orig_endo_nbr, M_.orig_maximum_lag);
     yinitdata(:,1) = M_.endo_histval(1:M_.orig_endo_nbr);

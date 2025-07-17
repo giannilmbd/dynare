@@ -19,10 +19,10 @@ function [ysim, xsim, errorflag] = simul_backward_nonlinear_model_(initialcondit
 % REMARKS
 % [1] The innovations used for the simulation are saved in oo_.exo_simul, and the resulting paths for the endogenous
 %     variables are saved in oo_.endo_simul.
-% [2] The last input argument is not mandatory. If absent we use random draws and rescale them with the informations provided
+% [2] The last input argument is not mandatory. If absent we use random draws and rescale them with the information provided
 %     through the shocks block.
-% [3] If the first input argument is empty, the endogenous variables are initialized with 0, or if available with the informations
-%     provided thrtough the histval block.
+% [3] If the first input argument is empty, the endogenous variables are initialized with 0, or if available with the information
+%     provided through the histval block.
 
 % Copyright © 2017-2023 Dynare Team
 %
@@ -170,7 +170,7 @@ for it = initialconditions.nobs+(1:samplesize)
         dprintf('\t %s', Error.message);
         skipline()
         break
-        % TODO Implement same checks with the jacobian matrix.
+        % TODO Implement same checks with the Jacobian matrix.
         % TODO Modify other solvers to return an exitflag.
     end
 end

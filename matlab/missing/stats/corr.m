@@ -27,12 +27,12 @@ function retval = corr(x, y)
 %@eod:
 %
 % Notes:    - the original Octave code has been rewritten to avoid calling cov, since
-%               there is a long-standing incompatiblity between Matlab's cov and Octave's cov
+%               there is a long-standing incompatibility between MATLAB's cov and Octave's cov
 %               (see https://savannah.gnu.org/bugs/?40751)
-%           - For compatibility with Matlab, the correlation of a constant
+%           - For compatibility with MATLAB, the correlation of a constant
 %               is defined as NaN, not 1
 %
-% Adapted for Matlab (R) from GNU Octave 4.0.1
+% Adapted for MATLAB (R) from GNU Octave 4.0.1
 % Original files: statistics\base\corr.m, statistics\base\cov.m, and packages\stk-2.3.4\misc\mole\corr\corr.m
 % Original authors: Kurt Hornik <hornik@wu-wien.ac.at> and Julien Bect  <julien.bect@supelec.fr>
 
@@ -77,7 +77,7 @@ if (nargin == 2)
     end
 end
 
-% Special case, correlation with scalar is NaN in Matlab
+% Special case, correlation with scalar is NaN in MATLAB
 if isscalar(x)
     if nargin==1
         retval = NaN;

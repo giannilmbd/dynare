@@ -12,9 +12,9 @@ function [dr,info]=AIM_first_order_solver(g1,M_,dr,qz_criterium)
 %! @item g1
 %! Matrix containing the Jacobian of the model
 %! @item M_
-%! Matlab's structure describing the model (initialized by @code{dynare}).
+%! MATLAB's structure describing the model (initialized by @code{Dynare}).
 %! @item dr
-%! Matlab's structure describing the reduced form solution of the model.
+%! MATLAB's structure describing the reduced form solution of the model.
 %! @item qz_criterium
 %! Double containing the criterium to separate explosive from stable eigenvalues
 %! @end table
@@ -23,7 +23,7 @@ function [dr,info]=AIM_first_order_solver(g1,M_,dr,qz_criterium)
 %! @sp 1
 %! @table @ @var
 %! @item dr
-%! Matlab's structure describing the reduced form solution of the model.
+%! MATLAB's structure describing the reduced form solution of the model.
 %! @item info
 %! Integer scalar, error code.
 %! @sp 1
@@ -51,14 +51,14 @@ function [dr,info]=AIM_first_order_solver(g1,M_,dr,qz_criterium)
 %! @end deftypefn
 %@eod:
 %
-% Maps Dynare jacobian to AIM 1st order model solver designed and developed by Gary Anderson
+% Maps Dynare Jacobian to AIM 1st order model solver designed and developed by Gary Anderson
 % and derives the solution for dr.ghx and dr.ghu from the AIM outputs
 % AIM System is given as a sum:
 % i.e. for i=-$...+&   SUM(Hi*xt+i)= £*zt, t = 0, . . . ,?
 % and its input as single array of matrices: [H-$...  Hi ... H+&]
 % and its solution as xt=SUM( Bi*xt+i) + @*£*zt for i=-$...-1
 % with the output in form bb=[B-$...  Bi ... B-1] and @=inv(Ho+H1*B-1)
-% Dynare jacobian = [fy'-$...  fy'i ... fy'+&  fu']
+% Dynare Jacobian = [fy'-$...  fy'i ... fy'+&  fu']
 % where [fy'-$...  fy'i ... fy'+&]=[H-$...  Hi ... H+&] and fu'= £
 %
 % Dynare use:
@@ -69,7 +69,7 @@ function [dr,info]=AIM_first_order_solver(g1,M_,dr,qz_criterium)
 %       (it does not depend on mjdgges output).
 %
 %       2) passing in aa={Q'|1}*g1 can produce ~ one order closer
-%       results to the Dynare solutiion then when if plain g1 is passed,
+%       results to the Dynare solution then when if plain g1 is passed,
 %       i.e. diff < e-14 for aa and diff < *e-13 for g1 if Q' is used.
 %
 % Initially written by George Perendia

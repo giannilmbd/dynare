@@ -1,6 +1,6 @@
 function plot_ms_irf(M_, options_, irf, figure_name, varlist)
 % function plot_ms_irf(M_, options_, irf, figure_name, varlist)
-% plots the impulse responses from the output from a ms-sbvar
+% plots the impulse responses from the output from a MS-SBVAR
 %
 % INPUTS
 %    M_:          (struct)    model structure
@@ -70,7 +70,7 @@ end
 
 dims = size(irf);
 if (length(dims) == 2)
-    % Point IRF (horizon x (nvarsxnvars) )
+    % Point IRF (horizon x (nvars x nvars) )
     horizon = dims(1);
     num_percentiles = 1;
 elseif (length(dims) == 3)

@@ -53,7 +53,7 @@ function [x,f,exitflag,n_f_evals,n_grad_evals,n_constraint_evals,n_constraint_gr
 %
 %
 % Algorithm: Kuntsevich, A.V., Kappel, F., SolvOpt - The solver for local nonlinear optimization problems
-% (version 1.1, Matlab, C, FORTRAN). University of Graz, Graz, 1997.
+% (version 1.1, MATLAB, C, FORTRAN). University of Graz, Graz, 1997.
 %
 %
 % Copyright © 1997-2008, Alexei Kuntsevich and Franz Kappel

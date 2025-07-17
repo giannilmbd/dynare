@@ -1,10 +1,10 @@
 function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indpmodel, indpstderr, indpcorr, d2flag)
 % DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indpmodel, indpstderr, indpcorr, d2flag)
-% previously getH.m in dynare 4.5
+% previously getH.m in Dynare 4.5
 % -------------------------------------------------------------------------
 % Computes derivatives (with respect to parameters) of
 %   (1) steady-state (ys) and covariance matrix of shocks (Sigma_e)
-%   (2) dynamic model jacobians (g1, g2, g3)
+%   (2) dynamic model Jacobians (g1, g2, g3)
 %   (3) perturbation solution matrices:
 %       * order==1: ghx,ghu
 %       * order==2: ghx,ghu,ghxx,ghxu,ghuu,ghs2
@@ -40,7 +40,7 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 %   dYss:       [endo_nbr by modparam_nbr] in DR order
 %               Jacobian (wrt model parameters only) of steady state, i.e. ys(order_var,:)
 %   dSigma_e:   [exo_nbr by exo_nbr by totparam_nbr] in declaration order
-%                Jacobian (wrt to all paramters) of covariance matrix of shocks, i.e. Sigma_e
+%                Jacobian (wrt to all parameters) of covariance matrix of shocks, i.e. Sigma_e
 %   dg1:        [endo_nbr by yy0ex0_nbr by modparam_nbr] in DR order
 %               Parameter Jacobian of first derivative (wrt dynamic model variables) of dynamic model (wrt to model parameters only)
 %   dg2:        [endo_nbr by yy0ex0_nbr^2*modparam_nbr] in DR order
@@ -56,7 +56,7 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 %   dghu:       [endo_nbr by exo_nbr by totparam_nbr] in DR order
 %               Jacobian (wrt to all parameters) of first-order perturbation solution matrix ghu
 %   dOm:        [endo_nbr by endo_nbr by totparam_nbr] in DR order
-%               Jacobian (wrt to all paramters) of Om = ghu*Sigma_e*transpose(ghu)
+%               Jacobian (wrt to all parameters) of Om = ghu*Sigma_e*transpose(ghu)
 %   dghxx       [endo_nbr by nspred*nspred by totparam_nbr] in DR order
 %               Jacobian (wrt to all parameters) of second-order perturbation solution matrix ghxx
 %   dghxu       [endo_nbr by nspred*exo_nbr by totparam_nbr] in DR order
@@ -295,7 +295,7 @@ if analytic_derivation_mode == -1
 % - covariance matrix of shocks: dSigma_e
 % - perturbation solution matrices: dghx, dghu, dghxx, dghxu, dghuu, dghs2, dghxxx, dghxxu, dghxuu, dghuuu, dghxss, dghuss
 
-    %Parameter Jacobian of covariance matrix and solution matrices (wrt selected stderr, corr and model paramters)
+    %Parameter Jacobian of covariance matrix and solution matrices (wrt selected stderr, corr and model parameters)
     dSig_gh         = identification.fjaco(numerical_objective_fname, xparam1, 'perturbation_solution', estim_params_, M_, options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
     ind_Sigma_e     = (1:exo_nbr^2);
     ind_ghx         = ind_Sigma_e(end) + (1:endo_nbr*nspred);
@@ -327,7 +327,7 @@ if analytic_derivation_mode == -1
         DERIVS.dghxss = reshape(dSig_gh(ind_ghxss,:), [endo_nbr nspred totparam_nbr]);           %in tensor notation, wrt selected parameters
         DERIVS.dghuss = reshape(dSig_gh(ind_ghuss,:), [endo_nbr exo_nbr totparam_nbr]);          %in tensor notation, wrt selected parameters
     end
-    % Parameter Jacobian of Om=ghu*Sigma_e*ghu' and Correlation_matrix (wrt selected stderr, corr and model paramters)
+    % Parameter Jacobian of Om=ghu*Sigma_e*ghu' and Correlation_matrix (wrt selected stderr, corr and model parameters)
     DERIVS.dOm                 = zeros(endo_nbr,endo_nbr,totparam_nbr); %initialize in tensor notation
     DERIVS.dCorrelation_matrix = zeros(exo_nbr,exo_nbr,totparam_nbr);   %initialize in tensor notation
     if ~isempty(indpstderr) %derivatives of ghu wrt stderr parameters are zero by construction
@@ -372,7 +372,7 @@ if analytic_derivation_mode == -1
     end
 
     if d2flag
-        % Hessian (wrt paramters) of steady state and first-order solution matrices ghx and Om
+        % Hessian (wrt parameters) of steady state and first-order solution matrices ghx and Om
         % note that hessian_sparse.m (contrary to hessian.m) does not take symmetry into account, but focuses already on unique values
         options_.order = 1; %make sure only first order
         d2Yss_KalmanA_Om = identification.hessian_sparse(numerical_objective_fname, xparam1, gstep, 'Kalman_Transition', estim_params_, M_, options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
@@ -1530,7 +1530,7 @@ function g22 = get_2nd_deriv_mat(gpp,i,j,npar)
 % output:
 % g22: [npar by npar] Hessian matrix (wrt parameters) of Jacobian of dynamic model for equation i
 %                                                    rows: first parameter in Hessian
-%                                                    columns: second paramater in Hessian
+%                                                    columns: second parameter in Hessian
 
 g22=zeros(npar,npar);
 is=find(gpp(:,1)==i);
@@ -1543,7 +1543,7 @@ return
 
 function r22 = get_all_resid_2nd_derivs(rpp,m,npar)
 % inputs:
-% - rpp: [#second_order_residual_terms by 4] double   Hessian matrix (wrt paramters) of model equations
+% - rpp: [#second_order_residual_terms by 4] double   Hessian matrix (wrt parameters) of model equations
 %                                                              rows: respective derivative term
 %                                                              1st column: equation number of the term appearing
 %                                                              2nd column: number of the first parameter in derivative
@@ -1570,7 +1570,7 @@ return
 
 function h2 = get_hess_deriv(hp,i,j,m,npar)
 % inputs:
-% - hp: [#first_order_Hessian_terms by 5] double   Jacobian matrix (wrt paramters) of dynamic Hessian
+% - hp: [#first_order_Hessian_terms by 5] double   Jacobian matrix (wrt parameters) of dynamic Hessian
 %                                                              rows: respective derivative term
 %                                                              1st column: equation number of the term appearing
 %                                                              2nd column: column number of first variable in Hessian of the dynamic model

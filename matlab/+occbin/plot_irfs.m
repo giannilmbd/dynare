@@ -2,9 +2,9 @@ function plot_irfs(M_,irfs,options_,var_list)
 % plot_irfs(M_,irfs,options_,var_list)
 %
 % INPUTS
-% - M_                      [structure]     Matlab's structure describing the model
+% - M_                      [structure]     MATLAB's structure describing the model
 % - irfs                    [structure]     IRF results
-% - options_                [structure]     Matlab's structure describing the current options
+% - options_                [structure]     MATLAB's structure describing the current options
 % - var_list                [character array]  list of endogenous variables specified
 %
 % OUTPUTS

@@ -332,7 +332,7 @@ C = C/T;
 % Save results
 dlhs = eval(strrep(lhs, 'data', 'data(range(1)-real(islaggedvariables):range(end)).data')); % REMARK: If lagged variables are present in the estimated equation (ie rhs) then an observation
                                                                                             % has been appended to the dataset (period range(1)-1) and the left hand side has been replaced
-                                                                                            % by data(2:end,lhs_id) in the matlab routine generated to evaluate the residuals (it is also the value
+                                                                                            % by data(2:end,lhs_id) in the MATLAB routine generated to evaluate the residuals (it is also the value
                                                                                             % hold by string variable lhs). Hence to evaluate the left hand side variable used for estimation,
                                                                                             % between range(1) and range(end) we need here to append the same observation in period range(1)-1.
 oo_.nls.(eqname).lhs = dseries(dlhs, range(1), sprintf('%s_lhs', eqname));

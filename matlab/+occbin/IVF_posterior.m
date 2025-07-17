@@ -7,10 +7,10 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 % INPUTS
 % - xparam1             [double]        current values for the estimated parameters.
 % - dataset_            [structure]     dataset after transformations
-% - dataset_info        [structure]     storing informations about the
+% - dataset_info        [structure]     storing information about the
 %                                       sample; not used but required for interface
-% - options_            [structure]     Matlab's structure describing the current options
-% - M_                  [structure]     Matlab's structure describing the model
+% - options_            [structure]     MATLAB's structure describing the current options
+% - M_                  [structure]     MATLAB's structure describing the model
 % - estim_params_       [structure]     characterizing parameters to be estimated
 % - bayestopt_          [structure]     describing the priors
 % - BoundsInfo          [structure]     containing prior bounds
@@ -21,7 +21,7 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 %
 % OUTPUTS
 % - fval                    [double]        scalar, value of the likelihood or posterior kernel.
-% - info                    [integer]       4×1 vector, informations resolution of the model and evaluation of the likelihood.
+% - info                    [integer]       4×1 vector, information resolution of the model and evaluation of the likelihood.
 % - exit_flag               [integer]       scalar, equal to 1 (no issues when evaluating the likelihood) or 0 (not able to evaluate the likelihood).
 % - DLIK                    [double]        Empty array.
 % - Hess                    [double]        Empty array.

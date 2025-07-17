@@ -5,7 +5,7 @@ function [fhat,xhat,fcount,retcode] = csminit1(fcn,x0,penalty,f0,g0,badg,H0,Verb
 %   fcn:        [string]        string naming the objective function to be minimized
 %   x0:         [npar by 1]     initial value of the parameter vector
 %   penalty:    [scalar]        variable penalty in case of failure of objective function
-%   f0:         [scalar]        initial value of the fucntion
+%   f0:         [scalar]        initial value of the function
 %   g0:         [npar by 1]     initial value of the gradient vector
 %   badg        [scalar]        indicator for problem in gradient computation
 %   H0:         [npar by npar]  initial value for the inverse Hessian.  Must be positive definite.
@@ -28,7 +28,7 @@ function [fhat,xhat,fcount,retcode] = csminit1(fcn,x0,penalty,f0,g0,badg,H0,Verb
 % Places where the number of P's need to be altered or the code could be returned to
 % its old form are marked with ARGLIST comments.
 %
-% Fixed 7/17/93 to use inverse-hessian instead of hessian itself in bfgs
+% Fixed 7/17/93 to use inverse-Hessian instead of Hessian itself in bfgs
 % update.
 %
 % Fixed 7/19/93 to flip eigenvalues of H to get better performance when

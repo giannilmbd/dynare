@@ -11,7 +11,7 @@ function oo_=disp_th_moments_pruned_state_space(dr,M_,options_,i_var,oo_)
 % oo_           [struct]    structure describing the Model
 %
 % OUTPUTS: 
-%           gamma_y                                 [cell]      Matlab cell of nar+1 arrays, where nar is the order of the autocorrelation function.
+%           gamma_y                                 [cell]      MATLAB cell of nar+1 arrays, where nar is the order of the autocorrelation function.
 %           gamma_y{1}                              [double]    Covariance matrix.
 %           gamma_y{i+1}                            [double]    Autocorrelation function (for i=1,...,options_.ar).
 %           mean                                    [vector]    Unconditional mean

@@ -4,11 +4,10 @@ function [fval,info,exit_flag,grad,hess,SteadyState,trend_coeff,PHI_tilde,SIGMA_
 %
 % INPUTS
 %   o xparam1               [double]    Vector of model's parameters.
-%   o gend                  [integer]   Number of observations (without conditionning observations for the lags).
 %   o dataset_              [dseries]   object storing the dataset     
-%   o dataset_info          [structure] storing informations about the sample.
+%   o dataset_info          [structure] storing information about the sample.
 %   o options_              [structure] describing the options
-%   o M_                    [structure] decribing the model
+%   o M_                    [structure] describing the model
 %   o estim_params_         [structure] characterizing parameters to be estimated
 %   o bayestopt_            [structure] describing the priors
 %   o BoundsInfo            [structure] containing prior bounds
@@ -19,11 +18,11 @@ function [fval,info,exit_flag,grad,hess,SteadyState,trend_coeff,PHI_tilde,SIGMA_
 %
 % OUTPUTS
 %   o fval          [double]     Value of the posterior kernel at xparam1.
-%   o info          [integer]    Vector of informations about the penalty.
+%   o info          [integer]    Vector of information about the penalty.
 %   o exit_flag     [integer]    Zero if the function returns a penalty, one otherwise.
 %   o grad          [double]     place holder for gradient of the likelihood
 %                                currently not supported by dsge_var
-%   o hess          [double]     place holder for hessian matrix of the likelihood
+%   o hess          [double]     place holder for Hessian matrix of the likelihood
 %                                currently not supported by dsge_var
 %   o SteadyState   [double]     Steady state vector possibly recomputed
 %                                by call to dynare_resolve()
@@ -34,7 +33,7 @@ function [fval,info,exit_flag,grad,hess,SteadyState,trend_coeff,PHI_tilde,SIGMA_
 %   o SIGMA_u_tilde [double]     Covariance matrix of the BVAR-DSGE (at the mode associated to xparam1),
 %                                formula (29), DS (2004)
 %   o iXX           [double]     inv(lambda*T*Gamma_XX^*+ X'*X)
-%   o prior         [double]     a matlab structure describing the dsge-var prior
+%   o prior         [double]     a MATLAB structure describing the dsge-var prior
 %                                   - SIGMA_u_star: prior covariance matrix, formula (23), DS (2004)
 %                                   - PHI_star: prior autoregressive matrices, formula (22), DS (2004)
 %                                   - ArtificialSampleSize: number of artificial observations from the prior (T^* in DS (2004))
@@ -49,7 +48,7 @@ function [fval,info,exit_flag,grad,hess,SteadyState,trend_coeff,PHI_tilde,SIGMA_
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2023Dynare Team
+% Copyright © 2006-2023 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -89,7 +88,7 @@ end
 % Initialization of of the index for parameter dsge_prior_weight in M_.params.
 dsge_prior_weight_idx = strmatch('dsge_prior_weight', M_.param_names);
 
-% Get the number of estimated (dsge) parameters.
+% Get the number of estimated (DSGE) parameters.
 nx = estim_params_.nvx + estim_params_.np;
 
 % Get the number of observed variables in the VAR model.
@@ -120,7 +119,7 @@ if info(1)
     return
 end
 
-% Get the weight of the dsge prior.
+% Get the weight of the DSGE prior.
 dsge_prior_weight = M_.params(dsge_prior_weight_idx);
 
 % Is the dsge prior proper?
@@ -138,7 +137,7 @@ end
 % 2. call model setup & reduction program
 %------------------------------------------------------------------------------
 
-% Solve the Dsge model and get the matrices of the reduced form solution. T and R are the matrices of the
+% Solve the DSGE model and get the matrices of the reduced form solution. T and R are the matrices of the
 % state equation
 [T,R,SteadyState,info] = dynare_resolve(M_,options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state,'restrict');
 

@@ -1,6 +1,6 @@
 function ms_sbvar_setup(options_)
 % function ms_sbvar_setup(options_)
-% does the general file initialization for ms sbvar
+% does the general file initialization for MS SBVAR
 %
 % INPUTS
 %    options_:    (struct)    options
@@ -93,7 +93,7 @@ gsig2_lmdm = options_.ms.gsig2_lmdm;
 % data series.
 xdd=options_.data;
 
-% Information about timing of the data for consistancy checks
+% Information about timing of the data for consistency checks
 % quarters (4) or months (12)
 q_m = options_.ms.freq;
 % beginning year in data set
@@ -111,7 +111,7 @@ yrStart=options_.ms.initial_year;
 qmStart=options_.ms.initial_subperiod;
 % last year to use in estimation
 yrEnd=options_.ms.final_year;
-% last quater or month to use in estimation
+% last quarter or month to use in estimation
 qmEnd=options_.ms.final_subperiod;
 % Log variables in xdd
 logindx = [];
@@ -152,7 +152,7 @@ indxDummy = options_.ms.bayesian_prior;
 
 %
 hpmsmd = [0.0; 0.0];
-indxmsmdeqn = [0; 0; 0; 0];  %This option disenable using this in fn_rnrprior_covres_dobs.m
+indxmsmdeqn = [0; 0; 0; 0];  %This option disable using this in fn_rnrprior_covres_dobs.m
 
 nStates = -1;
 

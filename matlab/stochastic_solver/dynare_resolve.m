@@ -3,8 +3,8 @@ function [A,B,ys,info,dr,params] = dynare_resolve(M_,options_,dr,endo_steady_sta
 % Computes the linear approximation and the matrices A and B of the transition equation.
 %
 % Inputs:
-% - M_                  [structure]     Matlab's structure describing the model
-% - options_            [structure]     Matlab's structure containing the options
+% - M_                  [structure]     MATLAB's structure describing the model
+% - options_            [structure]     MATLAB's structure containing the options
 % - dr                  [structure]     Reduced form model.
 % - endo_steady_state   [vector]        steady state value for endogenous variables
 % - exo_steady_state    [vector]        steady state value for exogenous variables

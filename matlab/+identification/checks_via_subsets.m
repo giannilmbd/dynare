@@ -1,20 +1,20 @@
 function [ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] = checks_via_subsets(ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal, totparam_nbr, modparam_nbr, options_ident,error_indicator)
 %[ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] = checks_via_subsets(ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal, totparam_nbr, modparam_nbr, options_ident,error_indicator)
 % -------------------------------------------------------------------------
-% Finds problematic sets of paramters via checking the necessary rank condition
+% Finds problematic sets of parameters via checking the necessary rank condition
 % of the Jacobians for all possible combinations of parameters. The rank is
-% computed via an inbuild function based on the SVD, similar to matlab's
+% computed via an inbuilt function based on the SVD, similar to MATLAB's
 % rank. The idea is that once we have the Jacobian for all parameters, we
 % can easily set up Jacobians containing all combinations of parameters by
 % picking the relevant columns/elements of the full Jacobian. Then the rank
-% of these smaller Jacobians indicates whether this paramter combination is
+% of these smaller Jacobians indicates whether this parameter combination is
 % identified or not. To speed up computations:
 % (1) single parameters are removed from possible higher-order sets,
 % (2) for parameters that are collinear, i.e. rank failure for 2 element sets,
 % we replace the second parameter by the first one, and then compute
 % higher-order combinations [uncommented]
 % (3) all lower-order problematic sets are removed from higher-order sets
-% by an inbuild function
+% by an inbuilt function
 % (4) we could replace nchoosek by a mex version, e.g. VChooseK
 % (https://de.mathworks.com/matlabcentral/fileexchange/26190-vchoosek) as
 % nchoosek could be the bottleneck in terms of speed (and memory for models

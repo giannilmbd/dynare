@@ -7,20 +7,20 @@ function [resids, grad, state_out, E, M_, out] = match_function(err_0, obs_list,
 %  - grad           [double]        [n by n_exo] gradient (response of observables to shocks)
 %  - state_out      [double]        [ny by 1] value of endogenous variables
 %  - E              [double]        response of endogenous variables to shocks
-%  - M_             [structure]     Matlab's structure describing the model (M_).
-%  - out            [structure]     Occbin's results structure
+%  - M_             [structure]     MATLAB's structure describing the model (M_).
+%  - out            [structure]     OccBin's results structure
 %
 % Inputs
 % - err_            [double]        value of shocks 
 % - obs_list        [cell]          names of observables
 % - current_obs     [double]        [1 by n_obs] current value of observables
 % - opts_simul      [structure]     Structure with simulation options
-% - M_              [structure]     Matlab's structure describing the model (M_).
+% - M_              [structure]     MATLAB's structure describing the model (M_).
 % - dr              [structure]     Reduced form model.
 % - endo_steady_state    [vector]   steady state value for endogenous variables
 % - exo_steady_state     [vector]   steady state value for exogenous variables
 % - exo_det_steady_state [vector]   steady state value for exogenous deterministic variables
-% - options_        [structure]     Matlab's structure describing the current options (options_).
+% - options_        [structure]     MATLAB's structure describing the current options (options_).
 
 % Original authors: Pablo Cuba-Borda, Luca Guerrieri, Matteo Iacoviello, and Molin Zhong
 % Original file downloaded from:

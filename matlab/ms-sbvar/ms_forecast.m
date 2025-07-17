@@ -50,7 +50,7 @@ opt = [opt ' -data ' num2str(options_.ms.forecast_data_obs)];
 if options_.ms.regimes
     opt = [opt ' -regimes'];
 elseif options_.ms.regime
-    % regime-1 since regime is 0-indexed in C but 1-indexed in Matlab
+    % regime-1 since regime is 0-indexed in C but 1-indexed in MATLAB
     opt = [opt ' -regime ' num2str(options_.ms.regime-1)];
 end
 

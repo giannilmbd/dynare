@@ -126,7 +126,7 @@ ghxu = ReducedForm.ghxu;
 yhatinit_ = randn(n,1);
 steadystate = ReducedForm.steadystate;
 t = true(6,1);
-% Call the tested routine (matlab).
+% Call the tested routine (MATLAB).
 addpath(sprintf('%s/missing/mex/local_state_space_iterations', fileparts(which('dynare'))))
 try
     yhat1 = local_state_space_iteration_2(yhatinit, epsilon(:,1), ghx, ghu, constant, ghxx, ghuu, ghxu, 1);
@@ -154,8 +154,8 @@ try
 catch
     t(4) = false;
 end
-t(5) = max(abs(yhat1-yhat3))<1e-12; % Compare matlab and mex routines without pruning.
-t(6) = max(abs(yhat2-yhat4))<1e-12; % Compare matlab and mex routines with pruning.
+t(5) = max(abs(yhat1-yhat3))<1e-12; % Compare MATLAB and mex routines without pruning.
+t(6) = max(abs(yhat2-yhat4))<1e-12; % Compare MATLAB and mex routines with pruning.
                                     % Check the results.
 T = all(t);
 %@eof:2

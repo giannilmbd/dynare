@@ -7,12 +7,12 @@ function [Gamma_y,stationary_vars] = th_autocovariances(dr,ivar,M_,options_,node
 % INPUTS
 %   dr:               [structure]    Reduced form solution of the DSGE model  (decisions rules)
 %   ivar:             [integer]      Vector of indices for a subset of variables.
-%   M_                [structure]    Global dynare's structure, description of the DSGE model.
-%   options_          [structure]    Global dynare's structure.
+%   M_                [structure]    Dynare structure, description of the DSGE model.
+%   options_          [structure]    Dynare structure.
 %   nodecomposition   [integer]      Scalar, if different from zero the variance decomposition is not triggered.
 %
 % OUTPUTS
-%   Gamma_y           [cell]         Matlab cell of nar+3 (second order approximation) or nar+2 (first order approximation) arrays,
+%   Gamma_y           [cell]         MATLAB cell of nar+3 (second order approximation) or nar+2 (first order approximation) arrays,
 %                                    where nar is the order of the autocorrelation function.
 %                                      Gamma_y{1}       [double]  Covariance matrix.
 %                                      Gamma_y{i+1}     [double]  Autocorrelation function (for i=1,...,options_.nar).

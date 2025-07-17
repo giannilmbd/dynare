@@ -6,7 +6,7 @@ function display_problematic_vars_Jacobian(problemrow, problemcol, M_, x, type, 
 % INPUTS
 %   problemrow      [vector] rows associated with problematic entries
 %   problemcol      [vector] columns associated with problematic entries
-%   M_              [matlab structure] Definition of the model.
+%   M_              [MATLAB structure] Definition of the model.
 %   x               [vector] point at which the Jacobian was evaluated
 %   type            [string] 'static' or 'dynamic' depending on the type of
 %                               Jacobian

@@ -10,12 +10,12 @@ function [filtered_errs, resids, Emat, stateval, error_code, regime_history] = I
 %  - error_code             [4 by 1]            error code
 %
 % Inputs
-% - M_                      [structure]     Matlab's structure describing the model (M_).
+% - M_                      [structure]     MATLAB's structure describing the model (M_).
 % - dr                      [structure]     Reduced form model.
 % - endo_steady_state       [vector]        steady state value for endogenous variables
 % - exo_steady_state        [vector]        steady state value for exogenous variables
 % - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables
-% - options_                [structure]     Matlab's structure describing the current options (options_).
+% - options_                [structure]     MATLAB's structure describing the current options (options_).
 % - err_index               [double]        index of shocks with strictly positive variance in M_.exo_names
 % - filtered_errs_init      [T by N_obs]    initial values for the shocks
 % - my_obs_list             [cell]          names of observables
@@ -28,7 +28,7 @@ function [filtered_errs, resids, Emat, stateval, error_code, regime_history] = I
 % Adapted for Dynare by Dynare Team.
 %
 % This code is in the public domain and may be used freely.
-% However the authors would appreciate acknowledgement of the source by
+% However the authors would appreciate acknowledgment of the source by
 % citation of any of the following papers:
 %
 % Pablo Cuba-Borda, Luca Guerrieri, Matteo Iacoviello, and Molin Zhong (2019): "Likelihood evaluation of models
