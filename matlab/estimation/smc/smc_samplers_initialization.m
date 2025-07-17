@@ -1,9 +1,9 @@
-function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initialization(funobj, sampler, n, Prior, SimulationFolder, nsteps)
-% function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initialization(funobj, sampler, n, Prior, SimulationFolder, nsteps)
+function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initialization(objective_function, sampler, n, Prior, SimulationFolder, nsteps)
+% function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initialization(objective_function, sampler, n, Prior, SimulationFolder, nsteps)
 % Initialize SMC samplers by drawing initial particles in the prior distribution.
 %
 % INPUTS
-% - funobj           [char]     string specifying the name of the objective function (posterior kernel).
+% - objective_function [char]     string specifying the name of the objective function (posterior kernel).
 % - sampler          [char]     name of the sampler.
 % - n                [integer]  scalar, number of particles.
 % - Prior            [class]    prior information
@@ -59,7 +59,7 @@ parfor j=1:n
         candidate = Prior.draw();
         if Prior.admissible(candidate)
             particles(:,j) = candidate;
-            [tlogpostkernel(j), loglikelihood(j)] = tempered_likelihood(funobj, candidate, 0.0, Prior);
+            [tlogpostkernel(j), loglikelihood(j)] = tempered_likelihood(objective_function, candidate, 0.0, Prior);
             if isfinite(loglikelihood(j)) % if returned log-density is Inf or Nan (penalized value)
                 notvalid = false;
             end

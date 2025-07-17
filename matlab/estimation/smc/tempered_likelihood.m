@@ -1,9 +1,9 @@
-function [tlogpostkernel,loglikelihood] = tempered_likelihood(postkernelfun, xparam, lambda, Prior)
+function [tlogpostkernel,loglikelihood] = tempered_likelihood(objective_function, xparam, lambda, Prior)
 
 % Evaluate tempered likelihood (posterior kernel)
 %
 % INPUTS
-% - postkernelfun       [handle]   Function handle for the opposite of the  posterior kernel.
+% - objective_function  [handle]   Function handle for the opposite of the  posterior kernel.
 % - xparam              [double]   n×1 vector of parameters.
 % - lambda              [double]   scalar between 0 and 1, weight on the posterior kernel.
 % - Prior               [dprior]   Prior specification.
@@ -29,7 +29,7 @@ function [tlogpostkernel,loglikelihood] = tempered_likelihood(postkernelfun, xpa
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-logpostkernel = -postkernelfun(xparam);
+logpostkernel = -objective_function(xparam);
 logprior = Prior.density(xparam);
 loglikelihood = logpostkernel-logprior;
 tlogpostkernel = lambda*loglikelihood + logprior;

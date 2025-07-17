@@ -1,9 +1,9 @@
-function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
-% mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+function mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+% mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
 % Sequential Monte-Carlo sampler, Herbst and Schorfheide (JAE, 2014).
 %
 % INPUTS
-% - TargetFun        [char]     string specifying the name of the objective function (posterior kernel).
+% - objective_function [char]   string specifying the name of the objective function (posterior kernel).
 % - mh_bounds        [double]   p×2 matrix defining lower and upper bounds for the parameters.
 % - dataset_         [dseries]  sample
 % - dataset_info     [struct]   Information about the dataset
@@ -44,7 +44,7 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
     Prior = dprior(bayestopt_, options_.prior_trunc);
 
     % Set function handle for the objective
-    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);', 'funobj', func2str(TargetFun)));
+    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);', 'funobj', func2str(objective_function)));
 
     mlogit = @(x) .95 + .1/(1 + exp(-16*x)); % Update of the scale parameter
 

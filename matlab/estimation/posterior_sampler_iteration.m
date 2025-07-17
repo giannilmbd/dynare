@@ -1,10 +1,10 @@
-function  [par, logpost, accepted, neval] = posterior_sampler_iteration(TargetFun,last_draw, last_posterior, sampler_options,varargin)
+function  [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
 
-% function [par, logpost, accepted, neval] = posterior_sampler_iteration(TargetFun,last_draw, last_posterior, sampler_options,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
+% function [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
 % posterior samplers
 %
 % INPUTS
-%   TargetFun:              string storing the objective function (e.g. 'dsge_likelihood.m')
+%   objective_function:     string storing the objective function (e.g. 'dsge_likelihood.m')
 %   last_draw:              parameter vector in last iteration
 %   last_posterior:         value of the posterior in last iteration
 %   sampler_options:        posterior sampler options
@@ -55,7 +55,7 @@ mh_bounds = sampler_options.bounds;
 switch posterior_sampling_method
   case 'slice'
 
-    [par, logpost, neval] = slice_sampler(TargetFun,last_draw, [mh_bounds.lb mh_bounds.ub], sampler_options,varargin{:});
+    [par, logpost, neval] = slice_sampler(objective_function,last_draw, [mh_bounds.lb mh_bounds.ub], sampler_options,varargin{:});
     accepted = 1;
   case 'random_walk_metropolis_hastings'
     neval = 1;
@@ -66,7 +66,7 @@ switch posterior_sampling_method
     par = feval(ProposalFun, last_draw, proposal_covariance_Cholesky_decomposition, n);
     if all( par(:) > mh_bounds.lb ) && all( par(:) < mh_bounds.ub )
         try
-            logpost = - feval(TargetFun, par(:),varargin{:});
+            logpost = - feval(objective_function, par(:),varargin{:});
         catch
             logpost = -inf;
         end
@@ -97,12 +97,12 @@ switch posterior_sampling_method
         nxopt=length(indices(blocks==block_iter,1)); %get size of current block
         par_start_current_block=current_draw(indices(blocks==block_iter,1));
         [xopt_current_block] = dynare_minimize_objective(@TaRB_optimizer_wrapper,par_start_current_block,sampler_options.mode_compute,options_,[mh_bounds.lb(indices(blocks==block_iter,1),1) mh_bounds.ub(indices(blocks==block_iter,1),1)],bayestopt_.name,bayestopt_,[],...
-                                                                            current_draw,indices(blocks==block_iter,1),TargetFun,...% inputs for wrapper
+                                                                            current_draw,indices(blocks==block_iter,1),objective_function,...% inputs for wrapper
                                                                             varargin{:}); %inputs for objective
         %% covariance for proposal density
         hessian_mat = reshape(hessian('TaRB_optimizer_wrapper',xopt_current_block, ...
                                       options_.gstep,...
-                                      current_draw,indices(blocks==block_iter,1),TargetFun,...% inputs for wrapper
+                                      current_draw,indices(blocks==block_iter,1),objective_function,...% inputs for wrapper
                                       varargin{:}),nxopt,nxopt);
 
         if any(any(isnan(hessian_mat))) || any(any(isinf(hessian_mat)))
@@ -131,7 +131,7 @@ switch posterior_sampling_method
         if all( proposed_par(:) > mh_bounds.lb(indices(blocks==block_iter,1),:) ) && all( proposed_par(:) < mh_bounds.ub(indices(blocks==block_iter,1),:) )
             try
                 logpost = - TaRB_optimizer_wrapper(proposed_par(:),...
-                                  current_draw,indices(blocks==block_iter,1),TargetFun,...% inputs for wrapper
+                                  current_draw,indices(blocks==block_iter,1),objective_function,...% inputs for wrapper
                                   varargin{:});
             catch
                 logpost = -inf;
@@ -174,7 +174,7 @@ switch posterior_sampling_method
     par = feval(ProposalFun, xparam1, proposal_covariance_Cholesky_decomposition, n);
     if all( par(:) > mh_bounds.lb ) && all( par(:) < mh_bounds.ub )
         try
-            logpost = - feval(TargetFun, par(:),varargin{:});
+            logpost = - feval(objective_function, par(:),varargin{:});
         catch
             logpost = -inf;
         end

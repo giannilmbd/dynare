@@ -1,9 +1,9 @@
-function Scale = calibrate_mh_scale_parameter(ObjectiveFunction, CovarianceMatrix, Parameters, MhBounds, options, varargin)
+function Scale = calibrate_mh_scale_parameter(objective_function, CovarianceMatrix, Parameters, MhBounds, options, varargin)
 % function Scale = calibrate_mh_scale_parameter(ObjectiveFunction, CovarianceMatrix, Parameters, MhBounds, options, varargin)
 % Tune the MH scale parameter so that the overall acceptance ratio is close to AcceptanceTarget.
 %
 % INPUTS
-% - ObjectiveFunction             [fhandle]      Function (posterior kernel).
+% - objective_function            [fhandle]      Function (posterior kernel).
 % - CovarianceMatrix              [double]       n*n matrix, covariance matrix of the jumping distribution.
 % - Parameters                    [double]       n*1 vector, parameter values.
 % - MhBounds                      [double]       n*2 matrix, bounds on the possible values for the parameters.
@@ -13,7 +13,7 @@ function Scale = calibrate_mh_scale_parameter(ObjectiveFunction, CovarianceMatri
 % OUTPUTS
 % - Scale                         [double]       scalar, optimal scale parameter for the jumping distribution.
 %
-% Note: program terminates if c3 consecutive runs of stepsize draws occured where 
+% Note: program terminates if c3 consecutive runs of stepsize draws occurred where 
 %   i) the overall acceptance rate was less than c1 from target and 
 %   ii) less than c2 over the last stepsize=2000 draws.
 % Adjustment between steps takes place using a weighted average with the exponent being rho
@@ -41,11 +41,11 @@ function Scale = calibrate_mh_scale_parameter(ObjectiveFunction, CovarianceMatri
 hh_fig = dyn_waitbar(0,'Tuning of the scale parameter...');
 set(hh_fig,'Name','Tuning of the scale parameter.');
 
-% Intilialize various counters.
+% Initialize various counters.
 j = 1; jj  = 1; isux = 0; jsux = 0; i = 0;
 
 % Evaluate the objective function.
-logpo0 = - feval(ObjectiveFunction, Parameters, varargin{:});
+logpo0 = - feval(objective_function, Parameters, varargin{:});
 logpo1 = logpo0;
 
 % Get the dimension of the problem.
@@ -86,7 +86,7 @@ while j<=options.maxiter
     % If out of boundaries set the posterior kernel equal to minus infinity
     % so that the proposal will be rejected with probability one.
     if all(proposal > MhBounds(1,:)) && all(proposal < MhBounds(2,:))
-        logpo0 = -feval(ObjectiveFunction, proposal(:), varargin{:});
+        logpo0 = -feval(objective_function, proposal(:), varargin{:});
     else
         logpo0 = -inf;
     end

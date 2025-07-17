@@ -1,5 +1,5 @@
-function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, dr , steady_state, exo_steady_state, exo_det_steady_state)
-
+function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, dr , steady_state, exo_steady_state, exo_det_steady_state)
+%dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, dr , steady_state, exo_steady_state, exo_det_steady_state)
 % Differential-Independence Mixture Ensemble ("DIME") MCMC sampling 
 % as proposed in "Ensemble MCMC Sampling for Robust Bayesian Inference" 
 % (Gregor Boehl, 2022, SSRN No. 4250395):
@@ -7,7 +7,7 @@ function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_
 %   https://gregorboehl.com/live/dime_mcmc_boehl.pdf
 %
 % INPUTS
-% - TargetFun               [char]     string specifying the name of the objective function (posterior kernel).
+% - objective_function      [char]     string specifying the name of the objective function (posterior kernel).
 % - init_x                  [double]   p×1 vector of parameters to be estimated (initial values, not used).
 % - mh_bounds               [double]   p×2 matrix defining lower and upper bounds for the parameters.
 % - dataset_                [dseries]  sample
@@ -79,7 +79,7 @@ function dime(TargetFun, init_x, mh_bounds, dataset_, dataset_info, options_, M_
     bounds = check_bounds(Prior, mh_bounds);
 
     % Set function handle for the objective
-    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, dr , steady_state, exo_steady_state, exo_det_steady_state, []);', 'funobj', func2str(TargetFun)));
+    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, dr , steady_state, exo_steady_state, exo_det_steady_state, []);', 'funobj', func2str(objective_function)));
 
     % Initialization of the sampler (draws from the prior distribution with finite logged likelihood)
     t0 = tic;
