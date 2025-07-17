@@ -50,7 +50,11 @@ if info(1)
             info(1) == 20 || info(1) == 21 || info(1) == 23 || info(1) == 26 || ...
             info(1) == 81 || info(1) == 84 ||  info(1) == 85
         loss = 1e8;
-        info(4)=info(2);
+        if ~isfinite(info(2))
+            info(4) = 0.1;
+        else
+            info(4) = info(2);
+        end
         return
     else
         loss = 1e8;

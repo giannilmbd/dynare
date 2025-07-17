@@ -92,7 +92,11 @@ if info(1)
                 info(1) == 81 || info(1) == 84 ||  info(1) == 85 ||  info(1) == 86
         %meaningful second entry of output that can be used
         fval = Inf;
+        if ~isfinite(info(2))
+            info(4) = 0.1;
+        else
         info(4) = info(2);
+        end
         exit_flag = 0;
         return
     else

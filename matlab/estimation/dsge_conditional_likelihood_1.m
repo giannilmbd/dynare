@@ -105,7 +105,11 @@ if info(1)
                 info(1) == 411 || info(1) == 412 || info(1) == 413 % logarithmic reduction 
         %meaningful second entry of output that can be used
         fval = Inf;
-        info(4) = info(2);
+        if ~isfinite(info(2))
+            info(4) = 0.1;
+        else
+            info(4) = info(2);
+        end
         exitflag = false;
         return
     else
@@ -120,7 +124,11 @@ end
 info = endogenous_prior_restrictions(T, R, M_, options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 if info(1)
     fval = Inf;
-    info(4)=info(2);
+    if ~isfinite(info(2))
+        info(4) = 0.1;
+    else
+        info(4) = info(2);
+    end
     exitflag = false;
     return
 end
