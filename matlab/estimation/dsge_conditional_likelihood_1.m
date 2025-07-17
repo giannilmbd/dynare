@@ -210,13 +210,36 @@ end
 
 % Computes minus log-likelihood.
 likelihood = -sum(llik);
-
+if isinf(likelihood)
+    fval = Inf; info(1) = 50; info(4) = 0.1; exitflag = false;
+    return
+end
+if isnan(likelihood)
+    fval = Inf; info(1) = 45; info(4) = 0.1; exitflag = false;
+    return
+end
+if imag(likelihood)~=0
+    fval = Inf; info(1) = 46; info(4) = 0.1; exitflag = false;
+    return
+end
 
 % ------------------------------------------------------------------------------
 % 5. Adds prior if necessary
 % ------------------------------------------------------------------------------
 
 lnprior = priordens(xparam1, bayestopt_.pshape, bayestopt_.p6, bayestopt_.p7, bayestopt_.p3, bayestopt_.p4);
+if isinf(lnprior)
+    fval = Inf; info(1) = 40; info(4) = 0.1; exitflag = false;
+    return
+end
+if isnan(lnprior)
+    fval = Inf; info(1) = 47; info(4) = 0.1; exitflag = false;
+    return
+end
+if imag(lnprior)~=0
+    fval = Inf; info(1) = 48; info(4) = 0.1; exitflag = false;
+    return
+end
 
 if options_.endogenous_prior==1
     [lnpriormom]  = endogenous_prior(Y, Pstar, bayestopt_, H);
@@ -228,20 +251,4 @@ end
 if options_.prior_restrictions.status
     tmp = feval(options_.prior_restrictions.routine, M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, dataset_, dataset_info);
     fval = fval - tmp;
-end
-
-if isnan(fval)
-    fval = Inf;
-    info(1) = 47;
-    info(4) = 0.1;
-    exitflag = false;
-    return
-end
-
-if imag(fval)~=0
-    fval = Inf;
-    info(1) = 48;
-    info(4) = 0.1;
-    exitflag = false;
-    return
 end

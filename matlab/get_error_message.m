@@ -85,21 +85,23 @@ switch info(1)
         message = 'The loglinearization of the model cannot be performed, because the steady state is not strictly positive.';
     case 30
         message = 'Ergodic variance can''t be computed.';
+    case 40
+        message = 'Prior density is Inf';
     case 41
         message = 'one (many) parameter(s) do(es) not satisfy the lower bound';
     case 42
         message = 'one (many) parameter(s) do(es) not satisfy the upper bound';
     case 43
         message = 'Covariance matrix of structural shocks is not positive definite';
-    case 44 %DsgeLikelihood_hh / dsge_likelihood
+    case 44
         message = 'The covariance matrix of the measurement errors is not positive definite.';
-    case 45 %DsgeLikelihood_hh / dsge_likelihood
-        message = 'Likelihood is not a number (NaN) or a complex number';
-    case 46 %DsgeLikelihood_hh / dsge_likelihood
+    case 45
+        message = 'Likelihood is not a number (NaN)';
+    case 46
         message = 'Likelihood is a complex number';
-    case 47 %DsgeLikelihood_hh / dsge_likelihood
+    case 47
         message = 'Prior density is not a number (NaN)';
-    case 48 %DsgeLikelihood_hh / dsge_likelihood
+    case 48
         message = 'Prior density is a complex number';
     case 49
         message = 'The model violates one (many) endogenous prior restriction(s)';
@@ -107,13 +109,13 @@ switch info(1)
         message = 'Likelihood is Inf';
     case 51
         message = sprintf('\n The dsge_prior_weight is dsge_var=%5.4f, but must be at least %5.4f for the prior to be proper.\n You are estimating a DSGE-VAR model, but the value of the dsge prior weight is too low!', info(2), info(3));
-    case 52 %dsge_var_likelihood
+    case 52
         message = 'You are estimating a DSGE-VAR model, but the implied covariance matrix of the VAR''s innovations, based on artificial and actual sample is not positive definite!';
-    case 53 %dsge_var_likelihood
+    case 53
         message = 'You are estimating a DSGE-VAR model, but the implied covariance matrix of the VAR''s innovations, based on the artificial sample, is not positive definite!';
     case 55
         message = 'Fast Kalman filter only works with stationary models [lik_init=1] or stationary observables for non-stationary models [lik_init=3]';
-    case 61 %Discretionary policy
+    case 61
         message = 'Discretionary policy: maximum number of iterations has been reached. Procedure failed.';
     case 62
         message = 'Discretionary policy: some eigenvalues greater than options_.qz_criterium. Model potentially unstable.';
@@ -165,32 +167,48 @@ switch info(1)
         message = 'Aim: A is NaN or Inf.';
     case 164
         message = 'Aim: Problem in SPEIG.';
+    case 174
+        message = 'OSR: the loss is Inf';
+    case 175
+        message = 'OSR: the loss is NaN';
+    case 176
+        message = 'OSR: the loss is a complex number';
+    case 177
+        message = 'method_of_moments: the sum of squared residuals is Inf';
+    case 178
+        message = 'method_of_moments: the sum of squared residuals is NaN';
+    case 179
+        message = 'method_of_moments: the sum of squared residuals is a complex number';
     case 180
         message = 'SMM: simulation resulted in NaN/Inf. You may need to enable pruning.';
     case 181
         message = 'IRF Matching: simulated IRFs were explosive. Either reduce the shock size, use pruning, or set the approximation order to 1.';
+    case 182
+        message = 'IRF Matching: transformations in irf_matching_file returned with an error.';
     case 201
         message = 'Particle Filter: Initial covariance of the states is not positive definite. Try a different nonlinear_filter_initialization';
     case 202
         message = 'Particle Filter: Initial covariance of the states based on simulation resulted in NaN/Inf. Use pruning or try a different nonlinear_filter_initialization';
+    case 300
+        message = 'IVF: The likelihood is a complex number.';
     case 301
         message = 'IVF: The likelihood is Inf.';
     case 302
         message = 'IVF: The likelihood is NaN.';
     case 303
-        message = 'IVF: The residuals are not 0.';        
+        message = 'IVF: The residuals are not 0.';
     case 304
-        message = 'IVF: The solver returned with an error code.';        
+        message = 'IVF: The solver returned with an error code.';
     case 305
-        message = 'IVF: The returned shocks are bigger than 1e8.';        
+        message = 'IVF: The returned shocks are bigger than 1e8.';
     case 310
-        message = 'Occbin: Simulation terminated with periodic solution (no convergence).';        
+        message = 'Occbin: Simulation terminated with periodic solution (no convergence).';
     case 311
-        message = 'Occbin: Simulation did not converge, increase maxit or check_ahead_periods.';        
+        message = 'Occbin: Simulation did not converge, increase maxit or check_ahead_periods.';
     case 312
-        message = 'Occbin: Constraint(s) are binding at the end of the sample.';        
+        message = 'Occbin: Constraint(s) are binding at the end of the sample.';
     case 313
-        message = 'Occbin: Simulation did not converge -- infinite loop of guess regimes';        
+        message = 'Occbin: Simulation did not converge -- infinite loop of guess regimes';
     case 320
         message = 'Piecewise linear Kalman filter: There was a problem in obtaining the likelihood.';
     case 321

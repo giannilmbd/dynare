@@ -95,7 +95,7 @@ if info(1)
         if ~isfinite(info(2))
             info(4) = 0.1;
         else
-        info(4) = info(2);
+            info(4) = info(2);
         end
         exit_flag = 0;
         return
@@ -159,26 +159,20 @@ end
 like = 0.5*sum(likei(options_.presample+1:end));
 
 if isinf(like) 
-    fval = Inf;
-    info(1) = 301;
-    info(4) = 1000;
-    exit_flag = 0;
+    fval = Inf; info(1) = 301; info(4) = 1000; exit_flag = 0;
     return
 elseif isnan(like)
-    fval = Inf;
-    info(1) = 302;
-    info(4) = 1000;
-    exit_flag = 0;
+    fval = Inf; info(1) = 302; info(4) = 1000; exit_flag = 0;
+    return
+elseif imag(like)~=0
+    fval = Inf; info(1) = 300; info(4) = 1000; exit_flag = 0;
     return
 end
 
 maxresid = max(abs(resids(:)));
 if maxresid>1e-3
     disp_verbose('Penalize failure of residuals to be zero',options_.verbosity)    
-    fval = Inf;
-    info(1) = 303;
-    info(4) = sum(resids(:).^2);
-    exit_flag = 0;
+    fval = Inf; info(1) = 303; info(4) = sum(resids(:).^2); exit_flag = 0;
     return
 end
 
@@ -187,11 +181,17 @@ if ~isempty(xparam1)
 else
     prior = 0;
 end
-if prior == Inf
+if isinf(prior)
     % If parameters outside prior bound, minus prior density is very large
-    fval = Inf;
-    info(4) = 1000;
-    exit_flag = 0;
+    fval = Inf; info(1) = 40; info(4) = 1000; exit_flag = 0;
+    return
+end
+if isnan(prior)
+    fval = Inf; info(1) = 47; info(4) = 1000; exit_flag = 0;
+    return
+end
+if imag(prior)~=0
+    fval = Inf; info(1) = 48; info(4) = 1000; exit_flag = 0;
     return
 end
 

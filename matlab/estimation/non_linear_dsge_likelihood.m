@@ -209,16 +209,13 @@ options_.warning_for_steadystate = 0;
 LIK = feval(options_.particle.algorithm, ReducedForm, Y, start, options_.particle, options_.threads, options_, M_);
 set_dynare_random_generator_state(s1,s2);
 if imag(LIK)
-    fval = Inf;
-    info(1) = 46;
-    info(4) = 0.1;
-    exit_flag = 0;
+    fval = Inf; info(1) = 46; info(4) = 0.1; exit_flag = 0;
     return
 elseif isnan(LIK)
-    fval = Inf;
-    info(1) = 45;
-    info(4) = 0.1;
-    exit_flag = 0;
+    fval = Inf; info(1) = 45; info(4) = 0.1; exit_flag = 0;
+    return
+elseif isinf(LIK)
+    fval = Inf; info(1) = 50; info(4) = 0.1; exit_flag = 0;
     return
 else
     likelihood = LIK;
@@ -228,28 +225,16 @@ options_.warning_for_steadystate = 1;
 % Adds prior if necessary
 % ------------------------------------------------------------------------------
 lnprior = priordens(xparam1(:),bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7,bayestopt_.p3,bayestopt_.p4);
+if isinf(lnprior)
+    fval = Inf; info(1) = 40; info(4) = 0.1; exit_flag = 0;
+    return
+end
+if isnan(lnprior)
+    fval = Inf; info(1) = 47; info(4) = 0.1; exit_flag = 0;
+    return
+end
+if imag(lnprior)~=0
+    fval = Inf; info(1) = 48; info(4) = 0.1; exit_flag = 0;
+    return
+end
 fval = (likelihood-lnprior);
-
-if isnan(fval)
-    fval = Inf;
-    info(1) = 47;
-    info(4) = 0.1;
-    exit_flag = 0;
-    return
-end
-
-if ~isreal(fval)
-    fval = Inf;
-    info(1) = 48;
-    info(4) = 0.1;
-    exit_flag = 0;
-    return
-end
-
-if isinf(LIK)
-    fval = Inf;
-    info(1) = 50;
-    info(4) = 0.1;
-    exit_flag = 0;
-    return
-end

@@ -119,7 +119,7 @@ if info(1)
         if ~isfinite(info(2))
             info(4) = 0.1;
         else
-        info(4) = info(2);
+            info(4) = info(2);
         end
         exit_flag = 0;
         if options_mom_.mom.vector_output == 1 % lsqnonlin requires vector output
@@ -297,7 +297,7 @@ if strcmp(options_mom_.mom.mom_method,'IRF_MATCHING') && strcmp(options_mom_.mom
         [model_irf, check] = feval(str2func(options_mom_.mom.irf_matching_file.name), model_irf, M_, options_mom_, dr.ys);
         if check
             fval = Inf;
-            info(1) = 180;
+            info(1) = 182;
             info(4) = 0.1;
             exit_flag = 0;
             if options_mom_.mom.vector_output == 1 % lsqnonlin requires vector output
@@ -334,11 +334,36 @@ if strcmp(options_mom_.mom.mom_method,'IRF_MATCHING')
     end
     % add log prior if necessary
     lnprior = priordens(xparam,bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7,bayestopt_.p3,bayestopt_.p4);
+    if isinf(lnprior)
+        fval = Inf; info(1) = 40; info(4) = 0.1; exit_flag = 0;
+        return
+    end
+    if isnan(lnprior)
+        fval = Inf; info(1) = 47; info(4) = 0.1; exit_flag = 0;
+        return
+    end
+    if imag(lnprior)~=0
+        fval = Inf; info(1) = 48; info(4) = 0.1; exit_flag = 0;
+        return
+    end
+    % compute the posterior kernel
     fval = - (lnlik + lnprior);
 
 elseif strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_method,'SMM')
     residuals = sqrt(options_mom_.mom.weighting_matrix_scaling_factor)*weighting_info.Sw*moments_difference;
     Q = residuals'*residuals;
+    if isinf(Q)
+        fval = Inf; info(1) = 177; info(4) = 0.1; exit_flag = 0;
+        return
+    end
+    if isnan(Q)
+        fval = Inf; info(1) = 178; info(4) = 0.1; exit_flag = 0;
+        return
+    end
+    if imag(Q)~=0
+        fval = Inf; info(1) = 179; info(4) = 0.1; exit_flag = 0;
+        return
+    end
     if options_mom_.mom.vector_output == 1 % lsqnonlin requires vector output
         fval = residuals;
         if options_mom_.mom.penalized_estimator

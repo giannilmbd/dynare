@@ -147,3 +147,16 @@ if info(1)
 end
 
 fval = - Prior.density(xparams);
+
+if isinf(fval)
+    fval = Inf; info(1) = 40; info(4) = 0.1; exitflag = false;
+    return
+end
+if isnan(fval)
+    fval = Inf; info(1) = 47; info(4) = 0.1; exitflag = false;
+    return
+end
+if imag(fval)~=0
+    fval = Inf; info(1) = 48; info(4) = 0.1; exitflag = false;
+    return
+end
