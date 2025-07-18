@@ -92,7 +92,7 @@ tarballs/x13as_asciisrc-v$(X13AS_VERSION).tar.gz:
 $(DEPS_ARCH)/sources64/x13as-$(X13AS_VERSION): tarballs/x13as_asciisrc-v$(X13AS_VERSION).tar.gz
 	rm -rf $(DEPS_ARCH)/sources64/x13as-*
 	mkdir -p $@
-	tar xf $< --directory $@
+	tar xf $< --directory $@ --strip-components=1
 
 $(DEPS_ARCH)/lib64/x13as/x13as: $(DEPS_ARCH)/sources64/x13as-$(X13AS_VERSION)
 	# Statically link x13as (see #1865).
