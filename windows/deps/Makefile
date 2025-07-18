@@ -1,4 +1,4 @@
-# Copyright © 2017-2024 Dynare Team
+# Copyright © 2017-2025 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -119,7 +119,7 @@ clean-octave:
 
 tarballs/matlab%.tar.xz:
 	mkdir -p tarballs
-	wget $(WGET_OPTIONS) -O $@.gpg https://www.dynare.org/windows-pkg-build/$(notdir $@).gpg
+	wget $(WGET_OPTIONS) -O $@.gpg https://www.dynare.org/pkg-build/$(notdir $@).gpg
 	gpg --output $@ --decrypt $@.gpg
 	rm $@.gpg
 
