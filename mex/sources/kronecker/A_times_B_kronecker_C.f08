@@ -1,7 +1,7 @@
 ! This MEX file computes A·(B⊗C) or A·(B⊗B) without explicitly building B⊗C or
 ! B⊗B, so that one can consider large matrices B and/or C.
 
-! Copyright © 2007-2023 Dynare Team
+! Copyright © 2007-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -85,10 +85,10 @@ contains
     do j = 1,nB
        ka = 1
        do i = 1,mB
-          ! D(:,kd:kd+nC) += B(i,j)·A(:,ka:ka+mC)·C
+          ! D(:,kd:kd+nC-1) += B(i,j)·A(:,ka:ka+mC-1)·C
           call dgemm("N", "N", int(mA, blint), int(nC, blint), int(mC, blint), B(i,j), &
-               A(:,ka:ka+mC), int(mA, blint), C, int(mC, blint), 1._real64, &
-               D(:,kd:kd+nC), int(mA, blint))
+               A(:,ka:ka+mC-1), int(mA, blint), C, int(mC, blint), 1._real64, &
+               D(:,kd:kd+nC-1), int(mA, blint))
           ka = ka + mC
        end do
        kd = kd + nC
@@ -103,10 +103,10 @@ contains
     do j = 1,nB
        ka = 1
        do i = 1,mB
-          ! D(:,kd:kd+nB) += B(i,j)·A(:,ka:ka+mB)·B
+          ! D(:,kd:kd+nB-1) += B(i,j)·A(:,ka:ka+mB-1)·B
           call dgemm("N", "N", int(mA, blint), int(nB, blint), int(mB, blint), B(i,j), &
-               A(:,ka:ka+mB), int(mA, blint), B, int(mB, blint), 1._real64, &
-               D(:,kd:kd+nB), int(mA, blint))
+               A(:,ka:ka+mB-1), int(mA, blint), B, int(mB, blint), 1._real64, &
+               D(:,kd:kd+nB-1), int(mA, blint))
           ka = ka + mB
        end do
        kd = kd + nB
