@@ -45,7 +45,7 @@ strip usr/local/lib/dynare/mex/matlab/*.mexa64
 
 # Get X13 binary from the Census Bureau website
 # The binary from Ubuntu has some shared library dependencies, so it is safer to use a static binary
-wget -q https://www2.census.gov/software/x-13arima-seats/x13as/unix-linux/program-archives/x13as_ascii-v${X13ASVER}.tar.gz
+wget --no-verbose --retry-connrefused --retry-on-host-error https://www2.census.gov/software/x-13arima-seats/x13as/unix-linux/program-archives/x13as_ascii-v${X13ASVER}.tar.gz
 tar xf x13as_ascii-v${X13ASVER}.tar.gz
 
 # Populate staging area for the zip
