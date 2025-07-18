@@ -416,7 +416,7 @@ contains
        fieldnames_zero(i) = trim(fieldnames(i)) // c_null_char
        fieldnames_ptr(i) = c_loc(fieldnames_zero(i))
     end do
-    mxCreateStructMatrix = mxCreateStructMatrix_internal(m, n, size(fieldnames), fieldnames_ptr)
+    mxCreateStructMatrix = mxCreateStructMatrix_internal(m, n, int(size(fieldnames), c_int), fieldnames_ptr)
   end function mxCreateStructMatrix
 
   pure type(c_ptr) function mxGetField(pm, index, fieldname)
