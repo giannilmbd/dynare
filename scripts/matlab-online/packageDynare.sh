@@ -6,7 +6,7 @@ set -exo pipefail
 # The required Ubuntu version can be obtained by running “!lsb_release -a” in
 # MATLAB Online.
 
-X13ASVER=1-1-b61
+X13ASVER=1-1-b62
 MATLABVER=R2024b
 
 MATLABPATH=/opt/MATLAB/${MATLABVER}
