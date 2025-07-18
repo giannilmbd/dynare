@@ -141,7 +141,9 @@ dyn_first_order_solver();
 
 % Set dynare random generator and seed.
 options_=set_dynare_seed_local_options(options_,'default');
-
+if ~isoctave && matlab.internal.parallel.isPCTInstalled
+    parfevalOnAll(@() set_dynare_seed_local_options(options_,'default'), 0) % set it in all workers
+end
 % Load user configuration file.
 if isfield(options_, 'global_init_file')
     if isfile(options_.global_init_file)
