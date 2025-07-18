@@ -1,4 +1,4 @@
-# Copyright © 2019-2023 Dynare Team
+# Copyright © 2019-2025 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -29,10 +29,10 @@ $(BUILDS): build-%: deps-%
 	./build.sh $*
 
 $(DEPS): deps-%:
-	make -C deps DEPS_ARCH=$*
+	gmake -C deps DEPS_ARCH=$*
 
 $(CLEAN_DEPS): clean-deps-%:
-	make -C deps clean-all DEPS_ARCH=$*
+	gmake -C deps clean-all DEPS_ARCH=$*
 
 clean-pkg:
 	rm -rf pkg

@@ -108,7 +108,7 @@ pkg_macOS_x86_64:
     # Enforce the arm64 meson for rewrite, as a workaround to https://github.com/mesonbuild/meson/issues/12282
     - env PATH="/opt/homebrew/bin:$PATH" meson rewrite kwargs set project / version "$VERSION"
     - ln -s ~/tarballs macOS/deps/
-    - make -C macOS build-x86_64
+    - gmake -C macOS build-x86_64
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
