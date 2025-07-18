@@ -131,7 +131,11 @@ if info(1)
                 info(1) == 81 || info(1) == 84 ||  info(1) == 85
         %meaningful second entry of output that can be used
         fval = Inf;
-        info(4) = info(2);
+        if ~isfinite(info(2))
+            info(4) = 0.1;
+        else
+            info(4) = info(2);
+        end
         exitflag = false;
         return
     else
@@ -143,3 +147,16 @@ if info(1)
 end
 
 fval = - Prior.density(xparams);
+
+if isinf(fval)
+    fval = Inf; info(1) = 40; info(4) = 0.1; exitflag = false;
+    return
+end
+if isnan(fval)
+    fval = Inf; info(1) = 47; info(4) = 0.1; exitflag = false;
+    return
+end
+if imag(fval)~=0
+    fval = Inf; info(1) = 48; info(4) = 0.1; exitflag = false;
+    return
+end

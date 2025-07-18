@@ -149,7 +149,11 @@ if info(1)
                 info(1) == 81 || info(1) == 84 ||  info(1) == 85
         %meaningful second entry of output that can be used
         fval = Inf;
-        info(4) = info(2);
+        if ~isfinite(info(2))
+            info(4) = 0.1;
+        else
+            info(4) = info(2);
+        end
         exit_flag = 0;
         return
     else
@@ -267,49 +271,35 @@ else% Evaluation of the likelihood of the dsge-var model when the dsge prior wei
     PHI_tilde=PHI_star;
 end
 
-if isnan(lik)
-    fval = Inf;
-    info(1) = 45;
-    info(4) = 0.1;
-    exit_flag = 0;
+if isinf(lik)
+    fval = Inf; info(1) = 50; info(4) = 0.1; exit_flag = 0;
     return
 end
-
+if isnan(lik)
+    fval = Inf; info(1) = 45; info(4) = 0.1; exit_flag = 0;
+    return
+end
 if imag(lik)~=0
-    fval = Inf;
-    info(1) = 46;
-    info(4) = 0.1;
-    exit_flag = 0;
+    fval = Inf; info(1) = 46; info(4) = 0.1; exit_flag = 0;
     return
 end
 
 % Add the (logged) prior density for the dsge-parameters.
 lnprior = priordens(xparam1,bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7,bayestopt_.p3,bayestopt_.p4);
+if isinf(lnprior)
+    fval = Inf; info(1) = 40; info(4) = 0.1; exit_flag = 0;
+    return
+end
+if isnan(lnprior)
+    fval = Inf; info(1) = 47; info(4) = 0.1; exit_flag = 0;
+    return
+end
+if imag(lnprior)~=0
+    fval = Inf; info(1) = 48; info(4) = 0.1; exit_flag = 0;
+    return
+end
+
 fval = (lik-lnprior);
-
-if isnan(fval)
-    fval = Inf;
-    info(1) = 47;
-    info(4) = 0.1;
-    exit_flag = 0;
-    return
-end
-
-if imag(fval)~=0
-    fval = Inf;
-    info(1) = 48;
-    info(4) = 0.1;
-    exit_flag = 0;
-    return
-end
-
-if isinf(fval)
-    fval = Inf;
-    info(1) = 50;
-    info(4) = 0.1;
-    exit_flag = 0;
-    return
-end
 
 if (nargout >= 10)
     if isinf(dsge_prior_weight)

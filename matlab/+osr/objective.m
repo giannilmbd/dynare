@@ -50,7 +50,11 @@ if info(1)
             info(1) == 20 || info(1) == 21 || info(1) == 23 || info(1) == 26 || ...
             info(1) == 81 || info(1) == 84 ||  info(1) == 85
         loss = 1e8;
-        info(4)=info(2);
+        if ~isfinite(info(2))
+            info(4) = 0.1;
+        else
+            info(4) = info(2);
+        end
         return
     else
         loss = 1e8;
@@ -81,4 +85,17 @@ else
     for jp=1:length(i_params)
         df(jp,1) = sum(weights(:).*model_moments_params_derivs(:,jp));
     end
+end
+
+if isinf(loss)
+    loss = 1e8; info(1) = 174; info(4) = 0.1;
+    return
+end
+if isnan(loss)
+    loss = 1e8; info(1) = 175; info(4) = 0.1;
+    return
+end
+if imag(loss)~=0
+    loss = 1e8; info(1) = 176; info(4) = 0.1;
+    return
 end
