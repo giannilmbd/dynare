@@ -1,5 +1,5 @@
 function [LIK, lik,a,P] = univariate_kalman_filter(data_index,number_of_observations,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
-% Computes the likelihood of a stationnary state space model (univariate approach).
+% Computes the likelihood of a stationary state space model (univariate approach).
 
 %@info:
 %! @deftypefn {Function File} {[@var{LIK},@var{likk},@var{a},@var{P} ] =} univariate_kalman_filter (@var{data_index}, @var{number_of_observations},@var{no_more_missing_observations}, @var{Y}, @var{start}, @var{last}, @var{a}, @var{P}, @var{kalman_tol}, @var{riccati_tol},@var{presample},@var{T},@var{Q},@var{R},@var{H},@var{Z},@var{mm},@var{pp},@var{rr},@var{Zflag},@var{diffuse_periods})
@@ -11,11 +11,11 @@ function [LIK, lik,a,P] = univariate_kalman_filter(data_index,number_of_observat
 %! @sp 1
 %! @table @ @var
 %! @item data_index
-%! Matlab's cell, 1*T cell of column vectors of indices (in the vector of observed variables).
+%! MATLAB's cell, 1*T cell of column vectors of indices (in the vector of observed variables).
 %! @item number_of_observations
 %! Integer scalar, effective number of observations.
 %! @item no_more_missing_observations
-%! Integer scalar, date after which there is no more missing observation (it is then possible to switch to the steady state kalman filter).
+%! Integer scalar, date after which there is no more missing observation (it is then possible to switch to the steady state Kalman filter).
 %! @item Y
 %! Matrix (@var{pp}*T) of doubles, data.
 %! @item start
@@ -27,7 +27,7 @@ function [LIK, lik,a,P] = univariate_kalman_filter(data_index,number_of_observat
 %! @item P
 %! Matrix (@var{mm}*@var{mm}) of doubles, initial covariance matrix of the state vector.
 %! @item kalman_tol
-%! Double scalar, tolerance parameter (rcond, inversibility of the covariance matrix of the prediction errors).
+%! Double scalar, tolerance parameter (rcond, invertibility of the covariance matrix of the prediction errors).
 %! @item riccati_tol
 %! Double scalar, tolerance parameter (iteration over the Riccati equation).
 %! @item presample
@@ -39,7 +39,7 @@ function [LIK, lik,a,P] = univariate_kalman_filter(data_index,number_of_observat
 %! @item R
 %! Matrix (@var{mm}*@var{rr}) of doubles,
 %! @item H
-%! Vector (@var{pp}) of doubles, diagonal of covariance matrix of the measurement errors (corelation among measurement errors is handled by a model transformation).
+%! Vector (@var{pp}) of doubles, diagonal of covariance matrix of the measurement errors (correlation among measurement errors is handled by a model transformation).
 %! @item Z
 %! Matrix (@var{pp}*@var{mm}) of doubles or vector of integers, matrix relating the states to the observed variables or vector of indices (depending on the value of @var{Zflag}).
 %! @item mm
@@ -249,7 +249,7 @@ if analytic_derivation
     end
 end
 
-% Call steady state univariate kalman filter if needed.
+% Call steady state univariate Kalman filter if needed.
 if t <= last
     if analytic_derivation
         if analytic_derivation==2

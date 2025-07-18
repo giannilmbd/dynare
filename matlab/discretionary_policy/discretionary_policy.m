@@ -1,16 +1,16 @@
 function [info, oo_, options_, M_] = discretionary_policy(M_, options_, oo_, var_list)
 % function [info, oo_, options_, M_] = discretionary_policy(M_, options_, oo_, var_list)
 % INPUTS
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
-% - oo_           [structure]     Matlab's structure containing the results (oo_).
+% - M_            [structure]     MATLAB's structure describing the model (M_).
+% - options_      [structure]     MATLAB's structure describing the current options (options_).
+% - oo_           [structure]     MATLAB's structure containing the results (oo_).
 % - var_list      [cell]          list of variables
 %
 % OUTPUTS
 % - info          [integer]       scalar or vector, error code.
-% - oo_           [structure]     Matlab's structure containing the results (oo_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
-% - M_            [structure]     Matlab's structure describing the model (M_).
+% - oo_           [structure]     MATLAB's structure containing the results (oo_).
+% - options_      [structure]     MATLAB's structure describing the current options (options_).
+% - M_            [structure]     MATLAB's structure describing the model (M_).
 
 % Copyright © 2007-2023 Dynare Team
 %

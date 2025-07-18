@@ -4,7 +4,7 @@ function D = sparse_hessian_times_B_kronecker_C(varargin)
 %! @deftypefn {Function File} {@var{D} =} sparse_hessian_times_B_kronecker_C (@var{A},@var{B},@var{C},@var{fake})
 %! @anchor{kronecker/sparse_hessian_times_B_kronecker_C}
 %! @sp 1
-%! Computes A*kron(B,C) where A is hessian matrix in sparse format.
+%! Computes A*kron(B,C) where A is Hessian matrix in sparse format.
 %! @sp 2
 %! @strong{Inputs}
 %! @sp 1

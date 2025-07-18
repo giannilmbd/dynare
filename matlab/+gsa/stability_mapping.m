@@ -6,9 +6,9 @@ function x0 = stability_mapping(OutputDirectoryName,opt_gsa,M_,oo_,options_,baye
 % Inputs
 %  - OutputDirectoryName    [string]        name of the output directory
 %  - opt_gsa                [structure]     GSA options structure
-%  - M_                     [structure]     Matlab's structure describing the model
-%  - oo_                    [structure]     Matlab's structure describing the results
-%  - options_               [structure]     Matlab's structure describing the current options
+%  - M_                     [structure]     MATLAB's structure describing the model
+%  - oo_                    [structure]     MATLAB's structure describing the results
+%  - options_               [structure]     MATLAB's structure describing the current options
 %  - bayestopt_             [structure]     describing the priors
 %  - estim_params_          [structure]     characterizing parameters to be estimated
 %
@@ -18,7 +18,7 @@ function x0 = stability_mapping(OutputDirectoryName,opt_gsa,M_,oo_,options_,baye
 %
 % Inputs from opt_gsa structure
 % Nsam = MC sample size
-% fload = 0 to run new MC; 1 to load prevoiusly generated analysis
+% fload = 0 to run new MC; 1 to load previously generated analysis
 % alpha2 =  significance level for bivariate sensitivity analysis
 % [abs(corrcoef) > alpha2]
 % prepSA = 1: save transition matrices for mapping reduced form
@@ -30,7 +30,7 @@ function x0 = stability_mapping(OutputDirectoryName,opt_gsa,M_,oo_,options_,baye
 %
 % GRAPHS
 % 1) Pdf's of marginal distributions under the stability (dotted
-%     lines) and unstability (solid lines) regions
+%     lines) and instability (solid lines) regions
 % 2) Cumulative distributions of:
 %   - stable subset (dotted lines)
 %   - unacceptable subset (solid lines)
@@ -347,7 +347,7 @@ if fload==0 %run new MC
     inorestriction=inorestriction(inorestriction~=0);  % stable params violating restrictions
     iunstable=iunstable(iunstable~=0);   % violation of BK & restrictions & solution could not be found (whatever goes wrong)
     iindeterm=iindeterm(iindeterm~=0);  % indeterminacy
-    iwrong=iwrong(iwrong~=0);  % dynare could not find solution
+    iwrong=iwrong(iwrong~=0);  % Dynare could not find solution
     ixun=iunstable(~ismember(iunstable,[iindeterm,iwrong,inorestriction])); % explosive roots
 
     bkpprior.pshape=bayestopt_.pshape;
@@ -451,7 +451,7 @@ if ~isempty(iunstable) || ~isempty(iwrong)
         end
         if ~isempty(iwrong)
             skipline()
-            disp(['For ',num2str(length(iwrong)/Nsam*100,'%4.1f'),'% of the prior support dynare could not find a solution.'])
+            disp(['For ',num2str(length(iwrong)/Nsam*100,'%4.1f'),'% of the prior support Dynare could not find a solution.'])
             skipline()
         end
         if any(infox==1)
@@ -461,7 +461,7 @@ if ~isempty(iunstable) || ~isempty(iwrong)
             disp(['    For ',num2str(length(find(infox==2))/Nsam*100,'%4.1f'),'% MJDGGES returned an error code.'])
         end
         if any(infox==6)
-            disp(['    For ',num2str(length(find(infox==6))/Nsam*100,'%4.1f'),'% The jacobian evaluated at the deterministic steady state is complex.'])
+            disp(['    For ',num2str(length(find(infox==6))/Nsam*100,'%4.1f'),'% The Jacobian evaluated at the deterministic steady state is complex.'])
         end
         if any(infox==19)
             disp(['    For ',num2str(length(find(infox==19))/Nsam*100,'%4.1f'),'% The steadystate routine has thrown an exception (inconsistent deep parameters).'])
@@ -489,7 +489,7 @@ if ~isempty(iunstable) || ~isempty(iwrong)
     skipline()
     if length(iunstable)<Nsam || length(istable)>1
         itot = 1:Nsam;
-        isolve = itot(~ismember(itot,iwrong)); % dynare could find a solution
+        isolve = itot(~ismember(itot,iwrong)); % Dynare could find a solution
                                                      % Blanchard Kahn
         if neighborhood_width
             options_mcf.xparam1 = xparam1(nshock+1:end);

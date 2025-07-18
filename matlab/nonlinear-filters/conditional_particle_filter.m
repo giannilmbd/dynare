@@ -3,10 +3,10 @@ function [LIK,lik] = conditional_particle_filter(ReducedForm, Y, s, ParticleOpti
 % Evaluates the likelihood of a non-linear model with a particle filter
 %
 % INPUTS
-% - ReducedForm        [structure]    Matlab's structure describing the reduced form model.
+% - ReducedForm        [structure]    MATLAB's structure describing the reduced form model.
 % - Y                  [double]       p×T matrix of (detrended) data, where p is the number of observed variables.
 % - s                  [integer]      scalar, likelihood evaluation starts at s (has to be smaller than T, the sample length provided in Y).
-% - ParticlesOptions   [struct]
+% - ParticleOptions    [struct]
 % - ThreadsOptions     [struct]
 % - options_           [struct]
 % - M_                 [struct]
@@ -31,7 +31,7 @@ function [LIK,lik] = conditional_particle_filter(ReducedForm, Y, s, ParticleOpti
 % - Allows using current observable information in the proposal
 % - The use of sparse grids Gaussian approximation is much faster than the Monte-Carlo approach
 % Cons:
-% - The use of the Kalman updating step may biais the proposal distribution since
+% - The use of the Kalman updating step may bias the proposal distribution since
 % it has been derived in a linear context and is implemented in a nonlinear
 % context. That is why particle resampling is performed.
 

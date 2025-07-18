@@ -1,14 +1,14 @@
 function d=jacob_element(func,element,args)
 % function d=jacob_element(func,element,args)
-% returns an entry of the finite differences approximation to the jacobian of func
+% returns an entry of the finite differences approximation to the Jacobian of func
 %
 % INPUTS
 %    func       [function name]    string with name of the function
-%    element    [int]              the index showing the element within the jacobian that should be returned
+%    element    [int]              the index showing the element within the Jacobian that should be returned
 %    args       [cell array]       arguments provided to func
 %
 % OUTPUTS
-%    d          [double]           jacobian[element]
+%    d          [double]           Jacobian [element]
 %
 % SPECIAL REQUIREMENTS
 %    none

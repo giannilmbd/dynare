@@ -34,7 +34,7 @@ function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_
 %  The importance of the parameter T (initial_temperature):
 %     The parameter T is crucial in using SA successfully. It influences
 %  VM, the step length over which the algorithm searches for optima. For
-%  a small intial T, the step length may be too small  thus not enough
+%  a small initial T, the step length may be too small  thus not enough
 %  of the function might be evaluated to find the global optima. The user
 %  should carefully examine VM in the intermediate output (set verbosity =
 %  1) to make sure that VM is appropriate. The relationship between the
@@ -87,8 +87,8 @@ function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_
 %                         number of moves (broken up into uphill, downhill, accepted and rejected), the
 %                         number of out of bounds trials, the number of new optima found at this
 %                         temperature, the current optimal X and the step length VM. Note that there are
-%                         N*NS*NT function evalutations before each temperature reduction. Finally, notice is
-%                         is also given upon achieveing the termination criteria.
+%                         N*NS*NT function evaluations before each temperature reduction. Finally, notice is
+%                         is also given upon achieving the termination criteria.
 %                     2 - Each new step length (VM), the current optimal X (XOPT) and the current trial X (X). This
 %                         gives the user some idea about how far X strays from XOPT as well as how VM is adapting
 %                         to the function.
@@ -156,7 +156,7 @@ function [xopt, fopt,exitflag, n_accepted_draws, n_total_draws, n_out_of_bounds_
 %  Simulated Annealing," Journal of Econometrics, vol. 60, no. 1/2,
 %  Jan./Feb. 1994, pp. 65-100.
 %
-%  Based on the Matlab code written by Thomas Werner (Bundesbank December
+%  Based on the MATLAB code written by Thomas Werner (Bundesbank December
 %  2002), which in turn is based on the GAUSS version of Bill Goffe's simulated annealing
 %  program for global optimization, written by E.G.Tsionas (9/4/95).
 %
@@ -228,7 +228,7 @@ if(optim.verbosity >1)
     end
 end
 %  Start the main loop. Note that it terminates if (i) the algorithm
-%  succesfully optimizes the function or (ii) there are too many
+%  successfully optimizes the function or (ii) there are too many
 %  function evaluations (more than optim.MaxIter).
 
 while (1>0)

@@ -82,7 +82,7 @@ while rank(Z*Pinf*Z',diffuse_kalman_tol) && (t<=last)
                                                                         %do case distinction based on whether F_{\infty,t} has full rank or 0 rank
     if rcond(Finf) < diffuse_kalman_tol                                 %F_{\infty,t} = 0
         if ~all(abs(Finf(:)) < diffuse_kalman_tol)                      %rank-deficient but not rank 0
-                                                                        % The univariate diffuse kalman filter should be used instead.
+                                                                        % The univariate diffuse Kalman filter should be used instead.
             return
         else                                                            %rank of F_{\infty,t} is 0
             Fstar  = Z*Pstar*Z' + H;                                    % (5.7) in DK (2012)

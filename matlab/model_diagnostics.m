@@ -2,9 +2,9 @@ function model_diagnostics(M_,options_,oo_)
 % function model_diagnostics(M_,options_,oo_)
 %   computes various diagnostics on the model
 % INPUTS
-%   M_         [matlab structure] Definition of the model.
-%   options_   [matlab structure] Global options.
-%   oo_        [matlab structure] Results
+%   M_         [MATLAB structure] Definition of the model.
+%   options_   [MATLAB structure] options.
+%   oo_        [MATLAB structure] Results
 %
 % OUTPUTS
 %   none

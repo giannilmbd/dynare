@@ -25,7 +25,7 @@ function record = load_last_mh_history_file(MetropolisFolder, ModelName)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-% record is also a Matlab function.
+% record is also a MATLAB function.
 record = 0;
 
 % Get the list of all the mh_history files.

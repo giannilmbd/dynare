@@ -12,7 +12,7 @@ function simulation = simul_static_model(samplesize, innovations)
 % REMARKS
 % [1] The innovations used for the simulation are saved in oo_.exo_simul, and the resulting paths for the endogenous
 %     variables are saved in oo_.endo_simul.
-% [2] The last input argument is not mandatory. If absent we use random draws and rescale them with the informations provided
+% [2] The last input argument is not mandatory. If absent we use random draws and rescale them with the information provided
 %     through the shocks block.
 
 % Copyright © 2019-2024 Dynare Team

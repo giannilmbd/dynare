@@ -30,7 +30,7 @@ function [pdraws, log_posterior]=get_posterior_subsample(M_,options_,SampleSize)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if ~issmc(options_)
-    % Get informations about the mcmc:
+    % Get information about the MCMC:
     record=load_last_mh_history_file([M_.dname filesep 'metropolis'], M_.fname);
     npar=size(record.InitialParameters,2);
     FirstMhFile = record.KeepedDraws.FirstMhFile;

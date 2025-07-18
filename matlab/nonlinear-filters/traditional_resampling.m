@@ -21,7 +21,7 @@ function return_resample = traditional_resampling(particles,weights,noise)
 %! @sp 1
 %! @table @ @var
 %! @item indx
-%! n*1 vector of intergers, indices.
+%! n*1 vector of integers, indices.
 %! @end table
 %! @sp 2
 %! @strong{This function is called by:}
@@ -92,7 +92,7 @@ else
     for i=1:number_of_particles
         indx(i) = sum(randvec(i)>c);
     end
-    % Matlab's indices start at 1...
+    % MATLAB's indices start at 1...
     indx = indx+1;
 end
 

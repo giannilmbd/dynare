@@ -20,9 +20,9 @@ function dr = dyn_second_order_solver(g1, g2, dr, M_, threads_BC)
 %! @item g2
 %! Sparse matrix containing the Hessian of the dynamic model
 %! @item dr
-%! Matlab's structure describing the reduced form solution of the model.
+%! MATLAB's structure describing the reduced form solution of the model.
 %! @item M_
-%! Matlab's structure describing the model (initialized by @code{dynare}).
+%! MATLAB's structure describing the model (initialized by @code{Dynare}).
 %! @item threads_BC
 %! Integer controlling number of threads in sparse_hessian_times_B_kronecker_C
 %! @end table
@@ -31,7 +31,7 @@ function dr = dyn_second_order_solver(g1, g2, dr, M_, threads_BC)
 %! @sp 1
 %! @table @ @var
 %! @item dr
-%! Matlab's structure describing the reduced form solution of the model.
+%! MATLAB's structure describing the reduced form solution of the model.
 %! @end table
 %! @end deftypefn
 %@eod:

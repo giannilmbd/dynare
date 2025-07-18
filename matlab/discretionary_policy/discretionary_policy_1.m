@@ -1,8 +1,8 @@
 function [dr, info, params]=discretionary_policy_1(M_, options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % Higher-level function for solving discretionary optimal policy
 % INPUTS
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
+% - M_            [structure]     MATLAB's structure describing the model (M_).
+% - options_      [structure]     MATLAB's structure describing the current options (options_).
 % - dr            [struct]        Decision rules for stochastic simulations.
 % - endo_steady_state       [vector]     steady state value for endogenous variables                                    
 % - exo_steady_state        [vector]     steady state value for exogenous variables
@@ -77,7 +77,7 @@ g2_v = feval([M_.fname,'.objective.sparse.static_g2'], y, [], params, T_order, T
 W = build_two_dim_hessian(M_.objective_g2_sparse_indices, g2_v, 1, M_.endo_nbr);
 W=reshape(W,M_.endo_nbr,M_.endo_nbr);
 
-% Find the jacobian
+% Find the Jacobian
 y3n = repmat(ys, 1, 3);
 x = zeros(M_.exo_nbr+M_.exo_det_nbr, 1);
 [resid, T_order, T] = feval([M_.fname '.sparse.dynamic_resid'], y3n, x, M_.params, ys);

@@ -21,7 +21,7 @@ function [abscissa,f] = kernel_density_estimate(data,number_of_grid_points,numbe
 %
 % REFERENCES
 %    A kernel density estimator is used (see Silverman [1986], "Density estimation for statistics and data analysis")
-%    The code is adapted from Anders Holtsberg's matlab toolbox (stixbox).
+%    The code is adapted from Anders Holtsberg's MATLAB toolbox (stixbox).
 %
 
 % Copyright © 2004-2017 Dynare Team

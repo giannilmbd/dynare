@@ -37,7 +37,7 @@ nodecomposition = 1;
 
 folder_name=get_posterior_folder_name(options_);
     
-% Get informations about the _posterior_draws files.
+% Get information about the _posterior_draws files.
 if strcmpi(type,'posterior')
     NumberOfDrawsFiles = length(dir([M_.dname filesep folder_name filesep M_.fname '_' type '_draws*' ]));
     posterior = 1;

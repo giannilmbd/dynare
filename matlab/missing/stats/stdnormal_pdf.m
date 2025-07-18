@@ -4,7 +4,7 @@ function pdf = stdnormal_pdf (x)
 %  For each element of X, compute the PDF of the standard normal
 %  distribution at X.
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/stdnormal_pdf.m
 % Original author: TT <Teresa.Twaroch@ci.tuwien.ac.at>
 

@@ -13,12 +13,12 @@ function myoutput=PosteriorIRF_core2(myinputs,fpar,npar,whoiam,ThisMatlab)
 %                                    parallel computing obtained from posterior_sampler.m
 %                                    function.
 %   o fblck and nblck    [integer]   The Metropolis-Hastings chains.
-%   o whoiam             [integer]   In concurrent programming a modality to refer to the differents thread running in parallel is needed.
+%   o whoiam             [integer]   In concurrent programming a modality to refer to the different threads running in parallel is needed.
 %                                    The integer whoaim is the integer that
 %                                    allows us to distinguish between them. Then it is the index number of this CPU among all CPUs in the
 %                                    cluster.
 %   o ThisMatlab         [integer]   Allows us to distinguish between the
-%                                    'main' matlab, the slave matlab worker, local matlab, remote matlab,
+%                                    'main' MATLAB, the slave MATLAB worker, local MATLAB, remote MATLAB,
 %                                     ... Then it is the index number of this slave machine in the cluster.
 %
 % OUTPUTS

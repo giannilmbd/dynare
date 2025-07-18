@@ -1,12 +1,12 @@
 function [fval, grad, hess, exit_flag]=analytic_gradient_wrapper(x, fcn, varargin)
-%function [fval, grad, hess, exitflag]=analytic_gradient_wrapper(x, fcn, varargin)
-% Encapsulates an objective function to be minimized for use with Matlab
+%function [fval, grad, hess, exit_flag]=analytic_gradient_wrapper(x, fcn, varargin)
+% Encapsulates an objective function to be minimized for use with MATLAB
 % optimizers
 %
 % INPUTS
 % - x             [double]    n*1 vector of instrument values.
 % - fcn           [fhandle]   objective function.
-% - varagin       [cell]      additional parameters for fcn.
+% - varargin      [cell]      additional parameters for fcn.
 %
 % OUTPUTS
 % - fval          [double]    scalar, value of the objective function at x.
@@ -33,5 +33,5 @@ function [fval, grad, hess, exit_flag]=analytic_gradient_wrapper(x, fcn, varargi
 
 [fval, ~, exit_flag, grad, hess] = fcn(x, varargin{:});
 if size(grad,2)==1
-    grad=grad'; %should be row vector for Matlab; exception lsqnonlin where Jacobian is required
+    grad=grad'; %should be row vector for MATLAB; exception lsqnonlin where Jacobian is required
 end

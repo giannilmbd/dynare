@@ -15,7 +15,7 @@ function [q,N] = quantile(X, p, dim, method, weights)
 %   Q = QUANTILE2(X,P,DIM,METHOD) calculates quantiles using one of the
 %   methods described in http://en.wikipedia.org/wiki/Quantile. The method
 %   are designated 'R-1'...'R-9'; the default is R-8 as described in
-%   http://bit.ly/1kX4NcT, whereas Matlab uses 'R-5'.
+%   http://bit.ly/1kX4NcT, whereas MATLAB uses 'R-5'.
 %
 %   Q = QUANTILE2(X,P,[],METHOD) uses the specified METHOD, but calculates
 %   quantiles along the first non-singleton dimension.

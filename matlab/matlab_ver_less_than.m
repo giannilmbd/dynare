@@ -1,7 +1,7 @@
 function r = matlab_ver_less_than(verstr)
 % function r = matlab_ver_less_than(verstr)
 %
-% Returns 1 if current Matlab version is strictly older than
+% Returns 1 if current MATLAB version is strictly older than
 % the one given in argument.
 %
 % Note that this function will fail under Octave.

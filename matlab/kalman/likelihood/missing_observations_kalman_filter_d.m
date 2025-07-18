@@ -16,19 +16,19 @@ function [dLIK,dlik,a,Pstar] = missing_observations_kalman_filter_d(data_index,n
 %    Pinf                         [double]      mm*mm matrix used to initialize the covariance matrix of the state vector.
 %    Pstar                        [double]      mm*mm matrix used to initialize the covariance matrix of the state vector.
 %    kalman_tol                   [double]      scalar, tolerance parameter (rcond).
-%    riccati_tol                  [double]      scalar, tolerance parameter (riccati iteration).
+%    riccati_tol                  [double]      scalar, tolerance parameter (Riccati iteration).
 %    presample                    [integer]     scalar, presampling if strictly positive.
 %    T                            [double]      mm*mm matrix, transition matrix in  the state equations.
 %    R                            [double]      mm*rr matrix relating the structural innovations to the state vector.
 %    Q                            [double]      rr*rr covariance matrix of the structural innovations.
 %    H                            [double]      pp*pp covariance matrix of the measurement errors (if H is equal to zero (scalar) there is no measurement error).
-%    Z                            [double]      pp*mm matrix, selection matrix or pp linear independant combinations of the state vector.
+%    Z                            [double]      pp*mm matrix, selection matrix or pp linear independent combinations of the state vector.
 %    mm                           [integer]     scalar, number of state variables.
 %    pp                           [integer]     scalar, number of observed variables.
 %    rr                           [integer]     scalar, number of structural innovations.
 %
 % OUTPUTS
-%    dLIK        [double]    scalar, MINUS loglikelihood
+%    dLIK        [double]    scalar, MINUS log likelihood
 %    dlik        [double]    vector, density of observations in each period.
 %    a           [double]    mm*1 vector, current estimate of the state vector tomorrow (E_{T}(alpha_{T+1})).
 %    Pstar       [double]    mm*mm matrix, covariance matrix of the states.
@@ -98,7 +98,7 @@ while rank(Pinf,diffuse_kalman_tol) && (t<=last)
         Finf  = ZZ*Pinf*ZZ';                                                % (5.7) in DK (2012)
         if rcond(Finf) < diffuse_kalman_tol                                 %F_{\infty,t} = 0
             if ~all(abs(Finf(:)) < diffuse_kalman_tol)                      %rank-deficient but not rank 0
-                                                                            % The univariate diffuse kalman filter should be used.
+                                                                            % The univariate diffuse Kalman filter should be used.
                 return
             else                                                            %rank of F_{\infty,t} is 0
                 Fstar = ZZ*Pstar*ZZ' + H(d_index,d_index);                  % (5.7) in DK (2012)

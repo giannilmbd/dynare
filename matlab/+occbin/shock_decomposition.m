@@ -2,12 +2,12 @@ function oo_ = shock_decomposition(oo_, M_, options_, vname)
 % function oo_ = shock_decomposition(oo_, M_, options_, vname)
 %
 % INPUTS
-% - oo_           [structure]     Matlab's structure containing the results (oo_).
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
+% - oo_           [structure]     MATLAB's structure containing the results
+% - M_            [structure]     MATLAB's structure describing the model
+% - options_      [structure]     MATLAB's structure describing the current options
 % - vname         [cell]          array of variable names
 % OUTPUT
-% - oo_           [structure]     Matlab's structure containing the results (oo_).
+% - oo_           [structure]     MATLAB's structure containing the results
 
 % Copyright © 2021 Dynare Team
 %
@@ -45,7 +45,7 @@ use_shock_groups = shock_decomp_options.use_shock_groups;
 init_names_ = shock_decomp_options.init_names_;
 nfrcst = shock_decomp_options.nfrcst;
 
-%% new dynare grouping
+%% new Dynare grouping
 if isempty(use_shock_groups)
     use_shock_groups = 'ALL';
     ngroups = M_.exo_nbr;

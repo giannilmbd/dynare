@@ -79,7 +79,7 @@ if options_.order > 1
             fprintf('\nPlease choose a mode-finder:\n')
             fprintf('\t 0 - Continue using gradient-based method (it is most likely that you will no get any sensible result).\n')
             fprintf('\t 6 - Monte Carlo based algorithm\n')
-            fprintf('\t 7 - Nelder-Mead simplex based optimization routine (Matlab optimization toolbox required)\n')
+            fprintf('\t 7 - Nelder-Mead simplex based optimization routine (MATLAB optimization toolbox required)\n')
             fprintf('\t 8 - Nelder-Mead simplex based optimization routine (Dynare''s implementation)\n')
             fprintf('\t 9 - CMA-ES (Covariance Matrix Adaptation Evolution Strategy) algorithm\n')
             choice = [];
@@ -208,7 +208,7 @@ if isequal(options_.mode_compute,0) && isempty(options_.mode_file) && ~options_.
                     if oo_.occbin.smoother.error_flag(1)==0
                         [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty);
                     else
-                        fprintf('\nOccbin: smoother did not succeed. No results will be written to oo_.\n')
+                        fprintf('\nOccBin: smoother did not succeed. No results will be written to oo_.\n')
                     end
                 else
                     [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
@@ -241,7 +241,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
             if current_optimizer==5
                 if options_.analytic_derivation
                     old_analytic_derivation = options_.analytic_derivation;
-                    options_.analytic_derivation=-1; %force analytic outer product gradient hessian for each iteration
+                    options_.analytic_derivation=-1; %force analytic outer product gradient Hessian for each iteration
                 end
             end
         end
@@ -272,7 +272,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                 elseif ~isnumeric(current_optimizer) || ~(isequal(current_optimizer,5) && newratflag~=1 && strcmp(func2str(objective_function),'dsge_likelihood'))
                     % enter here if i) not mode_compute_5, ii) if mode_compute_5 and newratflag==1;
                     % with flag==0 or 2 and dsge_likelihood, we force to use
-                    % the hessian from outer product gradient of optimizer 5 below
+                    % the Hessian from outer product gradient of optimizer 5 below
                     if options_.hessian.use_penalized_objective
                         penalized_objective_function = str2func('penalty_objective_function');
                         hh = hessian(penalized_objective_function, xparam1, options_.gstep, objective_function, fval, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
@@ -281,7 +281,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                     end 
                     hh = reshape(hh, nx, nx);
                 elseif isnumeric(current_optimizer) && isequal(current_optimizer,5)
-                    % other numerical hessian options available with optimizer
+                    % other numerical Hessian options available with optimizer
                     % 5 and dsge_likelihood
                     %
                     % if newratflag == 0

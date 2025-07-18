@@ -4,12 +4,12 @@ function [x, errorflag, info] = trust_region(objfun, x, j1, j2, jacobianflag, gs
 % trust-region method.
 %
 % INPUTS
-% - objfun         [function handle, char]      name of the routine evaluating the system of nonlinear equations (and possibly jacobian).
+% - objfun         [function handle, char]      name of the routine evaluating the system of nonlinear equations (and possibly Jacobian).
 % - x              [double]                     n×1 vector, initial guess for the solution.
 % - j1             [integer]                    vector, equation indices defining a subproblem to be solved.
 % - j2             [integer]                    vector, unknown variable indices to be solved for in the subproblem.
-% - jacobianflag   [logical]                    scalar, if true the jacobian matrix is expected to be returned as a second output argument when calling objfun, otherwise
-%                                               the jacobian is computed numerically.
+% - jacobianflag   [logical]                    scalar, if true the Jacobian matrix is expected to be returned as a second output argument when calling objfun, otherwise
+%                                               the Jacobian is computed numerically.
 % - gstep          [double]                     scalar, increment multiplier in numerical derivative computation (only used if jacobianflag value is false).
 % - tolf           [double]                     scalar, tolerance for residuals.
 % - tolx           [double]                     scalar, tolerance for solution variation.
@@ -24,7 +24,7 @@ function [x, errorflag, info] = trust_region(objfun, x, j1, j2, jacobianflag, gs
 % - info           [integer]                    scalar, information about the failure.
 %
 % REMARKS
-% [1] j1 and j2 muyst have the same number of elements.
+% [1] j1 and j2 must have the same number of elements.
 % [2] debug is here for compatibility purpose (see solve1), it does not affect the output.
 % [3] Possible values for info are:
 %
@@ -84,7 +84,7 @@ ncsucc = 0; ncslow = 0;
 xinit = x;
 
 %
-% Attempt to evaluate the residuals and jacobian matrix on the initial guess
+% Attempt to evaluate the residuals and Jacobian matrix on the initial guess
 %
 
 try
@@ -127,12 +127,12 @@ end
 %
 
 while iter<=maxiter && ~info
-    % Compute the columns norm ofr the Jacobian matrix.
+    % Compute the columns norm of the Jacobian matrix.
     fjacnorm = transpose(sqrt(sum((fjac.*fjac))));
     if iter==1
         % On the first iteration, calculate the norm of the scaled vector of unknowns x
         % and initialize the step bound delta. Scaling is done according to the norms of
-        % the columns of the initial jacobian.
+        % the columns of the initial Jacobian.
         fjacnorm__ = fjacnorm;
         fjacnorm__(fjacnorm<eps(1.0)) = 1.0;
         xnorm = norm(fjacnorm__.*x(j2));
@@ -252,7 +252,7 @@ while iter<=maxiter && ~info
         errorflag = true;
         continue
     end
-    % Compute the jacobian for the next iteration.
+    % Compute the Jacobian for the next iteration.
     fjac0 = fjac;
     if jacobianflag
         try

@@ -273,7 +273,7 @@ end
 % set priors and bounds over the estimated parameters
 [xparam0, estim_params_, bayestopt_, lb, ub, M_] = set_prior(estim_params_, M_, options_mom_);
 number_of_estimated_parameters = length(xparam0);
-hessian_xparam0 = []; % initialize hessian
+hessian_xparam0 = []; % initialize Hessian
 % check if enough moments for estimation
 if options_mom_.mom.mom_nbr < length(xparam0)
     skipline;
@@ -503,7 +503,7 @@ test_for_deep_parameters_calibration(M_);
 % -------------------------------------------------------------------------
 objective_function = str2func('mom.objective_function');
 try
-    % check for NaN or complex values of moment-distance-funtion evaluated at initial parameters
+    % check for NaN or complex values of moment-distance-function evaluated at initial parameters
     if strcmp(options_mom_.mom.mom_method,'SMM') || strcmp(options_mom_.mom.mom_method,'GMM')
         oo_.mom.weighting_info.Sw = eye(options_mom_.mom.mom_nbr); % initialize with identity weighting matrix
     end

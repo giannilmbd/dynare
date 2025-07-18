@@ -3,7 +3,7 @@ function lprobs_sample = trace_plot_dime(options_, M_)
 % Plot the history of the densities of an ensemble to visually inspect convergence.
 %
 % INPUTS
-% - options_         [struct]   dynare's options
+% - options_         [struct]   Dynare's options
 % - M_               [struct]   model description
 % - oo_              [struct]   outputs
 %

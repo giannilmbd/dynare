@@ -4,7 +4,7 @@ function r = octave_ver_less_than(verstr)
 % Returns 1 if current Octave version is strictly older than
 % the one given in argument.
 %
-% Note that this function will fail under Matlab.
+% Note that this function will fail under MATLAB.
 %
 % INPUTS
 %    verstr: a string of the format 'x.y' or 'x.y.z'

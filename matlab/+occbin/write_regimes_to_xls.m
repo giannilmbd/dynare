@@ -4,8 +4,8 @@ function write_regimes_to_xls(occbin_struct,M_,options_)
 %
 % INPUTS
 % - occbin_struct   [struct]    occbin structure containing information on the regimes
-% - M_              [struct]    Matlab's structure describing the model
-% - options_        [struct]    Matlab's structure describing the current options
+% - M_              [struct]    MATLAB's structure describing the model
+% - options_        [struct]    MATLAB's structure describing the current options
 
 % Copyright © 2021-2023 Dynare Team
 %

@@ -39,7 +39,7 @@ function [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info] = mr_hessian(x,f
 %                           varargin{8} --> oo_
 %
 % Outputs
-%  - hessian_mat        hessian
+%  - hessian_mat        Hessian
 %  - gg                 Jacobian
 %  - htol1              updated 'precision' of increment of function values for numerical
 %                       derivatives

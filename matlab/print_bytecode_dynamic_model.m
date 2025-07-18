@@ -1,6 +1,6 @@
 function print_bytecode_dynamic_model()
 % function print_bytecode_dynamic_model()
-% print the model and jacobian from the bytecode format for the dynamic model
+% print the model and Jacobian from the bytecode format for the dynamic model
 %
 % INPUTS
 %   none

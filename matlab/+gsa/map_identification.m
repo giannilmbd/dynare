@@ -3,9 +3,9 @@ function map_identification(OutputDirectoryName,opt_gsa,M_,oo_,options_,estim_pa
 % Inputs
 %  - OutputDirectoryName [string]    name of the output directory
 %  - opt_gsa             [structure]     GSA options structure
-%  - M_                  [structure]     Matlab's structure describing the model
-%  - oo_                 [structure]     Matlab's structure describing the results
-%  - options_            [structure]     Matlab's structure describing the current options
+%  - M_                  [structure]     MATLAB's structure describing the model
+%  - oo_                 [structure]     MATLAB's structure describing the results
+%  - options_            [structure]     MATLAB's structure describing the current options
 %  - estim_params_       [structure]     characterizing parameters to be estimated
 %  - bayestopt_          [structure]     describing the priors
 

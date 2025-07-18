@@ -5,7 +5,7 @@ function pdf = gampdf (x, a, b)
 %  with parameters A and B (i.e. mean of the distribution is A*B
 %  and variance is A*B^2).
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/gampdf.m
 % Original author: TT <Teresa.Twaroch@ci.tuwien.ac.at>
 

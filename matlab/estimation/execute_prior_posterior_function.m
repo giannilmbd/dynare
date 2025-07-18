@@ -4,18 +4,18 @@ function oo_=execute_prior_posterior_function(posterior_function_name,M_,options
 %
 % INPUTS
 %   functionhandle               Handle to the function to be executed
-%   M_           [structure]     Matlab/Octave structure describing the Model (initialized by dynare, see @ref{M_}).
-%   options_     [structure]     Matlab/Octave structure describing the options (initialized by dynare, see @ref{options_}).
-%   oo_          [structure]     Matlab/Octave structure gathering the results (initialized by dynare, see @ref{oo_}).
-%   estim_params_[structure]     Matlab/Octave structure describing the estimated_parameters (initialized by dynare, see @ref{estim_params_}).
-%   bayestopt_   [structure]     Matlab/Octave structure describing the parameter options (initialized by dynare, see @ref{bayestopt_}).
-%   dataset_     [structure]     Matlab/Octave structure storing the dataset
-%   dataset_info [structure]     Matlab/Octave structure storing the information about the dataset
+%   M_           [structure]     MATLAB/Octave structure describing the Model
+%   options_     [structure]     MATLAB/Octave structure describing the options
+%   oo_          [structure]     MATLAB/Octave structure gathering the results
+%   estim_params_[structure]     MATLAB/Octave structure describing the estimated_parameters
+%   bayestopt_   [structure]     MATLAB/Octave structure describing the parameter options
+%   dataset_     [structure]     MATLAB/Octave structure storing the dataset
+%   dataset_info [structure]     MATLAB/Octave structure storing the information about the dataset
 %   type         [string]        'prior' or 'posterior'
 %
 %
 % OUTPUTS
-%   oo_          [structure]     Matlab/Octave structure gathering the results (initialized by dynare, see @ref{oo_}).
+%   oo_          [structure]     MATLAB/Octave structure gathering the results
 
 % Copyright © 2013-2024 Dynare Team
 %
@@ -50,7 +50,7 @@ functionhandle=str2func(posterior_function_name);
 n_draws=options_.sampling_draws;
 
 if strcmpi(type,'posterior')
-    % Get informations about the _posterior_draws files.
+    % Get information about the _posterior_draws files.
     % discard first mh_drop percent of the draws:
     CutSample(M_, options_, 'prior_posterior_function');
     options_.sub_draws = n_draws; % set draws for sampling; changed value is not returned to base workspace
@@ -60,7 +60,7 @@ if strcmpi(type,'posterior')
     end
     n_draws = options_.sub_draws;
 elseif strcmpi(type,'prior')
-    % Get informations about the prior distribution.
+    % Get information about the prior distribution.
     if isempty(bayestopt_)
         if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.param_vals,1))==0)
             [~,estim_params_,bayestopt_,~,~,M_] = set_prior(estim_params_,M_,options_);

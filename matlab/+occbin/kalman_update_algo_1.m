@@ -17,13 +17,13 @@ function [a, a1, P, P1, v, T, R, C, regimes_, error_flag, M_, lik, etahat, alpha
 % - RR              [N by N_exo by 2]       shock impact matrix at t-1:t
 % - CC              [N by 2]                state space constant state transition matrix at t-1:t
 % - regimes0        [structure]             regime info at t-1:t
-% - M_              [structure]             Matlab's structure describing the model (M_).
+% - M_              [structure]             MATLAB's structure describing the model
 % - dr                   [structure]        Reduced form model.
 % - endo_steady_state    [vector]           steady state value for endogenous variables
 % - exo_steady_state     [vector]           steady state value for exogenous variables
 % - exo_det_steady_state [vector]           steady state value for exogenous deterministic variables
-% - options_        [structure]             Matlab's structure describing the current options (options_).
-% - occbin_options_ [structure]             Matlab's structure describing the Occbin options.
+% - options_        [structure]             MATLAB's structure describing the current options
+% - occbin_options_ [structure]             MATLAB's structure describing the OccBin options.
 % - kalman_tol      [double]                tolerance for reciprocal condition number
 % 
 % Outputs
@@ -37,7 +37,7 @@ function [a, a1, P, P1, v, T, R, C, regimes_, error_flag, M_, lik, etahat, alpha
 % - C               [N by 2]                state space constant state transition matrix at t-1:t
 % - regimes_        [structure]             regime info at t-1:t
 % - error_flag      [integer]               error code
-% - M_              [structure]             Matlab's structure describing the model (M_).
+% - M_              [structure]             MATLAB's structure describing the model
 % - lik             [double]                likelihood
 % - etahat:                                 smoothed shocks
 %

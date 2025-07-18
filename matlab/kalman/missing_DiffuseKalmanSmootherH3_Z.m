@@ -1,6 +1,6 @@
 function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,alphahat0,aalphahat0,V0,varargout] = missing_DiffuseKalmanSmootherH3_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag, filter_covariance_flag, smoother_redux, occbin_)
 % function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d] = missing_DiffuseKalmanSmootherH3_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag, filter_covariance_flag, smoother_redux, occbin_)
-% Computes the diffuse kalman smoother in the case of a singular var-cov matrix.
+% Computes the diffuse Kalman smoother in the case of a singular var-cov matrix.
 % Univariate treatment of multivariate time series.
 %
 % INPUTS
@@ -346,11 +346,11 @@ if isoccbin
     first_period_occbin_update = occbin_options.first_period_occbin_update;
     if d>0
         first_period_occbin_update = max(t+2,occbin_options.first_period_occbin_update);
-        % kalman update is not yet robust to accommodate diffuse steps
+        % Kalman update is not yet robust to accommodate diffuse steps
     end
     if occbin_options.opts_simul.waitbar && first_period_occbin_update<smpl
-        hh_fig = dyn_waitbar(0,'Occbin: Piecewise Kalman Filter');
-        set(hh_fig,'Name','Occbin: Piecewise Kalman Filter.');
+        hh_fig = dyn_waitbar(0,'OccBin: Piecewise Kalman Filter');
+        set(hh_fig,'Name','OccBin: Piecewise Kalman Filter.');
         waitbar_indicator=1;
     else
         waitbar_indicator=0;

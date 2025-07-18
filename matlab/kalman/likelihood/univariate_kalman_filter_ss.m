@@ -1,5 +1,5 @@
 function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2P)
-% Computes the likelihood of a stationnary state space model (steady state univariate kalman filter).
+% Computes the likelihood of a stationary state space model (steady state univariate Kalman filter).
 
 %@info:
 %! @deftypefn {Function File} {[@var{LIK},@var{likk},@var{a} ] =} univariate_kalman_filter_ss (@var{Y}, @var{start}, @var{last}, @var{a}, @var{P}, @var{kalman_tol}, @var{riccati_tol},@var{presample},@var{T},@var{Q},@var{R},@var{H},@var{Z},@var{mm},@var{pp},@var{rr},@var{Zflag},@var{diffuse_periods})
@@ -21,18 +21,18 @@ function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,
 %! @item P
 %! Matrix (@var{mm}*@var{mm}) of doubles, steady state covariance matrix of the state vector.
 %! @item kalman_tol
-%! Double scalar, tolerance parameter (rcond, inversibility of the covariance matrix of the prediction errors).
+%! Double scalar, tolerance parameter (rcond, invertibility of the covariance matrix of the prediction errors).
 %! @item T
 %! Matrix (@var{mm}*@var{mm}) of doubles, transition matrix of the state equation.
 %! @item H
-%! Vector (@var{pp}) of doubles, diagonal of covariance matrix of the measurement errors (corelation among measurement errors is handled by a model transformation).
+%! Vector (@var{pp}) of doubles, diagonal of covariance matrix of the measurement errors (correlation among measurement errors is handled by a model transformation).
 %! Matrix (@var{pp}*@var{pp}) of doubles, covariance matrix of the measurement errors (if no measurement errors set H as a zero scalar).
 %! @item Z
 %! Matrix (@var{pp}*@var{mm}) of doubles or vector of integers, matrix relating the states to the observed variables or vector of indices (depending on the value of @var{Zflag}).
 %! @item pp
 %! Integer scalar, number of observed variables.
 %! @item Zflag
-%! Integer scalar, equal to 0 if Z is a vector of indices targeting the obseved variables in the state vector, equal to 1 if Z is a @var{pp}*@var{mm} matrix.
+%! Integer scalar, equal to 0 if Z is a vector of indices targeting the observed variables in the state vector, equal to 1 if Z is a @var{pp}*@var{mm} matrix.
 %! @end table
 %! @sp 2
 %! @strong{Outputs}

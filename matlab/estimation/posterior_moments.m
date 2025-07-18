@@ -18,7 +18,7 @@ function [post_mean, post_median, post_var, hpd_interval, post_deciles, density]
 %                              columns are respectively abscissa and ordinate coordinates.
 %
 % SPECIAL REQUIREMENTS
-%    Other matlab routines distributed with Dynare: mh_optimal_bandwidth.m
+%    Other MATLAB routines distributed with Dynare: mh_optimal_bandwidth.m
 %                                                   kernel_density_estimate.m.
 %
 

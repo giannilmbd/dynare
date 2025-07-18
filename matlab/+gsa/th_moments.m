@@ -4,8 +4,8 @@ function [vdec, corr, autocorr, z, zz] = th_moments(dr,options_,M_)
 %
 % INPUTS
 % - dr            [structure]     model information structure
-% - options_      [structure]     Matlab's structure describing the current options
-% - M_            [structure]     Matlab's structure describing the model
+% - options_      [structure]     MATLAB's structure describing the current options
+% - M_            [structure]     MATLAB's structure describing the model
 %
 % OUTPUTS
 % - vdec          [double]        variance decomposition matrix

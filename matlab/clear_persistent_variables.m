@@ -62,7 +62,7 @@ list_of_functions_to_be_cleared;
 clear(list_of_functions{:});
 
 function cellofchar2mfile(fname, c, cname)
-% Write a cell of char in a matlab script.
+% Write a cell of char in a MATLAB script.
 %
 % INPUTS
 % - fname [string] name of the file where c is to be saved.
@@ -79,7 +79,7 @@ if isempty(ext)
     fname = [pathstr, name, '.m'];
 else
     if ~isequal(ext, '.m')
-        error('The first argument needs to be the name of a matlab script (with an .m extension)!')
+        error('The first argument needs to be the name of a MATLAB script (with an .m extension)!')
     end
 end
 

@@ -19,7 +19,7 @@ function ds = surgibbs(ds, param_names, beta0, A, ndraws, discarddraws, thin, eq
 %   none
 %
 % SPECIAL REQUIREMENTS
-%   dynare must have been run with the option: json=compute
+%   Dynare must have been run with the option: json=compute
 %
 % REFERENCES
 % - Ando, Tomohiro and Zellner, Arnold. 2010. Hierarchical Bayesian Analysis of the

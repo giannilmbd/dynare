@@ -9,7 +9,7 @@ function create_sur_report()
 % none
 %
 % SPECIAL REQUIREMENTS
-%   dynare must have been run with the option: json=compute
+%   Dynare must have been run with the option: json=compute
 
 % Copyright © 2019 Dynare Team
 %

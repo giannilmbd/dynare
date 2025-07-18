@@ -4,7 +4,7 @@ function inv = chi2inv (x, n)
 %  quantile (the inverse of the CDF) at X of the chi-square
 %  distribution with N degrees of freedom.
 
-% Adapted for Matlab (R) from GNU Octave 3.0.1
+% Adapted for MATLAB (R) from GNU Octave 3.0.1
 % Original file: statistics/distributions/chi2inv.m
 % Original author: TT <Teresa.Twaroch@ci.tuwien.ac.at>
 

@@ -4,8 +4,8 @@ function indcorr = stability_mapping_bivariate(x,alpha2, pvalue_crit, M_,options
 %  - x
 %  - alpha2
 %  - pvalue_crit
-%  - M_                     [structure]     Matlab's structure describing the model
-%  - options_               [structure]     Matlab's structure describing the current options
+%  - M_                     [structure]     MATLAB's structure describing the model
+%  - options_               [structure]     MATLAB's structure describing the current options
 %  - bayestopt_             [structure]     describing the priors
 %  - estim_params_          [structure]     characterizing parameters to be estimated
 %  - fnam                   [string]        file name

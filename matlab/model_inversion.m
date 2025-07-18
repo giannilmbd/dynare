@@ -8,7 +8,7 @@ function [endogenousvariables, exogenousvariables] = model_inversion(constraints
 % - constraints         [dseries]        with N constrained endogenous variables from t1 to t2.
 % - exogenousvariables  [dseries]        with Q exogenous variables.
 % - initialconditions   [dseries]        with M endogenous variables starting before t1 (M initialcond must contain at least the state variables).
-% - M_                  [struct]         Dynare global structure containing informations related to the model.
+% - M_                  [struct]         Dynare global structure containing information related to the model.
 % - options_            [struct]         Dynare global structure containing all the options.
 % - oo_                 [struct]         Dynare global structure containing all the options.
 %
@@ -82,7 +82,7 @@ exo_names = M_.exo_names;
 
 exogenousvariables = exogenousvariables{exo_names{:}};
 
-% Use specidalized routine if the model is backward looking.
+% Use specialized routine if the model is backward looking.
 if ~M_.maximum_lead
     if M_.maximum_lag
         [endogenousvariables, exogenousvariables] = ...

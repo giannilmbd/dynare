@@ -31,7 +31,7 @@ function generate_trace_plots(chain_number)
 global M_ options_ estim_params_
 
 if ~issmc(options_)
-    % Get informations about the posterior draws:
+    % Get information about the posterior draws:
     MetropolisFolder = CheckPath('metropolis', M_.dname);
     record=load_last_mh_history_file(MetropolisFolder, M_.fname);
     if max(chain_number)>record.Nblck

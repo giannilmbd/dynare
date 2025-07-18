@@ -6,12 +6,12 @@ function g = apprgrdn(x,f,fun,deltax,obj,varargin)
 % Inputs:
 % x:        point at which to evaluate gradient
 % f:        calculated function value at a point x;
-% fun:      Name of the Matlab function calculating the function values
+% fun:      Name of the MATLAB function calculating the function values
 % deltax:   vector of the relative stepsizes,
 % obj       flag indicating whether the gradient of the objective
 %           function (1) or the constraint function (0) is to be calculated.
 %
-% Modified by Giovanni Lombardo and Johannes Pfeifer to accomodate Dynare
+% Modified by Giovanni Lombardo and Johannes Pfeifer to accommodate Dynare
 % structure
 %
 %

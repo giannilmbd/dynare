@@ -22,7 +22,7 @@ function [xparam1, hh, gg, fval, igg, hess_info] = newrat(func0, x, bounds, anal
 %  - Save_files             1 if intermediate output is to be saved
 %  - hess_info              structure storing the step sizes for
 %                           computation of Hessian
-%  - prior_std              prior standard devation of parameters (can be NaN); 
+%  - prior_std              prior standard deviation of parameters (can be NaN); 
 %                           passed to mr_hessian
 %  - gradient_epsilon       [double] step size in gradient
 %  - parameter_names        [cell] names of parameters for error messages
@@ -39,10 +39,10 @@ function [xparam1, hh, gg, fval, igg, hess_info] = newrat(func0, x, bounds, anal
 %
 % Outputs
 % - xparam1                 parameter vector at optimum
-% - hh                      hessian
+% - hh                      Hessian
 % - gg                      gradient
 % - fval                    function value
-% - igg                     inverted outer product hessian
+% - igg                     inverted outer product Hessian
 % - hess_info               structure with updated step length
 
 % Copyright © 2004-2017 Dynare Team
@@ -70,7 +70,7 @@ nx=length(x);
 xparam1=x;
 %ftol0=1.e-6;
 htol_base = max(1.e-7, hess_info.htol);
-flagit=0;  % mode of computation of hessian in each iteration; hard-coded outer-product of gradients as it performed best in tests
+flagit=0;  % mode of computation of Hessian in each iteration; hard-coded outer-product of gradients as it performed best in tests
 ftol=ftol0;
 gtol=1.e-3;
 htol=htol_base;

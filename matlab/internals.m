@@ -4,7 +4,7 @@ function internals(flag, varargin)
 %! @deftypefn {Function File} internals (@var{flag},@var{a},@var{b}, ...)
 %! @anchor{internals}
 %! @sp 1
-%! This command provides internal documentation and unit tests for the matlab routines.
+%! This command provides internal documentation and unit tests for the MATLAB routines.
 %! @sp 2
 %! @strong{Inputs}
 %! @sp 1
@@ -29,7 +29,7 @@ function internals(flag, varargin)
 %! @example
 %! internals --info particle/local_state_iteration
 %! @end example
-%! will display the internal documentation of the routine local_state_iteration located in the particle subfolder of the matlab directory.
+%! will display the internal documentation of the routine local_state_iteration located in the particle subfolder of the MATLAB directory.
 %! @sp 1
 %! The following instruction:
 %! @sp 1
@@ -44,7 +44,7 @@ function internals(flag, varargin)
 %! @sp 1
 %! [2] It is possible to perform unit tests on a list of routines.
 %! @sp 1
-%! [3] For displaying the internal documentation, matlab calls texinfo which has to be installed.
+%! [3] For displaying the internal documentation, MATLAB calls texinfo which has to be installed.
 %! @sp 2
 %! @strong{This function is called by:}
 %! @sp 2
@@ -85,7 +85,7 @@ if strcmpi(flag,'--test')
             dtest(varargin{i},[dynare_path '..' filesep 'tests']);
         end
     else
-        disp('You have to specify at least one Matlab routine after --test flag!')
+        disp('You have to specify at least one MATLAB routine after --test flag!')
     end
     return
 end
@@ -179,9 +179,9 @@ if strcmpi(flag,'--info')
         dynInfo(varargin{1})
     else
         if nargin<2
-            disp('You have to specify a Matlab routine after --info flag!')
+            disp('You have to specify a MATLAB routine after --info flag!')
         else
-            disp('I can only show internal documentation for one Matlab routine!')
+            disp('I can only show internal documentation for one MATLAB routine!')
         end
     end
     return

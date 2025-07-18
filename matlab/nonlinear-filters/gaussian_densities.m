@@ -3,7 +3,7 @@ function IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sq
 % Elements to calculate the importance sampling ratio
 %
 % INPUTS
-%    reduced_form_model     [structure] Matlab's structure describing the reduced form model.
+%    reduced_form_model     [structure] MATLAB's structure describing the reduced form model.
 %                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
 %                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
 %                                       reduced_form_model.state.dr        [structure] output of resol.m.
@@ -18,7 +18,7 @@ function IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sq
 % REFERENCES
 %
 % NOTES
-%   The vector "lik" is used to evaluate the jacobian of the likelihood.
+%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
 % Copyright © 2009-2023 Dynare Team
 %

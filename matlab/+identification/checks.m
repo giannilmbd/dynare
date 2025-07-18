@@ -10,7 +10,7 @@ function [condX, rankX, ind0, indno, ixno, Mco, Pco, jweak, jweak_pair] = checks
 %                               test_flag = 0: Sample information matrix (Ahess)
 %                               test_flag = 1: Jacobian of Moments (J), reduced-form (dTAU) or dynamic model (dLRE)
 %                               test_flag = 2: Jacobian of minimal system (D)
-%                               test_flag = 3: Gram matrix (hessian or correlation type matrix) of spectrum (G)
+%                               test_flag = 3: Gram matrix (Hessian or correlation type matrix) of spectrum (G)
 % -------------------------------------------------------------------------
 % OUTPUTS
 %    * cond             [double]        condition number of X

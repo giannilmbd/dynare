@@ -11,9 +11,9 @@ function [pdraws, STO_REDUCEDFORM, STO_MOMENTS, STO_DYNAMIC, STO_si_dDYNAMIC, ST
 %         to put identification in your mod file, otherwise the preprocessor won't provide all necessary objects
 % =========================================================================
 % INPUTS
-%    * M_               [structure] Matlab's structure describing the model
-%    * oo_              [structure] Matlab's structure describing the results
-%    * options_         [structure] Matlab's structure describing the current options
+%    * M_               [structure] MATLAB's structure describing the model
+%    * oo_              [structure] MATLAB's structure describing the results
+%    * options_         [structure] MATLAB's structure describing the current options
 %    * bayestopt_       [structure] describing the priors
 %    * estim_params_    [structure] characterizing parameters to be estimated
 %    * options_ident    [structure] identification options
@@ -210,7 +210,7 @@ end
     % 5:  i) option 2 for non-stationary elements by setting their initial variance in the forecast error matrix to 10 on the diagonal and all co-variances to 0 and
     %    ii) option 1 for the stationary elements
 options_ident = set_default_option(options_ident,'analytic_derivation',1);
-    % 1: analytic derivation of gradient and hessian of likelihood in dsge_likelihood.m, only works for stationary models, i.e. kalman_algo<3
+    % 1: analytic derivation of gradient and Hessian of likelihood in dsge_likelihood.m, only works for stationary models, i.e. kalman_algo<3
 options_ident = set_default_option(options_ident,'order',1);
     % 1: first-order perturbation approximation, identification is based on linear state space system
     % 2: second-order perturbation approximation, identification is based on second-order pruned state space system
@@ -297,7 +297,7 @@ options_.prior_mc = options_ident.prior_mc;
 options_.schur_vec_tol = options_ident.schur_vec_tol;
 options_.nomoments = 0;
 options_.analytic_derivation=options_ident.analytic_derivation;
-    % 1: analytic derivation of gradient and hessian of likelihood in dsge_likelihood.m, only works for stationary models, i.e. kalman_algo<3
+    % 1: analytic derivation of gradient and Hessian of likelihood in dsge_likelihood.m, only works for stationary models, i.e. kalman_algo<3
 options_ = set_default_option(options_,'datafile','');
 options_.mode_compute = 0;
 if strcmp('slice',options_.posterior_sampler_options.posterior_sampling_method)
@@ -354,7 +354,7 @@ if prior_exist % use estimated_params block
     if ~isempty(estim_params_.var_exo)
         indpstderr = estim_params_.var_exo(:,1); %values correspond to varexo declaration order, row number corresponds to order in estimated_params
     end
-    indpcorr=[]; %initialize matrix for corr paramters
+    indpcorr=[]; %initialize matrix for corr parameters
     if ~isempty(estim_params_.corrx)
         indpcorr = estim_params_.corrx(:,1:2); %values correspond to varexo declaration order, row number corresponds to order in estimated_params
     end

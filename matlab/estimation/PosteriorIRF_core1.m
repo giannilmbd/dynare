@@ -2,16 +2,16 @@ function myoutput=PosteriorIRF_core1(myinputs,fpar,B,whoiam, ThisMatlab)
 %myoutput=PosteriorIRF_core1(myinputs,fpar,B,whoiam, ThisMatlab)
 %   Generates and stores Posterior IRFs
 %   PARALLEL CONTEXT
-%   This function perfoms in parallel execution a portion of the PosteriorIRF.m code.
+%   This function performs in parallel execution a portion of the PosteriorIRF.m code.
 %   This is a special kind of parallel function. Unlike of other parallel functions,
 %   that running in parallel a 'for' cycle, this function run in parallel a
 %   'while' loop! The parallelization of 'while' loop (when possible) is a more
 %   sophisticated procedure.
 %
-%   See also the comment in posterior_sampler_core.m funtion.
+%   See also the comment in posterior_sampler_core.m function.
 %
 % INPUTS
-%   See the comment in posterior_sampler_core.m funtion.
+%   See the comment in posterior_sampler_core.m function.
 %
 % OUTPUTS
 % o myoutput  [struc]

@@ -6,8 +6,8 @@ function [A,B,ys,info,dr,params,TT, RR, CC, A0, B0] ...
 % transition equation. Mirrors dynare_resolve
 %
 % Inputs:
-% - M_                  [structure]     Matlab's structure describing the model
-% - options_            [structure]     Matlab's structure containing the options
+% - M_                  [structure]     MATLAB's structure describing the model
+% - options_            [structure]     MATLAB's structure containing the options
 % - dr                  [structure]     Reduced form model.
 % - endo_steady_state   [vector]        steady state value for endogenous variables
 % - exo_steady_state    [vector]        steady state value for exogenous variables

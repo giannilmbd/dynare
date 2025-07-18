@@ -1,8 +1,8 @@
 function [dr,info,params] =compute_decision_rules(M_,options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
-% function [dr,info,params] =compute_decision_rules(M_,options_,oo_)
+% function [dr,info,params] =compute_decision_rules(M_,options_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % INPUTS
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
+% - M_            [structure]     MATLAB's structure describing the model (M_).
+% - options_      [structure]     MATLAB's structure describing the current options (options_).
 % - dr            [structure]     Reduced form model.
 % - endo_steady_state       [vector]     steady state value for endogenous variables
 % - exo_steady_state        [vector]     steady state value for exogenous variables

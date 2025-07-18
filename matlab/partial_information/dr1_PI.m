@@ -13,13 +13,13 @@ function [dr,info,oo_] = dr1_PI(dr,M_,options_,oo_)
 %       [s(t)' x(t)' E_t x(t+1)']'=G1pi [s(t-1)' x(t-1)' x(t)]'+C+impact*eps(t),
 %
 % INPUTS
-%   dr         [matlab structure] Decision rules for stochastic simulations.
-%   M_         [matlab structure] Definition of the model.
-%   options_   [matlab structure] Global options.
-%   oo_        [matlab structure] Results
+%   dr         [MATLAB structure] Decision rules for stochastic simulations.
+%   M_         [MATLAB structure] Definition of the model.
+%   options_   [MATLAB structure] Global options.
+%   oo_        [MATLAB structure] Results
 %
 % OUTPUTS
-%   dr         [matlab structure] Decision rules for stochastic simulations.
+%   dr         [MATLAB structure] Decision rules for stochastic simulations.
 %   info       [integer]          info=1: the model doesn't define current variables uniquely
 %                                 info=2: problem in mjdgges.dll info(2) contains error code.
 %                                 info=3: BK order condition not satisfied info(2) contains "distance"
@@ -27,7 +27,7 @@ function [dr,info,oo_] = dr1_PI(dr,M_,options_,oo_)
 %                                 info=4: BK order condition not satisfied info(2) contains "distance"
 %                                         indeterminacy.
 %                                 info=5: BK rank condition not satisfied.
-%   oo_        [matlab structure]
+%   oo_        [MATLAB structure]
 %
 % ALGORITHM
 %   ...

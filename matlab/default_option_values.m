@@ -248,7 +248,7 @@ options_.bnlms = bnlms;
 
 % Particle filter
 %
-% Default is that we do not use the non linear kalman filter
+% Default is that we do not use the non linear Kalman filter
 particle.status = false;
 % How do we initialize the states?
 particle.initialization = 1;
@@ -575,10 +575,10 @@ options_.homotopy_mode = 0;
 options_.homotopy_steps = 10;
 options_.homotopy_force_continue = false;
 
-% numerical hessian
+% numerical Hessian
 hessian.use_penalized_objective = false;
 
-% Robust prediction error covariance (kalman filter)
+% Robust prediction error covariance (Kalman filter)
 options_.rescale_prediction_error_covariance = false;
 
 options_.hessian = hessian;

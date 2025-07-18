@@ -1,6 +1,6 @@
 function [] = Tracing()
 % DESCRIPTION
-% This function is used to test the correct execution of a matlab section
+% This function is used to test the correct execution of a MATLAB section
 % on remote machine.
 %
 % If no error happen the function simply create a file.

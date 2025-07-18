@@ -54,13 +54,13 @@ else
     end
 end
 
-% Get informations about mcmc files.
+% Get information about MCMC files.
 if info
     disp('check_posterior_analysis_data:: Can''t find any mcmc file!')
     return
 end
 
-% Get informations about _posterior_draws files.
+% Get information about _posterior_draws files.
 drawsinfo = dir([ MetropolisFolder filesep M_.fname '_posterior_draws*.mat']);
 if isempty(drawsinfo)
     info = 1; % select_posterior_draws has to be called first.
@@ -101,7 +101,7 @@ else
     end
 end
 
-% Get informations about posterior data files.
+% Get information about posterior data files.
 switch type
   case 'variance'
     generic_post_data_file_name = 'Posterior2ndOrderMoments';

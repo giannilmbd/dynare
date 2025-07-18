@@ -22,7 +22,7 @@ function [dr, info] = stochastic_solvers(dr, task, M_, options_, exo_steady_stat
 %                                 info=4 -> BK order condition not satisfied info(2) contains "distance"
 %                                           indeterminacy.
 %                                 info=5 -> BK rank condition not satisfied.
-%                                 info=6 -> The jacobian matrix evaluated at the steady state is complex.
+%                                 info=6 -> The Jacobian matrix evaluated at the steady state is complex.
 %                                 info=9 -> k_order_pert was unable to compute the solution
 
 % Copyright © 1996-2024 Dynare Team

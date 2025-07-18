@@ -40,7 +40,7 @@ if nargout>1
     description = '';
 end
 
-%% Get informations about prior draws files.
+%% Get information about prior draws files.
 if ~exist([ M_.dname '/prior/draws'],'dir')
     disp('check_prior_analysis_data:: Can''t find any prior draws file!')
     return
@@ -48,7 +48,7 @@ end
 
 prior_draws_info = dir([ M_.dname '/prior/draws/prior_draws*.mat']);
 
-%% Get informations about _posterior_draws files.
+%% Get information about _posterior_draws files.
 if isempty(prior_draws_info)
     info = 1;
     if nargout>1
@@ -72,7 +72,7 @@ else
     end
 end
 
-%% Get informations about prior data files.
+%% Get information about prior data files.
 switch type
   case 'variance'
     generic_prior_data_file_name = 'Prior2ndOrderMoments';

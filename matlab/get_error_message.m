@@ -202,19 +202,19 @@ switch info(1)
     case 305
         message = 'IVF: The returned shocks are bigger than 1e8.';
     case 310
-        message = 'Occbin: Simulation terminated with periodic solution (no convergence).';
+        message = 'OccBin: Simulation terminated with periodic solution (no convergence).';
     case 311
-        message = 'Occbin: Simulation did not converge, increase maxit or check_ahead_periods.';
+        message = 'OccBin: Simulation did not converge, increase maxit or check_ahead_periods.';
     case 312
-        message = 'Occbin: Constraint(s) are binding at the end of the sample.';
+        message = 'OccBin: Constraint(s) are binding at the end of the sample.';
     case 313
-        message = 'Occbin: Simulation did not converge -- infinite loop of guess regimes';
+        message = 'OccBin: Simulation did not converge -- infinite loop of guess regimes';
     case 320
         message = 'Piecewise linear Kalman filter: There was a problem in obtaining the likelihood.';
     case 321
-        message = 'Occbin: there was a problem in running the smoother. Simulation within smoother failed.';
+        message = 'OccBin: there was a problem in running the smoother. Simulation within smoother failed.';
     case 322
-        message = 'Occbin: smoother did not converge.';
+        message = 'OccBin: smoother did not converge.';
     case 323
         message = 'Piecewise linear Kalman filter: the likelihood is NaN.';
     case 324

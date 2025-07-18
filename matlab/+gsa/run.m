@@ -2,12 +2,12 @@ function x0=run(M_,oo_,options_,bayestopt_,estim_params_,options_gsa)
 % x0=run(M_,oo_,options_,bayestopt_,estim_params_,options_gsa)
 % Frontend to the Sensitivity Analysis Toolbox for DYNARE
 % Inputs:
-%  - M_                     [structure]     Matlab's structure describing the model
-%  - oo_                    [structure]     Matlab's structure describing the results
-%  - options_               [structure]     Matlab's structure describing the current options
+%  - M_                     [structure]     MATLAB's structure describing the model
+%  - oo_                    [structure]     MATLAB's structure describing the results
+%  - options_               [structure]     MATLAB's structure describing the current options
 %  - bayestopt_             [structure]     describing the priors
 %  - estim_params_          [structure]     characterizing parameters to be estimated
-%  - options_gsa            [structure]     Matlab's structure describing the GSA options
+%  - options_gsa            [structure]     MATLAB's structure describing the GSA options
 %
 % Reference:
 % M. Ratto (2008), Analysing DSGE Models with Global Sensitivity Analysis, 
@@ -362,7 +362,7 @@ if options_gsa.redform && ~isempty(options_gsa.namendo)
             fprintf('To obtain it, go to:\n\n')
             fprintf('https://joint-research-centre.ec.europa.eu/system/files/2025-01/ss_anova_recurs.zip \n\n')
             fprintf('and follow the instructions there.\n')
-            fprintf('After obtaining the files, you need to unpack them and set a Matlab Path to those files.\n')
+            fprintf('After obtaining the files, you need to unpack them and set a MATLAB Path to those files.\n')
             error('SS-ANOVA-R Toolbox missing!')
         end
         gsa.reduced_form_mapping(OutputDirectoryName,options_gsa,M_,estim_params_,options_,bayestopt_,oo_);

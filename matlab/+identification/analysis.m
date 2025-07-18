@@ -24,7 +24,7 @@ function [ide_moments, ide_spectrum, ide_minimal, ide_hess, ide_reducedform, ide
 %    * indpstderr         [stderrparam_nbr by 1]
 %                         index of stderr parameters for which identification is checked
 %    * indpcorr           [corrparam_nbr by 2]
-%                         matrix of corr parmeters for which identification is checked
+%                         matrix of corr parameters for which identification is checked
 %    * options_ident      [structure]
 %                         identification options
 %    * dataset_info       [structure]
@@ -311,12 +311,12 @@ if info(1) == 0 %no errors in solution
                 [~, info, ~, ~, AHess, ~, ~, M_, options_, ~, oo_.dr] = dsge_likelihood(params', dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr, oo_.steady_state,oo_.exo_steady_state, oo_.exo_det_steady_state, derivatives_info); %non-used output variables need to be set for octave for some reason
                     %note that for the order of parameters in AHess we have: stderr parameters come first, corr parameters second, model parameters third. the order within these blocks corresponds to the order specified in the estimated_params block
                 options_.analytic_derivation = analytic_derivation; %reset option
-                AHess = -AHess; %take negative of hessian
+                AHess = -AHess; %take negative of Hessian
                 if min(eig(AHess))<-tol_rank
                     error('identification.analysis: Analytic Hessian is not positive semi-definite!')
                 end
                 ide_hess.AHess = AHess; %store asymptotic Hessian
-                %normalize asymptotic hessian
+                %normalize asymptotic Hessian
                 deltaM = sqrt(diag(AHess));
                 iflag = any((deltaM.*deltaM)==0); %check if all second-order derivatives wrt to a single parameter are nonzero
                 tildaM = AHess./((deltaM)*(deltaM')); %this normalization is for numerical purposes
@@ -352,8 +352,8 @@ if info(1) == 0 %no errors in solution
                 siTMP = si_dMOMENTS./repmat(sd,[1 totparam_nbr]);
                 MIM = (siTMP'*VV(:,id))*(DD(id,id)\(WW(:,id)'*siTMP));
                 clear siTMP;
-                ide_hess.AHess = MIM; %store asymptotic hessian
-                %normalize asymptotic hessian
+                ide_hess.AHess = MIM; %store asymptotic Hessian
+                %normalize asymptotic Hessian
                 deltaM = sqrt(diag(MIM));
                 iflag = any((deltaM.*deltaM)==0);
                 tildaM = MIM./((deltaM)*(deltaM'));

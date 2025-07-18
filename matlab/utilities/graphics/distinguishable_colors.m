@@ -2,7 +2,7 @@ function colors = distinguishable_colors(n_colors,bg,func)
 % DISTINGUISHABLE_COLORS: pick colors that are maximally perceptually distinct
 %
 % When plotting a set of lines, you may want to distinguish them by color.
-% By default, Matlab chooses a small set of colors and cycles among them,
+% By default, MATLAB chooses a small set of colors and cycles among them,
 % and so if you have more than a few lines there will be confusion about
 % which line is which. To fix this problem, one would want to be able to
 % pick a much larger set of distinct colors, where the number of colors
@@ -153,7 +153,7 @@ end
 
 function c = colorstr2rgb(c)
 % Convert a color string to an RGB value.
-% This is cribbed from Matlab's whitebg function.
+% This is cribbed from MATLAB's whitebg function.
 % Why don't they make this a stand-alone function?
 rgbspec = [1 0 0;0 1 0;0 0 1;1 1 1;0 1 1;1 0 1;1 1 0;0 0 0];
 cspec = 'rgbwcmyk';

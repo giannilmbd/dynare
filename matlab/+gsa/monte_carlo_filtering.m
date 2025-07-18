@@ -4,10 +4,10 @@ function [rmse_MC, ixx] = monte_carlo_filtering(OutDir,options_gsa_,dataset_,dat
 %  - OutputDirectoryName [string]       name of the output directory
 %  - options_gsa_        [structure]    GSA options
 %  - dataset_            [dseries]      object storing the dataset
-%  - dataset_info        [structure]    storing informations about the sample.
-%  - M_                  [structure]    Matlab's structure describing the model
+%  - dataset_info        [structure]    storing information about the sample.
+%  - M_                  [structure]    MATLAB's structure describing the model
 %  - oo_                 [structure]    storing the results
-%  - options_            [structure]    Matlab's structure describing the current options
+%  - options_            [structure]    MATLAB's structure describing the current options
 %  - bayestopt_          [structure]    describing the priors
 %  - estim_params_       [structure]    characterizing parameters to be estimated
 %
@@ -17,7 +17,7 @@ function [rmse_MC, ixx] = monte_carlo_filtering(OutDir,options_gsa_,dataset_,dat
 %                                       indices (descending order of RMSEs)
 %
 % Notes: the R^2 definition is 1-var(ymodel-ydata)/var(ydata). It ranges
-% bewteen (-inf, 1], with negative values indicating that themodel is a worse 
+% between (-inf, 1], with negative values indicating that the model is a worse 
 % predictor than the sample mean of the data
 
 % inputs (from opt_gsa structure)

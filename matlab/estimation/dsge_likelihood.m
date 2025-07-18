@@ -7,10 +7,10 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 % INPUTS
 % - xparam1             [double]        current values for the estimated parameters.
 % - dataset_            [structure]     dataset after transformations
-% - dataset_info        [structure]     storing informations about the
+% - dataset_info        [structure]     storing information about the
 %                                       sample; not used but required for interface
-% - options_            [structure]     Matlab's structure describing the current options
-% - M_                  [structure]     Matlab's structure describing the model
+% - options_            [structure]     MATLAB's structure describing the current options
+% - M_                  [structure]     MATLAB's structure describing the model
 % - estim_params_       [structure]     characterizing parameters to be estimated
 % - bayestopt_          [structure]     describing the priors
 % - BoundsInfo          [structure]     containing prior bounds
@@ -22,10 +22,10 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 %
 % OUTPUTS
 % - fval                    [double]        scalar, value of minus the likelihood or posterior kernel.
-% - info                    [integer]       4×1 vector, informations resolution of the model and evaluation of the likelihood.
+% - info                    [integer]       4×1 vector, information on whether solution and likelihood could be computed
 % - exit_flag               [integer]       scalar, equal to 1 (no issues when evaluating the likelihood) or 0 (not able to evaluate the likelihood).
 % - DLIK                    [double]        Vector with score of the likelihood
-% - Hess                    [double]        asymptotic hessian matrix.
+% - Hess                    [double]        asymptotic Hessian matrix.
 % - SteadyState             [double]        steady state level for the endogenous variables
 % - trend_coeff             [double]        Matrix of doubles, coefficients of the deterministic trend in the measurement equation.
 % - M_                      [struct]        Updated M_ structure described in INPUTS section.
@@ -33,7 +33,11 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 % - bayestopt_              [struct]        See INPUTS section.
 % - dr                      [structure]     Reduced form model.
 %
-% This function is called by: dynare_estimation_1, mode_check
+% This function is called by: dynare_estimation_1, mode_check,
+% initial_estimation_checks, hessian, mr_hessian, hssmc, dime, dsmh,
+% calibrate_mh_scale_parameter, posterior_sampler_initialization,
+% identification.analysis, TaRB_optimizer_wrapper,
+% posterior_sampler_iteration, slice_sampler, tempered_likelihood
 % This function calls: dynare_resolve, lyapunov_symm, lyapunov_solver, compute_Pinf_Pstar, kalman_filter_d, missing_observations_kalman_filter_d,
 % univariate_kalman_filter_d, kalman_steady_state, get_perturbation_params_deriv, kalman_filter, missing_observations_kalman_filter, univariate_kalman_filter, priordens
 
@@ -214,7 +218,7 @@ else
     trend = repmat(constant,1,dataset_.nobs);
 end
 
-% Get needed informations for kalman filter routines.
+% Get needed information for Kalman filter routines.
 start = options_.presample+1;
 Z = bayestopt_.mf;           %selector for observed variables
 no_missing_data_flag = ~dataset_info.missing.state;
@@ -243,7 +247,7 @@ end
 switch options_.lik_init
   case 1% Standard initialization with the steady state of the state equation.
     if kalman_algo~=2
-        % Use standard kalman filter except if the univariate filter is explicitely choosen.
+        % Use standard Kalman filter except if the univariate filter is explicitly chosen.
         kalman_algo = 1;
     end
     Pstar=lyapunov_solver(T,R,Q,options_);
@@ -263,7 +267,7 @@ switch options_.lik_init
     end
   case 2% Initialization with large numbers on the diagonal of the covariance matrix if the states (for non stationary models).
     if kalman_algo ~= 2
-        % Use standard kalman filter except if the univariate filter is explicitely choosen.
+        % Use standard Kalman filter except if the univariate filter is explicitly chosen.
         kalman_algo = 1;
     end
     Pstar = options_.Harvey_scale_factor*eye(mm);
@@ -281,7 +285,7 @@ switch options_.lik_init
         Zflag = 0;
     end
   case 3% Diffuse Kalman filter (Durbin and Koopman)
-        % Use standard kalman filter except if the univariate filter is explicitely choosen.
+        % Use standard Kalman filter except if the univariate filter is explicitly chosen.
     if kalman_algo == 0
         kalman_algo = 3;
     elseif ~((kalman_algo == 3) || (kalman_algo == 4))
@@ -299,7 +303,7 @@ switch options_.lik_init
     else
         QQ=Q;
     end
-    % Run diffuse kalman filter on first periods.
+    % Run diffuse Kalman filter on first periods.
     if (kalman_algo==3)
         % Multivariate Diffuse Kalman Filter
         a = zeros(mm,1);
@@ -857,7 +861,7 @@ function a=set_Kalman_starting_values(a,M_,dr,options_,bayestopt_)
 %
 % INPUTS
 %   o a             [double]   (p*1) vector of states
-%   o M_            [structure] decribing the model
+%   o M_            [structure] describing the model
 %   o dr            [structure] storing the decision rules
 %   o options_      [structure] describing the options
 %   o bayestopt_    [structure] describing the priors

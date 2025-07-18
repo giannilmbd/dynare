@@ -2,14 +2,14 @@ function [ErrorCode] = AnalyseComputationalEnvironment(DataInput, DataInputAdd)
 % PARALLEL CONTEXT
 % In a parallel context, this function is used to check the cluster defined by the user.
 % If no error happen the function returns 0. The function complies with
-% Windows/Linux operating systems and Matlab/Octave software.
+% Windows/Linux operating systems and MATLAB/Octave software.
 %
 %
 % INPUT/OUTPUT description:
 %
 %
 % DataInput
-%   is the strcture option_.parallel, with the follow fields:
+%   is the structure option_.parallel, with the following fields:
 %
 %             Local         1 is on local machine, 0 remote
 %      ComputerName         the computer name.
@@ -19,10 +19,10 @@ function [ErrorCode] = AnalyseComputationalEnvironment(DataInput, DataInputAdd)
 %       RemoteDrive         Drive used for Remote computation (data exchange, etc): must be contain 'RemoteFolder'.
 %   RemoteDirectory         Folder in RemoteDrive used for Remote computation.
 %  MatlabOctavePath         Path to MATLAB or Octave executable.
-%        DynarePath         Path to matlab directory within the Dynare installation directory.
+%        DynarePath         Path to MATLAB directory within the Dynare installation directory.
 %
 %   This information is typed by the user in the DYNARE configuration file and is parsed by the preprocessor,
-%   the goal of this function is to check if configuration is correct and if dynare
+%   the goal of this function is to check if configuration is correct and if Dynare
 %   can be executed successfully in parallel mode.
 %
 %
@@ -70,8 +70,8 @@ dynareParallelMkDir(RemoteTmpFolder,DataInput);
 %   Value 6:    It is impossible write/read files on the remote computer.
 %
 %   Value 7:    The values user and/or passwd are incorrect or the user has
-%               no permissions to execute a Matlab session. Or simply
-%               Matlab path (MatlabOctavePath) is incorrect!
+%               no permissions to execute a MATLAB session. Or simply
+%               MATLAB path (MatlabOctavePath) is incorrect!
 %
 %   Value 8:    Dynare path (DynarePath) is incorrect!
 %
@@ -312,7 +312,7 @@ for Node=1:length(DataInput) % To obtain a recursive function remove the 'for'
 
         % Now we verify if it possible to exchange data with the remote computer.
 
-        % Build a command file to test the matlab execution and dynare path ...
+        % Build a command file to test the MATLAB execution and Dynare path ...
 
         fid = fopen('Tracing.m', 'w+');
         s1=('fT = fopen(''MatlabOctaveIsOk.txt'',''w+'');\n');
@@ -369,7 +369,7 @@ for Node=1:length(DataInput) % To obtain a recursive function remove the 'for'
         end
 
 
-        % Now we verify if it is possible execute a matlab/octave section on remote
+        % Now we verify if it is possible execute a MATLAB/Octave section on remote
         % machine when the user is .UserName with password .Password and
         % the path is MatlabOctavePath.
 
@@ -379,20 +379,20 @@ for Node=1:length(DataInput) % To obtain a recursive function remove the 'for'
             else
                 ssh_token = '';
             end
-            if strfind([DataInput(Node).MatlabOctavePath], 'octave') % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+            if strfind([DataInput(Node).MatlabOctavePath], 'octave') % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                 system(['ssh ',ssh_token,' ',DataInput(Node).UserName,'@',DataInput(Node).ComputerName,' "cd ',DataInput(Node).RemoteDirectory,'/',RemoteTmpFolder,  '; ', DataInput(Node).MatlabOctavePath, ' Tracing.m;" &']);
             else
                 system(['ssh ',ssh_token,' ',DataInput(Node).UserName,'@',DataInput(Node).ComputerName,' "cd ',DataInput(Node).RemoteDirectory,'/',RemoteTmpFolder,  '; ', DataInput(Node).MatlabOctavePath, ' -nosplash -nodesktop -minimize -r Tracing;" &']);
             end
         else
             if ~strcmp(DataInput(Node).ComputerName,MasterName) % run on remote machine
-                if  strfind([DataInput(Node).MatlabOctavePath], 'octave') % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                if  strfind([DataInput(Node).MatlabOctavePath], 'octave') % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                     system(['start /B psexec \\',DataInput(Node).ComputerName,' -e -u ',DataInput(Node).UserName,' -p ',DataInput(Node).Password,' -W ',DataInput(Node).RemoteDrive,':\',DataInput(Node).RemoteDirectory,'\',RemoteTmpFolder ' -low   ',DataInput(Node).MatlabOctavePath,' Tracing.m']);
                 else
                     system(['start /B psexec \\',DataInput(Node).ComputerName,' -e -u ',DataInput(Node).UserName,' -p ',DataInput(Node).Password,' -W ',DataInput(Node).RemoteDrive,':\',DataInput(Node).RemoteDirectory,'\',RemoteTmpFolder ' -low   ',DataInput(Node).MatlabOctavePath,' -nosplash -nodesktop -minimize -r Tracing']);
                 end
             else % run on local machine via the network: user and passwd cannot be used!
-                if  strfind([DataInput(Node).MatlabOctavePath], 'octave') % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                if  strfind([DataInput(Node).MatlabOctavePath], 'octave') % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                     system(['start /B psexec \\',DataInput(Node).ComputerName,' -e ',' -W ',DataInput(Node).RemoteDrive,':\',DataInput(Node).RemoteDirectory,'\',RemoteTmpFolder ' -low   ',DataInput(Node).MatlabOctavePath,' Tracing.m']);
                 else
                     system(['start /B psexec \\',DataInput(Node).ComputerName,' -e ',' -W ',DataInput(Node).RemoteDrive,':\',DataInput(Node).RemoteDirectory,'\',RemoteTmpFolder ' -low   ',DataInput(Node).MatlabOctavePath,' -nosplash -nodesktop -minimize -r Tracing']);
@@ -415,7 +415,7 @@ for Node=1:length(DataInput) % To obtain a recursive function remove the 'for'
 
         while (1)
             if Flag==0
-                disp('Try to run matlab/octave on remote machine ... ')
+                disp('Try to run MATLAB/Octave on remote machine ... ')
                 skipline()
                 disp('please wait ... ')
                 skipline()
@@ -435,7 +435,7 @@ for Node=1:length(DataInput) % To obtain a recursive function remove the 'for'
 
         if  (ErrorCode==7)
 
-            disp ('It is not possible execute a matlab session on remote machine!')
+            disp ('It is not possible execute a MATLAB session on remote machine!')
             skipline()
             disp('ErrorCode 7.')
             skipline(2)

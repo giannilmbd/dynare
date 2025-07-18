@@ -6,8 +6,8 @@ function [s,nu] = inverse_gamma_specification(mu, sigma2, lb, type, use_fzero_fl
 % - mu               [double]   scalar, prior mean.
 % - sigma2           [double]   positive scalar, prior variance.
 % - type             [integer]  scalar equal to 1 or 2, type of the inverse gamma distribution
-% - use_fzero_flag   [logical]  scalar, Use (matlab/octave's implementation of) fzero to solve for nu if true, use
-%                               dynare's implementation of the secant method otherwise.
+% - use_fzero_flag   [logical]  scalar, Use (MATLAB/Octave's implementation of) fzero to solve for nu if true, use
+%                               Dynare's implementation of the secant method otherwise.
 % - name             [string]   name of the parameter or random variable.
 %
 % OUTPUS
@@ -17,8 +17,8 @@ function [s,nu] = inverse_gamma_specification(mu, sigma2, lb, type, use_fzero_fl
 % REMARKS
 % 1. In the Inverse Gamma parameterization with alpha and beta, we have alpha=nu/2 and beta=2/s, where
 %       if X is IG(alpha,beta) then 1/X is Gamma(alpha,1/beta)
-% 2. The call to the matlab's implementation of the secant method is here for testing purpose and should not be used. This routine fails
-% more often in finding an interval for nu containing a signe change because it expands the interval on both sides and eventually
+% 2. The call to MATLAB's implementation of the secant method is here for testing purpose and should not be used. This routine fails
+% more often in finding an interval for nu containing a sign change because it expands the interval on both sides and eventually
 % violates  the condition nu>2.
 
 % Copyright © 2003-2023 Dynare Team

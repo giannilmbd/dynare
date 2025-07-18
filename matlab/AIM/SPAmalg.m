@@ -3,7 +3,7 @@ function [b,rts,ia,nexact,nnumeric,lgroots,aimcode] = ...
 %  [b,rts,ia,nexact,nnumeric,lgroots,aimcode] = ...
 %                       SPAmalg(h,neq,nlag,nlead,condn,uprbnd)
 %
-%  Solve a linear perfect foresight model using the matlab eig
+%  Solve a linear perfect foresight model using the MATLAB eig
 %  function to find the invariant subspace associated with the big
 %  roots.  This procedure will fail if the companion matrix is
 %  defective and does not have a linearly independent set of

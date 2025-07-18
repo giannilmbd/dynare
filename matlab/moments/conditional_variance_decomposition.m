@@ -4,8 +4,8 @@ function [ConditionalVarianceDecomposition, ConditionalVarianceDecomposition_ME]
 % for a subset of endogenous variables.
 %
 % INPUTS
-%   M_                  [struct]        Matlab's structure describing the Model (initialized by dynare, see @ref{M_}).          
-%   options_            [struct]        Matlab's structure describing the options (initialized by dynare, see @ref{options_}).
+%   M_                  [struct]        MATLAB's structure describing the Model
+%   options_            [struct]        MATLAB's structure describing the options
 %   dr :                [struct]        Dynare decision rules structure
 %   Steps               [integer]       1*h vector of dates.
 %   SubsetOfVariables   [integer]       1*q vector of indices (declaration order).

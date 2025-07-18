@@ -8,7 +8,7 @@ function oo_ = make_ex_(M_, options_, oo_)
 % - oo_          [struct]   Dynare results structure
 %
 % OUTPUTS
-% - oo_          [struct]   Updated dynare results structure
+% - oo_          [struct]   Updated Dynare results structure
 
 % Copyright © 1996-2024 Dynare Team
 %

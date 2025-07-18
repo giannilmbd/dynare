@@ -10,7 +10,7 @@ function forecast = dyn_forecast(var_list,M_,options_,oo_,task,dataset_info)
 %   oo_:          Dynare results structure
 %   task:         indicates how to initialize the forecast
 %                 either 'simul' or 'smoother'
-%   dataset_info:   Various informations about the dataset (descriptive statistics and missing observations).
+%   dataset_info:   Various information about the dataset (descriptive statistics and missing observations).
 %
 % OUTPUTS
 %   forecast:   structure containing fields

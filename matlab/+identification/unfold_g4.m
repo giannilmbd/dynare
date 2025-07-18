@@ -1,7 +1,7 @@
 function g4_unfolded = unfold_g4(g4, ny)
 % Given the 4th order derivatives stored in a sparse matrix and without
 % symmetric elements (as returned by the static/dynamic files) and the number
-% of (static or dynamic) variables in the jacobian, returns
+% of (static or dynamic) variables in the Jacobian, returns
 % an unfolded version of the same matrix (i.e. with symmetric elements).
 
 % Copyright © 2019 Dynare Team

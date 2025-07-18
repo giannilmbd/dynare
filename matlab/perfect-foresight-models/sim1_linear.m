@@ -25,7 +25,7 @@ function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(e
 %
 % REMARKS
 % - The structure `M_` describing the structure of the model, must contain the
-% following informations:
+% following information:
 %  + lead_lag_incidence, incidence matrix (given by the preprocessor).
 %  + endo_nbr, number of endogenous variables (including aux. variables).
 %  + exo_nbr, number of innovations.
@@ -33,7 +33,7 @@ function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(e
 %  + maximum_endo_lag,
 %  + params, values of model's parameters.
 %  + fname, name of the model.
-%  + NNZDerivatives, number of non zero elements in the jacobian of the dynamic model.
+%  + NNZDerivatives, number of non zero elements in the Jacobian of the dynamic model.
 % - The structure `options_`, must contain the following options:
 %  + verbosity, controls the quantity of information displayed.
 %  + periods, the number of periods in the perfect foresight model.
@@ -62,7 +62,6 @@ function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(e
 verbose = options_.verbosity;
 
 ny = M_.endo_nbr;
-nx = M_.exo_nbr;
 
 maximum_lag = M_.maximum_lag;
 
@@ -215,7 +214,7 @@ if any(isnan(res)) || any(isinf(res)) || any(isnan(Y)) || any(isinf(Y)) || ~isre
         disp('There is most likely something wrong with your model. Try model_diagnostics or another simulation method.')
     end
 else
-    success = true; % Convergency obtained.
+    success = true; % Convergence obtained.
 end
 
 endogenousvariables(:,maximum_lag+(1:periods)) = reshape(Y, ny, periods);

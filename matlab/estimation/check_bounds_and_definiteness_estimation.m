@@ -5,13 +5,13 @@ function [fval,info,exit_flag,Q,H]=check_bounds_and_definiteness_estimation(xpar
 %
 % INPUTS
 % - xparam1                 [double]              n by 1 vector, estimated parameters.
-% - M_                      [struct]              Matlab's structure describing the Model.
-% - estim_params_           [struct]              Matlab's structure describing the estimated_parameters.
-% - bounds                  [struct]              Matlab's structure specifying the bounds on the paramater values (initialized by dynare_estimation_init).
+% - M_                      [struct]              MATLAB's structure describing the Model.
+% - estim_params_           [struct]              MATLAB's structure describing the estimated_parameters.
+% - bounds                  [struct]              MATLAB's structure specifying the bounds on the parameter values (initialized by dynare_estimation_init).
 %
 % OUTPUTS
 % - fval                    [double]              scalar, value of the likelihood or posterior kernel.
-% - info                    [integer]             4 by 1 vector, informations resolution of the model and evaluation of the likelihood.
+% - info                    [integer]             4 by 1 vector, information on whether solution and likelihood could be computed
 % - exit_flag               [integer]             scalar, equal to 1 (no issues when evaluating the likelihood) or 0 (not able to evaluate the likelihood).
 % - Q                       [matrix]              Covariance matrix of structural shocks
 % - H                       [matrix]              Covariance matrix of measurement errors

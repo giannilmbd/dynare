@@ -3,8 +3,8 @@ function [forecast, error_flag] = forecast(options_,M_,dr,endo_steady_state,exo_
 % Occbin forecasts
 %
 % INPUTS
-% - options_                [structure]     Matlab's structure describing the current options
-% - M_                      [structure]     Matlab's structure describing the model
+% - options_                [structure]     MATLAB's structure describing the current options
+% - M_                      [structure]     MATLAB's structure describing the model
 % - dr_in                   [structure]     model information structure
 % - endo_steady_state       [double]        steady state value for endogenous variables
 % - exo_steady_state        [double]        steady state value for exogenous variables

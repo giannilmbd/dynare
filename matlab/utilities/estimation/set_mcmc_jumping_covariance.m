@@ -4,7 +4,7 @@ function invhess = set_mcmc_jumping_covariance(invhess, xparam_nbr, MCMC_jumping
 % sets the jumping covariance matrix for the MCMC algorithm
 % -------------------------------------------------------------------------
 % INPUTS
-%  o invhess:                 [matrix] already computed inverse of the hessian matrix
+%  o invhess:                 [matrix] already computed inverse of the Hessian matrix
 %  o xparam_nbr:              [integer] number of estimated parameters
 %  o MCMC_jumping_covariance: [string] name of option or file setting the jumping covariance matrix
 %  o bayestopt_:              [struct] information on priors
@@ -35,7 +35,7 @@ function invhess = set_mcmc_jumping_covariance(invhess, xparam_nbr, MCMC_jumping
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 switch MCMC_jumping_covariance
-    case 'hessian' % do nothing and use hessian from previous mode optimization
+    case 'hessian' % do nothing and use Hessian from previous mode optimization
     case 'prior_variance' % use prior variance
         if any(isinf(bayestopt_.p2))
             error('%s: Infinite prior variances detected. You cannot use the prior variances as the proposal density, if some variances are Inf.',stringForErrors);

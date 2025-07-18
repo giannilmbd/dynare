@@ -16,7 +16,7 @@ function varargout = sur(ds, param_names, eqtags, model_name, noniterative, ds_r
 %   none
 %
 % SPECIAL REQUIREMENTS
-%   dynare must have been run with the option: json=compute
+%   Dynare must have been run with the option: json=compute
 
 % Copyright © 2017-2023 Dynare Team
 %

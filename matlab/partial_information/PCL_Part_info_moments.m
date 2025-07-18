@@ -1,6 +1,6 @@
 function oo_=PCL_Part_info_moments(M_, oo_, options_, varobs, dr, ivar)
 % function oo_=PCL_Part_info_moments(M_, oo_, options_, varobs, dr, ivar)
-% sets up parameters and calls part-info kalman filter
+% sets up parameters and calls part-info Kalman filter
 % developed by G Perendia, July 2006 for implementation from notes by Prof. Joe Pearlman to
 % suit partial information RE solution in accordance with, and based on, the
 % Pearlman, Currie and Levine 1986 solution.

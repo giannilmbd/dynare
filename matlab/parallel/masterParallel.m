@@ -5,10 +5,10 @@ function [fOutVar,nBlockPerCPU, totCPU] = masterParallel(Parallel,fBlock,nBlock,
 % It is the top-level function called on the master computer when parallelizing a task.
 %
 % This function has two main computational strategies for managing the
-% matlab worker (slave process):
+% MATLAB worker (slave process):
 %
-% 0 Simple Close/Open Stategy:
-%   In this case the new Matlab instances (slave process) are open when
+% 0 Simple Close/Open Strategy:
+%   In this case the new MATLAB instances (slave process) are open when
 %   necessary and then closed. This can happen many times during the
 %   simulation of a model.
 %
@@ -17,7 +17,7 @@ function [fOutVar,nBlockPerCPU, totCPU] = masterParallel(Parallel,fBlock,nBlock,
 %   which are no longer closed at the end of each job. The slave processes
 %   wait for a new job (if it exists). If a slave does not receive a new job after a
 %   fixed time it is destroyed. This solution removes the computational
-%   time necessary to Open/Close new Matlab instances.
+%   time necessary to Open/Close new MATLAB instances.
 %
 % The first (point 0) is the default Strategy
 % i.e.(Parallel_info.leaveSlaveOpen=0). This value can be changed by the
@@ -31,7 +31,7 @@ function [fOutVar,nBlockPerCPU, totCPU] = masterParallel(Parallel,fBlock,nBlock,
 %   Global variables used within the called function are wrapped and passed by storing their
 %   values at the start of the parallel computation in a file via
 %   storeGlobalVars.m. This file is then loaded in the separate,
-%   independent slave Matlab sessions. By keeping them separate, no
+%   independent slave MATLAB sessions. By keeping them separate, no
 %   interaction via global variables can take place.
 %
 % INPUTS
@@ -256,8 +256,8 @@ if parallel_recover ==0
         % According to the information contained in configuration file, compThread can limit MATLAB
         % to a single computational thread. By default, MATLAB makes use of the multithreading
         % capabilities of the computer on which it is running. Nevertheless
-        % exsperimental results show as matlab native
-        % multithreading limit the performaces when the parallel computing is active.
+        % experimental results show as MATLAB native
+        % multithreading limit the performances when the parallel computing is active.
 
 
         if strcmp('true',Parallel(indPC).SingleCompThread)
@@ -314,8 +314,8 @@ if parallel_recover ==0
         else
 
             % If the computation is executed remotely all the necessary files
-            % are created localy, then copied in remote directory and then
-            % deleted (loacal)!
+            % are created locally, then copied in remote directory and then
+            % deleted (local)!
 
             save( ['slaveParallel_input',int2str(j),'.mat'],'j');
 
@@ -352,7 +352,7 @@ if parallel_recover ==0
                     else
                         command1=[Parallel(indPC).MatlabOctavePath,' -nosplash -nodesktop -minimize ',compThread,' -r "addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); fParallel(',int2str(offset+1),',',int2str(sum(nBlockPerCPU(1:j))),',',int2str(j),',',int2str(indPC),',''',fname,''')" &'];
                     end
-                else    % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                else    % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                     if Parallel_info.use_psexec
                         token1 = ['psexec -accepteula -d -W "',DyMo, '" -a ',my_affinity,' -low  '];
                     else
@@ -387,10 +387,10 @@ if parallel_recover ==0
                     else
                         ssh_token = '';
                     end
-                    % To manage the diferences in Unix/Windows OS syntax.
+                    % To manage the differences in Unix/Windows OS syntax.
                     remoteFile=['remoteDynare',int2str(j)];
                     fidRemote=fopen([remoteFile,'.m'],'w+');
-                    if regexpi([Parallel(indPC).MatlabOctavePath], 'octave') % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                    if regexpi([Parallel(indPC).MatlabOctavePath], 'octave') % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                         remoteString=['default_save_options(''-v7''); addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); fParallel(',int2str(offset+1),',',int2str(sum(nBlockPerCPU(1:j))),',',int2str(j),',',int2str(indPC),',''',fname,''')'];
                         command1=[token, 'ssh ',ssh_token,' ',Parallel(indPC).UserName,'@',Parallel(indPC).ComputerName,' "cd ',Parallel(indPC).RemoteDirectory,'/',PRCDir, '; ',Parallel(indPC).MatlabOctavePath,' -f --eval ',remoteFile,' " &'];
                     else
@@ -403,7 +403,7 @@ if parallel_recover ==0
                     delete([remoteFile,'.m']);
                 else
                     if ~strcmpi(Parallel(indPC).ComputerName,MasterName)  % 0.3 Run on a remote machine!
-                                                                          % Hybrid computing Matlab(Master)-> Octave(Slaves) and Vice Versa!
+                                                                          % Hybrid computing MATLAB(Master)-> Octave(Slaves) and Vice Versa!
                         if  regexpi([Parallel(indPC).MatlabOctavePath], 'octave')
                             command1=['psexec \\',Parallel(indPC).ComputerName,' -accepteula -d -e -u ',Parallel(indPC).UserName,' -p ',Parallel(indPC).Password,' -W "',Parallel(indPC).RemoteDrive,':\',Parallel(indPC).RemoteDirectory,'\',PRCDir,'\" -a ',my_affinity, ...
                                       ' -low  ',Parallel(indPC).MatlabOctavePath,' -f --eval "default_save_options(''-v7''); addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); fParallel(',int2str(offset+1),',',int2str(sum(nBlockPerCPU(1:j))),',',int2str(j),',',int2str(indPC),',''',fname,''')"'];
@@ -413,7 +413,7 @@ if parallel_recover ==0
                                       ' -low  ',Parallel(indPC).MatlabOctavePath,' -nosplash -nodesktop -minimize ',compThread,' -r "addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); fParallel(',int2str(offset+1),',',int2str(sum(nBlockPerCPU(1:j))),',',int2str(j),',',int2str(indPC),',''',fname,''')"'];
                         end
                     else                                                  % 0.4 Run on the local machine via the network
-                                                                          % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                                                                          % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                         if  regexpi([Parallel(indPC).MatlabOctavePath], 'octave')
                             command1=['psexec \\',Parallel(indPC).ComputerName,' -accepteula -d -e -W "',Parallel(indPC).RemoteDrive,':\',Parallel(indPC).RemoteDirectory,'\',PRCDir,'\" -a ',my_affinity, ...
                                       ' -low  ',Parallel(indPC).MatlabOctavePath,' -f --eval "default_save_options(''-v7''); addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); fParallel(',int2str(offset+1),',',int2str(sum(nBlockPerCPU(1:j))),',',int2str(j),',',int2str(indPC),',''',fname,''')"'];
@@ -429,12 +429,12 @@ if parallel_recover ==0
           case 1
             if Parallel(indPC).Local == 1 && newInstance                       % 1.1 Run on the local machine.
                 if (~ispc || strcmpi('unix',Parallel(indPC).OperatingSystem))  % Hybrid computing Windows <-> Unix!
-                    if regexpi([Parallel(indPC).MatlabOctavePath], 'octave')    % Hybrid computing Matlab(Master)-> Octave(Slaves) and Vice Versa!
+                    if regexpi([Parallel(indPC).MatlabOctavePath], 'octave')    % Hybrid computing MATLAB(Master)-> Octave(Slaves) and Vice Versa!
                         command1=[Parallel(indPC).MatlabOctavePath,' -f --eval "default_save_options(''-v7''); addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); slaveParallel(',int2str(j),',',int2str(indPC),')" &'];
                     else
                         command1=[Parallel(indPC).MatlabOctavePath,' -nosplash -nodesktop -minimize ',compThread,' -r "addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); slaveParallel(',int2str(j),',',int2str(indPC),')" &'];
                     end
-                else    % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                else    % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                     if Parallel_info.use_psexec
                         token1 = ['psexec -accepteula -d -W "',DyMo, '" -a ',my_affinity,' -low  '];
                     else
@@ -473,10 +473,10 @@ if parallel_recover ==0
                         else
                             ssh_token = '';
                         end
-                        % To manage the diferences in Unix/Windows OS syntax.
+                        % To manage the differences in Unix/Windows OS syntax.
                         remoteFile=['remoteDynare',int2str(j)];
                         fidRemote=fopen([remoteFile,'.m'],'w+');
-                        if regexpi([Parallel(indPC).MatlabOctavePath], 'octave') % Hybrid computing Matlab(Master)-> Octave(Slaves) and Vice Versa!
+                        if regexpi([Parallel(indPC).MatlabOctavePath], 'octave') % Hybrid computing MATLAB(Master)-> Octave(Slaves) and Vice Versa!
                             remoteString=['default_save_options(''-v7''); addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); slaveParallel(',int2str(j),',',int2str(indPC),');'];
                             command1=[token, 'ssh ',ssh_token,' ',Parallel(indPC).UserName,'@',Parallel(indPC).ComputerName,' "cd ',Parallel(indPC).RemoteDirectory,'/',PRCDir '; ',Parallel(indPC).MatlabOctavePath,' -f --eval ',remoteFile,' " &'];
                         else
@@ -489,7 +489,7 @@ if parallel_recover ==0
                         delete([remoteFile,'.m']);
                     else
                         if ~strcmpi(Parallel(indPC).ComputerName,MasterName) % 1.3 Run on a remote machine.
-                                                                             % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                                                                             % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                             if  regexpi([Parallel(indPC).MatlabOctavePath], 'octave')
                                 command1=['psexec \\',Parallel(indPC).ComputerName,' -accepteula -d -e -u ',Parallel(indPC).UserName,' -p ',Parallel(indPC).Password,' -W "',Parallel(indPC).RemoteDrive,':\',Parallel(indPC).RemoteDirectory,'\',PRCDir,'\" -a ',my_affinity, ...
                                           ' -low  ',Parallel(indPC).MatlabOctavePath,' -f --eval "default_save_options(''-v7'');addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); slaveParallel(',int2str(j),',',int2str(indPC),')"'];
@@ -498,7 +498,7 @@ if parallel_recover ==0
                                           ' -low  ',Parallel(indPC).MatlabOctavePath,' -nosplash -nodesktop -minimize ',compThread,' -r "addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); slaveParallel(',int2str(j),',',int2str(indPC),')"'];
                             end
                         else                                                % 1.4 Run on the local machine via the network.
-                                                                            % Hybrid computing Matlab(Master)->Octave(Slaves) and Vice Versa!
+                                                                            % Hybrid computing MATLAB(Master)->Octave(Slaves) and Vice Versa!
                             if  regexpi([Parallel(indPC).MatlabOctavePath], 'octave')
                                 command1=['psexec \\',Parallel(indPC).ComputerName,' -accepteula -d -e -W "',Parallel(indPC).RemoteDrive,':\',Parallel(indPC).RemoteDirectory,'\',PRCDir,'\" -a ',my_affinity, ...
                                           ' -low  ',Parallel(indPC).MatlabOctavePath,' -f --eval "default_save_options(''-v7''); addpath(''',Parallel(indPC).DynarePath,'''), dynareroot = dynare_config(); slaveParallel(',int2str(j),',',int2str(indPC),')"'];
@@ -542,7 +542,7 @@ if parallel_recover ==0
     % Snapshot  of the contents of all the directories involved in parallel
     % computing. This is necessary when I want to copy continuously the files produced by
     % the slaves ...
-    % If the compuation is 'Local' it is not necessary to do it ...
+    % If the computation is 'Local' it is not necessary to do it ...
 
     if Strategy==0 || newInstance % See above.
         PRCDirSnapshot=dynareParallelSnapshot(PRCDir,Parallel(1:totSlaves));
@@ -565,7 +565,7 @@ if parallel_recover ==0
     end
 
 
-    % For matlab enviroment with options_.console_mode = 0:
+    % For MATLAB environment with options_.console_mode = 0:
     % create a parallel (local/remote) specialized computational status bars!
 
     global options_
@@ -745,7 +745,7 @@ if parallel_recover ==0
         % 1. The files .log and .txt are not copied.
         % 2. The comp_status_*.mat files are managed separately.
 
-        if isoctave % to avoid synchronism problems
+        if isoctave % to avoid synchronicity problems
             try
                 PRCDirSnapshot=dynareParallelGetNewFiles(PRCDir,Parallel(1:totSlaves),PRCDirSnapshot);
             catch

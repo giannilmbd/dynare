@@ -1,6 +1,6 @@
 function options_=set_dynare_seed_local_options(options_,a,b)
 % options_=set_dynare_seed_local_options(options_,a,b)
-% Set seeds depending on Matlab (octave) version
+% Set seeds depending on MATLAB (octave) version
 % Inputs:
 %   o options_              options structure
 %   o a                     first input argument, 
@@ -38,7 +38,7 @@ end
 
 matlab_random_streams = ~(isoctave || options_.parallel_info.isHybridMatlabOctave);
 
-if matlab_random_streams% Use new matlab interface.
+if matlab_random_streams% Use new MATLAB interface.
     if nargin==2
         if ischar(a) && strcmpi(a,'default')
             options_.DynareRandomStreams.algo = 'mt19937ar';
@@ -86,7 +86,7 @@ if matlab_random_streams% Use new matlab interface.
         s = RandStream(options_.DynareRandomStreams.algo,'Seed',options_.DynareRandomStreams.seed);
         reset(RandStream.setGlobalStream(s));
     end
-else% Use old matlab interface.
+else% Use old MATLAB interface.
     if nargin==2
         if ischar(a) && strcmpi(a,'default')
             if isoctave
@@ -116,6 +116,6 @@ else% Use old matlab interface.
         end
         error('set_dynare_seed:: Something is wrong in the calling sequence!')
     else
-        error('set_dynare_seed:: Cannot use more than one input argument with your version of Matlab/Octave!')
+        error('set_dynare_seed:: Cannot use more than one input argument with your version of MATLAB/Octave!')
     end
 end

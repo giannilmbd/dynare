@@ -8,13 +8,13 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 % - Y             [double]        (n*T) matrix of data.
 % - data_index    [cell]          1*smpl cell of column vectors of indices.
 % - missing_value [boolean]       1 if missing values, 0 otherwise
-% - M_            [structure]     Matlab's structure describing the model (M_).
-% - oo_           [structure]     Matlab's structure containing the results (oo_).
-% - options_      [structure]     Matlab's structure describing the current options (options_).
+% - M_            [structure]     MATLAB's structure describing the model (M_).
+% - oo_           [structure]     MATLAB's structure containing the results (oo_).
+% - options_      [structure]     MATLAB's structure describing the current options (options_).
 % - bayestopt_    [structure]     describing the priors
 % - estim_params_ [structure]     characterizing parameters to be estimated
 % - dataset_      [structure]     the dataset after required transformation
-% - dataset_info  [structure]     Various informations about the dataset (descriptive statistics and missing observations)
+% - dataset_info  [structure]     Various information about the dataset (descriptive statistics and missing observations)
 %
 % OUTPUTS
 % - alphahat      [double]  (m*T) matrix, smoothed endogenous variables (a_{t|T})  (decision-rule order)
@@ -35,7 +35,7 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 % - Trend         [double] (n*T) pure trend component; stored in options_.varobs order
 % - state_uncertainty [double] (K,K,T) array, storing the uncertainty
 %                                   about the smoothed state (decision-rule order)
-% - M_            [structure] decribing the model
+% - M_            [structure] describing the model
 % - oo_           [structure] storing the results
 % - options_      [structure] describing the options
 % - bayestopt_    [structure] describing the priors
@@ -85,7 +85,7 @@ if  options_.occbin.smoother.linear_smoother && nargin==12
     oo_.occbin.linear_smoother.alphahat0=alphahat0;
     oo_.occbin.linear_smoother.state_uncertainty0=state_uncertainty0;
 
-    disp_verbose('Occbin: linear smoother done.',options_.verbosity)
+    disp_verbose('OccBin: linear smoother done.',options_.verbosity)
     options_.occbin.smoother.status=true;
 end
 % if init_mode
@@ -171,7 +171,7 @@ occbin_options.first_period_occbin_update = inf;
 opts_regime.binding_indicator=[];
 regime_history0 = regime_history;
 
-disp_verbose('Occbin smoother iteration 1.',options_.verbosity)
+disp_verbose('OccBin smoother iteration 1.',options_.verbosity)
 opts_simul.SHOCKS = [etahat(:,1:end)'; zeros(1,M_.exo_nbr)];
 opts_simul.exo_pos = 1:M_.exo_nbr;
 opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
@@ -180,7 +180,7 @@ opts_simul.periods = size(opts_simul.SHOCKS,1);
 options_.occbin.simul=opts_simul;
 [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
 if out.error_flag
-    disp_verbose('Occbin smoother:: simulation within smoother did not converge.',options_.verbosity)    
+    disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)    
     oo_.occbin.smoother.error_flag=321;
     return;
 end
@@ -223,7 +223,7 @@ end
 
 while is_changed && maxiter>iter && ~is_periodic
     iter=iter+1;
-    disp_verbose(sprintf('Occbin smoother iteration %u.', iter),options_.verbosity)
+    disp_verbose(sprintf('OccBin smoother iteration %u.', iter),options_.verbosity)
     occbin_options.opts_regime.regime_history=regime_history;
     [alphahat,etahat,epsilonhat,~,SteadyState,trend_coeff,~,T0,R0,P,~,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0]...
         = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
@@ -242,7 +242,7 @@ while is_changed && maxiter>iter && ~is_periodic
     options_.occbin.simul=opts_simul;
     [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     if out.error_flag
-        disp_verbose('Occbin smoother:: simulation within smoother did not converge.',options_.verbosity)
+        disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)
         oo_.occbin.smoother.error_flag=321;
         return;
     end
@@ -446,7 +446,7 @@ if (~is_changed || occbin_smoother_debug) && nargin==12
             if max(abs(oo_.occbin.smoother.etahat(j,:)))>1.e-8
                 j1=j1+1;
                 if mod(j1,9)==1
-                    hh_fig = dyn_figure(options_.nodisplay,'name','Occbin smoothed shocks');
+                    hh_fig = dyn_figure(options_.nodisplay,'name','OccBin smoothed shocks');
                     ifig=ifig+1;
                     isub=0;
                 end

@@ -51,7 +51,7 @@ classdef dprior < handle
         % Class constructor.
         %
         % INPUTS
-        % - bayestopt_    [struct]   Informations about the prior distribution, aka bayestopt_.
+        % - bayestopt_    [struct]  Information about the prior distribution, aka bayestopt_.
         % - PriorTrunc   [double]   scalar, probability mass to be excluded, aka options_.prior_trunc
         % - Uniform      [logical]  scalar, produce uniform random deviates on the prior support.
         %

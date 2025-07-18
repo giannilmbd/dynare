@@ -6,20 +6,20 @@ function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_i
 %   objective_function  [function handle]                   handle to the objective function
 %   start_par_value     [n_params by 1] vector of doubles   starting values for the parameters
 %   minimizer_algorithm [scalar double, or string]          code of the optimizer algorithm, or string for the name of a user defined optimization routine (not shipped with dynare).
-%   options_            [matlab structure]                  Dynare options structure
+%   options_            [MATLAB structure]                  Dynare options structure
 %   bounds              [n_params by 2] vector of doubles   2 row vectors containing lower and upper bound for parameters
 %   parameter_names     [n_params by 1] cell array          strings containing the parameters names
-%   prior_information   [matlab structure]                  Dynare prior information structure (bayestopt_) provided for algorithm 6
-%   Initial_Hessian     [n_params by n_params] matrix       initial hessian matrix provided for algorithm 6
-%   new_rat_hess_info   [matlab structure]                  step size info used by algorith 5
+%   prior_information   [MATLAB structure]                  Dynare prior information structure (bayestopt_) provided for algorithm 6
+%   Initial_Hessian     [n_params by n_params] matrix       initial Hessian matrix provided for algorithm 6
+%   new_rat_hess_info   [MATLAB structure]                  step size info used by algorithm 5
 %   varargin            [cell array]                        Input arguments for objective function
 %
 % OUTPUTS
 %   opt_par_values      [n_params by 1] vector of doubles   optimal parameter values minimizing the objective
 %   fval                [scalar double]                     value of the objective function at the minimum
 %   exitflag            [scalar double]                     return code of the respective optimizer
-%   hessian_mat         [n_params by n_params] matrix       hessian matrix at the mode returned by optimizer
-%   options_            [matlab structure]                  Dynare options structure (to return options set by algorithms 5)
+%   hessian_mat         [n_params by n_params] matrix       Hessian matrix at the mode returned by optimizer
+%   options_            [MATLAB structure]                  Dynare options structure (to return options set by algorithms 5)
 %   Scale               [scalar double]                     scaling parameter returned by algorith 6
 %
 % SPECIAL REQUIREMENTS
@@ -345,7 +345,7 @@ switch minimizer_algorithm
     [opt_par_values, hessian_mat, Scale, fval] = gmhmaxlik(objective_function, start_par_value, ...
                                                       Initial_Hessian, options_.mh_jscale, bounds, prior_information.p2, options_.gmhmaxlik, options_.optim_opt, varargin{:});
   case 7
-    % Matlab's simplex (Optimization toolbox needed).
+    % MATLAB's simplex (Optimization toolbox needed).
     if isoctave && ~user_has_octave_forge_package('optim')
         error('Option mode_compute=7 requires the optim package')
     elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
@@ -577,7 +577,7 @@ switch minimizer_algorithm
     [opt_par_values, fval, exitflag] = particleswarm(objfun, length(start_par_value), bounds(:,1), bounds(:,2), particleswarmOptions);
     opt_par_values = opt_par_values(:);
   case 13
-    % Matlab's lsqnonlin (Optimization toolbox needed).
+    % MATLAB's lsqnonlin (Optimization toolbox needed).
     if ~isfield(options_,'mom')
         error('Option mode_compute=13 is available only for method_of_moments estimation.')
     end

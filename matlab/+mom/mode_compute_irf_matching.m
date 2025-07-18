@@ -9,7 +9,7 @@ function [xparam1, hessian_xparam1, fval, mom_verbose] = mode_compute_irf_matchi
 % -------------------------------------------------------------------------
 % INPUTS
 % xparam0:               [vector]       initialized parameters
-% hessian_xparam0:       [matrix]       initialized hessian at xparam0
+% hessian_xparam0:       [matrix]       initialized Hessian at xparam0
 % objective_function:    [func handle]  name of the objective function
 % doBayesianEstimation:  [logical]      true if Bayesian estimation
 % weighting_info:        [structure]    information on weighting matrix
@@ -26,7 +26,7 @@ function [xparam1, hessian_xparam1, fval, mom_verbose] = mode_compute_irf_matchi
 % -------------------------------------------------------------------------
 % OUTPUT
 % xparam1:               [vector]       mode of objective function
-% hessian_xparam1:       [matrix]       hessian at xparam1
+% hessian_xparam1:       [matrix]       Hessian at xparam1
 % fval:                  [double]       function value at mode
 % mom_verbose:           [structure]    information on intermediate estimation results
 % Also saves the computed mode and hessian to a file.

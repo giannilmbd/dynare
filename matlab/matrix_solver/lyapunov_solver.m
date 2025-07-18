@@ -20,7 +20,7 @@ function P=lyapunov_solver(T,R,Q,options_)
 %   options_.lyapunov_db == true
 %       doubling algorithm
 %   options_.lyapunov_srs == true
-%       Square-root solver for discrete-time Lyapunov equations (requires Matlab System Control toolbox
+%       Square-root solver for discrete-time Lyapunov equations (requires MATLAB System Control toolbox
 %       or Octave control package)
 
 % Copyright © 2016-2023 Dynare Team
@@ -48,7 +48,7 @@ elseif options_.lyapunov_db
         P = lyapunov_symm(T,R*Q*R',options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold, [], options_.debug);
     end
 elseif options_.lyapunov_srs
-    % works only with Matlab System Control toolbox or Octave control package,
+    % works only with MATLAB System Control toolbox or Octave control package,
     if isoctave
         if ~user_has_octave_forge_package('control')
             error('lyapunov=square_root_solver not available; you must install the control package from Octave Forge')

@@ -5,7 +5,7 @@ function [theta, fxsim, neval] = slice_sampler(objective_function,theta,thetapri
 % W: optimal value in the range (3,10)*std(x)
 %    - see C.Planas and A.Rossi (2014)
 % objective_function(theta,varargin): -log of any unnormalized pdf
-% with varargin (optional) a vector of auxiliaty parameters
+% with varargin (optional) a vector of auxiliary parameters
 % to be passed to f( ).
 % ----------------------------------------------------------
 %
@@ -55,7 +55,6 @@ npar = length(theta);
 W1 = sampler_options.W1;
 neval = zeros(npar,1);
 
-% % % fname0=fname;
 fname = [ int2str(sampler_options.curr_block)];
 
 Prior = dprior(varargin{6},varargin{3}.prior_trunc);

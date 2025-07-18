@@ -310,7 +310,7 @@ if init
             end
         end
 
-        % slice posterior sampler does not require mode or hessian to run
+        % slice posterior sampler does not require mode or Hessian to run
         % needs to be set to 1 to skip parts in dynare_estimation_1.m or mom.run.m
         % requiring posterior maximization/calibrated smoother before MCMC
         options_.mh_posterior_mode_estimation=true;

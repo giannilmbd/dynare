@@ -8,7 +8,7 @@ function mcheck = mode_check(fun,xparam,hessian_mat,options_,M_,estim_params_,ba
 % INPUTS
 % - fun:            [func_handle]  objective function
 % - xparam:         [vector]       estimated mode/minimum
-% - hessian_mat:    [matrix]       hessian of the objective function at the estimated mode/minimum
+% - hessian_mat:    [matrix]       Hessian of the objective function at the estimated mode/minimum
 % - options_:       [structure]    Dynare options structure
 % - M_:             [structure]    Dynare model structure
 % - estim_params_:  [structure]    Dynare estimated parameters structure

@@ -6,10 +6,10 @@ function [Q,R] = qr2(varargin)
 % & Schorfheides's identification scheme.
 %
 % INPUTS
-%   See matlab's documentation for QR decomposition.
+%   See MATLAB's documentation for QR decomposition.
 %
 % OUTPUTS
-%   See matlab's documentation for QR decomposition.
+%   See MATLAB's documentation for QR decomposition.
 %
 % ALGORITHM
 %   None.

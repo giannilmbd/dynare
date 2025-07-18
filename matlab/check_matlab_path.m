@@ -26,7 +26,7 @@ DYNARE_PATH = strrep(which('dynare'),'dynare.m','');
 
 if isempty(DYNARE_PATH)
     % Nothing to do here (this case should not happen)
-    disp('dynare.m is not in the Matlab''s path.')
+    disp('dynare.m is not in the MATLAB''s path.')
     return
 else
     % Removes trailing slash.
@@ -44,15 +44,15 @@ end
 idDYNARE = strfind(MATLAB_PATH,DYNARE_PATH);
 
 if isempty(idDYNARE)
-    disp('dynare.m is not in the Matlab''s path.')
+    disp('dynare.m is not in the MATLAB path.')
     return
 else
     if isequal(length(idDYNARE),1)
         if isequal(idDYNARE, 1)
-            % Dynare is on top of matlab's path! Nothing to do here...
+            % Dynare is on top of MATLAB's path! Nothing to do here...
             return
         else
-            str0 = sprintf('Dynare is not on top of the Matlab/Octave path!');
+            str0 = sprintf('Dynare is not on top of the MATLAB/Octave path!');
             % Check that this will not create a problem
             MATLAB_PATH_ = path2cell(MATLAB_PATH);
             DYNARE_ROUTINES = getallroutinenames(DYNARE_PATH, getalldirectories(DYNARE_PATH));
@@ -75,8 +75,8 @@ else
                 end
                 if change_path_flag
                     skipline()
-                    msg = sprintf(['I put %s on top of your Matlab/Octave path.' ...
-                                   '\nNote that this is a temporary change (i.e. it will not affect future Matlab/Octave sessions).\n' ...
+                    msg = sprintf(['I put %s on top of your MATLAB/Octave path.' ...
+                                   '\nNote that this is a temporary change (i.e. it will not affect future MATLAB/Octave sessions).\n' ...
                                    '\nIf the ordering was intentional, i.e. if you really want to override the routines distributed with Dynare,' ...
                                    ' you can change this behavior using the ''nopathchange'' option (see the reference manual).'], DYNARE_PATH);
                     warning(msg);
@@ -90,13 +90,13 @@ else
     else
         % Check that the user did not put all the subfolders in the path.
         % => If DYNARE_PATH/qz is in the path while mjdgges dll is available
-        % it most likely means that user wrongly put all subfolders in the
-        % matlab's path!
+        % it most likely means that user wrongly put all subfolders in
+        % MATLAB's path!
         mexpath = get_path_to_mex_files([DYNARE_PATH filesep]);
         MATLAB_PATH = path2cell(MATLAB_PATH);
         for i=1:length(mexpath)
             if exist([mexpath{i} filesep 'mjdgges.' mexext],'file') && ismember([DYNARE_PATH filesep 'qz'],MATLAB_PATH)
-                msg = sprintf(['You put all the subfolders of the Dynare matlab folder in the Matlab/Octave path! Only ' ...
+                msg = sprintf(['You put all the subfolders of the Dynare matlab folder in the MATLAB/Octave path! Only ' ...
                                'the dynare ' filesep 'matlab folder (without subfolders)\nshould be in the ' ...
                                'path. Dynare automatically adds any required subfolders to the ' ...
                                'path.']);

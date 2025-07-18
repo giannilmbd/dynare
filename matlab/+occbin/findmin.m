@@ -2,17 +2,17 @@ function [y, out, cost] = findmin(d_index, a0, P1, Qt, Y, ZZ, opts_simul,M_, dr,
 % [y, out, cost] = findmin(d_index, a0, P1, Qt, Y, ZZ, opts_simul,M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_)
 % Outputs:
 %  - cost               [double]        penalty 
-%  - out                [structure]     Occbin's results structure
+%  - out                [structure]     OccBin's results structure
 %
 % Inputs
 % - opts_simul          [structure]     Structure with simulation options
 %                                       used in cost function
-% - M_                  [structure]     Matlab's structure describing the model (M_).
+% - M_                  [structure]     MATLAB's structure describing the model
 % - dr_                 [structure]     model information structure
 % - endo_steady_state   [vector]        steady state value for endogenous variables
 % - exo_steady_state    [vector]        steady state value for exogenous variables
 % - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables                                    
-% - options_            [structure]     Matlab's structure describing the current options (options_).
+% - options_            [structure]     MATLAB's structure describing the current options
 
 % Copyright © 2023 Dynare Team
 %

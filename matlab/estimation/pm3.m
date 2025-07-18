@@ -13,19 +13,19 @@ function oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,na
 %  names1       [cell array] Names of all variables in the moment matrix from
 %                       which names2 is selected
 %  names2       [cell array] Names of variables subset selected for moments
-%  names3       [string] Name of the field in oo_ structure to be set
+%  name3       [string] Name of the field in oo_ structure to be set
 %  DirectoryName [string] Name of the directory in which to save and from
 %                       where to read
 %  var_type     [string] suffix of the filename from which to load moment
 %                   matrix
-%  dispString   [string] string to be displayes in the command window
+%  dispString   [string] string to be displays in the command window
 %
 % OUTPUTS
 %  oo_          [structure]     storing the results
 
 
 % PARALLEL CONTEXT
-% See also the comment in posterior_sampler.m funtion.
+% See also the comment in posterior_sampler.m function.
 
 
 % Copyright © 2007-2023 Dynare Team
@@ -340,7 +340,7 @@ if ~options_.nograph && ~options_.no_graph.posterior
             end
         end
     else
-        % For the time being in Octave enviroment the pm3.m is executed only in
+        % For the time being in Octave environment the pm3.m is executed only in
         % serial modality, to avoid problem with the plots.
         fout = pm3_core(localVars,1,nvar,0);
     end

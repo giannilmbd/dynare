@@ -13,7 +13,7 @@ function myoutput=pm3_core(myinputs,fpar,nvar,whoiam, ThisMatlab)
 %                                    allows us to distinguish between them. Then it is the index number of this CPU among all CPUs in the
 %                                    cluster.
 %   o ThisMatlab         [integer]   Allows us to distinguish between the
-%                                    'main' Matlab, the slave Matlab worker, local Matlab, remote Matlab,
+%                                    'main' MATLAB, the slave MATLAB worker, local MATLAB, remote MATLAB,
 %                                     ... Then it is the index number of this slave machine in the cluster.
 %
 % OUTPUTS

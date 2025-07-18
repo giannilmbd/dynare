@@ -17,10 +17,10 @@ function [simulations, errorflag] = simul_backward_linear_model(initialcondition
 % REMARKS
 % [1] The innovations used for the simulation are saved in oo_.exo_simul, and the resulting paths for the endogenous
 %     variables are saved in oo_.endo_simul.
-% [2] The last input argument is not mandatory. If absent we use random draws and rescale them with the informations provided
+% [2] The last input argument is not mandatory. If absent we use random draws and rescale them with the information provided
 %     through the shocks block.
-% [3] If the first input argument is empty, the endogenous variables are initialized with 0, or if available with the informations
-%     provided thrtough the histval block.
+% [3] If the first input argument is empty, the endogenous variables are initialized with 0, or if available with the information
+%     provided through the histval block.
 
 % Copyright © 2012-2023 Dynare Team
 %

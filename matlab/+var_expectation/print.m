@@ -1,6 +1,6 @@
 function print(varexpectationmodelname, withcalibration)
 
-% Prints the exansion of the VAR_EXPECTATION term in files.
+% Prints the expansion of the VAR_EXPECTATION term in files.
 %
 % INPUTS
 % - varepxpectationmodelname       [string]    Name of the expectation model.
@@ -16,7 +16,7 @@ function print(varexpectationmodelname, withcalibration)
 % - {varexpectationmodelname}-expression.inc     which contains the expanded version of the expectation model kind term.
 %
 % These routines are saved under the {modfilename}/model/varexpectationmodel subfolder, and can be used
-% after in another mod file (ie included with the macro directive @#include). A matlab routine is also
+% after in another mod file (ie included with the macro directive @#include). A MATLAB routine is also
 % created for evaluating (dseries) the var-expectations.
 
 % Copyright © 2018-2021 Dynare Team

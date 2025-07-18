@@ -6,10 +6,10 @@ function [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, option
 % INPUTS
 % - xparam1             [double]        current values for the estimated parameters.
 % - dataset_            [structure]     dataset after transformations
-% - dataset_info        [structure]     storing informations about the
+% - dataset_info        [structure]     storing information about the
 %                                       sample; not used but required for interface
-% - options_            [structure]     Matlab's structure describing the current options
-% - M_                  [structure]     Matlab's structure describing the model
+% - options_            [structure]     MATLAB's structure describing the current options
+% - M_                  [structure]     MATLAB's structure describing the model
 % - estim_params_       [structure]     characterizing parameters to be estimated
 % - bayestopt_          [structure]     describing the priors
 % - BoundsInfo          [structure]     containing prior bounds
@@ -21,10 +21,10 @@ function [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, option
 %
 % OUTPUTS
 % - fval                    [double]        scalar, value of the likelihood or posterior kernel.
-% - info                    [integer]       4×1 vector, informations resolution of the model and evaluation of the likelihood.
+% - info                    [integer]       4×1 vector, information on whether solution and likelihood could be computed
 % - exit_flag               [integer]       scalar, equal to 1 (no issues when evaluating the likelihood) or 0 (not able to evaluate the likelihood).
 % - DLIK                    [double]        Vector with score of the likelihood
-% - Hess                    [double]        asymptotic hessian matrix.
+% - Hess                    [double]        asymptotic Hessian matrix.
 % - SteadyState             [double]        steady state level for the endogenous variables
 % - trend_coeff             [double]        Matrix of doubles, coefficients of the deterministic trend in the measurement equation.
 % - M_                      [struct]        Updated M_ structure described in INPUTS section.

@@ -18,15 +18,15 @@
 % Compute the stochastic simulations of heterogeneus-agent models
 %
 % INPUTS
-% - M_       [structure] Matlab's structure describing the model
-% - options_ [structure] Matlab's structure describing the current options
-% - ss       [structure] Matlab's structure with the model steady-state
+% - M_       [structure] MATLAB's structure describing the model
+% - options_ [structure] MATLAB's structure describing the current options
+% - ss       [structure] MATLAB's structure with the model steady-state
 %                       information. It contains the following fields:
-%    - pol [structure] Matlab's structure containing the policy functions
+%    - pol [structure] MATLAB's structure containing the policy functions
 %                      discretization
-%       - pol.grids [structure]: Matlab's structure containing the nodes of the
+%       - pol.grids [structure]: MATLAB's structure containing the nodes of the
 %                                state grids as column vectors.
-%       - pol.values [structure]: Matlab's structure containing the policy
+%       - pol.values [structure]: MATLAB's structure containing the policy
 %                                 function as matrices. Row indices and column
 %                                 indices follow the lexicographic order
 %                                 specified in pol.shocks and pol.states
@@ -40,18 +40,18 @@
 %                             used for the columns of pol.values. If not
 %                             specified, it follows the declaration order in the
 %                             var(heterogeneity=) statement.
-%    - shocks [structure]: Matlab's stucture describing the discretization of
+%    - shocks [structure]: MATLAB's structure describing the discretization of
 %                          individual shocks or innovations:
-%       - shocks.grids [structure]: Matlab's structure containing the nodes of
+%       - shocks.grids [structure]: MATLAB's structure containing the nodes of
 %                                   the shock grids
-%       - shocks.Pi [structure]: Matlab's structure containing the Markov
+%       - shocks.Pi [structure]: MATLAB's structure containing the Markov
 %                                matrices if the shock processes are discretized
 %                                AR(1) processes. The field should be absent
 %                                otherwise.
-%       - shocks.w [structure]: Matlab's structure containing the Gauss-Hermite
+%       - shocks.w [structure]: MATLAB's structure containing the Gauss-Hermite
 %                               weights if the i.i.d gaussian innovation
 %                               processes are discretized
-%    - d [structure]: Matlab's structure describing the steady-state
+%    - d [structure]: MATLAB's structure describing the steady-state
 %                     distribution
 %       - d.grids [structure]: structure containing the states grids as column
 %                              vectors. If one of the states grid is not
@@ -70,7 +70,7 @@
 %                           for the columns of d.hist. If it is not
 %                           specified, it falls back to the value induced by
 %                           pol.states.
-%    - agg [structure]: Matlab's tructure containing the steady-state values of
+%    - agg [structure]: MATLAB's structure containing the steady-state values of
 %                       aggregate variables
 % OUTPUTS
 % - out_ss [structure]: validated and normalized steady-state input structure.

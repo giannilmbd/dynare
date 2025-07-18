@@ -5,13 +5,13 @@ function [xparam1, hh] = check_mode_file(xparam1, hh, options_, bayestopt_)
 % -------------------------------------------------------------------------
 % INPUTS
 %  o xparam1:                [vector] current vector of parameter values at the mode
-%  o hh:                     [matrix] current hessian matrix at the mode
+%  o hh:                     [matrix] current 'Hessian matrix at the mode
 %  o options_:               [structure] information about options
 %  o bayestopt_:             [structure] information about priors
 % -------------------------------------------------------------------------
 % OUTPUTS
 %  o xparam1:                [vector] updated vector of parameter values at the mode
-%  o hh:                     [matrix] updated hessian matrix at the mode
+%  o hh:                     [matrix] updated Hessian matrix at the mode
 % -------------------------------------------------------------------------
 % This function is called by
 %  o dynare_estimation_init.m

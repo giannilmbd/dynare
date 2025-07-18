@@ -5,8 +5,8 @@ function SampleAddress = selec_posterior_draws(M_,options_,dr,endo_steady_state,
 % This routine assures an _mh file cannot be opened twice.
 %
 % INPUTS
-%   o M_                    [structure]     Matlab's structure describing the model
-%   o options_              [structure]     Matlab's structure describing the current options
+%   o M_                    [structure]     MATLAB's structure describing the model
+%   o options_              [structure]     MATLAB's structure describing the current options
 %   o dr                    [structure]     Reduced form model.
 %   o endo_steady_state     [vector]        steady state value for endogenous variables
 %   o exo_steady_state      [vector]        steady state value for exogenous variables

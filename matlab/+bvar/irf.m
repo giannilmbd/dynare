@@ -3,7 +3,7 @@ function irf(nlags,identification)
 % builds IRFs for a BVAR model
 %
 % INPUTS
-%    nlags            [integer]     number of lags for the bvar
+%    nlags            [integer]     number of lags for the BVAR
 %    identification   [string]      identification scheme ('Cholesky' or 'SquareRoot')
 %
 % OUTPUTS
@@ -40,7 +40,7 @@ end
 S_inv_upper_chol = chol(inv(posterior.S));
 
 % Option 'lower' of chol() not available in old versions of
-% Matlab, so using transpose
+% MATLAB, so using transpose
 XXi_lower_chol = chol(posterior.XXi)';
 
 k = ny*nlags+nx;

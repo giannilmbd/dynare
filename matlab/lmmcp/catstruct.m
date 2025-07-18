@@ -41,7 +41,7 @@ function A = catstruct(varargin)
 %
 %   See also CAT, STRUCT, FIELDNAMES, STRUCT2CELL, ORDERFIELDS
 
-% for Matlab R13 and up
+% for MATLAB R13 and up
 % version 3.0 (mar 2013)
 % Originally downloaded from MATLAB central:
 % http://www.mathworks.com/matlabcentral/fileexchange/7842-catstruct

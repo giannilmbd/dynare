@@ -4,7 +4,7 @@ function [vdec, cc, ac] = monte_carlo_moments(mm, ss, dr, M_, options_, estim_pa
 % Inputs:
 %  - dr                 [structure]     decision rules
 %  - M_                 [structure]     model structure
-%  - options_           [structure]     Matlab's structure describing the current options
+%  - options_           [structure]     MATLAB's structure describing the current options
 %  - estim_params_      [structure]     characterizing parameters to be estimated
 %
 % Outputs:

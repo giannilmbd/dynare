@@ -54,7 +54,7 @@ else
             [oo_, yf] = store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty);
         else
             smoother_error=true;
-            fprintf('\nOccbin: smoother did not succeed. No results will be written to oo_.\n')
+            fprintf('\nOccBin: smoother did not succeed. No results will be written to oo_.\n')
         end
     else
         [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_] = DsgeSmoother(xparam1,dataset_.nobs,transpose(dataset_.data),dataset_info.missing.aindex,dataset_info.missing.state,M_,oo_,options_,bayestopt_,estim_params_);

@@ -1,4 +1,5 @@
 function y_=simult_(M_,options_,y0,dr,ex_,iorder)
+% y_=simult_(M_,options_,y0,dr,ex_,iorder)
 % Simulates the model using a perturbation approach, given the path for the exogenous variables and the
 % decision rules.
 %
@@ -6,8 +7,8 @@ function y_=simult_(M_,options_,y0,dr,ex_,iorder)
 %    M_       [struct]   model
 %    options_ [struct]   options
 %    y0       [double]   n*1 vector, initial value (n is the number of declared endogenous variables plus the number
-%                        of auxilliary variables for lags and leads); must be in declaration order, i.e. as in M_.endo_names
-%    dr       [struct]   matlab's structure where the reduced form solution of the model is stored.
+%                        of auxiliary variables for lags and leads); must be in declaration order, i.e. as in M_.endo_names
+%    dr       [struct]   MATLAB's structure where the reduced form solution of the model is stored.
 %    ex_      [double]   T*q matrix of innovations.
 %    iorder   [integer]  order of the taylor approximation.
 %
@@ -119,7 +120,7 @@ else
         ghuss = dr.ghuss;
         nspred = M_.nspred;
         ipred = M_.nstatic+(1:nspred);
-        %construction follows Andreasen et al (2013), Technical
+        %construction follows Andreasen et al. (2013), Technical
         %Appendix, Formulas (65) and (66)
         %split into first, second, and third order terms
         yhat1 = y0(order_var(k2))-dr.ys(order_var(k2));

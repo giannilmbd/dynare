@@ -11,11 +11,11 @@ function [dLIK, dlikk, a, Pstar, llik] = univariate_kalman_filter_d(data_index, 
 %! @sp 1
 %! @table @ @var
 %! @item data_index
-%! Matlab's cell, 1*T cell of column vectors of indices (in the vector of observed variables).
+%! MATLAB's cell, 1*T cell of column vectors of indices (in the vector of observed variables).
 %! @item number_of_observations
 %! Integer scalar, effective number of observations.
 %! @item no_more_missing_observations
-%! Integer scalar, date after which there is no more missing observation (it is then possible to switch to the steady state kalman filter).
+%! Integer scalar, date after which there is no more missing observation (it is then possible to switch to the steady state Kalman filter).
 %! @item Y
 %! Matrix (@var{pp}*T) of doubles, data.
 %! @item start
@@ -29,7 +29,7 @@ function [dLIK, dlikk, a, Pstar, llik] = univariate_kalman_filter_d(data_index, 
 %! @item Pstar
 %! Matrix (@var{mm}*@var{mm}) of doubles, initial covariance matrix of the state vector (stationary part).
 %! @item kalman_tol
-%! Double scalar, tolerance parameter (rcond, inversibility of the covariance matrix of the prediction errors).
+%! Double scalar, tolerance parameter (rcond, invertibility of the covariance matrix of the prediction errors).
 %! @item riccati_tol
 %! Double scalar, tolerance parameter (iteration over the Riccati equation).
 %! @item presample
@@ -41,7 +41,7 @@ function [dLIK, dlikk, a, Pstar, llik] = univariate_kalman_filter_d(data_index, 
 %! @item Q
 %! Matrix (@var{rr}*@var{rr}) of doubles, covariance matrix of the structural innovations (noise in the state equation).
 %! @item H
-%! Vector (@var{pp}) of doubles, diagonal of covariance matrix of the measurement errors (corelation among measurement errors is handled by a model transformation).
+%! Vector (@var{pp}) of doubles, diagonal of covariance matrix of the measurement errors (correlation among measurement errors is handled by a model transformation).
 %! @item Z
 %! Matrix (@var{pp}*@var{mm}) of doubles, matrix relating the states to the observed variables.
 %! @item mm
@@ -51,7 +51,7 @@ function [dLIK, dlikk, a, Pstar, llik] = univariate_kalman_filter_d(data_index, 
 %! @item rr
 %! Integer scalar, number of structural innovations.
 %! @item Zflag
-%! Integer scalar, equal to 0 if Z is a vector of indices targeting the obseved variables in the state vector, equal to 1 if Z is a @var{pp}*@var{mm} matrix.
+%! Integer scalar, equal to 0 if Z is a vector of indices targeting the observed variables in the state vector, equal to 1 if Z is a @var{pp}*@var{mm} matrix.
 %! @item diffuse_periods
 %! Integer scalar, number of diffuse filter periods in the initialization step.
 %! @end table
