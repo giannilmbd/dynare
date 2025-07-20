@@ -468,7 +468,7 @@ switch minimizer_algorithm
                 else
                     simpsaOptions.TOLX = tolx;
                 end
-              case 'EndTemparature'
+              case 'EndTemperature'
                 simpsaOptions.TEMP_END = options_list{i,2};
               case 'MaxFunEvals'
                 simpsaOptions.MAX_FUN_EVALS = options_list{i,2};
