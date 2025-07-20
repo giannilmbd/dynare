@@ -334,28 +334,28 @@ while 1
 
         if (abs(max(Y)-min(Y)) < OPTIONS.TOLFUN) && (TEMP_LOOP_NUMBER ~= 1)
             OUTPUT.MESSAGE = 'Change in the objective function value less than the specified tolerance (TOLFUN).';
-            disp(OUTPUT.MESSAGE)
+            disp_verbose(OUTPUT.MESSAGE, strcmp(OPTIONS.DISPLAY,'iter'));
             EXITFLAG = 1;
             break
         end
 
         if (max(max(abs(P(2:NDIM+1,:)-P(1:NDIM,:)))) < OPTIONS.TOLX) && (TEMP_LOOP_NUMBER ~= 1)
             OUTPUT.MESSAGE = 'Change in X less than the specified tolerance (TOLX).';
-            disp(OUTPUT.MESSAGE)
+            disp_verbose(OUTPUT.MESSAGE, strcmp(OPTIONS.DISPLAY,'iter'));
             EXITFLAG = 2;
             break
         end
 
         if (nITERATIONS >= OPTIONS.MAX_ITER_TOTAL*NDIM) || (nFUN_EVALS >= OPTIONS.MAX_FUN_EVALS*NDIM*(NDIM+1))
             OUTPUT.MESSAGE = 'Maximum number of function evaluations (MAX_FUN_EVALS*NDIM*(NDIM+1)) or iterations (MAX_ITER_TOTAL*NDIM) reached.';
-            disp(OUTPUT.MESSAGE);
+            disp_verbose(OUTPUT.MESSAGE, strcmp(OPTIONS.DISPLAY,'iter'));
             EXITFLAG = 0;
             break
         end
 
         if toc/60 > OPTIONS.MAX_TIME
             OUTPUT.MESSAGE = 'Exceeded maximum time.';
-            disp(OUTPUT.MESSAGE);
+            disp_verbose(OUTPUT.MESSAGE, strcmp(OPTIONS.DISPLAY,'iter'));
             EXITFLAG = -1;
             break
         end

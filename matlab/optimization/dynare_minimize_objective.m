@@ -382,6 +382,9 @@ switch minimizer_algorithm
     if isempty(prior_information) %Inf will be reset
         prior_information.p2=Inf(n_params,1);
     end
+    if options_.silent_optimizer
+        options_.gmhmaxlik.silent = true;
+    end
     opt_runtime_start = tic;
     [opt_par_values, hessian_mat, Scale, fval, funcCount] = ...
         gmhmaxlik(objective_function, start_par_value, Initial_Hessian, options_.mh_jscale, bounds, prior_information.p2, options_.gmhmaxlik, options_.optim_opt, varargin{:});
@@ -605,6 +608,9 @@ switch minimizer_algorithm
             end
         end
     end
+    if options_.silent_optimizer
+        particleswarmOptions = optimoptions(particleswarmOptions,'Display','off');
+    end
     % Get number of instruments.
     numberofvariables = length(start_par_value);
     % Set objective function.
@@ -613,7 +619,9 @@ switch minimizer_algorithm
         particleswarmOptions.SwarmSize = eval(particleswarmOptions.SwarmSize);
     end
     if isempty(particleswarmOptions.InitialSwarmMatrix)
-        fprintf('particleswarm: inititalizing swarm matrix...')
+        if ~options_.silent_optimizer
+            fprintf('particleswarm: inititalizing swarm matrix...');
+        end
         particleswarmOptions.InitialSwarmMatrix = zeros(particleswarmOptions.SwarmSize, numberofvariables);
         p = 1;
         FVALS = zeros(particleswarmOptions.SwarmSize, 1);
@@ -649,7 +657,9 @@ switch minimizer_algorithm
                 p = p + 1;
             end
         end
-        fprintf('done!\n');
+        if ~options_.silent_optimizer
+            fprintf('done!\n');
+        end
     end
     % particleswarm errors if objective function is inf, so we use penalized objective function
     % and set the base penalty to the worst value of the objective function in the InitialSwarmMatrix
@@ -743,7 +753,7 @@ switch minimizer_algorithm
         end
     end
     if options_.silent_optimizer
-        solveoptoptions.verbosity = 0;
+        solveoptoptions.verbosity = -1;
     end
     opt_runtime_start = tic;
     if options_.analytic_derivation || (isfield(options_,'mom') && options_.mom.analytic_jacobian==1)

@@ -131,14 +131,16 @@ for i=1:gmhmaxlikOptions.iterations
     fcount = fcount + 1;
     dVariance = max(max(abs(PostVariance-OldPostVariance)));
     dMean = max(abs(PostMean-OldPostMean));
-    skipline()
-    printline(58,'=')
-    disp(['   Change in the posterior covariance matrix = ' num2str(dVariance) '.'])
-    disp(['   Change in the posterior mean = ' num2str(dMean) '.'])
-    disp(['   Current mode = ' num2str(ModeValue)])
-    disp(['   Mode improvement = ' num2str(abs(OldModeValue-ModeValue))])
-    disp(['   New value of jscale = ' num2str(Scale)])
-    printline(58,'=')
+    if ~gmhmaxlikOptions.silent
+        skipline()
+        printline(58,'=')
+        disp(['   Change in the posterior covariance matrix = ' num2str(dVariance) '.'])
+        disp(['   Change in the posterior mean = ' num2str(dMean) '.'])
+        disp(['   Current mode = ' num2str(ModeValue)])
+        disp(['   Mode improvement = ' num2str(abs(OldModeValue-ModeValue))])
+        disp(['   New value of jscale = ' num2str(Scale)])
+        printline(58,'=')
+    end
     OldModeValue = ModeValue;
     OldPostMean = PostMean;
     OldPostVariance = PostVariance;
@@ -146,6 +148,8 @@ end
 
 HessianMatrix = inv(PostVariance);
 
-skipline()
-disp(['Optimal value of the scale parameter = ' num2str(Scale)])
-skipline()
+if ~gmhmaxlikOptions.silent
+    skipline()
+    disp(['Optimal value of the scale parameter = ' num2str(Scale)])
+    skipline()
+end
