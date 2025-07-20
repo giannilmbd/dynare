@@ -95,7 +95,7 @@ error43='Gradient equals zero at the starting point.';
 error50='<func> returns an empty string.';
 error51='<func> returns NaN at the point.';
 error52='<func> returns infinite value at the point.';
-error60='<gradc> returns an improper vector. Check the dimension';
+error60='<gradc> returns an improper vector. Check the dimension.';
 error61='<gradc> returns NaN at the point.';
 error62='<gradc> returns infinite vector at the point.';
 error63='<gradc> returns zero vector at an infeasible point.';
@@ -111,7 +111,7 @@ warn09='Re-run from recorded point.';
 warn08='Ravine with a flat bottom is detected.';
 termwarn0='SolvOpt: Normal termination.';
 termwarn1='SolvOpt: Termination warning:';
-appwarn='The above warning may be reasoned by inaccurate gradient approximation';
+appwarn='The above warning may be reasoned by inaccurate gradient approximation.';
 endwarn=[...
     'Premature stop is possible. Try to re-run the routine from the obtained point.               ';...
     'Result may not provide the optimum. The function apparently has many extremum points.        ';...
@@ -122,7 +122,7 @@ endwarn=[...
 % ARGUMENTS PASSED ----{
 if nargin<2           % Function and/or starting point are not specified
     exitflag=-1;
-    message = strcat(errmes, ': ', error1);
+    message = [errmes ' ' error1];
     disp(errmes);
     disp(error1);
     return
@@ -175,7 +175,7 @@ end
 
 % STARTING POINT ----{
 if max(size(x))<=1
-    message = strcat(errmes, ': ', error2);
+    message = [errmes, ' ', error2];
     disp(errmes);
     disp(error2);
     exitflag=-2;
@@ -188,7 +188,7 @@ elseif size(x,1)==1
     n=size(x,2);
     trx=0;
 else
-    message = strcat(errmes, ': ', error2);
+    message = [errmes ' ' error2];
     disp(errmes);
     disp(error2);
     exitflag=-2;
@@ -300,7 +300,7 @@ if isempty(f)
         disp(error30)
     end
     exitflag=-3;
-    message = strcat(errmes, ': ', error30);
+    message = [errmes ' ' error30];
     if trx
         x=x';
     end
@@ -312,7 +312,7 @@ elseif isnan(f)
         disp(error6)
     end
     exitflag=-3;
-    message = strcat(errmes, ': ', error31, ' ', error6);
+    message = [errmes ' ' error31 ' ' error6];
     if trx
         x=x';
     end
@@ -324,7 +324,7 @@ elseif abs(f)==Inf
         disp(error6)
     end
     exitflag=-3;
-    message = strcat(errmes, ': ', error32, ' ', error6);
+    message = [errmes ' ' error32 ' ' error6];
     if trx
         x=x';
     end
@@ -344,7 +344,7 @@ if constr,  fp=f; kless=0;
             disp(error50)
         end
         exitflag=-5;
-        message = strcat(errmes, ': ', error50);
+        message = [errmes ' ' error50];
         if trx
             x=x';
         end
@@ -356,7 +356,7 @@ if constr,  fp=f; kless=0;
             disp(error6)
         end
         exitflag=-5;
-        message = strcat(errmes, ': ', error51, ' ', error6);
+        message = [errmes ' ' error51 ' ' error6];
         if trx
             x=x';
         end
@@ -368,7 +368,7 @@ if constr,  fp=f; kless=0;
             disp(error6)
         end
         exitflag=-5;
-        message = strcat(errmes, ': ', error52, ' ', error6);
+        message = [errmes ' ' error52 ' ' error6];
         if trx
             x=x';
         end
@@ -412,7 +412,7 @@ if size(g,2)~=n
         disp(error40)
     end
     exitflag=-4;
-    message = strcat(errmes, ': ', error40);
+    message = [errmes ' ' error40];
     if trx
         x=x';
     end
@@ -424,7 +424,7 @@ elseif isnan(ng)
         disp(error6)
     end
     exitflag=-4;
-    message = strcat(errmes, ': ', error41, ' ', error6);
+    message = [errmes ' ' error41 ' ' error6];
     if trx
         x=x';
     end
@@ -436,7 +436,7 @@ elseif ng==Inf
         disp(error6)
     end
     exitflag=-4;
-    message = strcat(errmes, ': ', error42, ' ', error6);
+    message = [errmes ' ' error42 ' ' error6];
     if trx
         x=x';
     end
@@ -448,7 +448,7 @@ elseif ng<ZeroGrad
         disp(error6)
     end
     exitflag=-4;
-    message = strcat(errmes, ': ', error43, ' ', error6);
+    message = [errmes ' ' error43 ' ' error6];
     if trx
         x=x';
     end
@@ -484,7 +484,7 @@ if constr
                 disp(error60)
             end
             exitflag=-6;
-            message = strcat(errmes, ': ', error60);
+            message = [errmes ' ' error60];
             if trx
                 x=x';
             end
@@ -496,7 +496,7 @@ if constr
                 disp(error6)
             end
             exitflag=-6;
-            message = strcat(errmes, ': ', error61, ' ', error6);
+            message = [errmes ' ' error61 ' ' error6];
             if trx
                 x=x';
             end
@@ -508,7 +508,7 @@ if constr
                 disp(error6)
             end
             exitflag=-6;
-            message = strcat(errmes, ': ', error62, ' ', error6);
+            message = [errmes ' ' error62 ' ' error6];
             if trx
                 x=x';
             end
@@ -519,7 +519,7 @@ if constr
                 disp(error63)
             end
             exitflag=-6;
-            message = strcat(errmes, ': ', error63);
+            message = [errmes ' ' error63];
             if trx
                 x=x';
             end
@@ -639,7 +639,7 @@ while 1
                     disp(error5)
                 end
                 exitflag=-7;
-                message = strcat(errmes, ': ', error5);
+                message = [errmes ' ' error5];
                 if trx
                     x=x';
                 end
@@ -659,7 +659,7 @@ while 1
                         disp(error6)
                     end
                     exitflag=-5;
-                    message = strcat(errmes, ': ', error51, ' ', error6);
+                    message = [errmes ' ' error51 ' ' error6];
                     if trx
                         x=x';
                     end
@@ -671,7 +671,7 @@ while 1
                         disp(error6)
                     end
                     exitflag=-5;
-                    message = strcat(errmes, ': ', error52, ' ', error6);
+                    message = [errmes ' ' error52 ' ' error6];
                     if trx
                         x=x';
                     end
@@ -703,9 +703,9 @@ while 1
                     end
                 end
                 if isnan(f)
-                    message = strcat(wrnmes, ': ', error31);
+                    message = [wrnmes ' ' error31];
                 else
-                    message = strcat(wrnmes, ': ', error32);
+                    message = [wrnmes ' ' error32];
                 end
                 if ksm || kc>=mxtc
                     exitflag=-3;
@@ -733,7 +733,7 @@ while 1
                 stepvanish=stepvanish+1;
                 if stepvanish>=5
                     exitflag=-14;
-                    message = strcat(termwarn1, endwarn(4,:));
+                    message = [termwarn1 ' ' deblank(endwarn(4,:))];
                     if dispwarn
                         disp(termwarn1)
                         disp(endwarn(4,:))
@@ -842,7 +842,7 @@ while 1
                 disp(error41)
             end
             exitflag=-4;
-            message = strcat(errmes, ': ', error41);
+            message = [errmes ' ' error41];
             if trx
                 x=x';
             end
@@ -853,7 +853,7 @@ while 1
                 disp(error42)
             end
             exitflag=-4;
-            message = strcat(errmes, ': ', error42);
+            message = [errmes ' ' error42];
             if trx
                 x=x';
             end
@@ -905,7 +905,7 @@ while 1
                         disp(error61)
                     end
                     exitflag=-6;
-                    message = strcat(errmes, ': ', error61);
+                    message = [errmes ' ' error61];
                     if trx
                         x=x';
                     end
@@ -916,7 +916,7 @@ while 1
                         disp(error62)
                     end
                     exitflag=-6;
-                    message = strcat(errmes, ': ', error62);
+                    message = [errmes ' ' error62];
                     if trx
                         x=x';
                     end
@@ -927,7 +927,7 @@ while 1
                         disp(error63)
                     end
                     exitflag=-6;
-                    message = strcat(errmes, ': ', error63);
+                    message = [errmes ' ' error63];
                     if trx
                         x=x';
                     end
@@ -1027,9 +1027,9 @@ while 1
                             end
                             if warnno~=0
                                 exitflag=-warnno-10;
-                                message = strcat(termwarn1, endwarn(warnno,:));
+                                message = [termwarn1 ' ' deblank(endwarn(warnno,:))];
                                 if app
-                                    message = strcat(message, ' ', appwarn);
+                                    message = [message ' ' appwarn];
                                 end
                                 if dispwarn, disp(termwarn1)
                                     disp(endwarn(warnno,:))
@@ -1061,9 +1061,9 @@ while 1
                             disp(appwarn)
                         end
                     end
-                    message = strcat(termwarn1, endwarn(4,:));
+                    message = [termwarn1 ' ' deblank(endwarn(4,:))];
                     if app
-                        message = strcat(message, ' ', appwarn);
+                        message = [message ' ' appwarn];
                     end
                     x=xrec; f=frec;
                     if trx
@@ -1078,7 +1078,7 @@ while 1
         % ITERATIONS LIMIT
         if(k==optim.MaxIter)
             exitflag=-9;
-            message = strcat(wrnmes, ': ', warn4);
+            message = [wrnmes ' ' warn4];
             if trx
                 x=x';
             end
@@ -1097,7 +1097,7 @@ while 1
                     disp(warn1)
                 end
                 exitflag=-8;
-                message = strcat(termwarn1, ': ', warn1);
+                message = [termwarn1 ' ' warn1];
                 if trx
                     x=x';
                 end
@@ -1112,7 +1112,7 @@ while 1
                 end
                 if nzero>=3
                     exitflag=-8;
-                    message = strcat(wrnmes, ': ', warn1);
+                    message = [wrnmes ' ', warn1];
                     if trx
                         x=x';
                     end
@@ -1133,7 +1133,7 @@ while 1
                             disp(error32)
                         end
                         exitflag=-3;
-                        message = strcat(errmes, ': ', error32);
+                        message = [errmes ' ' error32];
                         if trx
                             x=x';
                         end
@@ -1144,7 +1144,7 @@ while 1
                             disp(error31)
                         end
                         exitflag=-3;
-                        message = strcat(errmes, ': ', error31);
+                        message = [errmes ' ' error31];
                         if trx
                             x=x';
                         end
@@ -1179,7 +1179,7 @@ while 1
                             disp(error42)
                         end
                         exitflag=-4;
-                        message = strcat(errmes, ': ', error42);
+                        message = [errmes ' ' error42];
                         if trx
                             x=x';
                         end
@@ -1190,7 +1190,7 @@ while 1
                             disp(error41)
                         end
                         exitflag=-4;
-                        message = strcat(errmes, ': ', error41);
+                        message = [errmes ' ' error41];
                         if trx
                             x=x';
                         end
@@ -1206,7 +1206,7 @@ while 1
                         disp(warn1)
                     end
                     exitflag=-8;
-                    message = strcat(termwarn1, ': ', warn1);
+                    message = [termwarn1 ' ' warn1];
                     if trx
                         x=x';
                     end

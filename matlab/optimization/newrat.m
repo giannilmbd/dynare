@@ -354,20 +354,20 @@ end
 
 if jit==nit
     skipline()
-    message = strcat(message, 'Maximum number of iterations reached.');
+    message = [message, repmat(' ', 1, ~isempty(message)), 'Maximum number of iterations reached.'];
     disp_verbose('Maximum number of iterations reached',Verbose);
     exitflag = 0;
     skipline()
 end
 
 if norm(gg)<=gtol
-    message = strcat(message, sprintf('Estimation ended: Gradient norm < %s', num2str(gtol)));
+    message = [message, repmat(' ', 1, ~isempty(message)), sprintf('Estimation ended: Gradient norm < %s', num2str(gtol))];
     disp_verbose('Estimation ended:',Verbose);
     disp_verbose(['Gradient norm < ', num2str(gtol)],Verbose);
     exitflag = -1;
 end
 if check==1
-    message = strcat(message, 'Estimation successful.');
+    message = [message, repmat(' ', 1, ~isempty(message)), 'Estimation successful.'];
     exitflag = 1;
     disp_verbose(message,Verbose)
 end
