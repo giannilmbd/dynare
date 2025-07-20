@@ -195,7 +195,7 @@ switch minimizer_algorithm
     optimization_info.iterations = n_total_draws;
     optimization_info.funcCount = n_total_draws;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = message;
+    optimization_info.message = strrep(message, newline, ' ');
 
   case 3
     if isoctave && ~user_has_octave_forge_package('optim')
@@ -301,7 +301,7 @@ switch minimizer_algorithm
     optimization_info.iterations = iterations;
     optimization_info.funcCount = funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = message;
+    optimization_info.message = strrep(message, newline, ' ');
     hessian_mat=inv(inverse_hessian_mat);
 
   case 5
@@ -389,7 +389,7 @@ switch minimizer_algorithm
     optimization_info.iterations = NaN;
     optimization_info.funcCount = funcCount;
     optimization_info.exitflag = 1;
-    optimization_info.message = 'Optimization successful, no meaningful message.';
+    optimization_info.message = 'Optimization successful.';
 
   case 7
     % MATLAB's simplex (Optimization toolbox needed).
@@ -456,7 +456,7 @@ switch minimizer_algorithm
     optimization_info.iterations = iterations;
     optimization_info.funcCount = funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = message;
+    optimization_info.message = strrep(message, newline, ' ');
 
   case 9
     % Set defaults
@@ -513,7 +513,7 @@ switch minimizer_algorithm
     opt_runtime_start = tic;
     [~, ~, ~, message, output, BESTEVER] = cmaes(func2str(objective_function),start_par_value,H0,cmaesOptions,varargin{:});
     optimization_info.runtime = toc(opt_runtime_start);
-    if strcmp(message,'tolfun') || strcmp(message,'tolx')
+    if any(strcmp(message, 'tolfun')) || any(strcmp(message, 'tolx'))
         exitflag = 1;
     elseif strcmp(message,'warnconditioncov')
         exitflag = 2;
@@ -523,7 +523,7 @@ switch minimizer_algorithm
     optimization_info.iterations = output.countiter;
     optimization_info.funcCount = output.evals + 1; % need to add one more for initial function evaluation
     optimization_info.exitflag = exitflag;
-    optimization_info.message = message;
+    optimization_info.message = strjoin(message, ' ');
     opt_par_values=BESTEVER.x;
     fval=BESTEVER.f;
 
@@ -572,7 +572,7 @@ switch minimizer_algorithm
     optimization_info.iterations = output.nITERATIONS;
     optimization_info.funcCount = output.nFUN_EVALS;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = output.MESSAGE;
+    optimization_info.message = strrep(output.MESSAGE, newline, ' ');
 
   case 11
     % waiting for validation 
@@ -665,7 +665,7 @@ switch minimizer_algorithm
     optimization_info.iterations = output.iterations;
     optimization_info.funcCount = output.funccount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = strrep(output.message, '\n', ' ');
+    optimization_info.message = strrep(output.message, newline, ' ');
     optimization_info.rngstate = output.rngstate;
     opt_par_values = opt_par_values(:);
 
@@ -760,7 +760,7 @@ switch minimizer_algorithm
     optimization_info.iterations = iterations;
     optimization_info.funcCount = n_f_evals + n_grad_evals;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = message;
+    optimization_info.message = strrep(message, newline, ' ');
 
   case 102
     if isoctave
