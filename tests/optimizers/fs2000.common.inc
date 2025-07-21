@@ -103,9 +103,11 @@ check;
 
 estimated_params;
 alp, beta_pdf, 0.356, 0.02;
+@#ifndef SPEED_UP_TESTSUITE
 bet, beta_pdf, 0.993, 0.002;
 gam, normal_pdf, 0.0085, 0.003;
 mst, normal_pdf, 1.0002, 0.007;
+@#endif
 /*
  * The prior on the autoregressive parameter rho is different from the one considered in the original paper.
  * We lowered the prior variance to ensure that the prior does not have an asymptote at zero, which causes

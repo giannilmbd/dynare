@@ -41,7 +41,7 @@ function [xparam1, hessian_xparam1, fval, mom_verbose] = mode_compute_irf_matchi
 %  o mom.objective_function
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -67,9 +67,11 @@ for optim_iter = 1:length(options_mom_.optimizer_vec)
         xparam1 = xparam0;
         hessian_xparam1 = hessian_xparam0;
         fval = feval(objective_function, xparam1, data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+        optimization_info = [];
     else
-        [xparam1, fval, exitflag, hessian_xparam1, options_mom_, Scale, new_rat_hess_info] = dynare_minimize_objective(objective_function, xparam0, options_mom_.optimizer_vec{optim_iter}, options_mom_, [BoundsInfo.lb BoundsInfo.ub], bayestopt_.name, bayestopt_, hessian_xparam0,...
-                                                                                                                       data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);        
+        [xparam1, fval, exitflag, hessian_xparam1, options_mom_, Scale, new_rat_hess_info, optimization_info] = ...
+            dynare_minimize_objective(objective_function, xparam0, options_mom_.optimizer_vec{optim_iter}, options_mom_, [BoundsInfo.lb BoundsInfo.ub], bayestopt_.name, bayestopt_, hessian_xparam0, ...
+                                      data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
     end
     fprintf('\nMode Compute Iteration %d: Value of minimized moment distance objective function: %12.10f.\n',optim_iter,fval);
     if options_mom_.mom.verbose
@@ -98,6 +100,7 @@ for optim_iter = 1:length(options_mom_.optimizer_vec)
             field_name_iter = sprintf('iter_%d',optim_iter);
         end
         mom_verbose.(field_name_iter) = display_estimation_results_table(xparam1,std_via_invhessian_xparam1_iter,M_,options_mom_,estim_params_,bayestopt_,[],prior_dist_names,tbl_title_iter,field_name_iter);
+        mom_verbose.(field_name_iter).optimization_info = optimization_info;
     end
     xparam0 = xparam1;
     hessian_xparam0 = hessian_xparam1;

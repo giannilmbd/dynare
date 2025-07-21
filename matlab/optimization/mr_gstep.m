@@ -1,18 +1,37 @@
-function [f0, x, ig] = mr_gstep(h1,x,bounds,func0,penalty,htol0,Verbose,Save_files,gradient_epsilon,parameter_names,robust,varargin)
-% [f0, x, ig] = mr_gstep(h1,x,bounds,func0,penalty,htol0,Verbose,Save_files,gradient_epsilon,parameter_names,robust,varargin)
+function [f0, x, ig, fcount] = mr_gstep(h1,x,bounds,func0,penalty,htol0,Verbose,Save_files,gradient_epsilon,parameter_names,robust,varargin)
+% [f0, x, ig, fcount] = mr_gstep(h1,x,bounds,func0,penalty,htol0,Verbose,Save_files,gradient_epsilon,parameter_names,robust,varargin)
 %
 % Gibbs type step in optimisation
 %
-% varargin{1} --> dataset_
-% varargin{2} --> dataset_info
-% varargin{3} --> options_
-% varargin{4} --> M_
-% varargin{5} --> estim_params_
-% varargin{6} --> bayestopt_
-% varargin{7} --> BoundsInfo
-% varargin{8} --> oo_
-
-% Copyright © 2006-2023 Dynare Team
+% Inputs:
+%  - h1                 [npar by 1]        step size
+%  - x                  [npar by 1]        parameter vector
+%  - bounds             [npar by 2]        prior bounds of parameters
+%  - func0              [function handle]  objective function
+%  - penalty            [scalar]           penalty due to error code
+%  - htol0              [scalar]           'precision' of increment of function values for numerical derivatives
+%  - Verbose            [scalar]           verbosity level
+%  - Save_files         [scalar]           save files flag
+%  - gradient_epsilon   [scalar]           gradient epsilon
+%  - parameter_names    [npar by 1]        parameter names
+%  - robust             [scalar]           robust flag
+%  - varargin           [varargin]         variable arguments
+%                        varargin{1} --> dataset_
+%                        varargin{2} --> dataset_info
+%                        varargin{3} --> options_
+%                        varargin{4} --> M_
+%                        varargin{5} --> estim_params_
+%                        varargin{6} --> bayestopt_
+%                        varargin{7} --> BoundsInfo
+%                        varargin{8} --> oo_
+%
+% Outputs:
+%  - f0                 [scalar]     objective function value
+%  - x                  [npar by 1]  parameter vector
+%  - ig                 [npar by 1]  gradient flag
+%  - fcount             [scalar]     function iteration count
+%
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -29,6 +48,7 @@ function [f0, x, ig] = mr_gstep(h1,x,bounds,func0,penalty,htol0,Verbose,Save_fil
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+fcount = 0;
 n=size(x,1);
 if isempty(h1)
     h1=gradient_epsilon*ones(n,1);
@@ -44,6 +64,7 @@ if length(htol)==1
     htol=htol*ones(n,1);
 end
 f0=penalty_objective_function(x,func0,penalty,varargin{:});
+fcount = fcount+1;
 
 xh1=x;
 f1=zeros(size(f0,1),n);
@@ -58,9 +79,11 @@ while i<n
     dx=[];
     xh1(i)=x(i)+h1(i);
     fx = penalty_objective_function(xh1,func0,penalty,varargin{:});
+    fcount = fcount+1;
     f1(:,i)=fx;
     xh1(i)=x(i)-h1(i);
     fx = penalty_objective_function(xh1,func0,penalty,varargin{:});
+    fcount = fcount+1;
     f_1(:,i)=fx;
     if hcheck && htol(i)<1
         htol(i)=min(1,max(min(abs(dx))*2,htol(i)*10));
@@ -73,7 +96,8 @@ while i<n
         gg(i)=(f1(i)'-f_1(i)')./(2.*h1(i));
         hh(i) = 1/max(1.e-9,abs( (f1(i)+f_1(i)-2*f0)./(h1(i)*h1(i)) ));
         if gg(i)*(hh(i)*gg(i))/2 > htol(i)
-            [ff, xx,~,retcode] = csminit1(func0,x,penalty,f0,gg,0,diag(hh),Verbose,varargin{:});
+            [ff, xx, fc, retcode] = csminit1(func0,x,penalty,f0,gg,0,diag(hh),Verbose,varargin{:});
+            fcount = fcount + fc;
             if retcode && robust 
                 if abs(x(i))<1.e-6
                     xa=transpose(linspace(x(i)/2, sign(x(i))*1.e-6*3/2, 7));
@@ -84,11 +108,13 @@ while i<n
                 for k=1:7
                     xh1(i)=xa(k);
                     fa(k,1) = penalty_objective_function(xh1,func0,penalty,varargin{:});
+                    fcount = fcount + 1;
                 end
                 b=[ones(7,1) xa xa.*xa./2]\fa;
                 gg(i)=x(i)*b(3)+b(2);
                 hh(i)=1/b(3);
-                [ff2, xx2] = csminit1(func0,x,penalty,f0,gg,0,diag(hh),Verbose,varargin{:});
+                [ff2, xx2, fc] = csminit1(func0,x,penalty,f0,gg,0,diag(hh),Verbose,varargin{:});
+                fcount = fcount + fc;
                 if ff2<ff
                     ff=ff2;
                     xx=xx2;
@@ -110,6 +136,7 @@ while i<n
                     xx(i) = max(xx(i)-h1(i), 0.5*(xx(i)+x(i)));
                 end
                 [ff,exit_flag]=penalty_objective_function(xx,func0,penalty,varargin{:});
+                fcount = fcount + 1;
                 if exit_flag~=1
                     disp_verbose('last step exited with bad status!',Verbose)
                 elseif ff<f0
@@ -119,7 +146,8 @@ while i<n
             else
                 % check improvement wrt predicted one
                 if abs(f0-ff) < abs(gg(i)*(hh(i)*gg(i))/2/100) || abs(x(i)-xx(i))<1.e-10
-                    [ff1, xx1] = csminit1(func0,x,penalty,f0,-gg,0,diag(hh),Verbose,varargin{:});
+                    [ff1, xx1, fc] = csminit1(func0,x,penalty,f0,-gg,0,diag(hh),Verbose,varargin{:});
+                    fcount = fcount + fc;
                     if not(isequal(xx1 , check_bounds(xx1,bounds)))
                         xx1 = check_bounds(xx1,bounds);
                         if xx1(i)<x(i)
@@ -130,6 +158,7 @@ while i<n
                             xx1(i) = max(xx1(i)-h1(i), 0.5*(xx1(i)+x(i)));
                         end
                         [ff1,exit_flag]=penalty_objective_function(xx1,func0,penalty,varargin{:});
+                        fcount = fcount + 1;
                         if exit_flag~=1
                             disp_verbose('last step exited with bad status!',Verbose)
                         end

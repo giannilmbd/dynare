@@ -1,5 +1,5 @@
-function [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info] = mr_hessian(x,func,penalty,hflag,htol0,hess_info,bounds,prior_std,Save_files,varargin)
-% function [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info] = mr_hessian(x,func,penalty,hflag,htol0,hess_info,bounds,prior_std,Save_files,varargin)
+function [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info, fcount] = mr_hessian(x,func,penalty,hflag,htol0,hess_info,bounds,prior_std,Save_files,varargin)
+% [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info, fcount] = mr_hessian(x,func,penalty,hflag,htol0,hess_info,bounds,prior_std,Save_files,varargin)
 %  numerical gradient and Hessian, with 'automatic' check of numerical
 %  error
 %
@@ -47,8 +47,9 @@ function [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info] = mr_hessian(x,f
 %  - hh_mat0            outer product hessian with modified std's
 %  - hh1                updated hess_info.h1
 %  - hess_info          structure with updated step length
+%  - fcount             number of function evaluations
 
-% Copyright © 2004-2017 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -65,9 +66,11 @@ function [hessian_mat, gg, htol1, ihh, hh_mat0, hh1, hess_info] = mr_hessian(x,f
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+fcount = 0;
 n=size(x,1);
 
 [f0,~, ff0]=penalty_objective_function(x,func,penalty,varargin{:});
+fcount = fcount + 1;
 h2=bounds(:,2)-bounds(:,1);
 hmax=bounds(:,2)-x;
 hmax=min(hmax,x-bounds(:,1));
@@ -106,6 +109,7 @@ while i<n
     hcheck=0;
     xh1(i)=x(i)+hess_info.h1(i);
     [fx,~,ffx]=penalty_objective_function(xh1,func,penalty,varargin{:});
+    fcount = fcount + 1;
     it=1;
     dx=(fx-f0);
     ic=0;
@@ -136,6 +140,7 @@ while i<n
             hess_info.h1(i) = max(htmp,1.e-10);
             xh1(i)=x(i)+hess_info.h1(i);
             [fx,~,ffx]=penalty_objective_function(xh1,func,penalty,varargin{:});
+            fcount = fcount + 1;
         end
         if abs(dx(it))>(3*hess_info.htol)
             istoobig(it)=true;
@@ -146,11 +151,13 @@ while i<n
             hess_info.h1(i) = max(htmp,1e-10);
             xh1(i)=x(i)+hess_info.h1(i);
             [fx,~,ffx]=penalty_objective_function(xh1,func,penalty,varargin{:});
+            fcount = fcount + 1;
             iter=0;
             while (fx-f0)==0 && iter<50
                 hess_info.h1(i)= hess_info.h1(i)*2;
                 xh1(i)=x(i)+hess_info.h1(i);
                 [fx,~,ffx]=penalty_objective_function(xh1,func,penalty,varargin{:});
+                fcount = fcount + 1;
                 ic=1;
                 iter=iter+1;
             end
@@ -189,6 +196,7 @@ while i<n
     end
     xh1(i)=x(i)-hess_info.h1(i);
     [fx,~,ffx]=penalty_objective_function(xh1,func,penalty,varargin{:});
+    fcount = fcount + 1;
     f_1(:,i)=fx;
     if outer_product_gradient
         if any(isnan(ffx)) || isempty(ffx)
@@ -230,7 +238,9 @@ if outer_product_gradient
                 xh_1(i)=x(i)-hess_info.h1(i);
                 xh_1(j)=x(j)-h_1(j);
                 temp1 = penalty_objective_function(xh1,func,penalty,varargin{:});
+                fcount = fcount + 1;
                 temp2 = penalty_objective_function(xh_1,func,penalty,varargin{:});
+                fcount = fcount + 1;
                 hessian_mat(:,(i-1)*n+j)=-(-temp1 -temp2+temp(:,i)+temp(:,j))./(2*hess_info.h1(i)*h_1(j));
                 xh1(i)=x(i);
                 xh1(j)=x(j);

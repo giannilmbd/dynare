@@ -14,15 +14,18 @@ function [fhat,xhat,fcount,retcode] = csminit1(fcn,x0,penalty,f0,g0,badg,H0,Verb
 %                               time it is called.
 
 % Outputs:
-%   fhat:       [scalar]        function value at minimum
-%   xhat:       [npar by 1]     parameter vector at minimum
-%   fcount      [scalar]        function iteration count upon termination
-%   retcode     [scalar]        0: normal step
-%                               1: zero gradient.
-%                               5: largest step still improves too fast.
-%                               2,4: back and forth adjustment of stepsize didn't finish.
-%                               3: smallest stepsize still improves too slow
-%                               6: no improvement found
+%   fhat:       [scalar]     function value at minimum
+%   xhat:       [npar by 1]  parameter vector at minimum
+%   fcount:     [scalar]     function iteration count upon termination
+%   retcode:    [scalar]     integer exit flag indicating line‐search outcome:
+%                            0 — Normal termination: step accepted with sufficient decrease.
+%                            1 — Zero gradient: ‖g‖ below threshold; no line search performed.
+%                            2 — Oscillation: step‐size adjustments repeatedly crossed bounds without converging.
+%                            3 — Minimum step reached: λ reduced to MINLAMB but insufficient decrease.
+%                            4 — Maximum step reached: λ increased to upper bound without sufficient decrease.
+%                            5 — Divergent step: λ grew beyond allowed maximum (divergent behavior).
+%                            6 — No improvement: reversing search direction still failed to improve f.
+%                            7 — Stagnation: damping factor fell below MINDFAC; line search stalled.
 %---------------------
 % Modified 7/22/96 to omit variable-length P list, for efficiency and compilation.
 % Places where the number of P's need to be altered or the code could be returned to
@@ -38,7 +41,7 @@ function [fhat,xhat,fcount,retcode] = csminit1(fcn,x0,penalty,f0,g0,badg,H0,Verb
 % http://sims.princeton.edu/yftp/optimize/mfiles/csminit.m
 %
 % Copyright © 1993-2007 Christopher Sims
-% Copyright © 2008-2023 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

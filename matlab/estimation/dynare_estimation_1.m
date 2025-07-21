@@ -12,7 +12,7 @@ function dynare_estimation_1(var_list_,dname)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2003-2024 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -245,9 +245,14 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                 end
             end
         end
-        [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info] = dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+        [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info, optimization_info] = ...
+            dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
         fprintf('\nFinal value of minus the log posterior (or likelihood):%f \n', fval);
-
+        if length(optimizer_vec) > 1
+            oo_.posterior.optimization.optimization_info.(sprintf('stage_%d', optim_iter)) = optimization_info;
+        else
+            oo_.posterior.optimization.optimization_info = optimization_info;
+        end
         if isnumeric(current_optimizer)
             if current_optimizer==5
                 newratflag = new_rat_hess_info.newratflag;

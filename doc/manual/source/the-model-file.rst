@@ -7696,10 +7696,10 @@ observed variables.
                        Maximum number of objective function
                        evaluations. No default.
 
-                   ``'MaxFunvEvalFactor'``
+                   ``'MaxFunEvalFactor'``
 
-                       Set ``MaxFunvEvals`` equal to
-                       ``MaxFunvEvalFactor`` times the number of
+                       Set ``MaxFunEvals`` equal to
+                       ``MaxFunEvalFactor`` times the number of
                        estimated parameters. Default: ``500``.
 
                    ``'TolFun'``
@@ -7777,7 +7777,7 @@ observed variables.
                        Maximum number of iterations. Default:
                        ``5000``.
 
-                   ``'MaxFunvEvals'``
+                   ``'MaxFunEvals'``
 
                        Maximum number of objective function
                        evaluations. No default.

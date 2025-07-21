@@ -26,7 +26,7 @@ function [info, oo_, options_, M_] = run(M_, options_, oo_, var_list, params, i_
 % SPECIAL REQUIREMENTS
 %   none.
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -140,11 +140,13 @@ else
         error('OSR: OSR with bounds on parameters requires a constrained optimizer, i.e. opt_algo= 1,2 or 9.')
     end
     %%do actual optimization
-    [p, f] = dynare_minimize_objective(str2func('osr.objective'),par_0,options_.osr.opt_algo,options_,M_.osr.param_bounds,M_.param_names(i_params),[],[], M_,oo_,options_,i_params,...
-                                       inv_order_var(i_var),W(i_var,i_var));
+    [p, f, ~, ~, ~, ~, ~, optimization_info] = ...
+        dynare_minimize_objective(str2func('osr.objective'),par_0,options_.osr.opt_algo,options_,M_.osr.param_bounds,M_.param_names(i_params),[],[], M_,oo_,options_,i_params,...
+                                  inv_order_var(i_var),W(i_var,i_var));
 end
 
 osr_res.objective_function = f;
+osr_res.optimization_info = optimization_info;
 M_.params(i_params)=p; %make sure optimal parameters are set (and not the last draw used in csminwel)
 for i=1:length(i_params)
     osr_res.optim_params.(M_.param_names{i_params(i)}) = p(i);

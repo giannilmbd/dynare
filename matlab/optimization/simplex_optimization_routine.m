@@ -1,5 +1,6 @@
-function [x,fval,exitflag] = simplex_optimization_routine(objective_function,x,options,var_names,varargin)
-
+function [x,fval,exitflag,iter_count_total,func_count_total,message] = simplex_optimization_routine(objective_function,x,options,var_names,varargin)
+% [x,fval,exitflag,iter_count_total,func_count_total,message] = simplex_optimization_routine(objective_function,x,options,var_names,varargin)
+%
 % Nelder-Mead like optimization routine (see http://en.wikipedia.org/wiki/Nelder-Mead_method)
 %
 % By default the standard values for the reflection, the expansion, the contraction
@@ -11,26 +12,26 @@ function [x,fval,exitflag] = simplex_optimization_routine(objective_function,x,o
 %  o objective_function     [string]                  Name of the objective function to be minimized.
 %  o x                      [double]                  n*1 vector, starting guess of the optimization routine.
 %  o options                [structure]               Options of this implementation of the simplex algorithm.
-%  o var_names              [cell]                    Names of parameters
-%                                                       for verbose output
+%  o var_names              [cell]                    Names of parameters for verbose output.
 %  o varargin               [cell of structures]      Structures to be passed to the objective function.
-%
-%     varargin{1} --> dataset_
-%     varargin{2} --> dataset_info
-%     varargin{3} --> options_
-%     varargin{4} --> M_
-%     varargin{5} --> estim_params_
-%     varargin{6} --> bayestopt_
-%     varargin{7} --> BoundsInfo
-%     varargin{8} --> oo_
+%    varargin{1} --> dataset_
+%    varargin{2} --> dataset_info
+%    varargin{3} --> options_
+%    varargin{4} --> M_
+%    varargin{5} --> estim_params_
+%    varargin{6} --> bayestopt_
+%    varargin{7} --> BoundsInfo
+%    varargin{8} --> oo_
 %
 % OUTPUTS
 %  o x                      [double]                  n*1 vector, estimate of the optimal inputs.
 %  o fval                   [double]                  scalar, value of the objective at the optimum.
-%  o exitflag               [integer]                 scalar equal to 0 or 1 (0 if the algorithm did not converge to
-%                                                     a minimum).
+%  o exitflag               [integer]                 scalar equal to 0 or 1 (0 if the algorithm did not converge to a minimum).
+%  o iter_count_total       [integer]                 scalar, total number of iterations.
+%  o func_count_total       [integer]                 scalar, total number of function evaluations.
+%  o message                [string]                  message indicating the reason for termination.
 
-% Copyright © 2010-2018 Dynare Team
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -46,6 +47,10 @@ function [x,fval,exitflag] = simplex_optimization_routine(objective_function,x,o
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
+% Initialize counters
+iter_count_total = 0;
+func_count_total = 0;
 
 % Set verbose mode
 verbose = options.verbosity;
@@ -192,12 +197,14 @@ if verbose
 end
 initial_point = x;
 [initial_score,~,nopenalty] = feval(objective_function,x,varargin{:});
+func_count_total = func_count_total + 1;
 if ~nopenalty
     disp('Cannot initialize the simplex with the provided initial guess.')
     skipline()
     error('simplex_optimization_routine:: Initial condition is wrong!')
 else
-    [v,fv,delta] = simplex_initialization(objective_function,initial_point,initial_score,delta,zero_delta,1,varargin{:});
+    [v,fv,delta,fc_init] = simplex_initialization(objective_function,initial_point,initial_score,delta,zero_delta,1,varargin{:});
+    func_count_total = func_count_total + fc_init;
     if verbose
         disp('Done!')
         skipline()
@@ -261,12 +268,14 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
     x  = xr;
     fxr = feval(objective_function,x,varargin{:});
     func_count = func_count+1;
+    func_count_total = func_count_total + 1;
     if fxr < fv(1)% xr is better than previous best point v(:,1).
                   % Calculate the expansion point
         xe = xbar + rho*chi*(xbar-v(:,end));
         x  = xe;
         fxe = feval(objective_function,x,varargin{:});
         func_count = func_count+1;
+        func_count_total = func_count_total + 1;
         if fxe < fxr% xe is even better than xr.
             if optimize_expansion_parameter
                 % Compute optimal expansion...
@@ -274,6 +283,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                 x    = xee;
                 fxee = feval(objective_function,x,varargin{:});
                 func_count = func_count+1;
+                func_count_total = func_count_total + 1;
                 if fxee<fxe
                     decrease = 1;
                     weight = rho*chi*1.02;
@@ -285,6 +295,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                         x      = xeee;
                         fxeee  = feval(objective_function,x,varargin{:});
                         func_count = func_count+1;
+                        func_count_total = func_count_total + 1;
                         if (fxeee<fxeee_old) && -(fxeee-fxeee_old)>f_tolerance*10*fxeee_old
                             fxeee_old = fxeee;
                             xeee_old  = xeee;
@@ -305,6 +316,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                         x      = xeee;
                         fxeee  = feval(objective_function,x,varargin{:});
                         func_count = func_count+1;
+                        func_count_total = func_count_total + 1;
                         if (fxeee<fxeee_old) && -(fxeee-fxeee_old)>f_tolerance*10*fxeee_old
                             fxeee_old = fxeee;
                             xeee_old  = xeee;
@@ -337,6 +349,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                 x  = xc;
                 fxc = feval(objective_function,x,varargin{:});
                 func_count = func_count+1;
+                func_count_total = func_count_total + 1;
                 if fxc <= fxr
                     v(:,end) = xc;
                     fv(end) = fxc;
@@ -349,6 +362,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                 x   = xcc;
                 fxcc = feval(objective_function,x,varargin{:});
                 func_count = func_count+1;
+                func_count_total = func_count_total + 1;
                 if fxcc < fv(end)
                     v(:,end) = xcc;
                     fv(end) = fxcc;
@@ -363,6 +377,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                     v(:,j)=v(:,1)+sigma*(v(:,j) - v(:,1));
                     x = v(:,j);
                     fv(j) = feval(objective_function,x,varargin{:});
+                    func_count_total = func_count_total + 1;
                 end
                 func_count = func_count + number_of_variables;
             end
@@ -401,6 +416,7 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
         end
     end
     iter_count = iter_count + 1;
+    iter_count_total = iter_count_total + 1;
     simplex_iterations = simplex_iterations+1;
     if abs(best_point_score-fv(1))<f_tolerance
         no_improvements = no_improvements+1;
@@ -420,7 +436,8 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
             % Compute the size of the simplex
             delta = delta*1.05;
             % Compute the new initial simplex.
-            [v,fv,delta] = simplex_initialization(objective_function,best_point,best_point_score,delta,zero_delta,1,varargin{:});
+            [v,fv,delta,fc_init] = simplex_initialization(objective_function,best_point,best_point_score,delta,zero_delta,1,varargin{:});
+            func_count_total = func_count_total + fc_init;
             if verbose
                 disp('(Re)Start with a lager simplex based on the best current values for the control variables.')
                 skipline()
@@ -430,13 +447,15 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
             no_improvements = 0;
             func_count = func_count + number_of_variables;
             iter_count = iter_count+1;
+            iter_count_total = iter_count_total + 1;
             iter_no_improvement_break = iter_no_improvement_break + 1;
             simplex_init = simplex_init+1;
             simplex_iterations = simplex_iterations+1;
         end
     end
     if ((func_count==max_func_calls) || (iter_count==max_iterations) || (iter_no_improvement_break==max_no_improvement_break) || convergence || tooslow)
-        [v,fv,delta] = simplex_initialization(objective_function,best_point,best_point_score,DELTA,zero_delta,1,varargin{:});
+        [v,fv,delta,fc_init] = simplex_initialization(objective_function,best_point,best_point_score,DELTA,zero_delta,1,varargin{:});
+        func_count_total = func_count_total + fc_init;
         if func_count==max_func_calls
             if verbose
                 skipline()
@@ -461,19 +480,24 @@ while (func_count < max_func_calls) && (iter_count < max_iterations) && (simplex
                 continue
             end
         elseif tooslow
-            skipline()
-            disp(['CONVERGENCE NOT ACHIEVED AFTER ' int2str(simplex_iterations) ' ITERATIONS! IMPROVING TOO SLOWLY!'])
-            skipline()
+            if verbose
+                skipline()
+                disp(['CONVERGENCE NOT ACHIEVED AFTER ' int2str(simplex_iterations) ' ITERATIONS! IMPROVING TOO SLOWLY!'])
+                skipline()
+            end
         else
-            skipline()
-            disp(['CONVERGENCE ACHIEVED AFTER ' int2str(simplex_iterations) ' ITERATIONS!'])
-            skipline()
+            if verbose
+                skipline()
+                disp(['CONVERGENCE ACHIEVED AFTER ' int2str(simplex_iterations) ' ITERATIONS!'])
+                skipline()
+            end
         end
         if simplex_algo_iterations<max_simplex_algo_iterations
             % Compute the size of the simplex
             delta = delta*1.05;
             % Compute the new initial simplex.
-            [v,fv,delta] = simplex_initialization(objective_function,best_point,best_point_score,delta,zero_delta,1,varargin{:});
+            [v,fv,delta,fc_init] = simplex_initialization(objective_function,best_point,best_point_score,delta,zero_delta,1,varargin{:});
+            func_count_total = func_count_total + fc_init;
             if verbose
                 disp('(Re)Start with a lager simplex based on the best current values for the control variables.')
                 skipline()
@@ -497,21 +521,28 @@ end % while loop.
 x(:) = v(:,1);
 fval = fv(1);
 exitflag = 1;
+message_success = 'The function converged to a solution x.';
+message_func = '';
+message_iter = '';
 
 if func_count>= max_func_calls
-    disp_verbose('Maximum number of objective function calls has been exceeded!',verbose)
+    message_func = 'Maximum number of objective function calls has been exceeded!';
+    message_success = '';
     exitflag = 0;
 end
 
 if iter_count>= max_iterations
-    disp_verbose('Maximum number of iterations has been exceeded!',verbose)
+    message_iter = 'Maximum number of iterations has been exceeded!';
+    message_success = '';
     exitflag = 0;
 end
 
+message = strcat(message_success, message_func, message_iter);
+disp_verbose(message,verbose);
 
 
-
-function [v,fv,delta] = simplex_initialization(objective_function,point,point_score,delta,zero_delta,check_delta,varargin)
+function [v,fv,delta,fc_init] = simplex_initialization(objective_function,point,point_score,delta,zero_delta,check_delta,varargin)
+fc_init = 0;
 n = length(point);
 v  = zeros(n,n+1);
 v(:,1) = point;
@@ -530,6 +561,7 @@ for j = 1:n
     v(:,j+1) = y;
     x = y;
     [fv(j+1),~,nopenalty_flag] = feval(objective_function,x,varargin{:});
+    fc_init = fc_init + 1;
     if check_delta
         while ~nopenalty_flag
             if y(j)~=0
@@ -546,6 +578,7 @@ for j = 1:n
             v(:,j+1) = y;
             x = y;
             [fv(j+1),~,nopenalty_flag] = feval(objective_function,x,varargin{:});
+            fc_init = fc_init + 1;
         end
     end
 end

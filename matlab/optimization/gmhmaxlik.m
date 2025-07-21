@@ -1,6 +1,32 @@
-function [PostMode, HessianMatrix, Scale, ModeValue] = gmhmaxlik(fun, xinit, Hinit, iscale, bounds, priorstd, gmhmaxlikOptions, OptimizationOptions, varargin)
+function [PostMode, HessianMatrix, Scale, ModeValue, fcount] = gmhmaxlik(fun, xinit, Hinit, iscale, bounds, priorstd, gmhmaxlikOptions, OptimizationOptions, varargin)
+% [PostMode, HessianMatrix, Scale, ModeValue, fcount] = gmhmaxlik(fun, xinit, Hinit, iscale, bounds, priorstd, gmhmaxlikOptions, OptimizationOptions, varargin)
+% Prepare (Dirty) Global minimization routine of (minus) a likelihood (or posterior density) function
+%
+% INPUTS
+%   o fun                 [char]      string specifying the name of the objective function.
+%   o xinit               [double]    (p*1) vector of parameters to be estimated (initial values).
+%   o Hinit               [double]    (p*p) matrix specifying the initial Hessian matrix (if empty, the prior covariance matrix is used).
+%   o iscale              [double]    scalar specifying the initial of the jumping distribution's scale parameter.
+%   o bounds              [double]    (p*2) matrix defining lower and upper bounds for the parameters.
+%   o priorstd            [double]    (p*1) vector specifying the standard deviations of the prior (if empty, the prior covariance matrix is used).
+%   o gmhmaxlikOptions    [structure]  options for the optimization algorithm (options_.gmhmaxlik).
+%   o OptimizationOptions [cell array] user-defined options for the optimization algorithm.
+%   o varargin            [cell array] additional arguments for the objective function.
+%
+% OUTPUTS
+%   o PostMode      [double]   (p*1) vector, evaluation of the posterior mode.
+%   o HessianMatrix [double]   (p*p) matrix, evaluation of the Hessian matrix at the posterior mode.
+%   o Scale         [double]   scalar specifying the scale parameter that should be used in an eventual Metropolis-Hastings algorithm.
+%   o ModeValue     [double]   scalar, function value at the posterior mode.
+%   o fcount        [integer]  scalar, number of function evaluations.
+%
+% ALGORITHM
+%  See gmhmaxlik_core.m for details.
+%
+% SPECIAL REQUIREMENTS
+%   None.
 
-% Copyright © 2006-2017 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -19,6 +45,7 @@ function [PostMode, HessianMatrix, Scale, ModeValue] = gmhmaxlik(fun, xinit, Hin
 
 % Set default options
 
+fcount = 0;
 if ~isempty(Hinit)
     gmhmaxlikOptions.varinit = 'previous';
 else
@@ -63,6 +90,7 @@ end
 
 % Evaluate the objective function.
 OldModeValue = feval(fun,xinit,varargin{:});
+fcount = fcount + 1;
 
 if ~exist('MeanPar','var')
     MeanPar = xinit;
@@ -97,18 +125,22 @@ for i=1:gmhmaxlikOptions.iterations
     else
         flag = 'LastCall';
     end
-    [PostMode, PostVariance, Scale, PostMean] = gmhmaxlik_core(fun, OldPostMode, bounds, gmhmaxlikOptions, Scale, flag, MeanPar, OldPostVariance, varargin{:});
+    [PostMode, PostVariance, Scale, PostMean, fc] = gmhmaxlik_core(fun, OldPostMode, bounds, gmhmaxlikOptions, Scale, flag, MeanPar, OldPostVariance, varargin{:});
+    fcount = fcount + fc;
     ModeValue = feval(fun, PostMode, varargin{:});
+    fcount = fcount + 1;
     dVariance = max(max(abs(PostVariance-OldPostVariance)));
     dMean = max(abs(PostMean-OldPostMean));
-    skipline()
-    printline(58,'=')
-    disp(['   Change in the posterior covariance matrix = ' num2str(dVariance) '.'])
-    disp(['   Change in the posterior mean = ' num2str(dMean) '.'])
-    disp(['   Current mode = ' num2str(ModeValue)])
-    disp(['   Mode improvement = ' num2str(abs(OldModeValue-ModeValue))])
-    disp(['   New value of jscale = ' num2str(Scale)])
-    printline(58,'=')
+    if ~gmhmaxlikOptions.silent
+        skipline()
+        printline(58,'=')
+        disp(['   Change in the posterior covariance matrix = ' num2str(dVariance) '.'])
+        disp(['   Change in the posterior mean = ' num2str(dMean) '.'])
+        disp(['   Current mode = ' num2str(ModeValue)])
+        disp(['   Mode improvement = ' num2str(abs(OldModeValue-ModeValue))])
+        disp(['   New value of jscale = ' num2str(Scale)])
+        printline(58,'=')
+    end
     OldModeValue = ModeValue;
     OldPostMean = PostMean;
     OldPostVariance = PostVariance;
@@ -116,6 +148,8 @@ end
 
 HessianMatrix = inv(PostVariance);
 
-skipline()
-disp(['Optimal value of the scale parameter = ' num2str(Scale)])
-skipline()
+if ~gmhmaxlikOptions.silent
+    skipline()
+    disp(['Optimal value of the scale parameter = ' num2str(Scale)])
+    skipline()
+end

@@ -37,7 +37,7 @@ function [xparam1, weighting_info, mom_verbose] = mode_compute_gmm_smm(xparam0, 
 % o prior_dist_names
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -109,6 +109,7 @@ for stage_iter = 1:size(options_mom_.mom.weighting_matrix,1)
         if options_mom_.optimizer_vec{optim_iter} == 0
             xparam1 = xparam0; % no minimization, evaluate objective at current values            
             fval = feval(objective_function, xparam1, data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            optimization_info = [];
         else
             if options_mom_.optimizer_vec{optim_iter} == 13
                 options_mom_.mom.vector_output = true;
@@ -120,8 +121,9 @@ for stage_iter = 1:size(options_mom_.mom.weighting_matrix,1)
             else
                 options_mom_.mom.compute_derivs = false;
             end
-            [xparam1, fval] = dynare_minimize_objective(objective_function, xparam0, options_mom_.optimizer_vec{optim_iter}, options_mom_, [BoundsInfo.lb BoundsInfo.ub], bayestopt_.name, bayestopt_, [],...
-                                                                  data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xparam1, fval, ~, ~, ~, ~, ~, optimization_info] = ...
+                dynare_minimize_objective(objective_function, xparam0, options_mom_.optimizer_vec{optim_iter}, options_mom_, [BoundsInfo.lb BoundsInfo.ub], bayestopt_.name, bayestopt_, [], ...
+                                          data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if options_mom_.mom.vector_output
                 fval = fval'*fval;
             end
@@ -133,6 +135,7 @@ for stage_iter = 1:size(options_mom_.mom.weighting_matrix,1)
             tbl_title_iter = sprintf('FREQUENTIST %s (STAGE %d ITERATION %d) VERBOSE',options_mom_.mom.mom_method,stage_iter,optim_iter);
             field_name_iter = sprintf('%s_stage_%d_iter_%d',lower(options_mom_.mom.mom_method),stage_iter,optim_iter);
             mom_verbose.(field_name_iter) = display_estimation_results_table(xparam1,std_via_invhessian_xparam1_iter,M_,options_mom_,estim_params_,bayestopt_,[],prior_dist_names,tbl_title_iter,field_name_iter);
+            mom_verbose.(field_name_iter).optimization_info = optimization_info;
         end
         xparam0 = xparam1;
     end

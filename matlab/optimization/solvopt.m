@@ -1,4 +1,4 @@
-function [x,f,exitflag,n_f_evals,n_grad_evals,n_constraint_evals,n_constraint_gradient_evals]=solvopt(x,fun,grad,func,gradc,optim,varargin)
+function [x,f,exitflag,n_f_evals,n_grad_evals,n_constraint_evals,n_constraint_gradient_evals,k,message]=solvopt(x,fun,grad,func,gradc,optim,varargin)
 % [x,f,options]=solvopt(x,fun,grad,func,gradc,options,varargin)
 %
 % The function SOLVOPT, developed by Alexei Kuntsevich and Franz Kappe,
@@ -50,6 +50,8 @@ function [x,f,exitflag,n_f_evals,n_grad_evals,n_constraint_evals,n_constraint_gr
 % n_grad_evals:         number of gradient evaluations,
 % n_constraint_evals:   number of constraint function evaluations,
 % n_constraint_gradient_evals   number of constraint gradient evaluations.
+% k                     number of iterations,
+% message               termination message.
 %
 %
 % Algorithm: Kuntsevich, A.V., Kappel, F., SolvOpt - The solver for local nonlinear optimization problems
@@ -58,7 +60,7 @@ function [x,f,exitflag,n_f_evals,n_grad_evals,n_constraint_evals,n_constraint_gr
 %
 % Copyright © 1997-2008, Alexei Kuntsevich and Franz Kappel
 % Copyright © 2008-2015 Giovanni Lombardo
-% Copyright © 2015-2017 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -78,6 +80,7 @@ function [x,f,exitflag,n_f_evals,n_grad_evals,n_constraint_evals,n_constraint_gr
 
 
 % strings: ----{
+message = '';
 errmes='SolvOpt error:';
 wrnmes='SolvOpt warning:';
 error1='No function name and/or starting point passed to the function.';
@@ -92,7 +95,7 @@ error43='Gradient equals zero at the starting point.';
 error50='<func> returns an empty string.';
 error51='<func> returns NaN at the point.';
 error52='<func> returns infinite value at the point.';
-error60='<gradc> returns an improper vector. Check the dimension';
+error60='<gradc> returns an improper vector. Check the dimension.';
 error61='<gradc> returns NaN at the point.';
 error62='<gradc> returns infinite vector at the point.';
 error63='<gradc> returns zero vector at an infeasible point.';
@@ -108,7 +111,7 @@ warn09='Re-run from recorded point.';
 warn08='Ravine with a flat bottom is detected.';
 termwarn0='SolvOpt: Normal termination.';
 termwarn1='SolvOpt: Termination warning:';
-appwarn='The above warning may be reasoned by inaccurate gradient approximation';
+appwarn='The above warning may be reasoned by inaccurate gradient approximation.';
 endwarn=[...
     'Premature stop is possible. Try to re-run the routine from the obtained point.               ';...
     'Result may not provide the optimum. The function apparently has many extremum points.        ';...
@@ -119,6 +122,7 @@ endwarn=[...
 % ARGUMENTS PASSED ----{
 if nargin<2           % Function and/or starting point are not specified
     exitflag=-1;
+    message = [errmes ' ' error1];
     disp(errmes);
     disp(error1);
     return
@@ -171,6 +175,7 @@ end
 
 % STARTING POINT ----{
 if max(size(x))<=1
+    message = [errmes, ' ', error2];
     disp(errmes);
     disp(error2);
     exitflag=-2;
@@ -183,6 +188,7 @@ elseif size(x,1)==1
     n=size(x,2);
     trx=0;
 else
+    message = [errmes ' ' error2];
     disp(errmes);
     disp(error2);
     exitflag=-2;
@@ -196,6 +202,9 @@ n_f_evals=0; n_grad_evals=0;      % function and gradient calculations
 if constr
     n_constraint_evals=0;
     n_constraint_gradient_evals=0;      % same for constraints
+else
+    n_constraint_evals=[];
+    n_constraint_gradient_evals=[];
 end
 epsnorm=1.e-15;
 epsnorm2=1.e-30;    % epsilon & epsilon^2
@@ -291,6 +300,7 @@ if isempty(f)
         disp(error30)
     end
     exitflag=-3;
+    message = [errmes ' ' error30];
     if trx
         x=x';
     end
@@ -302,6 +312,7 @@ elseif isnan(f)
         disp(error6)
     end
     exitflag=-3;
+    message = [errmes ' ' error31 ' ' error6];
     if trx
         x=x';
     end
@@ -313,6 +324,7 @@ elseif abs(f)==Inf
         disp(error6)
     end
     exitflag=-3;
+    message = [errmes ' ' error32 ' ' error6];
     if trx
         x=x';
     end
@@ -332,6 +344,7 @@ if constr,  fp=f; kless=0;
             disp(error50)
         end
         exitflag=-5;
+        message = [errmes ' ' error50];
         if trx
             x=x';
         end
@@ -343,6 +356,7 @@ if constr,  fp=f; kless=0;
             disp(error6)
         end
         exitflag=-5;
+        message = [errmes ' ' error51 ' ' error6];
         if trx
             x=x';
         end
@@ -354,6 +368,7 @@ if constr,  fp=f; kless=0;
             disp(error6)
         end
         exitflag=-5;
+        message = [errmes ' ' error52 ' ' error6];
         if trx
             x=x';
         end
@@ -374,18 +389,18 @@ if app
     deltax=h1*ddx*ones(size(x));
     if constr
         if trx
-            g=apprgrdn(x',fp,fun,deltax',1,varargin{:});
+            [g,fun_count]=apprgrdn(x',fp,fun,deltax',1,varargin{:});
         else
-            g=apprgrdn(x ,fp,fun,deltax,1,varargin{:});
+            [g,fun_count]=apprgrdn(x ,fp,fun,deltax,1,varargin{:});
         end
     else
         if trx
-            g=apprgrdn(x',f,fun,deltax',1,varargin{:});
+            [g,fun_count]=apprgrdn(x',f,fun,deltax',1,varargin{:});
         else
-            g=apprgrdn(x ,f,fun,deltax,1,varargin{:});
+            [g,fun_count]=apprgrdn(x ,f,fun,deltax,1,varargin{:});
         end
     end
-    n_f_evals=n_f_evals+n;
+    n_f_evals=n_f_evals+fun_count;
 else
     %done above
 end
@@ -397,6 +412,7 @@ if size(g,2)~=n
         disp(error40)
     end
     exitflag=-4;
+    message = [errmes ' ' error40];
     if trx
         x=x';
     end
@@ -408,6 +424,7 @@ elseif isnan(ng)
         disp(error6)
     end
     exitflag=-4;
+    message = [errmes ' ' error41 ' ' error6];
     if trx
         x=x';
     end
@@ -419,6 +436,7 @@ elseif ng==Inf
         disp(error6)
     end
     exitflag=-4;
+    message = [errmes ' ' error42 ' ' error6];
     if trx
         x=x';
     end
@@ -430,6 +448,7 @@ elseif ng<ZeroGrad
         disp(error6)
     end
     exitflag=-4;
+    message = [errmes ' ' error43 ' ' error6];
     if trx
         x=x';
     end
@@ -442,11 +461,11 @@ if constr
             deltax(idx)=ones(size(idx));
             deltax=ddx*deltax;
             if trx
-                gc=apprgrdn(x',fc,func,deltax',0);
+                [gc,fun_count]=apprgrdn(x',fc,func,deltax',0);
             else
-                gc=apprgrdn(x ,fc,func,deltax ,0);
+                [gc,fun_count]=apprgrdn(x ,fc,func,deltax ,0);
             end
-            n_constraint_evals=n_constraint_evals+n;
+            n_constraint_evals=n_constraint_evals+fun_count;
         else
             if trx
                 gc=feval(gradc,x');
@@ -465,6 +484,7 @@ if constr
                 disp(error60)
             end
             exitflag=-6;
+            message = [errmes ' ' error60];
             if trx
                 x=x';
             end
@@ -476,6 +496,7 @@ if constr
                 disp(error6)
             end
             exitflag=-6;
+            message = [errmes ' ' error61 ' ' error6];
             if trx
                 x=x';
             end
@@ -487,6 +508,7 @@ if constr
                 disp(error6)
             end
             exitflag=-6;
+            message = [errmes ' ' error62 ' ' error6];
             if trx
                 x=x';
             end
@@ -497,6 +519,7 @@ if constr
                 disp(error63)
             end
             exitflag=-6;
+            message = [errmes ' ' error63];
             if trx
                 x=x';
             end
@@ -616,6 +639,7 @@ while 1
                     disp(error5)
                 end
                 exitflag=-7;
+                message = [errmes ' ' error5];
                 if trx
                     x=x';
                 end
@@ -635,6 +659,7 @@ while 1
                         disp(error6)
                     end
                     exitflag=-5;
+                    message = [errmes ' ' error51 ' ' error6];
                     if trx
                         x=x';
                     end
@@ -646,6 +671,7 @@ while 1
                         disp(error6)
                     end
                     exitflag=-5;
+                    message = [errmes ' ' error52 ' ' error6];
                     if trx
                         x=x';
                     end
@@ -676,6 +702,11 @@ while 1
                         disp(error32)
                     end
                 end
+                if isnan(f)
+                    message = [wrnmes ' ' error31];
+                else
+                    message = [wrnmes ' ' error32];
+                end
                 if ksm || kc>=mxtc
                     exitflag=-3;
                     % don't return with NaN or Inf despite error code
@@ -702,6 +733,7 @@ while 1
                 stepvanish=stepvanish+1;
                 if stepvanish>=5
                     exitflag=-14;
+                    message = [termwarn1 ' ' deblank(endwarn(4,:))];
                     if dispwarn
                         disp(termwarn1)
                         disp(endwarn(4,:))
@@ -780,18 +812,18 @@ while 1
             deltax(idx)=ones(size(idx));  deltax=h1*ddx*deltax;
             if constr
                 if trx
-                    g=apprgrdn(x',fp,fun,deltax',1,varargin{:});
+                    [g,fun_count]=apprgrdn(x',fp,fun,deltax',1,varargin{:});
                 else
-                    g=apprgrdn(x ,fp,fun,deltax,1,varargin{:});
+                    [g,fun_count]=apprgrdn(x ,fp,fun,deltax,1,varargin{:});
                 end
             else
                 if trx
-                    g=apprgrdn(x',f,fun,deltax',1,varargin{:});
+                    [g,fun_count]=apprgrdn(x',f,fun,deltax',1,varargin{:});
                 else
-                    g=apprgrdn(x ,f,fun,deltax ,1,varargin{:});
+                    [g,fun_count]=apprgrdn(x ,f,fun,deltax ,1,varargin{:});
                 end
             end
-            n_f_evals=n_f_evals+n;
+            n_f_evals=n_f_evals+fun_count;
         else
             if trx                
                 [~,g]=feval(fun,x',varargin{:});
@@ -810,6 +842,7 @@ while 1
                 disp(error41)
             end
             exitflag=-4;
+            message = [errmes ' ' error41];
             if trx
                 x=x';
             end
@@ -820,6 +853,7 @@ while 1
                 disp(error42)
             end
             exitflag=-4;
+            message = [errmes ' ' error42];
             if trx
                 x=x';
             end
@@ -848,11 +882,11 @@ while 1
                     deltax=sign(x); idx=find(deltax==0);
                     deltax(idx)=ones(size(idx));  deltax=ddx*deltax;
                     if trx
-                        gc=apprgrdn(x',fc,func,deltax',0);
+                        [gc,fun_count]=apprgrdn(x',fc,func,deltax',0);
                     else
-                        gc=apprgrdn(x ,fc,func,deltax ,0);
+                        [gc,fun_count]=apprgrdn(x ,fc,func,deltax ,0);
                     end
-                    n_constraint_evals=n_constraint_evals+n;
+                    n_constraint_evals=n_constraint_evals+fun_count;
                 else
                     if trx
                         gc=feval(gradc,x');
@@ -871,6 +905,7 @@ while 1
                         disp(error61)
                     end
                     exitflag=-6;
+                    message = [errmes ' ' error61];
                     if trx
                         x=x';
                     end
@@ -881,6 +916,7 @@ while 1
                         disp(error62)
                     end
                     exitflag=-6;
+                    message = [errmes ' ' error62];
                     if trx
                         x=x';
                     end
@@ -891,6 +927,7 @@ while 1
                         disp(error63)
                     end
                     exitflag=-6;
+                    message = [errmes ' ' error63];
                     if trx
                         x=x';
                     end
@@ -990,6 +1027,10 @@ while 1
                             end
                             if warnno~=0
                                 exitflag=-warnno-10;
+                                message = [termwarn1 ' ' deblank(endwarn(warnno,:))];
+                                if app
+                                    message = [message ' ' appwarn];
+                                end
                                 if dispwarn, disp(termwarn1)
                                     disp(endwarn(warnno,:))
                                     if app
@@ -1001,6 +1042,7 @@ while 1
                                 if dispwarn
                                     disp(termwarn0);
                                 end
+                                message = termwarn0;
                             end
                             if trx
                                 x=x';
@@ -1019,6 +1061,10 @@ while 1
                             disp(appwarn)
                         end
                     end
+                    message = [termwarn1 ' ' deblank(endwarn(4,:))];
+                    if app
+                        message = [message ' ' appwarn];
+                    end
                     x=xrec; f=frec;
                     if trx
                         x=x';
@@ -1032,6 +1078,7 @@ while 1
         % ITERATIONS LIMIT
         if(k==optim.MaxIter)
             exitflag=-9;
+            message = [wrnmes ' ' warn4];
             if trx
                 x=x';
             end
@@ -1050,6 +1097,7 @@ while 1
                     disp(warn1)
                 end
                 exitflag=-8;
+                message = [termwarn1 ' ' warn1];
                 if trx
                     x=x';
                 end
@@ -1064,6 +1112,7 @@ while 1
                 end
                 if nzero>=3
                     exitflag=-8;
+                    message = [wrnmes ' ', warn1];
                     if trx
                         x=x';
                     end
@@ -1084,6 +1133,7 @@ while 1
                             disp(error32)
                         end
                         exitflag=-3;
+                        message = [errmes ' ' error32];
                         if trx
                             x=x';
                         end
@@ -1094,6 +1144,7 @@ while 1
                             disp(error31)
                         end
                         exitflag=-3;
+                        message = [errmes ' ' error31];
                         if trx
                             x=x';
                         end
@@ -1105,11 +1156,11 @@ while 1
                         deltax(idx)=ones(size(idx));
                         deltax=h1*ddx*deltax;
                         if trx
-                            g=apprgrdn(x',f,fun,deltax',1,varargin{:});
+                            [g,fun_count]=apprgrdn(x',f,fun,deltax',1,varargin{:});
                         else
-                            g=apprgrdn(x,f,fun,deltax,1,varargin{:});
+                            [g,fun_count]=apprgrdn(x,f,fun,deltax,1,varargin{:});
                         end
-                        n_f_evals=n_f_evals+n;
+                        n_f_evals=n_f_evals+fun_count;
                     else
                         if trx
                             [~,g]=feval(fun,x',varargin{:});
@@ -1128,6 +1179,7 @@ while 1
                             disp(error42)
                         end
                         exitflag=-4;
+                        message = [errmes ' ' error42];
                         if trx
                             x=x';
                         end
@@ -1138,6 +1190,7 @@ while 1
                             disp(error41)
                         end
                         exitflag=-4;
+                        message = [errmes ' ' error41];
                         if trx
                             x=x';
                         end
@@ -1153,6 +1206,7 @@ while 1
                         disp(warn1)
                     end
                     exitflag=-8;
+                    message = [termwarn1 ' ' warn1];
                     if trx
                         x=x';
                     end
@@ -1210,11 +1264,11 @@ while 1
                     if app
                         deltax=h1*ddx*ones(size(deltax));
                         if trx
-                            gt=apprgrdn(x1',fm,fun,deltax',1,varargin{:});
+                            [gt,fun_count]=apprgrdn(x1',fm,fun,deltax',1,varargin{:});
                         else
-                            gt=apprgrdn(x1 ,fm,fun,deltax ,1,varargin{:});
+                            [gt,fun_count]=apprgrdn(x1 ,fm,fun,deltax ,1,varargin{:});
                         end
-                        n_f_evals=n_f_evals+n;
+                        n_f_evals=n_f_evals+fun_count;
                     else
                         if trx
                             [~,gt]=feval(fun,x1',varargin{:});

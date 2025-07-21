@@ -1,5 +1,5 @@
-function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bounds,options,iScale,info,MeanPar,VarCov,varargin)
-
+function [PostMod,PostVar,Scale,PostMean,fcount] = gmhmaxlik_core(ObjFun,xparam1,mh_bounds,options,iScale,info,MeanPar,VarCov,varargin)
+% [PostMod,PostVar,Scale,PostMean,fcount] = gmhmaxlik_core(ObjFun,xparam1,mh_bounds,options,iScale,info,MeanPar,VarCov,varargin)
 % (Dirty) Global minimization routine of (minus) a likelihood (or posterior density) function.
 %
 % INPUTS
@@ -20,6 +20,7 @@ function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bou
 %   o Scale      [double]   scalar specifying the scale parameter that should be used in
 %                           an eventual metropolis-hastings algorithm.
 %   o PostMean   [double]   (p*1) vector, evaluation of the posterior mean.
+%   o fcount     [integer]  scalar, number of function evaluations.
 %
 % ALGORITHM
 %   Metropolis-Hastings with an constantly updated covariance matrix for
@@ -56,7 +57,7 @@ function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bou
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -73,6 +74,7 @@ function [PostMod,PostVar,Scale,PostMean] = gmhmaxlik_core(ObjFun,xparam1,mh_bou
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+fcount = 0;
 npar = length(xparam1);
 
 NumberOfIterations = options.number;
@@ -84,12 +86,15 @@ CovJump = VarCov;
 ModePar = xparam1;
 
 %% [1] I tune the scale parameter.
-hh_fig = dyn_waitbar(0,'Tuning of the scale parameter...');
-set(hh_fig,'Name','Tuning of the scale parameter.');
+if ~options.silent
+    hh_fig = dyn_waitbar(0,'Tuning of the scale parameter...');
+    set(hh_fig,'Name','Tuning of the scale parameter.');
+end
 j = 1; jj  = 1;
 isux = 0; jsux = 0; test = 0;
 ix2 = ModePar;% initial condition!
 ilogpo2 = - feval(ObjFun,ix2,varargin{:});% initial posterior density
+fcount = fcount + 1;
 mlogpo2 = ilogpo2;
 try
     dd = transpose(chol(CovJump));
@@ -100,6 +105,7 @@ while j<=MaxNumberOfTuningSimulations
     proposal = iScale*dd*randn(npar,1) + ix2;
     if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
         logpo2 = - feval(ObjFun,proposal,varargin{:});
+        fcount = fcount + 1;
     else
         logpo2 = -inf;
     end
@@ -115,7 +121,7 @@ while j<=MaxNumberOfTuningSimulations
         jsux = jsux + 1;
     end % ... otherwise I don't move.
     prtfrc = j/MaxNumberOfTuningSimulations;
-    if mod(j, 10)==0
+    if ~options.silent && mod(j, 10)==0
         dyn_waitbar(prtfrc,hh_fig,sprintf('Acceptance ratio [during last 500]: %f [%f]',isux/j,jsux/jj));
     end
     if  j/500 == round(j/500)
@@ -138,18 +144,24 @@ while j<=MaxNumberOfTuningSimulations
     jj = jj + 1;
 end
 
-dyn_waitbar_close(hh_fig);
+if ~options.silent
+    dyn_waitbar_close(hh_fig);
+end
 %% [2] One block metropolis, I update the covariance matrix of the jumping distribution
-hh_fig = dyn_waitbar(0,'Metropolis-Hastings...');
-set(hh_fig,'Name','Estimation of the posterior covariance...'),
+if ~options.silent
+    hh_fig = dyn_waitbar(0,'Metropolis-Hastings...');
+    set(hh_fig,'Name','Estimation of the posterior covariance...');
+end
 j = 1;
 isux = 0;
 ilogpo2 = - feval(ObjFun,ix2,varargin{:});
+fcount = fcount + 1;
 while j<= NumberOfIterations
     j = j+1;
     proposal = iScale*dd*randn(npar,1) + ix2;
     if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
         logpo2 = - feval(ObjFun,proposal,varargin{:});
+        fcount = fcount + 1;
     else
         logpo2 = -inf;
     end
@@ -165,7 +177,7 @@ while j<= NumberOfIterations
         jsux = jsux + 1;
     end % ... otherwise I don't move.
     prtfrc = j/NumberOfIterations;
-    if mod(j, 10)==0
+    if ~options.silent && mod(j, 10)==0
         dyn_waitbar(prtfrc,hh_fig,sprintf('Acceptance ratio: %f',isux/j));
     end
     % I update the covariance matrix and the mean:
@@ -174,25 +186,30 @@ while j<= NumberOfIterations
     CovJump = CovJump + oldMeanPar*oldMeanPar' - MeanPar*MeanPar' + ...
               (1/j)*(ix2*ix2' - CovJump - oldMeanPar*oldMeanPar');
 end
-dyn_waitbar_close(hh_fig);
+if ~options.silent
+    dyn_waitbar_close(hh_fig);
+end
 PostVar = CovJump;
 PostMean = MeanPar;
 %% [3 & 4] I tune the scale parameter (with the new covariance matrix) if
 %% this is the last call to the routine, and I climb the hill (without
 %% updating the covariance matrix)...
 if strcmpi(info,'LastCall')
-
-    hh_fig = dyn_waitbar(0,'Tuning of the scale parameter...');
-    set(hh_fig,'Name','Tuning of the scale parameter.'),
+    if ~options.silent
+        hh_fig = dyn_waitbar(0,'Tuning of the scale parameter...');
+        set(hh_fig,'Name','Tuning of the scale parameter.');
+    end
     j = 1; jj  = 1;
     isux = 0; jsux = 0;
     test = 0;
     ilogpo2 = - feval(ObjFun,ix2,varargin{:});% initial posterior density
+    fcount = fcount + 1;
     dd = transpose(chol(CovJump));
     while j<=MaxNumberOfTuningSimulations
         proposal = iScale*dd*randn(npar,1) + ix2;
         if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
             logpo2 = - feval(ObjFun,proposal,varargin{:});
+            fcount = fcount + 1;
         else
             logpo2 = -inf;
         end
@@ -208,7 +225,7 @@ if strcmpi(info,'LastCall')
             jsux = jsux + 1;
         end % ... otherwise I don't move.
         prtfrc = j/MaxNumberOfTuningSimulations;
-        if mod(j, 10)==0
+        if ~options.silent && mod(j, 10)==0
             dyn_waitbar(prtfrc,hh_fig,sprintf('Acceptance ratio [during last 1000]: %f [%f]',isux/j,jsux/jj));
         end
         if j/1000 == round(j/1000)
@@ -226,14 +243,18 @@ if strcmpi(info,'LastCall')
         j = j+1;
         jj = jj + 1;
     end
-    dyn_waitbar_close(hh_fig);
+    if ~options.silent
+        dyn_waitbar_close(hh_fig);
+    end
     Scale = iScale;
     %%
     %% Now I climb the hill
     %%
     if options.nclimb
-        hh_fig = dyn_waitbar(0,' ');
-        set(hh_fig,'Name','Now I am climbing the hill...'),
+        if ~options.silent
+            hh_fig = dyn_waitbar(0,' ');
+            set(hh_fig,'Name','Now I am climbing the hill...');
+        end
         j = 1; jj  = 1;
         jsux = 0;
         test = 0;
@@ -241,6 +262,7 @@ if strcmpi(info,'LastCall')
             proposal = iScale*dd*randn(npar,1) + ModePar;
             if all(proposal > mh_bounds(:,1)) && all(proposal < mh_bounds(:,2))
                 logpo2 = - feval(ObjFun,proposal,varargin{:});
+                fcount = fcount + 1;
             else
                 logpo2 = -inf;
             end
@@ -250,7 +272,7 @@ if strcmpi(info,'LastCall')
                 jsux = jsux + 1;
             end % otherwise I don't move...
             prtfrc = j/MaxNumberOfClimbingSimulations;
-            if mod(j, 10)==0
+            if ~options.silent && mod(j, 10)==0
                 dyn_waitbar(prtfrc,hh_fig,sprintf('%f Jumps / MaxStepSize %f',jsux,sqrt(max(diag(iScale*CovJump)))));
             end
             if  j/200 == round(j/200)
@@ -272,7 +294,9 @@ if strcmpi(info,'LastCall')
             j = j+1;
             jj = jj + 1;
         end
-        dyn_waitbar_close(hh_fig);
+        if ~options.silent
+            dyn_waitbar_close(hh_fig);
+        end
     end %climb
 else
     Scale = iScale;
