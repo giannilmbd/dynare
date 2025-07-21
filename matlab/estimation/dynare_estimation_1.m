@@ -245,7 +245,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                 end
             end
         end
-        [xparam1, fval, ~, hh, options_, Scale, new_rat_hess_info, optimization_info] = ...
+        [xparam1, fval, ~, hh, Scale, new_rat_hess_info, optimization_info] = ...
             dynare_minimize_objective(objective_function,xparam1,current_optimizer,options_,[bounds.lb bounds.ub],bayestopt_.name,bayestopt_,hh,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
         fprintf('\nFinal value of minus the log posterior (or likelihood):%f \n', fval);
         if length(optimizer_vec) > 1

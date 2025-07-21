@@ -96,7 +96,7 @@ switch posterior_sampling_method
         blocked_draws_counter=blocked_draws_counter+1;
         nxopt=length(indices(blocks==block_iter,1)); %get size of current block
         par_start_current_block=current_draw(indices(blocks==block_iter,1));
-        [xopt_current_block, ~, ~, ~, options_] = dynare_minimize_objective(@TaRB_optimizer_wrapper,par_start_current_block,sampler_options.mode_compute,options_,[mh_bounds.lb(indices(blocks==block_iter,1),1) mh_bounds.ub(indices(blocks==block_iter,1),1)],bayestopt_.name,bayestopt_,[],...
+        [xopt_current_block] = dynare_minimize_objective(@TaRB_optimizer_wrapper,par_start_current_block,sampler_options.mode_compute,options_,[mh_bounds.lb(indices(blocks==block_iter,1),1) mh_bounds.ub(indices(blocks==block_iter,1),1)],bayestopt_.name,bayestopt_,[],...
                                                                             current_draw,indices(blocks==block_iter,1),TargetFun,...% inputs for wrapper
                                                                             varargin{:}); %inputs for objective
         %% covariance for proposal density
