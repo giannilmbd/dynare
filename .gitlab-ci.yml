@@ -30,7 +30,7 @@ stages:
 build_matlab:
   stage: build
   script:
-    - meson setup -Dbuild_for=matlab -Dmatlab_path=/opt/MATLAB/$MATLAB_VERSION --buildtype=release build-matlab
+    - meson setup -Dbuild_for=matlab -Dmatlab_path=/opt/MATLAB/$MATLAB_VERSION --buildtype=release -Db_lto=true build-matlab
     - meson compile -v -C build-matlab
   artifacts:
     paths:
@@ -40,7 +40,7 @@ build_matlab:
 build_octave:
   stage: build
   script:
-    - meson setup -Dbuild_for=octave --buildtype=release build-octave
+    - meson setup -Dbuild_for=octave --buildtype=release -Db_lto=true build-octave
     - meson compile -v -C build-octave
   artifacts:
     paths:
@@ -180,7 +180,7 @@ test_matlab:
 test_old_matlab:
   stage: test
   script:
-    - meson setup -Dbuild_for=matlab -Dmatlab_path=/opt/MATLAB/$OLD_MATLAB_VERSION --buildtype=release build-old-matlab
+    - meson setup -Dbuild_for=matlab -Dmatlab_path=/opt/MATLAB/$OLD_MATLAB_VERSION --buildtype=release -Db_lto=true build-old-matlab
     - meson compile -v -C build-old-matlab
     - meson test -C build-old-matlab --num-processes $(($(nproc) * 3 / 4))
   artifacts:
