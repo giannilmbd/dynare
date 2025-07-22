@@ -349,7 +349,7 @@ if isoccbin
         % Kalman update is not yet robust to accommodate diffuse steps
     end
     if occbin_options.opts_simul.waitbar && first_period_occbin_update<smpl
-        hh_fig = dyn_waitbar(0,'OccBin: Piecewise Kalman Filter');
+        hh_fig = waitbar.run(0,'OccBin: Piecewise Kalman Filter');
         set(hh_fig,'Name','OccBin: Piecewise Kalman Filter.');
         waitbar_indicator=1;
     else
@@ -379,7 +379,7 @@ while notsteady && t<smpl
     di = data_index{t}';
     if t>=first_period_occbin_update
         if waitbar_indicator
-            dyn_waitbar(t/smpl, hh_fig, sprintf('Period %u of %u', t,smpl));
+            waitbar.run(t/smpl, hh_fig, sprintf('Period %u of %u', t,smpl));
         end
         occbin_options.opts_simul.waitbar=0;
         if t==1
@@ -568,7 +568,7 @@ while notsteady && t<smpl
     end
 end
 if waitbar_indicator
-    dyn_waitbar_close(hh_fig);
+    waitbar.close(hh_fig);
 end
 
 P1(:,:,t+1) = P(:,:,t+1);

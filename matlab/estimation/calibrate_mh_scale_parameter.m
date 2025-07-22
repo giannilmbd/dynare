@@ -38,7 +38,7 @@ function Scale = calibrate_mh_scale_parameter(objective_function, CovarianceMatr
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % Fire up the wait bar
-hh_fig = dyn_waitbar(0,'Tuning of the scale parameter...');
+hh_fig = waitbar.run(0,'Tuning of the scale parameter...');
 set(hh_fig,'Name','Tuning of the scale parameter.');
 
 % Initialize various counters.
@@ -100,7 +100,7 @@ while j<=options.maxiter
     prtfrc = j/options.maxiter;
     % Update the waitbar
     if ~mod(j, 10)
-        dyn_waitbar(prtfrc, hh_fig, sprintf('Acceptance ratio [during last %u]: %f [%f]', options.stepsize, isux/j, jsux/jj));
+        waitbar.run(prtfrc, hh_fig, sprintf('Acceptance ratio [during last %u]: %f [%f]', options.stepsize, isux/j, jsux/jj));
     end
     % Adjust the value of the scale parameter.
     if ~mod(j, options.stepsize)
@@ -135,4 +135,4 @@ while j<=options.maxiter
     jj = jj + 1;
 end
 
-dyn_waitbar_close(hh_fig);
+waitbar.close(hh_fig);

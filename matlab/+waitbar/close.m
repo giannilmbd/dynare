@@ -1,5 +1,5 @@
-function dyn_waitbar_close(h)
-% h = dyn_waitbar_close(h)
+function close(h)
+% h = close(h)
 % adaptive close waitbar, compatible with
 % octave and when console_mode=1
 
@@ -23,11 +23,11 @@ function dyn_waitbar_close(h)
 global options_
 
 if options_.console_mode
-    clear dyn_waitbar;
+    clear waitbar.run;
     diary on
     fprintf('\n');
 else
     close(h)
 end
 
-clear dyn_waitbar;
+clear waitbar.run;

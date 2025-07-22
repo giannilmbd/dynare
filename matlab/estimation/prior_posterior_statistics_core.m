@@ -141,7 +141,7 @@ if whoiam
 else
     prct0=0;
 end
-h = dyn_waitbar(prct0,['Taking ',type,' subdraws...']);
+h = waitbar.run(prct0,['Taking ',type,' subdraws...']);
 
 if RemoteFlag==1
     OutputFileName_smooth = {};
@@ -537,7 +537,7 @@ for b=fpar:B
         irun(irun_index) = 1;
     end
     if mod(b-fpar+1, 5)==0
-        dyn_waitbar((b-fpar+1)/(B-fpar+1),h);
+        waitbar.run((b-fpar+1)/(B-fpar+1),h);
     end
 end
 
@@ -559,7 +559,7 @@ if RemoteFlag==1
                         OutputFileName_state_uncert];
 end
 
-dyn_waitbar_close(h);
+waitbar.close(h);
 
 
 function yf=simulate_posterior_forecasts(y0,dr,horizon,stochastic_indicator,Sigma_e,n)

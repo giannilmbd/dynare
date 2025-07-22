@@ -80,7 +80,7 @@ end
 
 if opts.replic
     options_.noprint=true;
-    h = dyn_waitbar(0,'Please wait occbin forecast replic ...');
+    h = waitbar.run(0,'Please wait occbin forecast replic ...');
     ishock = find(sqrt(diag((M_.Sigma_e))));
     options_.occbin.simul.exo_pos=ishock;
     effective_exo_nbr=  length(ishock);
@@ -114,9 +114,9 @@ if opts.replic
                 save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag','out','shocks_base')
             end
         end
-        dyn_waitbar(iter/opts.replic,h,['OccBin MC forecast replic ',int2str(iter),'/',int2str(opts.replic)])
+        waitbar.run(iter/opts.replic,h,['OccBin MC forecast replic ',int2str(iter),'/',int2str(opts.replic)])
     end
-    dyn_waitbar_close(h);
+    waitbar.close(h);
     if options_.debug
          save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag')
     end

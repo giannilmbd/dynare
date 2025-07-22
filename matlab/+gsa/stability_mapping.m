@@ -236,7 +236,7 @@ if fload==0 %run new MC
         end
     end
     %
-    h = dyn_waitbar(0,'Please wait...');
+    h = waitbar.run(0,'Please wait...');
     istable=1:Nsam;
     jstab=0;
     iunstable=1:Nsam;
@@ -333,10 +333,10 @@ if fload==0 %run new MC
         ys_=real(dr_.ys);
         yys(:,j) = ys_;
         if mod(j,3)
-            dyn_waitbar(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)])
+            waitbar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)])
         end
     end
-    dyn_waitbar_close(h);
+    waitbar.close(h);
     if prepSA && jstab
         T=T(:,:,1:jstab);
     else
@@ -389,7 +389,7 @@ else %load old run
     end
 
     if prepSA && isempty(strmatch('T',who('-file', filetoload),'exact'))
-        h = dyn_waitbar(0,'Please wait...');
+        h = waitbar.run(0,'Please wait...');
         options_.periods=0;
         options_.nomoments=1;
         options_.irf=0;
@@ -408,10 +408,10 @@ else %load old run
             ys_=real(dr_.ys);
             yys(:,j) = ys_;
             if mod(j,3)
-                dyn_waitbar(j/ntrans,h,['MC iteration ',int2str(j),'/',int2str(ntrans)])
+                waitbar.run(j/ntrans,h,['MC iteration ',int2str(j),'/',int2str(ntrans)])
             end
         end
-        dyn_waitbar_close(h);
+        waitbar.close(h);
         save(filetoload,'T','-append')
     end
 end

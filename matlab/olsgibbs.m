@@ -183,11 +183,11 @@ for i=1:discarddraws
     h = gamrnd(PosteriorDegreesOfFreedom/2.0, 2.0/(PosteriorDegreesOfFreedom*s2_));
 end
 
-hh_fig = dyn_waitbar(0,'Please wait. Gibbs sampler...');
+hh_fig = waitbar.run(0,'Please wait. Gibbs sampler...');
 set(hh_fig,'Name','Olsgibbs estimation.');
 for i = discarddraws+1:ndraws
     if ~mod(i,100)
-        dyn_waitbar((i-discarddraws)/(ndraws-discarddraws),hh_fig,'Please wait. Gibbs sampler...');
+        waitbar.run((i-discarddraws)/(ndraws-discarddraws),hh_fig,'Please wait. Gibbs sampler...');
     end
     % Set conditional distribution of β
     InverseConditionalPoseriorVariance = BetaInversePriorVariance + h*(X'*X);
@@ -211,7 +211,7 @@ for i = discarddraws+1:ndraws
         periods = periods+1;
     end
 end
-dyn_waitbar_close(hh_fig);
+waitbar.close(hh_fig);
 
 %% Save posterior moments.
 oo_.olsgibbs.(model_name).posterior.mean.beta = mean(oo_.olsgibbs.(model_name).draws(:,1:n))';

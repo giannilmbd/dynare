@@ -234,11 +234,11 @@ else % Run in serial as usual
             refresh_rate = sampler_options.parallel_bar_refresh_rate;
             bar_title = sampler_options.parallel_bar_title;
             prc0=(curr_block-fblck)/(nblck-fblck+1)*(isoctave() || options_.console_mode)+(draw_iter-1)/nruns_cb;
-            hh_fig = dyn_waitbar({prc0,whoiam,options_.parallel(ThisMatlab)},sprintf(Label,bar_title, '...'));
+            hh_fig = waitbar.run({prc0,whoiam,options_.parallel(ThisMatlab)},sprintf(Label,bar_title, '...'));
         else
             refresh_rate = sampler_options.serial_bar_refresh_rate;
             bar_title = sampler_options.serial_bar_title;
-            hh_fig = dyn_waitbar(0,sprintf(Label,bar_title, '...'));
+            hh_fig = waitbar.run(0,sprintf(Label,bar_title, '...'));
             set(hh_fig,'Name',bar_title);
         end
         hh_fig.UserData = sprintf(Label,bar_title, ' %s');
@@ -295,7 +295,7 @@ else % Run in serial as usual
             draw_index_current_file = draw_index_current_file_i;
         end
 
-        dyn_waitbar_close(hh_fig);
+        waitbar.close(hh_fig);
 
     end % End of the loop over the mh-blocks.
 
@@ -321,7 +321,7 @@ function [accepted_draws_this_chain, feval_this_chain, draw_iter, ...
 %   - See parent function for most of them
 %   - UseParallel (true/false) whether to use Parallel Computing Toolbox or
 %   not
-%   - q either the queue or the dyn_waitbar figure
+%   - q either the queue or the waitbar.run figure
 
 curr_block_str = int2str(curr_block);
 
@@ -415,7 +415,7 @@ while draw_iter <= nruns_cb
         if UseParallel
             send(q, struct('Initialize', false, 'Block', curr_block_str, 'Text', txt, 'Value', prtfrc))
         else
-            dyn_waitbar(prtfrc, q, sprintf(q.UserData, txt));
+            waitbar.run(prtfrc, q, sprintf(q.UserData, txt));
         end
 
         if save_tmp_file
