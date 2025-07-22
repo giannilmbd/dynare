@@ -1,5 +1,5 @@
-function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_info,optimization_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
-% [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_info,optimization_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
+function [opt_par_values,fval,exitflag,hessian_mat,Scale,new_rat_hess_info,optimization_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
+% [opt_par_values,fval,exitflag,hessian_mat,Scale,new_rat_hess_info,optimization_info]=dynare_minimize_objective(objective_function,start_par_value,minimizer_algorithm,options_,bounds,parameter_names,prior_information,Initial_Hessian,varargin)
 % Calls a minimizer
 %
 % INPUTS
@@ -18,9 +18,8 @@ function [opt_par_values,fval,exitflag,hessian_mat,options_,Scale,new_rat_hess_i
 %   fval                [scalar double]                     value of the objective function at the minimum
 %   exitflag             [scalar double]                     return code of the respective optimizer
 %   hessian_mat         [n_params by n_params] matrix       Hessian matrix at the mode returned by optimizer
-%   options_            [MATLAB structure]                  Dynare options structure (to return options set by algorithms 5)
 %   Scale               [scalar double]                     scaling parameter returned by algorithm 6
-%   new_rat_hess_info   [MATLAB structure]                  step size info used by algorithm 5
+%   new_rat_hess_info   [MATLAB structure]                  options related to mode_compute=5 settings
 %   optimization_info   [MATLAB structure]                  optimization information on runtime, iterations, function count, exitflag, and message
 %
 % SPECIAL REQUIREMENTS

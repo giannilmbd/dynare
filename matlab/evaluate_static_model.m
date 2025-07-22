@@ -1,6 +1,5 @@
-function [residuals,check1,jacob] = evaluate_static_model(ys,exo_ss,params,M_,options_)
-
-% function [residuals,check1,jacob] = evaluate_static_model(ys,exo_ss,params,M_,options_)
+function [residuals,jacob] = evaluate_static_model(ys,exo_ss,params,M_,options_)
+% function [residuals,jacob] = evaluate_static_model(ys,exo_ss,params,M_,options_)
 % Evaluates the static model
 %
 % INPUTS
@@ -14,13 +13,12 @@ function [residuals,check1,jacob] = evaluate_static_model(ys,exo_ss,params,M_,op
 % OUTPUTS
 %   residuals                 vector           residuals when ys is not
 %                                              the steady state
-%   check1                    scalar           error flag
 %   jacob                     matrix           Jacobian of static model
 %
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,7 +35,6 @@ function [residuals,check1,jacob] = evaluate_static_model(ys,exo_ss,params,M_,op
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-check1 = 0;
 if options_.bytecode
     if nargout<3
         [residuals]= bytecode('evaluate', 'static', M_, options_, ys, ...

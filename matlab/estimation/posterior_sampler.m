@@ -1,9 +1,9 @@
-function posterior_sampler(TargetFun,ProposalFun,xparam1,sampler_options,mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_,dispString)
-% function posterior_sampler(TargetFun,ProposalFun,xparam1,sampler_options,mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_,dispString)
+function posterior_sampler(objective_function,ProposalFun,xparam1,sampler_options,mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_,dispString)
+% function posterior_sampler(objective_function,ProposalFun,xparam1,sampler_options,mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_,dispString)
 % Random Walk Metropolis-Hastings algorithm.
 %
 % INPUTS
-%   o TargetFun         [char]      string specifying the name of the objective
+%   o objective_function [char]      string specifying the name of the objective
 %                                   function (posterior kernel).
 %   o ProposalFun       [char]      string specifying the name of the proposal
 %                                   density
@@ -57,7 +57,7 @@ function posterior_sampler(TargetFun,ProposalFun,xparam1,sampler_options,mh_boun
 vv = sampler_options.invhess;
 % Initialization of the sampler
 [ ix2, ilogpo2, ModelName, MetropolisFolder, fblck, fline, npar, nblck, nruns, NewFile, MAX_nruns, d, bayestopt_] = ...
-    posterior_sampler_initialization(TargetFun, xparam1, vv, mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_, dispString);
+    posterior_sampler_initialization(objective_function, xparam1, vv, mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_, dispString);
 
 InitSizeArray = min([repmat(MAX_nruns,nblck,1) fline+nruns-1],[],2);
 
@@ -81,7 +81,7 @@ record=load_last_mh_history_file(MetropolisFolder, ModelName);
 % on many cores). The mandatory variables for local/remote parallel
 % computing are stored in the localVars struct.
 
-localVars =   struct('TargetFun', TargetFun, ...
+localVars =   struct('objective_function', objective_function, ...
                      'ProposalFun', ProposalFun, ...
                      'xparam1', xparam1, ...
                      'vv', vv, ...

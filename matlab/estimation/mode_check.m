@@ -1,12 +1,12 @@
-function mcheck = mode_check(fun,xparam,hessian_mat,options_,M_,estim_params_,bayestopt_,bounds,isMinimum, varargin)
-% function mcheck = mode_check(fun,xparam,hessian_mat,options_,M_,estim_params_,bayestopt_,bounds,isMinimum, varargin)
+function mcheck = mode_check(objective_function,xparam,hessian_mat,options_,M_,estim_params_,bayestopt_,bounds,isMinimum, varargin)
+% function mcheck = mode_check(objective_function,xparam,hessian_mat,options_,M_,estim_params_,bayestopt_,bounds,isMinimum, varargin)
 % -------------------------------------------------------------------------
 % Checks the estimated ML or Posterior mode/minimum by plotting sections of
 % the likelihood/posterior kernel. Each plot shows the variation of the
-% function implied by the variations of a single parameter ( ceteris paribus)
+% function implied by the variations of a single parameter (ceteris paribus)
 % -------------------------------------------------------------------------
 % INPUTS
-% - fun:            [func_handle]  objective function
+% - objective_function: [func_handle]  objective function
 % - xparam:         [vector]       estimated mode/minimum
 % - hessian_mat:    [matrix]       Hessian of the objective function at the estimated mode/minimum
 % - options_:       [structure]    Dynare options structure
@@ -15,7 +15,7 @@ function mcheck = mode_check(fun,xparam,hessian_mat,options_,M_,estim_params_,ba
 % - bayestopt_:     [structure]    information on the priors
 % - bounds:         [structure]    information on the bounds
 % - isMinimum:      [boolean]      true if xparam is a minimum, false if it is a mode
-% - varargin:       [cell]         additional arguments to be passed to fun
+% - varargin:       [cell]         additional arguments to be passed to objective_function
 % -------------------------------------------------------------------------
 % OUTPUTS
 % - mcheck: [structure]     structure containing the data for the check plots
@@ -45,7 +45,7 @@ function mcheck = mode_check(fun,xparam,hessian_mat,options_,M_,estim_params_,ba
 
 tolBounds = 1e-8;
 
-fval = feval(fun,xparam,varargin{:});
+fval = feval(objective_function,xparam,varargin{:});
 
 if ~isempty(hessian_mat)
     [ s_min, k ] = min(diag(hessian_mat));
@@ -83,10 +83,6 @@ else
 end
 
 for plt = 1:nbplt
-    if options_.TeX
-        NAMES = [];
-        TeXNAMES = [];
-    end
     if isMinimum
         hh_fig = dyn_figure(options_.nodisplay,'Name','Minimum check plots');
     else
@@ -144,7 +140,7 @@ for plt = 1:nbplt
         end
         for i = 1:length(z)
             xx(kk) = z(i);
-            [fval, info, exit_flag] = feval(fun,xx, varargin{:});                
+            [fval, info, exit_flag] = feval(objective_function,xx, varargin{:});                
             if exit_flag
                 y(i,1) = fval;
             else

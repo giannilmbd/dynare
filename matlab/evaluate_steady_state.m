@@ -83,7 +83,7 @@ if options_.ramsey_policy
         if ~options_.debug
             resids = evaluate_static_model(ys,exo_ss,params,M_,options_);
         else
-            [resids, ~ , jacob]= evaluate_static_model(ys,exo_ss,params,M_,options_);
+            [resids, jacob]= evaluate_static_model(ys,exo_ss,params,M_,options_);
         end
         nan_indices=find(isnan(resids(M_.ramsey_orig_endo_nbr+(1:M_.ramsey_orig_eq_nbr))));
 

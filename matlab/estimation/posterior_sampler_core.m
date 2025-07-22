@@ -5,7 +5,7 @@ function myoutput = posterior_sampler_core(myinputs,fblck,nblck,whoiam, ThisMatl
 % cycle are completely independent to be suitable for parallel execution.
 %
 % INPUTS
-%   o myimput            [struc]     The mandatory variables for local/remote
+%   o myinputs           [struc]     The mandatory variables for local/remote
 %                                    parallel computing obtained from posterior_sampler.m
 %                                    function.
 %   o fblck and nblck    [integer]   The Metropolis-Hastings chains.
@@ -60,7 +60,7 @@ end
 % reshape 'myinputs' for local computation.
 % In order to avoid confusion in the name space, the instruction struct2local(myinputs) is replaced by:
 
-TargetFun=myinputs.TargetFun;
+objective_function=myinputs.objective_function;
 ProposalFun=myinputs.ProposalFun;
 xparam1=myinputs.xparam1;
 mh_bounds=myinputs.mh_bounds;
@@ -190,7 +190,7 @@ for curr_block = fblck:nblck
     sampler_options.curr_block = curr_block;
     while draw_iter <= nruns(curr_block)
 
-        [par, logpost, accepted, neval] = posterior_sampler_iteration(TargetFun, last_draw(curr_block,:), last_posterior(curr_block), sampler_options,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+        [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function, last_draw(curr_block,:), last_posterior(curr_block), sampler_options,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 
         x2(draw_index_current_file,:) = par;
         last_draw(curr_block,:) = par;

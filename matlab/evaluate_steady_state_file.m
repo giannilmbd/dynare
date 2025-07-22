@@ -101,12 +101,7 @@ end
 
 if steady_state_checkflag
     % Check whether the steady state obtained from the _steadystate file is a steady state.
-    [residuals, check] = evaluate_static_model(ys, exo_ss, params, M_, options_);
-    if check
-        info(1) = 19;
-        info(2) = check; % to be improved
-        return
-    end
+    residuals = evaluate_static_model(ys, exo_ss, params, M_, options_);
     if max(abs(residuals)) > options_.solve_tolf
         info(1) = 19;
         info(2) = residuals'*residuals;

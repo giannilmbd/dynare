@@ -1,14 +1,13 @@
-function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
-
+function mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+% mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
 % Sequential Monte-Carlo sampler, Herbst and Schorfheide (JAE, 2014).
 %
 % INPUTS
-% - TargetFun        [char]     string specifying the name of the objective function (posterior kernel).
-% - xparam1          [double]   p×1 vector of parameters to be estimated (initial values).
+% - objective_function [char]   string specifying the name of the objective function (posterior kernel).
 % - mh_bounds        [double]   p×2 matrix defining lower and upper bounds for the parameters.
 % - dataset_         [dseries]  sample
-% - dataset_info     [struct]   informations about the dataset
-% - options_         [struct]   dynare's options
+% - dataset_info     [struct]   Information about the dataset
+% - options_         [struct]   Dynare options
 % - M_               [struct]   model description
 % - estim_params_    [struct]   estimated parameters
 % - bayestopt_       [struct]   estimated parameters
@@ -45,14 +44,14 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
     Prior = dprior(bayestopt_, options_.prior_trunc);
 
     % Set function handle for the objective
-    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);', 'funobj', func2str(TargetFun)));
+    eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);', 'funobj', func2str(objective_function)));
 
     mlogit = @(x) .95 + .1/(1 + exp(-16*x)); % Update of the scale parameter
 
     % Create the tempering schedule
     phi = ((0:smcopt.steps-1)/(smcopt.steps-1)).^smcopt.lambda;
 
-    % Initialise the estimate of the marginal density of the data
+    % Initialize the estimate of the marginal density of the data
     mdd = .0;
 
     % tuning for MH algorithms matrices
@@ -73,7 +72,7 @@ function mdd = hssmc(TargetFun, mh_bounds, dataset_, dataset_info, options_, M_,
 
     resampled_particle_swarm = false;
 
-    for i=2:smcopt.steps % Loop over the weight on the liklihood (phi)
+    for i=2:smcopt.steps % Loop over the weight on the likelihood (phi)
         weights = weights.*exp((phi(i)-phi(i-1))*loglikelihood);
         sweight = sum(weights);
         weights = weights/sweight;

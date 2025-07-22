@@ -1,9 +1,9 @@
-function dsmh(TargetFun, xparam1, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
-
+function dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+% dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
 % Dynamic Striated Metropolis-Hastings algorithm.
 %
 % INPUTS
-%   o TargetFun  [char]     string specifying the name of the objective
+%   o objective_function  [char]     string specifying the name of the objective
 %                           function (posterior kernel).
 %   o xparam1    [double]   (p*1) vector of parameters to be estimated (initial values).
 %   o mh_bounds  [double]   (p*2) matrix defining lower and upper bounds for the parameters.
@@ -58,7 +58,7 @@ MM = int64(options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_
 
 % Step 0: Initialization of the sampler
 [param, tlogpost_iminus1, loglik, bayestopt_] = ...
-    smc_samplers_initialization(TargetFun, 'dsmh', opts.particles, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
+    smc_samplers_initialization(objective_function, 'dsmh', opts.particles, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
 
 ESS = zeros(options_.posterior_sampler_options.dsmh.H,1) ;
 zhat = 1 ;
@@ -72,9 +72,9 @@ for i=2:options_.posterior_sampler_options.dsmh.H
     [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1,loglik,param) ;
     [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param,tlogpost_iminus1,loglik,lambda,i,zhat,ESS) ;
     % Step 2: tune c_i
-    c = tune_c(TargetFun,param,tlogpost_i,lambda,i,c,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+    c = tune_c(objective_function,param,tlogpost_i,lambda,i,c,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
     % Step 3: Metropolis step
-    [param,tlogpost_iminus1,loglik] = mutation_DSMH(TargetFun,param,tlogpost_i,tlogpost_iminus1,loglik,lambda,i,c,MM,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+    [param,tlogpost_iminus1,loglik] = mutation_DSMH(objective_function,param,tlogpost_i,tlogpost_iminus1,loglik,lambda,i,c,MM,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
 end
 
 weights = exp(loglik*(lambda(end)-lambda(end-1)));
@@ -170,7 +170,7 @@ z = bsxfun(@minus,param,mu);
 Omega = z*diag(weights)*z';
 Omegachol = chol(Omega)';
 
-function c = tune_c(TargetFun,param,tlogpost_i,lambda,i,c,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
+function c = tune_c(objective_function,param,tlogpost_i,lambda,i,c,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
 disp('tuning c_i...');
 disp('Initial value =');
 disp(c) ;
@@ -189,7 +189,7 @@ while stop==0
             while validate == 0
                 candidate = param0(:,j) + sqrt(c)*Omegachol*randn(npar,1);
                 if all(candidate >= mh_bounds.lb) && all(candidate <= mh_bounds.ub)
-                    [tlogpostx,loglikx] = tempered_likelihood(TargetFun,candidate,lambda(i),dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+                    [tlogpostx,loglikx] = tempered_likelihood(objective_function,candidate,lambda(i),dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
                     if isfinite(loglikx) % if returned log-density is not Inf or Nan (penalized value)
                         validate = 1;
                         if rand(1,1)<exp(tlogpostx-tlogpost0(j)) % accept
@@ -220,7 +220,7 @@ while stop==0
     end
 end
 
-function [out_param,out_tlogpost_iminus1,out_loglik] = mutation_DSMH(TargetFun,param,tlogpost_i,tlogpost_iminus1,loglik,lambda,i,c,MM,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
+function [out_param,out_tlogpost_iminus1,out_loglik] = mutation_DSMH(objective_function,param,tlogpost_i,tlogpost_iminus1,loglik,lambda,i,c,MM,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
 indx_levels = (1:1:MM-1)*options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_options.dsmh.G/MM;
 npar = size(param,1) ;
 p = 1/(10*options_.posterior_sampler_options.dsmh.tau);
@@ -267,7 +267,7 @@ for l=1:options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_opt
             while validate==0
                 candidate = param0(:,j) + sqrt(c)*Omegachol*randn(npar,1);
                 if all(candidate(:) >= mh_bounds.lb) && all(candidate(:) <= mh_bounds.ub)
-                    [tlogpostx,loglikx] = tempered_likelihood(TargetFun,candidate,lambda(i),dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+                    [tlogpostx,loglikx] = tempered_likelihood(objective_function,candidate,lambda(i),dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
                     if isfinite(loglikx) % if returned log-density is not Inf or Nan (penalized value)
                         validate = 1;
                         if u2<exp(tlogpostx-tlogpost_i0(j)) % accept
