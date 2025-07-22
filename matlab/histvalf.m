@@ -31,6 +31,11 @@ function [endo_histval, exo_histval, exo_det_histval] = histvalf(M_, options_)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 series = histvalf_initvalf('HISTVAL', M_, options_);
+
+if series.nobs ~= M_.orig_maximum_lag
+    error('histval_file: number of observations does not correspond to the number of lags in the model')
+end
+
 k = M_.orig_maximum_lag - M_.maximum_lag + 1;
 
 endo_histval  = series{M_.endo_names{:}}.data(k:end, :)';

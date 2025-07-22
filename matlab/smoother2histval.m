@@ -24,7 +24,7 @@ function smoother2histval(opts)
 %
 % The function also uses the value of option_.parameter_set
 
-% Copyright © 2014-2021 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -166,7 +166,7 @@ if ~isfield(opts, 'outfile')
     M_.endo_histval = repmat(oo_.steady_state, 1, M_.maximum_lag);
 else
     % Output to a file
-    data = zeros(M_.maximum_endo_lag, length(invars));
+    data = zeros(M_.orig_maximum_lag, length(invars));
     for i=1:length(outvars)
         j = strmatch(outvars{i}, M_.endo_names, 'exact');
         if ~isempty(j)
@@ -204,7 +204,7 @@ for i = 1:length(invars)
             error(['smoother2histval: output variable ' outvars{i} ' does not exist.'])            
         end
     else
-        data(:, i) = v';
+        data(M_.orig_maximum_lag-M_.maximum_lag+1:end, i) = v';
     end
 end
 if isfield(opts, 'outfile')

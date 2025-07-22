@@ -69,7 +69,7 @@ steady;
 OO = load(['fs2000_smooth' filesep 'Output' filesep 'fs2000_smooth_results']);;
 M_.params = OO.M_.params;
 
-histval_file(filename = 'fs2000_histval.mat');
+histval_file(datafile = 'fs2000_histval.mat');
 
 perfect_foresight_setup(periods = 100);
 perfect_foresight_solver;
