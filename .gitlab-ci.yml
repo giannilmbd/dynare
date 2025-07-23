@@ -147,6 +147,13 @@ pkg_matlab_online:
   rules:
     - if: '$CI_PROJECT_NAMESPACE == "Dynare" && $CI_COMMIT_REF_NAME == "master"'
       when: on_success
+    # Avoid the creation of merge request pipelines containing only that job
+    # (other jobs either have no “rules” and are thus not considered in merge
+    # request pipelines, or have “rules” but are explicitly disabled in merge
+    # request pipelines; additionally, we have no “workflow” stanza)
+    # See https://docs.gitlab.com/ci/pipelines/merge_request_pipelines/
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
     - when: manual
       allow_failure: true
   script:
