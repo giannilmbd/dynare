@@ -1,6 +1,6 @@
 function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
 
-% function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
+% [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
 % Computes the diffuse Kalman smoother without measurement error, in the case of a non-singular var-cov matrix.
 %
 % INPUTS
@@ -57,7 +57,7 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 %   Durbin/Koopman (2012): "Time Series Analysis by State Space Methods", Oxford University Press,
 %   Second Edition, Ch. 5
 
-% Copyright © 2004-2021 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -73,12 +73,6 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-% modified by M. Ratto:
-% new output argument aK (1-step to k-step predictions)
-% new options_.nk: the max step ahed prediction in aK (default is 4)
-% new crit1 value for rank of Pinf
-% it is assured that P is symmetric
 
 d = 0;
 decomp = [];
@@ -229,8 +223,7 @@ Lstar = Lstar(:,:,1:d);
 Kstar = Kstar(:,:,1:d);
 Pstar = Pstar(:,:,1:d);
 Pinf  = Pinf(:,:,1:d);
-notsteady = 1;
-while notsteady && t<smpl
+while t<smpl
     t = t+1;
     P(:,:,t)=tril(P(:,:,t))+transpose(tril(P(:,:,t),-1));                   % make sure P is symmetric
     di = data_index{t};
@@ -243,8 +236,8 @@ while notsteady && t<smpl
         P(:,:,t+1)      = T*P(:,:,t)*T' + QQ;                               %p. 111, DK(2012)
     else
         ZZ = Z(di,:);
-        v(di,t)      = Y(di,t) - ZZ*a(:,t);
-        F = ZZ*P(:,:,t)*ZZ' + H(di,di);
+        v(di,t)      = Y(di,t) - ZZ*a(:,t);                                 %DK (2012), (4.24)
+        F = ZZ*P(:,:,t)*ZZ' + H(di,di);                                     %DK (2012), (4.24)
         sig=sqrt(diag(F));
 
         if any(diag(F)<kalman_tol) || rcond(F./(sig*sig')) < kalman_tol
@@ -252,33 +245,33 @@ while notsteady && t<smpl
             return
         end
         iF(di,di,t)   = inv(F./(sig*sig'))./(sig*sig');
-        PZI         = P(:,:,t)*ZZ'*iF(di,di,t);
-        atilde(:,t) = a(:,t) + PZI*v(di,t);
-        K(:,di,t)    = T*PZI;
-        L(:,:,t)    = T-K(:,di,t)*ZZ;
-        P(:,:,t+1)  = T*P(:,:,t)*L(:,:,t)' + QQ;
+        PZI         = P(:,:,t)*ZZ'*iF(di,di,t);                             %auxiliary variable      
+        atilde(:,t) = a(:,t) + PZI*v(di,t);                                 %DK (2012), (4.24)
+        K(:,di,t)    = T*PZI;                                               %DK (2012), below (4.24)
+        L(:,:,t)    = T-K(:,di,t)*ZZ;                                       %DK (2012), equal to bracket in P_{t+1} in (4.24)
+        P(:,:,t+1)  = T*P(:,:,t)*L(:,:,t)' + QQ;                            %DK (2012), (4.24)
     end
     if smoother_redux
         ri=zeros(mm,1);
-        for st=t:-1:max(d+1,t-1)
+        for st=t:-1:max(d+1,t-1) %use smoother recursions backwards in time from t to t-1 to get objects required for smoother_redux
             di = data_index{st};
             if isempty(di)
                 % in this case, L is simply T due to Z=0, so that DK (2012), eq. 4.93 obtains
-                ri = L(:,:,t)'*ri;                                        %compute r_{t-1}, DK (2012), eq. 4.38 with Z=0
+                ri = L(:,:,t)'*ri;                                           %compute r_{t-1}, DK (2012), eq. 4.38 with Z=0
             else
                 ZZ = Z(di,:);
                 ri = ZZ'*iF(di,di,st)*v(di,st) + L(:,:,st)'*ri;              %compute r_{t-1}, DK (2012), eq. 4.38
             end
             if st==t-1
-                % get states in t-1|t
-                aalphahat(:,st)       = a(:,st) + P(:,:,st)*ri;                         %DK (2012), eq. 4.35
+                % get "smoothed" state in t-1|t, i.e. \hat \alpha_{t-1}=E(alpha_t-1|Y_t)
+                aalphahat(:,st)       = a(:,st) + P(:,:,st)*ri;                       %DK (2012), eq. 4.39
             else
                 % get shocks in t|t
                 eetahat(:,st) = QRt*ri;                                               %DK (2012), eq. 4.63
             end
         end
         if t==1
-            ri = T'*ri;                                        %compute r_{t-1}, DK (2012), eq. 4.38 with Z=0
+            ri = T'*ri;                                             %compute r_{t-1}, DK (2012), eq. 4.38 with Z=0
             aalphahat0       = P(:,:,1)*ri;                         %DK (2012), eq. 4.35
         end
     end
@@ -298,31 +291,8 @@ while notsteady && t<smpl
             aK(jnk,:,t+jnk) = T*dynare_squeeze(aK(jnk-1,:,t+jnk-1));
         end
     end
-    %    notsteady   = ~(max(max(abs(P(:,:,t+1)-P(:,:,t))))<kalman_tol);
 end
 
-% $$$ if t<smpl
-% $$$     PZI_s = PZI;
-% $$$     K_s = K(:,:,t);
-% $$$     iF_s = iF(:,:,t);
-% $$$     P_s = P(:,:,t+1);
-% $$$     P  = cat(3,P(:,:,1:t),repmat(P_s,[1 1 smpl-t]));
-% $$$     iF = cat(3,iF(:,:,1:t),repmat(iF_s,[1 1 smpl-t]));
-% $$$     L  = cat(3,L(:,:,1:t),repmat(T-K_s*Z,[1 1 smpl-t]));
-% $$$     K  = cat(3,K(:,:,1:t),repmat(T*P_s*Z'*iF_s,[1 1 smpl-t]));
-% $$$ end
-% $$$ while t<smpl
-% $$$     t=t+1;
-% $$$     v(:,t) = Y(:,t) - Z*a(:,t);
-% $$$     atilde(:,t) = a(:,t) + PZI*v(:,t);
-% $$$     a(:,t+1) = T*atilde(:,t);
-% $$$     Pf          = P(:,:,t);
-% $$$     for jnk=1:nk,
-% $$$   Pf = T*Pf*T' + QQ;
-% $$$         aK(jnk,:,t+jnk) = T^jnk*atilde(:,t);
-% $$$   PK(jnk,:,:,t+jnk) = Pf;
-% $$$     end
-% $$$ end
 %% backward pass; r_T and N_T, stored in entry (smpl+1) were initialized at 0
 t = smpl+1;
 while t>d+1
