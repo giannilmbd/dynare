@@ -101,11 +101,11 @@ else
     prct0=0;
 end
 if strcmpi(type,'posterior')
-    h = dyn_waitbar(prct0,'Bayesian (posterior) IRFs...');
+    h = waitbar.run(prct0,'Bayesian (posterior) IRFs...');
 elseif strcmpi(type,'gsa')
-    h = dyn_waitbar(prct0,'GSA (prior) IRFs...');
+    h = waitbar.run(prct0,'GSA (prior) IRFs...');
 else
-    h = dyn_waitbar(prct0,'Bayesian (prior) IRFs...');
+    h = waitbar.run(prct0,'Bayesian (prior) IRFs...');
 end
 
 OutputFileName_bvardsge = {};
@@ -273,10 +273,10 @@ while fpar<B
         ifil2 = ifil2 + 1;
         irun2 = 0;
     end
-    dyn_waitbar((fpar-fpar0)/(B-fpar0),h);
+    waitbar.run((fpar-fpar0)/(B-fpar0),h);
 end
 
-dyn_waitbar_close(h);
+waitbar.close(h);
 
 if whoiam==0
     if nosaddle

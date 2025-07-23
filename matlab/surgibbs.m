@@ -106,12 +106,12 @@ if ~options_.noprint
     disp('surgibbs: estimating, please wait...')
 end
 
-hh_fig = dyn_waitbar(0,'Please wait. Gibbs sampler...');
+hh_fig = waitbar.run(0,'Please wait. Gibbs sampler...');
 set(hh_fig,'Name','Surgibbs estimation.');
 residdraws = zeros(floor((ndraws-discarddraws)/thin), nobs, m);
 for i = 1:ndraws
     if ~mod(i,100)
-        dyn_waitbar(i/ndraws,hh_fig,'Please wait. Gibbs sampler...');
+        waitbar.run(i/ndraws,hh_fig,'Please wait. Gibbs sampler...');
     end
     % Draw Omega, given X, Y, Beta
     resid = reshape(Y - X*beta, nobs, m);
@@ -135,7 +135,7 @@ for i = 1:ndraws
         end
     end
 end
-dyn_waitbar_close(hh_fig);
+waitbar.close(hh_fig);
 
 %
 % Save results.

@@ -59,7 +59,7 @@ tittxt1=strrep(tittxt1, '.', '');
 cosnJ = zeros(totparam_nbr,max_dim_cova_group); %initialize
 pars{totparam_nbr,max_dim_cova_group}=[];       %initialize
 for ll = 1:max_dim_cova_group
-    h = dyn_waitbar(0,['Brute force collinearity for ' int2str(ll) ' parameters.']);
+    h = waitbar.run(0,['Brute force collinearity for ' int2str(ll) ' parameters.']);
     for ii = 1:totparam_nbr
         tmp = find([1:totparam_nbr]~=ii);
         tmp2  = nchoosek(tmp,ll); %find all possible combinations, ind16 could speed this up
@@ -81,9 +81,9 @@ for ll = 1:max_dim_cova_group
         else
             pars{ii,ll} = NaN(1,ll);
         end
-        dyn_waitbar(ii/totparam_nbr,h)
+        waitbar.run(ii/totparam_nbr,h)
     end
-    dyn_waitbar_close(h);
+    waitbar.close(h);
     if TeX
         filename = [OutputDirectoryName '/' fname '_collin_patterns_',tittxt1,'_' int2str(ll) '.tex'];
         fidTeX = fopen(filename,'w');

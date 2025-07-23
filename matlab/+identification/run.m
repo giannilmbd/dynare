@@ -37,8 +37,8 @@ function [pdraws, STO_REDUCEDFORM, STO_MOMENTS, STO_DYNAMIC, STO_si_dDYNAMIC, ST
 % This function calls
 %    * checkpath
 %    * identification.display
-%    * dyn_waitbar
-%    * dyn_waitbar_close
+%    * waitbar.run
+%    * waitbar.close
 %    * get_all_parameters
 %    * get_posterior_parameters
 %    * get_the_name
@@ -533,7 +533,7 @@ if iload <=0
     if SampleSize > 1
         % initializations for Monte Carlo Analysis
         fprintf('\nMonte Carlo Testing\n');
-        h = dyn_waitbar(0,'Monte Carlo identification checks ...');
+        h = waitbar.run(0,'Monte Carlo identification checks ...');
         iteration  = 0; % initialize counter for admissable draws
         run_index  = 0; % initialize counter for admissable draws after saving previous draws to file(s)
         file_index = 0; % initialize counter for files (if options_.MaxNumberOfBytes is reached, we store results in files)
@@ -747,13 +747,13 @@ if iload <=0
                 run_index = 0; % reset index
             end
             if SampleSize > 1 && mod(iteration,3)
-                dyn_waitbar(iteration/SampleSize, h, ['MC identification checks ', int2str(iteration), '/', int2str(SampleSize)]);
+                waitbar.run(iteration/SampleSize, h, ['MC identification checks ', int2str(iteration), '/', int2str(SampleSize)]);
             end
         end
     end
 
     if SampleSize > 1
-        dyn_waitbar_close(h);
+        waitbar.close(h);
         normalize_STO_DYNAMIC = std(STO_DYNAMIC,0,2);
         if ~options_MC.no_identification_reducedform
             normalize_STO_REDUCEDFORM = std(STO_REDUCEDFORM,0,2);

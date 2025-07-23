@@ -34,7 +34,7 @@ mm=zeros(length(indx),replic);
 disp('Evaluating simulated moment uncertainty ... please wait')
 disp(['Doing ',int2str(replic),' replicas of length ',int2str(periods),' periods.'])
 
-h = dyn_waitbar(0,'Simulated moment uncertainty ...');
+h = waitbar.run(0,'Simulated moment uncertainty ...');
 %Do check whether simulation is possible
 if options_.periods == 0
     error('simulated_moment_uncertainty: Periods must be bigger than 0')
@@ -96,9 +96,9 @@ for j=1:replic
         dum=[dum; vec(oo_.autocorr{i}.*(sd*sd'))];
     end
     mm(:,j)=dum(indx);
-    dyn_waitbar(j/replic,h,['Simulated moment uncertainty. Replic  ',int2str(j),'/',int2str(replic)])
+    waitbar.run(j/replic,h,['Simulated moment uncertainty. Replic  ',int2str(j),'/',int2str(replic)])
 end
-dyn_waitbar_close(h);
+waitbar.close(h);
 
 cmm = cov(mm');
 disp('Simulated moment uncertainty ... done!')

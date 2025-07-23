@@ -73,7 +73,7 @@ end
 
 if whoiam
     prct0={0,whoiam,Parallel(ThisMatlab)};
-    h = dyn_waitbar(prct0,'Parallel plots pm3 ...');
+    h = waitbar.run(prct0,'Parallel plots pm3 ...');
 end
 
 figunumber = 0;
@@ -137,11 +137,11 @@ for i=fpar:nvar
     end
 
     if whoiam
-        dyn_waitbar((i-fpar+1)/(nvar-fpar+1),h);
+        waitbar.run((i-fpar+1)/(nvar-fpar+1),h);
     end
 end
 
 if whoiam
-    dyn_waitbar_close(h);
+    waitbar.close(h);
 end
 myoutput.OutputFileName=OutputFileName;

@@ -92,7 +92,7 @@ if whoiam
         RemoteFlag =1;
     end
     prct0={0,whoiam,Parallel(ThisMatlab)};
-    dyn_waitbar(prct0,'PosteriorIRF Plots ...');
+    waitbar.run(prct0,'PosteriorIRF Plots ...');
 end
 
 OutputFileName={};
@@ -165,7 +165,7 @@ for i=fpar:npar
     if whoiam
         fprintf('Done! \n');
         waitbarString = [ 'Exog. shocks ' int2str(i) '/' int2str(npar) ' done.'];
-        dyn_waitbar((i-fpar+1)/(npar-fpar+1),[],waitbarString);
+        waitbar.run((i-fpar+1)/(npar-fpar+1),[],waitbarString);
     end
 end % loop over exo_var
 

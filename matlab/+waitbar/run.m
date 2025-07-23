@@ -1,5 +1,5 @@
-function h = dyn_waitbar(prctdone, varargin)
-% h = dyn_waitbar(prctdone, varargin)
+function h = run(prctdone, varargin)
+% h = waitbar(prctdone, varargin)
 % adaptive waitbar, producing console mode waitbars with
 % octave and when console_mode=1
 

@@ -33,7 +33,7 @@ function [vdec, cc, ac] = monte_carlo_moments(mm, ss, dr, M_, options_, estim_pa
 [~, nc1, nsam] = size(mm);
 nobs=length(options_.varobs);
 disp('monte_carlo_moments: Computing theoretical moments ...')
-h = dyn_waitbar(0,'Theoretical moments ...');
+h = waitbar.run(0,'Theoretical moments ...');
 vdec = zeros(nobs,M_.exo_nbr,nsam);
 cc = zeros(nobs,nobs,nsam);
 ac = zeros(nobs,nobs*options_.ar,nsam);
@@ -52,9 +52,9 @@ for j=1:nsam
     end
     ac(:,:,j)=dum;
     if mod(j,3)==0
-        dyn_waitbar(j/nsam,h)
+        waitbar.run(j/nsam,h)
     end
 end
-dyn_waitbar_close(h)
+waitbar.close(h)
 skipline()
 disp('... done !')

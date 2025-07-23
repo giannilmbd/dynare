@@ -105,7 +105,7 @@ if init
     end
 
     irestrictions = 1:Nsam;
-    h = dyn_waitbar(0,'Please wait...');
+    h = waitbar.run(0,'Please wait...');
     for j=1:Nsam
         M_ = set_all_parameters(lpmat(j,:)',estim_params_,M_);
         if nbr_moment_restrictions
@@ -131,10 +131,10 @@ if init
             irestrictions(j)=0;
         end
         if mod(j,3)==0
-            dyn_waitbar(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)])
+            waitbar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)])
         end
     end
-    dyn_waitbar_close(h);
+    waitbar.close(h);
 
     irestrictions=irestrictions(find(irestrictions));
     xmat=lpmat(irestrictions,:);
