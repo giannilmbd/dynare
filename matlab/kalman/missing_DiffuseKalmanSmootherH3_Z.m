@@ -1,5 +1,5 @@
 function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,alphahat0,aalphahat0,V0,varargout] = missing_DiffuseKalmanSmootherH3_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag, filter_covariance_flag, smoother_redux, occbin_)
-% function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d] = missing_DiffuseKalmanSmootherH3_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag, filter_covariance_flag, smoother_redux, occbin_)
+% [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,alphahat0,aalphahat0,V0,varargout] = missing_DiffuseKalmanSmootherH3_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag, filter_covariance_flag, smoother_redux, occbin_)
 % Computes the diffuse Kalman smoother in the case of a singular var-cov matrix.
 % Univariate treatment of multivariate time series.
 %
@@ -27,6 +27,7 @@ function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,al
 %    filter_covariance_flag:    if true, compute filter covariance
 %    smoother_redux:            if true, compute smoother on restricted
 %                               state space, recover static variables from this
+%    occbin_:   structure for passing OccBin related inputs
 %
 % OUTPUTS
 %    alphahat: smoothed state variables (a_{t|T})
@@ -44,6 +45,18 @@ function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,al
 %    aalphahat:     filtered states in t-1|t
 %    eetahat:       updated shocks in t|t
 %    d:             number of diffuse periods
+%    alphahat0:     smoothed state in t_0|T
+%    aalphahat0:    E(alpha_0|Y_1)
+%    V0:            initial state uncertainty
+%    varargout:     additional OccBin outputs
+%       varargout{1} = regimes_;
+%       varargout{2} = TTT;
+%       varargout{3} = RRR;
+%       varargout{4} = CCC;
+%       varargout{5} = TT;
+%       varargout{6} = RR;
+%       varargout{7} = CC;
+
 %
 % Notes:
 %   Outputs are stored in decision-rule order, i.e. to get variables in order of declaration
@@ -56,7 +69,7 @@ function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,al
 %   Series Analysis by State Space Methods", Oxford University Press,
 %   Second Edition, Ch. 6.4 + 7.2.5
 %   and
-%   Koopman/Durbin (2000): "Fast Filtering and Smoothing for Multivariatze State Space
+%   Koopman/Durbin (2000): "Fast Filtering and Smoothing for Multivariate State Space
 %   Models", in Journal of Time Series Analysis, vol. 21(3), pp. 281-296.
 %
 % SPECIAL REQUIREMENTS
@@ -64,7 +77,7 @@ function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,al
 %   Models", S.J. Koopman and J. Durbin (2003), in Journal of Time Series
 %   Analysis, vol. 24(1), pp. 85-98.
 
-% Copyright © 2004-2023 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -81,12 +94,8 @@ function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,al
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-% Modified by M. Ratto
-% New output argument aK: 1-step to nk-stpe ahed predictions)
-% New input argument nk: max order of predictions in aK
-
 if size(H,2)>1
-    error('missing_DiffuseKalmanSmootherH3_Z:: H is not a vector. This must not happens')
+    error('missing_DiffuseKalmanSmootherH3_Z:: H is not a vector. This must not happen. Please contact the developers.')
 end
 
 d = 0;
@@ -258,7 +267,6 @@ if newRank
         T = TT(:,:,1);
         C = CC(:,1);
         a1(:,1) = T*a(:,1)+C;                                                 %transition according to (6.14) in DK (2012)
-%         Pinf(:,:,1)   = T*Pinf(:,:,1)*T';
     end
     Pstar(:,:,1)  = T*Pstar(:,:,1)*T' + QQ;
 end
@@ -367,8 +375,7 @@ Pstar = Pstar(:,:,1:d);
 Pinf  = Pinf(:,:,1:d);
 Pstar1 = Pstar1(:,:,1:d);
 Pinf1  = Pinf1(:,:,1:d);
-notsteady = 1;
-while notsteady && t<smpl
+while t<smpl
     t = t+1;
     if t==1
         Pinit = P(:,:,1);
@@ -401,15 +408,13 @@ while notsteady && t<smpl
             RR01 = cat(3,R,RR(:,:,1));
             CC01 = zeros(size(CC,1),2);
             CC01(:,2) = CC(:,1);
-    %        [ax, a1x, Px, P1x, vx, Fix, Kix, Tx, Rx, Cx, tmp, error_flag, M_, aha, etaha,TTx,RRx,CCx] = occbin.kalman_update_algo_3(a0,a10,P0,P10,data_index0,Z,v0,Fi0,Ki0,Y0,H,Qt,T0,R0,TT01,RR01,CC01,regimes_(t:t+1),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
-            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, likx, etaha, aha, V, Fix, Kix, TTx,RRx,CCx] = occbin.kalman_update_engine(a0, a10, P0, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
+            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, ~, etaha, aha, V, Fix, Kix, TTx,RRx,CCx] = occbin.kalman_update_engine(a0, a10, P0, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
                 Fi0,Ki0,kalman_tol,nk);
         else
             if isqvec
                 Qt = Qvec(:,:,t-1:t+1);
             end
-     %       [ax, a1x, Px, P1x, vx, Fix, Kix, Tx, Rx, Cx, tmp, error_flag, M_, aha, etaha,TTx,RRx,CCx] = occbin.kalman_update_algo_3(a(:,t-1),a1(:,t-1:t),P(:,:,t-1),P1(:,:,t-1:t),data_index(t-1:t),Z,v(:,t-1:t),Fi(:,t-1),Ki(:,:,t-1),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
-            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, likx, etaha, aha, V, Fix, Kix,TTx,RRx,CCx] = occbin.kalman_update_engine(a(:,t-1),a1(:,t-1:t),P(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,v(:,t-1:t), Y(:,t-1:t), H, Qt, T0, R0, TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t), regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
+            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, ~, etaha, aha, V, Fix, Kix,TTx,RRx,CCx] = occbin.kalman_update_engine(a(:,t-1),a1(:,t-1:t),P(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,v(:,t-1:t), Y(:,t-1:t), H, Qt, T0, R0, TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t), regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
                 Fi(:,t-1),Ki(:,:,t-1),kalman_tol,nk);
         end
         if ~error_flag
@@ -481,7 +486,7 @@ while notsteady && t<smpl
         end
         if smoother_redux
             ri=zeros(mm,1);
-            for st=t:-1:max(d+1,t-1)
+            for st=t:-1:max(d+1,t-1) %use smoother recursions backwards in time from t to t-1 to get objects required for smoother_redux, see missing_DiffuseKalmanSmootherH3_Z.m
                 di = flipud(data_index{st})';
                 for i = di
                     if Fi(i,st) > kalman_tol
@@ -589,37 +594,6 @@ varargout{4} = CCC;
 varargout{5} = TT;
 varargout{6} = RR;
 varargout{7} = CC;
-% $$$ P_s=tril(P(:,:,t))+tril(P(:,:,t),-1)';
-% $$$ P1_s=tril(P1(:,:,t))+tril(P1(:,:,t),-1)';
-% $$$ Fi_s = Fi(:,t);
-% $$$ Ki_s = Ki(:,:,t);
-% $$$ L_s  =Li(:,:,:,t);
-% $$$ if t<smpl
-% $$$   P  = cat(3,P(:,:,1:t),repmat(P_s,[1 1 smpl-t]));
-% $$$   P1  = cat(3,P1(:,:,1:t),repmat(P1_s,[1 1 smpl-t]));
-% $$$   Fi = cat(2,Fi(:,1:t),repmat(Fi_s,[1 1 smpl-t]));
-% $$$   Li  = cat(4,Li(:,:,:,1:t),repmat(L_s,[1 1 smpl-t]));
-% $$$   Ki  = cat(3,Ki(:,:,1:t),repmat(Ki_s,[1 1 smpl-t]));
-% $$$ end
-% $$$ while t<smpl
-% $$$   t=t+1;
-% $$$   a(:,t) = a1(:,t);
-% $$$   di = data_index{t}';
-% $$$   for i=di
-% $$$     Zi = Z(i,:);
-% $$$     v(i,t)      = Y(i,t) - Zi*a(:,t);
-% $$$     if Fi_s(i) > kalman_tol
-% $$$       a(:,t) = a(:,t) + Ki_s(:,i)*v(i,t)/Fi_s(i);
-% $$$     end
-% $$$   end
-% $$$   a1(:,t+1) = T*a(:,t);
-% $$$   Pf          = P(:,:,t);
-% $$$   for jnk=1:nk,
-% $$$       Pf = T*Pf*T' + QQ;
-% $$$       aK(jnk,:,t+jnk) = T^jnk*a(:,t);
-% $$$       PK(jnk,:,:,t+jnk) = Pf;
-% $$$   end
-% $$$ end
 
 %% do backward pass
 ri=zeros(mm,1);
