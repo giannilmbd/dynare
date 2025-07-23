@@ -11,7 +11,7 @@ function [ytrend,ycycle]=one_sided_hp_filter(y,lambda,x_user,P_user,discard)
 %                               Default: use backwards extrapolations
 %                               based on the first two observations
 %   P_user      [n*1] struct    structural array with n elements, each a two
-%                               2x2 matrix of intial MSE estimates for each
+%                               2x2 matrix of initial MSE estimates for each
 %                               variable in y.
 %                               Default: matrix with large variances
 %   discard     [scalar]        number of initial periods to be discarded
@@ -69,8 +69,9 @@ Q=[q,0;
    0,0];        % covariance matrix state equation errors
 R=1;            % variance observation equation error
 
+ytrend=NaN(T,n);
 for k=1:n %Run the Kalman filter for each variable
-    if nargin < 3 || isempty(x_user) %no intial value for state, extrapolate back two periods from the observations
+    if nargin < 3 || isempty(x_user) %no initial value for state, extrapolate back two periods from the observations
         x=[2*y(1,k)-y(2,k);
            3*y(1,k)-2*y(2,k)];
     else
