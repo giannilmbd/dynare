@@ -130,7 +130,8 @@ npar = size(param,1);
 lower_prob = (.5*(opts.alpha0+opts.alpha1))^5;
 upper_prob = (.5*(opts.alpha0+opts.alpha1))^(1/5);
 stop=0 ;
-while stop==0
+outer_iter=1;
+while stop==0 && outer_iter<200
     acpt = 0.0;
     indx_resmpl = kitagawa(weights,rand(1,1),opts.G);
     param0 = param(:,indx_resmpl);
@@ -138,8 +139,10 @@ while stop==0
     for j=1:opts.G
         for l=1:opts.K
             validate = 0;
-            while validate == 0
+            l_iter=1;
+            while validate == 0 && l_iter<200
                 candidate = param0(:,j) + sqrt(c)*Omegachol*randn(npar,1);
+                l_iter=l_iter+1;
                 if all(candidate >= mh_bounds.lb) && all(candidate <= mh_bounds.ub)
                     [tlogpostx,loglikx] = tempered_likelihood(funobj, candidate, lambda(i), Prior);
                     if isfinite(loglikx) % if returned log-density is not Inf or Nan (penalized value)
@@ -151,6 +154,9 @@ while stop==0
                         end
                     end
                 end
+            end
+            if l_iter==200
+                error('dsmh: Inner loop reached maximum of iterations.')
             end
         end
     end
@@ -170,6 +176,10 @@ while stop==0
         %                disp('Trying with c= ') ;
         %                disp(c)
     end
+    outer_iter=outer_iter+1;
+end
+if outer_iter==200
+    error('dsmh: Outer loop reached maximum of iterations.')
 end
 
 function [out_param,out_tlogpost_iminus1,out_loglik] = mutation_DSMH(funobj, param, tlogpost_i, tlogpost_iminus1, loglik, lambda, i, c, MM, Omegachol, weights, mh_bounds, opts, Prior)
