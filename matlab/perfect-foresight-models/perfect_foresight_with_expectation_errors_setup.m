@@ -7,7 +7,7 @@ function oo_=perfect_foresight_with_expectation_errors_setup(M_, options_, oo_)
 % OUTPUTS
 %   oo_                 [structure] storing the results
 
-% Copyright © 2021-2024 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -25,10 +25,10 @@ function oo_=perfect_foresight_with_expectation_errors_setup(M_, options_, oo_)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if ~isempty(M_.endo_histval)
-    error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with histval')
+    error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with histval or histval_file')
 end
 if ~isempty(oo_.initval_series)
-    error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with histval_file/initval_file')
+    error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with initval_file')
 end
 
 [periods, first_simulation_period] = get_simulation_periods(options_);
