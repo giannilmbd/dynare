@@ -66,6 +66,7 @@ var e, u = phi*0.009*0.009;
 end;
 
 stoch_simul;
+send_irfs_to_workspace;
 
 shocke = dseries();
 shocku = dseries();
