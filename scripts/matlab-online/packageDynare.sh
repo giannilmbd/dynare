@@ -22,7 +22,7 @@ cleanup ()
 trap cleanup EXIT
 
 pushd ../..
-meson setup -Dbuild_for=matlab -Dmatlab_path="$MATLABPATH" --buildtype=release --prefer-static "$tmpdir"/build-matlab-online
+meson setup -Dbuild_for=matlab -Dmatlab_path="$MATLABPATH" --buildtype=release -Db_lto=true --prefer-static "$tmpdir"/build-matlab-online
 
 cd "$tmpdir"/build-matlab-online
 meson compile -v
