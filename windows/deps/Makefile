@@ -21,8 +21,8 @@ ROOT_PATH = $(realpath .)
 
 WGET_OPTIONS := --no-verbose --no-use-server-timestamps --retry-connrefused --retry-on-host-error
 
-# See comments in scripts/windows-cross.ini
-FFLAGS := -O3 -march=nocona -msahf -mtune=generic
+# See comments in windows/mingw-cross.ini
+FFLAGS := -O3 -flto=auto -march=nocona -msahf -mtune=generic
 
 .PHONY: all build octave matlab msys2 \
 	build build-slicot build-x13as \
@@ -64,14 +64,12 @@ sources64/slicot-$(SLICOT_VERSION)-with-32bit-integer-and-underscore: tarballs/s
 	touch $@
 
 lib64/Slicot/without-underscore/libslicot64_pic.a: sources64/slicot-$(SLICOT_VERSION)-with-64bit-integer
-	make -C $< -f makefile_Unix lib SLICOTLIB=../libslicot64_pic.a OPTS="$(FFLAGS) -fno-underscoring -fdefault-integer-8" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-ar
-	x86_64-w64-mingw32-strip --strip-debug $</libslicot64_pic.a
+	make -C $< -f makefile_Unix lib SLICOTLIB=../libslicot64_pic.a OPTS="$(FFLAGS) -fno-underscoring -fdefault-integer-8" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-gcc-ar
 	mkdir -p $(dir $@)
 	cp $</libslicot64_pic.a $@
 
 lib64/Slicot/with-underscore/libslicot_pic.a: sources64/slicot-$(SLICOT_VERSION)-with-32bit-integer-and-underscore
-	make -C $< -f makefile_Unix lib SLICOTLIB=../libslicot_pic.a OPTS="$(FFLAGS)" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-ar
-	x86_64-w64-mingw32-strip --strip-debug $</libslicot_pic.a
+	make -C $< -f makefile_Unix lib SLICOTLIB=../libslicot_pic.a OPTS="$(FFLAGS)" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-gcc-ar
 	mkdir -p $(dir $@)
 	cp $</libslicot_pic.a $@
 

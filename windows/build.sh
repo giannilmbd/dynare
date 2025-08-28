@@ -53,7 +53,7 @@ ln -s "$ROOT_DIRECTORY"/deps/mkoctfile64 /tmp/windeps/
 # Go to source root directory
 cd ..
 
-common_meson_opts=(--buildtype=release --cross-file windows/mingw-cross.ini)
+common_meson_opts=(--buildtype=release -Db_lto=true --cross-file windows/mingw-cross.ini)
 
 # Create Windows 64-bit DLL binaries for MATLAB ≥ R2020a
 meson setup --cross-file windows/mingw-cross-matlab.ini -Dmatlab_path=/tmp/windeps/matlab64/R2020a \
