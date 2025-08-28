@@ -1,10 +1,9 @@
-function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(fh, y, x, steady_state, T, Block_Num, cutoff, options_, M_)
+function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(y, x, steady_state, T, Block_Num, cutoff, options_, M_)
 % Computes the deterministic simulation of a block of equations containing
 % both lead and lag variables, using a Newton method over the stacked Jacobian
 % (in particular, this excludes LBJ).
 %
 % INPUTS
-%   fh                  [handle]        function handle to the dynamic file for the block
 %   y                   [matrix]        All the endogenous variables of the model
 %   x                   [matrix]        All the exogenous variables of the model
 %   steady_state        [vector]        steady state of the model
@@ -42,6 +41,8 @@ function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(fh, y, x,
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+assert(~options_.bytecode);
+
 Blck_size = M_.block_structure.block(Block_Num).mfs;
 y_index = M_.block_structure.block(Block_Num).variable(end-Blck_size+1:end);
 periods = get_simulation_periods(options_);
@@ -54,38 +55,30 @@ end
 
 verbose = options_.verbosity;
 
+ny = size(y, 1);
+if M_.maximum_lag > 0
+    y0 = y(:,M_.maximum_lag);
+else
+    y0 = NaN(ny, 1);
+end
+if M_.maximum_lead > 0
+    yT = y(:,M_.maximum_lag+periods+1);
+else
+    yT = NaN(ny, 1);
+end
+yy = y(:,M_.maximum_lag+(1:periods));
+
 cvg=false;
 iter=0;
 correcting_factor=0.01;
 max_resa=1e100;
 lambda = 1; % Length of Newton step (unused for stack_solve_algo=4)
 while ~(cvg || iter > options_.simul.maxit)
-    r = NaN(Blck_size, periods);
-    g1a = spalloc(Blck_size*periods, Blck_size*periods, M_.block_structure.block(Block_Num).NNZDerivatives*periods);
-    for it_ = y_kmin+(1:periods)
-        [yy, T(:, it_), r(:, it_-y_kmin), g1]=fh(dynendo(y, it_, M_), x(it_, :), M_.params, steady_state, ...
-                                                 M_.block_structure.block(Block_Num).g1_sparse_rowval, ...
-                                                 M_.block_structure.block(Block_Num).g1_sparse_colval, ...
-                                                 M_.block_structure.block(Block_Num).g1_sparse_colptr, T(:, it_));
-        y(:, it_) = yy(M_.endo_nbr+(1:M_.endo_nbr));
-        if periods == 1
-            g1a = g1(:, Blck_size+(1:Blck_size));
-        elseif it_ == y_kmin+1
-            g1a(1:Blck_size, 1:Blck_size*2) = g1(:, Blck_size+1:end);
-        elseif it_ == y_kmin+periods
-            g1a((periods-1)*Blck_size+1:end, (periods-2)*Blck_size+1:end) = g1(:, 1:2*Blck_size);
-        else
-            g1a((it_-y_kmin-1)*Blck_size+(1:Blck_size), (it_-y_kmin-2)*Blck_size+(1:3*Blck_size)) = g1;
-        end
-    end
-    ya = reshape(y(y_index, y_kmin+(1:periods)), 1, periods*Blck_size)';
-    ra = reshape(r, periods*Blck_size, 1);
+    [yy, T, ra, g1a] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
+    ya = reshape(yy(y_index,1:periods), 1, periods*Blck_size)';
     b=-ra+g1a*ya;
-    [max_res, max_indx]=max(max(abs(r')));
-    if ~isreal(r)
-        max_res = (-max_res^2)^0.5;
-    end
-    if ~isreal(max_res) || isnan(max_res)
+    max_res=max(max(abs(ra)));
+    if isnan(max_res) || any(any(isnan(g1a)))
         cvg = false;
     elseif M_.block_structure.block(Block_Num).is_linear && iter>0
         cvg = true;
@@ -94,40 +87,36 @@ while ~(cvg || iter > options_.simul.maxit)
     end
     if ~cvg
         if iter>0
-            if ~isreal(max_res) || isnan(max_res) %|| (max_resa<max_res && iter>1)
-                if verbose && ~isreal(max_res)
-                    disp(['Variable ' M_.endo_names{max_indx} ' (' int2str(max_indx) ') returns an undefined value']);
-                end
-                if isnan(max_res)
-                    detJ=det(g1aa);
-                    if abs(detJ)<1e-7
-                        max_factor=max(max(abs(g1aa)));
-                        ze_elem=sum(diag(g1aa)<cutoff);
+            if isnan(max_res) || any(any(isnan(g1a)))
+                detJ=det(g1aa);
+                if abs(detJ)<1e-7
+                    max_factor=max(max(abs(g1aa)));
+                    ze_elem=sum(diag(g1aa)<cutoff);
+                    if verbose
+                        disp([num2str(full(ze_elem),'%d') ' elements on the Jacobian diagonal are below the cutoff (' num2str(cutoff,'%f') ')']);
+                    end
+                    if correcting_factor<max_factor
+                        correcting_factor=correcting_factor*4;
                         if verbose
-                            disp([num2str(full(ze_elem),'%d') ' elements on the Jacobian diagonal are below the cutoff (' num2str(cutoff,'%f') ')']);
+                            disp(['The Jacobian matrix is singular, det(Jacobian)=' num2str(detJ,'%f') '.']);
+                            disp('    trying to correct the Jacobian matrix:');
+                            disp(['    correcting_factor=' num2str(correcting_factor,'%f') ' max(Jacobian)=' num2str(full(max_factor),'%f')]);
                         end
-                        if correcting_factor<max_factor
-                            correcting_factor=correcting_factor*4;
-                            if verbose
-                                disp(['The Jacobian matrix is singular, det(Jacobian)=' num2str(detJ,'%f') '.']);
-                                disp('    trying to correct the Jacobian matrix:');
-                                disp(['    correcting_factor=' num2str(correcting_factor,'%f') ' max(Jacobian)=' num2str(full(max_factor),'%f')]);
-                            end
-                            dx = (g1aa+correcting_factor*speye(periods*Blck_size))\ba- ya_save;
-                            y(y_index, y_kmin+(1:periods))=reshape((ya_save+lambda*dx)',length(y_index),periods);
-                            continue
-                        else
-                            disp('The singularity of the Jacobian matrix could not be corrected');
-                            success = false;
-                            return
-                        end
+                        dx = (g1aa+correcting_factor*speye(periods*Blck_size))\ba- ya_save;
+                        yy(y_index,1:periods)=reshape((ya_save+lambda*dx)', length(y_index), periods);
+                        continue
+                    else
+                        disp('The singularity of the Jacobian matrix could not be corrected');
+                        y(:,y_kmin+(1:periods)) = yy;
+                        success = false;
+                        return
                     end
                 elseif lambda>1e-8 && stack_solve_algo ~= 4
                     lambda=lambda/2;
                     if verbose
                         disp(['reducing the path length: lambda=' num2str(lambda,'%f')]);
                     end
-                    y(y_index, y_kmin+(1:periods))=reshape((ya_save+lambda*dx)',length(y_index),periods);
+                    yy(y_index,1:periods)=reshape((ya_save+lambda*dx)', length(y_index), periods);
                     continue
                 else
                     if verbose
@@ -137,6 +126,7 @@ while ~(cvg || iter > options_.simul.maxit)
                             fprintf('Convergence not achieved in block %d, after %d iterations.\n Increase "maxit" or set "cutoff=0" in model options.\n',Block_Num, iter);
                         end
                     end
+                    y(:,y_kmin+(1:periods)) = yy;
                     success = false;
                     return
                 end
@@ -154,7 +144,7 @@ while ~(cvg || iter > options_.simul.maxit)
                                    && options_.simul.iterstack_nperiods == 0 && options_.simul.iterstack_nlu == 0 && size(g1a, 1) < options_.simul.iterstack_maxlu) % Fallback to LU if block too small for iterstack
             dx = g1a\b- ya;
             ya = ya + lambda*dx;
-            y(y_index, y_kmin+(1:periods))=reshape(ya',length(y_index),periods);
+            yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
         elseif ismember(stack_solve_algo, [2, 3])
             if strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0
                 [L, U, P, Q] = lu(g1a);
@@ -177,7 +167,7 @@ while ~(cvg || iter > options_.simul.maxit)
             end
             dx = Q*zb - ya;
             ya = ya + lambda*dx;
-            y(y_index, y_kmin+(1:periods))=reshape(ya',length(y_index),periods);
+            yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
         elseif stack_solve_algo==4
             stpmx = 100 ;
             stpmax = stpmx*max([sqrt(ya'*ya);size(y_index,2)]);
@@ -185,9 +175,9 @@ while ~(cvg || iter > options_.simul.maxit)
             g = (ra'*g1a)';
             f = 0.5*ra'*ra;
             p = -g1a\ra;
-            yn = lnsrch1(ya,f,g,p,stpmax,@lnsrch1_wrapper_two_boundaries,nn,nn, options_.solve_tolx, fh, Block_Num, y, y_index,x, M_.params, steady_state, T, periods, Blck_size, M_);
+            yn = lnsrch1(ya,f,g,p,stpmax,@lnsrch1_wrapper_two_boundaries,nn,nn, options_.solve_tolx, y_index, Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
             dx = ya - yn;
-            y(y_index, y_kmin+(1:periods))=reshape(yn',length(y_index),periods);
+            yy(y_index,1:periods)=reshape(yn', length(y_index), periods);
         end
     end
     iter=iter+1;
@@ -195,6 +185,8 @@ while ~(cvg || iter > options_.simul.maxit)
         disp(['iteration: ' num2str(iter,'%d') ' error: ' num2str(max_res,'%e')]);
     end
 end
+
+y(:,y_kmin+(1:periods)) = yy;
 
 if iter > options_.simul.maxit
     if verbose
@@ -211,11 +203,7 @@ success = true;
 function y3n = dynendo(y, it_, M_)
     y3n = reshape(y(:, it_+(-1:1)), 3*M_.endo_nbr, 1);
 
-function ra = lnsrch1_wrapper_two_boundaries(ya, fh, Block_Num, y, y_index, x, ...
-                                             params, steady_state, T, periods, ...
-                                             y_size, M_)
-    y(y_index, M_.maximum_lag+(1:periods)) = reshape(ya',length(y_index),periods);
-    ra = NaN(periods*y_size, 1);
-    for it_ = M_.maximum_lag+(1:periods)
-        [~, ~, ra((it_-M_.maximum_lag-1)*y_size+(1:y_size)), g1] = fh(dynendo(y, it_, M_), x(it_, :), params, steady_state, M_.block_structure.block(Block_Num).g1_sparse_rowval, M_.block_structure.block(Block_Num).g1_sparse_colval, M_.block_structure.block(Block_Num).g1_sparse_colptr, T(:, it_));
-    end
+function ra = lnsrch1_wrapper_two_boundaries(ya, y_index, Block_Num, yy, y0, yT, x, ...
+                                             params, steady_state, T, periods, M_, options_)
+    yy(y_index,1:periods) = reshape(ya', length(y_index), periods);
+    [~, ~, ra] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, params, steady_state, T, periods, M_, options_);

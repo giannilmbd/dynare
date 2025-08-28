@@ -29,18 +29,6 @@ std::string DynamicModelCaller::error_msg;
 std::string DynamicModelCaller::error_id;
 std::mutex DynamicModelCaller::error_mtx;
 
-#if !defined(_WIN32) && !defined(__CYGWIN32__)
-void* DynamicModelDllCaller::resid_mex {nullptr};
-void* DynamicModelDllCaller::g1_mex {nullptr};
-#else
-HINSTANCE DynamicModelDllCaller::resid_mex {nullptr};
-HINSTANCE DynamicModelDllCaller::g1_mex {nullptr};
-#endif
-DynamicModelDllCaller::dynamic_tt_fct DynamicModelDllCaller::residual_tt_fct {nullptr},
-    DynamicModelDllCaller::g1_tt_fct {nullptr};
-DynamicModelDllCaller::dynamic_fct DynamicModelDllCaller::residual_fct {nullptr},
-    DynamicModelDllCaller::g1_fct {nullptr};
-
 void
 DynamicModelCaller::setErrMsg(std::string msg)
 {
@@ -79,55 +67,6 @@ DynamicModelCaller::setMException(const mxArray* exception)
   mxFree(identifier);
 }
 
-void
-DynamicModelDllCaller::load_dll(const std::string& basename)
-{
-  // Load symbols from dynamic MEX
-  const std::filesystem::path sparse_dir {"+" + basename + "/+sparse/"};
-  const std::filesystem::path resid_mex_name {sparse_dir / ("dynamic_resid"s + MEXEXT)},
-      g1_mex_name {sparse_dir / ("dynamic_g1"s + MEXEXT)};
-#if !defined(__CYGWIN32__) && !defined(_WIN32)
-  resid_mex = dlopen(resid_mex_name.c_str(), RTLD_NOW);
-  g1_mex = dlopen(g1_mex_name.c_str(), RTLD_NOW);
-#else
-  resid_mex = LoadLibraryW(resid_mex_name.c_str());
-  g1_mex = LoadLibraryW(g1_mex_name.c_str());
-#endif
-  if (!resid_mex)
-    mexErrMsgTxt("Can't load dynamic_resid MEX file");
-  if (!g1_mex)
-    mexErrMsgTxt("Can't load dynamic_g1 MEX file");
-
-#if !defined(__CYGWIN32__) && !defined(_WIN32)
-  residual_tt_fct = reinterpret_cast<dynamic_tt_fct>(dlsym(resid_mex, "dynamic_resid_tt"));
-  residual_fct = reinterpret_cast<dynamic_fct>(dlsym(resid_mex, "dynamic_resid"));
-  g1_tt_fct = reinterpret_cast<dynamic_tt_fct>(dlsym(g1_mex, "dynamic_g1_tt"));
-  g1_fct = reinterpret_cast<dynamic_fct>(dlsym(g1_mex, "dynamic_g1"));
-#else
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wcast-function-type"
-  residual_tt_fct = reinterpret_cast<dynamic_tt_fct>(GetProcAddress(resid_mex, "dynamic_resid_tt"));
-  residual_fct = reinterpret_cast<dynamic_fct>(GetProcAddress(resid_mex, "dynamic_resid"));
-  g1_tt_fct = reinterpret_cast<dynamic_tt_fct>(GetProcAddress(g1_mex, "dynamic_g1_tt"));
-  g1_fct = reinterpret_cast<dynamic_fct>(GetProcAddress(g1_mex, "dynamic_g1"));
-# pragma GCC diagnostic pop
-#endif
-  if (!residual_tt_fct || !residual_fct || !g1_tt_fct || !g1_fct)
-    mexErrMsgTxt("Can't load functions in dynamic MEX file");
-}
-
-void
-DynamicModelDllCaller::unload_dll()
-{
-#if !defined(__CYGWIN32__) && !defined(_WIN32)
-  dlclose(resid_mex);
-  dlclose(g1_mex);
-#else
-  FreeLibrary(resid_mex);
-  FreeLibrary(g1_mex);
-#endif
-}
-
 DynamicModelDllCaller::DynamicModelDllCaller(size_t ntt, mwIndex ny, mwIndex nx,
                                              const double* params_arg,
                                              const double* steady_state_arg,
@@ -141,8 +80,6 @@ DynamicModelDllCaller::DynamicModelDllCaller(size_t ntt, mwIndex ny, mwIndex nx,
   tt.resize(ntt);
   y_p.resize(3 * ny);
   x_p.resize(nx);
-  if (compute_jacobian)
-    jacobian_p.resize(g1_sparse_colptr[3 * ny + nx] - 1);
 }
 
 void
@@ -150,21 +87,6 @@ DynamicModelDllCaller::copy_jacobian_column(mwIndex col, double* dest) const
 {
   std::ranges::copy_n(jacobian_p.data() + g1_sparse_colptr[col] - 1,
                       g1_sparse_colptr[col + 1] - g1_sparse_colptr[col], dest);
-}
-
-void
-DynamicModelDllCaller::eval(double* resid)
-{
-  residual_tt_fct(y_p.data(), x_p.data(), params, steady_state, tt.data());
-  residual_fct(y_p.data(), x_p.data(), params, steady_state, tt.data(), resid);
-  if (compute_jacobian)
-    {
-      g1_tt_fct(y_p.data(), x_p.data(), params, steady_state, tt.data());
-      g1_fct(y_p.data(), x_p.data(), params, steady_state, tt.data(), jacobian_p.data());
-
-      if (linear)
-        compute_jacobian = false; // If model is linear, no need to recompute Jacobian later
-    }
 }
 
 DynamicModelMatlabCaller::DynamicModelMatlabCaller(std::string basename_arg, mwIndex ny, mwIndex nx,
@@ -235,8 +157,119 @@ DynamicModelMatlabCaller::copy_jacobian_column(mwIndex col, double* dest) const
     }
 }
 
+#if !defined(_WIN32) && !defined(__CYGWIN32__)
+void* DynamicModelNoblockDllCaller::resid_mex {nullptr};
+void* DynamicModelNoblockDllCaller::g1_mex {nullptr};
+#else
+HINSTANCE DynamicModelNoblockDllCaller::resid_mex {nullptr};
+HINSTANCE DynamicModelNoblockDllCaller::g1_mex {nullptr};
+#endif
+DynamicModelNoblockDllCaller::dynamic_tt_fct DynamicModelNoblockDllCaller::residual_tt_fct {
+    nullptr},
+    DynamicModelNoblockDllCaller::g1_tt_fct {nullptr};
+DynamicModelNoblockDllCaller::dynamic_fct DynamicModelNoblockDllCaller::residual_fct {nullptr},
+    DynamicModelNoblockDllCaller::g1_fct {nullptr};
+
+DynamicModelNoblockDllCaller::DynamicModelNoblockDllCaller(
+    size_t ntt, mwIndex ny, mwIndex nx, const double* params_arg, const double* steady_state_arg,
+    const int32_T* g1_sparse_colptr_arg, bool linear_arg, bool compute_jacobian_arg) :
+    DynamicModelDllCaller {ntt,
+                           ny,
+                           nx,
+                           params_arg,
+                           steady_state_arg,
+                           g1_sparse_colptr_arg,
+                           linear_arg,
+                           compute_jacobian_arg}
+{
+  if (compute_jacobian)
+    jacobian_p.resize(g1_sparse_colptr[3 * ny + nx] - 1);
+}
+
 void
-DynamicModelMatlabCaller::eval(double* resid)
+DynamicModelNoblockDllCaller::load_dll(const std::string& basename)
+{
+  // Load symbols from dynamic MEX
+  const std::filesystem::path sparse_dir {"+" + basename + "/+sparse/"};
+  const std::filesystem::path resid_mex_name {sparse_dir / ("dynamic_resid"s + MEXEXT)},
+      g1_mex_name {sparse_dir / ("dynamic_g1"s + MEXEXT)};
+#if !defined(__CYGWIN32__) && !defined(_WIN32)
+  resid_mex = dlopen(resid_mex_name.c_str(), RTLD_NOW);
+  g1_mex = dlopen(g1_mex_name.c_str(), RTLD_NOW);
+#else
+  resid_mex = LoadLibraryW(resid_mex_name.c_str());
+  g1_mex = LoadLibraryW(g1_mex_name.c_str());
+#endif
+  if (!resid_mex)
+    mexErrMsgTxt("Can't load dynamic_resid MEX file");
+  if (!g1_mex)
+    mexErrMsgTxt("Can't load dynamic_g1 MEX file");
+
+#if !defined(__CYGWIN32__) && !defined(_WIN32)
+  residual_tt_fct = reinterpret_cast<dynamic_tt_fct>(dlsym(resid_mex, "dynamic_resid_tt"));
+  residual_fct = reinterpret_cast<dynamic_fct>(dlsym(resid_mex, "dynamic_resid"));
+  g1_tt_fct = reinterpret_cast<dynamic_tt_fct>(dlsym(g1_mex, "dynamic_g1_tt"));
+  g1_fct = reinterpret_cast<dynamic_fct>(dlsym(g1_mex, "dynamic_g1"));
+#else
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wcast-function-type"
+  residual_tt_fct = reinterpret_cast<dynamic_tt_fct>(GetProcAddress(resid_mex, "dynamic_resid_tt"));
+  residual_fct = reinterpret_cast<dynamic_fct>(GetProcAddress(resid_mex, "dynamic_resid"));
+  g1_tt_fct = reinterpret_cast<dynamic_tt_fct>(GetProcAddress(g1_mex, "dynamic_g1_tt"));
+  g1_fct = reinterpret_cast<dynamic_fct>(GetProcAddress(g1_mex, "dynamic_g1"));
+# pragma GCC diagnostic pop
+#endif
+  if (!residual_tt_fct || !residual_fct || !g1_tt_fct || !g1_fct)
+    mexErrMsgTxt("Can't load functions in dynamic MEX file");
+}
+
+void
+DynamicModelNoblockDllCaller::unload_dll()
+{
+#if !defined(__CYGWIN32__) && !defined(_WIN32)
+  dlclose(resid_mex);
+  dlclose(g1_mex);
+#else
+  FreeLibrary(resid_mex);
+  FreeLibrary(g1_mex);
+#endif
+}
+
+void
+DynamicModelNoblockDllCaller::eval(double* resid)
+{
+  residual_tt_fct(y_p.data(), x_p.data(), params, steady_state, tt.data());
+  residual_fct(y_p.data(), x_p.data(), params, steady_state, tt.data(), resid);
+  if (compute_jacobian)
+    {
+      g1_tt_fct(y_p.data(), x_p.data(), params, steady_state, tt.data());
+      g1_fct(y_p.data(), x_p.data(), params, steady_state, tt.data(), jacobian_p.data());
+
+      if (linear)
+        compute_jacobian = false; // If model is linear, no need to recompute Jacobian later
+    }
+}
+
+DynamicModelNoblockMatlabCaller::DynamicModelNoblockMatlabCaller(
+    std::string basename_arg, mwIndex ny, mwIndex nx, const mxArray* params_mx_arg,
+    const mxArray* steady_state_mx_arg, const mxArray* g1_sparse_rowval_mx_arg,
+    const mxArray* g1_sparse_colval_mx_arg, const mxArray* g1_sparse_colptr_mx_arg, bool linear_arg,
+    bool compute_jacobian_arg) :
+    DynamicModelMatlabCaller {std::move(basename_arg),
+                              ny,
+                              nx,
+                              params_mx_arg,
+                              steady_state_mx_arg,
+                              g1_sparse_rowval_mx_arg,
+                              g1_sparse_colval_mx_arg,
+                              g1_sparse_colptr_mx_arg,
+                              linear_arg,
+                              compute_jacobian_arg}
+{
+}
+
+void
+DynamicModelNoblockMatlabCaller::eval(double* resid)
 {
   mxArray *T_order_mx, *T_mx;
 
@@ -316,4 +349,182 @@ DynamicModelMatlabCaller::eval(double* resid)
 
   mxDestroyArray(T_order_mx);
   mxDestroyArray(T_mx);
+}
+
+#if !defined(_WIN32) && !defined(__CYGWIN32__)
+void* DynamicModelBlockDllCaller::mex {nullptr};
+#else
+HINSTANCE DynamicModelBlockDllCaller::mex {nullptr};
+#endif
+DynamicModelBlockDllCaller::dynamic_resid_fct DynamicModelBlockDllCaller::residual_fct {nullptr};
+DynamicModelBlockDllCaller::dynamic_g1_fct DynamicModelBlockDllCaller::g1_fct {nullptr};
+
+void
+DynamicModelBlockDllCaller::load_dll(const std::string& basename, int block_num)
+{
+  // Load symbols from dynamic MEX
+  const std::filesystem::path sparse_dir {"+" + basename + "/+sparse/+block"};
+  const std::filesystem::path mex_name {sparse_dir
+                                        / ("dynamic_"s + std::to_string(block_num) + MEXEXT)};
+#if !defined(__CYGWIN32__) && !defined(_WIN32)
+  mex = dlopen(mex_name.c_str(), RTLD_NOW);
+#else
+  mex = LoadLibraryW(mex_name.c_str());
+#endif
+  if (!mex)
+    mexErrMsgTxt(("Can't load dynamic_"s + std::to_string(block_num) + " MEX file").c_str());
+
+#if !defined(__CYGWIN32__) && !defined(_WIN32)
+  residual_fct = reinterpret_cast<dynamic_resid_fct>(
+      dlsym(mex, ("dynamic_"s + std::to_string(block_num) + "_resid").c_str()));
+  g1_fct = reinterpret_cast<dynamic_g1_fct>(
+      dlsym(mex, ("dynamic_"s + std::to_string(block_num) + "_g1").c_str()));
+#else
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wcast-function-type"
+  residual_fct = reinterpret_cast<dynamic_resid_fct>(
+      GetProcAddress(mex, ("dynamic_"s + std::to_string(block_num) + "_resid").c_str()));
+  g1_fct = reinterpret_cast<dynamic_g1_fct>(
+      GetProcAddress(mex, ("dynamic_"s + std::to_string(block_num) + "_g1").c_str()));
+# pragma GCC diagnostic pop
+#endif
+  if (!residual_fct || !g1_fct)
+    mexErrMsgTxt("Can't load functions in dynamic MEX file");
+}
+
+void
+DynamicModelBlockDllCaller::unload_dll()
+{
+#if !defined(__CYGWIN32__) && !defined(_WIN32)
+  dlclose(mex);
+#else
+  FreeLibrary(mex);
+#endif
+}
+
+DynamicModelBlockDllCaller::DynamicModelBlockDllCaller(size_t ntt, size_t mfs, mwIndex ny,
+                                                       mwIndex nx, const double* params_arg,
+                                                       const double* steady_state_arg,
+                                                       const int32_T* g1_sparse_colptr_arg,
+                                                       bool linear_arg, bool compute_jacobian_arg) :
+    DynamicModelDllCaller {ntt,
+                           ny,
+                           nx,
+                           params_arg,
+                           steady_state_arg,
+                           g1_sparse_colptr_arg,
+                           linear_arg,
+                           compute_jacobian_arg}
+{
+  if (compute_jacobian)
+    jacobian_p.resize(g1_sparse_colptr[3 * mfs] - 1);
+}
+
+void
+DynamicModelBlockDllCaller::eval(double* resid)
+{
+  residual_fct(y_p.data(), x_p.data(), params, steady_state, tt.data(), resid);
+  if (compute_jacobian)
+    {
+      g1_fct(y_p.data(), x_p.data(), params, steady_state, tt.data(), jacobian_p.data());
+
+      if (linear)
+        compute_jacobian = false; // If model is linear, no need to recompute Jacobian later
+    }
+}
+
+DynamicModelBlockMatlabCaller::DynamicModelBlockMatlabCaller(
+    std::string basename_arg, int block_num_arg, mwIndex ntt, mwIndex ny, mwIndex nx,
+    const mxArray* params_mx_arg, const mxArray* steady_state_mx_arg,
+    const mxArray* g1_sparse_rowval_mx_arg, const mxArray* g1_sparse_colval_mx_arg,
+    const mxArray* g1_sparse_colptr_mx_arg, bool linear_arg, bool compute_jacobian_arg) :
+    DynamicModelMatlabCaller {std::move(basename_arg),
+                              ny,
+                              nx,
+                              params_mx_arg,
+                              steady_state_mx_arg,
+                              g1_sparse_rowval_mx_arg,
+                              g1_sparse_colval_mx_arg,
+                              g1_sparse_colptr_mx_arg,
+                              linear_arg,
+                              compute_jacobian_arg},
+    block_num {block_num_arg},
+    T_mx {mxCreateDoubleMatrix(ntt, 1, mxREAL)}
+{
+}
+
+DynamicModelBlockMatlabCaller::~DynamicModelBlockMatlabCaller()
+{
+  mxDestroyArray(T_mx);
+}
+
+void
+DynamicModelBlockMatlabCaller::eval(double* resid)
+{
+  std::string funcname {basename + ".sparse.block.dynamic_" + std::to_string(block_num)};
+
+  std::array prhs {y_mx,
+                   x_mx,
+                   params_mx,
+                   steady_state_mx,
+                   g1_sparse_rowval_mx,
+                   g1_sparse_colval_mx,
+                   g1_sparse_colptr_mx,
+                   T_mx};
+  std::vector<mxArray*> plhs(3 + static_cast<int>(compute_jacobian));
+  mxArray* exception {
+      mexCallMATLABWithTrap(plhs.size(), plhs.data(), prhs.size(), prhs.data(), funcname.c_str())};
+
+  if (exception)
+    {
+      setMException(exception);
+      return; // Avoid manipulating null pointers in plhs, see #1832
+    }
+
+  mxDestroyArray(y_mx);
+  if (mxIsComplex(plhs[0]))
+    y_mx = cmplxToReal<false>(plhs[0]);
+  else
+    y_mx = plhs[0];
+
+  mxDestroyArray(T_mx);
+  if (mxIsComplex(plhs[1]))
+    T_mx = cmplxToReal<false>(plhs[1]);
+  else
+    T_mx = plhs[1];
+
+  if (!mxIsDouble(plhs[2]) || mxIsSparse(plhs[2]))
+    {
+      setErrMsg("Residuals should be a dense array of double floats");
+      return;
+    }
+
+  if (mxIsComplex(plhs[2]))
+    plhs[2] = cmplxToReal<false>(plhs[2]);
+
+  std::ranges::copy_n(mxGetPr(plhs[2]), mxGetNumberOfElements(plhs[2]), resid);
+  mxDestroyArray(plhs[2]);
+
+  if (compute_jacobian)
+    {
+      if (jacobian_mx)
+        {
+          mxDestroyArray(jacobian_mx);
+          jacobian_mx = nullptr;
+        }
+
+      if (!mxIsDouble(plhs[3]) || !mxIsSparse(plhs[3]))
+        {
+          setErrMsg("Jacobian should be a dense array of double floats");
+          return;
+        }
+
+      if (mxIsComplex(plhs[3]))
+        jacobian_mx = cmplxToReal<true>(plhs[3]);
+      else
+        jacobian_mx = plhs[3];
+
+      if (linear)
+        compute_jacobian = false; // If model is linear, no need to recompute Jacobian later
+    }
 }

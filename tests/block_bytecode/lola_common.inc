@@ -975,7 +975,7 @@ end;
 % *******************************************
 
 perfect_foresight_setup(periods=125);
-perfect_foresight_solver(maxit=100);
+perfect_foresight_solver;
 
 if ~oo_.deterministic_simulation.status
    error('Perfect foresight simulation failed')

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -29,20 +29,22 @@
 void
 mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 {
-  if (nlhs < 1 || nlhs > 2 || nrhs != 9)
-    mexErrMsgTxt("Must have 9 input arguments and 1 or 2 output arguments");
-  bool compute_jacobian = nlhs == 2;
+  if (nlhs < 3 || nlhs > 4 || nrhs != 11)
+    mexErrMsgTxt("Must have 11 input arguments and 3 or 4 output arguments");
+  bool compute_jacobian = nlhs == 4;
 
   // Give explicit names to input arguments
-  const mxArray* y_mx = prhs[0];
-  const mxArray* y0_mx = prhs[1];
-  const mxArray* yT_mx = prhs[2];
-  const mxArray* exo_path_mx = prhs[3];
-  const mxArray* params_mx = prhs[4];
-  const mxArray* steady_state_mx = prhs[5];
-  const mxArray* periods_mx = prhs[6];
-  const mxArray* M_mx = prhs[7];
-  const mxArray* options_mx = prhs[8];
+  const mxArray* block_num_mx = prhs[0];
+  const mxArray* y_mx = prhs[1];
+  const mxArray* y0_mx = prhs[2];
+  const mxArray* yT_mx = prhs[3];
+  const mxArray* exo_path_mx = prhs[4];
+  const mxArray* params_mx = prhs[5];
+  const mxArray* steady_state_mx = prhs[6];
+  const mxArray* T_mx = prhs[7];
+  const mxArray* periods_mx = prhs[8];
+  const mxArray* M_mx = prhs[9];
+  const mxArray* options_mx = prhs[10];
 
   // Extract various fields from M_
   const mxArray* basename_mx = mxGetField(M_mx, 0, "fname");
@@ -60,14 +62,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     mexErrMsgTxt("M_.maximum_lag should be a numeric scalar");
   auto maximum_lag = static_cast<mwIndex>(mxGetScalar(maximum_lag_mx));
 
-  const mxArray* dynamic_tmp_nbr_mx = mxGetField(M_mx, 0, "dynamic_tmp_nbr");
-  if (!(dynamic_tmp_nbr_mx && mxIsDouble(dynamic_tmp_nbr_mx)
-        && mxGetNumberOfElements(dynamic_tmp_nbr_mx) >= 2)
-      || mxIsComplex(dynamic_tmp_nbr_mx) || mxIsSparse(dynamic_tmp_nbr_mx))
-    mexErrMsgTxt("M_.dynamic_tmp_nbr should be a real dense array of at least 2 elements");
-  size_t ntt {static_cast<size_t>(mxGetPr(dynamic_tmp_nbr_mx)[0])
-              + (compute_jacobian ? static_cast<size_t>(mxGetPr(dynamic_tmp_nbr_mx)[1]) : 0)};
-
+  // TODO: could be improved to take into account only the equations of the block
   const mxArray* has_external_function_mx = mxGetField(M_mx, 0, "has_external_function");
   if (!(has_external_function_mx && mxIsLogicalScalar(has_external_function_mx)))
     mexErrMsgTxt("M_.has_external_function should be a logical scalar");
@@ -79,29 +74,28 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     mexErrMsgTxt("options_.use_dll should be a logical scalar");
   bool use_dll = static_cast<bool>(mxGetScalar(use_dll_mx));
 
-  const mxArray* linear_mx = mxGetField(options_mx, 0, "linear");
-  if (!(linear_mx && mxIsLogicalScalar(linear_mx)))
-    mexErrMsgTxt("options_.linear should be a logical scalar");
-  bool linear = static_cast<bool>(mxGetScalar(linear_mx));
-
   const mxArray* threads_mx = mxGetField(options_mx, 0, "threads");
   if (!threads_mx)
     mexErrMsgTxt("Can't find field options_.threads");
-  const mxArray* num_threads_mx = mxGetField(threads_mx, 0, "perfect_foresight_problem");
+  const mxArray* num_threads_mx = mxGetField(threads_mx, 0, "perfect_foresight_block_problem");
   if (!(num_threads_mx && mxIsScalar(num_threads_mx) && mxIsNumeric(num_threads_mx)))
-    mexErrMsgTxt("options_.threads.perfect_foresight_problem should be a numeric scalar");
+    mexErrMsgTxt("options_.threads.perfect_foresight_block_problem should be a numeric scalar");
   // False positive: num_threads is used in OpemMP pragma
   // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   int num_threads = static_cast<int>(mxGetScalar(num_threads_mx));
 
   // Check other input and map it to local variables
+  if (!(mxIsScalar(block_num_mx) && mxIsNumeric(block_num_mx)))
+    mexErrMsgTxt("block_num should be a numeric scalar");
+  auto block_num = static_cast<int>(mxGetScalar(block_num_mx));
+
   if (!(mxIsScalar(periods_mx) && mxIsNumeric(periods_mx)))
     mexErrMsgTxt("periods should be a numeric scalar");
   auto periods = static_cast<mwIndex>(mxGetScalar(periods_mx));
 
-  if (!(mxIsDouble(y_mx) && mxGetM(y_mx) == static_cast<size_t>(ny * periods) && mxGetN(y_mx) == 1))
-    mexErrMsgTxt("y should be a double precision column-vector of M_.endo_nbr*periods elements");
-  const double* y = mxGetPr(y_mx);
+  if (!(mxIsDouble(y_mx) && mxGetM(y_mx) == static_cast<size_t>(ny)
+        && mxGetN(y_mx) == static_cast<size_t>(periods)))
+    mexErrMsgTxt("y should be a double precision matrix of size M_.endo_nbr*periods elements");
 
   if (!(mxIsDouble(y0_mx) && mxGetM(y0_mx) == static_cast<size_t>(ny) && mxGetN(y0_mx) == 1))
     mexErrMsgTxt("y0 should be a double precision column-vector of M_.endo_nbr elements");
@@ -119,37 +113,67 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   size_t nb_row_x = mxGetM(exo_path_mx);
   const double* exo_path = mxGetPr(exo_path_mx);
 
-  const mxArray* g1_sparse_rowval_mx {mxGetField(M_mx, 0, "dynamic_g1_sparse_rowval")};
+  const mxArray* block_structure_mx {mxGetField(M_mx, 0, "block_structure")};
+  if (!(block_structure_mx && mxIsStruct(block_structure_mx)))
+    mexErrMsgTxt("M_.block_structure should be a structure");
+  const mxArray* block_mx {mxGetField(block_structure_mx, 0, "block")};
+  if (!(block_mx && mxIsStruct(block_mx)))
+    mexErrMsgTxt("M_.block_structure.block should be a structure");
+
+  const mxArray* linear_mx = mxGetField(block_mx, block_num - 1, "is_linear");
+  if (!(linear_mx && mxIsLogicalScalar(linear_mx)))
+    mexErrMsgTxt("M_.block_structure.block(block_num).is_linear should be a logical scalar");
+  bool linear = static_cast<bool>(mxGetScalar(linear_mx));
+
+  const mxArray* mfs_mx {mxGetField(block_mx, block_num - 1, "mfs")};
+  if (!(mxIsScalar(mfs_mx) && mxIsNumeric(mfs_mx)))
+    mexErrMsgTxt("M_.block_structure.block(block_num).mfs should be a numeric scalar");
+  auto mfs = static_cast<mwIndex>(mxGetScalar(mfs_mx));
+
+  const mxArray* g1_sparse_rowval_mx {mxGetField(block_mx, block_num - 1, "g1_sparse_rowval")};
   if (!(mxIsInt32(g1_sparse_rowval_mx)))
-    mexErrMsgTxt("M_.dynamic_g1_sparse_rowval should be an int32 vector");
+    mexErrMsgTxt("M_.block_structure.block(block_num).g1_sparse_rowval should be an int32 vector");
 #if MX_HAS_INTERLEAVED_COMPLEX
   const int32_T* g1_sparse_rowval {mxGetInt32s(g1_sparse_rowval_mx)};
 #else
   const int32_T* g1_sparse_rowval {static_cast<const int32_T*>(mxGetData(g1_sparse_rowval_mx))};
 #endif
 
-  const mxArray* g1_sparse_colval_mx {mxGetField(M_mx, 0, "dynamic_g1_sparse_colval")};
+  const mxArray* g1_sparse_colval_mx {mxGetField(block_mx, block_num - 1, "g1_sparse_colval")};
   if (!(mxIsInt32(g1_sparse_colval_mx)))
-    mexErrMsgTxt("M_.dynamic_g1_sparse_colval should be an int32 vector");
+    mexErrMsgTxt("M_.block_structure.block(block_num).g1_sparse_colval should be an int32 vector");
   if (mxGetNumberOfElements(g1_sparse_colval_mx) != mxGetNumberOfElements(g1_sparse_rowval_mx))
-    mexErrMsgTxt(
-        "M_.dynamic_g1_sparse_colval should have the same length as M_.dynamic_g1_sparse_rowval");
+    mexErrMsgTxt("M_.block_structure.block(block_num).g1_sparse_colval should have the same length "
+                 "as M_.block_structure.block(block_num).g1_sparse_rowval");
 
-  const mxArray* g1_sparse_colptr_mx {mxGetField(M_mx, 0, "dynamic_g1_sparse_colptr")};
+  const mxArray* g1_sparse_colptr_mx {mxGetField(block_mx, block_num - 1, "g1_sparse_colptr")};
   if (!(mxIsInt32(g1_sparse_colptr_mx)
-        && mxGetNumberOfElements(g1_sparse_colptr_mx) == static_cast<size_t>(3 * ny + nx + 1)))
-    mexErrMsgTxt(("M_.dynamic_g1_sparse_colptr should be an int32 vector with "
-                  + std::to_string(3 * ny + nx + 1) + " elements")
-                     .c_str());
+        && mxGetNumberOfElements(g1_sparse_colptr_mx) == static_cast<size_t>(3 * mfs + 1)))
+    mexErrMsgTxt(
+        ("M_.block_structure.block(block_num).g1_sparse_colptr should be an int32 vector with "
+         + std::to_string(3 * mfs + 1) + " elements")
+            .c_str());
 #if MX_HAS_INTERLEAVED_COMPLEX
   const int32_T* g1_sparse_colptr {mxGetInt32s(g1_sparse_colptr_mx)};
 #else
   const int32_T* g1_sparse_colptr {static_cast<const int32_T*>(mxGetData(g1_sparse_colptr_mx))};
 #endif
-  if (static_cast<size_t>(g1_sparse_colptr[3 * ny + nx]) - 1
+  if (static_cast<size_t>(g1_sparse_colptr[3 * mfs]) - 1
       != mxGetNumberOfElements(g1_sparse_rowval_mx))
-    mexErrMsgTxt("The size of M_.dynamic_g1_sparse_rowval is not consistent with the last element "
-                 "of M_.dynamic_g1_sparse_colptr");
+    mexErrMsgTxt(
+        "The size of M_.block_structure.block(block_num).g1_sparse_rowval is not consistent with "
+        "the last element of M_.block_structure.block(block_num).g1_sparse_colptr");
+
+  const mxArray* dyn_tmp_nbr_mx = mxGetField(block_structure_mx, 0, "dyn_tmp_nbr");
+  if (!(dyn_tmp_nbr_mx && mxIsDouble(dyn_tmp_nbr_mx)) || mxIsComplex(dyn_tmp_nbr_mx)
+      || mxIsSparse(dyn_tmp_nbr_mx))
+    mexErrMsgTxt("M_.block_structure.dyn_tmp_nbr should be a real scalar");
+  auto ntt = static_cast<size_t>(mxGetScalar(dyn_tmp_nbr_mx));
+
+  if (!(mxIsDouble(T_mx) && mxGetM(T_mx) == static_cast<size_t>(ntt)
+        && mxGetN(T_mx) >= static_cast<size_t>(maximum_lag + periods)))
+    mexErrMsgTxt("T should be a double precision matrix with as many lines as temporary terms and "
+                 "at least M_.maximum_lag+periods columns");
 
   if (!(mxIsDouble(params_mx) && mxGetN(params_mx) == 1))
     mexErrMsgTxt("params should be a double precision column-vector");
@@ -160,17 +184,21 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   const double* steady_state = mxGetPr(steady_state_mx);
 
   // Allocate output matrices
-  plhs[0] = mxCreateDoubleMatrix(periods * ny, 1, mxREAL);
-  double* stacked_residual = mxGetPr(plhs[0]);
+  plhs[0] = mxDuplicateArray(y_mx);
+  plhs[1] = mxDuplicateArray(T_mx);
+  plhs[2] = mxCreateDoubleMatrix(periods * mfs, 1, mxREAL);
+  double* y = mxGetPr(plhs[0]);
+  double* TT = mxGetPr(plhs[1]); // Named TT to avoid name-clash with mwIndex T (period index)
+  double* stacked_residual = mxGetPr(plhs[2]);
 
   double* stacked_jacobian = nullptr;
   mwIndex *ir = nullptr, *jc = nullptr;
   if (compute_jacobian)
-    std::tie(plhs[1], stacked_jacobian, ir, jc)
-        = init_stacked_jacobian(periods, ny, g1_sparse_rowval, g1_sparse_colptr);
+    std::tie(plhs[3], stacked_jacobian, ir, jc)
+        = init_stacked_jacobian(periods, mfs, g1_sparse_rowval, g1_sparse_colptr);
 
   if (use_dll)
-    DynamicModelNoblockDllCaller::load_dll(basename);
+    DynamicModelBlockDllCaller::load_dll(basename, block_num);
 
   DynamicModelCaller::error_msg.clear();
   DynamicModelCaller::error_id.clear();
@@ -182,12 +210,12 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     // Allocate (thread-private) model evaluator (which allocates space for temporaries)
     std::unique_ptr<DynamicModelCaller> m;
     if (use_dll)
-      m = std::make_unique<DynamicModelNoblockDllCaller>(
-          ntt, ny, nx, params, steady_state, g1_sparse_colptr, linear, compute_jacobian);
+      m = std::make_unique<DynamicModelBlockDllCaller>(ntt, mfs, ny, nx, params, steady_state,
+                                                       g1_sparse_colptr, linear, compute_jacobian);
     else
-      m = std::make_unique<DynamicModelNoblockMatlabCaller>(
-          basename, ny, nx, params_mx, steady_state_mx, g1_sparse_rowval_mx, g1_sparse_colval_mx,
-          g1_sparse_colptr_mx, linear, compute_jacobian);
+      m = std::make_unique<DynamicModelBlockMatlabCaller>(
+          basename, block_num, ntt, ny, nx, params_mx, steady_state_mx, g1_sparse_rowval_mx,
+          g1_sparse_colval_mx, g1_sparse_colptr_mx, linear, compute_jacobian);
 
     // Main computing loop
 #pragma omp for
@@ -200,12 +228,21 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         for (mwIndex j {0}; j < nx; j++)
           m->x()[j] = exo_path[T + maximum_lag + nb_row_x * j];
 
+        // Fill temporary terms
+        std::ranges::copy_n(TT + (T + maximum_lag) * ntt, ntt, m->T());
+
         // Compute the residual and Jacobian, and fill the stacked residual
-        m->eval(stacked_residual + T * ny);
+        m->eval(stacked_residual + T * mfs);
+
+        // Copy back endogenous in plhs[0]
+        std::ranges::copy_n(m->y() + ny, ny, y + T * ny);
+
+        // Copy back temporary terms in plhs[1]
+        std::ranges::copy_n(m->T(), ntt, TT + (T + maximum_lag) * ntt);
 
         if (compute_jacobian)
           // Fill the stacked jacobian
-          fill_stacked_jacobian(T, periods, ny, stacked_jacobian, ir, jc, m);
+          fill_stacked_jacobian(T, periods, mfs, stacked_jacobian, ir, jc, m);
       }
   }
 
@@ -216,8 +253,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   if (compute_jacobian)
     // Remove spurious zeros from sparse stacked Jacobian
-    compress_stacked_jacobian(periods, ny, stacked_jacobian, ir, jc);
+    compress_stacked_jacobian(periods, mfs, stacked_jacobian, ir, jc);
 
   if (use_dll)
-    DynamicModelNoblockDllCaller::unload_dll();
+    DynamicModelBlockDllCaller::unload_dll();
 }

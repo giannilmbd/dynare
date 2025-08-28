@@ -103,7 +103,7 @@ for blk = 1:nblocks
             if ismember(options_.stack_solve_algo, [1 6])
                 [y, T, success, maxblkerror, iter] = solve_two_boundaries_lbj(fh_dynamic, y, exo_simul, steady_state, T, blk, options_, M_);
             else
-                [y, T, success, maxblkerror, iter] = solve_two_boundaries_stacked(fh_dynamic, y, exo_simul, steady_state, T, blk, cutoff, options_, M_);
+                [y, T, success, maxblkerror, iter] = solve_two_boundaries_stacked(y, exo_simul, steady_state, T, blk, cutoff, options_, M_);
             end
     end
 

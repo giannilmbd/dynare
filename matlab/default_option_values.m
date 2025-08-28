@@ -79,6 +79,7 @@ options_.threads.local_state_space_iteration_2 = num_procs;
 options_.threads.local_state_space_iteration_3 = num_procs;
 options_.threads.local_state_space_iteration_k = 1;
 options_.threads.perfect_foresight_problem = num_procs;
+options_.threads.perfect_foresight_block_problem = num_procs;
 options_.threads.k_order_perturbation = max(1, num_procs/2);
 
 % steady state

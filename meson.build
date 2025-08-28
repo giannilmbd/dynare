@@ -365,6 +365,10 @@ perfect_foresight_problem_src = [ 'mex/sources/perfect_foresight_problem/perfect
                                   'mex/sources/perfect_foresight_problem/DynamicModelCaller.cc' ]
 shared_module('perfect_foresight_problem', perfect_foresight_problem_src, kwargs : mex_kwargs, dependencies : [ openmp_dep, dl_dep ])
 
+perfect_foresight_block_problem_src = [ 'mex/sources/perfect_foresight_problem/perfect_foresight_block_problem.cc',
+                                        'mex/sources/perfect_foresight_problem/DynamicModelCaller.cc' ]
+shared_module('perfect_foresight_block_problem', perfect_foresight_block_problem_src, kwargs : mex_kwargs, dependencies : [ openmp_dep, dl_dep ])
+
 block_trust_region_src = [ 'mex/sources/block_trust_region/dulmage_mendelsohn.f08',
                            'mex/sources/block_trust_region/matlab_fcn_closure.F08',
                            'mex/sources/block_trust_region/trust_region.f08',
