@@ -3851,8 +3851,7 @@ speed-up on large models.
                the full LU decomposition with complete pivoting of the linear
                system (and use it to solve that first iteration rather than
                using the iterative solver). This LU decomposition is then used
-               as the preconditioner in further Newton iterations. Inspired
-               from TROLL’s option with the same name.
+               as the preconditioner in further Newton iterations.
 
            ``iterstack``
 
@@ -3869,7 +3868,6 @@ speed-up on large models.
                :opt:`iterstack_nperiods <iterstack_nperiods = INTEGER>`,
                :opt:`iterstack_nlu <iterstack_nlu = INTEGER>`,
                :opt:`iterstack_relu <iterstack_relu = DOUBLE>`.
-               Inspired from TROLL’s solver with the same name.
 
            ``ilu``
 
