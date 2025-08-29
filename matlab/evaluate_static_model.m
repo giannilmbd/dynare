@@ -46,7 +46,7 @@ if options_.bytecode
     end      
 else
     [residuals, T_order, T] = feval([M_.fname '.sparse.static_resid'], ys, exo_ss, params);
-    if nargout >= 3
+    if nargout >= 2
         jacob = feval([M_.fname '.sparse.static_g1'], ys, exo_ss, params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
     end
 end
