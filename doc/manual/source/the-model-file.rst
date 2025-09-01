@@ -56,7 +56,7 @@ are introduced by ``/*`` and terminated by ``*/``.
 Note that these comment marks should not be used in native MATLAB code regions
 where the ``%`` should be preferred instead to introduce a comment. In a
 ``verbatim`` block, see :ref:`verbatim`, this would result in a crash since
-``//`` is not a valid MATLAB statement).
+``//`` is not a valid MATLAB statement.
 
 Most Dynare commands have arguments and several accept options,
 indicated in parentheses after the command keyword. Several options
