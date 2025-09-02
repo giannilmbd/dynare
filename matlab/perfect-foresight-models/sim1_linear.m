@@ -160,7 +160,7 @@ end
 
 % Try to update the vector of endogenous variables.
 try
-    dY = -A\res;
+    dY = -lin_solve(A, res, options_);
     Y = Y + dY;
 catch
     % Normally, because the model is linear, the solution of the perfect foresight model should

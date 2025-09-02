@@ -121,7 +121,7 @@ if ~isempty(controlled_paths_by_period)
 end
 
 
-if options_.linear && ismember(options_.stack_solve_algo, [0 7]) && ~options_.block ...
+if options_.linear && ismember(options_.stack_solve_algo, [0, 2, 3, 7]) && ~options_.block ...
         && ~options_.bytecode && M_.maximum_endo_lead > 0 && M_.maximum_endo_lag > 0
     options_.linear_approximation = true;
 end
