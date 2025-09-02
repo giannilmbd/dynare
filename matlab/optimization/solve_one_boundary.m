@@ -61,6 +61,7 @@ Blck_size=size(y_index_eq,2);
 correcting_factor=0.01;
 max_resa=1e100;
 lambda = 1; % Length of Newton step
+umfiter_precond = [];
 if is_forward
     incr = 1;
     start = y_kmin+1;
@@ -188,39 +189,21 @@ for it_=start:incr:finish
                                     M_.block_structure.block(Block_Num).g1_sparse_rowval, ...
                                     M_.block_structure.block(Block_Num).g1_sparse_colval, ...
                                     M_.block_structure.block(Block_Num).g1_sparse_colptr, T(:, it_));
-            elseif (is_dynamic && (ismember(stack_solve_algo, [0 1 6]) || ...
-                                   (ismember(stack_solve_algo, [2 3]) && strcmp(options_.simul.preconditioner, 'iterstack')))) ... % Iterstack does not make sense for one boundary problems
-                   || (~is_dynamic && options_.solve_algo==6)
-                if verbose && ~is_dynamic
+            elseif is_dynamic && ismember(stack_solve_algo, [0, 1, 2, 3, 6])
+                % Iterstack and LBJ do not make sense for one boundary problems, hence use LU.
+                force_lu = (ismember(stack_solve_algo, [2 3]) ...
+                            && strcmp(options_.simul.preconditioner, 'iterstack')) ...
+                            || ismember(stack_solve_algo, [1 6]);
+                [dx, umfiter_precond] = lin_solve(g1, r, options_, umfiter_precond, force_lu);
+                ya = ya - lambda*dx;
+                y(y_index_eq, it_) = ya;
+            elseif ~is_dynamic && options_.solve_algo == 6
+                if verbose
                     disp('steady: Sparse LU ')
                 end
                 dx =  g1\r;
                 ya = ya - lambda*dx;
-                if is_dynamic
-                    y(y_index_eq, it_) = ya;
-                else
-                    y(y_index_eq) = ya;
-                end
-            elseif is_dynamic && ismember(stack_solve_algo, [2 3])
-                if strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0
-                    [L, U, P, Q] = lu(g1);
-                    zc = L\(P*r);
-                    zb = U\zc;
-                elseif strcmp(options_.simul.preconditioner, 'ilu')
-                    [L, U, P] = ilu(g1, options_.simul.ilu);
-                    Q = speye(size(g1));
-                end
-                if ~(strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0)
-                    [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, g1, r);
-                    if stack_solve_algo==2
-                        [zb, flag] = gmres(P*g1*Q, P*r, gmres_restart, iter_tol, iter_maxit, L, U);
-                    else
-                        [zb, flag] = bicgstab(P*g1*Q, P*r, iter_tol, iter_maxit, L, U);
-                    end
-                    iter_solver_error_flag(flag)
-                end
-                ya = ya - lambda*Q*zb;
-                y(y_index_eq, it_) = ya;
+                y(y_index_eq) = ya;
             elseif ~is_dynamic && ismember(options_.solve_algo, [7 8])
                 if verbose
                     if options_.solve_algo == 7

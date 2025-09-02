@@ -73,6 +73,8 @@ iter=0;
 correcting_factor=0.01;
 max_resa=1e100;
 lambda = 1; % Length of Newton step (unused for stack_solve_algo=4)
+umfiter_precond = [];
+
 while ~(cvg || iter > options_.simul.maxit)
     [yy, T, ra, g1a] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
     ya = reshape(yy(y_index,1:periods), 1, periods*Blck_size)';
@@ -139,32 +141,14 @@ while ~(cvg || iter > options_.simul.maxit)
         ra_save=ra;
         g1aa=g1a;
         max_resa=max_res;
-        if stack_solve_algo==0 || (ismember(stack_solve_algo, [2 3]) && strcmp(options_.simul.preconditioner, 'iterstack') ...
-                                   && options_.simul.iterstack_nperiods == 0 && options_.simul.iterstack_nlu == 0 && size(g1a, 1) < options_.simul.iterstack_maxlu) % Fallback to LU if block too small for iterstack
-            dx = -g1a\ra;
-            ya = ya + lambda*dx;
-            yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
-        elseif ismember(stack_solve_algo, [2, 3])
-            if strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0
-                [L, U, P, Q] = lu(g1a);
-                zc = L\(P*ra);
-                zb = U\zc;
-            elseif strcmp(options_.simul.preconditioner, 'iterstack')
-                [L, U, P, Q] = iterstack_preconditioner(g1a, options_);
-            elseif strcmp(options_.simul.preconditioner, 'ilu')
-                [L, U, P] = ilu(g1a, options_.simul.ilu);
-                Q = speye(size(g1a));
-            end
-            if ~(strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0)
-                [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, g1a, ra);
-                if stack_solve_algo == 2
-                    [zb, flag] = gmres(P*g1a*Q, P*ra, gmres_restart, iter_tol, iter_maxit, L, U);
-                else
-                    [zb, flag] = bicgstab(P*g1a*Q, P*ra, iter_tol, iter_maxit, L, U);
-                end
-                iter_solver_error_flag(flag)
-            end
-            dx = -Q*zb;
+        if ismember(stack_solve_algo, [0, 2, 3])
+            % Fallback to LU if block too small for iterstack
+            force_lu = ismember(stack_solve_algo, [2 3]) ...
+                && strcmp(options_.simul.preconditioner, 'iterstack') ...
+                && options_.simul.iterstack_nperiods == 0 ...
+                && options_.simul.iterstack_nlu == 0 && size(g1a, 1) < options_.simul.iterstack_maxlu;
+            [mdx, umfiter_precond] = lin_solve(g1a, ra, options_, umfiter_precond, force_lu);
+            dx = -mdx;
             ya = ya + lambda*dx;
             yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
         elseif stack_solve_algo==4

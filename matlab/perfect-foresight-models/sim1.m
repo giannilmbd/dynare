@@ -151,7 +151,7 @@ while ~(converged || iter > options_.simul.maxit)
         if options_.simul.robust_lin_solve
             dy = -lin_solve_robust(A, res, verbose, options_);
         else
-            [mdy, umfiter_precond] = lin_solve(A, res, verbose, options_, umfiter_precond);
+            [mdy, umfiter_precond] = lin_solve(A, res, options_, umfiter_precond);
             dy = -mdy;
         end
         if any(isnan(dy)) || any(isinf(dy))
@@ -219,56 +219,6 @@ end
 
 if verbose
     skipline();
-end
-
-function [x, umfiter_precond] = lin_solve(A, b, verbose, options_, umfiter_precond)
-
-if norm(b) < sqrt(eps) % then x = 0 is a solution
-    x = 0;
-    return
-end
-
-if options_.stack_solve_algo == 0
-    x = A\b;
-else
-    if strcmp(options_.simul.preconditioner, 'umfiter')
-        if isempty(umfiter_precond)
-            [L, U, P, Q] = lu(A);
-        else
-            L = umfiter_precond.L;
-            U = umfiter_precond.U;
-            P = umfiter_precond.P;
-            Q = umfiter_precond.Q;
-        end
-    elseif strcmp(options_.simul.preconditioner, 'iterstack')
-        [L, U, P, Q] = iterstack_preconditioner(A, options_);
-    elseif strcmp(options_.simul.preconditioner, 'ilu')
-        [L, U, P] = ilu(A, options_.simul.ilu);
-        Q = speye(size(A));
-    end
-
-    if strcmp(options_.simul.preconditioner, 'umfiter') && isempty(umfiter_precond)
-        z = L\(P*b);
-        y = U\z;
-        umfiter_precond = struct('L', L, 'U', U, 'P', P, 'Q', Q);
-    else
-        [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, A, b);
-        if options_.stack_solve_algo == 2
-            [y, flag] = gmres(P*A*Q, P*b, gmres_restart, iter_tol, iter_maxit, L, U);
-        elseif options_.stack_solve_algo == 3
-            [y, flag] = bicgstab(P*A*Q, P*b, iter_tol, iter_maxit, L, U);
-        else
-            error('sim1: invalid value for options_.stack_solve_algo')
-        end
-        iter_solver_error_flag(flag)
-    end
-
-    x = Q*y;
-end
-x(~isfinite(x)) = 0;
-relres = norm(b - A*x) / norm(b);
-if relres > 1e-6 && verbose
-    fprintf('WARNING : Failed to find a solution to the linear system.\n');
 end
 
 function [ x, flag, relres ] = lin_solve_robust(A, b ,verbose, options_)
