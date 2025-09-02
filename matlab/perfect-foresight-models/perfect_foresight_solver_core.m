@@ -180,6 +180,10 @@ else
                     if options_.solve_algo == 10 || options_.solve_algo == 11
                         warning('Since you are requesting an MCP solver, you should not specify your model as model(linear) or use the linear_approximation option!')
                     end
+                    if ~isempty(controlled_paths_by_period)
+                        % TODO: implement and test this combination (check results across all ssa values)
+                        error('The combination of the linear or linear_approximation option, stack_solve_algo=7 and perfect_foresight_controlled_paths is not supported')
+                    end
                     [y, success] = solve_stacked_linear_problem(y, exo_simul, steady_state, exo_steady_state, M_, options_);
                 else
                     [y, success, maxerror, exo_simul] = solve_stacked_problem(y, exo_simul, steady_state, controlled_paths_by_period, M_, options_);
