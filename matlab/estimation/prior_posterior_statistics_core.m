@@ -347,7 +347,7 @@ for b=fpar:B
             else
                 yf = yf+repmat(SteadyState',horizon+maxlag,1);
             end
-            yf1 = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
+            yf1 = simulate_posterior_forecasts(yyyy,dr,horizon,true,M_.Sigma_e,1);
             if options_.prefilter == 1
                 % add mean
                 yf1(:,IdObs,:) = yf1(:,IdObs,:)+ ...
