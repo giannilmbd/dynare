@@ -76,7 +76,6 @@ lambda = 1; % Length of Newton step (unused for stack_solve_algo=4)
 while ~(cvg || iter > options_.simul.maxit)
     [yy, T, ra, g1a] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
     ya = reshape(yy(y_index,1:periods), 1, periods*Blck_size)';
-    b=-ra+g1a*ya;
     max_res=max(max(abs(ra)));
     if isnan(max_res) || any(any(isnan(g1a)))
         cvg = false;
@@ -102,7 +101,7 @@ while ~(cvg || iter > options_.simul.maxit)
                             disp('    trying to correct the Jacobian matrix:');
                             disp(['    correcting_factor=' num2str(correcting_factor,'%f') ' max(Jacobian)=' num2str(full(max_factor),'%f')]);
                         end
-                        dx = (g1aa+correcting_factor*speye(periods*Blck_size))\ba- ya_save;
+                        dx = -(g1aa+correcting_factor*speye(periods*Blck_size))\ra_save;
                         yy(y_index,1:periods)=reshape((ya_save+lambda*dx)', length(y_index), periods);
                         continue
                     else
@@ -137,18 +136,18 @@ while ~(cvg || iter > options_.simul.maxit)
             end
         end
         ya_save=ya;
+        ra_save=ra;
         g1aa=g1a;
-        ba=b;
         max_resa=max_res;
         if stack_solve_algo==0 || (ismember(stack_solve_algo, [2 3]) && strcmp(options_.simul.preconditioner, 'iterstack') ...
                                    && options_.simul.iterstack_nperiods == 0 && options_.simul.iterstack_nlu == 0 && size(g1a, 1) < options_.simul.iterstack_maxlu) % Fallback to LU if block too small for iterstack
-            dx = g1a\b- ya;
+            dx = -g1a\ra;
             ya = ya + lambda*dx;
             yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
         elseif ismember(stack_solve_algo, [2, 3])
             if strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0
                 [L, U, P, Q] = lu(g1a);
-                zc = L\(P*b);
+                zc = L\(P*ra);
                 zb = U\zc;
             elseif strcmp(options_.simul.preconditioner, 'iterstack')
                 [L, U, P, Q] = iterstack_preconditioner(g1a, options_);
@@ -157,15 +156,15 @@ while ~(cvg || iter > options_.simul.maxit)
                 Q = speye(size(g1a));
             end
             if ~(strcmp(options_.simul.preconditioner, 'umfiter') && iter == 0)
-                [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, g1a, b);
+                [iter_tol, iter_maxit, gmres_restart] = iter_solver_params(options_, g1a, ra);
                 if stack_solve_algo == 2
-                    [zb, flag] = gmres(P*g1a*Q, P*b, gmres_restart, iter_tol, iter_maxit, L, U);
+                    [zb, flag] = gmres(P*g1a*Q, P*ra, gmres_restart, iter_tol, iter_maxit, L, U);
                 else
-                    [zb, flag] = bicgstab(P*g1a*Q, P*b, iter_tol, iter_maxit, L, U);
+                    [zb, flag] = bicgstab(P*g1a*Q, P*ra, iter_tol, iter_maxit, L, U);
                 end
                 iter_solver_error_flag(flag)
             end
-            dx = Q*zb - ya;
+            dx = -Q*zb;
             ya = ya + lambda*dx;
             yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
         elseif stack_solve_algo==4
