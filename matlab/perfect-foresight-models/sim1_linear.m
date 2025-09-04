@@ -1,5 +1,5 @@
 function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, controlled_paths_by_period, M_, options_)
-% [endogenousvariables, success, ERR] = sim1_linear(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, M_, options_)
+% [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, M_, options_)
 % Solves a linear approximation of a perfect foresight model using sparse matrix.
 %
 % INPUTS
@@ -141,7 +141,7 @@ h2 = clock;
 [res, A] = linear_perfect_foresight_problem(Y, jacobian, y0, yT, exogenousvariables, params, steadystate_y, maximum_lag, periods, ny);
 
 if ~isempty(controlled_paths_by_period)
-    A = controlled_paths_substitute_stacked_jacobian(A, Y, y0, yT, exogenousvariables, steadystate_y, controlled_paths_by_period, M_);
+    A = controlled_paths_substitute_stacked_jacobian(A, repmat(steadystate_y, 1, periods), steadystate_y, steadystate_y, repmat(steadystate_x', periods, 1), steadystate_y, controlled_paths_by_period, M_);
 end
 
 % Evaluation of the maximum residual at the initial guess (steady state for the endogenous variables).
@@ -181,7 +181,7 @@ if ~isempty(controlled_paths_by_period)
         if isempty(endogenize_id)
             continue
         end
-        Y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values;
+        Y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values - steadystate_y(exogenize_id);
         exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + dY(exogenize_id+(p-1)*M_.endo_nbr)';
     end
 end
@@ -219,6 +219,7 @@ end
 
 endogenousvariables(:,maximum_lag+(1:periods)) = reshape(Y, ny, periods);
 endogenousvariables = bsxfun(@plus, endogenousvariables, steadystate_y);
+exogenousvariables = bsxfun(@plus, exogenousvariables, steadystate_x');
 
 if verbose
     skipline();
