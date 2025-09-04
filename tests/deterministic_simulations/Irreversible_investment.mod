@@ -103,7 +103,7 @@ var epsilonA1; periods 1; values 2;
 @#endfor
 
 end;
-
+options_.debug=true;
 perfect_foresight_setup(periods=400);
 perfect_foresight_solver(robust_lin_solve);
 
@@ -114,3 +114,6 @@ else
     endo_simul=oo_.endo_simul;
     save endo_simul endo_simul
 end
+
+perfect_foresight_setup(periods=400);
+perfect_foresight_solver(robust_lin_solve,allow_nonfinite_values);

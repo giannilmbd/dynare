@@ -1,5 +1,5 @@
 function [endogenousvariables, success, err, iter, exogenousvariables] = sim1(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
-% [endogenousvariables, success, err, iter] = sim1(endogenousvariables, exogenousvariables, steadystate, M_, options_)
+% [endogenousvariables, success, err, iter] = sim1(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
 % Performs deterministic simulations with lead or lag of one period, using
 % a basic Newton solver on sparse matrices.
 % Uses perfect_foresight_problem DLL to construct the stacked problem.
@@ -37,6 +37,15 @@ function [endogenousvariables, success, err, iter, exogenousvariables] = sim1(en
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 verbose = options_.verbosity && ~options_.noprint;
+
+if options_.simul.robust_lin_solve
+    orig_warning_state = warning;
+    if isoctave
+        warning('off','Octave:singular-matrix');
+    else
+        warning('off','MATLAB:singularMatrix');
+    end
+end
 
 ny = M_.endo_nbr;
 periods = get_simulation_periods(options_);
@@ -88,7 +97,7 @@ while ~(converged || iter > options_.simul.maxit)
     h2 = clock;
 
     [res, A] = perfect_foresight_problem(y, y0, yT, exogenousvariables, M_.params, steadystate, periods, M_, options_);
-    % A is the stacked Jacobian with period x equations alongs the rows and
+    % A is the stacked Jacobian with period x equations along the rows and
     % periods times variables (in declaration order) along the columns
 
     if ~isempty(controlled_paths_by_period)
@@ -149,7 +158,7 @@ while ~(converged || iter > options_.simul.maxit)
         converged = true;
     else
         if options_.simul.robust_lin_solve
-            dy = -lin_solve_robust(A, res, verbose, options_);
+            dy = -lin_solve_robust(A, res, options_);
         else
             [mdy, first_iter_lu] = lin_solve(A, res, options_, first_iter_lu);
             dy = -mdy;
@@ -205,7 +214,7 @@ if converged
             fprintf('Total time of simulation: %g.\n', etime(clock,h1))
             printline(56)
         end
-        success = true; % Convergency obtained.
+        success = true; % Convergence obtained.
     end
 else
     if verbose
@@ -221,7 +230,12 @@ if verbose
     skipline();
 end
 
-function [ x, flag, relres ] = lin_solve_robust(A, b ,verbose, options_)
+if options_.simul.robust_lin_solve
+    warning(orig_warning_state);
+end
+
+
+function [ x, flag, relres ] = lin_solve_robust(A, b ,options_)
 if norm(b) < sqrt(eps) % then x = 0 is a solution
     x = 0;
     flag = 0;
@@ -230,19 +244,17 @@ if norm(b) < sqrt(eps) % then x = 0 is a solution
 end
 
 x = A\b;
-x(~isfinite(x)) = 0;
+if ~options_.simul.allow_nonfinite_values
+    x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
+end
 [ x, flag, relres ] = bicgstab(A, b, [], [], [], [], x); % returns immediately if x is a solution
 if flag == 0
     return
 end
 
-if ~options_.noprint
-    disp( relres );
-end
+disp_verbose(['    lin_solve_robust: Relative residual from bicgstab: ' num2str(relres,8)],options_.debug);
+disp_verbose('    lin_solve_robust: Initial bicgstab failed, trying alternative start point.',options_.debug);
 
-if verbose
-    fprintf('Initial bicgstab failed, trying alternative start point.\n');
-end
 old_x = x;
 old_relres = relres;
 [ x, flag, relres ] = bicgstab(A, b);
@@ -250,9 +262,11 @@ if flag == 0
     return
 end
 
-if verbose
-    fprintf('Alternative start point also failed with bicgstab, trying gmres.\n');
+if ~options_.simul.allow_nonfinite_values
+    x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
 end
+
+disp_verbose('    lin_solve_robust: Alternative start point also failed with bicgstab, trying gmres.',options_.debug);
 if old_relres < relres
     x = old_x;
 end
@@ -261,9 +275,12 @@ if flag == 0
     return
 end
 
-if verbose
-    fprintf('Initial gmres failed, trying alternative start point.\n');
+if ~options_.simul.allow_nonfinite_values
+    x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
 end
+
+disp_verbose('    lin_solve_robust: Initial gmres failed, trying alternative start point.',options_.debug);
+
 old_x = x;
 old_relres = relres;
 [ x, flag, relres ] = gmres(A, b);
@@ -271,9 +288,12 @@ if flag == 0
     return
 end
 
-if verbose
-    fprintf('Alternative start point also failed with gmres, using the (SLOW) Moore-Penrose Pseudo-Inverse.\n');
+if ~options_.simul.allow_nonfinite_values
+    x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
 end
+
+disp_verbose('    lin_solve_robust: Alternative start point also failed with gmres, using the (SLOW) Moore-Penrose Pseudo-Inverse.',options_.debug)
+
 if old_relres < relres
     x = old_x;
     relres = old_relres;
@@ -281,14 +301,18 @@ end
 old_x = x;
 old_relres = relres;
 x = pinv(full(A)) * b;
+if ~options_.simul.allow_nonfinite_values
+    x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
+end
+
 relres = norm(b - A*x) / norm(b);
 if old_relres < relres
     x = old_x;
     relres = old_relres;
 end
-flag = relres > 1e-6;
-if flag ~= 0 && verbose
-    fprintf('WARNING : Failed to find a solution to the linear system\n');
+flag = (relres > 1e-6); %corresponds to hard-coded relative tolerance in e.g. bicgstab
+if flag ~= 0
+    disp_verbose('    lin_solve_robust: robust_lin_solve failed to find a solution to the linear system.', options_.debug);
 end
 
 function display_critical_variables(dyy, M_, noprint)
