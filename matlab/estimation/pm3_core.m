@@ -4,12 +4,12 @@ function myoutput=pm3_core(myinputs,fpar,nvar,whoiam, ThisMatlab)
 % Core functionality for pm3.m function, which can be parallelized.
 
 % INPUTS
-%   o myimput            [struc]     The mandatory variables for local/remote
+%   o myinputs           [struc]     The mandatory variables for local/remote
 %                                    parallel computing obtained from prior_posterior_statistics.m
 %                                    function.
 %   o fpar and nvar      [integer]   first variable and number of variables
 %   o whoiam             [integer]   In concurrent programming a modality to refer to the different threads running in parallel is needed.
-%                                    The integer whoaim is the integer that
+%                                    The integer whoiam is the integer that
 %                                    allows us to distinguish between them. Then it is the index number of this CPU among all CPUs in the
 %                                    cluster.
 %   o ThisMatlab         [integer]   Allows us to distinguish between the
@@ -23,7 +23,7 @@ function myoutput=pm3_core(myinputs,fpar,nvar,whoiam, ThisMatlab)
 % SPECIAL REQUIREMENTS.
 %   None.
 
-% Copyright © 2007-2023 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -89,13 +89,10 @@ end
 OutputFileName = {};
 
 for i=fpar:nvar
-    if max(abs(Mean(:,i))) > 10^(-6)
+    if ~all(isnan(Mean(:,i)))
         subplotnum = subplotnum+1;
         set(0,'CurrentFigure',hh_fig);
         subplot(nn,nn,subplotnum);
-        if ~(all(all(Distrib(:,:,i)))>0 || ~all(all(Distrib(:,:,i)))<0)
-            plot([1 n2],[0 0],'-r','linewidth',0.5);
-        end
         hold on
         for k = 1:9
             plot(1:n2,squeeze(Distrib(k,:,i)),'-g','linewidth',0.5);
@@ -117,7 +114,6 @@ for i=fpar:nvar
             set(gca,'yticklabel',yticklabels_new)
         end
     end
-
     if whoiam
         if Parallel(ThisMatlab).Local==0
             DirectoryName = CheckPath('Output',dname);
