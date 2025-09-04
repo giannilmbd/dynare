@@ -1,17 +1,21 @@
-function [pars, cosnJ] = bruteforce(dname,fname,J, max_dim_cova_group, TeX, name_tex, tittxt, tol_deriv)
-% [pars, cosnJ] = bruteforce(dname,fname,J, max_dim_cova_group, TeX, name_tex, tittxt, tol_deriv)
+function [pars, cosnJ] = bruteforce(dname,fname,J, max_dim_cova_group, TeX, name_tex, tittxt, tol_deriv, console_mode)
+% [pars, cosnJ] = bruteforce(dname,fname,J, max_dim_cova_group, TeX, name_tex, tittxt, tol_deriv, console_mode)
 % -------------------------------------------------------------------------
 % given the Jacobian matrix J of moment derivatives w.r.t. parameters
 % computes, for  each column of J, the groups of columns from 1 to n that
 % can replicate at best the derivatives of that column
 % =========================================================================
 % INPUTS
-%  J                  [double] (normalized) Jacobian matrix of moment derivatives
-%  max_dim_cova_group [scalar] maximum size of covariance groups tested
-%  TeX                [scalar] Indicator whether TeX-output is requested
-%  pnames_TeX         [char] list of tex names
+%  dname              [char]    directory name for saving
+%  fname              [char]    file name for saving
+%  J                  [double]  (normalized) Jacobian matrix of moment derivatives
+%  max_dim_cova_group [scalar]  maximum size of covariance groups tested
+%  TeX                [scalar]  Indicator whether TeX-output is requested
+%  name_tex           [char]    list of parameter tex names
 %  tittxt             [string]  string indicating the title text for
 %                               graphs and figures
+%  tol_deriv          [double]  tolerance for singularity
+%  console_mode       [boolean] indicator for whether waitbar is in console mode
 % -------------------------------------------------------------------------
 % OUTPUTS
 %  pars  : cell array with group of params for each column of J for 1 to n
@@ -52,6 +56,9 @@ end
 if nargin < 8
     tol_deriv = 1.e-8;
 end
+if nargin < 9
+    console_mode=false;
+end
 
 tittxt1=regexprep(tittxt, ' ', '_');
 tittxt1=strrep(tittxt1, '.', '');
@@ -59,7 +66,8 @@ tittxt1=strrep(tittxt1, '.', '');
 cosnJ = zeros(totparam_nbr,max_dim_cova_group); %initialize
 pars{totparam_nbr,max_dim_cova_group}=[];       %initialize
 for ll = 1:max_dim_cova_group
-    h = waitbar.run(0,['Brute force collinearity for ' int2str(ll) ' parameters.']);
+    wait_string=['Brute force collinearity for ' int2str(ll) ' parameters.'];
+    [h,length_of_old_string]=waitbar.run(0,[],wait_string,console_mode,0,'Brute force collinearity test.');
     for ii = 1:totparam_nbr
         tmp = find([1:totparam_nbr]~=ii);
         tmp2  = nchoosek(tmp,ll); %find all possible combinations, ind16 could speed this up
@@ -81,9 +89,9 @@ for ll = 1:max_dim_cova_group
         else
             pars{ii,ll} = NaN(1,ll);
         end
-        waitbar.run(ii/totparam_nbr,h)
+        [~,length_of_old_string]=waitbar.run(ii/totparam_nbr,h,wait_string,console_mode,length_of_old_string);
     end
-    waitbar.close(h);
+    waitbar.close(h,console_mode);
     if TeX
         filename = [OutputDirectoryName '/' fname '_collin_patterns_',tittxt1,'_' int2str(ll) '.tex'];
         fidTeX = fopen(filename,'w');

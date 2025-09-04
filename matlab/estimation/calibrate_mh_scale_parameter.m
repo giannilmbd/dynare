@@ -1,5 +1,5 @@
 function Scale = calibrate_mh_scale_parameter(objective_function, CovarianceMatrix, Parameters, MhBounds, options, varargin)
-% function Scale = calibrate_mh_scale_parameter(ObjectiveFunction, CovarianceMatrix, Parameters, MhBounds, options, varargin)
+% Scale = calibrate_mh_scale_parameter(ObjectiveFunction, CovarianceMatrix, Parameters, MhBounds, options, varargin)
 % Tune the MH scale parameter so that the overall acceptance ratio is close to AcceptanceTarget.
 %
 % INPUTS
@@ -20,7 +20,7 @@ function Scale = calibrate_mh_scale_parameter(objective_function, CovarianceMatr
 
 
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,8 +38,7 @@ function Scale = calibrate_mh_scale_parameter(objective_function, CovarianceMatr
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % Fire up the wait bar
-hh_fig = waitbar.run(0,'Tuning of the scale parameter...');
-set(hh_fig,'Name','Tuning of the scale parameter.');
+[hh_fig, length_of_old_string] = waitbar.run(0, [], 'Tuning of the scale parameter...', options.console_mode, 0, 'Tuning of the scale parameter.');
 
 % Initialize various counters.
 j = 1; jj  = 1; isux = 0; jsux = 0; i = 0;
@@ -100,7 +99,7 @@ while j<=options.maxiter
     prtfrc = j/options.maxiter;
     % Update the waitbar
     if ~mod(j, 10)
-        waitbar.run(prtfrc, hh_fig, sprintf('Acceptance ratio [during last %u]: %f [%f]', options.stepsize, isux/j, jsux/jj));
+        [~,length_of_old_string]=waitbar.run(prtfrc, hh_fig, sprintf('Acceptance ratio [during last %u]: %f [%f]', options.stepsize, isux/j, jsux/jj),options.console_mode,length_of_old_string);
     end
     % Adjust the value of the scale parameter.
     if ~mod(j, options.stepsize)
@@ -135,4 +134,4 @@ while j<=options.maxiter
     jj = jj + 1;
 end
 
-waitbar.close(hh_fig);
+waitbar.close(hh_fig,options.console_mode);

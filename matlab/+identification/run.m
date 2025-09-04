@@ -533,7 +533,8 @@ if iload <=0
     if SampleSize > 1
         % initializations for Monte Carlo Analysis
         fprintf('\nMonte Carlo Testing\n');
-        h = waitbar.run(0,'Monte Carlo identification checks ...');
+        [h, length_of_old_string] = waitbar.run(0,[],'Monte Carlo identification checks ...', options_.console_mode, 0,'Monte Carlo Identification Analysis.');
+
         iteration  = 0; % initialize counter for admissable draws
         run_index  = 0; % initialize counter for admissable draws after saving previous draws to file(s)
         file_index = 0; % initialize counter for files (if options_.MaxNumberOfBytes is reached, we store results in files)
@@ -747,13 +748,13 @@ if iload <=0
                 run_index = 0; % reset index
             end
             if SampleSize > 1 && mod(iteration,3)
-                waitbar.run(iteration/SampleSize, h, ['MC identification checks ', int2str(iteration), '/', int2str(SampleSize)]);
+                [~, length_of_old_string] = waitbar.run(iteration/SampleSize, h, ['MC identification checks ', int2str(iteration), '/', int2str(SampleSize)], options_.console_mode, length_of_old_string);
             end
         end
     end
 
     if SampleSize > 1
-        waitbar.close(h);
+        waitbar.close(h,options_.console_mode);
         normalize_STO_DYNAMIC = std(STO_DYNAMIC,0,2);
         if ~options_MC.no_identification_reducedform
             normalize_STO_REDUCEDFORM = std(STO_REDUCEDFORM,0,2);

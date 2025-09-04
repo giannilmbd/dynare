@@ -50,6 +50,9 @@ function myoutput=PosteriorIRF_core2(myinputs,fpar,npar,whoiam,ThisMatlab)
 if nargin<4
     whoiam=0;
 end
+if nargin<5
+    ThisMatlab=1;
+end
 
 % Reshape 'myinputs' for local computation.
 % In order to avoid confusion in the name space, the instruction struct2local(myinputs) is replaced by:
@@ -80,6 +83,8 @@ MaxNumberOfPlotPerFigure=myinputs.MaxNumberOfPlotPerFigure;
 % Necessary only for remote computing!
 if whoiam
     Parallel=myinputs.Parallel;
+else
+    Parallel=0; %make sure it exists    
 end
 
 % To save the figures where the function is computed!
@@ -91,8 +96,7 @@ if whoiam
     if Parallel(ThisMatlab).Local==0
         RemoteFlag =1;
     end
-    prct0={0,whoiam,Parallel(ThisMatlab)};
-    waitbar.run(prct0,'PosteriorIRF Plots ...');
+    [hh_fig, length_of_old_string] = waitbar.run(0, [], 'PosteriorIRF: Plots ...', options_.console_mode, 0, 'Posterior IRF plots.', whoiam,Parallel(ThisMatlab));
 end
 
 OutputFileName={};
@@ -165,7 +169,7 @@ for i=fpar:npar
     if whoiam
         fprintf('Done! \n');
         waitbarString = [ 'Exog. shocks ' int2str(i) '/' int2str(npar) ' done.'];
-        waitbar.run((i-fpar+1)/(npar-fpar+1),[],waitbarString);
+        [~,length_of_old_string]=waitbar.run((i-fpar+1)/(npar-fpar+1),hh_fig,waitbarString, options_.console_mode, length_of_old_string, [], whoiam, Parallel(ThisMatlab));
     end
 end % loop over exo_var
 

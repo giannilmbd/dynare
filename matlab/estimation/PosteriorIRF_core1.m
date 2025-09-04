@@ -44,7 +44,9 @@ function myoutput=PosteriorIRF_core1(myinputs,fpar,B,whoiam, ThisMatlab)
 if nargin<4
     whoiam=0;
 end
-
+if nargin<5
+    ThisMatlab=1;
+end
 % Reshape 'myinputs' for local computation.
 % In order to avoid confusion in the name space, the instruction struct2local(myinputs) is replaced by:
 
@@ -86,6 +88,8 @@ end
 
 if whoiam
     Parallel=myinputs.Parallel;
+else
+    Parallel=0; %make sure it exists
 end
 
 MhDirectoryName = myinputs.MhDirectoryName;
@@ -96,17 +100,15 @@ if whoiam
     if Parallel(ThisMatlab).Local==0
         RemoteFlag =1;
     end
-    prct0={0,whoiam,Parallel(ThisMatlab)};
-else
-    prct0=0;
 end
 if strcmpi(type,'posterior')
-    h = waitbar.run(prct0,'Bayesian (posterior) IRFs...');
+    waitbar_string='Bayesian (posterior) IRFs...';
 elseif strcmpi(type,'gsa')
-    h = waitbar.run(prct0,'GSA (prior) IRFs...');
+    waitbar_string='GSA (prior) IRFs...';
 else
-    h = waitbar.run(prct0,'Bayesian (prior) IRFs...');
+    waitbar_string='Bayesian (prior) IRFs...';
 end
+[h, length_of_old_string] = waitbar.run(0, [], waitbar_string, options_.console_mode, 0, 'Posterior IRFs.', whoiam,Parallel(ThisMatlab));
 
 OutputFileName_bvardsge = {};
 OutputFileName_dsge = {};
@@ -273,10 +275,10 @@ while fpar<B
         ifil2 = ifil2 + 1;
         irun2 = 0;
     end
-    waitbar.run((fpar-fpar0)/(B-fpar0),h);
+    [~,length_of_old_string]=waitbar.run((fpar-fpar0)/(B-fpar0),h, waitbar_string, options_.console_mode, length_of_old_string, [], whoiam, Parallel(ThisMatlab));
 end
 
-waitbar.close(h);
+waitbar.close(h,options_.console_mode);
 
 if whoiam==0
     if nosaddle

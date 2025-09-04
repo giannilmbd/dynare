@@ -43,7 +43,9 @@ function myoutput=pm3_core(myinputs,fpar,nvar,whoiam, ThisMatlab)
 if nargin<4
     whoiam=0;
 end
-
+if nargin<5
+    ThisMatlab=1;
+end
 % Reshape 'myinputs' for local computation.
 % In order to avoid confusion in the name space, the instruction struct2local(myinputs) is replaced by:
 
@@ -65,6 +67,8 @@ dname=myinputs.dname;
 
 if whoiam
     Parallel=myinputs.Parallel;
+else
+    Parallel=0; %make sure it exists    
 end
 
 if options_.TeX
@@ -72,8 +76,7 @@ if options_.TeX
 end
 
 if whoiam
-    prct0={0,whoiam,Parallel(ThisMatlab)};
-    h = waitbar.run(prct0,'Parallel plots pm3 ...');
+    [h, length_of_old_string] = waitbar.run(0, [], 'pm3: Parallel plots ...', options_.console_mode, 0, 'Posterior moments plotting.', whoiam,Parallel(ThisMatlab));
 end
 
 figunumber = 0;
@@ -133,11 +136,11 @@ for i=fpar:nvar
     end
 
     if whoiam
-        waitbar.run((i-fpar+1)/(nvar-fpar+1),h);
+        [h, length_of_old_string] = waitbar.run((i-fpar+1)/(nvar-fpar+1), h, 'pm3: Parallel plots ...', options_.console_mode, 0, [], whoiam,Parallel(ThisMatlab));
     end
 end
 
 if whoiam
-    waitbar.close(h);
+    waitbar.close(h,options_.console_mode);
 end
 myoutput.OutputFileName=OutputFileName;

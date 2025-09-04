@@ -13,7 +13,7 @@ function [vdec, cc, ac] = monte_carlo_moments(mm, ss, dr, M_, options_, estim_pa
 % - ac                  [cell]          autocorrelation matrix
 
 
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,7 +33,8 @@ function [vdec, cc, ac] = monte_carlo_moments(mm, ss, dr, M_, options_, estim_pa
 [~, nc1, nsam] = size(mm);
 nobs=length(options_.varobs);
 disp('monte_carlo_moments: Computing theoretical moments ...')
-h = waitbar.run(0,'Theoretical moments ...');
+[h, length_of_old_string] = waitbar.run(0,[],'monte_carlo_moments: Theoretical moments ...', options_.console_mode, 0, 'Monte Carlo moments.');
+
 vdec = zeros(nobs,M_.exo_nbr,nsam);
 cc = zeros(nobs,nobs,nsam);
 ac = zeros(nobs,nobs*options_.ar,nsam);
@@ -52,9 +53,9 @@ for j=1:nsam
     end
     ac(:,:,j)=dum;
     if mod(j,3)==0
-        waitbar.run(j/nsam,h)
+        [~, length_of_old_string]=waitbar.run(j/nsam,h,'monte_carlo_moments: Theoretical moments ...',options_.console_mode,length_of_old_string);
     end
 end
-waitbar.close(h)
+waitbar.close(h,options_.console_mode)
 skipline()
 disp('... done !')

@@ -50,6 +50,9 @@ function myoutput=prior_posterior_statistics_core(myinputs,fpar,B,whoiam, ThisMa
 if nargin<4
     whoiam=0;
 end
+if nargin<5
+    ThisMatlab=1;
+end
 
 % Reshape 'myinputs' for local computation.
 % In order to avoid confusion in the name space, the instruction struct2local(myinputs) is replaced by:
@@ -115,6 +118,8 @@ else
 end
 if whoiam
     Parallel=myinputs.Parallel;
+else
+    Parallel=0; %make sure it exists    
 end
 
 % DirectoryName = myinputs.DirectoryName;
@@ -137,11 +142,9 @@ if whoiam
         RemoteFlag =1;
     end
     ifil=ifil(:,whoiam);
-    prct0={0,whoiam,Parallel(ThisMatlab)};
-else
-    prct0=0;
 end
-h = waitbar.run(prct0,['Taking ',type,' subdraws...']);
+waitbar_string=['Taking ',type,' subdraws...'];
+[h, length_of_old_string] = waitbar.run(0, [], waitbar_string, options_.console_mode, 0, 'Prior/posterior objects.', whoiam,Parallel(ThisMatlab));
 
 if RemoteFlag==1
     OutputFileName_smooth = {};
@@ -537,7 +540,7 @@ for b=fpar:B
         irun(irun_index) = 1;
     end
     if mod(b-fpar+1, 5)==0
-        waitbar.run((b-fpar+1)/(B-fpar+1),h);
+        [~,length_of_old_string]=waitbar.run((b-fpar+1)/(B-fpar+1),h,waitbar_string, options_.console_mode, length_of_old_string,[],whoiam,Parallel(ThisMatlab));
     end
 end
 
@@ -559,7 +562,7 @@ if RemoteFlag==1
                         OutputFileName_state_uncert];
 end
 
-waitbar.close(h);
+waitbar.close(h,options_.console_mode);
 
 
 function yf=simulate_posterior_forecasts(y0,dr,horizon,stochastic_indicator,Sigma_e,n)

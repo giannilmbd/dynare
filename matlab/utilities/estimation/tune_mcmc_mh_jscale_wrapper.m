@@ -42,6 +42,12 @@ posterior_sampler_options_temp = options_.posterior_sampler_options.current_opti
 posterior_sampler_options_temp.invhess = invhess;
 posterior_sampler_options_temp = check_posterior_sampler_options(posterior_sampler_options_temp, M_.fname, M_.dname, options_);
 opt = options_.mh_tune_jscale;
+
+if options_.console_mode
+    opt.console_mode = true;
+else
+    opt.console_mode = false;
+end
 opt.rwmh = options_.posterior_sampler_options.rwmh;
 mh_jscale = calibrate_mh_scale_parameter(objective_function, ...
                                           posterior_sampler_options_temp.invhess, xparam1, [bounds.lb,bounds.ub], ...

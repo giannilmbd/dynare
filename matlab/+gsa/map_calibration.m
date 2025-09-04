@@ -13,7 +13,7 @@ function map_calibration(OutputDirectoryName, M_, options_, oo_, estim_params_, 
 % marco.ratto@ec.europa.eu
 
 % Copyright © 2014-2016 European Commission
-% Copyright © 2014-2023 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -105,7 +105,7 @@ if init
     end
 
     irestrictions = 1:Nsam;
-    h = waitbar.run(0,'Please wait...');
+    [h,length_of_old_string]=waitbar.run(0,[],'Please wait...',options_.console_mode,0,'Sensitivity analysis for calibration criteria.');
     for j=1:Nsam
         M_ = set_all_parameters(lpmat(j,:)',estim_params_,M_);
         if nbr_moment_restrictions
@@ -131,10 +131,10 @@ if init
             irestrictions(j)=0;
         end
         if mod(j,3)==0
-            waitbar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)])
+            [~,length_of_old_string]=waitbar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)],options_.console_mode,length_of_old_string);
         end
     end
-    waitbar.close(h);
+    waitbar.close(h,options_.console_mode);
 
     irestrictions=irestrictions(find(irestrictions));
     xmat=lpmat(irestrictions,:);
