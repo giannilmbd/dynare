@@ -226,15 +226,20 @@ module matlab_mat
        type(c_ptr), intent(in), value :: pm
      end function mxIsSparse
 
-     pure type(c_ptr) function mxGetIr(pm) bind(c, name="mxGetIr"//API_VER)
+     pure integer(c_size_t) function mxGetNzmax(pm) bind(c, name="mxGetNzmax"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
-     end function mxGetIr
+     end function mxGetNzmax
 
-     pure type(c_ptr) function mxGetJc(pm) bind(c, name="mxGetJc"//API_VER)
+     pure type(c_ptr) function mxGetIr_internal(pm) bind(c, name="mxGetIr"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
-     end function mxGetJc
+     end function mxGetIr_internal
+
+     pure type(c_ptr) function mxGetJc_internal(pm) bind(c, name="mxGetJc"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: pm
+     end function mxGetJc_internal
 
      ! Nonnumeric types
      pure type(c_ptr) function mxGetData(pm) bind(c, name="mxGetData"//API_VER)
@@ -392,6 +397,18 @@ contains
     call c_f_pointer(mxGetPi_internal(pm), mxGetPi, [ mxGetNumberOfElements(pm) ])
   end function mxGetPi
 #endif
+
+  function mxGetIr(pm)
+    type(c_ptr), intent(in) :: pm
+    integer(mwIndex), dimension(:), pointer, contiguous :: mxGetIr
+    call c_f_pointer(mxGetIr_internal(pm), mxGetIr, [ mxGetNzmax(pm) ])
+  end function mxGetIr
+
+  function mxGetJc(pm)
+    type(c_ptr), intent(in) :: pm
+    integer(mwIndex), dimension(:), pointer, contiguous :: mxGetJc
+    call c_f_pointer(mxGetJc_internal(pm), mxGetJc, [ mxGetN(pm)+1 ])
+  end function mxGetJc
 
   function mxGetLogicals(array_ptr)
     type(c_ptr), intent(in) :: array_ptr
