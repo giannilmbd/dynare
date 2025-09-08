@@ -113,7 +113,7 @@ for blockFlag = 0:1
         for i = 1:length(stack_solve_algos)
             if ismember(stack_solve_algos(i), [2 3])
                 if storageFlag ~= 2
-                    preconditioners = {'umfiter', 'iterstack', 'ilu'};
+                    preconditioners = {'first_iter_lu', 'block_diagonal_lu', 'ilu'};
                 else % bytecode
                     preconditioners = {'ilu'};
                 end

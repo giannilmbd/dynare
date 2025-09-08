@@ -219,14 +219,14 @@ perfect_foresight_solver(no_homotopy, stack_solve_algo = @{stack_solve_algo}
 @#if length(preconditioner) > 0
 , preconditioner = @{preconditioner}
 @#endif
-@#if preconditioner == "iterstack"
+@#if preconditioner == "block_diagonal_lu"
 @# if !(block && stack_solve_algo == 3)
-// Ensure that problem is not too small for iterstack, and also that there is a “residual” in the block diagonal matrix (since 3 does not divide 20)
-, iterstack_nperiods = 3
+// Ensure that problem is not too small for block_diagonal_lu, and also that there is a “residual” in the block diagonal matrix (since 3 does not divide 20)
+, block_diagonal_lu_nperiods = 3
 @# else
-// For some reason iterstack can’t solve this model with block decomposition + BiCGStab
+// For some reason block_diagonal_lu can’t solve this model with block decomposition + BiCGStab
 // Hence do the equivalent of a full LU
-, iterstack_nperiods = 20
+, block_diagonal_lu_nperiods = 20
 @# endif
 @#endif
 );

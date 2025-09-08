@@ -3845,7 +3845,7 @@ speed-up on large models.
        in combination with the iterative sparse linear solver (either GMRES or
        BiCGStab). Possible values for OPTION are:
 
-           ``umfiter``
+           ``first_iter_lu``
 
                At the first iteration of the nonlinear Newton solver, compute
                the full LU decomposition with complete pivoting of the linear
@@ -3853,7 +3853,7 @@ speed-up on large models.
                using the iterative solver). This LU decomposition is then used
                as the preconditioner in further Newton iterations.
 
-           ``iterstack``
+           ``block_diagonal_lu``
 
                Compute the LU decomposition with complete pivoting for only a
                few simulation periods within the stacked Jacobian (which is a
@@ -3864,17 +3864,17 @@ speed-up on large models.
                periods used for the small LU, then an additional LU is computed
                for the remainder. The following options can be used to control
                the construction of this preconditioner:
-               :opt:`iterstack_maxlu <iterstack_maxlu = INTEGER>`,
-               :opt:`iterstack_nperiods <iterstack_nperiods = INTEGER>`,
-               :opt:`iterstack_nlu <iterstack_nlu = INTEGER>`,
-               :opt:`iterstack_relu <iterstack_relu = DOUBLE>`.
+               :opt:`block_diagonal_lu_maxlu <block_diagonal_lu_maxlu = INTEGER>`,
+               :opt:`block_diagonal_lu_nperiods <block_diagonal_lu_nperiods = INTEGER>`,
+               :opt:`block_diagonal_lu_nlu <block_diagonal_lu_nlu = INTEGER>`,
+               :opt:`block_diagonal_lu_relu <block_diagonal_lu_relu = DOUBLE>`.
 
            ``ilu``
 
                Use an incomple LU decomposition as the preconditioner,
                recomputed at every iteration of the nonlinear Newton solver.
 
-       |br| Default value is ``umfiter``.
+       |br| Default value is ``first_iter_lu``.
 
     .. option:: iter_tol = DOUBLE
 
@@ -3905,10 +3905,10 @@ speed-up on large models.
        the GMRES algorithm. It corresponds to the ``restart`` option of the
        ``gmres`` MATLAB/Octave function. Default: ``100``.
 
-    .. option:: iterstack_maxlu = INTEGER
+    .. option:: block_diagonal_lu_maxlu = INTEGER
 
        When :opt:`preconditioner <preconditioner = OPTION>` is equal to
-       ``iterstack``, controls the maximum size of the matrix for which the
+       ``block_diagonal_lu``, controls the maximum size of the matrix for which the
        small LU will computed. The actual size of the matrix will be determined
        by the largest number of periods that, multiplied by the number of
        equations, is less than the value of the option. Note that when combined
@@ -3917,25 +3917,25 @@ speed-up on large models.
        regular LU decomposition instead of the iterative linear solver.
        Default: ``20000``.
 
-    .. option:: iterstack_nperiods = INTEGER
+    .. option:: block_diagonal_lu_nperiods = INTEGER
 
        When :opt:`preconditioner <preconditioner = OPTION>` is equal to
-       ``iterstack``, controls the number of periods used for the small LU.
-       If nonzero, this option overrides the :opt:`iterstack_maxlu <iterstack_maxlu = INTEGER>`
-       and :opt:`iterstack_nlu <iterstack_nlu = INTEGER>` options. Default: ``0``.
+       ``block_diagonal_lu``, controls the number of periods used for the small LU.
+       If nonzero, this option overrides the :opt:`block_diagonal_lu_maxlu <block_diagonal_lu_maxlu = INTEGER>`
+       and :opt:`block_diagonal_lu_nlu <block_diagonal_lu_nlu = INTEGER>` options. Default: ``0``.
 
-    .. option:: iterstack_nlu = INTEGER
+    .. option:: block_diagonal_lu_nlu = INTEGER
 
        When :opt:`preconditioner <preconditioner = OPTION>` is equal to
-       ``iterstack``, specifies the number of times that the small LU should be
+       ``block_diagonal_lu``, specifies the number of times that the small LU should be
        repeated in the large preconditioner. If nonzero, this option overrides
-       the :opt:`iterstack_maxlu <iterstack_maxlu = INTEGER>` option. Default:
+       the :opt:`block_diagonal_lu_maxlu <block_diagonal_lu_maxlu = INTEGER>` option. Default:
        ``0``.
 
-    .. option:: iterstack_relu = DOUBLE
+    .. option:: block_diagonal_lu_relu = DOUBLE
 
        When :opt:`preconditioner <preconditioner = OPTION>` is equal to
-       ``iterstack``, controls the relative position of the small LU within the
+       ``block_diagonal_lu``, controls the relative position of the small LU within the
        whole stacked system. Must be a number between ``0`` and ``1``. Default:
        ``0.5``.
 

@@ -73,7 +73,7 @@ iter=0;
 correcting_factor=0.01;
 max_resa=1e100;
 lambda = 1; % Length of Newton step (unused for stack_solve_algo=4)
-umfiter_precond = [];
+first_iter_lu = [];
 
 while ~(cvg || iter > options_.simul.maxit)
     [yy, T, ra, g1a] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
@@ -142,12 +142,12 @@ while ~(cvg || iter > options_.simul.maxit)
         g1aa=g1a;
         max_resa=max_res;
         if ismember(stack_solve_algo, [0, 2, 3])
-            % Fallback to LU if block too small for iterstack
+            % Fallback to LU if block too small for block_diagonal_lu
             force_lu = ismember(stack_solve_algo, [2 3]) ...
-                && strcmp(options_.simul.preconditioner, 'iterstack') ...
-                && options_.simul.iterstack_nperiods == 0 ...
-                && options_.simul.iterstack_nlu == 0 && size(g1a, 1) < options_.simul.iterstack_maxlu;
-            [mdx, umfiter_precond] = lin_solve(g1a, ra, options_, umfiter_precond, force_lu);
+                && strcmp(options_.simul.preconditioner, 'block_diagonal_lu') ...
+                && options_.simul.block_diagonal_lu_nperiods == 0 ...
+                && options_.simul.block_diagonal_lu_nlu == 0 && size(g1a, 1) < options_.simul.block_diagonal_lu_maxlu;
+            [mdx, first_iter_lu] = lin_solve(g1a, ra, options_, first_iter_lu, force_lu);
             dx = -mdx;
             ya = ya + lambda*dx;
             yy(y_index,1:periods)=reshape(ya', length(y_index), periods);

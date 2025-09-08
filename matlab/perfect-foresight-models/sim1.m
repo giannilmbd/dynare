@@ -82,7 +82,7 @@ end
 h1 = clock;
 iter = 1;
 converged = false;
-umfiter_precond = [];
+first_iter_lu = [];
 
 while ~(converged || iter > options_.simul.maxit)
     h2 = clock;
@@ -151,7 +151,7 @@ while ~(converged || iter > options_.simul.maxit)
         if options_.simul.robust_lin_solve
             dy = -lin_solve_robust(A, res, verbose, options_);
         else
-            [mdy, umfiter_precond] = lin_solve(A, res, options_, umfiter_precond);
+            [mdy, first_iter_lu] = lin_solve(A, res, options_, first_iter_lu);
             dy = -mdy;
         end
         if any(isnan(dy)) || any(isinf(dy))

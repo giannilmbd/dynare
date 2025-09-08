@@ -61,7 +61,7 @@ Blck_size=size(y_index_eq,2);
 correcting_factor=0.01;
 max_resa=1e100;
 lambda = 1; % Length of Newton step
-umfiter_precond = [];
+first_iter_lu = [];
 if is_forward
     incr = 1;
     start = y_kmin+1;
@@ -190,11 +190,11 @@ for it_=start:incr:finish
                                     M_.block_structure.block(Block_Num).g1_sparse_colval, ...
                                     M_.block_structure.block(Block_Num).g1_sparse_colptr, T(:, it_));
             elseif is_dynamic && ismember(stack_solve_algo, [0, 1, 2, 3, 6])
-                % Iterstack and LBJ do not make sense for one boundary problems, hence use LU.
+                % Block diagonal LU preconditioner and LBJ do not make sense for one boundary problems, hence use LU.
                 force_lu = (ismember(stack_solve_algo, [2 3]) ...
-                            && strcmp(options_.simul.preconditioner, 'iterstack')) ...
+                            && strcmp(options_.simul.preconditioner, 'block_diagonal_lu')) ...
                             || ismember(stack_solve_algo, [1 6]);
-                [dx, umfiter_precond] = lin_solve(g1, r, options_, umfiter_precond, force_lu);
+                [dx, first_iter_lu] = lin_solve(g1, r, options_, first_iter_lu, force_lu);
                 ya = ya - lambda*dx;
                 y(y_index_eq, it_) = ya;
             elseif ~is_dynamic && options_.solve_algo == 6

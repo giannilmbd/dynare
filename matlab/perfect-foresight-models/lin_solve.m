@@ -1,10 +1,10 @@
-function [x, umfiter_precond] = lin_solve(A, b, options_, umfiter_precond, force_lu)
+function [x, first_iter_lu] = lin_solve(A, b, options_, first_iter_lu, force_lu)
 % Solves the linear system A·x=b. Used at the heart of the perfect foresight solver when
 % stack_solve_algo equals 0 (LU), 2 (GMRES) or 3 (BiCGStab).
 %
 % If force_lu is true, then the value of options_.stack_solve_algo is ignored and a LU is used.
 %
-% umfiter_precond corresponds to the preconditioner used when precondioner=umfiter.
+% first_iter_lu corresponds to the preconditioner used when precondioner=first_iter_lu.
 % If empty on input, then the routine computes the preconditioner and returns on output.
 % If not empty, use that preconditioner without recomputing it, and pass it unmodified on output.
 
@@ -26,7 +26,7 @@ function [x, umfiter_precond] = lin_solve(A, b, options_, umfiter_precond, force
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if nargin < 4
-    umfiter_precond = [];
+    first_iter_lu = [];
 end
 if nargin < 5
     force_lu = false;
@@ -40,26 +40,26 @@ end
 if options_.stack_solve_algo == 0 || force_lu
     x = A\b;
 else % Iterative algorithm
-    if strcmp(options_.simul.preconditioner, 'umfiter')
-        if isempty(umfiter_precond)
+    if strcmp(options_.simul.preconditioner, 'first_iter_lu')
+        if isempty(first_iter_lu)
             [L, U, P, Q] = lu(A);
         else
-            L = umfiter_precond.L;
-            U = umfiter_precond.U;
-            P = umfiter_precond.P;
-            Q = umfiter_precond.Q;
+            L = first_iter_lu.L;
+            U = first_iter_lu.U;
+            P = first_iter_lu.P;
+            Q = first_iter_lu.Q;
         end
-    elseif strcmp(options_.simul.preconditioner, 'iterstack')
-        [L, U, P, Q] = iterstack_preconditioner(A, options_);
+    elseif strcmp(options_.simul.preconditioner, 'block_diagonal_lu')
+        [L, U, P, Q] = block_diagonal_lu_preconditioner(A, options_);
     elseif strcmp(options_.simul.preconditioner, 'ilu')
         [L, U, P] = ilu(A, options_.simul.ilu);
         Q = speye(size(A));
     end
 
-    if strcmp(options_.simul.preconditioner, 'umfiter') && isempty(umfiter_precond)
+    if strcmp(options_.simul.preconditioner, 'first_iter_lu') && isempty(first_iter_lu)
         z = L\(P*b);
         y = U\z;
-        umfiter_precond = struct('L', L, 'U', U, 'P', P, 'Q', Q);
+        first_iter_lu = struct('L', L, 'U', U, 'P', P, 'Q', Q);
     else
         iter_tol = options_.simul.iter_tol;
         if isempty(iter_tol)
@@ -86,38 +86,38 @@ else % Iterative algorithm
 end
 
 
-function [L, U, P, Q] = iterstack_preconditioner(A, options_)
+function [L, U, P, Q] = block_diagonal_lu_preconditioner(A, options_)
 
 ny = size(A, 1) / options_.periods;
 
-if options_.simul.iterstack_nperiods > 0
-    if options_.simul.iterstack_nperiods > options_.periods
-        error('iterstack preconditioner: iterstack_nperiods option is greater than the periods options')
+if options_.simul.block_diagonal_lu_nperiods > 0
+    if options_.simul.block_diagonal_lu_nperiods > options_.periods
+        error('block_diagonal_lu preconditioner: block_diagonal_lu_nperiods option is greater than the periods options')
     end
-    lusize = ny * options_.simul.iterstack_nperiods;
-elseif options_.simul.iterstack_nlu ~= 0
-    if options_.simul.iterstack_nlu < 0 % To avoid misleading TROLL users
-        error('iterstack preconditioner: negative value of iterstack_nlu option is not supported')
+    lusize = ny * options_.simul.block_diagonal_lu_nperiods;
+elseif options_.simul.block_diagonal_lu_nlu ~= 0
+    if options_.simul.block_diagonal_lu_nlu < 0 % To avoid misleading TROLL users
+        error('block_diagonal_lu preconditioner: negative value of block_diagonal_lu_nlu option is not supported')
     end
-    lusize = floor(floor(size(A, 1) / options_.simul.iterstack_nlu) / ny) * ny;
+    lusize = floor(floor(size(A, 1) / options_.simul.block_diagonal_lu_nlu) / ny) * ny;
     if lusize == 0
-        error('iterstack preconditioner: iterstack_nlu option is too large')
+        error('block_diagonal_lu preconditioner: block_diagonal_lu_nlu option is too large')
     end
 else
-    if size(A, 1) < options_.simul.iterstack_maxlu
-        error('iterstack preconditioner: too small problem; either decrease iterstack_maxlu option, or use iterstack_nperiods or iterstack_nlu options')
+    if size(A, 1) < options_.simul.block_diagonal_lu_maxlu
+        error('block_diagonal_lu preconditioner: too small problem; either decrease block_diagonal_lu_maxlu option, or use block_diagonal_lu_nperiods or block_diagonal_lu_nlu options')
     end
-    if ny > options_.simul.iterstack_maxlu
-        error('iterstack preconditioner: too large problem; either increase iterstack_maxlu option, or use iterstack_nperiods or iterstack_nlu options')
+    if ny > options_.simul.block_diagonal_lu_maxlu
+        error('block_diagonal_lu preconditioner: too large problem; either increase block_diagonal_lu_maxlu option, or use block_diagonal_lu_nperiods or block_diagonal_lu_nlu options')
     end
-    lusize = floor(options_.simul.iterstack_maxlu / ny) * ny;
+    lusize = floor(options_.simul.block_diagonal_lu_maxlu / ny) * ny;
 end
 
-if options_.simul.iterstack_relu < 0 || options_.simul.iterstack_relu > 1
-    error('iterstack preconditioner: iterstack_relu option must be between 0 and 1')
+if options_.simul.block_diagonal_lu_relu < 0 || options_.simul.block_diagonal_lu_relu > 1
+    error('block_diagonal_lu preconditioner: block_diagonal_lu_relu option must be between 0 and 1')
 end
 
-luidx = floor((floor(size(A, 1) / lusize) - 1) * options_.simul.iterstack_relu) * lusize + (1:lusize);
+luidx = floor((floor(size(A, 1) / lusize) - 1) * options_.simul.block_diagonal_lu_relu) * lusize + (1:lusize);
 [L1, U1, P1, Q1] = lu(A(luidx,luidx));
 eyek = speye(floor(size(A, 1) / lusize));
 L = kron(eyek, L1);
@@ -134,7 +134,7 @@ if r > 0 % Compute additional smaller LU for remainder, if any
 end
 
 if options_.debug
-    fprintf('iterstack preconditioner: main LU size = %d, remainder LU size = %d\n', lusize, r)
+    fprintf('block_diagonal_lu preconditioner: main LU size = %d, remainder LU size = %d\n', lusize, r)
 end
 
 
