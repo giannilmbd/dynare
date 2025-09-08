@@ -1,5 +1,5 @@
 function oo_ = compute_moments_varendo(type, options_, M_, oo_, estim_params_, var_list_)
-
+% oo_ = compute_moments_varendo(type, options_, M_, oo_, estim_params_, var_list_)
 % Computes the second order moments (autocorrelation function, covariance
 % matrix and variance decomposition) distributions for all the endogenous variables selected in
 % var_list_. The results are saved in oo_
@@ -110,32 +110,12 @@ end
 waitbar.close(hh_fig,options_.console_mode)
 
 % CORRELATION FUNCTION.
-[hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: correlation', options_.console_mode, 0, 'Endogenous moments: correlation.');
 if posterior
-    lag_iter=1;
-    for h=NumberOfLags:-1:1
-        lag_iter=lag_iter+1;
-        for i=1:NumberOfEndogenousVariables
-            for j=1:NumberOfEndogenousVariables
-                oo_ = posterior_analysis('correlation', var_list_{i}, var_list_{j}, h, options_, M_, oo_, estim_params_);
-                [hh_fig, length_of_old_string] = waitbar.run(((lag_iter-1)*NumberOfEndogenousVariables^2+(i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables^2*NumberOfLags), hh_fig, 'Endogenous moments: correlation', options_.console_mode, length_of_old_string);
-            end
-        end
-    end
+    oo_ = posterior_analysis('correlation', var_list_, NumberOfEndogenousVariables, NumberOfLags, options_, M_, oo_, estim_params_);
 else
-    lag_iter=1;
-    for h=NumberOfLags:-1:1
-        lag_iter=lag_iter+1;
-        for i=1:NumberOfEndogenousVariables
-            for j=1:NumberOfEndogenousVariables
-                oo_ = prior_analysis('correlation', var_list_{i}, var_list_{j}, h, options_, M_, oo_, estim_params_);
-                [hh_fig, length_of_old_string] = waitbar.run(((lag_iter-1)*NumberOfEndogenousVariables^2+(i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables^2*NumberOfLags), hh_fig, 'Endogenous moments: correlation', options_.console_mode, length_of_old_string);
-            end
-        end
-    end
+    oo_ = prior_analysis('correlation', var_list_, NumberOfEndogenousVariables, NumberOfLags, options_, M_, oo_, estim_params_);
 end
-waitbar.close(hh_fig,options_.console_mode)
-
+ 
 
 % VARIANCE DECOMPOSITION.
 if options_.order==1

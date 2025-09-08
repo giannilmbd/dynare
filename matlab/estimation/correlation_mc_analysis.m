@@ -2,7 +2,7 @@ function oo_ = correlation_mc_analysis(SampleSize,type,dname,fname,vartan,nvar,v
 % This function analyses the (posterior or prior) distribution of the
 % endogenous variables correlation function.
 
-% Copyright © 2008-2024 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -28,93 +28,49 @@ else
     PATH = [dname '/prior/moments/'];
 end
 
-indx1 = check_name(vartan,var1);
-if isempty(indx1)
-    disp([ type '_analysis:: ' var1 ' is not a stationary endogenous variable!'])
-    return
-end
-if ~isempty(var2)
-    indx2 = check_name(vartan,var2);
-    if isempty(indx2)
-        disp([ type '_analysis:: ' var2 ' is not a stationary endogenous variable!'])
-        return
-    end
-else
-    indx2 = indx1;
-    var2 = var1;
-end
-
-var1=deblank(var1);
-var2=deblank(var2);
-
-if isfield(oo_,[TYPE 'TheoreticalMoments'])
-    temporary_structure = oo_.([TYPE, 'TheoreticalMoments']);
-    if isfield(temporary_structure,'dsge')
-        temporary_structure = oo_.([TYPE, 'TheoreticalMoments']).dsge;
-        if isfield(temporary_structure,'correlation')
-            temporary_structure = oo_.([TYPE, 'TheoreticalMoments']).dsge.correlation.Mean;
-            if isfield(temporary_structure,deblank(var1))
-                temporary_structure_1 = oo_.([TYPE, 'TheoreticalMoments']).dsge.correlation.Mean.(var1);
-                if isfield(temporary_structure_1,deblank(var2))
-                    temporary_structure_2 = temporary_structure_1.(var2);
-                    l1 = length(temporary_structure_2);
-                    if l1<nar
-                        % INITIALIZATION:
-                        oo_ = initialize_output_structure(var1,var2,nar,type,oo_);
-                        delete([PATH fname '_' TYPE 'Correlations*'])
-                    else
-                        if ~isnan(temporary_structure_2(nar))
-                            %Nothing to do.
-                            return
-                        end
-                    end
-                else
-                    oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
-                end
-            else
-                oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
-            end
-        else
-            oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
-        end
-    else
-        oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
-    end
-else
-    oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
-end
 ListOfFiles = dir([ PATH  fname '_' TYPE 'Correlations*.mat']);
-i1 = 1; tmp = zeros(SampleSize,1);
-for file = 1:length(ListOfFiles)
-    load([ PATH  ListOfFiles(file).name ],'Correlation_array');
-    i2 = i1 + rows(Correlation_array) - 1;
-    tmp(i1:i2) = Correlation_array(:,indx1,indx2,nar);
-    i1 = i2+1;
+
+[hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: correlation', options_.console_mode, 0);
+if ~options_.console_mode
+    set(hh_fig,'Name', 'Endogenous moments: correlation.' );
 end
-if options_.estimation.moments_posterior_density.indicator
-    [p_mean, p_median, p_var, hpd_interval, p_deciles, density] = ...
-        posterior_moments(tmp,mh_conf_sig);
-else
-    [p_mean, p_median, p_var, hpd_interval, p_deciles] = ...
-        posterior_moments(tmp,mh_conf_sig);
-end
-if isfield(oo_,[ TYPE 'TheoreticalMoments'])
-    temporary_structure = oo_.([TYPE, 'TheoreticalMoments']);
-    if isfield(temporary_structure,'dsge')
-        temporary_structure = oo_.([TYPE, 'TheoreticalMoments']).dsge;
-        if isfield(temporary_structure,'correlation')
-            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'Mean',nar,p_mean);
-            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'Median',nar,p_median);
-            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'Variance',nar,p_var);
-            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'HPDinf',nar,hpd_interval(1));
-            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'HPDsup',nar,hpd_interval(2));
-            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'deciles',nar,p_deciles);
+
+for var_iter_1=1:nvar
+    i1 = 1; tmp = zeros(SampleSize,nvar,nvar,nar);
+    for file = 1:length(ListOfFiles)
+        load([ PATH  ListOfFiles(file).name ],'Correlation_array');
+        i2 = i1 + rows(Correlation_array) - 1;
+        tmp(i1:i2,:,:,:) = Correlation_array;
+        i1 = i2+1;
+    end
+
+    var1=vartan{var_iter_1};
+    for var_iter_2=1:nvar
+        var2=vartan{var_iter_2};
+        [hh_fig, length_of_old_string] = waitbar.run(((var_iter_1-1)*nvar+var_iter_2)/(nvar^2), hh_fig, 'Endogenous moments: correlation', options_.console_mode, length_of_old_string);
+
+        oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
+        for nar_iter=1:nar
             if options_.estimation.moments_posterior_density.indicator
-                oo_ = fill_output_structure(var1,var2,TYPE,oo_,'density',nar,density);
+                [p_mean, p_median, p_var, hpd_interval, p_deciles, density] = ...
+                    posterior_moments(tmp(:,var_iter_1,var_iter_2,nar_iter),mh_conf_sig);
+            else
+                [p_mean, p_median, p_var, hpd_interval, p_deciles] = ...
+                    posterior_moments(tmp(:,var_iter_1,var_iter_2,nar_iter),mh_conf_sig);
+            end
+            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'Mean',nar_iter,p_mean);
+            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'Median',nar_iter,p_median);
+            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'Variance',nar_iter,p_var);
+            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'HPDinf',nar_iter,hpd_interval(1));
+            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'HPDsup',nar_iter,hpd_interval(2));
+            oo_ = fill_output_structure(var1,var2,TYPE,oo_,'deciles',nar_iter,p_deciles);
+            if options_.estimation.moments_posterior_density.indicator
+                oo_ = fill_output_structure(var1,var2,TYPE,oo_,'density',nar_iter,density);
             end
         end
     end
 end
+waitbar.close(hh_fig,options_.console_mode)
 
 function oo_ = initialize_output_structure(var1,var2,nar,type,oo_,options_)
 oo_.([type, 'TheoreticalMoments']).dsge.correlation.Mean.(var1).(var2) = NaN(nar,1);
@@ -135,10 +91,10 @@ end
 
 function oo_ = fill_output_structure(var1,var2,type,oo_,moment,lag,result)
 switch moment
-  case {'Mean','Median','Variance','HPDinf','HPDsup'}
-    oo_.([type,  'TheoreticalMoments']).dsge.correlation.(moment).(var1).(var2)(lag,1) = result;
-  case {'deciles','density'}
-    oo_.([type, 'TheoreticalMoments']).dsge.correlation.(moment).(var1).(var2)(lag,1) = {result};
-  otherwise
-    disp('fill_output_structure:: Unknown field!')
+    case {'Mean','Median','Variance','HPDinf','HPDsup'}
+        oo_.([type,  'TheoreticalMoments']).dsge.correlation.(moment).(var1).(var2)(lag,1) = result;
+    case {'deciles','density'}
+        oo_.([type, 'TheoreticalMoments']).dsge.correlation.(moment).(var1).(var2)(lag,1) = {result};
+    otherwise
+        disp('fill_output_structure:: Unknown field!')
 end
