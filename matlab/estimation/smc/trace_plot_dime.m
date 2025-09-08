@@ -61,10 +61,11 @@ hold off
 
 dyn_saveas(hh_fig,[graphFolder '/' M_.fname '_trace_lprob'],options_.nodisplay,options_.graph_format);
 if options_.TeX && any(strcmp('eps',cellstr(options_.graph_format)))
+    fidTeX=fopen([graphFolder '/',M_.fname,'_trace_lprob.tex'],'w+');
     fprintf(fidTeX,'\\begin{figure}[H]\n');
     fprintf(fidTeX,'\\centering \n');
     fprintf(fidTeX,'\\includegraphics[width=0.8\\textwidth]{%s_trace_lprob}\n',[graphFolder '/' M_.fname]);
-    fprintf(fidTeX,'\\caption{Ensemble traces of posterior densities for DIME.\n');
+    fprintf(fidTeX,'\\caption{Ensemble traces of posterior densities for DIME.}\n');
     fprintf(fidTeX,'\\label{Fig:DIME_trace}\n');
     fprintf(fidTeX,'\\end{figure}\n');
     fprintf(fidTeX,'\n');

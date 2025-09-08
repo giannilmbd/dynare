@@ -1,5 +1,5 @@
 function oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,name3,DirectoryName,var_type,dispString)
-
+% oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,name3,DirectoryName,var_type,dispString)
 % Computes, stores and plots the posterior moment statistics.
 %
 % INPUTS
@@ -28,7 +28,7 @@ function oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,na
 % See also the comment in posterior_sampler.m function.
 
 
-% Copyright © 2007-2023 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -281,7 +281,7 @@ else
     end
 end
 
-if strcmp(var_type,'_trend_coeff') || max(max(abs(Mean(:,:))))<=10^(-6) || all(all(isnan(Mean)))
+if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean)))
     fprintf(['%s: ' tit1 ', done!\n'],dispString);
     return %not do plots
 end
@@ -359,7 +359,7 @@ if ~options_.nograph && ~options_.no_graph.posterior
             nvar=nvar0(j);
             while i<nvar
                 i=i+1;
-                if max(abs(Mean(:,i))) > 10^(-6)
+                if ~all(isnan(Mean(:,i))) % must be consistent with condition used in pm3_core.m
                     subplotnum = subplotnum+1;
                 end
                 if subplotnum == MaxNumberOfPlotsPerFigure || i == nvar
