@@ -76,7 +76,7 @@ struct iter_solver_opts_t
   mxArray* iter_tol;
   mxArray* iter_maxit;
   mxArray* gmres_restart;
-  mxArray* ilu;
+  mxArray* incomplete_lu;
 
   void set_static_values(const mxArray* options_);
   void set_dynamic_values(const mxArray* options_);

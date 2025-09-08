@@ -51,8 +51,8 @@ else % Iterative algorithm
         end
     elseif strcmp(options_.simul.preconditioner, 'block_diagonal_lu')
         [L, U, P, Q] = block_diagonal_lu_preconditioner(A, options_);
-    elseif strcmp(options_.simul.preconditioner, 'ilu')
-        [L, U, P] = ilu(A, options_.simul.ilu);
+    elseif strcmp(options_.simul.preconditioner, 'incomplete_lu')
+        [L, U, P] = ilu(A, options_.simul.incomplete_lu);
         Q = speye(size(A));
     end
 

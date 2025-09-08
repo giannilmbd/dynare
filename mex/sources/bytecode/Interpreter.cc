@@ -43,10 +43,10 @@ iter_solver_opts_t::set_static_values(const mxArray* options_)
     mexErrMsgTxt("steady is not a field of options_");
   mxArray* steady {mxGetFieldByNumber(options_, 0, field)};
 
-  field = mxGetFieldNumber(steady, "ilu");
+  field = mxGetFieldNumber(steady, "incomplete_lu");
   if (field < 0)
-    mexErrMsgTxt("ilu is not a field of options_.steady");
-  ilu = mxGetFieldByNumber(steady, 0, field);
+    mexErrMsgTxt("incomplete_lu is not a field of options_.steady");
+  incomplete_lu = mxGetFieldByNumber(steady, 0, field);
 }
 
 void
@@ -72,10 +72,10 @@ iter_solver_opts_t::set_dynamic_values(const mxArray* options_)
     mexErrMsgTxt("gmres_restart is not a field of options_.simul");
   gmres_restart = mxGetFieldByNumber(simul, 0, field);
 
-  field = mxGetFieldNumber(simul, "ilu");
+  field = mxGetFieldNumber(simul, "incomplete_lu");
   if (field < 0)
-    mexErrMsgTxt("ilu is not a field of options_.simul");
-  ilu = mxGetFieldByNumber(simul, 0, field);
+    mexErrMsgTxt("incomplete_lu is not a field of options_.simul");
+  incomplete_lu = mxGetFieldByNumber(simul, 0, field);
 }
 
 Interpreter::Interpreter(Evaluate& evaluator_arg, double* params_arg, double* y_arg, double* ya_arg,
@@ -2742,7 +2742,7 @@ Interpreter::Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundari
   size_t n = mxGetM(A_m);
 
   std::array<mxArray*, 2> lhs0;
-  std::array rhs0 {A_m, iter_solver_opts.ilu};
+  std::array rhs0 {A_m, iter_solver_opts.incomplete_lu};
   if (mexCallMATLAB(lhs0.size(), lhs0.data(), rhs0.size(), rhs0.data(), "ilu"))
     throw FatalException("In GMRES, the incomplete LU decomposition (ilu) has failed");
   mxArray* L1 = lhs0[0];
@@ -2815,7 +2815,7 @@ Interpreter::Solve_Matlab_BiCGStab(mxArray* A_m, mxArray* b_m, bool is_two_bound
   size_t n = mxGetM(A_m);
 
   std::array<mxArray*, 2> lhs0;
-  std::array rhs0 {A_m, iter_solver_opts.ilu};
+  std::array rhs0 {A_m, iter_solver_opts.incomplete_lu};
   if (mexCallMATLAB(lhs0.size(), lhs0.data(), rhs0.size(), rhs0.data(), "ilu"))
     throw FatalException {"In BiCGStab, the incomplete LU decomposition (ilu) has failed"};
   mxArray* L1 = lhs0[0];
@@ -3891,10 +3891,11 @@ Interpreter::Simulate_One_Boundary()
               mexPrintf("MODEL STEADY STATE: (method=Sparse LU)\n");
               break;
             case 7:
-              mexPrintf("MODEL STEADY STATE: (method=GMRES with 'ilu' preconditioner)\n");
+              mexPrintf("MODEL STEADY STATE: (method=GMRES with 'incomplete_lu' preconditioner)\n");
               break;
             case 8:
-              mexPrintf("MODEL STEADY STATE: (method=BiCGStab with 'ilu' preconditioner)\n");
+              mexPrintf(
+                  "MODEL STEADY STATE: (method=BiCGStab with 'incomplete_lu' preconditioner)\n");
               break;
             }
         }
@@ -4239,11 +4240,11 @@ Interpreter::Simulate_Newton_Two_Boundaries(
               mexPrintf("MODEL SIMULATION: (method=Sparse LU solver on stacked system)\n");
               break;
             case 2:
-              mexPrintf(
-                  "MODEL SIMULATION: (method=GMRES on stacked system with 'ilu' preconditioner)\n");
+              mexPrintf("MODEL SIMULATION: (method=GMRES on stacked system with 'incomplete_lu' "
+                        "preconditioner)\n");
               break;
             case 3:
-              mexPrintf("MODEL SIMULATION: (method=BiCGStab on stacked system with 'ilu' "
+              mexPrintf("MODEL SIMULATION: (method=BiCGStab on stacked system with 'incomplete_lu' "
                         "preconditioner)\n");
               break;
             case 4:

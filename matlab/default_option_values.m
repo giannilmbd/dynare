@@ -58,9 +58,9 @@ options_.dr_display_tol=1e-6;
 options_.dp.maxit = 3000;
 options_.steady.maxit = 50;
 options_.steady.non_zero = false;
-options_.steady.ilu.type = 'ilutp';
-options_.steady.ilu.droptol = 1e-10;
-options_.steady.ilu.udiag = true;
+options_.steady.incomplete_lu.type = 'ilutp';
+options_.steady.incomplete_lu.droptol = 1e-10;
+options_.steady.incomplete_lu.udiag = true;
 options_.simul.maxit = 50;
 options_.simul.robust_lin_solve = false;
 
@@ -342,9 +342,9 @@ options_.simul.block_diagonal_lu_maxlu = 20000;
 options_.simul.block_diagonal_lu_nperiods = 0;
 options_.simul.block_diagonal_lu_nlu = 0;
 options_.simul.block_diagonal_lu_relu = 0.5;
-options_.simul.ilu.type = 'ilutp';
-options_.simul.ilu.droptol = 1e-12;
-options_.simul.ilu.udiag = true;
+options_.simul.incomplete_lu.type = 'ilutp';
+options_.simul.incomplete_lu.droptol = 1e-12;
+options_.simul.incomplete_lu.udiag = true;
 
 options_.simul.homotopy_max_completion_share = 1;
 options_.simul.homotopy_min_step_size = 1e-3;

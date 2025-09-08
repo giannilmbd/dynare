@@ -213,7 +213,7 @@ for it_=start:incr:finish
                     end
                 end
                 %% Should be the same options as in newton_solve.m and bytecode/Interpreter.cc (static case)
-                [L, U] = ilu(g1, options_.steady.ilu);
+                [L, U] = ilu(g1, options_.steady.incomplete_lu);
                 if options_.solve_algo == 7
                     zb = gmres(g1, r, [], [], [], L, U);
                 else

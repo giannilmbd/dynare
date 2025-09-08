@@ -1,4 +1,4 @@
-function [x, errorflag, errorcode] = newton_solve(func, x, jacobian_flag, gstep, tolf, tolx, maxit, solve_algo, ilu_opts, varargin)
+function [x, errorflag, errorcode] = newton_solve(func, x, jacobian_flag, gstep, tolf, tolx, maxit, solve_algo, incomplete_lu_opts, varargin)
 
 % Solves systems of non linear equations of several variables using a Newton solver, with three
 % variants for the inner linear solver:
@@ -17,7 +17,7 @@ function [x, errorflag, errorcode] = newton_solve(func, x, jacobian_flag, gstep,
 %    tolx             tolerance for solution variation
 %    maxit            maximum number of iterations
 %    solve_algo       from options_
-%    ilu_opts         structure of options for ilu
+%    incomplete_lu_opts    structure of options for ilu function
 %    varargin:        list of extra arguments to the function
 %
 % OUTPUTS
@@ -105,7 +105,7 @@ for it = 1:maxit
         p = fjac\fvec;
     else
         % Should be the same options as in solve_one_boundary.m and bytecode/Interpreter.cc (static case)
-        [L1, U1] = ilu(fjac, ilu_opts);
+        [L1, U1] = ilu(fjac, incomplete_lu_opts);
         if solve_algo == 7
             p = gmres(fjac, fvec, [], [], [], L1, U1);
         elseif solve_algo == 8

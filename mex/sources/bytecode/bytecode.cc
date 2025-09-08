@@ -488,7 +488,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     {
       if (stack_solve_algo == 2 || stack_solve_algo == 3)
         {
-          // Check that a preconditioner other than 'ilu' has not been requested
+          // Check that a preconditioner other than 'incomplete_lu' has not been requested
           int field {mxGetFieldNumber(options_, "simul")};
           if (field < 0)
             mexErrMsgTxt("simul is not a field of options_");
@@ -500,9 +500,9 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
           if (!mxIsChar(preconditioner))
             mexErrMsgTxt("options_.simul.preconditioner should be a character array");
           char* preconditioner_str {mxArrayToString(preconditioner)};
-          if (std::strcmp(preconditioner_str, "ilu"))
-            mexErrMsgTxt(
-                "The 'bytecode' option is not compatible with a preconditioner other than 'ilu'");
+          if (std::strcmp(preconditioner_str, "incomplete_lu"))
+            mexErrMsgTxt("The 'bytecode' option is not compatible with a preconditioner other than "
+                         "'incomplete_lu'");
           mxFree(preconditioner_str);
         }
 

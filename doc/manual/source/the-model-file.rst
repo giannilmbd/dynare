@@ -3869,7 +3869,7 @@ speed-up on large models.
                :opt:`block_diagonal_lu_nlu <block_diagonal_lu_nlu = INTEGER>`,
                :opt:`block_diagonal_lu_relu <block_diagonal_lu_relu = DOUBLE>`.
 
-           ``ilu``
+           ``incomplete_lu``
 
                Use an incomple LU decomposition as the preconditioner,
                recomputed at every iteration of the nonlinear Newton solver.
