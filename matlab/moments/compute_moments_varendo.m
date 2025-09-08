@@ -17,7 +17,7 @@ function oo_ = compute_moments_varendo(type, options_, M_, oo_, estim_params_, v
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2008-2021 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -163,55 +163,55 @@ if options_.order==1
             if ~options_.noprint
                 skipline();
             end
-        end
-        if ~options_.noprint
-            skipline();
-        end
-        if ~all(diag(M_.H)==0)
-            if isoctave && octave_ver_less_than('8.4') %Octave bug #60347
-                [observable_name_requested_vars, varlist_pos] = intersect_stable(var_list_, options_.varobs);
-            else
-                [observable_name_requested_vars, varlist_pos] = intersect(var_list_, options_.varobs, 'stable');
-            end
-            if ~isempty(observable_name_requested_vars)
-                NumberOfObservedEndogenousVariables = length(observable_name_requested_vars);
-                temp = NaN(NumberOfObservedEndogenousVariables, NumberOfExogenousVariables+1);
-                if posterior
-                    for i=1:NumberOfObservedEndogenousVariables
-                        for j=1:NumberOfExogenousVariables
-                            temp(i,j,:) = oo_.PosteriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
-                        end
-                        endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
-                        oo_ = posterior_analysis('decomposition', var_list_{endo_index_varlist}, 'ME', [], options_, M_, oo_, estim_params_);
-                        temp(i,j+1,:) = oo_.PosteriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).('ME');
-                    end
-                    title='Posterior mean variance decomposition (in percent) with measurement error';
-                    save_name_string='dsge_post_mean_var_decomp_uncond_ME';
-                else
-                    for i=1:NumberOfObservedEndogenousVariables
-                        for j=1:NumberOfExogenousVariables
-                            temp(i,j,:) = oo_.PriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
-                        end
-                        endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
-                        oo_ = prior_analysis('decomposition', var_list_{endo_index_varlist}, 'ME', [], options_, M_, oo_);
-                        temp(i,j+1,:) = oo_.PriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).('ME');
-                    end
-                    title='Prior mean variance decomposition (in percent) with measurement error';
-                    save_name_string='dsge_prior_mean_var_decomp_uncond_ME';
-                end
-                title=add_filter_subtitle(title, options_);
-                headers = M_.exo_names;
-                headers = vertcat(' ', headers, 'ME');
-                lh = cellofchararraymaxlength(var_list_)+2;
-                dyntable(options_, title, headers, observable_name_requested_vars,100*temp,lh,8,2);
-                if options_.TeX
-                    headers = M_.exo_names_tex;
-                    headers = vertcat(' ', headers, 'ME');
-                    labels = var_list_tex(varlist_pos);
-                    lh = cellofchararraymaxlength(labels)+2;
-                    dyn_latex_table(M_, options_, title, save_name_string, headers, labels, 100*temp, lh, 8, 2);
-                end
+            if ~options_.noprint
                 skipline();
+            end
+            if ~all(diag(M_.H)==0)
+                if isoctave && octave_ver_less_than('8.4') %Octave bug #60347
+                    [observable_name_requested_vars, varlist_pos] = intersect_stable(var_list_, options_.varobs);
+                else
+                    [observable_name_requested_vars, varlist_pos] = intersect(var_list_, options_.varobs, 'stable');
+                end
+                if ~isempty(observable_name_requested_vars)
+                    NumberOfObservedEndogenousVariables = length(observable_name_requested_vars);
+                    temp = NaN(NumberOfObservedEndogenousVariables, NumberOfExogenousVariables+1);
+                    if posterior
+                        for i=1:NumberOfObservedEndogenousVariables
+                            for j=1:NumberOfExogenousVariables
+                                temp(i,j,:) = oo_.PosteriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
+                            end
+                            endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
+                            oo_ = posterior_analysis('decomposition', var_list_{endo_index_varlist}, 'ME', [], options_, M_, oo_, estim_params_);
+                            temp(i,j+1,:) = oo_.PosteriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).('ME');
+                        end
+                        title='Posterior mean variance decomposition (in percent) with measurement error';
+                        save_name_string='dsge_post_mean_var_decomp_uncond_ME';
+                    else
+                        for i=1:NumberOfObservedEndogenousVariables
+                            for j=1:NumberOfExogenousVariables
+                                temp(i,j,:) = oo_.PriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
+                            end
+                            endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
+                            oo_ = prior_analysis('decomposition', var_list_{endo_index_varlist}, 'ME', [], options_, M_, oo_);
+                            temp(i,j+1,:) = oo_.PriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).('ME');
+                        end
+                        title='Prior mean variance decomposition (in percent) with measurement error';
+                        save_name_string='dsge_prior_mean_var_decomp_uncond_ME';
+                    end
+                    title=add_filter_subtitle(title, options_);
+                    headers = M_.exo_names;
+                    headers = vertcat(' ', headers, 'ME');
+                    lh = cellofchararraymaxlength(var_list_)+2;
+                    dyntable(options_, title, headers, observable_name_requested_vars,100*temp,lh,8,2);
+                    if options_.TeX
+                        headers = M_.exo_names_tex;
+                        headers = vertcat(' ', headers, 'ME');
+                        labels = var_list_tex(varlist_pos);
+                        lh = cellofchararraymaxlength(labels)+2;
+                        dyn_latex_table(M_, options_, title, save_name_string, headers, labels, 100*temp, lh, 8, 2);
+                    end
+                    skipline();
+                end
             end
         end
         % CONDITIONAL VARIANCE DECOMPOSITION.
