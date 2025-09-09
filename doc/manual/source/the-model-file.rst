@@ -3786,8 +3786,8 @@ speed-up on large models.
                (GMRES) solver at each iteration, applied on the stacked system
                of all equations in all periods. The following options can be
                used to control the behaviour of the algorithm:
-               :opt:`preconditioner <preconditioner = OPTION>`, :opt:`iter_tol
-               <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`,
+               :opt:`preconditioner <preconditioner = OPTION>`,
+               :opt:`iter_tol <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`,
                :opt:`gmres_restart <gmres_restart = INTEGER>`.
 
            ``3``
@@ -3796,8 +3796,8 @@ speed-up on large models.
                (BiCGStab) solver at each iteration, applied on the stacked
                system of all equations in all periods. The following options
                can be used to control the behaviour of the algorithm:
-               :opt:`preconditioner <preconditioner = OPTION>`, :opt:`iter_tol
-               <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`.
+               :opt:`preconditioner <preconditioner = OPTION>`,
+               :opt:`iter_tol <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`.
 
            ``4``
 
