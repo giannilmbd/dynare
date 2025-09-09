@@ -193,11 +193,29 @@ module matlab_mat
      end function mxGetPr_internal
 
      ! Noncomplex integer
+
+     pure logical(c_bool) function mxIsInt32(pm) bind(c, name="mxIsInt32"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: pm
+     end function mxIsInt32
+
 #if MX_HAS_INTERLEAVED_COMPLEX
      pure type(c_ptr) function mxGetInt32s_internal(pa) bind(c, name="mxGetInt32s"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pa
      end function mxGetInt32s_internal
+#endif
+
+     pure logical(c_bool) function mxIsInt64(pm) bind(c, name="mxIsInt64"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: pm
+     end function mxIsInt64
+
+#if MX_HAS_INTERLEAVED_COMPLEX
+     pure type(c_ptr) function mxGetInt64s_internal(pa) bind(c, name="mxGetInt64s"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: pa
+     end function mxGetInt64s_internal
 #endif
 
      ! Complex Float
@@ -382,6 +400,12 @@ contains
     integer(int32), dimension(:), pointer, contiguous :: mxGetInt32s
     call c_f_pointer(mxGetInt32s_internal(pa), mxGetInt32s, [ mxGetNumberOfElements(pa) ])
   end function mxGetInt32s
+
+  function mxGetInt64s(pa)
+    type(c_ptr), intent(in) :: pa
+    integer(int64), dimension(:), pointer, contiguous :: mxGetInt64s
+    call c_f_pointer(mxGetInt64s_internal(pa), mxGetInt64s, [ mxGetNumberOfElements(pa) ])
+  end function mxGetInt64s
 #endif
 
 #if MX_HAS_INTERLEAVED_COMPLEX
