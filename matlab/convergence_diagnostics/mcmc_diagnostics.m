@@ -17,7 +17,7 @@ function oo_ = mcmc_diagnostics(options_, estim_params_, M_, oo_)
 % PARALLEL CONTEXT
 % See the comment in posterior_sampler.m function.
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -293,14 +293,23 @@ for i = 1:pages
                 plt1 = UDIAG(:,1,k);
                 plt2 = UDIAG(:,2,k);
                 namnam  = [nam , ' (Interval)'];
+                if TeX
+                    namnamtex  = [namtex , ' (Interval)'];
+                end
             elseif crit == 2
                 plt1 = UDIAG(:,3,k);
                 plt2 = UDIAG(:,4,k);
                 namnam  = [nam , ' (m2)'];
+                if TeX
+                    namnamtex  = [namtex , ' (m2)'];
+                end
             elseif crit == 3
                 plt1 = UDIAG(:,5,k);
                 plt2 = UDIAG(:,6,k);
                 namnam  = [nam , ' (m3)'];
+                if TeX
+                    namnamtex  = [namtex , ' (m3)'];
+                end
             end
             subplot(npardisp,3,boxplot);  %Added more rows to display more variables
             plot(xx,plt1,'-b');     % Pooled
@@ -309,11 +318,10 @@ for i = 1:pages
             hold off;
             xlim([xx(1) xx(NumberOfLines)])
             if TeX
-                title(namtex,'interpreter','latex')
+                title(namnamtex,'interpreter','latex')
             else
                 title(namnam,'Interpreter','none')
             end
-
             boxplot = boxplot + 1;
         end
     end
