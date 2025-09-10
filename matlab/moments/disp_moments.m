@@ -11,7 +11,7 @@ function oo_=disp_moments(y,var_list,M_,options_,oo_)
 % OUTPUTS
 %   oo_                 [structure]    Dynare's results structure,
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -240,22 +240,3 @@ end
 
 warning(warning_old_state);
 end
-
-function y = get_filtered_time_series(y, m, options_)
-
-if options_.hp_filter && ~options_.one_sided_hp_filter  && ~options_.bandpass.indicator
-    [~,y] = sample_hp_filter(y,options_.hp_filter);
-elseif ~options_.hp_filter && options_.one_sided_hp_filter && ~options_.bandpass.indicator
-    [~,y] = one_sided_hp_filter(y,options_.one_sided_hp_filter);
-elseif ~options_.hp_filter && ~options_.one_sided_hp_filter && options_.bandpass.indicator
-    data_temp=dseries(y,'0q1');
-    data_temp=baxter_king_filter(data_temp,options_.bandpass.passband(1),options_.bandpass.passband(2),options_.bandpass.K);
-    y=data_temp.data;
-elseif ~options_.hp_filter && ~options_.one_sided_hp_filter  && ~options_.bandpass.indicator
-    y = bsxfun(@minus, y, m);
-else
-    error('disp_moments:: You cannot use more than one filter at the same time')
-end
-
-end
-

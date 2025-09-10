@@ -47,7 +47,7 @@ function [fval, info, exit_flag, df, junk_hessian, Q, model_moments, model_momen
 % o simult_
 % -------------------------------------------------------------------------
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -254,7 +254,7 @@ if strcmp(options_mom_.mom.mom_method,'SMM')
     if options_mom_.prefilter
         y_sim = bsxfun(@minus, y_sim, mean(y_sim,1));
     end
-    model_moments = mom.get_data_moments(y_sim, options_mom_.mom.obs_var, dr.inv_order_var, M_.matched_moments, options_mom_);
+    model_moments = mom.get_data_moments(get_filtered_time_series(y_sim, zeros(1,size(y_sim,2)), options_mom_), options_mom_.mom.obs_var, dr.inv_order_var, M_.matched_moments, options_mom_);
 end
 
 
