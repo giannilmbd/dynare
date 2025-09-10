@@ -50,8 +50,7 @@ endogenous_variables_paths = NaN(M_.endo_nbr, samplesize+1);
 endogenous_variables_paths(:,1) = initialconditions;
 
 % Set waitbar (graphic or text  mode)
-hh_fig = waitbar.run(0,'Please wait. Extended Path simulations...');
-set(hh_fig,'Name', 'EP simulations.' );
+[hh_fig, length_of_old_string] = waitbar.run(0, [], 'Please wait. Extended Path simulations...', options_.console_mode, 0, 'EP simulations.');
 
 % Initialize while-loop index.
 t = 1;
@@ -59,7 +58,7 @@ t = 1;
 % Main loop.
 while (t <= samplesize)
     if ~mod(t,10)
-        waitbar.run(t/samplesize,hh_fig,'Please wait. Extended Path simulations...');
+        [~,length_of_old_string]=waitbar.run(t/samplesize,hh_fig,'Please wait. Extended Path simulations...',options_.console_mode,length_of_old_string);
     end
     % Set period index.
     t = t+1;
@@ -100,7 +99,7 @@ while (t <= samplesize)
 end % (while) loop over t
 
 % Close waitbar.
-waitbar.close(hh_fig);
+waitbar.close(hh_fig,options_.console_mode);
 
 % Set the initial period.
 if isdates(options_.initial_period)

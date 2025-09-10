@@ -81,9 +81,9 @@ if options_.occbin.simul.check_ahead_periods>options_.occbin.simul.max_check_ahe
 end
 
 if M_.occbin.constraint_nbr==1
-    [out, ss, error_flag  ] = occbin.solve_one_constraint(M_,dr,options_.occbin.simul,solve_dr);
+    [out, ss, error_flag  ] = occbin.solve_one_constraint(M_,dr,options_.occbin.simul,solve_dr,options_.console_mode);
 elseif M_.occbin.constraint_nbr==2
-    [out, ss, error_flag  ] = occbin.solve_two_constraints(M_,dr,options_.occbin.simul,solve_dr);
+    [out, ss, error_flag  ] = occbin.solve_two_constraints(M_,dr,options_.occbin.simul,solve_dr,options_.console_mode);
 end
 
 out.error_flag=error_flag;

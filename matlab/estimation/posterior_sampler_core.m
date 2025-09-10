@@ -56,6 +56,9 @@ function myoutput = posterior_sampler_core(myinputs,fblck,nblck,whoiam,ThisMatla
 if nargin<4
     whoiam=0;
 end
+if nargin<5
+    ThisMatlab=1;
+end
 
 % reshape 'myinputs' for local computation.
 % In order to avoid confusion in the name space, the instruction struct2local(myinputs) is replaced by:
@@ -233,13 +236,12 @@ else % Run in serial as usual
         if whoiam
             refresh_rate = sampler_options.parallel_bar_refresh_rate;
             bar_title = sampler_options.parallel_bar_title;
-            prc0=(curr_block-fblck)/(nblck-fblck+1)*(isoctave() || options_.console_mode)+(draw_iter-1)/nruns_cb;
-            hh_fig = waitbar.run({prc0,whoiam,options_.parallel(ThisMatlab)},sprintf(Label,bar_title, '...'));
+            prc0=(curr_block-fblck)/(nblck-fblck+1)*(isoctave() || options_.console_mode);
+            [hh_fig, length_of_old_string]= waitbar.run(prc0,[],sprintf(Label,bar_title, '...'),options_.console_mode,0, [], whoiam,options_.parallel(ThisMatlab));
         else
             refresh_rate = sampler_options.serial_bar_refresh_rate;
             bar_title = sampler_options.serial_bar_title;
-            hh_fig = waitbar.run(0,sprintf(Label,bar_title, '...'));
-            set(hh_fig,'Name',bar_title);
+            [hh_fig, length_of_old_string] = waitbar.run(0, [], sprintf(Label,bar_title, '...'), options_.console_mode, 0, bar_title, whoiam);
         end
         hh_fig.UserData = sprintf(Label,bar_title, ' %s');
 
@@ -277,7 +279,8 @@ else % Run in serial as usual
             ModelName, ...
             refresh_rate, ...
             false, ...
-            hh_fig);
+            hh_fig, ...
+            whoiam,options_.parallel(ThisMatlab),length_of_old_string); %potential inputs for waitbar.run
 
         % Reconcile
         record.LastParameters(curr_block,:) = LastParameters;
@@ -295,7 +298,7 @@ else % Run in serial as usual
             draw_index_current_file = draw_index_current_file_i;
         end
 
-        waitbar.close(hh_fig);
+        waitbar.close(hh_fig,options_.console_mode);
 
     end % End of the loop over the mh-blocks.
 
@@ -312,7 +315,7 @@ function [accepted_draws_this_chain, feval_this_chain, draw_iter, ...
     LastSeeds_cb, OutputFileName, LastParameters_cb, LastLogPost_cb, ...
     draw_index_current_file, NewFile_cb] = computeMHBlock(curr_block, options_, InitialSeeds_cb, BaseName, OpenOldFile_cb, NewFile_cb, ...
     InitSizeArray_cb, last_draw_cb, last_posterior_cb, objective_function, mh_bounds,dataset_, fline_cb, npar, nruns_cb, MAX_nruns, sampler_options, dataset_info, bayestopt_, estim_params_, ...
-    M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state,save_tmp_file, MetropolisFolder, ModelName, refresh_rate, UseParallel, q)
+    M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state,save_tmp_file, MetropolisFolder, ModelName, refresh_rate, UseParallel, q, whoiam, Parallel_structure, length_of_old_string)
 %COMPUTEMHBlOCK do the calculation of each block. The logic of the waitbar
 %is different depending on whether we are in serial or using pstools versus
 %using the parallel computing toolbox
@@ -415,7 +418,7 @@ while draw_iter <= nruns_cb
         if UseParallel
             send(q, struct('Initialize', false, 'Block', curr_block_str, 'Text', txt, 'Value', prtfrc))
         else
-            waitbar.run(prtfrc, q, sprintf(q.UserData, txt));
+            [~, length_of_old_string]=waitbar.run(prtfrc, q, sprintf(q.UserData, txt),options_.console_mode,length_of_old_string,[],whoiam,Parallel_structure);
         end
 
         if save_tmp_file

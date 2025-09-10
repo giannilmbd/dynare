@@ -1,5 +1,22 @@
 function oo_ = prior_analysis(type,arg1,arg2,arg3,options_,M_,oo_,estim_params_)
-% Copyright © 2009-2017 Dynare Team
+% oo_ = prior_analysis(type,arg1,arg2,arg3,options_,M_,oo_,estim_params_)
+% Inputs
+% - type            [string]        type of object to be computed
+% - arg1                            first input argument of called function
+%                                   (usually variable list)
+% - arg2                            second input argument of called function
+%                                   (usually variable or shock list)
+% - arg3                            first input argument of called function
+%                                   (nar or FEVD steps)
+% - options_        [structure]     Dynare structure defining global options.
+% - M_              [structure]     Dynare structure describing the model.
+% - oo_             [structure]     Dynare structure where the results are saved.
+% - estim_params_   [structure]     structure storing information about estimated
+%                   parameters
+% Outputs:
+% - oo_             [structure]     Dynare structure where the results are saved.
+
+% Copyright © 2009-2015 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -81,7 +98,7 @@ switch type
             dsge_simulated_theoretical_correlation(SampleSize,arg3,M_,options_,oo_,'prior');
     end
     oo_ = correlation_mc_analysis(SampleSize,'prior',M_.dname,M_.fname,...
-                                  vartan,nvar,arg1,arg2,arg3,options_.mh_conf_sig,oo_,M_,options_);
+          vartan,nvar,arg1,arg2,arg3,options_.mh_conf_sig,oo_,M_,options_);
   case 'conditional decomposition'
     if nargin==narg1
         [~,vartan] = ...

@@ -1,12 +1,12 @@
-function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, solve_DM)
-%function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, solve_DM)
+function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, solve_DM, console_mode)
+%function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, solve_DM, console_mode)
 %
 % INPUT: 
 % - M_                  [structure]     MATLAB's structure describing the model (M_).
 % - dr                  [structure]     decision rules for the model
 % - opts_simul          [structure]     MATLAB's structure containing the OccBin options (opts_simul).
 % - solve_DM            [double]        indicator on whether to recompute decision rules
-%
+% - console_mode        [boolean]       indicator for whether waitbar is in console mode
 % OUTPUT:
 % - data                [structure]     simulation result containing fields:
 %                                           - linear: paths for endogenous variables ignoring OBC (linear solution)
@@ -114,13 +114,12 @@ else
 end
 
 if opts_simul_.waitbar
-    hh_fig = waitbar.run(0,'OccBin: Solving the model');
-    set(hh_fig,'Name','OccBin: Solving the model.');
+    [hh_fig, length_of_old_string] = waitbar.run(0,[],'OccBin: Solving the model', console_mode, 0, 'OccBin: Solving the model.');
 end
 
 for shock_period = 1:n_shocks_periods
     if opts_simul_.waitbar
-        waitbar.run(shock_period/n_shocks_periods, hh_fig, sprintf('Period %u of %u', shock_period,n_shocks_periods));
+        [~,length_of_old_string]=waitbar.run(shock_period/n_shocks_periods, hh_fig, sprintf('Period %u of %u', shock_period,n_shocks_periods), console_mode, length_of_old_string);
     end
     
     regime_change_this_iteration=true;
@@ -334,7 +333,7 @@ for shock_period = 1:n_shocks_periods
                 if periodic_solution
                     disp_verbose(['Max error:' num2str(merr) '.'],opts_simul_.debug)
                 else
-                    if opts_simul_.waitbar; waitbar.close(hh_fig); end
+                    if opts_simul_.waitbar; waitbar.close(hh_fig,console_mode); end
                     error_flag = 310;
                     return
                 end
@@ -346,7 +345,7 @@ for shock_period = 1:n_shocks_periods
                 disp_verbose('Did not converge -- increase maxit.',opts_simul_.debug)
                     error_flag = 311;
                 end
-                if opts_simul_.waitbar; waitbar.close(hh_fig); end
+                if opts_simul_.waitbar; waitbar.close(hh_fig,console_mode); end
                 return
             end
         else
@@ -355,7 +354,7 @@ for shock_period = 1:n_shocks_periods
     end
     if any(error_code_period)
         disp_verbose('Increase nperiods.',opts_simul_.debug)
-        if opts_simul_.waitbar; waitbar.close(hh_fig); end
+        if opts_simul_.waitbar; waitbar.close(hh_fig,console_mode); end
         error_flag = 312;
         return
     end
@@ -385,5 +384,5 @@ if ~opts_simul_.piecewise_only
 end
 
 if opts_simul_.waitbar
-    waitbar.close(hh_fig); 
+    waitbar.close(hh_fig,console_mode); 
 end

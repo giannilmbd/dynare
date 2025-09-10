@@ -384,6 +384,11 @@ switch minimizer_algorithm
     if options_.silent_optimizer
         options_.gmhmaxlik.silent = true;
     end
+    if options_.console_mode
+        options_.gmhmaxlik.console_mode = true;
+    else
+        options_.gmhmaxlik.console_mode = false;
+    end
     opt_runtime_start = tic;
     [opt_par_values, hessian_mat, Scale, fval, funcCount] = ...
         gmhmaxlik(objective_function, start_par_value, Initial_Hessian, options_.mh_jscale, bounds, prior_information.p2, options_.gmhmaxlik, options_.optim_opt, varargin{:});

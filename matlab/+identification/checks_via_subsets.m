@@ -1,5 +1,5 @@
-function [ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] = checks_via_subsets(ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal, totparam_nbr, modparam_nbr, options_ident,error_indicator)
-%[ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] = checks_via_subsets(ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal, totparam_nbr, modparam_nbr, options_ident,error_indicator)
+function [ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] = checks_via_subsets(ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal, totparam_nbr, modparam_nbr, options_ident,error_indicator, console_mode)
+%[ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] = checks_via_subsets(ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal, totparam_nbr, modparam_nbr, options_ident,error_indicator, console_mode)
 % -------------------------------------------------------------------------
 % Finds problematic sets of parameters via checking the necessary rank condition
 % of the Jacobians for all possible combinations of parameters. The rank is
@@ -38,8 +38,9 @@ function [ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] 
 %                       (Komunjer and Ng, 2011). If either options_ident.no_identification_minimal or
 %                       error_indicator.identification_minimal are 1 then the search for problematic parameter sets will be skipped
 %   totparam_nbr:       [integer] number of estimated stderr, corr and model parameters
-%   numzerotolrank:     [double] tolerance level for rank compuations
+%   numzerotolrank:     [double] tolerance level for rank computations
 %   error_indicator     [structure] indicators whether objects could be computed
+%   console_mode        [bool]      indicator whether console mode was requested
 % -------------------------------------------------------------------------
 % OUTPUTS
 %   ide_reducedform, ide_moments, ide_spectrum, ide_minimal are augmented by the
@@ -52,7 +53,7 @@ function [ide_dynamic, ide_reducedform, ide_moments, ide_spectrum, ide_minimal] 
 % This function is called by
 %   * identification.analysis.m
 % =========================================================================
-% Copyright © 2019-2021 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -322,7 +323,9 @@ end
 indtotparam = unique([indparam_dDYNAMIC indparam_dREDUCEDFORM indparam_dMOMENTS indparam_dSPECTRUM indparam_dMINIMAL]);
 
 for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subsets
-    h = waitbar.run(0,['Brute force collinearity for ' int2str(j) ' parameters.']);
+    waitbar_string=['Brute force collinearity for ' int2str(j) ' parameters.'];
+    [h, length_of_old_string] = waitbar.run(0, [], waitbar_string, console_mode, 0,'Brute force collinearity test.');
+
     %Step1: get all possible unique subsets of j elements
     if ~no_identification_dynamic ...
             || (~no_identification_reducedform && ~error_indicator.identification_reducedform)...
@@ -424,7 +427,7 @@ for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subset
                 end
             end
         end
-        waitbar.run(k/maxk,h)
+        [~,length_of_old_string]=waitbar.run(k/maxk,h, waitbar_string, console_mode, length_of_old_string);
     end
 
     %Step 4: Compare rank conditions for all possible subsets. If rank condition is violated, then the corresponding numbers of the parameters are stored
@@ -473,7 +476,7 @@ for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subset
 %             indtotparam(ismember(indtotparam,idx2(:,2))) = [];
 %         end
 %     end
-    waitbar.close(h);
+    waitbar.close(h,console_mode);
 end
 
 %% Save output variables

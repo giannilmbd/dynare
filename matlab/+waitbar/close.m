@@ -1,10 +1,9 @@
-function close(h)
-% h = close(h)
-% adaptive close waitbar, compatible with
-% octave and when console_mode=1
+function close(h,console_mode)
+% h = close(h,console_mode)
+% adaptive close waitbar, compatible with Octave and when console_mode=1
 
 %
-% Copyright © 2011-2021 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -20,14 +19,12 @@ function close(h)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-global options_
 
-if options_.console_mode
-    clear waitbar.run;
+if console_mode
     diary on
     fprintf('\n');
 else
-    close(h)
+    if ishandle(h)
+        close(h)
+    end
 end
-
-clear waitbar.run;

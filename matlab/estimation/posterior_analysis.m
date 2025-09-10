@@ -1,6 +1,22 @@
 function oo_ = posterior_analysis(type,arg1,arg2,arg3,options_,M_,oo_,estim_params_)
+% oo_ = posterior_analysis(type,arg1,arg2,arg3,options_,M_,oo_,estim_params_)
+% Inputs
+% - type            [string]        type of object to be computed
+% - arg1                            first input argument of called function
+%                                   (usually variable list)
+% - arg2                            second input argument of called function
+%                                   (usually variable or shock list)
+% - arg3                            first input argument of called function
+%                                   (nar or FEVD steps)
+% - options_        [structure]     Dynare structure defining global options.
+% - M_              [structure]     Dynare structure describing the model.
+% - oo_             [structure]     Dynare structure where the results are saved.
+% - estim_params_   [structure]     structure storing information about estimated
+%                   parameters
+% Outputs:
+% - oo_             [structure]     Dynare structure where the results are saved.
 
-% Copyright © 2008-2021 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -76,10 +92,6 @@ switch type
         end
     end
   case 'correlation'
-    if nargin==narg1
-        [nvar,vartan] = ...
-            dsge_simulated_theoretical_correlation(SampleSize,arg3,M_,options_,oo_,'posterior');
-    end
     oo_ = correlation_mc_analysis(SampleSize,'posterior',M_.dname,M_.fname,...
                                   vartan,nvar,arg1,arg2,arg3,options_.mh_conf_sig,oo_,M_,options_);
   case 'conditional decomposition'
