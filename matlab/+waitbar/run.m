@@ -42,7 +42,7 @@ else
     init=0;
 end
 
-if nargin< 7
+if nargin< 6
     fig_title=[];
 end
 if nargin< 7 || isempty(whoiam) 
