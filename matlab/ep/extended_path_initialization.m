@@ -95,7 +95,7 @@ end
 
 % Set seed.
 if ep.set_dynare_seed_to_default
-    options_=set_dynare_seed_local_options(options_,'default');
+    set_dynare_seed_local_options([],false,'default');
 end
 
 % hybrid correction

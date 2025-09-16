@@ -181,7 +181,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
     end
     % Find initial values for the NumberOfBlocks chains...
     if NumberOfBlocks > 1 || options_.mh_initialize_from_previous_mcmc.status% Case 1: multiple chains
-        options_=set_dynare_seed_local_options(options_,'default');
+        options_.DynareRandomStreams=set_dynare_seed_local_options([],options_.parallel_info.isHybridMatlabOctave,'default');
         fprintf(fidlog,'  Initial values of the parameters:\n');
         fprintf('%s: Searching for initial values...\n', dispString);
         if ~options_.mh_initialize_from_previous_mcmc.status
@@ -296,7 +296,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
     else
         for j=1:NumberOfBlocks
             % we set a different seed for the random generator for each block then we record the corresponding random generator state (vector)
-            options_=set_dynare_seed_local_options(options_,options_.DynareRandomStreams.seed+j);
+            options_.DynareRandomStreams=set_dynare_seed_local_options([],options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.seed+j);
             % record.Seeds keeps a vector of the random generator state and not the scalar seed despite its name
             [record.InitialSeeds(j).Unifor,record.InitialSeeds(j).Normal] = get_dynare_random_generator_state();
         end

@@ -341,15 +341,16 @@ try
     %
     % Set the random number generator type (the seed is useless but needed by the function)
     if ~isoctave
-        options_=set_dynare_seed_local_options(options_,options_.DynareRandomStreams.algo, options_.DynareRandomStreams.seed);
+        options_.DynareRandomStreams=set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.algo, options_.DynareRandomStreams.seed);
+
     else
-        options_=set_dynare_seed_local_options(options_,options_.DynareRandomStreams.seed+curr_block);
+        options_.DynareRandomStreams=set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.seed+curr_block);
     end
     % Set the state of the RNG
     set_dynare_random_generator_state(InitialSeeds_cb.Unifor, InitialSeeds_cb.Normal);
 catch
     % If the state set by master is incompatible with the slave, we only reseed
-    options_=set_dynare_seed_local_options(options_,options_.DynareRandomStreams.seed+curr_block);
+    options_.DynareRandomStreams=set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.seed+curr_block);
 end
 mh_recover_flag=0;
 if options_.mh_recover && exist([BaseName '_mh_tmp_blck' curr_block_str '.mat'],'file')==2 && OpenOldFile_cb
