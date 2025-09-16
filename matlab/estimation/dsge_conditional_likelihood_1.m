@@ -1,6 +1,6 @@
-function [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, options_, bayestopt_, dr] = ...
+function [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, dr] = ...
     dsge_conditional_likelihood_1(xparam1, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, derivatives_info)
-% [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, options_, bayestopt_, dr] = ...
+% [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, dr] = ...
 %    dsge_conditional_likelihood_1(xparam1, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, derivatives_info)
 %
 % INPUTS
@@ -28,11 +28,9 @@ function [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, option
 % - SteadyState             [double]        steady state level for the endogenous variables
 % - trend_coeff             [double]        Matrix of doubles, coefficients of the deterministic trend in the measurement equation.
 % - M_                      [struct]        Updated M_ structure described in INPUTS section.
-% - options_                [struct]        Updated options_ structure described in INPUTS section.
-% - bayestopt_              [struct]        See INPUTS section.
 % - dr                      [structure]     Reduced form model.
 
-% Copyright (C) 2017-2023 Dynare Team
+% Copyright (C) 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -133,9 +131,6 @@ if info(1)
     return
 end
 
-% Define a vector of indices for the observed variables. Is this really usefull?...
-bayestopt_.mf = bayestopt_.mf1;
-
 % Define the constant vector of the measurement equation.
 if ~options_.noconstant
     if options_.loglinear
@@ -164,7 +159,7 @@ if dataset_info.missing.state
 end
 
 % Get the selection matrix (vector of row indices for T and R)
-Z = bayestopt_.mf;
+Z = bayestopt_.mf1;
 
 % Get the number of observed variables.
 pp = dataset_.vobs;

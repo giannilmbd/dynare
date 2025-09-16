@@ -1,5 +1,5 @@
-function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,dr] = dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
-% [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,oo_] = dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,oo_,derivatives_info)
+function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr] = dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
+% [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,oo_] = dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,oo_,derivatives_info)
 % Evaluates the negative of the posterior kernel of a DSGE model using the specified
 % kalman_algo; the resulting posterior includes the 2*pi constant of the
 % likelihood function
@@ -29,8 +29,6 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 % - SteadyState             [double]        steady state level for the endogenous variables
 % - trend_coeff             [double]        Matrix of doubles, coefficients of the deterministic trend in the measurement equation.
 % - M_                      [struct]        Updated M_ structure described in INPUTS section.
-% - options_                [struct]        Updated options_ structure described in INPUTS section.
-% - bayestopt_              [struct]        See INPUTS section.
 % - dr                      [structure]     Reduced form model.
 %
 % This function is called by: dynare_estimation_1, mode_check,
@@ -66,6 +64,7 @@ SteadyState = [];
 trend_coeff = [];
 exit_flag   = 1;
 info        = zeros(4,1);
+
 if options_.analytic_derivation
     DLIK        = NaN(1,length(xparam1));
 else
@@ -190,7 +189,7 @@ if info(1)
 end
 
 if is_restrict_state_space
-%% Define a vector of indices for the observed variables. Is this really usefull?...
+%% Define a vector of indices for the observed variables
     bayestopt_.mf = bayestopt_.mf1;
 else
 %get location of observed variables and requested smoothed variables in
@@ -843,11 +842,6 @@ end
 if options_.prior_restrictions.status
     tmp = feval(options_.prior_restrictions.routine, M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, dataset_, dataset_info);
     fval = fval - tmp;
-end
-
-if ~options_.kalman.keep_kalman_algo_if_singularity_is_detected
-    % Update options_.kalman_algo.
-    options_.kalman_algo = kalman_algo;
 end
 
 if analytic_derivation==0 && nargout>3

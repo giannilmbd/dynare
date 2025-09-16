@@ -1,4 +1,4 @@
-function [fval,info,exit_flag,DLIK,Hess,ys,trend_coeff,M_,options_,bayestopt_,dr] = non_linear_dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
+function [fval,info,exit_flag,DLIK,Hess,ys,trend_coeff,M_,bayestopt_,dr] = non_linear_dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % [fval,info,exit_flag,DLIK,Hess,ys,trend_coeff,M_,options_,bayestopt_,dr] = non_linear_dsge_likelihood(xparam1,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % Evaluates the posterior kernel of a dsge model using a non linear filter.
 %

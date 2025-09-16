@@ -1,6 +1,6 @@
-function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,dr, atT, innov, regime_history] = IVF_posterior(xparam1,...
+function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr, atT, innov, regime_history] = IVF_posterior(xparam1,...
     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
-% [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,bayestopt_,dr, atT, innov] = IVF_posterior(xparam1,...
+% [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr, atT, innov] = IVF_posterior(xparam1,...
 %     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % Computes Likelihood with inversion filter
 %
@@ -28,8 +28,6 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,options_,baye
 % - SteadyState             [double]        Empty array.
 % - trend                   [double]        Empty array.
 % - M_                      [struct]        Updated M_ structure described in INPUTS section.
-% - options_                [struct]        Updated options_ structure described in INPUTS section.
-% - bayestopt_              [struct]        See INPUTS section.
 % - dr                      [structure]     Reduced form model.
 % - atT                     [double]        (m*T) matrix, smoothed endogenous variables (a_{t|T})  (decision-rule order)
 % - innov                   [double]        (r*T) matrix, smoothed structural shocks (r>n is the umber of shocks).

@@ -16,7 +16,7 @@ function [opt_par_values,fval,exitflag,hessian_mat,Scale,new_rat_hess_info,optim
 % OUTPUTS
 %   opt_par_values      [n_params by 1] vector of doubles   optimal parameter values minimizing the objective
 %   fval                [scalar double]                     value of the objective function at the minimum
-%   exitflag             [scalar double]                     return code of the respective optimizer
+%   exitflag            [scalar double]                     return code of the respective optimizer
 %   hessian_mat         [n_params by n_params] matrix       Hessian matrix at the mode returned by optimizer
 %   Scale               [scalar double]                     scaling parameter returned by algorithm 6
 %   new_rat_hess_info   [MATLAB structure]                  options related to mode_compute=5 settings
