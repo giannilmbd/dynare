@@ -196,3 +196,33 @@ if nargout>8
     % initialization of vector y.
     y = NaN(3*M_.endo_nbr,1);
 end
+
+
+function l = get_lags_on_exogenous_variables(M_)
+% l = get_lags_on_exogenous_variables(M_)
+% Returns a vector with the max lag for each exogenous variable.
+
+l = zeros(M_.exo_nbr, 1);
+
+if ~isempty(M_.aux_vars)
+    aux_var_for_lagged_exogenous = find([M_.aux_vars(:).type]==3);
+    for i=1:length(aux_var_for_lagged_exogenous)
+        l(M_.aux_vars(aux_var_for_lagged_exogenous(i)).orig_index) = ...
+            M_.aux_vars(aux_var_for_lagged_exogenous(i)).orig_lead_lag-1;
+    end
+end
+
+function l = get_lags_on_endogenous_variables(M_)
+% l = get_lags_on_endogenous_variables(M_)
+% Returns a vector with the max lag for each endogenous variable.
+
+l = zeros(M_.orig_endo_nbr, 1);
+l(find(M_.lead_lag_incidence(1,1:M_.orig_endo_nbr))) = -1;
+
+if ~isempty(M_.aux_vars)
+    aux_var_for_lagged_endogenous = find([M_.aux_vars(:).type]==1);
+    for i=1:length(aux_var_for_lagged_endogenous)
+        l(M_.aux_vars(aux_var_for_lagged_endogenous(i)).orig_index) = ...
+            M_.aux_vars(aux_var_for_lagged_endogenous(i)).orig_lead_lag;
+    end
+end
