@@ -130,7 +130,7 @@ initialconditions = dseries(init, 2000Q1, vertcat(M_.endo_names,M_.exo_names));
 
 // Simulate the model for 500 periods
 TrueData = simul_backward_model(initialconditions, 500);
-
+options_.TeX=true;
 decomposition = shock_decomposition_backward(TrueData, initialconditions, { 'g1', 'g2', 'es' }, { 'z', 'y', 'u'});
 
 % Verify that y is only influenced by g1 (which contains ey)
