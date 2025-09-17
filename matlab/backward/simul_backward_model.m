@@ -44,7 +44,7 @@ end
 
 if ~M_.maximum_lag
     dprintf('Model defined in %s.mod is static. Use simul_static_model instead.', M_.fname)
-    simul_static_model(samplesize, innovations);
+    [simulation, oo_]= backward_model.simul_static_model(M_,options_,oo_,samplesize, innovations);
     return
 end
 
