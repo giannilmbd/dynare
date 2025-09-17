@@ -1,6 +1,7 @@
 function [initialconditions, samplesize, innovations, options_, M_, oo_, endonames, exonames, dynamic_resid, dynamic_g1, y] = ...
-    simul_backward_model_init(initialconditions, samplesize, options_, M_, oo_, innovations)
-
+    initialize(initialconditions, samplesize, options_, M_, oo_, innovations)
+% [initialconditions, samplesize, innovations, options_, M_, oo_, endonames, exonames, dynamic_resid, dynamic_g1, y] = ...
+%     initialize(initialconditions, samplesize, options_, M_, oo_, innovations)
 % Initialization of the routines simulating backward models.
 
 % Copyright © 2017-2025 Dynare Team

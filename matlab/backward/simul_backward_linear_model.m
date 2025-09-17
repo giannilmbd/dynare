@@ -53,7 +53,7 @@ if nargin<6
 end
 
 [initialconditions, samplesize, innovations, options_, M_, oo_, endonames, exonames, dynamic_resid, dynamic_g1] = ...
-    simul_backward_model_init(initialconditions, samplesize, options_, M_, oo_, innovations);
+    backward_model.initialize(initialconditions, samplesize, options_, M_, oo_, innovations);
 
 [ysim, xsim, oo_, errorflag] = backward_model.simul_linear_model(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
 

@@ -144,7 +144,7 @@ end
 
 % Set up initial conditions
 [initialcondition, periods, Innovations, options_local, M_, oo_, endonames, exonames, dynamic_resid, dynamic_g1] = ...
-    simul_backward_model_init(initialcondition, periods, options_, M_, oo_, Innovations);
+    backward_model.initialize(initialcondition, periods, options_, M_, oo_, Innovations);
 
 % Get the covariance matrix of the shocks.
 if ~deterministicshockflag

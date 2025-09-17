@@ -68,7 +68,7 @@ end
 
 % Set up initial conditions
 [initialcondition, periods, innovations, options_, M_, oo_, endonames, ~, dynamic_resid, dynamic_g1] = ...
-    simul_backward_model_init(initialcondition, periods, options_, M_, oo_, zeros(periods, M_.exo_nbr));
+    backward_model.initialize(initialcondition, periods, options_, M_, oo_, zeros(periods, M_.exo_nbr));
 
 % Get vector of indices for the selected endogenous variables.
 n = length(listofvariables);
