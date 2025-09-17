@@ -1,6 +1,6 @@
 function set_historical_values(ds, initialperiod)
-
-% Builds endo_histval and exo_hsitval from the content of a dseries object.
+% set_historical_values(ds, initialperiod)
+% Builds endo_histval and exo_histval from the content of a dseries object.
 %
 % INPUTS
 % - ds                [dseries]    Dataset.

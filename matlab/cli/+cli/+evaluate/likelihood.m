@@ -1,16 +1,16 @@
 function llik = likelihood(parameters)
-
+% llik = likelihood(parameters)
 % Evaluates the likelihood function.
 %
 % INPUTS
 % - parameters    [char,double]    If row char array, possible values are 'posterior mode', 'posterior mean',
-%                                  'posterior median', 'prior mode' or 'prior mean'. Otherwise, parmaters must
+%                                  'posterior median', 'prior mode' or 'prior mean'. Otherwise, parameters must
 %                                  be a vector of doubles (arbitrary values for the parameters).
 %
 % OUTPUTS
-% None
+% - llik           [double]         likelihood
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
