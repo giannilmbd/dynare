@@ -94,7 +94,7 @@ else
 end
 
 if options_.linear
-    [simulation, errorflag] = simul_backward_linear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
+    [simulation, oo_, errorflag] = simul_backward_linear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
 else
-    [simulation, errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
+    [simulation, oo_, errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
 end

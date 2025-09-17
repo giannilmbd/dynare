@@ -94,9 +94,9 @@ end
 
 % Compute forecast without shock
 if options_.linear
-    [ysim__0, errorflag] = simul_backward_linear_model_(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+    [ysim__0, ~, ~, errorflag] = backward_model.simul_linear_model(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
 else
-    [ysim__0, errorflag] = simul_backward_nonlinear_model_(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+    [ysim__0, ~, ~, errorflag] = backward_model.simul_nonlinear_model(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
 end
 
 if errorflag
@@ -114,9 +114,9 @@ if withuncertainty
     for i=1:B
         innovations = transpose(sigma*randn(M_.exo_nbr, periods));
         if options_.linear
-            [ysim__, ~, errorflag] = simul_backward_linear_model_(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+            [ysim__, ~, ~, errorflag] = backward_model.simul_linear_model(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
         else
-            [ysim__, ~, errorflag] = simul_backward_nonlinear_model_(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+            [ysim__, ~, ~, errorflag] = backward_model.simul_nonlinear_model(initialcondition, periods, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
         end
         if errorflag
             error('Simulation failed.')

@@ -165,9 +165,9 @@ irfs = struct();
 % Baseline paths (get transition paths induced by the initial condition and
 % baseline innovations).
 if options_.linear
-    [ysim__0, errorflag] = simul_backward_linear_model_(initialcondition, periods, options_local, M_, oo_, Innovations, dynamic_resid, dynamic_g1);
+    [ysim__0, ~, ~, errorflag] = backward_model.simul_linear_model(initialcondition, periods, options_local, M_, oo_, Innovations, dynamic_resid, dynamic_g1);
 else
-    [ysim__0, errorflag] = simul_backward_nonlinear_model_(initialcondition, periods, options_local, M_, oo_, Innovations, dynamic_resid, dynamic_g1);
+    [ysim__0, ~, ~, errorflag] = backward_model.simul_nonlinear_model(initialcondition, periods, options_local, M_, oo_, Innovations, dynamic_resid, dynamic_g1);
 end
 
 if errorflag
@@ -204,9 +204,9 @@ for i=1:length(listofshocks)
         innovations(1,:) = innovations(1,:) + transpose(C(:,j));
     end
     if options_.linear
-        [ysim__1, errorflag] = simul_backward_linear_model_(initialcondition, periods, options_local, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+        [ysim__1, ~, ~, errorflag] = backward_model.simul_linear_model(initialcondition, periods, options_local, M_, oo_, innovations, dynamic_resid, dynamic_g1);
     else
-        [ysim__1, errorflag] = simul_backward_nonlinear_model_(initialcondition, periods, options_local, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+        [ysim__1, ~, ~, errorflag] = backward_model.simul_nonlinear_model(initialcondition, periods, options_local, M_, oo_, innovations, dynamic_resid, dynamic_g1);
     end
     if errorflag
         warning('Simulation failed. Cannot compute IRF for %s.', listofshocks{i})

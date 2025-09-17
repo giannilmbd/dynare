@@ -1,5 +1,5 @@
-function [ysim, xsim, errorflag] = simul_backward_nonlinear_model_(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1)
-% [ysim, xsim, errorflag] = simul_backward_nonlinear_model_(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1)
+function [ysim, xsim, oo_, errorflag] = simul_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1)
+% [ysim, xsim, oo_, errorflag] = simul_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1)
 % Simulates a stochastic non linear backward looking model with arbitrary precision (a deterministic solver is used).
 %
 % INPUTS
@@ -13,6 +13,8 @@ function [ysim, xsim, errorflag] = simul_backward_nonlinear_model_(initialcondit
 % - dynamic_g1
 %
 % OUTPUTS
+% - ysim                [double]      simulated endogenous variables
+% - xsim                [double]      simulated exogenous variables  
 % - oo_                 [struct]      Dynare's oo_ global structure.
 % - errorflag           [logical]     scalar, equal to false iff the simulation did not fail.
 %
