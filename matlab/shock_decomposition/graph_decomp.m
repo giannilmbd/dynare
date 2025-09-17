@@ -249,7 +249,7 @@ for j=1:nvar
         if options_.TeX && any(strcmp('eps',cellstr(options_.plot_shock_decomp.graph_format)))
             fprintf(fidTeX,'\\begin{figure}[H]\n');
             fprintf(fidTeX,'\\centering \n');
-            fprintf(fidTeX,'\\includegraphics[width=0.8\\textwidth]{%s/graphs/%s%s}\n',M_.fname,M_.fname,[preamble_figname endo_names{i_var(j)} fig_mode1 fig_name]);
+            fprintf(fidTeX,'\\includegraphics[width=0.8\\textwidth]{%s/graphs/%s%s}\n',M_.dname,M_.fname,[preamble_figname endo_names{i_var(j)} fig_mode1 fig_name]);
             fprintf(fidTeX,'\\label{Fig:shock_decomp:%s}\n',[fig_mode endo_names{i_var(j)} fig_name]);
             fprintf(fidTeX,['\\caption{' preamble_txt fig_name_long strrep(fig_mode1, '_',  ' ') ': $ %s $.}\n'],M_.endo_names_tex{i_var(j)});
             fprintf(fidTeX,'\\end{figure}\n');
