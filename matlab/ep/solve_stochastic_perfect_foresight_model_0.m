@@ -135,7 +135,7 @@ if update_pfm_struct
     pfm.world_nbr = world_nbr;
 
     pfm.i_cols_1 = i_cols_1;
-    pfm.i_cols_h = i_cols_j;
+    pfm.i_cols_j = i_cols_j;
     pfm.icA = icA;
     pfm.i_cols_T = i_cols_T;
     pfm.i_upd_r = i_upd_r;
