@@ -8621,21 +8621,6 @@ observed variables.
        penalty value for the likelihood when such a singularity is
        encountered. Default: ``1``.
 
-    .. option:: keep_kalman_algo_if_singularity_is_detected
-
-       With the default
-       :opt:`use_univariate_filters_if_singularity_is_detected=1
-       <use_univariate_filters_if_singularity_is_detected = INTEGER>`,
-       Dynare will switch to the univariate Kalman filter when it
-       encounters a singular forecast error variance matrix during
-       Kalman filtering. Upon encountering such a singularity for the
-       first time, all subsequent parameter draws and computations
-       will automatically rely on univariate filter, i.e. Dynare will
-       never try the multivariate filter again. Use the
-       ``keep_kalman_algo_if_singularity_is_detected`` option to have
-       the ``use_univariate_filters_if_singularity_is_detected`` only
-       affect the behavior for the current draw/computation.
-
     .. option:: rescale_prediction_error_covariance
 
        Rescales the prediction error covariance in the Kalman filter

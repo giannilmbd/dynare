@@ -106,7 +106,7 @@ end
 
 if options_.occbin.smoother.status
     if options_.occbin.smoother.inversion_filter
-        [~, info, ~, ~, ~, ~, ~, ~, ~, ~, oo_.dr, atT, innov] = occbin.IVF_posterior(parameters,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,prior_bounds(bayestopt_,options_.prior_trunc),oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+        [~, info, ~, ~, ~, ~, ~, ~, oo_.dr, atT, innov] = occbin.IVF_posterior(parameters,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,prior_bounds(bayestopt_,options_.prior_trunc),oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
         if ismember(info(1),[303,304,306])
             oo_.occbin.smoother.error_flag=1;
         else

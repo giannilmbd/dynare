@@ -235,7 +235,7 @@ for b=fpar:B
             opts_local.occbin.smoother.linear_smoother=false; % speed-up
             if options_.occbin.smoother.inversion_filter
                 dataset_.data=Y';
-                [~, info, ~, ~, ~, ~, ~, ~, ~, ~, oo_.dr, alphahat, etahat] = ...
+                [~, info, ~, ~, ~, ~, ~, ~, oo_.dr, alphahat, etahat] = ...
                     occbin.IVF_posterior(deep,dataset_,[],options_,M_,estim_params_,bayestopt_,prior_bounds(bayestopt_,options_.prior_trunc),oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                 if info(1)
                     message=get_error_message(info,opts_local);
