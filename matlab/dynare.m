@@ -75,11 +75,9 @@ if isoctave
     % package, it is manually added in binary packages distributed on dynare.org
     if exist('supported_octave_version', 'file') && ~strcmp(supported_octave_version, version)
         skipline()
-        warning(['This version of Octave is not supported. Consider installing ' ...
-                 'version %s of Octave\n' ...
-                 'from www.octave.org, otherwise m files will be used instead ' ...
-                 'of precompiled mex files and some\nfeatures, like solution ' ...
-                 'of models approximated at third order, will not be available.'], supported_octave_version())
+        warning(['This version of Octave is not supported. Consider using version %s of '
+                 'Octave from www.octave.org, otherwise precompiled MEX files may fail to load, '
+                 'leading to an important loss of functionality.'], supported_octave_version())
         skipline()
     elseif octave_ver_less_than('7.1.0') % Should match the test in meson.build, and also the one in matlab/modules/dseries/src/initialize_dseries_class.m
         skipline()
