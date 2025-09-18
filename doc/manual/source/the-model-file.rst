@@ -6796,6 +6796,9 @@ observed variables.
 
             estimation(datafile='../fsdat_simul.mat',...);
 
+       The `datafile` option is mandatory unless a :comm:`data (OPTIONS...)` 
+       command is present.
+
     .. option:: dirname = FILENAME
 
        Directory in which to store ``estimation`` output. To pass a
@@ -9612,6 +9615,57 @@ observed variables.
         :opt:`raftery_lewis_diagnostics`). There is a subfield in the struct array 
         for each MCMC chain. Contains the results of the test in individual fields.
 
+
+.. command:: data (OPTIONS...);
+
+    |br| This command allows specifying the dataset used for estimation using `dseries` objects. 
+    It obviates the need for a :opt:`datafile = FILENAME` option to the `estimation` command.
+
+    *Options*
+
+    .. option:: file = FILENAME
+
+        The name of the file containing the data: See :opt:`datafile = FILENAME` for syntax 
+        and supported file types. Mandatory input if :opt:`series = DSERIES` is not specified.
+
+    .. option:: series = DSERIES
+
+        The name of a `dseries` object available in memory containing the data series to be used.
+        Mandatory input if :opt:`file = FILENAME` is not specified.
+
+    .. option:: xls_sheet = QUOTED_STRING
+
+        See :opt:`xls_sheet = QUOTED_STRING`
+
+    .. option:: xls_range = RANGE
+
+        See :opt:`xls_range = RANGE`
+    
+    .. option:: nobs = INTEGER
+
+        See :opt:`nobs = INTEGER`
+
+    .. option:: nobs = [INTEGER1:INTEGER2]
+
+        See :opt:`nobs = [INTEGER1:INTEGER2]`
+
+    .. option:: first_obs = DATE
+
+        The date (see :ref:`dates-members`) of the first observation to be 
+        used in the file.
+
+    .. option:: first_obs = INTEGER
+
+        See :opt:`first_obs = INTEGER`
+
+    .. option:: first_obs = [INTEGER1:INTEGER2]
+
+        See :opt:`first_obs = [INTEGER1:INTEGER2]`
+
+    .. option:: last_obs = DATE
+
+        The date (see :ref:`dates-members`) of the last observation to be 
+        used in the file.
 
 .. command:: unit_root_vars VARIABLE_NAME...;
 
