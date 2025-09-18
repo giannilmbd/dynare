@@ -49,8 +49,6 @@ if isempty(options_.qz_criterium)
     options_.qz_criterium = 1+1e-6;
 end
 
-oo_=make_ex_(M_,options_,oo_);
-
 np = size(params,1);
 i_params = zeros(np,1);
 for i=1:np
