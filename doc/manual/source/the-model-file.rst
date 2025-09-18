@@ -9406,7 +9406,9 @@ observed variables.
     .. matvar:: oo_.posterior_mode
 
         Variable set by the ``estimation`` command during
-        mode-finding. Fields are of the form::
+        mode-finding. If no mode-finding is conducted, the field will be set
+        to the mode from the MCMC if ``mh_replic > 0``.
+        Fields are of the form::
 
             oo_.posterior_mode.ESTIMATED_OBJECT.VARIABLE_NAME
 
