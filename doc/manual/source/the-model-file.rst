@@ -12427,11 +12427,13 @@ with ``discretionary_policy`` or for optimal simple rules with ``osr``
 
     .. matvar:: oo_.planner_objective_value.conditional
 
-    In a perfect foresight context, this field will be a scalar storing the value of 
+    In a non-Ramsey context, this field will be a scalar storing the value of 
+    welfare conditional on the specified initial condition. In a perfect foresight Ramsey 
+    context, this field will be a scalar storing the value of 
     welfare conditional on the specified initial condition and zero initial Lagrange
-    multipliers. 
+    multipliers.
 
-    In a stochastic context, it will have two subfields:
+    In a stochastic Ramsey context, it will have two subfields:
 
     .. matvar:: oo_.planner_objective_value.conditional.steady_initial_multiplier
 
