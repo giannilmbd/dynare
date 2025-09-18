@@ -260,10 +260,18 @@ mkdir -p /home/$USER/dynare/x13as
 cd /home/$USER/dynare/x13as
 wget https://www2.census.gov/software/x-13arima-seats/x13as/unix-linux/program-archives/x13as_asciisrc-v1-1-b62.tar.gz
 tar xf x13as_asciisrc-v1-1-b62.tar.gz
+cd x13as_asciisrc-v1-1-b62
 sed -i "s|-static| |" makefile.gf # this removes '-static' in the makefile.gf
 make -f makefile.gf FFLAGS="-O2 -std=legacy" PROGRAM=x13as
 sudo cp x13as /usr/bin/
+
+# test x13as
+cd /home/$USER/dynare
+x13as
+# X-13ARIMA-SEATS Seasonal Adjustment Program
+# Version Number 1.1 Build 62
 ```
+Alternatively, if you don't have admin privileges you can install it into `$HOME/.local/bin` and add this folder to your PATH.
 
 If you use MATLAB, we strongly advise to also rename or exclude the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by Fedora, see e.g. the [OpenGL Section of the ArchWiki article on MATLAB](https://wiki.archlinux.org/title/MATLAB#OpenGL_acceleration) for instructions.
 
@@ -496,11 +504,15 @@ mkdir -p $DYNAREDIR/x13as
 cd $DYNAREDIR/x13as
 curl -O https://www2.census.gov/software/x-13arima-seats/x13as/unix-linux/program-archives/x13as_asciisrc-v1-1-b62.tar.gz
 tar xf x13as_asciisrc-v1-1-b62.tar.gz
+cd x13as_asciisrc-v1-1-b62
 sed -i '' 's/-static//g' makefile.gf
 make -j$(sysctl -n hw.ncpu) -f makefile.gf FC=$BREWDIR/bin/gfortran LINKER=$BREWDIR/bin/gcc-15 FFLAGS="-O2 -std=legacy" LDFLAGS=-static-libgcc LIBS="$BREWDIR/lib/gcc/current/libgfortran.a /$BREWDIR/lib/gcc/current/libquadmath.a" PROGRAM=x13as
 sudo cp $DYNAREDIR/x13as/x13as /usr/local/bin/x13as
+# test x13as
 cd $DYNAREDIR
 x13as
+# X-13ARIMA-SEATS Seasonal Adjustment Program
+# Version Number 1.1 Build 62
 ```
 Alternatively, if you don't have admin privileges you can install it into `$HOME/.local/bin` and add this folder to your PATH.
 
