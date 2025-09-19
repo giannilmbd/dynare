@@ -1,10 +1,11 @@
 function [x, first_iter_lu] = lin_solve(A, b, options_, first_iter_lu, force_lu)
+% [x, first_iter_lu] = lin_solve(A, b, options_, first_iter_lu, force_lu)
 % Solves the linear system A·x=b. Used at the heart of the perfect foresight solver when
 % stack_solve_algo equals 0 (LU), 2 (GMRES) or 3 (BiCGStab).
 %
 % If force_lu is true, then the value of options_.stack_solve_algo is ignored and a LU is used.
 %
-% first_iter_lu corresponds to the preconditioner used when precondioner=first_iter_lu.
+% first_iter_lu corresponds to the preconditioner used when preconditioner=first_iter_lu.
 % If empty on input, then the routine computes the preconditioner and returns on output.
 % If not empty, use that preconditioner without recomputing it, and pass it unmodified on output.
 
@@ -83,6 +84,9 @@ else % Iterative algorithm
     end
 
     x = Q*y;
+end
+if ~options_.simul.allow_nonfinite_values
+    x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
 end
 
 

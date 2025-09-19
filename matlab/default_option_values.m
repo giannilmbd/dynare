@@ -63,6 +63,7 @@ options_.steady.incomplete_lu.droptol = 1e-10;
 options_.steady.incomplete_lu.udiag = true;
 options_.simul.maxit = 50;
 options_.simul.robust_lin_solve = false;
+options_.simul.allow_nonfinite_values = false;
 
 options_.mode_check.status = false;
 options_.mode_check.neighbourhood_size = .5;

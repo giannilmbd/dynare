@@ -3944,6 +3944,13 @@ speed-up on large models.
        Triggers the use of a robust linear solver for the default
        ``stack_solve_algo=0``.
 
+    .. option:: allow_nonfinite_values
+
+       By default, Dynare sets all NaN and Inf encountered during iterations to 0 
+       and tries to continue solving the model. This approach regularly prevents the 
+       usually terminal propation of non-finite values. The current option allows keeping
+       non-finite values, which may be useful for debugging purposes.
+
     .. option:: check_jacobian_singularity
 
        Triggers a check of the dynamic Jacobian for singularity during the first iteration. 
