@@ -34,7 +34,7 @@ elseif ~options_.hp_filter && options_.one_sided_hp_filter && ~options_.bandpass
 elseif ~options_.hp_filter && ~options_.one_sided_hp_filter && options_.bandpass.indicator
     data_temp=dseries(y,'0q1');
     data_temp=baxter_king_filter(data_temp,options_.bandpass.passband(1),options_.bandpass.passband(2),options_.bandpass.K);
-    y=data_temp.data;
+    y=[NaN(options_.bandpass.K,size(y,2)); data_temp.data; NaN(options_.bandpass.K,size(y,2))]; %pad cut off observations with NaN to preserve length of time series
 elseif ~options_.hp_filter && ~options_.one_sided_hp_filter  && ~options_.bandpass.indicator
     y = bsxfun(@minus, y, m);
 else

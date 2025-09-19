@@ -66,7 +66,14 @@ if ~all(M_.H==0)
         y_ME_only = shock_mat(options_.drop+1:end,index_observables);
         m_ME = mean(y_ME);
         y_ME=get_filtered_time_series(y_ME,m_ME,options_);
+        if options_.bandpass.indicator
+            y_ME=y_ME(options_.bandpass.K+1:end-options_.bandpass.K,:); %remove NaN
+        end
         y_ME_only_filtered=get_filtered_time_series(y_ME_only,mean(y_ME_only),options_);
+        if options_.bandpass.indicator
+            y_ME_only_filtered=y_ME_only_filtered(options_.bandpass.K+1:end-options_.bandpass.K,:); %remove NaN
+        end
+        
         s2_ME = mean(y_ME.*y_ME);
         s_ME = sqrt(s2_ME);
         zero_variance_ME_var_index=index_subset(abs(s_ME')<zero_moments_tolerance);
@@ -78,7 +85,9 @@ m = mean(y);
 
 % filter series
 y=get_filtered_time_series(y,m,options_);
-
+if options_.bandpass.indicator
+    y=y(options_.bandpass.K+1:end-options_.bandpass.K,:); %remove NaN
+end
 s2 = mean(y.*y);
 s = sqrt(s2);
 oo_.mean = transpose(m);
@@ -185,6 +194,10 @@ if ~options_.nodecomposition
             y_sim_one_shock = simult_(M_,options_,y0,oo_.dr,temp_shock_mat,options_.order);
             y_sim_one_shock=y_sim_one_shock(ivar,1+options_.drop+1:end)';
             y_sim_one_shock=get_filtered_time_series(y_sim_one_shock,mean(y_sim_one_shock),options_);
+            if options_.bandpass.indicator
+                y_sim_one_shock=y_sim_one_shock(options_.bandpass.K+1:end-options_.bandpass.K,:); %remove NaN
+            end
+
             oo_.variance_decomposition(:,i_exo_var(shock_iter))=var(y_sim_one_shock)./s2*100;            
         end
         oo_.variance_decomposition(zero_variance_var_index,:)=NaN;
