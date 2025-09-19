@@ -1,6 +1,9 @@
 function [info, oo_, options_, M_] = run(M_, options_, oo_, var_list, params, i_var,W)
 % [info, oo_, options_, M_] = osr(M_, options_, oo_, var_list, params, i_var,W)
-% Function computing the solution to the optimal simple rule-problem
+% Function computing the solution to the optimal simple rule-problem. There
+% are two calling syntaxes. The first one with 5 inputs assumes a
+% planner_objective is present. The second (legacy) one at order==1 requires 
+% an optim_weights block to provide two more inputs.
 %
 % INPUTS
 %   M_          [structure]                 Dynare's model structure
@@ -9,6 +12,7 @@ function [info, oo_, options_, M_] = run(M_, options_, oo_, var_list, params, i_
 %   var_list    [character array]           list of endogenous variables specified
 %   params      [character array]           list of parameter to be chosen in
 %                                           optimal simple rule
+%  Additional inputs if used at order==1 with optim_weights:
 %   i_var       [n_osr_vars by 1 double]    indices of osr-variable in
 %                                           specified in optim_weights in declaration order
 %   W           [M_.endo_nbr by M_.endo_nbr sparse matrix] Weighting matrix for variance of endogenous variables
@@ -42,8 +46,26 @@ function [info, oo_, options_, M_] = run(M_, options_, oo_, var_list, params, i_
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+if nargin==5
+    use_planner_objective=true;
+elseif nargin==7
+    use_planner_objective=false;
+else
+    error('OSR: wrong number of input arguments.')
+end
 
-options_.order = 1;
+if ~use_planner_objective 
+    if options_.order ~= 1
+        error ('OSR: OSR without planner_objective only supports order=1.');
+    end
+    if any(any(isinf(W)))
+        error ('OSR: At least one of the optim_weights is infinite.') ;
+    end
+else
+    if options_.analytic_derivation
+        error ('OSR: analytic_derivation is only available at order=1 with optim_weights.') ;
+    end
+end
 
 if isempty(options_.qz_criterium)
     options_.qz_criterium = 1+1e-6;
@@ -52,8 +74,8 @@ end
 np = size(params,1);
 i_params = zeros(np,1);
 for i=1:np
-    str = deblank(params(i,:));
-    i_params(i) = strmatch(str{:}, M_.param_names, 'exact');
+    str = params{i,:};
+    i_params(i) = strmatch(str, M_.param_names, 'exact');
 end
 
 if ~options_.noprint
@@ -72,10 +94,6 @@ end
 
 if M_.maximum_lead == 0
     error ('OSR: Backward or static model: no point in using OSR') ;
-end
-
-if any(any(isinf(W)))
-    error ('OSR: At least one of the optim_weights is infinite.') ;
 end
 
 if any(isnan(M_.params(i_params)))
@@ -107,10 +125,14 @@ oo_.dr = set_state_space(oo_.dr,M_);
 par_0 = M_.params(i_params);
 inv_order_var = oo_.dr.inv_order_var;
 
-%extract unique entries of covariance
-i_var=unique(i_var);
-%% do initial checks
-[loss,info]=osr.objective(par_0,M_,oo_,options_,i_params,inv_order_var(i_var),W(i_var,i_var));
+if use_planner_objective
+    [loss,info]=osr.objective(par_0,M_,oo_,options_,i_params);
+else
+    %extract unique entries of covariance
+    i_var=unique(i_var);
+    %% do initial checks
+    [loss,info]=osr.objective(par_0,M_,oo_,options_,i_params,inv_order_var(i_var),W(i_var,i_var));
+end
 if info~=0
     print_info(info, options_.noprint, options_);
 else
@@ -138,9 +160,14 @@ else
         error('OSR: OSR with bounds on parameters requires a constrained optimizer, i.e. opt_algo= 1,2 or 9.')
     end
     %%do actual optimization
-    [p, f, ~, ~, ~, ~, optimization_info] = ...
-        dynare_minimize_objective(str2func('osr.objective'),par_0,options_.osr.opt_algo,options_,M_.osr.param_bounds,M_.param_names(i_params),[],[], M_,oo_,options_,i_params,...
-                                  inv_order_var(i_var),W(i_var,i_var));
+    if use_planner_objective
+        [p, f, ~, ~, ~, ~, optimization_info] = ...
+            dynare_minimize_objective(str2func('osr.objective'),par_0,options_.osr.opt_algo,options_,M_.osr.param_bounds,M_.param_names(i_params),[],[], M_,oo_,options_,i_params);
+    else
+        [p, f, ~, ~, ~, ~, optimization_info] = ...
+            dynare_minimize_objective(str2func('osr.objective'),par_0,options_.osr.opt_algo,options_,M_.osr.param_bounds,M_.param_names(i_params),[],[], M_,oo_,options_,i_params,...
+            inv_order_var(i_var),W(i_var,i_var));
+    end    
 end
 
 osr_res.objective_function = f;
