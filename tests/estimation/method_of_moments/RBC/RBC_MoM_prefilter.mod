@@ -1,6 +1,6 @@
 % Tests SMM and GMM routines with prefilter, explicit initialization, and estimated_params_init(use_calibration);
 %
-% Copyright © 2020-2021 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -106,7 +106,7 @@ if ~isequal(M_.matched_moments,matched_moments_)
     error('Translation to matched_moments-block failed')
 end
 
-weighting_matrix=diag([1000;ones(8,1)]);
+weighting_matrix=diag([ones(3,1);1000;ones(8,1)]);
 save('test_matrix.mat','weighting_matrix')
 
 @#for mommethod in ["GMM", "SMM"]

@@ -102,32 +102,6 @@ n*n(-1);
 iv*iv(-1);
 end;
 
-% get indices in declaration order
-ic  = strmatch('c',  M_.endo_names,'exact');
-iiv = strmatch('iv', M_.endo_names,'exact');
-in  = strmatch('n',  M_.endo_names,'exact');
-% first entry: number of variable in declaration order
-% second entry: lag
-% third entry: power
-
-matched_moments_ = {
-    [ic  ic ]  [0  0],  [1 1];
-    [ic  iiv]  [0  0],  [1 1];
-    [ic  in ]  [0  0],  [1 1];
-    [iiv iiv]  [0  0],  [1 1];
-    [in  iiv]  [0  0],  [1 1];
-%    [in  ic ]  [0  0],  [1 1];
-%    [in  iiv]  [0  0],  [1 1];
-    [in  in ]  [0  0],  [1 1];
-    [ic  ic ]  [0 -1],  [1 1];
-    [in  in ]  [0 -1],  [1 1];
-    [iiv iiv]  [0 -1],  [1 1];
-%    [iiv iiv]  [0 -1],  [1 1];
-};
-
-if ~isequal(M_.matched_moments,matched_moments_)
-    error('Translation to matched_moments-block failed')
-end
 
 method_of_moments(
 % Necessary options

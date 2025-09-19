@@ -1,5 +1,5 @@
-function [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var, matched_moments_, options_mom_)
-% [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var, matched_moments_, options_mom_)
+function [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var, matched_moments_)
+% [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var, matched_moments_)
 % -------------------------------------------------------------------------
 % Computes the user-selected empirical moments from data
 % -------------------------------------------------------------------------
@@ -8,7 +8,6 @@ function [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var,
 %  o obs_var:                [integer]         index of observables
 %  o inv_order_var:          [integer]         inverse decision rule order
 %  o matched_moments_:       [structure]       information about selected moments to match in estimation
-%  o options_mom_:           [structure]       information about all settings (specified by the user, preprocessor, and taken from global options_)
 % -------------------------------------------------------------------------
 % OUTPUTS
 %  o data_moments            [numMom x 1]       mean of selected empirical moments
@@ -19,7 +18,7 @@ function [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var,
 %  o mom.objective_function
 % -------------------------------------------------------------------------
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,12 +37,13 @@ function [data_moments, m_data] = get_data_moments(data, obs_var, inv_order_var,
 
 
 % Initialization
+mom_nbr=size(matched_moments_,1);
 T = size(data,1); % Number of observations (T)
-data_moments = NaN(options_mom_.mom.mom_nbr,1);
-m_data = NaN(T,options_mom_.mom.mom_nbr);
+data_moments = NaN(mom_nbr,1);
+m_data = NaN(T,mom_nbr);
 % Product moment for each time period, i.e. each row t contains y_t1(l1)^p1*y_t2(l2)^p2*...
 % note that here we already are able to treat leads and lags and any power product moments
-for jm = 1:options_mom_.mom.mom_nbr
+for jm = 1:mom_nbr
     vars     = inv_order_var(matched_moments_{jm,1})';
     leadlags = matched_moments_{jm,2}; % lags are negative numbers and leads are positive numbers
     powers   = matched_moments_{jm,3};
