@@ -30,7 +30,7 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % Set seed for randn().
-options_ = set_dynare_seed_local_options(options_,'default');
+set_dynare_seed_local_options([],false,'default');
 options_.verbosity=0; %particularly suppress warning messages during k_order_pert within the loop
 pruning = options_.particle.pruning;
 variance_update = true;

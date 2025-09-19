@@ -26,4 +26,4 @@ if nargin<1
     error('set_dynare_seed:: I need at least one input argument!')
 end
 
-options_=set_dynare_seed_local_options(options_,varargin{:});
+options_.DynareRandomStreams=set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,varargin{:});

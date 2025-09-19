@@ -1,8 +1,11 @@
-function options_=set_dynare_seed_local_options(options_,a,b)
-% options_=set_dynare_seed_local_options(options_,a,b)
+function DynareRandomStreams=set_dynare_seed_local_options(DynareRandomStreams,isHybridMatlabOctave,a,b)
+% DynareRandomStreams=set_dynare_seed_local_options(DynareRandomStreams,isHybridMatlabOctave,a,b)
 % Set seeds depending on MATLAB (octave) version
 % Inputs:
-%   o options_              options structure
+%   o DynareRandomStreams   options structure relating to options_.DynareRandomStreams, 
+%                           potentially empty for initialization (a=='default')
+%   o isHybridMatlabOctave  bool indicating whether parallel mixed pool is
+%                           used
 %   o a                     first input argument, 
 %                           for single argument input, either
 %                               [number]       seed
@@ -14,8 +17,11 @@ function options_=set_dynare_seed_local_options(options_,a,b)
 %   o b                     second input argument
 %                               [number]        seed for algorithm
 %                                               specified with first input
+% Outputs:
+%   o DynareRandomStreams   options structure relating to options_.DynareRandomStreams
 
-% Copyright © 2010-2023 Dynare Team
+
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -32,86 +38,86 @@ function options_=set_dynare_seed_local_options(options_,a,b)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if nargin<2
-    error('set_dynare_seed:: I need at least two input arguments!')
+if nargin<3
+    error('set_dynare_seed:: I need at least three input arguments!')
 end
 
-matlab_random_streams = ~(isoctave || options_.parallel_info.isHybridMatlabOctave);
+matlab_random_streams = ~(isoctave || isHybridMatlabOctave);
 
 if matlab_random_streams% Use new MATLAB interface.
-    if nargin==2
+    if nargin==3
         if ischar(a) && strcmpi(a,'default')
-            options_.DynareRandomStreams.algo = 'mt19937ar';
-            options_.DynareRandomStreams.seed = 0;
-            s = RandStream(options_.DynareRandomStreams.algo,'Seed',options_.DynareRandomStreams.seed);
+            DynareRandomStreams.algo = 'mt19937ar';
+            DynareRandomStreams.seed = 0;
+            s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
             reset(RandStream.setGlobalStream(s));
             return
         end
         if ischar(a) && strcmpi(a,'reset')
-            s = RandStream(options_.DynareRandomStreams.algo,'Seed',options_.DynareRandomStreams.seed);
+            s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
             reset(RandStream.setGlobalStream(s));
             return
         end
         if ~ischar(a) || (ischar(a) && strcmpi(a, 'clock'))
-            options_.DynareRandomStreams.algo = 'mt19937ar';
+            DynareRandomStreams.algo = 'mt19937ar';
             if ischar(a)
-                options_.DynareRandomStreams.seed = rem(floor(now*24*60*60), 2^32);
+                DynareRandomStreams.seed = rem(floor(now*24*60*60), 2^32);
             else
-                options_.DynareRandomStreams.seed = a;
+                DynareRandomStreams.seed = a;
             end
-            s = RandStream(options_.DynareRandomStreams.algo,'Seed',options_.DynareRandomStreams.seed);
+            s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
             reset(RandStream.setGlobalStream(s));
             return
         end
         error('set_dynare_seed:: something is wrong in the calling sequence!')
-    elseif nargin==3
+    elseif nargin==4
         if ~ischar(a) || ~( strcmpi(a,'mcg16807') || ...
                             strcmpi(a,'mlfg6331_64') || ...
                             strcmpi(a,'mrg32k3a') || ...
                             strcmpi(a,'mt19937ar') || ...
                             strcmpi(a,'shr3cong') || ...
                             strcmpi(a,'swb2712') )
-            disp('set_dynare_seed:: First argument must be string designing the uniform random number algorithm!')
+            disp('set_dynare_seed:: third argument must be string designing the uniform random number algorithm!')
             RandStream.list
             skipline()
-            disp('set_dynare_seed:: Change the first input accordingly...')
+            disp('set_dynare_seed:: Change the third input accordingly...')
             skipline()
             error(' ')
         end
         if ~isint(b)
-            error('set_dynare_seed:: The second input argument must be an integer!')
+            error('set_dynare_seed:: The fourth input argument must be an integer!')
         end
-        options_.DynareRandomStreams.algo = a;
-        options_.DynareRandomStreams.seed = b;
-        s = RandStream(options_.DynareRandomStreams.algo,'Seed',options_.DynareRandomStreams.seed);
+        DynareRandomStreams.algo = a;
+        DynareRandomStreams.seed = b;
+        s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
         reset(RandStream.setGlobalStream(s));
     end
 else% Use old MATLAB interface.
-    if nargin==2
+    if nargin==3
         if ischar(a) && strcmpi(a,'default')
             if isoctave
-                options_.DynareRandomStreams.algo = 'state';
+                DynareRandomStreams.algo = 'state';
             else
-                options_.DynareRandomStreams.algo = 'twister';
+                DynareRandomStreams.algo = 'twister';
             end
-            options_.DynareRandomStreams.seed = 0;
-            rand(options_.DynareRandomStreams.algo,options_.DynareRandomStreams.seed);
-            randn('state',options_.DynareRandomStreams.seed);
+            DynareRandomStreams.seed = 0;
+            rand(DynareRandomStreams.algo,DynareRandomStreams.seed);
+            randn('state',DynareRandomStreams.seed);
             return
         end
         if ischar(a) && strcmpi(a,'reset')
-            rand(options_.DynareRandomStreams.algo,options_.DynareRandomStreams.seed);
-            randn('state',options_.DynareRandomStreams.seed);
+            rand(DynareRandomStreams.algo,DynareRandomStreams.seed);
+            randn('state',DynareRandomStreams.seed);
             return
         end
         if (~ischar(a) && isint(a)) || (ischar(a) && strcmpi(a,'clock'))
             if ischar(a)
-                options_.DynareRandomStreams.seed = floor(now*24*60*60);
+                DynareRandomStreams.seed = floor(now*24*60*60);
             else
-                options_.DynareRandomStreams.seed = a;
+                DynareRandomStreams.seed = a;
             end
-            rand(options_.DynareRandomStreams.algo,options_.DynareRandomStreams.seed);
-            randn('state',options_.DynareRandomStreams.seed);
+            rand(DynareRandomStreams.algo,DynareRandomStreams.seed);
+            randn('state',DynareRandomStreams.seed);
             return
         end
         error('set_dynare_seed:: Something is wrong in the calling sequence!')

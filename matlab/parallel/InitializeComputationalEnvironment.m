@@ -64,7 +64,7 @@ isHybridMatlabOctave = isHybridMatlabOctave && ~isoctave;
 options_.parallel_info.isHybridMatlabOctave = isHybridMatlabOctave;
 if isHybridMatlabOctave
     % Reset dynare random generator and seed.
-    options_=set_dynare_seed_local_options(options_,'default');
+    options_.DynareRandomStreams=set_dynare_seed_local_options([],options_.parallel_info.isHybridMatlabOctave,'default');
 end
 
 

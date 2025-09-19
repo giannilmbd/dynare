@@ -11,7 +11,7 @@ function global_initialization()
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -140,7 +140,7 @@ end
 dyn_first_order_solver();
 
 % Set dynare random generator and seed.
-options_=set_dynare_seed_local_options(options_,'default');
+options_.DynareRandomStreams=set_dynare_seed_local_options([],false,'default'); %no parallel context necessary here; posterior_sampler_initialization.m takes care of that
 
 % Load user configuration file.
 if isfield(options_, 'global_init_file')
