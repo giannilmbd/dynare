@@ -97,7 +97,6 @@ T = TT(:,:,t);
 ZZ = Z(di,:);
 di = data_index{t};
 F = ZZ*P1(:,:,t)*ZZ' + H(di,di);
-Fi(di,di,t)=F;
 sig=sqrt(diag(F));  
 iF(di,di,t)   = inv(F./(sig*sig'))./(sig*sig');
 PZI         = P1(:,:,t)*ZZ'*iF(di,di,t);
