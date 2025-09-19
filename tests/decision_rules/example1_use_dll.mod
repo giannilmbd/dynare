@@ -44,7 +44,7 @@ end;
 
 stoch_simul(nograph);
 
-if ~exist(['example1' filesep 'Output' filesep 'example1_results.mat'],'file');
+if ~isfile('example1/Output/example1_results.mat')
    error('example1 must be run first');
 end;
 

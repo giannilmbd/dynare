@@ -56,7 +56,7 @@ for blockFlag = 0:1
 
         % Workaround for strange race condition related to the static/dynamic
         % files (especially when we switch to/from use_dll)
-        if isoctave && exist('+ls2003_tmp')
+        if isoctave && isfolder('+ls2003_tmp')
             rmdir('+ls2003_tmp', 's');
             pause(1)
         end

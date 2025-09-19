@@ -35,7 +35,7 @@ evaluate_planner_objective(periods=10000,drop=1000);
 
 [W_dynpp] = k_order_welfare(oo_.dr, M_, options_);
 
-if ~exist(['neo_growth_k_order' filesep 'Output' filesep 'neo_growth_k_order_results.mat'],'file');
+if ~isfile('neo_growth_k_order/Output/neo_growth_k_order_results.mat')
    error('neo_growth_k_order must be run first');
 end;
 

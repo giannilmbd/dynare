@@ -35,8 +35,8 @@ perfect_foresight_solver;
 
 planner_objective_value = evaluate_planner_objective(M_, options_, oo_);
 
-if ~exist('neo_growth_foresight_results.mat','file');
-   error('neo_growth_foresight must be run first');
+if ~isfile('neo_growth_foresight_results.mat')
+   error('neo_growth_foresight must be run first')
 end;
 
 oo1 = load(['neo_growth_foresight' filesep 'Output' filesep 'neo_growth_foresight_results'],'oo_');

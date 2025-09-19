@@ -33,7 +33,7 @@ stoch_simul(order=2, irf=0);
 
 planner_objective_value = evaluate_planner_objective(M_, options_, oo_);
 
-if ~exist(['neo_growth' filesep 'Output' filesep 'neo_growth_results.mat'],'file');
+if ~isfile('neo_growth/Output/neo_growth_results.mat')
    error('neo_growth must be run first');
 end;
 

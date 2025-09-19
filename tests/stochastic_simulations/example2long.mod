@@ -51,7 +51,7 @@ end;
 
 stoch_simul;
 
-if ~exist(['example1long' filesep 'Output' filesep 'example1long_results.mat'],'file');
+if ~isfile('example1long/Output/example1long_results.mat')
    error('example1long must be run first');
 end;
 

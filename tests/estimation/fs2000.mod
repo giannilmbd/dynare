@@ -120,8 +120,8 @@ if ~isoctave
     end
 end
         
-if ~exist([M_.dname filesep 'Output'],'dir')
-    mkdir(M_.dname,'Output');
+if ~isfolder(sprintf('%s/Output', M_.dname))
+    mkdir(sprintf('%s/Output', M_.dname));
 end
 save([M_.dname filesep 'Output' filesep 'fs2000_results.mat'], 'oo_');
 options_.load_results_after_load_mh=1;

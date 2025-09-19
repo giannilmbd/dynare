@@ -66,7 +66,7 @@ steady;
 
 stoch_simul(order=2,k_order_solver,periods=1000);
 
-if ~exist(['fs2000k2a' filesep 'Output' filesep 'fs2000k2a_results.mat'],'file');
+if ~isfile('fs2000k2a/Output/fs2000k2a_results.mat')
    error('fs2000k2a must be run first');
 end;
 
