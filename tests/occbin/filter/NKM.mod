@@ -203,7 +203,7 @@ model;
 end;
 options_.TeX=1;
 occbin_constraints;
-name 'zlb'; bind inom <=  inomlb; relax inom > inomlb;
+name 'zlb'; bind inomnot <=  inomlb; relax inomnot > inomlb;
 end;
 
 // ---------------- Steady state -----------------------------------------//        
