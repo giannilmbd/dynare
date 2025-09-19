@@ -51,32 +51,28 @@ else
     pfm.nyf = 0;
     pfm.iyf = [];
 end
-pfm.nd = pfm.nyp+pfm.ny0+pfm.nyf;
-pfm.nrc = pfm.nyf+1;
-pfm.isp = 1:pfm.nyp;
-pfm.is = pfm.nyp+1:pfm.ny+pfm.nyp;
-pfm.isf = pfm.iyf+pfm.nyp;
-pfm.isf1 = pfm.nyp+pfm.ny+1:pfm.nyf+pfm.nyp+pfm.ny+1;
-pfm.iz = 1:pfm.ny+pfm.nyp+pfm.nyf;
 pfm.periods = options_.ep.periods;
 pfm.steady_state = oo_.steady_state;
 pfm.params = M_.params;
 if M_.maximum_endo_lead
-    pfm.i_cols_1 = nonzeros(pfm.lead_lag_incidence(pfm.max_lag+(1:2),:)');
     pfm.i_cols_A1 = find(pfm.lead_lag_incidence(pfm.max_lag+(1:2),:)');
 else
-    pfm.i_cols_1 = nonzeros(pfm.lead_lag_incidence(pfm.max_lag+1,:)');
     pfm.i_cols_A1 = find(pfm.lead_lag_incidence(pfm.max_lag+1,:)');
 end
+pfm.i_cols_1 = pfm.i_cols_A1 + pfm.max_lag*pfm.ny;
 if pfm.max_lag > 0
-    pfm.i_cols_T = nonzeros(pfm.lead_lag_incidence(1:2,:)');
+    pfm.i_cols_T = find(pfm.lead_lag_incidence(1:2,:)');
 else
-    pfm.i_cols_T = nonzeros(pfm.lead_lag_incidence(1,:)');
+    pfm.i_cols_T = find(pfm.lead_lag_incidence(1,:)') + pfm.ny;
 end
-pfm.i_cols_j = 1:pfm.nd;
+pfm.i_cols_j = find(pfm.lead_lag_incidence');
 pfm.i_upd = pfm.ny+(1:pfm.periods*pfm.ny);
 if ~options_.bytecode
-    pfm.dynamic_model = str2func([M_.fname,'.dynamic']);
+    pfm.dynamic_resid = str2func([M_.fname, '.sparse.dynamic_resid']);
+    pfm.dynamic_g1 = str2func([M_.fname, '.sparse.dynamic_g1']);
+    pfm.sparse_rowval = M_.dynamic_g1_sparse_rowval;
+    pfm.sparse_colval = M_.dynamic_g1_sparse_colval;
+    pfm.sparse_colptr = M_.dynamic_g1_sparse_colptr;
 end
 pfm.verbose = options_.ep.verbosity;
 pfm.maxit_ = options_.simul.maxit;

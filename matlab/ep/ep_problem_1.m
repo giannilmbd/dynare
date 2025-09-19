@@ -36,7 +36,11 @@ function [res, A, info] = ep_problem_1(y, x, pfm)
 info = false;
 A = [];
 
-dynamic_model = pfm.dynamic_model;
+dynamic_resid = pfm.dynamic_resid;
+dynamic_g1 = pfm.dynamic_g1;
+sparse_rowval = pfm.sparse_rowval;
+sparse_colval = pfm.sparse_colval;
+sparse_colptr = pfm.sparse_colptr;
 ny = pfm.ny;
 params = pfm.params;
 steady_state = pfm.steady_state;
@@ -62,13 +66,13 @@ eq_index = pfm.eq_index;
 
 
 
-i_cols_p = i_cols(1:nyp);
-i_cols_s = i_cols(nyp+(1:ny));
-i_cols_f = i_cols(nyp+ny+(1:nyf));
-i_cols_Ap0 = i_cols_p;
-i_cols_As = i_cols_s;
-i_cols_Af0 = i_cols_f - ny;
-i_hc = i_cols_f - 2*ny;
+i_cols_p = 1:ny;
+i_cols_s = ny + (1:ny);
+i_cols_f = 2*ny + (1:ny);
+i_cols_Ap0 = i_cols(1:nyp);
+i_cols_As = i_cols(nyp+(1:ny));
+i_cols_Af0 = i_cols(nyp+ny+(1:nyf)) - ny;
+i_hc = 1:ny;
 
 nzA = cell(periods,world_nbr);
 res = zeros(ny,periods,world_nbr);
@@ -122,7 +126,8 @@ for i = 1:order+1
                          Y(i_cols_f,k1)];
                 end
                 if nargout > 1
-                    [d1,jacobian] = dynamic_model(z,innovation,params,steady_state,i+1);
+                    [d1, T_order, T] = dynamic_resid(z, innovation(i+1,:), params, steady_state);
+                    jacobian = dynamic_g1(z, innovation(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
                     if i == 1
                         % in first period we don't keep track of
                         % predetermined variables
@@ -133,7 +138,7 @@ for i = 1:order+1
                         A1(i_rows,i_cols_A) = A1(i_rows,i_cols_A) + weights(k)*jacobian(eq_index,i_cols_j);
                     end
                 else
-                    d1 = dynamic_model(z,innovation,params,steady_state,i+1);
+                    d1 = dynamic_resid(z, innovation(i+1,:), params, steady_state);
                 end
                 res(:,i,1) = res(:,i,1)+weights(k)*d1(eq_index);
             end
@@ -154,12 +159,13 @@ for i = 1:order+1
                  Y(i_cols_s,j);
                  Y(i_cols_f,j)];
             if nargout > 1
-                [d1,jacobian] = dynamic_model(z,innovation,params,steady_state,i+1);
+                [d1, T_order, T] = dynamic_resid(z, innovation(i+1,:), params, steady_state);
+                jacobian = dynamic_g1(z, innovation(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
                 i_cols_A = [i_cols_Ap; i_cols_As; i_cols_Af];
                 [ir,ic,v] = find(jacobian(eq_index,i_cols_j));
                 nzA{i,j} = [i_rows(ir),i_cols_A(ic), v]';
             else
-                d1 = dynamic_model(z,innovation,params,steady_state,i+1);
+                d1 = dynamic_resid(z, innovation(i+1,:), params, steady_state);
             end
             res(:,i,j) = d1(eq_index);
             if nargout > 1
@@ -175,13 +181,14 @@ for i = 1:order+1
                  Y(i_cols_s,j);
                  Y(i_cols_f,j)];
             if nargout > 1
-                [d1,jacobian] = dynamic_model(z,innovation,params,steady_state,i+1);
+                [d1, T_order, T] = dynamic_resid(z, innovation(i+1,:), params, steady_state);
+                jacobian = dynamic_g1(z, innovation(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
                 i_cols_A = [i_cols_Ap; i_cols_As; i_cols_Af];
                 [ir,ic,v] = find(jacobian(eq_index,i_cols_j));
                 nzA{i,j} = [i_rows(ir),i_cols_A(ic),v]';
                 i_cols_Af = i_cols_Af + ny;
             else
-                d1 = dynamic_model(z,innovation,params,steady_state,i+1);
+                d1 = dynamic_resid(z, innovation(i+1,:), params, steady_state);
             end
             res(:,i,j) = d1(eq_index);
         end
@@ -199,13 +206,13 @@ for i = 1:order+1
     i_cols_f = i_cols_f + ny;
 end
 for j=1:world_nbr
-    i_rows_y = i_cols+(order+1)*ny;
+    i_rows_y = (1:3*ny) + (order+1)*ny;
     offset_c = ny*(order+(nnodes-1)*(order-1)*order/2+j-1);
     offset_r = offset_r0+(j-1)*ny;
     for i=order+2:periods
         if nargout > 1
-            [d1,jacobian] = dynamic_model(Y(i_rows_y,j),x,params, ...
-                                          steady_state,i+1);
+            [d1, T_order, T] = dynamic_resid(Y(i_rows_y,j), x(i+1,:), params, steady_state);
+            jacobian = dynamic_g1(Y(i_rows_y,j), x(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
             if i < periods
                 [ir,ic,v] = find(jacobian(eq_index,i_cols_j));
             else
@@ -213,8 +220,7 @@ for j=1:world_nbr
             end
             nzA{i,j} = [offset_r+ir,offset_c+icA(ic), v]';
         else
-            d1 = dynamic_model(Y(i_rows_y,j),x,params, ...
-                               steady_state,i+1);
+            d1 = dynamic_resid(Y(i_rows_y,j), x(i+1,:), params, steady_state);
         end
         res(:,i,j) = d1(eq_index);
         i_rows_y = i_rows_y + ny;
