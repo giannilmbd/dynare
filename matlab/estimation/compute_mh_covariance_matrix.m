@@ -1,13 +1,11 @@
-function [mean, covariance, mode, kernel_at_the_mode] = compute_mh_covariance_matrix(names, fname, dname, outputFolderName)
-
+function [mean, covariance, mode, kernel_at_the_mode] = compute_mh_covariance_matrix(fname, dname)
+% [mean, covariance, mode, kernel_at_the_mode] = compute_mh_covariance_matrix(fname, dname)
 % Estimation of the posterior covariance matrix, posterior mean, posterior mode and evaluation of the posterior kernel at the
 % estimated mode, using posterior draws from a metropolis-hastings.
 %
 % INPUTS
-% - names                    [cell]     n×1 cell array of row char arrays, names of the estimated parameters.
 % - fname                    [char]     name of the model
 % - dname                    [char]     name of subfolder with output files
-% - outputFolderName         [char]     name of directory to store results
 %
 % OUTPUTS
 % - mean                     [double]   n×1 vector, posterior expectation of the parameters.
@@ -15,7 +13,7 @@ function [mean, covariance, mode, kernel_at_the_mode] = compute_mh_covariance_ma
 % - mode                     [double]   n×1 vector, posterior mode of the parameters.
 % - kernel_at_the_mode       [double]   scalar, value of the posterior kernel at the mode.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
