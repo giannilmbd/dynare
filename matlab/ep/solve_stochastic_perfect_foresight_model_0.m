@@ -64,7 +64,7 @@ if update_pfm_struct
 
     if pfm.hybrid_order>0
         if pfm.hybrid_order==2
-            pfm.h_correction = 0.5*pfm.dr.ghs2(dr.inv_order_var);
+            pfm.h_correction = 0.5*pfm.dr.ghs2(pfm.dr.inv_order_var);
         elseif pfm.hybrid_order>2
             pfm.h_correction = pfm.dr.g_0(pfm.dr.inv_order_var);
         else
