@@ -7,7 +7,7 @@ set -exo pipefail
 # MATLAB Online.
 
 X13ASVER=1-1-b62
-MATLABVER=R2025a
+MATLABVER=R2025b
 
 MATLABPATH=/opt/MATLAB/${MATLABVER}
 # TODO: change size and put white background for better rendering in MATLAB Add-Ons browser
