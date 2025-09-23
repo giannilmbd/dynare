@@ -3,7 +3,7 @@
 # On a Debian system, install the packages needed for Windows
 # cross-compilation, and also setup the cross-compiler alternatives.
 
-# Copyright © 2017-2024 Dynare Team
+# Copyright © 2017-2025 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -22,7 +22,7 @@
 
 [[ $(id -u) == 0 ]] || { echo "You must be root" >&2; exit 1; }
 
-PACKAGES=(make p7zip zip zstd wget meson mingw-w64-tools
+PACKAGES=(make 7zip zip zstd wget meson mingw-w64-tools
           gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix
           gfortran-mingw-w64-x86-64-posix flex libfl-dev bison texlive
           texlive-publishers texlive-latex-extra texlive-science
