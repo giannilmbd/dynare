@@ -1403,6 +1403,7 @@ mod_and_m_tests = [
   { 'test' : [ 'ep/linearmodel0.mod' ] },
   { 'test' : [ 'ep/linearmodel1.mod' ] },
   { 'test' : [ 'ep/rbc_bytecode.mod' ] },
+  { 'test' : [ 'ep/burnside.mod' ] },
   { 'test' : [ 'stochastic_simulations/example1_noprint.mod' ] },
   { 'test' : [ 'stochastic_simulations/example_seeds.mod' ] },
   { 'test' : [ 'stochastic-backward-models/solow_cd.mod' ] },
