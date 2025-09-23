@@ -97,7 +97,20 @@ T = TT(:,:,t);
 ZZ = Z(di,:);
 di = data_index{t};
 F = ZZ*P1(:,:,t)*ZZ' + H(di,di);
-sig=sqrt(diag(F));  
+if any(any(isnan(F)))
+    error_flag=325;
+    warning(orig_warning_state);
+    return;
+end
+if rank(F)<size(F,1) 
+    % here we trap cases when some OBC regime triggers singularity 
+    % e.g. no shock to interest rate at ZLB
+    error_flag=326;
+    warning(orig_warning_state);
+    return;
+end
+sig=sqrt(diag(F));
+
 iF(di,di,t)   = inv(F./(sig*sig'))./(sig*sig');
 PZI         = P1(:,:,t)*ZZ'*iF(di,di,t);
 % K(:,di,t)    = T*PZI;
@@ -373,12 +386,9 @@ else
     if rank(F)<size(F,1) 
         % here we trap cases when some OBC regime triggers singularity 
         % e.g. no shock to interest rate at ZLB
-        di=di(find(sig));
-        ZZ = Z(di,:);
-        v(di,t)      = Y(di,t) - ZZ*a(:,t);
-        F = ZZ*P(:,:,t)*ZZ' + H(di,di);
-        sig=sqrt(diag(F));
-        data_index{t}=di;
+        error_flag=326;
+        warning(orig_warning_state);
+        return;
     end
 
     if rescale_prediction_error_covariance

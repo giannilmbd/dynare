@@ -549,6 +549,9 @@ while t<smpl
             opts_simul.waitbar=0;
             options_.occbin.simul=opts_simul;
             [~, out] = occbin.solver(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state);
+            if out.error_flag
+                error('missing_DiffuseKalmanSmootherH3_Z:: OccBin solver did not solve the model in period %u.',t)
+            end
         end
         for jnk=1:nk
             if filter_covariance_flag

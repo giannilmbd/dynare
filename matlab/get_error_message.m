@@ -221,6 +221,8 @@ switch info(1)
         message = 'Piecewise linear Kalman filter: updated state vector is NaN.';
     case 325
         message = 'Piecewise linear Kalman filter: filter covariance NaN.';
+    case 326
+        message = 'Piecewise linear Kalman filter: the forecast error variance became singular, maybe because a shop dropped out in a regime.';
     case 330
         message = 'Piecewise linear Kalman filter: update step did not reach a fixed point (periodic loop).';
     case 331
