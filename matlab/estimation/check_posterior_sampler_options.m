@@ -551,10 +551,6 @@ if strcmp(posterior_sampler_options.posterior_sampling_method,'slice')
             if isempty(invhess)
                 error('check_posterior_sampler_options:: This error should not occur, please contact developers.')
             end
-            % % %             if options_.load_mh_file && options_.use_mh_covariance_matrix,
-            % % %                 [~, invhess] = compute_mh_covariance_matrix(bayestopt_,M_.fname,M_.dname));
-            % % %                 posterior_sampler_options.invhess = invhess;
-            % % %             end
             [V1, D]=eig(invhess);
             posterior_sampler_options.V1=V1;
             posterior_sampler_options.WR=sqrt(diag(D))*3;
