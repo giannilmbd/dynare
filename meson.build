@@ -572,9 +572,20 @@ ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_op
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/dw_csminwel.c' ]
 shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs, dependencies : [ gsl_dep, matio_dep ])
 
-hank_src = [ 'mex/sources/hank/utils/interpolation.f08' ]
-hank_lib = static_library('hank', hank_src, kwargs : static_library_kwargs, dependencies : mex_fortran_dep)
-shared_module('find_bracket_linear_weight', [ 'mex/sources/hank/find_bracket_linear_weight/mexFunction.f08' ], kwargs : mex_kwargs, link_with : hank_lib)
+heterogeneity_src = [
+   'mex/sources/heterogeneity/utils/gray_code.f08',
+   'mex/sources/heterogeneity/utils/interpolation.f08',
+   'mex/sources/heterogeneity/utils/markov.f08',
+   'mex/sources/heterogeneity/utils/expectations.f08',
+   'mex/sources/heterogeneity/utils/curlyDs.f08'
+]
+heterogeneity_lib = static_library('heterogeneity', heterogeneity_src, kwargs : static_library_kwargs, dependencies : [ mex_fortran_dep, blas_fortran_dep ])
+shared_module('find_bracket_linear_weight',  'mex/sources/heterogeneity/find_bracket_linear_weight.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('rouwenhorst',  'mex/sources/heterogeneity/rouwenhorst.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('compute_expected_dx',  'mex/sources/heterogeneity/compute_expected_dx.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('compute_expected_y',  'mex/sources/heterogeneity/compute_expected_y.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('compute_curlyDs',  'mex/sources/heterogeneity/compute_curlyDs.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('compute_transition_matrices',  'mex/sources/heterogeneity/compute_transition_matrices.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 
 ### Documentation
 
@@ -730,10 +741,6 @@ alias_target('doc',
 ### Tests implemented as .mod or .m (both integration and unit tests)
 
 mod_and_m_tests = [
-  { 'test' : [ 'hank/ks.mod' ],
-    'extra': [ 'hank/ks_ar1_ss.mat',
-               'hank/ks_iid_ss.mat',
-               'hank/expect_error.m' ] },
   { 'test' : [ 'decision_rules/first_order/walsh.mod' ],
     'extra' : [ 'decision_rules/first_order/+matlab/+namespace/y_k.m'] },
   { 'test' : [ 'occbin/model_irrcap_twoconstraints/dynrbc.mod',
@@ -1878,6 +1885,76 @@ mod_and_m_tests = [
   { 'test' : [ 'particle/first_spec_MCMC.mod' ],
     'extra' : [ 'particle/first_spec_common.inc' ] },
 
+  # Heterogeneity
+  { 'test' : [ 'heterogeneity/ks.mod' ],
+    'extra': [ 'heterogeneity/ks.mat',
+               'heterogeneity/expect_error.m',
+               'heterogeneity/print_test_summary.m',
+               'heterogeneity/run_test.m',
+               'heterogeneity/test_solve_functionality.m',
+               'heterogeneity/test_simulate_stochastic.m',
+               'heterogeneity/test_check_steady_state.m',
+               'heterogeneity/test_field_validation.m' ] },
+  { 'test' : [ 'heterogeneity/hank_1a.mod' ],
+    'extra': [ 'heterogeneity/hank_1a.mat',
+               'heterogeneity/print_test_summary.m',
+               'heterogeneity/run_test.m',
+               'heterogeneity/test_simulate_stochastic.m' ] },
+  { 'test' : [ 'heterogeneity/hank_1a.mod' ],
+    'dynare_args': [ '-DDET_SHOCKS=1' ],
+    'extra': [ 'heterogeneity/hank_1a.mat',
+               'heterogeneity/print_test_summary.m',
+               'heterogeneity/run_test.m',
+               'heterogeneity/test_simulate_news_shocks.m' ] },
+  { 'test' : [ 'heterogeneity/hank_2a.mod' ],
+    'extra': [ 'heterogeneity/hank_2a.mat',
+               'heterogeneity/print_test_summary.m',
+               'heterogeneity/run_test.m',
+               'heterogeneity/test_simulate_stochastic.m' ] },
+  { 'test' : [ 'heterogeneity/ks_commands.mod' ],
+    'extra' : [ 'heterogeneity/ks.mat' ] },
+  { 'test' : [ 'heterogeneity/ks_commands.mod' ],
+    'dynare_args': [ '-DDET_SHOCKS=1' ],
+    'extra' : [ 'heterogeneity/ks.mat' ] },
+  { 'test' : [ 'heterogeneity/ks_news_shocks_stochastic_options_xfail.mod' ],
+    'dynare_args': [ '-DTEST_OPTION="periods"' ],
+    'extra' : [ 'heterogeneity/ks.mat' ],
+    'should_fail' : true },
+  { 'test' : [ 'heterogeneity/ks_news_shocks_stochastic_options_xfail.mod' ],
+    'dynare_args': [ '-DTEST_OPTION="irf"' ],
+    'extra' : [ 'heterogeneity/ks.mat' ],
+    'should_fail' : true },
+  { 'test' : [ 'heterogeneity/ks_news_shocks_stochastic_options_xfail.mod' ],
+    'dynare_args': [ '-DTEST_OPTION="irf_shocks"' ],
+    'extra' : [ 'heterogeneity/ks.mat' ],
+    'should_fail' : true },
+  { 'test' : [ 'heterogeneity/ks_news_shocks_stochastic_options_xfail.mod' ],
+    'dynare_args': [ '-DTEST_OPTION="relative_irf"' ],
+    'extra' : [ 'heterogeneity/ks.mat' ],
+    'should_fail' : true },
+  { 'test' : [ 'heterogeneity/ks_news_shocks_stochastic_options_xfail.mod' ],
+    'dynare_args': [ '-DTEST_OPTION="combined"' ],
+    'extra' : [ 'heterogeneity/ks.mat' ],
+    'should_fail' : true },
+
+  # Heterogenous agents tests requiring large file downloads
+  # They are excluded from the default test setup, see add_test_setup() call below
+  { 'test' : [ 'heterogeneity/large_file_download/ks_ssj.mod' ],
+    'extra': [ 'heterogeneity/large_file_download/print_test_summary.m',
+               'heterogeneity/large_file_download/run_test.m',
+               'heterogeneity/large_file_download/test_solve_with_custom_impulse_responses.m' ] },
+  { 'test' : [ 'heterogeneity/large_file_download/hank_1a_ssj.mod' ],
+    'extra': [ 'heterogeneity/large_file_download/print_test_summary.m',
+               'heterogeneity/large_file_download/run_test.m',
+               'heterogeneity/large_file_download/test_solve_functionality.m',
+               'heterogeneity/large_file_download/test_solve_with_custom_impulse_responses.m',
+               'heterogeneity/large_file_download/test_simulate_stochastic.m' ] },
+  { 'test' : [ 'heterogeneity/large_file_download/hank_2a_ssj.mod' ],
+    'extra': [ 'heterogeneity/large_file_download/print_test_summary.m',
+               'heterogeneity/large_file_download/run_test.m',
+               'heterogeneity/large_file_download/test_solve_functionality.m',
+               'heterogeneity/large_file_download/test_solve_with_custom_impulse_responses.m' ] },
+
   # Expected failures
   { 'test' : [ 'preprocessor_checks/ramst_all_values_required_xfail.mod' ],
     'should_fail' : true },
@@ -2014,6 +2091,18 @@ foreach t : mod_and_m_tests
   endif
   test_name = t['test'][-1] # Use the last test file as the test name
 
+  # Handle optional dynare_args field for passing -D options to preprocessor
+  if t.has_key('dynare_args')
+    # Pass each argument as a separate environment variable
+    args_list = t['dynare_args']
+    test_env = { 'dynare_arg_count': args_list.length().to_string() }
+    foreach i : range(args_list.length())
+      test_env += { f'dynare_arg_@i@': args_list[i] }
+    endforeach
+  else
+    test_env = {}
+  endif
+
   # Construct the suite name(s) using the path to the test file
   # If test file is a/b/c/test.mod, then the suites will be:
   # [ 'a', 'a/b', 'a/b/c' ]
@@ -2040,9 +2129,12 @@ foreach t : mod_and_m_tests
   endforeach
 
   test(test_name, test_driver_exe, args : test_driver_args, suite : test_suite,
-       should_fail : t.get('should_fail', false), timeout : 0)
+       env : test_env, should_fail : t.get('should_fail', false), timeout : 0)
 endforeach
 
+# Exclude some tests from the default test setup
+# They can still be run manually using the --suite option
+add_test_setup('default', is_default : true, exclude_suites : [ 'heterogeneity/large_file_download' ])
 
 ### Developper stuff
 

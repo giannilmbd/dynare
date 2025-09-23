@@ -29,7 +29,17 @@ tic;
 
 % NB: all variables will be cleared by the call to Dynare
 try
-    dynare(getenv('mod_file'), 'console')
+    % Read arguments from individual environment variables
+    dynare_arg_count = str2double(getenv('dynare_arg_count'));
+    if isnan(dynare_arg_count) || dynare_arg_count == 0
+        dynare(getenv('mod_file'), 'console')
+    else
+        args_cell = cell(1, dynare_arg_count);
+        for i = 1:dynare_arg_count
+            args_cell{i} = getenv(sprintf('dynare_arg_%d', i-1));
+        end
+        dynare(getenv('mod_file'), 'console', args_cell{:})
+    end
     testFailed = false;
 catch exception
     printTestError(getenv('mod_file'), exception);

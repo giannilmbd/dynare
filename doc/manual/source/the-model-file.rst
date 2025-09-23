@@ -15060,6 +15060,383 @@ form:
             end;
 
 
+.. _heterogeneity:
+
+Heterogeneity
+===========================
+
+Dynare provides tools for solving models with microeconomic heterogeneity, where a continuum of agents differs in wealth, income, or employment status. Aggregate dynamics arise from the interaction between individual decisions and the distribution of agents’ states.
+
+The implementation notably handles incomplete-markets macroeconomic models (such as HANK models) and combines elements from *Bhandari et al. (2023)* and *Auclert et al. (2021)*.
+
+Examples throughout this section draw on *Krusell and Smith (1998)*, a benchmark for economies with idiosyncratic and aggregate shocks.
+
+Declaring Heterogeneous Agent Models
+-------------------------------------
+
+heterogeneity_dimension
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. command:: heterogeneity_dimension NAME;
+
+    Declares a heterogeneity dimension for the model. This command must appear before any variable declarations that use this dimension.
+
+    Currently, Dynare supports only **one** heterogeneity dimension per model (for example, ``households``).
+
+    *Example*::
+
+        heterogeneity_dimension households;
+
+Heterogeneous Variable Declarations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Variables that vary across heterogeneous agents must be declared with the ``heterogeneity`` option:
+
+.. command:: var(heterogeneity=NAME) VAR_NAME...;
+             varexo(heterogeneity=NAME) VAR_NAME...;
+
+    Declares endogenous or exogenous variables defined for each agent in the specified heterogeneity dimension.
+
+    *Example*::
+
+        heterogeneity_dimension households;
+
+        var(heterogeneity=households)
+            c  (long_name=`consumption')
+            a  (long_name=`assets')
+            Va (long_name=`marginal value of assets')
+        ;
+
+        varexo(heterogeneity=households)
+            e  (long_name=`idiosyncratic productivity shock') 
+        ;
+
+Heterogeneous Agent Model Block
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. block:: model(heterogeneity=NAME);
+
+    Declares equations describing the behavior of heterogeneous agents.  
+    The ``heterogeneity`` option specifies which heterogeneity dimension these equations pertain to.
+
+    The complementarity operator ``⟂`` (Unicode U+27C2) or its alternative pure-ASCII syntax ``_|_`` can be used to specify inequality constraints on variables. As a best practice, it is recommended to write equations with complementarity conditions following the same conventions as described in :opt:`lmmcp` to ensure correct economic interpretation and compatibility with the LMMCP numerical solver.
+
+    *Example*::
+
+        model(heterogeneity=households);
+            beta*Va(+1)-c^(-1/eis)=0 ⟂ a>=0;
+            (1+r)*a(-1)+w*e=c+a;
+            Va = (1+r)*c^(-1/eis);
+        end;
+
+Heterogeneous Shocks Block
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. block:: shocks(heterogeneity=NAME);
+
+    Declares variances of exogenous shocks for a specific heterogeneity dimension.  
+    The ``heterogeneity`` option specifies which heterogeneity dimension these shocks belong to.
+
+    *Example*::
+
+        shocks(heterogeneity=households);
+            var eps_e; stderr 0.01;
+        end;
+
+Aggregate Variable Declarations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Standard ``var`` and ``varexo`` declarations (without the ``heterogeneity`` option) are used for aggregate variables that apply to the economy as a whole.
+
+*Example*::
+
+    var
+        Y  (long_name = 'aggregate output')
+        r  (long_name = 'rate of return on capital')
+        w  (long_name = 'wage rate')
+        K  (long_name = 'aggregate capital')
+    ;
+
+    varexo Z  (long_name = 'aggregate productivity shock');
+
+Aggregate Shocks Block
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The standard ``shocks`` block (without the ``heterogeneity`` option) declares variances of aggregate exogenous shocks.
+
+*Example*::
+
+    shocks;
+        var Z; stderr 0.01;
+    end;
+
+Aggregate Model Block
+^^^^^^^^^^^^^^^^^^^^^^
+
+The standard ``model`` block (without the ``heterogeneity`` option) describes aggregate dynamics and equilibrium conditions linking aggregate and heterogeneous variables.
+
+Dynare provides the ``SUM`` operator for aggregating heterogeneous variables within the aggregate model block:
+
+**SUM(var)**
+    Computes the integral of a heterogeneous variable over the stationary distribution:
+
+    .. math::
+
+        \\text{SUM}(x) = \\int x(s) \\, d\\mu(s)
+
+    where :math:`\\mu` is the distribution of agents over individual states :math:`s`.
+
+*Example*::
+
+    model;
+        Y = (Z_ss+Z) * K(-1)^alpha * L^(1-alpha);
+        r = alpha * (Z_ss+Z) * (K(-1)/L)^(alpha-1) + delta;
+        w = (1-alpha) * (Z_ss+Z) * (K(-1)/L)^alpha;
+        K - SUM(a) = 0;
+    end;
+
+Solving Heterogeneous Agent Models
+-----------------------------------
+
+heterogeneity_load_steady_state
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. command:: heterogeneity_load_steady_state ;
+             heterogeneity_load_steady_state (OPTIONS...);
+
+    Initializes and validates the steady state for a heterogeneous-agent model.
+    The steady state represents the set of policy functions of heterogeneous agents and their stationary distribution when aggregate variables are at their steady-state values. It must be computed externally and loaded from a MAT file.
+
+    *Options*
+
+    .. option:: filename = FILENAME
+
+        *Required.* Path to the MAT file containing the steady-state structure.
+        It must be included in quotes if the filename contains a path or an extension.
+        If the ``.mat`` extension is omitted, it will be added automatically.
+
+    .. option:: variable = STRING
+
+        Variable name within the MAT file to load.  
+        Default: ``'steady_state'``
+
+    *Steady-State Structure*
+
+    The MAT file must contain a structure with the following fields.
+
+    **Key Terminology:**
+
+    - **States**: Pre-determined endogenous heterogeneous variables that appear with a time lag (e.g., ``a(-1)``) in the ``model(heterogeneity=...)`` block equations. These are the state variables over which policy functions are defined.
+
+    - **Shocks**: Discretized idiosyncratic exogenous processes, typically AR(1) processes with i.i.d. Gaussian innovations. These must be declared in ``varexo(heterogeneity=...)`` and discretized into finite-state Markov chains with grids and transition matrices.
+
+    - **Policy functions**: Decision rules that map current shocks and states to agents' choices and values (e.g., consumption ``c(e,a)``, next-period assets ``a'(e,a)``, marginal value ``Va(e,a)``).
+
+    **Structure Fields:**
+
+    **steady_state.agg** (structure)
+        Steady-state values for all the endogenous aggregate variables declared in the ``var`` statement. Each field should be a scalar real number corresponding to an aggregate variable declared in ``var``. When endogenous or exogenous aggregate variables appear with more than one lead or lag in the aggregate model block, Dynare internally transforms the model into an augmented aggregate state space with aggregate auxiliary variables. Users only need to provide steady-state values for the original aggregate variables declared in the ``var`` statement. Dynare automatically computes the steady-state values of the auxiliary aggregate variables.
+
+        *Example (Krusell-Smith model)*::
+
+            steady_state.agg.r = 0.0245      % Interest rate
+            steady_state.agg.w = 1.0231      % Wage
+            steady_state.agg.Y = 0.5531      % Output
+            steady_state.agg.K = 10.4667     % Capital
+
+    **steady_state.pol** (structure)
+        Policy functions with subfields:
+
+        - ``pol.grids``: structure containing all the state variable grids as column vectors. Each field corresponds to a state variable (pre-determined endogenous heterogeneous variable).
+
+          *Example*::
+
+              steady_state.pol.grids.a  % Column vector [500×1] containing asset grid points
+
+        - ``pol.values``: structure containing policy functions as multidimensional arrays for all the variables declared using the ``var(heterogeneity=...)`` statement. Each field corresponds to a heterogeneous endogenous variable. Dimensions are ordered according to ``pol.order``.
+
+          *Example*::
+
+              steady_state.pol.values.c   % Consumption policy [7×500]: dimension 1=shocks (e), dimension 2=states (a)
+              steady_state.pol.values.a   % Next-period assets policy [7×500]
+              steady_state.pol.values.Va  % Marginal value of assets [7×500]
+
+        - ``pol.order``: cell array specifying the dimension ordering for policy function arrays. The first dimensions correspond to shocks, followed by states.
+
+          *Example*::
+
+              steady_state.pol.order = {'e', 'a'}  % Dimension 1 = shock e, Dimension 2 = state a
+
+    **steady_state.shocks** (structure)
+        Discretized idiosyncratic shocks with subfields:
+
+        - ``shocks.grids``: structure containing discretized shock values as column vectors. Each field corresponds to an exogenous shock declared in ``varexo(heterogeneity=...)``.
+
+          *Example*::
+
+              steady_state.shocks.grids.e  % Column vector [7×1] containing productivity shock values
+
+        - ``shocks.Pi``: structure containing Markov transition matrices. Each field is a matrix where element (i,j) gives the probability of transitioning from shock state i to shock state j. Each row must sum to 1.
+
+          *Example*::
+
+              steady_state.shocks.Pi.e  % Matrix [7×7] with row sums = 1, all elements >= 0
+
+        Both ``grids`` and ``Pi`` must be provided for all shocks to ensure consistency with the policy function values defined on the tensored grid.
+
+    **steady_state.d** (structure)
+        The stationary distribution:
+
+        - ``d.grids``: structure with distribution state grids (optional; defaults to ``pol.grids``). Allows using different grids for the distribution than for policy functions.
+
+        - ``d.hist``: multidimensional array containing the histogram of the stationary distribution. Must sum to 1.0. Dimensions are ordered according to ``d.order``.
+
+          *Example*::
+
+              steady_state.d.hist  % Array [7×500] representing fraction of agents at each (e,a) point
+                         % sum(ss.d.hist(:)) == 1.0
+
+        - ``d.order``: cell array specifying the dimension ordering of the distribution.
+          This ensures that ``d.hist`` and ``pol.values`` are aligned, even if their grid dimensions differ. If not specified, defaults to ``pol.order``.
+
+          *Example*::
+
+              steady_state.d.order = {'e', 'a'}  % Same ordering as pol.order
+
+    *Output*
+
+        Populates ``oo_.heterogeneity`` with internal data structures needed by ``heterogeneity_solve`` and ``heterogeneity_simulate``.
+
+heterogeneity_solve
+^^^^^^^^^^^^^^^^^^^
+
+.. command:: heterogeneity_solve ;
+             heterogeneity_solve (OPTIONS...);
+
+    Computes the linearized solution using the Sequence-Space Jacobian method.  
+    ``heterogeneity_load_steady_state`` must be called first.
+
+    *Options*
+
+    .. option:: truncation_horizon = INTEGER
+
+        Time horizon for Jacobian computations.
+        Default: ``300``
+
+    *Output*
+
+        Populates ``oo_.heterogeneity.dr`` with:
+
+        - ``G.(variable).(shock)``: Linear response matrix showing how deviations in the exogenous shock ``shock`` affect the endogenous variable ``variable`` over time; for example, ``G.(variable).(shock)(t,s)`` gives the effect on ``variable`` in period ``t`` of a one-time deviation in ``shock`` occurring in period ``s``, treated as known at time 0
+
+heterogeneity_simulate
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. command:: heterogeneity_simulate ;
+             heterogeneity_simulate (OPTIONS...) [VARIABLE_NAME...];
+
+    Computes linear impulse response functions (IRFs) or simulations for heterogeneous-agent models.
+    The command automatically detects the appropriate simulation mode based on model contents and options. ``heterogeneity_solve`` must be called first.
+
+    **Simulation Modes**
+
+    Dynare distinguishes two simulation modes based on shock anticipation:
+
+    1. **Stochastic simulation:**
+       Computes responses to unanticipated shocks drawn from distributions specified in the ``shocks`` block.
+       Always produces impulse response functions (IRFs). When ``periods > 0``, also produces stochastic simulation paths with random shocks drawn each period from a multivariate normal law with mean zero and variance-covariance matrix ``M_.Sigma_e``.
+
+    2. **News shock sequence:**
+       Triggered automatically if the model file includes a ``shocks`` block with ``periods`` and ``values`` keywords.
+       Simulates the model's response to anticipated shocks known at date 0. Following *Auclert et al. (2021)*: households learn at t=0 about the sequence of future shocks.
+       News shock mode is mutually exclusive with stochastic simulation options ``irf``, ``periods``, ``irf_shocks`` and ``relative_irf``.
+
+    *Options*
+
+    The following options are available. See :comm:`stoch_simul` for detailed descriptions.
+
+    .. option:: irf = INTEGER
+
+        Horizon for impulse response functions. See :opt:`irf <irf = INTEGER>`.
+        Cannot be used with news shock sequence mode.
+        Default: ``40``
+
+    .. option:: periods = INTEGER
+
+        Number of periods for stochastic simulation paths. See :opt:`periods <periods = INTEGER>`.
+        When ``0`` (default): only IRFs are computed.
+        When ``>0``: also computes stochastic simulation with random shocks.
+        Cannot be used with news shock sequence mode.
+
+    .. option:: irf_shocks = ( SHOCK_NAME [[,] SHOCK_NAME ...] )
+
+        List of exogenous shocks for which to compute IRFs. See :opt:`irf_shocks <irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )>`.
+        Cannot be used with news shock sequence mode.
+        Default: all aggregate shocks
+
+    .. option:: relative_irf
+
+        Requests IRFs as percentage deviations from steady state in response to a unit shock. See :opt:`relative_irf`.
+        Cannot be used with news shock sequence mode.
+
+    .. option:: nograph
+
+        Suppresses graph generation. See :opt:`nograph`.
+
+    .. option:: nodisplay
+
+        Prevents display of graphs. See :opt:`nodisplay`.
+
+    .. option:: graph_format = FORMAT
+
+        Specifies output format(s) for graphs. See :opt:`graph_format <graph_format = FORMAT>`.
+
+    .. option:: tex
+
+        Requests generation of TeX files for including IRF figures in LaTeX documents. See :opt:`tex`.
+
+    .. option:: irf_plot_threshold = DOUBLE
+
+        Threshold for plotting IRFs. See :opt:`irf_plot_threshold <irf_plot_threshold = DOUBLE>`.
+        Cannot be used with news shock sequence mode.
+
+    .. option:: print
+
+        Enables printing of results. See :opt:`print`.
+
+    .. option:: noprint
+
+        Suppresses printing of results. See :opt:`noprint`.
+
+    *Output*
+
+    The simulation results are stored in the same format as standard Dynare simulations: impulse responses in :mvar:`oo_.irfs`, simulated endogenous variables in :mvar:`oo_.endo_simul`, and exogenous paths in :mvar:`oo_.exo_simul`.
+
+    **Stochastic simulation:**
+        - :mvar:`oo_.irfs`: impulse response vectors for each variable-shock pair ``(var)_(shock)``
+        - :mvar:`oo_.endo_simul`: simulated paths in levels (only when ``periods > 0``)
+
+    **News shock sequence:**
+        - :mvar:`oo_.endo_simul`: simulated paths in levels
+        - :mvar:`oo_.exo_simul`: realized news shock paths
+
+    *Examples*::
+
+        % Impulse responses for all aggregate shocks
+        heterogeneity_simulate;
+
+        % IRFs only for aggregate TFP shock
+        heterogeneity_simulate(irf_shocks=(Z));
+
+        % Stochastic simulation over 1000 periods
+        heterogeneity_simulate(periods=1000);
+
+        % Deterministic sequence simulation (when declared in shocks block)
+        heterogeneity_simulate(periods=40);
+
+        % IRFs for specific variables only
+        heterogeneity_simulate Y K;
+
 .. _semi-strutural:
 
 Semi-structural models

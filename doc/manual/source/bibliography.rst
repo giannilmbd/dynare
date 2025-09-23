@@ -12,9 +12,11 @@ Bibliography
 * Andreasen, Martin M., Jesús Fernández-Villaverde, and Juan Rubio-Ramírez (2018): “The Pruned State-Space System for Non-Linear DSGE Models: Theory and Empirical Applications,” *Review of Economic Studies*, 85(1), 1-49.
 * Andrle, Michal and Miroslav Plašil (2018): “Econometrics with system priors,” *Economics Letters*, 172, 134-137.
 * Andrews, Donald W.K (1991): “Heteroskedasticity and autocorrelation consistent covariance matrix estimation”, *Econometrica*, 59(3), 817–858.
+* Auclert, Adrien, Bence Bardóczy, Matthew Rognlie, and Ludwig Straub (2021): “Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent Models,” *Econometrica*, 89(5), 2375–2408.
 * Backus, David K., Patrick J. Kehoe, and Finn E. Kydland (1992): “International Real Business Cycles,” *Journal of Political Economy*, 100(4), 745–775.
 * Arasaratnam Ienkaran and Simon Haykin (2009): “Cubature Kalman Filters”, *IEEE Transactions on Automatic Control*, 54(6), 1254-1269.
 * Baxter, Marianne and Robert G. King (1999): “Measuring Business Cycles: Approximate Band-pass Filters for Economic Time Series,” *Review of Economics and Statistics*, 81(4), 575–593.
+* Bhandari, Anmol, Thomas Bourany, David Evans, Mikhail Golosov (2023): “A Perturbational Approach for Approximating Heterogeneous Agent Models,” *NBER Working Paper*, No. 31744.
 * Bini, Dario A., Guy Latouche, and Beatrice Meini (2002): “Solving matrix polynomial equations arising in queueing problems,” *Linear Algebra and its Applications*, 340, 225–244.
 * Boehl, Gregor (2022): “DIME MCMC: A Swiss Army Knife for Bayesian Inference”, *SSRN No. 4250395*
 * Born, Benjamin and Johannes Pfeifer (2014): “Policy risk and the business cycle”, *Journal of Monetary Economics*, 68, 68-85.
@@ -71,6 +73,7 @@ Bibliography
 * Koopman, S. J. and J. Durbin (2003): “Filtering and Smoothing of State Vector for Diffuse State Space Models,” *Journal of Time Series Analysis*, 24(1), 85–98.
 * Kotecha Jayesh and Petar M. Djuric (2003a), “Gaussian Particle Filtering”. *IEEE Transactions on Signal Processing*, 51(10), 2592–2601.
 * Kotecha Jayesh and Petar M. Djuric (2003b), “Gaussian Sum Particle Filtering”, *IEEE transactions on signal processing*, 51(10), 2602-2612.
+* Krusell, Per and Anthony A. Smith, Jr (1998): “Income and Wealth Heterogeneity in the Macroeconomy,” *Journal of Political Economy*, 106(5), 867–896.
 * Kuntsevich, Alexei V. and Franz Kappel (1997): “SolvOpt - The solver for local nonlinear optimization problems (version 1.1, Matlab, C, FORTRAN)”, University of Graz, Graz, Austria.
 * Laffargue, Jean-Pierre (1990): “Résolution d’un modèle macroéconomique avec anticipations rationnelles”, *Annales d’Économie et Statistique*, 17, 97–119.
 * Liu, Jane and Mike West (2001): “Combined parameter and state estimation in simulation-based filtering”, in *Sequential Monte Carlo Methods in Practice*, Eds. Doucet, Freitas and Gordon, Springer Verlag, Chapter 10, 197-223.
