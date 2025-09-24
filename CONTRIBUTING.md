@@ -88,6 +88,8 @@ The Dynare testsuite runs every time a commit is pushed, either in the official 
 
 The output from the latest run of the test suite can be found in the `test_matlab` job associated to the [latest pipeline](https://git.dynare.org/Dynare/dynare/pipelines). This is also a good place to start fixing bugs. If you see a `.mod` file that doesn’t run in the test suite and think you can fix it, create an issue and once you have the go ahead, go for it!
 
+If for some reason you do not want the testsuite to be run after your push (for example because you know for sure that nothing has been broken and you want to save computing ressources), pass the `-o ci.skip` option to `git push` or alternatively put `[skip ci]` in the commit message (the former technique is preferred to avoid cluttering the git history).
+
 ### Integration tests
 
 It’s useful to contribute `.mod` files that test some aspect of Dynare that is not currently tested. A `.mod` file that runs into a bug is perfect. As the test suite currently takes several hours to run, we prefer you modify a current test to also create the bug you’ve found. If you can’t do that, please add a new test that runs as quickly as possible. It will contain only those commands necessary to create the bug, nothing more. To contribute a test, after having made an issue and cloned and forked the repository as described above, do the following:
