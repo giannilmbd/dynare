@@ -39,7 +39,7 @@ if update_pfm_struct
     lead_lag_incidence = pfm.lead_lag_incidence;
     i_cols_1 = pfm.i_cols_1;
     i_cols_j = pfm.i_cols_j;
-    i_cols_T = nonzeros(lead_lag_incidence(1:2,:)');
+    i_cols_T = pfm.i_cols_T;
 
     nodes = pfm.nodes;
     weights = pfm.weights;
