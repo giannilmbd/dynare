@@ -24,9 +24,6 @@ function oo_=perfect_foresight_with_expectation_errors_setup(M_, options_, oo_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if ~isempty(M_.endo_histval)
-    error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with histval or histval_file')
-end
 if ~isempty(oo_.initval_series)
     error('perfect_foresight_with_expectation_errors_setup: cannot be used in conjunction with initval_file')
 end
@@ -174,11 +171,18 @@ for p = 1:periods
     oo_.pfwee.controlled_paths_by_period(:, p) = controlled_paths_by_period(M_, options_, p);
 end
 
-% Build initial paths for endos and exos (only initial conditions are set, the rest is NaN)
-if isempty(oo_.initial_steady_state)
-    oo_.endo_simul = repmat(oo_.steady_state, 1, M_.maximum_lag+periods+M_.maximum_lead);
-else
-    oo_.endo_simul = [repmat(oo_.initial_steady_state, 1, M_.maximum_lag) repmat(oo_.steady_state, 1, periods+M_.maximum_lead)];
+% Build initial paths for endos and exos
+if isempty(M_.endo_histval)
+    if isempty(oo_.initial_steady_state)
+        oo_.endo_simul = repmat(oo_.steady_state, 1, M_.maximum_lag+periods+M_.maximum_lead);
+    else
+        oo_.endo_simul = [repmat(oo_.initial_steady_state, 1, M_.maximum_lag) repmat(oo_.steady_state, 1, periods+M_.maximum_lead)];
+    end
+else % histval or histval_file present
+    if ~isempty(oo_.initial_steady_state)
+        error('histval and endval cannot be used simultaneously')
+    end
+    oo_.endo_simul = [M_.endo_histval repmat(oo_.steady_state, 1, periods+M_.maximum_lead)];
 end
 if isempty(oo_.initial_exo_steady_state)
     oo_.exo_simul = repmat(oo_.exo_steady_state', M_.maximum_lag+periods+M_.maximum_lead, 1);
