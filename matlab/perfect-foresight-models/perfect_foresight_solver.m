@@ -557,7 +557,7 @@ if recompute_final_steady_state
     % Effectively compute the terminal steady state
     for j = lastperiods
         % First use the terminal steady of the previous homotopy iteration as guess value (or the contents of the endval block if this is the first iteration)
-        [endo_simul(:, j), ~, info] = evaluate_steady_state(endo_simul(:, j), exo_simul(j, :)', M_, options_, true);
+        [endo_simul(:, j), ~, info] = evaluate_steady_state(endo_simul(:, j), exo_simul(j, :)', M_, options_, ~options_.simul.endval_steady_nocheck);
         if info(1)
             % If this fails, then try again using the initial steady state as guess value
             if isempty(oo_.initial_steady_state)
@@ -565,7 +565,7 @@ if recompute_final_steady_state
             else
                 guess_value = oo_.initial_steady_state;
             end
-            [endo_simul(:, j), ~, info] = evaluate_steady_state(guess_value, exo_simul(j, :)', M_, options_, true);
+            [endo_simul(:, j), ~, info] = evaluate_steady_state(guess_value, exo_simul(j, :)', M_, options_, ~options_.simul.endval_steady_nocheck);
             if info(1)
                 % If this fails again, give up and restore last periods in endo_simul
                 endo_simul(:, lastperiods) = saved_ss;

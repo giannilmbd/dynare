@@ -331,6 +331,7 @@ options_.minimal_solving_periods = 1;
 options_.endogenous_terminal_period = false;
 options_.no_homotopy = false;
 options_.simul.endval_steady = false;
+options_.simul.endval_steady_nocheck = false;
 options_.simul.first_simulation_period = dates();
 options_.simul.last_simulation_period = dates();
 

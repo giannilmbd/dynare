@@ -3703,6 +3703,12 @@ speed-up on large models.
        than first computing the terminal steady state by homotopy, then
        computing the transitional dynamics by homotopy).
 
+    .. option:: endval_steady_nocheck
+
+       Similar to the :opt:`nocheck` option applied to the terminal steady
+       state computation when used in conjuction with the ``endval_steady``
+       option.
+
     *Output*
 
     The paths for the exogenous variables are stored into
@@ -4613,6 +4619,11 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
        from period ``s``, is given in line ``t+2``, and in the column which has
        the name of the variable on the first line and ``s`` on the second
        line. Of course, values in cells corresponding to ``t<s`` are ignored.
+
+    .. option:: endval_steady_nocheck
+
+       Similar to the :opt:`nocheck` option applied to the terminal steady
+       state computation.
 
     *Output*
 
