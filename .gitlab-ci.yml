@@ -170,7 +170,7 @@ pkg_matlab_online:
 test_matlab:
   stage: test
   script:
-    - meson test -C build-matlab --no-rebuild --num-processes $(($(nproc) * 3 / 4))
+    - meson test -C build-matlab --no-rebuild -j $(($(nproc) * 3 / 4))
   artifacts:
     paths:
       - build-matlab/meson-logs/testlog.txt
@@ -182,7 +182,7 @@ test_old_matlab:
   script:
     - meson setup -Dbuild_for=matlab -Dmatlab_path=/opt/MATLAB/$OLD_MATLAB_VERSION --buildtype=release -Db_lto=true build-old-matlab
     - meson compile -v -C build-old-matlab
-    - meson test -C build-old-matlab --num-processes $(($(nproc) * 3 / 4))
+    - meson test -C build-old-matlab -j $(($(nproc) * 3 / 4))
   artifacts:
     paths:
       - build-old-matlab/meson-logs/testlog.txt
