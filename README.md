@@ -290,7 +290,7 @@ If your distribution ships an older version of `bison`, compile it from source a
 bison --version # bison (GNU Bison) 3.0.4
 mkdir -p /home/$USER/dynare/bison
 cd /home/$USER/dynare/bison
-wget http://ftp.gnu.org/gnu/bison/bison-3.6.4.tar.gz #change the version number accordingly
+wget https://ftpmirror.gnu.org/gnu/bison/bison-3.6.4.tar.gz #change the version number accordingly
 tar xf bison-3.6.4.tar.gz
 cd bison-3.6.4
 ./configure --prefix=/home/$USER/dynare/bison

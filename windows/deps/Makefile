@@ -94,7 +94,7 @@ clean-slicot-all: clean-slicot-src clean-slicot-tar clean-libslicot
 
 tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z:
 	mkdir -p tarballs
-	wget $(WGET_OPTIONS) -O $@ https://ftp.gnu.org/gnu/octave/windows/$(notdir $@)
+	wget $(WGET_OPTIONS) -O $@ https://ftpmirror.gnu.org/gnu/octave/windows/$(notdir $@)
 
 octave64: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
 	rm -rf $@
