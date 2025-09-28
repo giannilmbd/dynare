@@ -28,7 +28,7 @@ if nargout>5
     update_options_struct = true;
 end
 
-dynamic_model = pfm.dynamic_model;
+dynamic_g1 = pfm.dynamic_g1;
 
 periods = pfm.periods;
 
@@ -41,7 +41,7 @@ nyp = pfm.nyp;
 nyf = pfm.nyf;
 i_cols_1 = pfm.i_cols_1;
 i_cols_j = pfm.i_cols_j;
-i_cols_T = nonzeros(lead_lag_incidence(1:2,:)');
+i_cols_T = pfm.i_cols_T;
 
 nodes = pfm.nodes;
 weights = pfm.weights;
@@ -74,8 +74,8 @@ if update_pfm_struct
         pfm.h_correction = 0;
     end
 
-    z = endo_simul(lead_lag_incidence_t(:)>0);
-    [~, jacobian] = dynamic_model(z, exo_simul, pfm.params, pfm.steady_state, 2);
+    z = endo_simul(1:3*ny);
+    jacobian = dynamic_g1(z, exo_simul(2,:), pfm.params, pfm.steady_state, pfm.sparse_rowval, pfm.sparse_colval, pfm.sparse_colptr);
 
     world_nbr = nnodes^order;
 
@@ -115,17 +115,13 @@ if update_pfm_struct
 
     i_rows = 1:ny;
     i_cols = find(lead_lag_incidence');
-    i_cols_p = i_cols(1:nyp);
-    i_cols_s = i_cols(nyp+(1:ny));
-    i_cols_f = i_cols(nyp+ny+(1:nyf));
-
-    pfm.i_cols_Ap = i_cols_p;
-    pfm.i_cols_As = i_cols_s;
-    pfm.i_cols_Af = i_cols_f - ny;
-    pfm.i_hc = i_cols_f - 2*ny;
-    pfm.i_cols_p = i_cols_p;
-    pfm.i_cols_s = i_cols_s;
-    pfm.i_cols_f = i_cols_f;
+    pfm.i_cols_Ap = i_cols(1:nyp);;
+    pfm.i_cols_As = i_cols(nyp+(1:ny));
+    pfm.i_cols_Af = i_cols(nyp+ny+(1:nyf)) - ny;
+    pfm.i_hc = 1:ny;
+    pfm.i_cols_p = 1:ny;
+    pfm.i_cols_s = ny + (1:ny);
+    pfm.i_cols_f = 2*ny + (1:ny);
     pfm.i_rows = i_rows;
 
     pfm.A1 = sparse([],[],[],ny*(sum(nnodes.^(0:order-1),2)+1),dimension,(order+1)*world_nbr*nnz(jacobian));
@@ -135,7 +131,7 @@ if update_pfm_struct
     pfm.world_nbr = world_nbr;
 
     pfm.i_cols_1 = i_cols_1;
-    pfm.i_cols_h = i_cols_j;
+    pfm.i_cols_j = i_cols_j;
     pfm.icA = icA;
     pfm.i_cols_T = i_cols_T;
     pfm.i_upd_r = i_upd_r;

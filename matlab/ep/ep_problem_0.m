@@ -16,13 +16,34 @@ function [res, A, info] = ep_problem_0(y, x, pfm)
 % REMARKS:
 % [1] The structure pfm holds the given initial condition for the states (pfm.y0) and the terminal condition
 
+% Copyright © 2025 Dynare Team
+%
+% This file is part of Dynare.
+%
+% Dynare is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% Dynare is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
 info = false;
 
 params = pfm.params;
 steady_state = pfm.steady_state;
 ny = pfm.ny;
 periods = pfm.periods;
-dynamic_model = pfm.dynamic_model;
+dynamic_resid = pfm.dynamic_resid;
+dynamic_g1 = pfm.dynamic_g1;
+sparse_rowval = pfm.sparse_rowval;
+sparse_colval = pfm.sparse_colval;
+sparse_colptr = pfm.sparse_colptr;
 lead_lag_incidence = pfm.lead_lag_incidence;
 i_cols_1 = pfm.i_cols_1;
 i_cols_j = pfm.i_cols_j;
@@ -69,7 +90,8 @@ for i = 1:order+1
                          Y(i_cols_f,(j-1)*nnodes+k)];
                 end
 
-                [d1,jacobian] = dynamic_model(z,innovation,params,steady_state,i+1);
+                [d1, T_order, T] = dynamic_resid(z, innovation(i+1,:), params, steady_state);
+                jacobian = dynamic_g1(z, innovation(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
                 if i == 1
                     % in first period we don't keep track of
                     % predetermined variables
@@ -86,7 +108,8 @@ for i = 1:order+1
             z = [Y(i_cols_p,i_w_p);
                  Y(i_cols_s,j);
                  Y(i_cols_f,j)];
-            [d1,jacobian] = dynamic_model(z,innovation,params,steady_state,i+1);
+            [d1, T_order, T] = dynamic_resid(z, innovation(i+1,:), params, steady_state);
+            jacobian = dynamic_g1(z, innovation(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
             if i == 1
                 % in first period we don't keep track of
                 % predetermined variables
@@ -116,11 +139,12 @@ for i = 1:order+1
 end
 nzA = cell(periods,pfm.world_nbr);
 for j=1:pfm.world_nbr
-    i_rows_y = find(lead_lag_incidence')+(order+1)*ny;
+    i_rows_y = (1:3*ny) + (order+1)*ny;
     offset_c = ny*(sum(nnodes.^(0:order-1),2)+j-1);
     offset_r = (j-1)*ny;
     for i=order+2:periods
-        [d1,jacobian] = dynamic_model(Y(i_rows_y,j), x, params, steady_state, i+1);
+        [d1, T_order, T] = dynamic_resid(Y(i_rows_y,j), x(i+1,:), params, steady_state);
+        jacobian = dynamic_g1(Y(i_rows_y,j), x(i+1,:), params, steady_state, sparse_rowval, sparse_colval, sparse_colptr, T_order, T);
         if i == periods
             [ir,ic,v] = find(jacobian(:,i_cols_T));
         else
