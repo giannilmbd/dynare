@@ -342,7 +342,7 @@ The dates class
     |br|
 
     .. datesmethod:: C = append (A, B)
-                     append_ (B)
+                     append_ (A, B)
 
         |br| Appends ``dates`` object ``B``, or a string that can be
         interpreted as a date, to the ``dates`` object ``A``. If ``B``
@@ -826,8 +826,8 @@ The dates class
 
     .. datesmethod:: C = pop (A)
                      C = pop (A, B)
-                     pop_ ()
-                     pop_ (B)
+                     pop_ (A)
+                     pop_ (A, B)
 
         |br| Pop method for ``dates`` class. If only one input is
         provided, the method removes the last element of a ``dates``
@@ -850,7 +850,7 @@ The dates class
 
 
     .. datesmethod:: C = remove (A, B)
-                     remove_ (B)
+                     remove_ (A, B)
 
         |br| Remove method for ``dates`` class. Both inputs have to be ``dates`` objects, removes dates in ``B`` from ``A``.
 
@@ -890,7 +890,7 @@ The dates class
 
 
     .. datesmethod:: B = sort (A)
-                     sort_ ()
+                     sort_ (A)
 
         |br| Sort method for ``dates`` objects. Returns a ``dates`` object
         with elements sorted by increasing order.
@@ -976,7 +976,7 @@ The dates class
 
 
     .. datesmethod:: B = unique (A)
-                     unique_ ()
+                     unique_ (A)
 
         |br| Overloads the MATLAB/Octave ``unique`` function. Returns
         a ``dates`` object with repetitions removed (only the last
@@ -1159,7 +1159,7 @@ The dseries class
 
 
     .. dseriesmethod:: A = abs (B)
-                       abs_ ()
+                       abs_ (B)
 
         |br| Overloads the ``abs()`` function for ``dseries``
         objects. Returns the absolute value of the variables in
@@ -1214,7 +1214,7 @@ The dseries class
                 1973Q3 | 0.99791 | 0.22677
 
     .. dseriesmethod:: [A, B] = align (A, B)
-                       align_ (B)
+                       align_ (A, B)
 
         If ``dseries`` objects ``A`` and ``B`` are defined on
         different time ranges, this function extends ``A`` and/or
@@ -1322,7 +1322,7 @@ The dseries class
 
 
     .. dseriesmethod:: C = backcast (A, B[, diff])
-                       backcast_ (B[, diff])
+                       backcast_ (A, B[, diff])
 
         Backcasts ``dseries`` object ``A`` with ``dseries`` object B's
         growth rates (except if the last optional argument, ``diff``,
@@ -1331,7 +1331,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = baxter_king_filter (A[, hf[, lf[, K]]])
-                       baxter_king_filter_ ([hf[, lf[, K]]])
+                       baxter_king_filter_ (A[, hf[, lf[, K]]])
 
         |br| Implementation of the *Baxter and King* (1999) band pass
         filter for ``dseries`` objects. This filter isolates business
@@ -1377,7 +1377,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = center (A[, geometric])
-                       center_ ([geometric])
+                       center_ (A[, geometric])
 
        |br| Centers variables in ``dseries`` object ``A`` around their
        arithmetic means, except if the optional argument ``geometric``
@@ -1386,7 +1386,7 @@ The dseries class
 
 
     .. dseriesmethod:: C = chain (A, B)
-                       chain_ (B)
+                       chain_ (A, B)
 
         |br| Merge two ``dseries`` objects along the time
         dimension. The two objects must have the same number of
@@ -1520,7 +1520,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = cumprod (A[, d[, v]])
-                      cumprod_ ([d[, v]])
+                       cumprod_ (A[, d[, v]])
 
         |br| Overloads the MATLAB/Octave ``cumprod`` function for
         ``dseries`` objects. The cumulated product cannot be computed
@@ -1583,7 +1583,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = cumsum (A[, d[, v]])
-                       cumsum_ ([d[, v]])
+                       cumsum_ (A[, d[, v]])
 
         |br| Overloads the MATLAB/Octave ``cumsum`` function for
         ``dseries`` objects. The cumulated sum cannot be computed if
@@ -1655,7 +1655,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = detrend (A[, m])
-                       detrend_ ([m])
+                       detrend_ (A[, m])
 
         |br| Detrends ``dseries`` object ``A`` with a fitted
         polynomial of order ``m``. Default value fir ``m`` is 0 (time
@@ -1664,13 +1664,13 @@ The dseries class
 
 
     .. dseriesmethod:: B = dgrowth (A)
-                       dgrowth_ ()
+                       dgrowth_ (A)
 
         |br| Computes daily growth rates.
 
 
     .. dseriesmethod:: B = diff (A)
-                       diff_ ()
+                       diff_ (A)
 
         |br| Returns the first difference of ``dseries`` object ``A``.
 
@@ -1944,13 +1944,13 @@ The dseries class
 
 
     .. dseriesmethod:: B = hdiff (A)
-                       hdiff_ ()
+                       hdiff_ (A)
 
        |br| Computes bi-annual differences.
 
 
     .. dseriesmethod:: B = hgrowth (A)
-                       hgrowth_ ()
+                       hgrowth_ (A)
 
        |br| Computes bi-annual growth rates.
 
@@ -1991,7 +1991,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = hpcycle (A[, lambda])
-                       hpcycle_ ([lambda])
+                       hpcycle_ (A[, lambda])
 
         |br| Extracts the cycle component from a ``dseries`` ``A``
         object using the *Hodrick and Prescott (1997)* filter and
@@ -2032,7 +2032,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = hptrend (A[, lambda])
-                       hptrend_ ([lambda])
+                       hptrend_ (A[, lambda])
 
         |br| Extracts the trend component from a ``dseries`` A object
         using the *Hodrick and Prescott (1997)* filter and returns a
@@ -2129,7 +2129,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = lag (A[, p])
-                       lag_ ([p])
+                       lag_ (A[, p])
 
         |br| Returns lagged time series. Default value of integer
         scalar ``p``, the number of lags, is ``1``. The `dseries`
@@ -2276,7 +2276,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = lead (A[, p])
-                       lead_ ([p])
+                       lead_ (A[, p])
 
         |br| Returns a lead time series. The default value for the
         integer scalar ``p``, which represents the number of leads, is
@@ -2356,7 +2356,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = log (A)
-                       log_ ()
+                       log_ (A)
 
         |br| Overloads the MATLAB/Octave ``log`` function for
         ``dseries`` objects.
@@ -2369,9 +2369,9 @@ The dseries class
                 >> ts1 = ts0.log();
 
     .. dseriesmethod:: B = mdiff (A)
-                       mdiff_ ()
+                       mdiff_ (A)
                        B = mgrowth (A)
-                       mgrowth_ ()
+                       mgrowth_ (A)
 
        |br| Calculates the monthly differences or growth rates of
        variables in the ``dseries`` object ``A``.
@@ -2697,7 +2697,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = onesidedhpcycle (A[, lambda[, init]])
-                       onesidedhpcycle_ ([lambda[, init]])
+                       onesidedhpcycle_ (A[, lambda[, init]])
 
         |br| Extracts the cycle component from a ``dseries`` ``A``
         object using a one-sided HP filter (implemented with a Kalman
@@ -2811,7 +2811,7 @@ The dseries class
 
 
     .. dseriesmethod:: C = pop (A[, B])
-                       pop_ ([B])
+                       pop_ (A[, B])
 
         |br| Removes the variable ``B`` from the ``dseries`` object
         ``A``. By default, if the second argument is not specified, the
@@ -2866,8 +2866,8 @@ The dseries class
 
     .. dseriesmethod:: B = qdiff (A)
                        B = qgrowth (A)
-                       qdiff_ ()
-                       qgrowth_ ()
+                       qdiff_ (A)
+                       qgrowth_ (A)
 
         |br| Computes quarterly differences or growth rates.
 
@@ -2901,7 +2901,7 @@ The dseries class
 
 
     .. dseriesmethod:: C = remove (A, B)
-                       remove_ (B)
+                       remove_ (A, B)
 
         |br| If ``B`` is a row character array representing the name
         of a variable, these methods serve as aliases for the ``pop``
@@ -2939,7 +2939,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = rename (A, oldname, newname)
-                       rename_ (oldname, newname)
+                       rename_ (A, oldname, newname)
 
         |br| Renames the variable ``oldname`` to ``newname`` in the
         ``dseries`` object ``A``. This function returns a ``dseries``
@@ -2962,7 +2962,7 @@ The dseries class
 
 
     .. dseriesmethod:: C = rename (A, newname)
-                       rename_ (newname)
+                       rename_ (A, newname)
 
         |br| Replace the names in ``A`` with those specified in the
         cell of row character arrays ``newname``. The cell ``newname`` must contain
@@ -2994,7 +2994,7 @@ The dseries class
 
 
     .. dseriesmethod:: B = round (A[, n])
-                       round_ ([n])
+                       round_ (A[, n])
 
         |br| Rounds each value to the nearest decimal or integer. The
         parameter ``n`` specifies the precision (number of decimal
@@ -3169,8 +3169,8 @@ The dseries class
 
     .. dseriesmethod:: B = tex_rename (A, name, newtexname)
                        B = tex_rename (A, newtexname)
-                       tex_rename_ (name, newtexname)
-                       tex_rename_ (newtexname)
+                       tex_rename_ (A, name, newtexname)
+                       tex_rename_ (A, newtexname)
 
         |br| Updates the TeX name of the variable ``name`` to
         ``newtexname`` in the ``dseries`` object ``A``. Returns an
@@ -3252,8 +3252,8 @@ The dseries class
 
     .. dseriesmethod:: B = ydiff (A)
                        B = ygrowth (A)
-                       ydiff_ ()
-                       ygrowth_ ()
+                       ydiff_ (A)
+                       ygrowth_ (A)
 
         |br| Calculates annual differences or growth rates.
 
