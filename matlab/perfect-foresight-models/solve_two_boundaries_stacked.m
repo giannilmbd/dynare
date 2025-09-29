@@ -70,7 +70,6 @@ yy = y(:,M_.maximum_lag+(1:periods));
 cvg=false;
 iter=0;
 correcting_factor=0.01;
-max_resa=1e100;
 lambda = 1; % Length of Newton step (unused for stack_solve_algo=4)
 first_iter_lu = [];
 
@@ -139,7 +138,6 @@ while ~(cvg || iter > options_.simul.maxit)
         ya_save=ya;
         ra_save=ra;
         g1aa=g1a;
-        max_resa=max_res;
         if ismember(stack_solve_algo, [0, 2, 3])
             % Fallback to LU if block too small for block_diagonal_lu
             force_lu = ismember(stack_solve_algo, [2 3]) ...
