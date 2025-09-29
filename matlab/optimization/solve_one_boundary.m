@@ -1,5 +1,5 @@
 function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, steady_state, T, ...
-                                                             y_index_eq, nze, periods, is_linear, Block_Num, y_kmin, maxit_, solve_tolf, cutoff, stack_solve_algo, is_forward, is_dynamic, verbose, M_, options_)
+                                                             y_index_eq, nze, periods, is_linear, Block_Num, maximum_lag, maxit_, solve_tolf, cutoff, stack_solve_algo, is_forward, is_dynamic, verbose, M_, options_)
 % Computes the deterministic simulation or the steady state for a block of equations containing
 % only lags or only leads (but not both).
 %
@@ -17,7 +17,7 @@ function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, s
 %   periods             [integer]       number of simulation periods
 %   is_linear           [logical]       whether the block is linear
 %   Block_Num           [integer]       block number
-%   y_kmin              [integer]       maximum number of lag in the model
+%   maximum_lag         [integer]       maximum number of lag in the model
 %   maxit_              [integer]       maximum number of iteration in Newton
 %   solve_tolf          [double]        convergence criteria
 %   cutoff              [double]        cutoff to correct the direction in Newton in case
@@ -64,12 +64,12 @@ lambda = 1; % Length of Newton step
 first_iter_lu = [];
 if is_forward
     incr = 1;
-    start = y_kmin+1;
-    finish = periods+y_kmin;
+    start = maximum_lag+1;
+    finish = maximum_lag+periods;
 else
     incr = -1;
-    start = periods+y_kmin;
-    finish = y_kmin+1;
+    start = maximum_lag+periods;
+    finish = maximum_lag+1;
 end
 
 for it_=start:incr:finish

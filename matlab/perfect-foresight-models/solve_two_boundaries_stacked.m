@@ -46,7 +46,6 @@ assert(~options_.bytecode);
 Blck_size = M_.block_structure.block(Block_Num).mfs;
 y_index = M_.block_structure.block(Block_Num).variable(end-Blck_size+1:end);
 periods = get_simulation_periods(options_);
-y_kmin = M_.maximum_lag;
 stack_solve_algo = options_.stack_solve_algo;
 
 if ~ismember(stack_solve_algo, [0 2 3 4])
@@ -108,7 +107,7 @@ while ~(cvg || iter > options_.simul.maxit)
                         continue
                     else
                         disp('The singularity of the Jacobian matrix could not be corrected');
-                        y(:,y_kmin+(1:periods)) = yy;
+                        y(:,M_.maximum_lag+(1:periods)) = yy;
                         success = false;
                         return
                     end
@@ -127,7 +126,7 @@ while ~(cvg || iter > options_.simul.maxit)
                             fprintf('Convergence not achieved in block %d, after %d iterations.\n Increase "maxit" or set "cutoff=0" in model options.\n',Block_Num, iter);
                         end
                     end
-                    y(:,y_kmin+(1:periods)) = yy;
+                    y(:,M_.maximum_lag+(1:periods)) = yy;
                     success = false;
                     return
                 end
@@ -174,7 +173,7 @@ if any(any(isnan(yy(y_index,:)))) || any(any(isinf(yy(y_index,:))))
     return
 end
 
-y(:,y_kmin+(1:periods)) = yy;
+y(:,M_.maximum_lag+(1:periods)) = yy;
 
 if iter > options_.simul.maxit
     if verbose
