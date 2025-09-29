@@ -169,6 +169,11 @@ while ~(cvg || iter > options_.simul.maxit)
     end
 end
 
+if any(any(isnan(yy(y_index,:)))) || any(any(isinf(yy(y_index,:))))
+    success = false;
+    return
+end
+
 y(:,y_kmin+(1:periods)) = yy;
 
 if iter > options_.simul.maxit

@@ -245,6 +245,11 @@ for it_=start:incr:finish
     end
 end
 
+if any(any(isnan(y(y_index_eq)))) || any(any(isinf(y(y_index_eq))))
+    success = false;
+    return
+end
+
 success = true;
 
 
