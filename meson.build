@@ -99,9 +99,7 @@ else
 endif
 
 pthread_t_sizeof = c_compiler.sizeof('pthread_t', prefix : '#include <pthread.h>')
-# TODO: when requiring meson ⩾ 1.2, incorporate pthread.F08 into the dependency object with “extra_files” option
-# (and thus remove the pthread_fortran_iface variable)
-pthread_fortran_dep = declare_dependency(compile_args : '-DSIZEOF_PTHREAD_T=' + pthread_t_sizeof.to_string())
+pthread_fortran_dep = declare_dependency(compile_args : '-DSIZEOF_PTHREAD_T=' + pthread_t_sizeof.to_string(), sources : 'mex/sources/pthread.F08')
 
 ## Determine MEX compilation options
 
@@ -353,7 +351,6 @@ static_library_kwargs = mex_kwargs + { 'name_prefix' : [], 'name_suffix' : [], '
 mex_fortran_iface = [ 'mex/sources/matlab_mex.F08' ]
 blas_fortran_iface = [ 'mex/sources/blas.F08' ]
 lapack_fortran_iface = [ 'mex/sources/lapack.F08' ]
-pthread_fortran_iface = [ 'mex/sources/pthread.F08' ]
 
 
 ## Various core MEX
@@ -431,7 +428,7 @@ kordersim_src = [ 'mex/sources/libkordersim/pascal.f08',
                   'mex/sources/libkordersim/partitions.f08',
                   'mex/sources/libkordersim/tensors.f08',
                   'mex/sources/libkordersim/simulation.f08',
-                  'mex/sources/libkordersim/struct.f08' ] + mex_fortran_iface + blas_fortran_iface + pthread_fortran_iface
+                  'mex/sources/libkordersim/struct.f08' ] + mex_fortran_iface + blas_fortran_iface
 kordersim_lib = static_library('kordersim', kordersim_src, kwargs : static_library_kwargs, dependencies : [ blas_dep, pthread_fortran_dep ])
 
 shared_module('folded_to_unfolded_dr', 'mex/sources/folded_to_unfolded_dr/mexFunction.f08', kwargs : mex_kwargs, link_with : kordersim_lib)
