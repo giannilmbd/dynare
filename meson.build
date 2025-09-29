@@ -34,7 +34,7 @@ endif
 
 subdir('preprocessor/src')
 
-# NB: the following two symlinks my be improved if this wishlist item is done:
+# NB: the following two symlinks may be improved if this wishlist item is done:
 #  https://github.com/mesonbuild/meson/issues/11519
 
 install_symlink('dynare-preprocessor', install_dir : 'lib/dynare/preprocessor/',
