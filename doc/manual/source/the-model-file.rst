@@ -3961,11 +3961,13 @@ speed-up on large models.
 
        Triggers a check of the dynamic Jacobian for singularity during the first iteration. 
        Useful for detecting pathologies in the model specification. Available only for
-       ``stack_solve_algo`` equal to ``0``, ``2`` or ``3``. Neither compatible with the i) ``block``,``bytecode``, and ``linear``
-       ``model`` or ``model_options`` options nor ii) the ``linear_approximation`` and ``lmmcp`` options, 
+       ``stack_solve_algo`` equal to ``0``, ``2`` or ``3``. Neither compatible
+       with the i) ``block``, ``bytecode``, and ``linear`` options of the
+       ``model`` block or ``model_options`` command nor ii) the ``linear_approximation`` and ``lmmcp`` options,
        nor iii) with purely forward or backward models.
        Due to computational intensity and high memory requirements, 
-       it is strongly recommended to conduct this test with ``periods=1``.
+       it is strongly recommended to conduct this test with a small value for
+       the ``periods`` option.
 
     .. option:: solve_algo
 
