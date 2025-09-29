@@ -145,7 +145,7 @@ if ~isempty(controlled_paths_by_period)
 end
 
 % Evaluation of the maximum residual at the initial guess (steady state for the endogenous variables).
-err = max(abs(res));
+err = norm(res, 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
 
 if options_.debug
     fprintf('\nLargest absolute residual at iteration %d: %10.3f\n', 1, err);
@@ -195,7 +195,7 @@ for t = 1:periods
     i_rows = i_rows + ny;
 end
 
-ERR = max(abs(res));
+ERR = norm(res, 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
 
 if verbose
     fprintf('Iter: %s,\t Initial err. = %s,\t err. = %s,\t time = %s\n', num2str(1), num2str(err), num2str(ERR), num2str(etime(clock,h2)));

@@ -113,7 +113,7 @@ residuals(:, M_.maximum_lag+(1:periods)) = reshape(res, M_.endo_nbr, periods);
 if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementarity problem
     residuals(eq_to_ignore,bsxfun(@le, endogenousvariables(eq_to_ignore,:), lb(eq_to_ignore)+eps) | bsxfun(@ge,endogenousvariables(eq_to_ignore,:),ub(eq_to_ignore)-eps))=0;
 end
-maxerror = max(max(abs(residuals)));
+maxerror = norm(vec(residuals), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
 success = ~check;
 
 if ~success && options_.debug

@@ -131,7 +131,7 @@ while ~(converged || iter > options_.simul.maxit)
     end
     if options_.endogenous_terminal_period && iter > 1
         for it = 1:periods
-            if max(abs(res((it-1)*ny+(1:ny)))) < options_.dynatol.f/1e7
+            if norm(res((it-1)*ny+(1:ny)), 'Inf') < options_.dynatol.f/1e7
                 if it < periods
                     res = res(1:(it*ny));
                     A = A(1:(it*ny), 1:(it*ny));
@@ -146,7 +146,7 @@ while ~(converged || iter > options_.simul.maxit)
         vperiods(iter) = periods;
     end
 
-    err = max(abs(res));
+    err = norm(res, 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
     if options_.debug
         fprintf('\nLargest absolute residual at iteration %d: %10.3f\n',iter,err);
         if any(isnan(res)) || any(isinf(res)) || any(any(isnan(endogenousvariables))) || any(any(isinf(endogenousvariables)))

@@ -76,7 +76,7 @@ first_iter_lu = [];
 while ~(cvg || iter > options_.simul.maxit)
     [yy, T, ra, g1a] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
     ya = reshape(yy(y_index,1:periods), 1, periods*Blck_size)';
-    max_res=max(max(abs(ra)));
+    max_res = norm(vec(ra), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
     if isnan(max_res) || any(any(isnan(g1a)))
         cvg = false;
     elseif M_.block_structure.block(Block_Num).is_linear && iter>0

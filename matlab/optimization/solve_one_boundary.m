@@ -89,9 +89,9 @@ for it_=start:incr:finish
                                M_.block_structure_stat.block(Block_Num).g1_sparse_colptr, T);
         end
         if ~isreal(r)
-            max_res=(-(max(max(abs(r))))^2)^0.5;
+            max_res=(-(norm(vec(r), 'Inf'))^2)^0.5;
         else
-            max_res=max(max(abs(r)));
+            max_res = norm(vec(r), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
         end
         if verbose
             disp(['iteration : ' int2str(iter+1) ' => ' num2str(max_res) ' time = ' int2str(it_)])

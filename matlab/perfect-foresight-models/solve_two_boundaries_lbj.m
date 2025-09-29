@@ -86,7 +86,7 @@ for iter = 1:options_.simul.maxit
     dy = back_subst_lbj(c, ny, iyf, periods);
 
     y(y_index, M_.maximum_lag+(1:periods)) = y(y_index, M_.maximum_lag+(1:periods)) + dy;
-    err = max(max(abs(dy)));
+    err = norm(vec(dy), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
 
     if options_.verbosity
         fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err), num2str(etime(clock, h)));

@@ -67,7 +67,7 @@ else % Iterative algorithm
             % The tolerance passed to gmres and bicgstab is a relative one (‖Ax−b‖/‖b‖).
             % However, we test the convergence of algorithms via options_.dynatol.f, which is an
             % absolute error (‖Ax−b‖). Hence the need to rescale by the norm of the RHS (‖b‖).
-            iter_tol = options_.dynatol.f / max(abs(b)) / 10;
+            iter_tol = options_.dynatol.f / norm(b, 'Inf') / 10;
         end
 
         iter_maxit = min(options_.simul.iter_maxit, size(A, 1));

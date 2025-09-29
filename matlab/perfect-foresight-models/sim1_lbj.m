@@ -140,7 +140,7 @@ for iter = 1:options_.simul.maxit
         end
     end
 
-    err = max(max(abs(c)));
+    err = norm(vec(c), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
     if verbose
         fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err), num2str(etime(clock, h2)));
     end
