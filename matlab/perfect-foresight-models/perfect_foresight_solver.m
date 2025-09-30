@@ -608,11 +608,11 @@ end
 function maxerror = recompute_maxerror(endo_simul, exo_simul, steady_state, M_, options_)
     % Computes ∞-norm of residuals for a given path of endogenous,
     % given the exogenous path, steady state and parameters in M_
+    periods = size(endo_simul, 2) - M_.maximum_lag - M_.maximum_lead;
     if options_.bytecode
-        residuals = bytecode('dynamic', 'evaluate', M_, options_, endo_simul, exo_simul, M_.params, steady_state, 1);
+        residuals = bytecode('dynamic', 'evaluate', M_, options_, endo_simul, exo_simul, M_.params, steady_state, periods);
     else
         ny = size(endo_simul, 1);
-        periods = size(endo_simul, 2) - M_.maximum_lag - M_.maximum_lead;
         if M_.maximum_lag > 0
             y0 = endo_simul(:, M_.maximum_lag);
         else
