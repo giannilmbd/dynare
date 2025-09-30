@@ -22,7 +22,7 @@ function [x, errorflag, errorcode] = solve1(func, x, j1, j2, jacobian_flag, gste
 %    x:               results
 %    errorflag=true:  the model can not be solved
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -79,7 +79,7 @@ end
 
 f = 0.5*(fvec'*fvec);
 
-if max(abs(fvec))<tolf*tolf
+if norm(fvec, 'Inf') < tolf*tolf
     % Initial guess is a solution
     errorcode = -1;
     return
@@ -170,7 +170,7 @@ for its = 1:maxit
             end
             return
         end
-    elseif max(abs(fvec)) < tolf
+    elseif norm(fvec, 'Inf') < tolf
         errorcode = 1;
         return
     end

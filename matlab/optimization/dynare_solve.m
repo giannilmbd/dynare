@@ -208,7 +208,7 @@ if options_.solve_algo == 0
     if errorcode==1
         errorflag = false;
     elseif errorcode>1
-        if max(abs(fvec)) > tolf
+        if norm(fvec, 'Inf') > tolf
             errorflag = true;
         else
             errorflag = false;

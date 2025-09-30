@@ -94,7 +94,7 @@ if any(idNan)
     return
 end
 
-if max(abs(fvec)) < tolf
+if norm(fvec, 'Inf') < tolf
     % Initial guess is a solution
     errorcode = -1;
     return
@@ -119,7 +119,7 @@ for it = 1:maxit
 
     update_fvec_fjac;
 
-    if max(abs(fvec)) < tolf
+    if norm(fvec, 'Inf') < tolf
         errorcode = 1;
         return
     end
