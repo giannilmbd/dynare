@@ -153,7 +153,7 @@ Dynare will translate this as::
     disp('Initial period is dates('1950Q1')');
 
 which will lead to a crash because this expression is illegal in
-MATLAB. For this situation, Dynare provides the ``$`` escape
+MATLAB/Octave. For this situation, Dynare provides the ``$`` escape
 parameter. The following expression::
 
     disp('Initial period is $1950Q1');
@@ -162,7 +162,7 @@ will be translated as::
 
     disp('Initial period is 1950Q1');
 
-in the generated MATLAB script.
+in the generated MATLAB/Octave script.
 
 
 .. _dates-members:
@@ -1129,7 +1129,7 @@ The dseries class
        Creates a ``dseries`` object given the MATLAB Table provided as the sole
        argument. It is assumed that the first column of the table contains the
        dates of the ``dseries`` and the first row contains the names. This
-       feature is not available under Octave or MATLAB R2013a or earlier.
+       feature is not available under Octave.
 
        *Example*
 
@@ -1684,8 +1684,8 @@ The dseries class
 
         |br| Overloads the MATLAB/Octave display function for
         ``dseries`` object. ``display`` is the function called by
-        MATLAB to print the content of an object if a semicolon is
-        missing at the end of a MATLAB statement. If the ``dseries``
+        MATLAB/Octave to print the content of an object if a semicolon is
+        missing at the end of a MATLAB/Octave statement. If the ``dseries``
         object is defined over a too large time span, only the first
         and last periods will be printed. If the ``dseries`` object
         contains too many variables, only the first and last variables
@@ -2097,33 +2097,33 @@ The dseries class
 
     .. dseriesmethod:: B = isempty (A)
 
-       |br| Overloads the MATLAB/octave’s ``isempty`` function. Returns
+       |br| Overloads the MATLAB/Octave’s ``isempty`` function. Returns
        ``true`` if ``dseries`` object ``A`` is empty.
 
 
     .. dseriesmethod:: C = isequal (A, B)
 
-        |br| Overloads the MATLAB/octave’s ``isequal`` function. Returns
+        |br| Overloads the MATLAB/Octave’s ``isequal`` function. Returns
         ``true`` if ``dseries`` objects ``A`` and ``B`` are identical.
 
 
     .. dseriesmethod:: C = isinf (A)
 
-        |br| Overloads the MATLAB/octave’s ``isinf`` function. Returns
+        |br| Overloads the MATLAB/Octave’s ``isinf`` function. Returns
         a logical array, with element ``(i,j)`` equal to ``true`` if and
         only if variable ``j`` is finite in period ``A.dates(i)``.
 
 
     .. dseriesmethod:: C = isnan (A)
 
-        |br| Overloads the MATLAB/octave’s ``isnan`` function. Returns
+        |br| Overloads the MATLAB/Octave’s ``isnan`` function. Returns
         a logical array, with element ``(i,j)`` equal to ``true`` if and
         only if variable ``j`` isn't NaN in period ``A.dates(i)``.
 
 
     .. dseriesmethod:: C = isreal (A)
 
-        |br| Overloads the MATLAB/octave’s ``isreal`` function. Returns
+        |br| Overloads the MATLAB/Octave’s ``isreal`` function. Returns
         a logical array, with element ``(i,j)`` equal to ``true`` if and
         only if variable ``j`` is real in period ``A.dates(i)``.
 
@@ -2764,7 +2764,7 @@ The dseries class
 
             If one wants to modify the properties of the plotted time
             series (line style, colours, ...), the set function can be
-            used (see MATLAB’s documentation)::
+            used (see MATLAB/Octave’s documentation)::
 
                 >> set(h(1),'-k','linewidth',2);
                 >> set(h(2),'--r');
@@ -3025,7 +3025,7 @@ The dseries class
 
         |br| Overloads the MATLAB/Octave ``save`` function to save the
         ``dseries`` object ``A`` to disk. The available formats
-        include ``mat`` (default, MATLAB binary data file), ``m``
+        include ``mat`` (default, MATLAB/Octave binary data file), ``m``
         (MATLAB/Octave script), and ``csv`` (comma-separated values
         file). The base name of the file, excluding the extension, is
         specified by ``basename``.
