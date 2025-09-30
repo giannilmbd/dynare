@@ -16,7 +16,7 @@ function [y, success, maxerror, iter, per_block_status, exo_simul] = perfect_for
 % OUTPUTS
 % - y                   [double array] path for the endogenous variables (solution)
 % - success             [logical] Whether a solution was found
-% - maxerror            [double] contains the maximum absolute error
+% - maxerror            [double] ∞-norm of the residual
 % - iter                [integer] Number of iterations of the underlying nonlinear solver (empty for non-iterative methods)
 % - per_block_status    [struct] In the case of block decomposition, provides per-block solver status information (empty if no block decomposition)
 

@@ -1,4 +1,4 @@
-function [endogenousvariables, success, err, iter, exogenousvariables] = sim1_lbj(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
+function [endogenousvariables, success, err_f, iter, exogenousvariables] = sim1_lbj(endogenousvariables, exogenousvariables, steadystate, controlled_paths_by_period, M_, options_)
 
 % Performs deterministic simulations with lead or lag on one period using the historical LBJ algorithm
 %
@@ -8,7 +8,7 @@ function [endogenousvariables, success, err, iter, exogenousvariables] = sim1_lb
 % OUTPUTS
 %   endogenousvariables [matrix]        All endogenous variables of the model
 %   success             [logical]       Whether a solution was found
-%   err                 [double]        ∞-norm of Δendogenousvariables
+%   err_f               [double]        ∞-norm of the residual
 %   iter                [integer]       Number of iterations
 %   exogenousvariables  [matrix]        All exogenous variables of the model
 %                                       (may be modified if perfect_foresight_controlled_paths present)
@@ -140,15 +140,17 @@ for iter = 1:options_.simul.maxit
         end
     end
 
-    err = norm(vec(c), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
+    err_x = norm(vec(c), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
     if verbose
-        fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err), num2str(etime(clock, h2)));
+        fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err_x), num2str(etime(clock, h2)));
     end
-    if err < options_.dynatol.x
+    if err_x < options_.dynatol.x
         success = true; % Convergency obtained.
         break
     end
 end
+
+err_f = compute_maxerror(endogenousvariables, exogenousvariables, steadystate, M_, options_);
 
 if verbose
     fprintf('\nTotal time of simulation: %s\n', num2str(etime(clock,h1)))

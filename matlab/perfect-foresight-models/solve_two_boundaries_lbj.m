@@ -1,4 +1,4 @@
-function [y, T, success, err, iter] = solve_two_boundaries_lbj(fh, y, x, steady_state, T, blk, options_, M_)
+function [y, T, success, err_f, iter] = solve_two_boundaries_lbj(fh, y, x, steady_state, T, blk, options_, M_)
 % Computes the deterministic simulation of a block of equations containing
 % both lead and lag variables, using the LBJ algorithm.
 %
@@ -16,7 +16,7 @@ function [y, T, success, err, iter] = solve_two_boundaries_lbj(fh, y, x, steady_
 %   y                   [matrix]        All endogenous variables of the model
 %   T                   [matrix]        Temporary terms
 %   success             [logical]       Whether a solution was found
-%   err                 [double]        ∞-norm of Δy
+%   err_f               [double]        ∞-norm of the residual
 %   iter                [integer]       Number of iterations
 %
 % ALGORITHM
@@ -25,7 +25,7 @@ function [y, T, success, err, iter] = solve_two_boundaries_lbj(fh, y, x, steady_
 %   simulation of dynamic models with forward variables through the use
 %   of a relaxation algorithm. CEPREMAP. Couverture Orange. 9602.
 
-% Copyright © 2023-2024 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -86,17 +86,20 @@ for iter = 1:options_.simul.maxit
     dy = back_subst_lbj(c, ny, iyf, periods);
 
     y(y_index, M_.maximum_lag+(1:periods)) = y(y_index, M_.maximum_lag+(1:periods)) + dy;
-    err = norm(vec(dy), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
+    err_x = norm(vec(dy), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
 
     if options_.verbosity
-        fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err), num2str(etime(clock, h)));
+        fprintf('Iter: %s,\t err. = %s, \t time = %s\n', num2str(iter), num2str(err_x), num2str(etime(clock, h)));
     end
-    if err < options_.dynatol.x
+    if err_x < options_.dynatol.x
         success = true;
         break
     end
 end
 
+% Compute ∞-norm of the residual
+[~, ~, ra] = perfect_foresight_block_problem(blk, y(:,M_.maximum_lag+(1:periods)), y(:,M_.maximum_lag), y(:,M_.maximum_lag+periods+1), x, M_.params, steady_state, T, periods, M_, options_);
+err_f = norm(vec(ra), 'Inf');
 
 function y3n = dynendo(y, it_, M_)
     y3n = reshape(y(:, it_+(-1:1)), 3*M_.endo_nbr, 1);
