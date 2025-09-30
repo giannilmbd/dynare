@@ -201,7 +201,7 @@ elseif options_.simul.homotopy_linearization_fallback && completed_share > 0
         oo_.exo_simul = exobase + (exo_simul - exobase)/completed_share;
     end
 
-    maxerror = recompute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
+    maxerror = compute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
 
     if ~options_.noprint
         fprintf('Perfect foresight solution found for %.1f%% of the shock, then extrapolation was performed using linearization\n\n', completed_share*100)
@@ -280,7 +280,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
             oo_.exo_simul = exo_simul + (exo_simul - extra_exo_simul)*(1-completed_share)/options_.simul.homotopy_marginal_linearization_fallback;
         end
 
-        maxerror = recompute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
+        maxerror = compute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
 
         if ~options_.noprint
             fprintf('Perfect foresight solution found for %.1f%% of the shock, then extrapolation was performed using marginal linearization (extra simulation took %.1f seconds)\n\n', completed_share*100, extra_simul_time_elapsed)
@@ -475,7 +475,7 @@ end
 %If simulated paths are complex, take real part and recompute the residuals to check whether this is actually a solution
 if ~isreal(endo_simul(:)) % cannot happen with bytecode or the perfect_foresight_problem DLL
     real_simul = real(endo_simul);
-    real_maxerror = recompute_maxerror(real_simul, exo_simul, steady_state, M_, options_);
+    real_maxerror = compute_maxerror(real_simul, exo_simul, steady_state, M_, options_);
     if real_maxerror <= options_.dynatol.f
         endo_simul = real_simul;
         maxerror = real_maxerror;
@@ -603,30 +603,6 @@ if ~isempty(controlled_paths_by_period)
         exo_simul(length(initperiods)+p,exo_ids) = saved_exo_simul(length(initperiods)+p,exo_ids);
     end
 end
-
-
-function maxerror = recompute_maxerror(endo_simul, exo_simul, steady_state, M_, options_)
-    % Computes ∞-norm of residuals for a given path of endogenous,
-    % given the exogenous path, steady state and parameters in M_
-    periods = size(endo_simul, 2) - M_.maximum_lag - M_.maximum_lead;
-    if options_.bytecode
-        residuals = bytecode('dynamic', 'evaluate', M_, options_, endo_simul, exo_simul, M_.params, steady_state, periods);
-    else
-        ny = size(endo_simul, 1);
-        if M_.maximum_lag > 0
-            y0 = endo_simul(:, M_.maximum_lag);
-        else
-            y0 = NaN(ny, 1);
-        end
-        if M_.maximum_lead > 0
-            yT = endo_simul(:, M_.maximum_lag+periods+1);
-        else
-            yT = NaN(ny, 1);
-        end
-        yy = endo_simul(:,M_.maximum_lag+(1:periods));
-        residuals = perfect_foresight_problem(yy(:), y0, yT, exo_simul, M_.params, steady_state, periods, M_, options_);
-    end
-    maxerror = norm(vec(residuals), 'Inf');
 
 
 function check_input_arguments(options_, M_, oo_)

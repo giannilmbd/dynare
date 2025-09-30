@@ -192,7 +192,7 @@ endogenousvariables(:, M_.maximum_lag+(1:periods)) = reshape(y, ny, periods);
 
 if options_.endogenous_terminal_period
     periods = get_simulation_periods(options_);
-    err = evaluate_max_dynamic_residual(str2func([M_.fname,'.sparse.dynamic_resid']), endogenousvariables, exogenousvariables, M_.params, steadystate, periods, M_.maximum_lag);
+    err = compute_maxerror(endogenousvariables, exogenousvariables, steadystate, M_, options_);
 end
 
 if converged
@@ -397,15 +397,4 @@ if rank_jacob < size(jacob,1)
     end
 else
     disp(['sim1:  The Jacobian of the dynamic model has full rank.'])    
-end
-
-
-function err = evaluate_max_dynamic_residual(dynamic_resid, endogenousvariables, exogenousvariables, params, steady_state, periods, max_lag)
-
-err = 0;
-
-for it = max_lag+(1:periods)
-    d = dynamic_resid(endogenousvariables(:, it+(-1:1)), exogenousvariables(it, :), params, steady_state);
-    r = max(abs(d));
-    err = max(err, r);
 end
