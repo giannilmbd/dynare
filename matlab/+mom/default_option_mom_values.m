@@ -31,7 +31,7 @@ function options_mom_ = default_option_mom_values(options_mom_, options_, dname,
 %   o user_has_octave_forge_package
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -83,6 +83,32 @@ if strcmp(mom_method,'IRF_MATCHING')
         warning('method_of_moments: The ''penalized_estimator'' option is not supported yet for IRF_MATCHING and will be ignored.');
     end
     options_mom_.mom.penalized_estimator = false;
+end
+
+if (isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && ~(isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && ~(isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+    if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_method,'IRF_MATCHING')
+        error('method_of_moments: HP filtering of data is only supported for SMM.');
+    end
+    options_mom_.one_sided_hp_filter=0;
+    options_mom_.bandpass.indicator=false;
+elseif ~(isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && (isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && ~(isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+    if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_method,'IRF_MATCHING')
+        error('method_of_moments: One-sided HP filtering of data is only supported for SMM.');
+    end
+    options_mom_.hp_filter=0;
+    options_mom_.bandpass.indicator=false;
+elseif ~(isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && ~(isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && (isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+    if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_method,'IRF_MATCHING')
+        error('method_of_moments: Bandpass filtering of data is only supported for SMM.');
+    end
+    options_mom_.hp_filter=0;
+    options_mom_.one_sided_hp_filter=0;
+    options_mom_.bandpass.K=12;
+elseif ~(isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && ~(isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && ~(isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+    %default case, nothing to do
+    options_mom_.hp_filter=0;
+    options_mom_.one_sided_hp_filter=0;
+    options_mom_.bandpass.indicator=false;    
 end
 
 % -------------------------------------------------------------------------

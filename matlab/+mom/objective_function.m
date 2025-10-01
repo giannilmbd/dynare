@@ -47,7 +47,7 @@ function [fval, info, exit_flag, df, junk_hessian, Q, model_moments, model_momen
 % o simult_
 % -------------------------------------------------------------------------
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -171,7 +171,7 @@ if strcmp(options_mom_.mom.mom_method,'GMM')
     model_moments = NaN(options_mom_.mom.mom_nbr,1);
     for jm = 1:size(M_.matched_moments,1)
         % First moments
-        if ~options_mom_.prefilter && (sum(M_.matched_moments{jm,3}) == 1)
+        if (sum(M_.matched_moments{jm,3}) == 1)
             idx1 = (options_mom_.mom.obs_var == find(dr.order_var==M_.matched_moments{jm,1}) );
             model_moments(jm,1) = pruned_state_space.E_y(idx1);
             if options_mom_.mom.compute_derivs && ( options_mom_.mom.analytic_standard_errors || options_mom_.mom.analytic_jacobian )
@@ -251,10 +251,15 @@ if strcmp(options_mom_.mom.mom_method,'SMM')
         y_sim = y_sim+shock_mat;
     end
     % remove mean if centered moments
+    model_moments=NaN(size(M_.matched_moments,1),1);
+    first_moment_indicator = cellfun(@(x) sum(abs(x))==1,M_.matched_moments(:,3));
+    [first.moments]=mom.get_data_moments(y_sim, options_mom_.mom.obs_var, dr.inv_order_var, M_.matched_moments(first_moment_indicator,:));
     if options_mom_.prefilter
         y_sim = bsxfun(@minus, y_sim, mean(y_sim,1));
     end
-    model_moments = mom.get_data_moments(y_sim, options_mom_.mom.obs_var, dr.inv_order_var, M_.matched_moments, options_mom_);
+    [other.moments] = mom.get_data_moments(get_filtered_time_series(y_sim, zeros(1,size(y_sim,2)), options_mom_), options_mom_.mom.obs_var, dr.inv_order_var, M_.matched_moments(~first_moment_indicator,:));
+    model_moments(first_moment_indicator)=first.moments; 
+    model_moments(~first_moment_indicator)=other.moments; 
 end
 
 

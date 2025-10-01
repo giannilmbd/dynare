@@ -18,7 +18,7 @@ function print_info_on_estimation_settings(options_mom_, number_of_estimated_par
 %  o skipline
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,6 +47,13 @@ if strcmp(options_mom_.mom.mom_method,'SMM') || strcmp(options_mom_.mom.mom_meth
         fprintf('\n  - centered moments (prefilter=1)');
     else
         fprintf('\n  - uncentered moments (prefilter=0)');
+    end
+    if (isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && ~(isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && ~(isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+        fprintf('\n  - HP filter with lambda=%4.1f',options_mom_.hp_filter);
+    elseif ~(isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && (isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && ~(isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+        fprintf('\n  - One-sided HP filter with lambda=%4.1f',options_mom_.one_sided_hp_filter);
+    elseif ~(isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && ~(isfield(options_mom_,'one_sided_hp_filter') && options_mom_.one_sided_hp_filter)  && (isfield(options_mom_,'bandpass') && options_mom_.bandpass.indicator)
+        fprintf('\n  - Bandpass filter with passband [%4.1f,%4.1f]',options_mom_.bandpass.passband);
     end
     if options_mom_.mom.penalized_estimator
         fprintf('\n  - penalized estimation using deviation from prior mean and weighted with prior precision');

@@ -96,7 +96,7 @@ function [oo_, options_mom_, M_] = run(bayestopt_, options_, oo_, estim_params_,
 %  o test_for_deep_parameters_calibration
 %  o transform_prior_to_laplace_prior
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -210,11 +210,7 @@ end
 if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_method,'SMM')
     M_.matched_moments = mom.matched_moments_block(M_.matched_moments, options_mom_.mom.mom_method);    
     % Check if both prefilter and first moments were specified
-    first_moment_indicator = find(cellfun(@(x) sum(abs(x))==1,M_.matched_moments(:,3)))';
-    if options_mom_.prefilter && ~isempty(first_moment_indicator)
-        fprintf('Centered moments requested (prefilter option is set); therefore, ignore declared first moments in ''matched_moments'' block.\n');
-        M_.matched_moments(first_moment_indicator,:)=[]; %remove first moments entries
-    end
+    first_moment_indicator = cellfun(@(x) sum(abs(x))==1,M_.matched_moments(:,3));
     options_mom_.mom.mom_nbr = size(M_.matched_moments,1);
     % Get maximum lag number for autocovariances/autocorrelations
     options_mom_.ar = max(cellfun(@max,M_.matched_moments(:,2))) - min(cellfun(@min,M_.matched_moments(:,2)));
@@ -424,7 +420,7 @@ if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_meth
     if strcmp(name,M_.fname)
         error('method_of_moments: ''datafile'' and mod file are not allowed to have the same name; change the name of the ''datafile''!');
     end
-    dataset_ = makedataset(options_mom_);
+    [dataset_, dataset_info]= makedataset(options_mom_);
     % set options for old interface from the ones for new interface
     if ~isempty(dataset_)
         options_mom_.nobs = dataset_.nobs;
@@ -433,10 +429,22 @@ if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_meth
     if options_mom_.ar > options_mom_.nobs+1
         error('method_of_moments: Dataset is too short to compute higher than first moments!');
     end
+    if dataset_info.missing.state && (options_mom_.hp_filter || options_mom_.one_sided_hp_filter || options_.bandpass.indicator)
+        error('method_of_moments: missing data is incompatible with filtering data!');        
+    end 
     % provide info on data moments handling
     fprintf('Computing data moments. Note that NaN values in the moments (due to leads and lags or missing data) are replaced by the mean of the corresponding moment.\n');
     % get data moments for the method of moments
-    [oo_.mom.data_moments, oo_.mom.m_data] = mom.get_data_moments(dataset_.data, options_mom_.mom.obs_var, oo_.dr.inv_order_var, M_.matched_moments, options_mom_);
+    oo_.mom.data_moments=NaN(size(M_.matched_moments,1),1);
+    oo_.mom.m_data=NaN(dataset_.nobs,size(M_.matched_moments,1));
+    %get first moments separately on unfiltered data (either statistical filter or options_mom_.prefilter)
+    [first.moments, first.m_data]=mom.get_data_moments(dataset_info.rawdata, options_mom_.mom.obs_var, oo_.dr.inv_order_var, M_.matched_moments(first_moment_indicator,:));
+    [other.moments, other.m_data] = mom.get_data_moments(get_filtered_time_series(dataset_.data, zeros(1,dataset_.vobs), options_mom_), options_mom_.mom.obs_var, oo_.dr.inv_order_var, M_.matched_moments(~first_moment_indicator,:));
+    oo_.mom.data_moments(first_moment_indicator)=first.moments; 
+    oo_.mom.data_moments(~first_moment_indicator)=other.moments; 
+    oo_.mom.m_data(:,first_moment_indicator)=first.m_data; 
+    oo_.mom.m_data(:,~first_moment_indicator)=other.m_data; 
+    clear first other;
     if ~isreal(dataset_.data)
         error('method_of_moments: The data moments contain complex values!');
     end

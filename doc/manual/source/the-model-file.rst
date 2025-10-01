@@ -10140,6 +10140,22 @@ SMM specific options
         Multiple of data length used for simulation.
         Default: ``7``.
 
+    .. option:: hp_filter = DOUBLE
+
+       See :opt:`hp_filter = DOUBLE`
+
+    .. option:: one_sided_hp_filter = DOUBLE
+
+       See :opt:`one_sided_hp_filter = DOUBLE`
+
+    .. option:: bandpass_filter
+
+       See :opt:`bandpass_filter`
+
+    .. option:: bandpass_filter = [HIGHEST_PERIODICITY LOWEST_PERIODICITY]
+
+       See :opt:`bandpass_filter = [HIGHEST_PERIODICITY LOWEST_PERIODICITY]`
+
 GMM specific options
 ^^^^^^^^^^^^^^^^^^^^
 
