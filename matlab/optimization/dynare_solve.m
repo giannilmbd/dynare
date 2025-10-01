@@ -113,7 +113,7 @@ else
         return;
     end
     wrong_initial_guess_flag = false;
-    if ~all(isfinite(fvec))
+    if options_.solve_randomize_initial_guess && ~all(isfinite(fvec))
         % Let's try random numbers for the variables initialized with the default value.
         wrong_initial_guess_flag = true;
         % First try with positive numbers.
