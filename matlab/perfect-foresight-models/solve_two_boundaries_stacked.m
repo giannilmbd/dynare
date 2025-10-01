@@ -75,7 +75,7 @@ first_iter_lu = [];
 
 while ~(cvg || iter > options_.simul.maxit)
     [yy, T, ra, g1a] = perfect_foresight_block_problem(Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
-    ya = reshape(yy(y_index,1:periods), 1, periods*Blck_size)';
+    ya = reshape(yy(y_index,:), 1, periods*Blck_size)';
     max_res = norm(vec(ra), 'Inf'); % Do not use max(max(abs(…))) because it omits NaN
     if isnan(max_res) || any(any(isnan(g1a)))
         cvg = false;
@@ -102,7 +102,7 @@ while ~(cvg || iter > options_.simul.maxit)
                             disp(['    correcting_factor=' num2str(correcting_factor,'%f') ' max(Jacobian)=' num2str(full(max_factor),'%f')]);
                         end
                         dx = -(g1aa+correcting_factor*speye(periods*Blck_size))\ra_save;
-                        yy(y_index,1:periods)=reshape((ya_save+lambda*dx)', length(y_index), periods);
+                        yy(y_index,:) = reshape((ya_save+lambda*dx)', length(y_index), periods);
                         continue
                     else
                         disp('The singularity of the Jacobian matrix could not be corrected');
@@ -115,7 +115,7 @@ while ~(cvg || iter > options_.simul.maxit)
                     if verbose
                         disp(['reducing the path length: lambda=' num2str(lambda,'%f')]);
                     end
-                    yy(y_index,1:periods)=reshape((ya_save+lambda*dx)', length(y_index), periods);
+                    yy(y_index,:) = reshape((ya_save+lambda*dx)', length(y_index), periods);
                     continue
                 else
                     if verbose
@@ -147,7 +147,7 @@ while ~(cvg || iter > options_.simul.maxit)
             [mdx, first_iter_lu] = lin_solve(g1a, ra, options_, first_iter_lu, force_lu);
             dx = -mdx;
             ya = ya + lambda*dx;
-            yy(y_index,1:periods)=reshape(ya', length(y_index), periods);
+            yy(y_index,:) = reshape(ya', length(y_index), periods);
         elseif stack_solve_algo==4
             stpmx = 100 ;
             stpmax = stpmx*max([sqrt(ya'*ya);size(y_index,2)]);
@@ -157,7 +157,7 @@ while ~(cvg || iter > options_.simul.maxit)
             p = -g1a\ra;
             yn = lnsrch1(ya,f,g,p,stpmax,@lnsrch1_wrapper_two_boundaries,nn,nn, options_.solve_tolx, y_index, Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
             dx = ya - yn;
-            yy(y_index,1:periods)=reshape(yn', length(y_index), periods);
+            yy(y_index,:) = reshape(yn', length(y_index), periods);
         end
     end
     iter=iter+1;
