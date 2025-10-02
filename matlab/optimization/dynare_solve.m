@@ -63,7 +63,7 @@ if jacobian_flag
     [fvec, fjac] = feval(f, x, varargin{:});
     wrong_initial_guess_flag = false;
     if ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)))
-        if ~ismember(options_.solve_algo,[10,11]) && ~any(isnan(fvec)) && max(abs(fvec))< tolf
+        if ~ismember(options_.solve_algo,[10,11]) && all(isfinite(fvec)) && max(abs(fvec))< tolf
             % return if initial value solves the problem except if a mixed complementarity problem is to be solved (complementarity conditions may not be satisfied)
             % max([NaN, 0])=0, so explicitly exclude the case where fvec contains a NaN
             errorcode = -11;
@@ -106,7 +106,7 @@ if jacobian_flag
 else
     fvec = feval(f, x, varargin{:});
     fjac = zeros(nn, nn);
-    if ~ismember(options_.solve_algo,[10,11]) && ~any(isnan(fvec)) && max(abs(fvec)) < tolf
+    if ~ismember(options_.solve_algo,[10,11]) && all(isfinite(fvec)) && max(abs(fvec)) < tolf
         % return if initial value solves the problem except if a mixed complementarity problem is to be solved (complementarity conditions may not be satisfied)
         % max([NaN, 0])=0, so explicitly exclude the case where fvec contains a NaN
         errorcode = -11;
