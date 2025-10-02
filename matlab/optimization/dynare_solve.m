@@ -62,45 +62,48 @@ end
 if jacobian_flag
     [fvec, fjac] = feval(f, x, varargin{:});
     wrong_initial_guess_flag = false;
-    if ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)))
-        if ~ismember(options_.solve_algo,[10,11]) && all(isfinite(fvec)) && max(abs(fvec))< tolf
-            % return if initial value solves the problem except if a mixed complementarity problem is to be solved (complementarity conditions may not be satisfied)
-            % max([NaN, 0])=0, so explicitly exclude the case where fvec contains a NaN
+    if all(isfinite(fvec)) && all(isreal(fvec))
+        % check whether we already found a solution, do not allow NaN or Inf here
+        % Better solution may be found in that case
+        if ~ismember(options_.solve_algo,[10,11]) && max(abs(fvec))< tolf
+            % return if initial value solves the problem except if a mixed complementarity problem is to be solved (complementarity conditions may not be satisfied)            
+            % max([NaN, 0])=0, so explicitly exclude the case where fvec contains NaN via isfinite
             errorcode = -11;
             return;
+        end        
+    end
+    if options_.solve_randomize_initial_guess && (~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:))))
+        % no solution yet found, but problem was encountered in fvec or Jacobian, try different initial guess
+        if any(~isreal(fvec)) || any(~isreal(fjac(:)))
+            disp_verbose('dynare_solve: starting value results in complex values. Randomize initial guess...', options_.verbosity)
+        else
+            disp_verbose('dynare_solve: starting value results in nonfinite/NaN value. Randomize initial guess...', options_.verbosity)
         end
-        if options_.solve_randomize_initial_guess
-            if any(~isreal(fvec)) || any(~isreal(fjac(:)))
-                disp_verbose('dynare_solve: starting value results in complex values. Randomize initial guess...', options_.verbosity)
-            else
-                disp_verbose('dynare_solve: starting value results in nonfinite/NaN value. Randomize initial guess...', options_.verbosity)
-            end
-            % Let's try random numbers for the variables initialized with the default value.
-            wrong_initial_guess_flag = true;
-            % First try with positive numbers.
-            tentative_number = 0;
-            while wrong_initial_guess_flag && tentative_number<=in0*10
-                tentative_number = tentative_number+1;
-                x(idx) = rand(in0, 1)*10;
-                [fvec, fjac] = feval(f, x, varargin{:});
-                wrong_initial_guess_flag = ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)));
-            end
-            % If all previous attempts failed, try with real numbers.
-            tentative_number = 0;
-            while wrong_initial_guess_flag && tentative_number<=in0*10
-                tentative_number = tentative_number+1;
-                x(idx) = randn(in0, 1)*10;
-                [fvec, fjac] = feval(f, x, varargin{:});
-                wrong_initial_guess_flag = ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)));
-            end
-            % Last tentative, iff all previous attempts failed, try with negative numbers.
-            tentative_number = 0;
-            while wrong_initial_guess_flag && tentative_number<=in0*10
-                tentative_number = tentative_number+1;
-                x(idx) = -rand(in0, 1)*10;
-                [fvec, fjac] = feval(f, x, varargin{:});
-                wrong_initial_guess_flag = ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)));
-            end
+        % Let's try random numbers for the variables initialized with the default value.
+        wrong_initial_guess_flag = true;
+        % First try with positive numbers.
+        tentative_number = 0;
+        while wrong_initial_guess_flag && tentative_number<=in0*10
+            tentative_number = tentative_number+1;
+            x(idx) = rand(in0, 1)*10;
+            [fvec, fjac] = feval(f, x, varargin{:});
+            wrong_initial_guess_flag = ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)));
+        end
+        % If all previous attempts failed, try with real numbers.
+        tentative_number = 0;
+        while wrong_initial_guess_flag && tentative_number<=in0*10
+            tentative_number = tentative_number+1;
+            x(idx) = randn(in0, 1)*10;
+            [fvec, fjac] = feval(f, x, varargin{:});
+            wrong_initial_guess_flag = ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)));
+        end
+        % Last tentative, iff all previous attempts failed, try with negative numbers.
+        tentative_number = 0;
+        while wrong_initial_guess_flag && tentative_number<=in0*10
+            tentative_number = tentative_number+1;
+            x(idx) = -rand(in0, 1)*10;
+            [fvec, fjac] = feval(f, x, varargin{:});
+            wrong_initial_guess_flag = ~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:)));
         end
     end
 else
