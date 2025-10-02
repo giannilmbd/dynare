@@ -161,6 +161,11 @@ pkg_matlab_online:
     - cd scripts/matlab-online && ./packageDynare.sh
   tags:
     - matlab-online
+  cache:
+    - key: $CI_JOB_NAME
+      # This cache is shared between all branches, to save space
+      paths:
+        - scripts/matlab-online/x13as*.tar.gz
   artifacts:
     paths:
       - scripts/matlab-online/*.mltbx

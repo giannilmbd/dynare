@@ -21,6 +21,14 @@ cleanup ()
 }
 trap cleanup EXIT
 
+# Get X13 binary from the Census Bureau website if not cached, and unpack it into the temporary workspace
+# The binary from Ubuntu has some shared library dependencies, so it is safer to use a static binary
+X13ASTARBALL=x13as_ascii-v${X13ASVER}.tar.gz
+if [[ ! -f ${X13ASTARBALL} ]]; then
+    wget --no-verbose --retry-connrefused --retry-on-host-error https://www2.census.gov/software/x-13arima-seats/x13as/unix-linux/program-archives/${X13ASTARBALL}
+fi
+tar -xf ${X13ASTARBALL} -C "${tmpdir}"
+
 pushd ../..
 meson setup -Dbuild_for=matlab -Dmatlab_path="$MATLABPATH" --buildtype=release -Db_lto=true --prefer-static "$tmpdir"/build-matlab-online
 
@@ -42,11 +50,6 @@ fi
 cd ..
 strip usr/local/bin/dynare-preprocessor
 strip usr/local/lib/dynare/mex/matlab/*.mexa64
-
-# Get X13 binary from the Census Bureau website
-# The binary from Ubuntu has some shared library dependencies, so it is safer to use a static binary
-wget --no-verbose --retry-connrefused --retry-on-host-error https://www2.census.gov/software/x-13arima-seats/x13as/unix-linux/program-archives/x13as_ascii-v${X13ASVER}.tar.gz
-tar xf x13as_ascii-v${X13ASVER}.tar.gz
 
 # Populate staging area for the zip
 cp -pRL usr/local/lib/dynare dynare # -L is needed to dereference the preprocessor symlink
