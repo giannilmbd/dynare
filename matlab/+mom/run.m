@@ -696,8 +696,8 @@ if do_bayesian_estimation_mcmc
     CutSample(M_, options_mom_, 'method_of_moments::mcmc'); % discard first mh_drop percent of the draws
     if options_mom_.mh_posterior_mode_estimation
         % skip optimizer-based mode-finding and instead compute the mode based on a run of a MCMC
-        [~,~,posterior_mode,~] = compute_mh_covariance_matrix(bayestopt_,M_.fname,M_.dname,'method_of_moments');
-        oo_.mom = fill_mh_mode(posterior_mode',NaN(length(posterior_mode),1),M_,options_mom_,estim_params_,bayestopt_,oo_.mom,'posterior');
+        [~,~,posterior_mode,~] = compute_mh_covariance_matrix(M_.fname,M_.dname);
+        oo_.mom = fill_mh_mode(posterior_mode',NaN(length(posterior_mode),1),M_,options_mom_,estim_params_,oo_.mom,'posterior');
         warning(orig_warning_state);
         return
     else
