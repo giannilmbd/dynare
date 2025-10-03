@@ -6804,7 +6804,7 @@ observed variables.
     .. option:: datafile = FILENAME
 
        The datafile: a ``.m`` file, a ``.mat`` file, a ``.csv`` file,
-       or a ``.xls/.xlsx`` file (under Octave, the `io
+       or a ``.xls``/``.xlsx`` file (under Octave, the `io
        <https://octave.sourceforge.io/io/>`__ package from Octave-Forge
        is required for the ``.csv`` and ``.xlsx`` formats and the
        ``.xls`` file extension is not supported). Note that the base
@@ -6816,7 +6816,7 @@ observed variables.
 
             estimation(datafile='../fsdat_simul.mat',...);
 
-       The `datafile` option is mandatory unless a :comm:`data (OPTIONS...)` 
+       The ``datafile`` option is mandatory unless a :comm:`data`
        command is present.
 
     .. option:: dirname = FILENAME
@@ -9625,8 +9625,8 @@ observed variables.
 
 .. command:: data (OPTIONS...);
 
-    |br| This command allows specifying the dataset used for estimation using `dseries` objects. 
-    It obviates the need for a :opt:`datafile = FILENAME` option to the `estimation` command.
+    |br| This command allows specifying the dataset used for estimation using ``dseries`` objects.
+    It obviates the need for a :opt:`datafile = FILENAME` option to the ``estimation`` command.
 
     *Options*
 
@@ -9637,7 +9637,7 @@ observed variables.
 
     .. option:: series = DSERIES
 
-        The name of a `dseries` object available in memory containing the data series to be used.
+        The name of a ``dseries`` object available in memory containing the data series to be used.
         Mandatory input if :opt:`file = FILENAME` is not specified.
 
     .. option:: xls_sheet = QUOTED_STRING

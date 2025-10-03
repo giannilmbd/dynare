@@ -1064,7 +1064,7 @@ The dseries class
         |br| Instantiates and populates a ``dseries`` object with a
         data file specified by *FILENAME*, a string passed as
         input. Valid file types are ``.m``, ``.mat``, ``.csv`` and
-        ``.xls/.xlsx`` (Octave only supports ``.xlsx`` files and the
+        ``.xls``/``.xlsx`` (Octave only supports ``.xlsx`` files and the
         `io <https://octave.sourceforge.io/io/>`__ package from
         Octave-Forge must be installed). The extension of the file
         should be explicitly provided.
@@ -1133,11 +1133,13 @@ The dseries class
 
        *Example*
 
-       Various ways to create a ``dseries`` object::
+       Various ways to create a ``dseries`` object inside a ``.mod`` file::
 
          do1 = dseries(1999Q3);
          do2 = dseries('filename.csv');
          do3 = dseries([1; 2; 3], 1999Q3, {'var123'}, {'var_{123}'});
+
+       Equivalent commands at the MATLAB/Octave prompt::
 
          >> do1 = dseries(dates('1999Q3'));
          >> do2 = dseries('filename.csv');
@@ -1163,7 +1165,7 @@ The dseries class
 
         |br| Overloads the ``abs()`` function for ``dseries``
         objects. Returns the absolute value of the variables in
-        dseries ``object`` ``B``.
+        ``dseries`` object ``B``.
 
         *Example*
 
@@ -1451,7 +1453,7 @@ The dseries class
                 1951Q2 | 6
 
 
-    .. dseriesmethod:: [error_flag, message ] = check (A)
+    .. dseriesmethod:: [error_flag, message] = check (A)
 
         |br| Sanity check of ``dseries`` object ``A``. Returns ``1``
         if there is an error, ``0`` otherwise. The second output
@@ -1658,7 +1660,7 @@ The dseries class
                        detrend_ (A[, m])
 
         |br| Detrends ``dseries`` object ``A`` with a fitted
-        polynomial of order ``m``. Default value fir ``m`` is 0 (time
+        polynomial of order ``m``. Default value fir ``m`` is ``0`` (time
         series are detrended by removing the average). Note that each
         variable is detrended with a different polynomial.
 
@@ -1838,12 +1840,13 @@ The dseries class
        correspond to an existing variable within the dseries
        object. When ``v`` is a scalar, its value will be applied to
        all periods uniformly. If ``v`` is a vector, its length must
-       match the number of observations in the dseries object.You can
-       invoke this method for a batch of variables by providing a 1 by
-       n cell array of character row arrays as the first argument. When
-       "v" is a row vector with n elements, the method will be applied
-       uniformly across all periods. If "v" is a matrix, it must have
-       n columns, and the number of rows should correspond to the
+       match the number of observations in the dseries object. You can
+       invoke this method for a batch of variables by providing a
+       :math:`1 \times n`
+       cell array of character row arrays as the first argument. When
+       ``v`` is a row vector with n elements, the method will be applied
+       uniformly across all periods. If ``v`` is a matrix, it must have
+       :math:`n` columns, and the number of rows should correspond to the
        number of periods.
 
        *Example*
@@ -1960,7 +1963,7 @@ The dseries class
         |br| Overloads the ``horzcat`` MATLAB/Octave’s method for
         ``dseries`` objects. Returns a ``dseries`` object ``D``
         containing the variables in ``dseries`` objects passed as
-        inputs: ``A, B, ...`` If the inputs are not defined on the
+        inputs: ``A``, ``B``, ... If the inputs are not defined on the
         same time ranges, the method adds NaNs to the variables so
         that the variables are redefined on the smallest common time
         range. Note that the names in the ``dseries`` objects passed
@@ -2066,7 +2069,7 @@ The dseries class
         in ``dseries`` object ``A`` at positions specified by integer
         scalars in vector ``I``, returns augmented ``dseries`` object
         ``C``. The integer scalars in ``I`` must take values between
-        `` and ``A.length()+1`` and refers to ``A`` ’s column
+        ``1`` and ``A.length()+1`` and refers to ``A`` ’s column
         numbers. The ``dseries`` objects ``A`` and ``B`` need not be
         defined over the same time ranges, but it is assumed that they
         have common frequency.
@@ -2132,9 +2135,9 @@ The dseries class
                        lag_ (A[, p])
 
         |br| Returns lagged time series. Default value of integer
-        scalar ``p``, the number of lags, is ``1``. The `dseries`
-        class overloads the parentheses, so that `ts.lag(p)` is
-        equivalent to `ts(-p)`.
+        scalar ``p``, the number of lags, is ``1``. The ``dseries``
+        class overloads the parentheses operator, so that ``ts.lag(p)`` is
+        equivalent to ``ts(-p)``.
 
         *Example*
 
@@ -2214,7 +2217,7 @@ The dseries class
     .. dseriesmethod:: f = lastobservedperiod (A)
 
        |br| Returns the last period in which all variables of the
-       ``dseries`` object ``A`` are fully observed (i.e., contain no
+       ``dseries`` object ``A`` are fully observed (*i.e.*, contain no
        NaN values).
 
 
@@ -2230,7 +2233,7 @@ The dseries class
     .. dseriesmethod:: l = le (A, B)
                        l = lt (A, B)
 
-       |br| Overloads the ``gt`` (<) and ``ge`` (<=) binary operators. Returns a logical array.
+       |br| Overloads the ``lt`` (<) and ``le`` (<=) binary operators. Returns a logical array.
 
        *Example*
 
@@ -2281,7 +2284,7 @@ The dseries class
         |br| Returns a lead time series. The default value for the
         integer scalar ``p``, which represents the number of leads, is
         ``1``. Similar to the ``lag`` method, the ``dseries`` class
-        overloads the parentheses, making ``ts.lead(p)`` equivalent to
+        overloads the parentheses operator, making ``ts.lead(p)`` equivalent to
         ``ts(p)``.
 
         *Example*
@@ -2323,7 +2326,7 @@ The dseries class
             ...
             end;
 
-        and if variables ``, ``A`` and ``K`` are defined as
+        and if variables ``C``, ``A`` and ``K`` are defined as
         ``dseries`` objects, then by writing::
 
             Residuals = 1/C - beta/C(1)*(exp(A(1))*K^(alpha-1)+1-delta) ;
@@ -2370,12 +2373,15 @@ The dseries class
 
     .. dseriesmethod:: B = mdiff (A)
                        mdiff_ (A)
-                       B = mgrowth (A)
-                       mgrowth_ (A)
 
-       |br| Calculates the monthly differences or growth rates of
+       |br| Calculates the monthly differences of
        variables in the ``dseries`` object ``A``.
 
+    .. dseriesmethod:: B = mgrowth (A)
+                       mgrowth_ (A)
+
+       |br| Calculates the monthly growth rates of
+       variables in the ``dseries`` object ``A``.
 
     .. dseriesmethod:: B = mean (A[, geometric])
 
@@ -2453,7 +2459,7 @@ The dseries class
         observations and :math:`N_A` and :math:`N_B` variables, then
         :math:`N_A` must equal :math:`N_B` or :math:`1`, and
         :math:`N_B` must equal :math:`N_A` or :math:`1`. If
-        :math:`T_A=T_B`, ``isequal(A.init,B.init)`` returns ``1``,
+        :math:`T_A=T_B`, ``isequal(A.init,B.init)`` returns ``true``,
         and :math:`N_A=N_B`, then the ``minus`` operator will compute
         for each pair :math:`(t,n)`, where :math:`1\le t\le T_A` and
         :math:`1\le n\le N_A`, the operation
@@ -2561,7 +2567,7 @@ The dseries class
         :math:`T_B` observations and :math:`N_B` variables, then
         :math:`N_A` must equal :math:`N_B` or :math:`1`, and vice
         versa. If :math:`T_A=T_B` and ``isequal(A.init,B.init)``
-        returns ``1``, along with :math:`N_A=N_B`, the ``mrdivide``
+        returns ``true``, along with :math:`N_A=N_B`, the ``mrdivide``
         operator calculates for each pair :math:`(t,n)`, where
         :math:`1\le t\le T_A` and :math:`1\le n\le N_A`, the value of
         ``C.data(t,n)=A.data(t,n)/B.data(t,n)``. If :math:`N_B` equals
@@ -2613,7 +2619,7 @@ The dseries class
         :math:`T_B` observations and :math:`N_B` variables, then
         :math:`N_A` must equal :math:`N_B` or :math:`1`, and vice
         versa. If :math:`T_A=T_B` and ``isequal(A.init,B.init)``
-        returns ``1``, along with :math:`N_A=N_B`, the ``mtimes``
+        returns ``true``, along with :math:`N_A=N_B`, the ``mtimes``
         operator calculates for each pair :math:`(t,n)`, where
         :math:`1\le t\le T_A` and :math:`1\le n\le N_A`, the value of
         ``C.data(t,n)=A.data(t,n)*B.data(t,n)``. If :math:`N_B` equals
@@ -2658,7 +2664,7 @@ The dseries class
         the same number of observations (denoted as :math:`T`) and
         variables (denoted as :math:`N`). The output is a :math:`T` by
         :math:`N` matrix consisting of zeros and ones. The element
-        :math:`(i,j)` of the matrix ``C`` is equal to ``1`` if and
+        :math:`(i,j)` of the matrix ``C`` is equal to ``true`` if and
         only if observation :math:`i` for variable :math:`j` in ``A``
         and ``B`` are not equal.
 
@@ -2699,8 +2705,8 @@ The dseries class
     .. dseriesmethod:: B = onesidedhpcycle (A[, lambda[, init]])
                        onesidedhpcycle_ (A[, lambda[, init]])
 
-        |br| Extracts the cycle component from a ``dseries`` ``A``
-        object using a one-sided HP filter (implemented with a Kalman
+        |br| Extracts the cycle component from a ``dseries`` object ``A``
+        using a one-sided HP filter (implemented with a Kalman
         filter) and returns a ``dseries`` object, ``B``. The default
         value for ``lambda``, the smoothing parameter, is set to
         ``1600``. By default, if ``init`` is not provided, the initial
@@ -2710,8 +2716,8 @@ The dseries class
     .. dseriesmethod:: B = onesidedhptrend (A[, lambda[, init]])
                        onesidedhptrend_ (A[, lambda[, init]])
 
-        |br| Extracts the trend component from a ``dseries`` ``A``
-        object using a one-sided HP filter (implemented with a Kalman
+        |br| Extracts the trend component from a ``dseries`` object ``A``
+        using a one-sided HP filter (implemented with a Kalman
         filter) and returns a ``dseries`` object, ``B``. The default
         value for ``lambda``, the smoothing parameter, is set to
         ``1600``. By default, if ``init`` is not provided, the initial
@@ -2792,7 +2798,7 @@ The dseries class
         observations and :math:`N_A` and :math:`N_B` variables, then
         :math:`N_A` must be equal to :math:`N_B` or :math:`1` and
         :math:`N_B` must be equal to :math:`N_A` or :math:`1`. If
-        :math:`T_A=T_B`, ``isequal(A.init,B.init)`` returns ``1`` and
+        :math:`T_A=T_B`, ``isequal(A.init,B.init)`` returns ``true`` and
         :math:`N_A=N_B`, then the ``plus`` operator will compute for
         each pair :math:`(t,n)`, with :math:`1\le t\le T_A` and
         :math:`1\le n\le N_A`,
@@ -2847,10 +2853,10 @@ The dseries class
         the (exponential) trend; if ``'Constant'``, it indicates the
         variable's level; and if ``'AR'``, it denotes the
         autoregressive parameter. Variables can be projected using an
-        AR(p) model if the third column contains a 1×p vector of
-        doubles. Note that the stationarity of the AR(p) model is not
-        tested. For constant projections, one can use either `'Trend'`
-        with a growth factor of 1 or `'AR'` with an autoregressive
+        AR(:math:`p`) model if the third column contains a :math:`1 \times p` vector of
+        doubles. Note that the stationarity of the AR(:math:`p`) model is not
+        tested. For constant projections, one can use either ``'Trend'``
+        with a growth factor of 1 or ``'AR'`` with an autoregressive
         parameter of one (indicating a random walk). This projection
         routine solely addresses exponential trends.
 
@@ -2865,11 +2871,9 @@ The dseries class
 
 
     .. dseriesmethod:: B = qdiff (A)
-                       B = qgrowth (A)
                        qdiff_ (A)
-                       qgrowth_ (A)
 
-        |br| Computes quarterly differences or growth rates.
+        |br| Computes quarterly differences.
 
         *Example*
 
@@ -2899,6 +2903,11 @@ The dseries class
                 1950M5  | 3
                 1950M6  | 3
 
+
+    .. dseriesmethod:: B = qgrowth (A)
+                       qgrowth_ (A)
+
+        |br| Computes quarterly growth rates.
 
     .. dseriesmethod:: C = remove (A, B)
                        remove_ (A, B)
@@ -2988,7 +2997,7 @@ The dseries class
         |br| Redefine ``ops`` member.
 
 
-    .. dseriesmethod:: A = resetags (A, ops)
+    .. dseriesmethod:: A = resettags (A, tags)
 
         |br| Redefine ``tags`` member.
 
@@ -2998,7 +3007,7 @@ The dseries class
 
         |br| Rounds each value to the nearest decimal or integer. The
         parameter ``n`` specifies the precision (number of decimal
-        places), with a default value of 0, indicating that the method
+        places), with a default value of ``0``, indicating that the method
         will round to the nearest integer by default.
 
         *Example*
@@ -3037,7 +3046,7 @@ The dseries class
                 >> ts0 = dseries(ones(2,2));
                 >> ts0.save('ts0', 'csv');
 
-            The last command will create a file ts0.csv with the
+            The last command will create a file ``ts0.csv`` with the
             following content::
 
                 ,Variable_1,Variable_2
@@ -3048,7 +3057,7 @@ The dseries class
 
                 >> ts0.save('ts0','m');
 
-            will produce a file ts0.m with the following content::
+            will produce a file ``ts0.m`` with the following content::
 
                 % File created on 14-Nov-2013 12:08:52.
 
@@ -3097,14 +3106,14 @@ The dseries class
                 1Y | 1        | 1          | 1
 
 
-    .. dseriesmethod:: [T, N ] = size(A[, dim])
+    .. dseriesmethod:: [T, N] = size(A[, dim])
 
         Overloads the MATLAB/Octave ``size`` function to return the
-        number of observations in the ``dseries`` object ``A`` (i.e.,
-        ``A.nobs``) as well as the number of variables (i.e.,
+        number of observations in the ``dseries`` object ``A`` (*i.e.*,
+        ``A.nobs``) as well as the number of variables (*i.e.*,
         ``A.vobs``). If a second input argument is provided, the
         ``size`` function will return the number of observations when
-        ``dim=1`` or the number of variables when ``dim=2``. An error
+        ``dim`` equals ``1`` or the number of variables when ``dim`` equals ``2``. An error
         will be issued for any other values of ``dim``.
 
         *Example*
@@ -3251,11 +3260,14 @@ The dseries class
 
 
     .. dseriesmethod:: B = ydiff (A)
-                       B = ygrowth (A)
                        ydiff_ (A)
+
+        |br| Calculates annual differences.
+
+    .. dseriesmethod:: B = ygrowth (A)
                        ygrowth_ (A)
 
-        |br| Calculates annual differences or growth rates.
+        |br| Calculates annual growth rates.
 
 
 .. _x13-members:
@@ -3266,8 +3278,8 @@ X-13 ARIMA-SEATS interface
 .. class:: x13
 
     |br| The x13 class provides a method for each X-13 command as
-    documented in the X-13 ARIMA-SEATS reference manual (`x11`,
-    `automdl`, `estimate`, ...). The respective options (see Chapter 7 of U.S. Census Bureau (2020))
+    documented in the X-13 ARIMA-SEATS reference manual (``x11``,
+    ``automdl``, ``estimate``, ...). The respective options (see Chapter 7 of U.S. Census Bureau (2020))
     can then be passed by key/value pairs. The ``x13`` class has 22 members:
 
     :arg y: ``dseries`` object with a single variable.
@@ -3297,14 +3309,14 @@ X-13 ARIMA-SEATS interface
 
     .. construct:: x13 (y)
 
-        |br| Instantiates an ``x13`` object with `dseries` object
+        |br| Instantiates an ``x13`` object with ``dseries`` object
         ``y``. The ``dseries`` object passed as an argument must
         contain only one variable, the one we need to pass to X-13.
 
 
     .. construct:: x13 (y, x)
 
-        |br| Instantiates an ``x13`` object with `dseries` objects
+        |br| Instantiates an ``x13`` object with ``dseries`` objects
         ``y`` and ``x``. The first ``dseries`` object passed as an
         argument must contain only one variable, the second
         ``dseries`` object contains the exogenous variables used by
@@ -3312,7 +3324,7 @@ X-13 ARIMA-SEATS interface
         same time span.
 
 
-    The following methods allow to set sequence of X-13 commands, write an `.spc` file, and run the X-13 binary:
+    The following methods allow to set sequence of X-13 commands, write an ``.spc`` file, and run the X-13 binary:
 
 
     .. x13method:: A = arima (A, key, value[, key, value[, [...]]])
@@ -3520,14 +3532,14 @@ X-13 ARIMA-SEATS interface
         ``o.transform('function','auto','savelog','atr')`` instructs the subsequent
         ``o.automdl()`` command to check whether an additional or a multiplicative
         pattern fits the data better and to save the result. The result is saved in
-        `o.results.autotransform`, which in the present example indicates that a
-        log transformation, i.e. a multiplicative model was preferred. The ``o.automdl('savelog','all')`` automatically selects a fitting
-        ARIMA model and saves all relevant output to the .log-file. The ``o.x11('save','(d11, d10)')`` instructs
+        ``o.results.autotransform``, which in the present example indicates that a
+        log transformation, *i.e.* a multiplicative model was preferred. The ``o.automdl('savelog','all')`` automatically selects a fitting
+        ARIMA model and saves all relevant output to the ``.log`` file. The ``o.x11('save','(d11, d10)')`` instructs
         ``x11`` to save both the final seasonally adjusted series ``d11`` and the final seasonal factor ``d10``
         into ``dseries`` with the respective names in the output structure ``o.results``.  ``o.clean()`` removes the
-        temporary files created by ``o.run()``. Among these are the ``.log``-file storing
-        summary information, the ``.err``-file storing information on problems encountered,
-        the ``.out``-file storing the raw output, and the `.spc`-file storing the specification for the `x11` run.
+        temporary files created by ``o.run()``. Among these are the ``.log`` file storing
+        summary information, the ``.err`` file storing information on problems encountered,
+        the ``.out`` file storing the raw output, and the ``.spc`` file storing the specification for the ``x11`` run.
         There may be further files depending on the output requested. The last part of the example reads out the
         results and plots a comparison of the logged raw data and its log-additive decomposition into a
         seasonal pattern and the seasonally adjusted series.
