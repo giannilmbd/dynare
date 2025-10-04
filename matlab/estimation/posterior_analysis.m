@@ -45,7 +45,7 @@ switch info
         if drsize*SampleSize>MaxMegaBytes
             drsize=0;
         end
-        selec_posterior_draws(M_,options_,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state,estim_params_,SampleSize,drsize); %save draws to disk
+        select_posterior_draws(M_,options_,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state,estim_params_,SampleSize,drsize); %save draws to disk
         oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);
     case {4,5} %process draws and save files
         oo_ = job(type,SampleSize,arg1,arg2,arg3,options_,M_,oo_);

@@ -1,4 +1,6 @@
-function SampleAddress = selec_posterior_draws(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,estim_params_,SampleSize,drsize)
+function SampleAddress = select_posterior_draws(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,estim_params_,SampleSize,drsize)
+% SampleAddress = select_posterior_draws(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,estim_params_,SampleSize,drsize)
+% --------------------------------------------------------------------------
 % Selects a sample of draws from the posterior distribution and if nargin>1
 % saves the draws in _pdraws mat files (metropolis folder). If drsize>0
 % the dr structure, associated to the parameters, is also saved in _pdraws.
@@ -25,7 +27,7 @@ function SampleAddress = selec_posterior_draws(M_,options_,dr,endo_steady_state,
 %   None.
 %
 
-% Copyright © 2006-2024 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,7 +64,7 @@ switch nargin
     end
     drawsize = drsize+npar*8/1048576;
   otherwise
-    error('selec_posterior_draws:: Unexpected number of input arguments!')
+    error('select_posterior_draws:: Unexpected number of input arguments!')
 end
 
 if ~issmc(options_)
