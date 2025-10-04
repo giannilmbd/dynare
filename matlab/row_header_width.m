@@ -41,7 +41,7 @@ if np
     w = cellofchararraymaxlength(bayestopt_.name);
 end
 if nvx
-    w = max(w, cellofchararraymaxlength(M_.endo_names(estim_params_.var_exo(1:nvx,1))));
+    w = max(w, cellofchararraymaxlength(M_.exo_names(estim_params_.var_exo(1:nvx,1))));
 end
 if nvn
     w = max(w, cellofchararraymaxlength(M_.endo_names(estim_params_.var_endo(1:nvn,1))));
