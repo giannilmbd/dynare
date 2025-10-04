@@ -150,12 +150,7 @@ missing_value = dataset_info.missing.state;
 gend = dataset_.nobs;
 
 % Get the number of parameters to be estimated.
-nvx = estim_params_.nvx;  % Variance of the structural innovations (number of parameters).
-nvn = estim_params_.nvn;  % Variance of the measurement innovations (number of parameters).
-ncx = estim_params_.ncx;  % Covariance of the structural innovations (number of parameters).
-ncn = estim_params_.ncn;  % Covariance of the measurement innovations (number of parameters).
-np  = estim_params_.np ;  % Number of deep parameters.
-nx  = nvx+nvn+ncx+ncn+np; % Total number of parameters to be estimated.
+nx = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np; % Total number of parameters to be estimated.
 
 if ~isempty(estim_params_)
     M_ = set_all_parameters(xparam1,estim_params_,M_);

@@ -1,6 +1,6 @@
-function xparam1=get_all_parameters(estim_params_,M_)
-
-% function xparam1=get_parameters
+function xparam1 = get_all_parameters(estim_params_, M_)
+% xparam1 = get_all_parameters(estim_params_, M_)
+% -------------------------------------------------------------------------
 % gets parameters values from M_.params into xparam1 (inverse mapping to set_all_parameters)
 % This is called if a model was calibrated before estimation to back out
 % parameter values
@@ -15,7 +15,7 @@ function xparam1=get_all_parameters(estim_params_,M_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -32,73 +32,58 @@ function xparam1=get_all_parameters(estim_params_,M_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if ~isempty(estim_params_)
-    nvx = estim_params_.nvx;
-    ncx = estim_params_.ncx;
-    nvn = estim_params_.nvn;
-    ncn = estim_params_.ncn;
-    np = estim_params_.np;
-else
-    nvx = 0;
-    ncx = 0;
-    nvn = 0;
-    ncn = 0;
-    np = 0;
+if isempty(estim_params_)
+    estim_params_.nvx = 0;
+    estim_params_.ncx = 0;
+    estim_params_.nvn = 0;
+    estim_params_.ncn = 0;
+    estim_params_.np  = 0;
 end
-Sigma_e = M_.Sigma_e;
-Correlation_matrix = M_.Correlation_matrix;
-H = M_.H;
-Correlation_matrix_ME = M_.Correlation_matrix_ME;
 
-xparam1=NaN(nvx+ncx+nvn+ncn+np,1);
-% stderrs of the exogenous shocks
-if nvx
+xparam1 = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
+
+% standard deviation of exogenous shocks (stderr on varexo, ordered first in xparam1)
+if estim_params_.nvx
     var_exo = estim_params_.var_exo;
-    for i=1:nvx
+    for i = 1:estim_params_.nvx
         k = var_exo(i,1);
-        xparam1(i)=sqrt(Sigma_e(k,k));
+        xparam1(i) = sqrt(M_.Sigma_e(k,k));
     end
 end
-% update offset
-offset = nvx;
+offset = estim_params_.nvx;
 
-% setting measument error variance
-if nvn
-    for i=1:nvn
+% standard deviation of measurement errors (stderr on varobs, ordered second in xparam1)
+if estim_params_.nvn
+    for i = 1:estim_params_.nvn
         k = estim_params_.nvn_observable_correspondence(i,1);
-        xparam1(offset+i)=sqrt(H(k,k));
+        xparam1(offset+i) = sqrt(M_.H(k,k));
     end
 end
+offset = estim_params_.nvx+estim_params_.nvn;
 
-% update offset
-offset = nvx+nvn;
-
-% correlations among shocks (ncx)
-if ncx
+% correlations among shocks (corr on varexo, ordered third in xparam1)
+if estim_params_.ncx
     corrx = estim_params_.corrx;
-    for i=1:ncx
+    for i = 1:estim_params_.ncx
         k1 = corrx(i,1);
         k2 = corrx(i,2);
-        xparam1(i+offset)=Correlation_matrix(k1,k2);
+        xparam1(i+offset) = M_.Correlation_matrix(k1,k2);
     end
 end
-% update offset
-offset = nvx+nvn+ncx;
+offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx;
 
-if ncn
+% correlations among measurement errors (corr on varobs, ordered fourth in xparam1)
+if estim_params_.ncn
     corrn_observable_correspondence = estim_params_.corrn_observable_correspondence;
-    for i=1:ncn
+    for i=1:estim_params_.ncn
         k1 = corrn_observable_correspondence(i,1);
         k2 = corrn_observable_correspondence(i,2);
-        xparam1(i+offset)=Correlation_matrix_ME(k1,k2);
+        xparam1(i+offset) = M_.Correlation_matrix_ME(k1,k2);
     end
 end
+offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn;
 
-% update offset
-offset = nvx+ncx+nvn+ncn;
-
-
-% structural parameters
-if np
-    xparam1(offset+1:end)=M_.params(estim_params_.param_vals(:,1));
+% structural parameters (ordered last in xparam1)
+if estim_params_.np
+    xparam1(offset+1:end) = M_.params(estim_params_.param_vals(:,1));
 end

@@ -1,6 +1,7 @@
-function w=row_header_width(M_,estim_params_,bayestopt_)
-% This function computes the width of the row headers for
-% the estimation results
+function w = row_header_width(M_,estim_params_,bayestopt_)
+% w = row_header_width(M_,estim_params_,bayestopt_)
+% -------------------------------------------------------------------------
+% This function computes the width of the row headers for the estimation results
 %
 % INPUTS
 %   estim_params_    [structure]
@@ -13,7 +14,7 @@ function w=row_header_width(M_,estim_params_,bayestopt_)
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2018 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -30,32 +31,25 @@ function w=row_header_width(M_,estim_params_,bayestopt_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-np = estim_params_.np;
-nvx = estim_params_.nvx;
-nvn = estim_params_.nvn;
-ncx = estim_params_.ncx;
-ncn = estim_params_.ncn;
-
 w = 0;
-if np
+if estim_params_.np % estimated structural parameters
     w = cellofchararraymaxlength(bayestopt_.name);
 end
-if nvx
-    w = max(w, cellofchararraymaxlength(M_.exo_names(estim_params_.var_exo(1:nvx,1))));
+if estim_params_.nvx % estimated stderr parameters for structural shocks
+    w = max(w, cellofchararraymaxlength(M_.exo_names(estim_params_.var_exo(1:estim_params_.nvx,1))));
 end
-if nvn
-    w = max(w, cellofchararraymaxlength(M_.endo_names(estim_params_.var_endo(1:nvn,1))));
+if estim_params_.nvn % estimated stderr parameters for measurement errors
+    w = max(w, cellofchararraymaxlength(M_.endo_names(estim_params_.var_endo(1:estim_params_.nvn,1))));
 end
-if ncx
-    for i=1:ncx
+if estim_params_.ncx % estimated corr parameters for structural shocks
+    for i=1:estim_params_.ncx
         k1 = estim_params_.corrx(i,1);
         k2 = estim_params_.corrx(i,2);
         w = max(w, length(M_.exo_names{k1})+length(M_.exo_names{k2}));
-
     end
 end
-if ncn
-    for i=1:ncn
+if estim_params_.ncn % estimated corr parameters for measurement errors
+    for i=1:estim_params_.ncn
         k1 = estim_params_.corrn(i,1);
         k2 = estim_params_.corrn(i,2);
         w = max(w, length(M_.endo_names{k1})+length(M_.endo_names{k2}));

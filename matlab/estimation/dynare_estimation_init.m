@@ -30,7 +30,7 @@ function [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2003-2024 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -420,12 +420,8 @@ end
 
 %check steady state at initial parameters
 M_local = M_;
-nvx = estim_params_.nvx;
-ncx = estim_params_.ncx;
-nvn = estim_params_.nvn;
-ncn = estim_params_.ncn;
 if estim_params_.np
-    M_local.params(estim_params_.param_vals(:,1)) = xparam1(nvx+ncx+nvn+ncn+1:end);
+    M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.ncn+1:end);
 end
 [oo_.steady_state, params,info] = evaluate_steady_state(oo_.steady_state,[oo_.exo_steady_state; oo_.exo_det_steady_state],M_local,options_,steadystate_check_flag);
 
