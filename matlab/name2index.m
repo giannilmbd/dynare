@@ -1,10 +1,9 @@
-function i = name2index(options_, M_, estim_params_, type, name1, name2 )
+function i = name2index(M_, estim_params_, type, name1, name2 )
 % Returns the index associated to an estimated object (deep parameter,
 % variance of a structural shock or measurement error, covariance between
 % two structural shocks, covariance between two measurement errors).
 %
 % INPUTS:
-%   options_        [structure]    Dynare structure.
 %   M_              [structure]    Dynare structure (related to model definition).
 %   estim_params_   [structure]    Dynare structure (related to estimation).
 %   type            [string]       'DeepParameter', 'MeasurementError' (for measurement equation error) or 'StructuralShock' (for structural shock).
@@ -16,7 +15,7 @@ function i = name2index(options_, M_, estim_params_, type, name1, name2 )
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2008-2018 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
