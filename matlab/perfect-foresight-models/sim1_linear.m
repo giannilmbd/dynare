@@ -141,7 +141,7 @@ h2 = clock;
 [res, A] = linear_perfect_foresight_problem(Y, jacobian, y0, yT, exogenousvariables, params, steadystate_y, maximum_lag, periods, ny);
 
 if ~isempty(controlled_paths_by_period)
-    A = controlled_paths_substitute_stacked_jacobian(A, repmat(steadystate_y, 1, periods), steadystate_y, steadystate_y, repmat(steadystate_x', periods, 1), steadystate_y, controlled_paths_by_period, M_);
+    A = controlled_paths_substitute_stacked_jacobian(A, repmat(steadystate_y, periods, 1), steadystate_y, steadystate_y, repmat(steadystate_x', periods, 1), steadystate_y, controlled_paths_by_period, M_);
 end
 
 % Evaluation of the maximum residual at the initial guess (steady state for the endogenous variables).
