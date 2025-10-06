@@ -12766,7 +12766,7 @@ Optimal Simple Rules (OSR)
           ``var`` command, whose (co)-variance enters the loss
           function;
         * :math:`e` are the exogenous stochastic shocks, specified in
-          the ``varexo``- ommand;
+          the ``varexo``- command;
         * :math:`W` is the weighting matrix;
 
     The linear quadratic problem consists of choosing a subset of
