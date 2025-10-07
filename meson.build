@@ -1088,6 +1088,7 @@ mod_and_m_tests = [
   { 'test' : [ 'optimal_policy/OSR/osr_obj_corr_algo_7.mod' ] },
   { 'test' : [ 'optimal_policy/OSR/osr_obj_corr_algo_8.mod' ] },
   { 'test' : [ 'optimal_policy/OSR/osr_obj_corr_algo_9.mod' ] },
+  { 'test' : [ 'optimal_policy/OSR/OSR_planner_objective.mod' ] },
   { 'test' : [ 'optimal_policy/ramsey_.mod' ] },
   { 'test' : [ 'optimal_policy/nk_ramsey.mod' ] },
   { 'test' : [ 'optimal_policy/nk_ramsey_model.mod' ] },

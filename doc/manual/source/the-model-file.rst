@@ -12715,8 +12715,35 @@ Optimal Simple Rules (OSR)
 .. command:: osr [VARIABLE_NAME...];
              osr (OPTIONS...) [VARIABLE_NAME...];
 
-    |br| This command computes optimal simple policy rules for
-    linear-quadratic problems of the form:
+    |br| This command computes optimal simple policy rules. There are two
+    different supported approaches. The first one chooses a set of parameters 
+    :math:`\gamma` to maximize the expected lifetime value of a :comm:`planner_objective`:
+
+        .. math::
+
+             \max_\gamma E\sum\limits_{t = 0}^\infty {\tilde \beta}^t U_t
+
+    where:
+
+        * :math:`E` denotes the unconditional expectations operator;
+        * :math:`\gamma` are parameters to be optimized. They must be
+          specified as parameters in the ``params`` command and be 
+          entered in the ``model`` block;
+        * :math:`U` is the period objective function of the planner, specified with
+          :comm:`planner_objective`. 
+        * :math:`\tilde \beta` is the discount factor the planner employs
+          (see :opt:`planner_discount <planner_discount = EXPRESSION>`).
+
+    The subset of the model parameters over which the optimal simple
+    rule is to be optimized, :math:`\gamma`, must be listed with
+    :comm:`osr_params`.
+
+    Dynare will invoke this approach whenever it encounters an :comm:`osr` command 
+    in conjunction with a :comm:`planner_objective`.
+
+    The second (legacy) approach will be triggered if an :comm:`optim_weights` block 
+    is present instead of a :comm:`planner_objective`. Dynare then solves linear-quadratic 
+    problems of the form:
 
         .. math::
 
@@ -12739,7 +12766,7 @@ Optimal Simple Rules (OSR)
           ``var`` command, whose (co)-variance enters the loss
           function;
         * :math:`e` are the exogenous stochastic shocks, specified in
-          the ``varexo``- ommand;
+          the ``varexo``- command;
         * :math:`W` is the weighting matrix;
 
     The linear quadratic problem consists of choosing a subset of
@@ -12750,23 +12777,20 @@ Optimal Simple Rules (OSR)
     selected endogenous variables’ deviations from their steady state,
     i.e. in case they are not already mean 0 the variables entering
     the loss function are automatically demeaned so that the centered
-    second moments are minimized. Second, ``osr`` only solves linear
-    quadratic problems of the type resulting from combining the
+    second moments are minimized. Second, ``osr`` with this syntax only 
+    solves linear quadratic problems of the type resulting from combining the
     specified quadratic loss function with a first order approximation
     to the model’s equilibrium conditions. The reason is that the
     first order state-space representation is used to compute the
-    unconditional (co)-variances. Hence, ``osr`` will automatically
-    select ``order=1``. Third, because the objective involves
+    unconditional (co)-variances. Hence, ``osr`` without a 
+    :comm:`planner_objective` is only compatible with 
+    ``order=1``. Third, because the objective involves
     minimizing a weighted sum of unconditional second moments, those
     second moments must be finite. In particular, unit roots in
     :math:`y` are not allowed.
 
-    The subset of the model parameters over which the optimal simple
-    rule is to be optimized, :math:`\gamma`, must be listed with
-    ``osr_params``.
-
     The weighting matrix :math:`W` used for the quadratic objective
-    function is specified in the ``optim_weights`` block. By attaching
+    function is specified in the :comm:`optim_weights` block. By attaching
     weights to endogenous variables, the subset of endogenous
     variables entering the objective function, :math:`y`, is
     implicitly specified.
@@ -12815,10 +12839,12 @@ Optimal Simple Rules (OSR)
     .. option:: analytic_derivation
 
        Triggers estimation with analytic gradient of the objective function.
+       It is only supported for the linear-quadratic approach at ``order=1``
 
     .. option:: analytic_derivation_mode = INTEGER
 
-        See :opt:analytic_derivation_mode.
+        See :opt:analytic_derivation_mode. It is only supported for the 
+        linear-quadratic approach at ``order=1``.
 
     .. option:: silent_optimizer
 
@@ -12848,7 +12874,8 @@ Optimal Simple Rules (OSR)
 
 .. block:: optim_weights ;
 
-    |br| This block specifies quadratic objectives for optimal policy problems.
+    |br| This block specifies quadratic objectives for optimal policy problems
+    if the legacy linear-quadratic approach without a :comm:`planner_objective` is used.
 
     More precisely, this block specifies the nonzero elements of the
     weight matrix :math:`W` used in the quadratic form of the
@@ -12961,13 +12988,15 @@ Optimal Simple Rules (OSR)
 
     After an execution of the ``osr`` command, this sparse matrix
     contains the weighting matrix associated with the variables in the
-    objective function.
+    objective function. The field is only set if the legacy linear-quadratic 
+    approach without a :comm:`planner_objective` is used.
 
 .. matvar:: M_.osr.variable_indices
 
     After an execution of the ``osr`` command, this vector contains
     the indices of the variables entering the objective function in
-    ``M_.endo_names``.
+    ``M_.endo_names``. The field is only set if the legacy linear-quadratic 
+    approach without a :comm:`planner_objective` is used.
 
 
 Sensitivity and identification analysis

@@ -15,7 +15,7 @@ function [loss,info,exit_flag,df,vx]=objective(x,M_, oo_, options_,i_params,i_va
 %   loss                      scalar           loss function returned to solver
 %   info                      vector           info vector returned by resol
 %   exit_flag                 scalar           exit flag returned to solver
-%   df                        vectcor          Analytic Jacobian
+%   df                        vector          Analytic Jacobian
 %   vx                        vector           variances of the endogenous variables
 %
 % SPECIAL REQUIREMENTS
@@ -62,29 +62,34 @@ if info(1)
         return
     end
 end
+if nargin== 7
+    if ~options_.analytic_derivation
+        vx = osr.get_variance_of_endogenous_variables(M_,options_,oo_.dr,i_var);
+        loss = full(weights(:)'*vx(:));
+    else
+        totparam_nbr=length(i_params);
+        oo_.dr.derivs = identification.get_perturbation_params_derivs(M_, options_, [], oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state, i_params, [], [], 0); %analytic derivatives of perturbation matrices
 
-if ~options_.analytic_derivation
-    vx = osr.get_variance_of_endogenous_variables(M_,options_,oo_.dr,i_var);
-    loss = full(weights(:)'*vx(:));
+        pruned_state_space = pruned_SS.pruned_state_space_system(M_, options_, oo_.dr, i_var, 0, 0, 1);
+        vx = pruned_state_space.Var_y + pruned_state_space.E_y*pruned_state_space.E_y';
+        dE_yy = pruned_state_space.dVar_y;
+        for jp=1:length(i_params)
+            dE_yy(:,:,jp) = dE_yy(:,:,jp) + pruned_state_space.dE_y(:,jp)*pruned_state_space.E_y' + pruned_state_space.E_y*pruned_state_space.dE_y(:,jp)';
+        end
+
+        model_moments_params_derivs = reshape(dE_yy,length(i_var)^2,totparam_nbr);
+
+        df = NaN(totparam_nbr,1);
+        loss = full(weights(:)'*vx(:));
+
+        for jp=1:length(i_params)
+            df(jp,1) = sum(weights(:).*model_moments_params_derivs(:,jp));
+        end
+    end
 else
-    totparam_nbr=length(i_params);
-    oo_.dr.derivs = identification.get_perturbation_params_derivs(M_, options_, [], oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state, i_params, [], [], 0); %analytic derivatives of perturbation matrices
-
-    pruned_state_space = pruned_SS.pruned_state_space_system(M_, options_, oo_.dr, i_var, 0, 0, 1);
-    vx = pruned_state_space.Var_y + pruned_state_space.E_y*pruned_state_space.E_y';
-    dE_yy = pruned_state_space.dVar_y;
-    for jp=1:length(i_params)
-        dE_yy(:,:,jp) = dE_yy(:,:,jp) + pruned_state_space.dE_y(:,jp)*pruned_state_space.E_y' + pruned_state_space.E_y*pruned_state_space.dE_y(:,jp)';
-    end
-
-    model_moments_params_derivs = reshape(dE_yy,length(i_var)^2,totparam_nbr);
-
-    df = NaN(totparam_nbr,1);
-    loss = full(weights(:)'*vx(:));
-
-    for jp=1:length(i_params)
-        df(jp,1) = sum(weights(:).*model_moments_params_derivs(:,jp));
-    end
+    options_.noprint = true;
+    planner_objective_value = evaluate_planner_objective(M_,options_,oo_);
+    loss = -planner_objective_value.unconditional;
 end
 
 if isinf(loss)
