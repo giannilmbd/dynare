@@ -9,10 +9,10 @@ function [eigenvalues_,result,info] = check(M_, options_, oo_)
 %
 % OUTPUTS
 % - eigenvalues_  [double]        vector, eigenvalues.
-% - result        [integer]       scalar, equal to 1 if Blanchard and Kahn conditions are satisfied, zero otherwise.
+% - result        [integer]       logical scalar, equal to true if Blanchard and Kahn conditions are satisfied, false otherwise.
 % - info          [integer]       scalar or vector, error code as returned by resol routine.
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -51,10 +51,7 @@ end
 eigenvalues_ = dr.eigval;
 [m_lambda,i]=sort(abs(eigenvalues_));
 
-result = 0;
-if isfield(dr,'edim') && (M_.nsfwrd == dr.edim) && (dr.full_rank)
-    result = 1;
-end
+result = isfield(dr,'edim') && M_.nsfwrd == dr.edim && dr.full_rank;
 
 if ~options_.noprint
     skipline()
@@ -64,12 +61,14 @@ if ~options_.noprint
     fprintf('%16.4g %16.4g %16.4g\n',z);
     if isfield(dr,'edim')
         fprintf('\nThere are %d eigenvalue(s) larger than 1 in modulus ', dr.edim);
-        fprintf('for %d forward-looking variable(s)', M_.nsfwrd);
+        fprintf('for %d forward-looking variable(s).', M_.nsfwrd);
         skipline()
         if result
-            disp('The rank condition is verified.')
+            disp('The order and rank conditions are verified.')
+        elseif M_.nsfwrd ~= dr.edim
+            disp('The order condition is NOT verified.')
         else
-            disp('The rank condition ISN''T verified!')
+            disp('The rank condition is NOT verified.')
         end
     end
     skipline()
