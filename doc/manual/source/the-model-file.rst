@@ -11975,7 +11975,7 @@ the :comm:`bvar_forecast` command.
     that there is no forecast uncertainty arising from these exogenous variables
     in uncontrolled periods. Second, by making use of the first order state
     space solution, even if a higher-order approximation was performed, the
-    conditional forecasts will be based on a first order approximation. Since
+    conditional forecasts will be based on a first order approximation. Third, since
     the controlled exogenous variables are identified on the basis of the
     reduced form model (*i.e.* after solving for the expectations), they are
     unforeseen shocks from the perspective of the agents in the model. That is,
@@ -11988,7 +11988,7 @@ the :comm:`bvar_forecast` command.
     innovations (as declared after ``varexo``). As in VAR models, a Cholesky
     decomposition is used to factorise the covariance matrix and identify
     orthogonal impulses. It is preferable to declare the correlations in the
-    model block (explicitly imposing the identification restrictions), unless
+    :bck:`model` block (explicitly imposing the identification restrictions), unless
     you are satisfied with the implicit identification restrictions implied by
     the Cholesky decomposition.
 
