@@ -416,6 +416,10 @@ endif
 if get_option('prefer_static') and host_machine.system() == 'darwin'
   qmc_sequence_mex_kwargs += { 'link_args' : qmc_sequence_mex_kwargs.get('link_args') + [ '-lquadmath' ] }
 endif
+# Workaround for cross-compiler bug in Debian 13
+if get_option('build_for') == 'octave' and host_machine.system() == 'windows'
+  qmc_sequence_mex_kwargs += { 'override_options' : [ 'b_lto=false' ] }
+endif
 shared_module('qmc_sequence', qmc_sequence_src, kwargs : qmc_sequence_mex_kwargs, dependencies : [ blas_dep, openmp_dep ])
 
 shared_module('kalman_steady_state', 'mex/sources/kalman_steady_state/kalman_steady_state.cc', kwargs : mex_kwargs, dependencies : slicot_dep)
