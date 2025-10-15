@@ -30,23 +30,19 @@ WGET_OPTIONS := --no-verbose --no-use-server-timestamps --retry-connrefused --re
 
 NTHREADS=$(shell sysctl -n hw.perflevel0.physicalcpu)
 
-.PHONY: all build build-slicot build-x13as \
-	clean-lib clean-libslicot clean-x13as-bin \
-	clean-src clean-slicot-src clean-x13as-src \
-	clean-tar clean-slicot-tar clean-x13as-tar \
-	clean-all clean-lib clean-src clean-tar
+.PHONY: all build build-slicot build-x13as clean clean-all
 
 all: build
 
 build: build-slicot build-x13as
 
-clean-lib: clean-libslicot clean-x13as-bin
+# Clean everything except downloaded tarballs
+clean:
+	rm -rf $(DEPS_ARCH)/sources64 $(DEPS_ARCH)/lib64
 
-clean-src: clean-slicot-src clean-x13as-src
-
-clean-tar: clean-slicot-tar clean-x13as-tar
-
-clean-all: clean-lib clean-src clean-tar
+# Clean everything (including downloaded tarballs)
+clean-all: clean
+	rm -rf tarballs
 
 #
 # slicot
@@ -68,18 +64,6 @@ $(DEPS_ARCH)/lib64/slicot/libslicot64_pic.a: $(DEPS_ARCH)/sources64/slicot-$(SLI
 	cp $</libslicot64_pic.a $@
 
 build-slicot: $(DEPS_ARCH)/lib64/slicot/libslicot64_pic.a
-
-clean-slicot-tar:
-	rm -f tarballs/slicot-$(SLICOT_VERSION).tar.gz
-
-clean-slicot-src:
-	rm -rf $(DEPS_ARCH)/sources64/slicot-$(SLICOT_VERSION)
-
-clean-libslicot:
-	rm -rf $(DEPS_ARCH)/lib64/slicot
-
-clean-slicot-all: clean-slicot-src clean-slicot-tar clean-libslicot
-
 
 
 #
@@ -112,14 +96,3 @@ $(DEPS_ARCH)/lib64/x13as/x13as: $(DEPS_ARCH)/sources64/x13as-$(X13AS_VERSION)
 	cp $</x13as $@
 
 build-x13as: $(DEPS_ARCH)/lib64/x13as/x13as
-
-clean-x13as-tar:
-	rm -f tarballs/x13as_asciisrc-v$(X13AS_VERSION).tar.gz
-
-clean-x13as-src:
-	rm -rf $(DEPS_ARCH)/sources64/x13as-$(X13AS_VERSION)
-
-clean-x13as-bin:
-	rm -rf $(DEPS_ARCH)/lib64/x13as
-
-clean-x13as-all: clean-x13as-tar clean-x13as-src clean-x13as-bin

@@ -1,4 +1,4 @@
-# Copyright © 2017-2022 Dynare Team
+# Copyright © 2017-2025 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-.PHONY: build deps clean-deps clean clean-all install
+.PHONY: build deps clean-deps clean-all-deps clean-pkgs clean clean-all install
 
 NTHREADS=$(shell nproc)
 
@@ -26,12 +26,19 @@ deps:
 	make -C deps -j$(NTHREADS)
 
 clean-deps:
+	make -C deps clean
+
+clean-all-deps:
 	make -C deps clean-all
 
-clean:
+clean-pkgs:
 	rm -rf exe/ 7z/ zip/
 
-clean-all: clean-deps clean
+# Clean everything except downloaded tarballs of dependencies
+clean: clean-pkgs clean-deps
+
+# Clean everything (including downloaded tarballs of dependencies)
+clean-all: clean-pkgs clean-all-deps
 
 install:
 	./install-packages.sh

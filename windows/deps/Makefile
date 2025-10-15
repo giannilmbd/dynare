@@ -24,24 +24,22 @@ WGET_OPTIONS := --no-verbose --no-use-server-timestamps --retry-connrefused --re
 # See comments in windows/mingw-cross.ini
 FFLAGS := -O3 -flto=auto -march=nocona -msahf -mtune=generic
 
-.PHONY: all build octave matlab msys2 \
-	build build-slicot build-x13as \
-	clean-lib clean-libslicot clean-matlab clean-octave clean-msys2 clean-x13as-bin \
-	clean-src clean-slicot-src clean-x13as-src \
-	clean-tar clean-slicot-tar clean-x13as-tar \
-	clean-all clean-lib clean-src clean-tar
+.PHONY: all build octave64 matlab64 msys2 x13as \
+	build build-slicot \
+	clean clean-all \
+	lib64-msys2 mingw64
 
-all: build octave matlab msys2 x13as
+all: build octave64 matlab64 msys2 x13as
 
 build: build-slicot
 
-clean-lib: clean-libslicot clean-matlab clean-octave clean-msys2 clean-x13as-bin
+# Clean everything except downloaded tarballs
+clean:
+	rm -rf sources64 lib64 lib64-msys2 mingw64 matlab64 octave64
 
-clean-src: clean-slicot-src clean-x13as-src
-
-clean-tar: clean-slicot-tar clean-x13as-tar
-
-clean-all: clean-lib clean-src clean-tar
+# Clean everything (including downloaded tarballs)
+clean-all: clean
+	rm -rf tarballs
 
 #
 # Slicot
@@ -76,18 +74,6 @@ lib64/Slicot/with-underscore/libslicot_pic.a: sources64/slicot-$(SLICOT_VERSION)
 build-slicot: lib64/Slicot/without-underscore/libslicot64_pic.a \
 	lib64/Slicot/with-underscore/libslicot_pic.a
 
-clean-slicot-tar:
-	rm -f tarballs/slicot-$(SLICOT_VERSION).tar.gz
-
-clean-slicot-src:
-	rm -rf sources64/slicot-$(SLICOT_VERSION)-with-64bit-integer
-	rm -rf sources64/slicot-$(SLICOT_VERSION)-with-32bit-integer-and-underscore
-
-clean-libslicot:
-	rm -rf lib64/Slicot
-
-clean-slicot-all: clean-slicot-src clean-slicot-tar clean-libslicot
-
 #
 # Octave
 #
@@ -105,12 +91,6 @@ octave64: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
 	cd $@/mingw64/include && rm -f $$(grep -l "This file is part of the \\(mingw-w64 runtime\\|mingw-runtime\\) package" *.h) minwinbase.h omp.h swprintf.inl
 	touch $@
 
-octave: octave64
-
-clean-octave:
-	rm -rf octave64
-	rm -f tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
-
 #
 # MATLAB
 #
@@ -126,12 +106,6 @@ matlab64: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz
 	mkdir -p $@
 	tar xf $< --directory $@
 	touch $@
-
-matlab: matlab64
-
-clean-matlab:
-	rm -f tarballs/matlab64*.tar.xz
-	rm -rf matlab64
 
 #
 # Stuff downloaded from MSYS2:
@@ -158,11 +132,6 @@ tarballs/mingw-w64-x86_64-%-any.pkg.tar.zst:
 	mkdir -p tarballs
 	wget $(WGET_OPTIONS) -O $@ http://repo.msys2.org/mingw/x86_64/$(notdir $@)
 
-clean-msys2:
-	rm -rf lib64-msys2
-	rm -rf mingw64
-	rm -f tarballs/mingw-w64-x86_64-*.tar.zst
-
 #
 # X13AS
 #
@@ -176,11 +145,3 @@ lib64/x13as/x13as.exe: tarballs/x13as_ascii-v$(X13AS_VERSION).zip
 	mv lib64/x13as/x13as_ascii.exe $@
 
 x13as: lib64/x13as/x13as.exe
-
-clean-x13as-tar:
-	rm -f tarballs/x13as_ascii-v$(X13AS_VERSION).zip
-
-clean-x13as-bin:
-	rm -rf lib64/x13as
-
-clean-x13as-all: clean-x13as-tar clean-x13as-bin
