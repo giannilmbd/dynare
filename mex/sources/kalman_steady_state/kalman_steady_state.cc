@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009-2024 Dynare Team.
+ * Copyright © 2009-2025 Dynare Team.
  *
  * This file is part of Dynare.
  *
@@ -60,15 +60,15 @@ extern "C"
 {
   /* Note: matrices q, r and l may be modified internally (though they are
      restored on exit), hence their pointers are not declared as const */
-  int sb02od(const char* dico, const char* jobb, const char* fact, const char* uplo,
-             const char* jobl, const char* sort, const lapack_int* n, const lapack_int* m,
-             const lapack_int* p, const double* a, const lapack_int* lda, const double* b,
-             const lapack_int* ldb, double* q, const lapack_int* ldq, double* r,
-             const lapack_int* ldr, double* l, const lapack_int* ldl, double* rcond, double* x,
-             const lapack_int* ldx, double* alfar, double* alfai, double* beta, double* s,
-             const lapack_int* lds, double* t, const lapack_int* ldt, double* u,
-             const lapack_int* ldu, const double* tol, lapack_int* iwork, double* dwork,
-             const lapack_int* ldwork, lapack_int* bwork, lapack_int* info);
+  void sb02od(const char* dico, const char* jobb, const char* fact, const char* uplo,
+              const char* jobl, const char* sort, const lapack_int* n, const lapack_int* m,
+              const lapack_int* p, const double* a, const lapack_int* lda, const double* b,
+              const lapack_int* ldb, double* q, const lapack_int* ldq, double* r,
+              const lapack_int* ldr, double* l, const lapack_int* ldl, double* rcond, double* x,
+              const lapack_int* ldx, double* alfar, double* alfai, double* beta, double* s,
+              const lapack_int* lds, double* t, const lapack_int* ldt, double* u,
+              const lapack_int* ldu, const double* tol, lapack_int* iwork, double* dwork,
+              const lapack_int* ldwork, lapack_int* bwork, lapack_int* info);
 }
 
 void
