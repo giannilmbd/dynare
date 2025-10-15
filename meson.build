@@ -22,7 +22,7 @@ c_compiler = meson.get_compiler('c')
 # If this is GCC, enforce minimal version
 # NB: when modifiying this value, also update the gcc-*.ini native file under scripts/
 # Other compilers are unsupported, but are nevertheless accepted by the present meson file
-gcc_minimal_version = 12
+gcc_minimal_version = 13
 if ((cpp_compiler.get_id() == 'gcc'
      and cpp_compiler.version().version_compare('<' + gcc_minimal_version.to_string()))
     or (fortran_compiler.get_id() == 'gcc'
