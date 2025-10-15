@@ -315,12 +315,16 @@ if get_option('prefer_static')
   static_flags_pre = [ '-static-libgcc', '-static-libstdc++' ]
   static_flags_post = []
   if host_machine.system() == 'windows'
-    # Under Debian 12, libgfortran.a and libquadmath.a are not compiled with -fPIC, so can’t be linked in a MEX.
+    # Try to statically link libgfortran and libquadmath.
+    # Under Debian 13, libgfortran.a and libquadmath.a are not compiled with -fPIC, so can’t be linked in a MEX.
     # Under macOS, -static-libgcc implies -static-libgfortran (see gfortran -dumpspecs), and for libquadmath
     # we use a hack with a local copy of libquadmath.a.
+    # So we only add flags for Windows.
     # -static-libquadmath was introduced in GCC 13. Until we require the latter, use a hack.
     static_flags_pre += [ '-static-libgfortran', '-Wl,-Bstatic,--whole-archive', '-lquadmath', '-Wl,-Bdynamic,--no-whole-archive' ]
+  endif
 
+  if host_machine.system() == 'windows'
     # Hack to avoid dynamically linking against libwinpthread DLL (which is
     # pulled in by libstdc++, even without using threads, since we are using
     # the POSIX threads version of MinGW).
@@ -332,7 +336,7 @@ if get_option('prefer_static')
   # NB: constructing a dependency object with link_args : ['-Wl,-Bstatic', '-lgomp', '-Wl,-Bdynamic'] does not work,
   # because it reorders the three arguments and puts -lgomp at the end
   if host_machine.system() != 'linux'
-    # Under Debian 12, trying to link (static) libgomp.a in a MEX fails.
+    # Under Debian 13, trying to link (static) libgomp.a in a MEX fails.
     openmp_dep_tmp = cpp_compiler.find_library('gomp', static : true)
     openmp_dep = declare_dependency(dependencies : [ openmp_dep, openmp_dep_tmp ])
   endif
@@ -408,6 +412,8 @@ if get_option('prefer_static') and host_machine.system() == 'darwin'
   qmc_sequence_mex_kwargs += { 'link_args' : qmc_sequence_mex_kwargs.get('link_args') + [ '-lquadmath' ] }
 endif
 # Workaround for cross-compiler bug in Debian 13
+# With LTO, one gets a compilation failure with messages such as:
+#  /usr/bin/x86_64-w64-mingw32-ld: cannot export _Z10icdfmSigmaIdEviiPT_PKd: symbol wrong type (4 vs 3)
 if get_option('build_for') == 'octave' and host_machine.system() == 'windows'
   qmc_sequence_mex_kwargs += { 'override_options' : [ 'b_lto=false' ] }
 endif
