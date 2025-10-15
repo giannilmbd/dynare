@@ -325,15 +325,6 @@ if get_option('prefer_static')
     # pulled in by libstdc++, even without using threads, since we are using
     # the POSIX threads version of MinGW).
     static_flags_pre += [ '-Wl,-Bstatic,--whole-archive', '-lwinpthread', '-Wl,-Bdynamic,--no-whole-archive' ]
-
-    # Hack for libssp, which is pulled in by -fstack-protector (curiously only
-    # on some MEX files), see windows/build.sh. Note that the link against
-    # libssp should not happen with compilers from MSYS2, see:
-    # https://www.msys2.org/news/#2022-10-10-libssp-is-no-longer-required
-    # But it happens with Debian’s cross compilers (as of Debian “bookworm”
-    # 12). Also note that the -lssp must come by the end of the link command
-    # (otherwise it will have to be enclosed within --whole-archive).
-    static_flags_post = [ '-Wl,-Bstatic', '-lssp', '-Wl,-Bdynamic' ]
   endif
 
   mex_kwargs += { 'link_args' : static_flags_pre + mex_kwargs.get('link_args', []) + static_flags_post }
