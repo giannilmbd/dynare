@@ -19,7 +19,7 @@ function trace_plot(options_,M_,estim_params_,type,blck,name1,name2)
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -42,9 +42,9 @@ if strcmpi(type,'PosteriorDensity')
     name1='';
 else
     if nargin<7
-        column = name2index(options_, M_, estim_params_, type, name1);
+        column = name2index(M_, estim_params_, type, name1);
     else
-        column = name2index(options_, M_, estim_params_, type, name1, name2);
+        column = name2index(M_, estim_params_, type, name1, name2);
     end
 end
 

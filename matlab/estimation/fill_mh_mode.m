@@ -1,5 +1,6 @@
 function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, field_name)
-
+% oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, field_name)
+% -------------------------------------------------------------------------
 % Fill oo_.<field_name>.mode and oo_.<field_name>.std_at_mode
 %
 % INPUTS
@@ -16,7 +17,7 @@ function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, fie
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,15 +34,9 @@ function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, fie
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-nvx = estim_params_.nvx;  % Variance of the structural innovations (number of parameters).
-nvn = estim_params_.nvn;  % Variance of the measurement innovations (number of parameters).
-ncx = estim_params_.ncx;  % Covariance of the structural innovations (number of parameters).
-ncn = estim_params_.ncn;  % Covariance of the measurement innovations (number of parameters).
-np  = estim_params_.np ;  % Number of deep parameters.
-
-if np
-    ip = nvx+nvn+ncx+ncn+1;
-    for i=1:np
+if estim_params_.np % estimated structural parameters
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+    for i=1:estim_params_.np
         k = estim_params_.param_vals(i,1);
         name = M_.param_names{k};
         oo_.([field_name '_mode']).parameters.(name) = xparam1(ip);
@@ -49,9 +44,10 @@ if np
         ip = ip+1;
     end
 end
-if nvx
-    ip = 1;
-    for i=1:nvx
+
+if estim_params_.nvx % estimated stderr parameters for structural shocks
+    ip = 1; % offset: stderr parameters for structural shocks are ordered first in xparam1
+    for i=1:estim_params_.nvx
         k = estim_params_.var_exo(i,1);
         name = M_.exo_names{k};
         oo_.([field_name '_mode']).shocks_std.(name)= xparam1(ip);
@@ -59,9 +55,10 @@ if nvx
         ip = ip+1;
     end
 end
-if nvn
-    ip = nvx+1;
-    for i=1:nvn
+
+if estim_params_.nvn % estimated stderr parameters for measurement errors
+    ip = estim_params_.nvx+1; % offset: stderr parameters for measurement errors are ordered second in xparam1
+    for i=1:estim_params_.nvn
         name = options_.varobs{estim_params_.nvn_observable_correspondence(i,1)};
         oo_.([field_name '_mode']).measurement_errors_std.(name) = xparam1(ip);
         oo_.([field_name '_std_at_mode']).measurement_errors_std.(name) = stdh(ip);
@@ -69,9 +66,9 @@ if nvn
     end
 end
 
-if ncx
-    ip = nvx+nvn+1;
-    for i=1:ncx
+if estim_params_.ncx % estimated corr parameters for structural shocks
+    ip = estim_params_.nvx+estim_params_.nvn+1; % offset: corr parameters for structural shocks are ordered third in xparam1
+    for i=1:estim_params_.ncx
         k1 = estim_params_.corrx(i,1);
         k2 = estim_params_.corrx(i,2);
         name = [M_.exo_names{k1} '_' M_.exo_names{k2}];
@@ -81,9 +78,9 @@ if ncx
     end
 end
 
-if ncn
-    ip = nvx+nvn+ncx+1;
-    for i=1:ncn
+if estim_params_.ncn % estimated corr parameters for measurement errors
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+1; % offset: corr parameters for measurement errors are ordered fourth in xparam1
+    for i=1:estim_params_.ncn
         k1 = estim_params_.corrn(i,1);
         k2 = estim_params_.corrn(i,2);
         name = [M_.endo_names{k1} '_' M_.endo_names{k2}];

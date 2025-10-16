@@ -20,7 +20,7 @@ function oo_=display_estimation_results_table(xparam1,stdh,M_,options_,estim_par
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2014-2023 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,13 +37,6 @@ function oo_=display_estimation_results_table(xparam1,stdh,M_,options_,estim_par
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-nvx = estim_params_.nvx;  % Variance of the structural innovations (number of parameters).
-nvn = estim_params_.nvn;  % Variance of the measurement innovations (number of parameters).
-ncx = estim_params_.ncx;  % Covariance of the structural innovations (number of parameters).
-ncn = estim_params_.ncn;  % Covariance of the measurement innovations (number of parameters).
-np  = estim_params_.np ;  % Number of deep parameters.
-nx  = nvx+nvn+ncx+ncn+np; % Total number of parameters to be estimated.
-
 skipline()
 disp(['RESULTS FROM ' upper(table_title) ' ESTIMATION'])
 LaTeXtitle=strrep(table_title,' ','_');
@@ -56,11 +49,12 @@ if contains(field_name,'posterior')
 else
     tit1 = sprintf('%-*s %10s %7s %6s\n', header_width, ' ', 'Estimate', 's.d.', 't-stat');
 end
-if np
-    ip = nvx+nvn+ncx+ncn+1;
+
+if estim_params_.np % number of estimated structural parameters
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
     disp('parameters')
     disp(tit1)
-    for i=1:np
+    for i=1:estim_params_.np
         name = bayestopt_.name{ip};
         if contains(field_name,'posterior')
             fprintf('%-*s %10.4f %8.4f %7.4f %6s %6.4f \n', ...
@@ -78,11 +72,12 @@ if np
     end
     skipline()
 end
-if nvx
-    ip = 1;
+
+if estim_params_.nvx % number of estimated stderr parameters for structural shocks
+    ip = 1; % offset: stderr of shocks are ordered first in xparam1
     disp('standard deviation of shocks')
     disp(tit1)
-    for i=1:nvx
+    for i=1:estim_params_.nvx
         k = estim_params_.var_exo(i,1);
         name = M_.exo_names{k};
         if contains(field_name,'posterior')
@@ -100,11 +95,12 @@ if nvx
     end
     skipline()
 end
-if nvn
+
+if estim_params_.nvn % number of estimated stderr parameters for measurement errors
     disp('standard deviation of measurement errors')
     disp(tit1)
-    ip = nvx+1;
-    for i=1:nvn
+    ip = estim_params_.nvx+1; % offset: stderr of measurement errors are ordered second in xparam1
+    for i=1:estim_params_.nvn
         name = options_.varobs{estim_params_.nvn_observable_correspondence(i,1)};
         if contains(field_name,'posterior')
             fprintf('%-*s %10.4f %8.4f %7.4f %6s %6.4f \n', ...
@@ -123,11 +119,11 @@ if nvn
     skipline()
 end
 
-if ncx
+if estim_params_.ncx % number of estimated corr parameters for structural shocks
     disp('correlation of shocks')
     disp(tit1)
-    ip = nvx+nvn+1;
-    for i=1:ncx
+    ip = estim_params_.nvx+estim_params_.nvn+1; % offset: corr of shocks are ordered third in xparam1
+    for i=1:estim_params_.ncx
         k1 = estim_params_.corrx(i,1);
         k2 = estim_params_.corrx(i,2);
         name = sprintf('%s,%s', M_.exo_names{k1}, M_.exo_names{k2});
@@ -149,11 +145,11 @@ if ncx
     skipline()
 end
 
-if ncn
+if estim_params_.ncn % number of estimated corr parameters for measurement errors
     disp('correlation of measurement errors')
     disp(tit1)
-    ip = nvx+nvn+ncx+1;
-    for i=1:ncn
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+1; % offset: corr of measurement errors are ordered fourth in xparam1
+    for i=1:estim_params_.ncn
         k1 = estim_params_.corrn(i,1);
         k2 = estim_params_.corrn(i,2);
         name = sprintf('%s,%s', M_.endo_names{k1}, M_.endo_names{k2});
@@ -173,19 +169,19 @@ if ncn
     skipline()
 end
 
-if any(xparam1(1:nvx+nvn)<0)
+if any(xparam1(1:estim_params_.nvx+estim_params_.nvn)<0)
     warning(sprintf('Some estimated standard deviations are negative.\n         Dynare internally works with variances so that the sign does not matter.\n         Nevertheless, it is recommended to impose either prior restrictions (Bayesian Estimation)\n         or a lower bound (ML) to assure positive values.'))
 end
 
 latexDirectoryName = CheckPath('latex',M_.dname);
 
 if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior mode) Latex output
-    if np
+    if estim_params_.np % structural parameters
         filename = [latexDirectoryName '/' M_.fname '_Posterior_Mode_1.tex'];
         fidTeX = fopen(filename,'w');
         TeXBegin_Bayesian(fidTeX,1,'parameters')
-        ip = nvx+nvn+ncx+ncn+1;
-        for i=1:np
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+        for i=1:estim_params_.np
             fprintf(fidTeX,'$%s$ & %s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
                     M_.param_names_tex{estim_params_.param_vals(i,1)}, ...
                     pnames{bayestopt_.pshape(ip)+1}, ...
@@ -197,12 +193,12 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         end
         TeXEnd(fidTeX)
     end
-    if nvx
+    if estim_params_.nvx % stderr of shocks
         TeXfile = [latexDirectoryName '/' M_.fname '_Posterior_Mode_2.tex'];
         fidTeX = fopen(TeXfile,'w');
         TeXBegin_Bayesian(fidTeX,2,'standard deviation of structural shocks')
-        ip = 1;
-        for i=1:nvx
+        ip = 1; % offset: stderr of shocks are ordered first in xparam1
+        for i=1:estim_params_.nvx
             k = estim_params_.var_exo(i,1);
             fprintf(fidTeX, '$%s$ & %4s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
                     M_.exo_names_tex{k},...
@@ -215,12 +211,12 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         end
         TeXEnd(fidTeX)
     end
-    if nvn
+    if estim_params_.nvn % stderr of measurement errors
         TeXfile = [latexDirectoryName '/' M_.fname '_Posterior_Mode_3.tex'];
         fidTeX  = fopen(TeXfile,'w');
         TeXBegin_Bayesian(fidTeX,3,'standard deviation of measurement errors')
-        ip = nvx+1;
-        for i=1:nvn
+        ip = estim_params_.nvx+1; % offset: stderr of measurement errors are ordered second in xparam1
+        for i=1:estim_params_.nvn
             idx = strmatch(options_.varobs{estim_params_.nvn_observable_correspondence(i,1)}, M_.endo_names);
             fprintf(fidTeX,'$%s$ & %4s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
                     M_.endo_names_tex{idx}, ...
@@ -233,12 +229,12 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         end
         TeXEnd(fidTeX)
     end
-    if ncx
+    if estim_params_.ncx % corr of shocks
         TeXfile = [latexDirectoryName '/' M_.fname '_Posterior_Mode_4.tex'];
         fidTeX = fopen(TeXfile,'w');
         TeXBegin_Bayesian(fidTeX,4,'correlation of structural shocks')
-        ip = nvx+nvn+1;
-        for i=1:ncx
+        ip = estim_params_.nvx+estim_params_.nvn+1; % offset: corr of shocks are ordered third in xparam1
+        for i=1:estim_params_.ncx
             k1 = estim_params_.corrx(i,1);
             k2 = estim_params_.corrx(i,2);
             fprintf(fidTeX, '$%s$ & %s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
@@ -252,12 +248,12 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         end
         TeXEnd(fidTeX)
     end
-    if ncn
+    if estim_params_.ncn % corr of measurement errors
         TeXfile = [latexDirectoryName '/' M_.fname '_Posterior_Mode_5.tex'];
         fidTeX = fopen(TeXfile,'w');
         TeXBegin_Bayesian(fidTeX,5,'correlation of measurement errors')
-        ip = nvx+nvn+ncx+1;
-        for i=1:ncn
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+1; % offset: corr of measurement errors are ordered fourth in xparam1
+        for i=1:estim_params_.ncn
             k1 = estim_params_.corrn(i,1);
             k2 = estim_params_.corrn(i,2);
             fprintf(fidTeX,'$%s$ & %s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
@@ -272,12 +268,12 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         TeXEnd(fidTeX)
     end
 elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
-    if np
+    if estim_params_.np % structural parameters
         filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_1.tex'];
         fidTeX = fopen(filename, 'w');
         TeXBegin_ML(fidTeX, 1, 'parameters', table_title, LaTeXtitle)
-        ip = nvx+nvn+ncx+ncn+1;
-        for i=1:np
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+        for i=1:estim_params_.np
             fprintf(fidTeX,'$%s$ & %8.4f & %7.4f & %7.4f\\\\ \n',...
                     M_.param_names_tex{estim_params_.param_vals(i,1)}, ...
                     xparam1(ip), ...
@@ -287,12 +283,12 @@ elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
         end
         TeXEnd(fidTeX)
     end
-    if nvx
+    if estim_params_.nvx % stderr of shocks
         filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_2.tex'];
         fidTeX = fopen(filename, 'w');
         TeXBegin_ML(fidTeX, 2, 'standard deviation of structural shocks', table_title, LaTeXtitle)
-        ip = 1;
-        for i=1:nvx
+        ip = 1; % offset: stderr of shocks are ordered first in xparam1
+        for i=1:estim_params_.nvx
             k = estim_params_.var_exo(i,1);
             fprintf(fidTeX, '$%s$ & %8.4f & %7.4f & %7.4f\\\\ \n', ...
                     M_.exo_names_tex{k}, ...
@@ -303,12 +299,12 @@ elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
         end
         TeXEnd(fidTeX)
     end
-    if nvn
+    if estim_params_.nvn % stderr of measurement errors
         filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_3.tex'];
         fidTeX = fopen(filename, 'w');
         TeXBegin_ML(fidTeX, 3, 'standard deviation of measurement errors', table_title, LaTeXtitle)
-        ip = nvx+1;
-        for i=1:nvn
+        ip = estim_params_.nvx+1; % offset: stderr of measurement errors are ordered second in xparam1
+        for i=1:estim_params_.nvn
             idx = strmatch(options_.varobs{estim_params_.nvn_observable_correspondence(i,1)}, M_.endo_names);
             fprintf(fidTeX, '$%s$ & %8.4f & %7.4f & %7.4f \\\\ \n', ...
                     M_.endo_names_tex{idx}, ...
@@ -319,12 +315,12 @@ elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
         end
         TeXEnd(fidTeX)
     end
-    if ncx
+    if estim_params_.ncx % corr of shocks
         filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_4.tex'];
         fidTeX = fopen(filename, 'w');
         TeXBegin_ML(fidTeX, 4, 'correlation of structural shocks', table_title,LaTeXtitle)
-        ip = nvx+nvn+1;
-        for i=1:ncx
+        ip = estim_params_.nvx+estim_params_.nvn+1; % offset: corr of shocks are ordered third in xparam1
+        for i=1:estim_params_.ncx
             k1 = estim_params_.corrx(i,1);
             k2 = estim_params_.corrx(i,2);
             fprintf(fidTeX, '$%s$  & %8.4f & %7.4f & %7.4f \\\\ \n', ...
@@ -336,12 +332,12 @@ elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
         end
         TeXEnd(fidTeX)
     end
-    if ncn
+    if estim_params_.ncn % corr of measurement errors
         filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_5.tex'];
         fidTeX = fopen(filename, 'w');
         TeXBegin_ML(fidTeX, 5, 'correlation of measurement errors', table_title, LaTeXtitle)
-        ip = nvx+nvn+ncx+1;
-        for i=1:ncn
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+1; % offset: corr of measurement errors are ordered fourth in xparam1
+        for i=1:estim_params_.ncn
             k1 = estim_params_.corrn(i,1);
             k2 = estim_params_.corrn(i,2);
             fprintf(fidTeX, '$%s$  & %8.4f & %7.4f & %7.4f \\\\ \n', ...

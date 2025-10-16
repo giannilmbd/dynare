@@ -1,5 +1,6 @@
 function [xparam1, estim_params_, bayestopt_, lb, ub, M_]=set_prior(estim_params_, M_, options_)
-% function [xparam1,estim_params_,bayestopt_,lb,ub, M_]=set_prior(estim_params_, M_, options_)
+% [xparam1,estim_params_,bayestopt_,lb,ub, M_]=set_prior(estim_params_, M_, options_)
+% -------------------------------------------------------------------------
 % sets prior distributions
 %
 % INPUTS
@@ -18,7 +19,7 @@ function [xparam1, estim_params_, bayestopt_, lb, ub, M_]=set_prior(estim_params
 % SPECIAL REQUIREMENTS
 %    None
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -35,17 +36,11 @@ function [xparam1, estim_params_, bayestopt_, lb, ub, M_]=set_prior(estim_params
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-nvx = size(estim_params_.var_exo,1);
-nvn = size(estim_params_.var_endo,1);
-ncx = size(estim_params_.corrx,1);
-ncn = size(estim_params_.corrn,1);
-np = size(estim_params_.param_vals,1);
-
-estim_params_.nvx = nvx; %exogenous shock variances
-estim_params_.nvn = nvn; %endogenous variances, i.e. measurement error
-estim_params_.ncx = ncx; %exogenous shock correlations
-estim_params_.ncn = ncn; % correlation between endogenous variables, i.e. measurement error.
-estim_params_.np = np;   % other parameters of the model
+estim_params_.nvx = size(estim_params_.var_exo,1);    % number of estimated stderr parameters for structural shocks
+estim_params_.nvn = size(estim_params_.var_endo,1);   % number of estimated stderr parameters for measurement errors
+estim_params_.ncx = size(estim_params_.corrx,1);      % number of estimated corr parameters for structural shocks
+estim_params_.ncn = size(estim_params_.corrn,1);      % number of estimated corr parameters for measurement errors
+estim_params_.np  = size(estim_params_.param_vals,1); % number of estimated structural parameters
 
 xparam1 = [];
 ub = []; % Upper bound imposed for optimization.
@@ -55,32 +50,34 @@ bayestopt_.p1 = []; % prior mean
 bayestopt_.p2 = []; % prior standard deviation
 bayestopt_.p3 = []; % lower bound of the distribution, only considering whether a generalized distribution is used, not when the prior is truncated
 bayestopt_.p4 = []; % upper bound of the distribution, only considering whether a generalized distribution is used, not when the prior is truncated
-bayestopt_.p5 = zeros(nvx+nvn+ncx+ncn+np,1); % prior mode
+bayestopt_.p5 = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1); % prior mode
 bayestopt_.p6 = []; % first hyper-parameter (\alpha for the BETA and GAMMA distributions, s for the INVERSE GAMMAs, expectation for the GAUSSIAN distribution, lower bound for the UNIFORM distribution).
 bayestopt_.p7 = []; % second hyper-parameter (\beta for the BETA and GAMMA distributions, \nu for the INVERSE GAMMAs, standard deviation for the GAUSSIAN distribution, upper bound for the UNIFORM distribution).
 
 bayestopt_.jscale = []; %jscale might subsequently be overwritten by mode_compute=6 or check_posterior_sampler_options
 bayestopt_.name = {};
-if nvx
-    xparam1 = estim_params_.var_exo(:,2);
-    ub = estim_params_.var_exo(:,4);
-    lb = estim_params_.var_exo(:,3);
-    bayestopt_.pshape =  estim_params_.var_exo(:,5);
-    bayestopt_.p1 =  estim_params_.var_exo(:,6);
-    bayestopt_.p2 =  estim_params_.var_exo(:,7);
-    bayestopt_.p3 =  estim_params_.var_exo(:,8); %take generalized distribution into account
-    bayestopt_.p4 =  estim_params_.var_exo(:,9); %take generalized distribution into account
-    bayestopt_.jscale =  estim_params_.var_exo(:,10);
-    bayestopt_.name = M_.exo_names(estim_params_.var_exo(:,1));
+
+if estim_params_.nvx % estimated stderr parameters for structural shocks (ordered first in xparam1)
+    xparam1 = [xparam1; estim_params_.var_exo(:,2)];
+    ub = [ub; estim_params_.var_exo(:,4)];
+    lb = [lb; estim_params_.var_exo(:,3)];
+    bayestopt_.pshape = [ bayestopt_.pshape; estim_params_.var_exo(:,5)];
+    bayestopt_.p1 = [ bayestopt_.p1; estim_params_.var_exo(:,6) ];
+    bayestopt_.p2 = [ bayestopt_.p2; estim_params_.var_exo(:,7) ];
+    bayestopt_.p3 = [ bayestopt_.p3; estim_params_.var_exo(:,8) ]; %take generalized distribution into account
+    bayestopt_.p4 = [ bayestopt_.p4; estim_params_.var_exo(:,9) ]; %take generalized distribution into account
+    bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.var_exo(:,10) ];
+    bayestopt_.name = [ bayestopt_.name; M_.exo_names(estim_params_.var_exo(:,1)) ];
 end
-if nvn
-    estim_params_.nvn_observable_correspondence=NaN(nvn,1); % stores number of corresponding observable
+
+if estim_params_.nvn % estimated stderr parameters for measurement errors (ordered second in xparam1)
+    estim_params_.nvn_observable_correspondence=NaN(estim_params_.nvn,1); % stores number of corresponding observable
     if isequal(M_.H,0) %if no previously set measurement error, initialize H
         nvarobs = length(options_.varobs);
         M_.H = zeros(nvarobs,nvarobs);
         M_.Correlation_matrix_ME = eye(nvarobs);
     end
-    for i=1:nvn
+    for i=1:estim_params_.nvn
         obsi_ = strmatch(M_.endo_names{estim_params_.var_endo(i,1)}, options_.varobs, 'exact');
         if isempty(obsi_)
             error(['The variable ' M_.endo_names{estim_params_.var_endo(i,1)} ' has to be declared as observable since you assume a measurement error on it.'])
@@ -98,7 +95,8 @@ if nvn
     bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.var_endo(:,10)];
     bayestopt_.name = [ bayestopt_.name; options_.varobs(estim_params_.nvn_observable_correspondence)];
 end
-if ncx
+
+if estim_params_.ncx % estimated corr parameters for structural shocks (ordered third in xparam1)
     xparam1 = [xparam1; estim_params_.corrx(:,3)];
     ub = [ub; max(min(estim_params_.corrx(:,5),1),-1)];
     lb = [lb; min(max(estim_params_.corrx(:,4),-1),1)];
@@ -109,15 +107,16 @@ if ncx
     bayestopt_.p4 = [ bayestopt_.p4; estim_params_.corrx(:,10)]; %take generalized distribution into account
     bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.corrx(:,11)];
     baseid = length(bayestopt_.name);
-    bayestopt_.name = [bayestopt_.name; cell(ncx, 1)];
-    for i = 1:ncx
+    bayestopt_.name = [bayestopt_.name; cell(estim_params_.ncx, 1)];
+    for i = 1:estim_params_.ncx
         bayestopt_.name(baseid+i) = {sprintf('corr %s, %s', ...
                                              M_.exo_names{estim_params_.corrx(i,1)}, ...
                                              M_.exo_names{estim_params_.corrx(i,2)})};
     end
 end
-if ncn
-    estim_params_.corrn_observable_correspondence=NaN(ncn,2);
+
+if estim_params_.ncn % estimated corr parameters for measurement errors (ordered fourth in xparam1)
+    estim_params_.corrn_observable_correspondence=NaN(estim_params_.ncn,2);
     if isequal(M_.H,0)
         nvarobs = length(options_.varobs);
         M_.H = zeros(nvarobs,nvarobs);
@@ -133,8 +132,8 @@ if ncn
     bayestopt_.p4 = [ bayestopt_.p4; estim_params_.corrn(:,10)]; %take generalized distribution into account
     bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.corrn(:,11)];
     baseid = length(bayestopt_.name);
-    bayestopt_.name = [bayestopt_.name; cell(ncn, 1)];
-    for i=1:ncn
+    bayestopt_.name = [bayestopt_.name; cell(estim_params_.ncn, 1)];
+    for i=1:estim_params_.ncn
         k1 = estim_params_.corrn(i,1);
         k2 = estim_params_.corrn(i,2);
         bayestopt_.name(baseid+i) = {sprintf('corr %s, %s', M_.endo_names{k1}, M_.endo_names{k2})};
@@ -145,7 +144,8 @@ if ncn
         estim_params_.corrn_observable_correspondence(i,:)=[obsi1, obsi2];
     end
 end
-if np
+
+if estim_params_.np % estimated structural parameters (ordered last in xparam1)
     xparam1 = [xparam1; estim_params_.param_vals(:,2)];
     ub = [ub; estim_params_.param_vals(:,4)];
     lb = [lb; estim_params_.param_vals(:,3)];

@@ -22,7 +22,7 @@ function oo_=prior_posterior_statistics(type,dataset_,dataset_info,M_,oo_,option
 % See the comments in the posterior_sampler.m function.
 
 
-% Copyright © 2005-2024 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,8 +47,7 @@ localVars=[];
 Y = transpose(dataset_.data);
 gend = dataset_.nobs;
 
-nvn  = estim_params_.nvn;
-npar = estim_params_.nvx+nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np;
+npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np;
 naK = length(options_.filter_step_ahead);
 
 MaxNumberOfBytes=options_.MaxNumberOfBytes;
@@ -160,7 +159,7 @@ localVars.varobs=options_.varobs;
 localVars.mean_varobs=dataset_info.descriptive.mean;
 localVars.irun=irun;
 localVars.endo_nbr=endo_nbr;
-localVars.nvn=nvn;
+localVars.nvn=estim_params_.nvn;
 localVars.naK=naK;
 localVars.horizon=horizon;
 localVars.iendo=1:endo_nbr;
@@ -335,7 +334,7 @@ if options_.smoother
             varlist,'StateUncertainty',DirectoryName,'_state_uncert',dispString);
     end
 
-    if nvn
+    if estim_params_.nvn
         for obs_iter=1:length(options_.varobs)
             meas_error_names{obs_iter,1}=['SE_EOBS_' M_.endo_names{strmatch(options_.varobs{obs_iter},M_.endo_names,'exact')}];
             texnames{obs_iter,1}=['\sigma^{ME}_' M_.endo_names_tex{strmatch(options_.varobs{obs_iter},M_.endo_names,'exact')}];

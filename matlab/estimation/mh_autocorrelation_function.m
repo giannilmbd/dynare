@@ -17,7 +17,7 @@ function mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,n
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -36,9 +36,9 @@ function mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,n
 
 % Cet the column index:
 if nargin<7
-    column = name2index(options_, M_, estim_params_, type, name1);
+    column = name2index(M_, estim_params_, type, name1);
 else
-    column = name2index(options_, M_, estim_params_, type, name1, name2);
+    column = name2index(M_, estim_params_, type, name1, name2);
 end
 
 if isempty(column)

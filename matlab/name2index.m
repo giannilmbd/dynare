@@ -1,10 +1,11 @@
-function i = name2index(options_, M_, estim_params_, type, name1, name2 )
+function i = name2index(M_, estim_params_, type, name1, name2 )
+% i = name2index(M_, estim_params_, type, name1, name2 )
+% -------------------------------------------------------------------------
 % Returns the index associated to an estimated object (deep parameter,
 % variance of a structural shock or measurement error, covariance between
 % two structural shocks, covariance between two measurement errors).
 %
 % INPUTS:
-%   options_        [structure]    Dynare structure.
 %   M_              [structure]    Dynare structure (related to model definition).
 %   estim_params_   [structure]    Dynare structure (related to estimation).
 %   type            [string]       'DeepParameter', 'MeasurementError' (for measurement equation error) or 'StructuralShock' (for structural shock).
@@ -16,7 +17,7 @@ function i = name2index(options_, M_, estim_params_, type, name1, name2 )
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2008-2018 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,17 +34,10 @@ function i = name2index(options_, M_, estim_params_, type, name1, name2 )
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-nvx     = estim_params_.nvx;
-nvn     = estim_params_.nvn;
-ncx     = estim_params_.ncx;
-ncn     = estim_params_.ncn;
-npa     = estim_params_.np ;
-nnn = nvx+nvn+ncx+ncn+npa;
-
-i = [];
+i = []; % initialize output
 
 if strcmpi(type,'DeepParameter')
-    i = nvx + nvn + ncx + ncn + ...
+    i = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + ...
         strmatch(name1, M_.param_names(estim_params_.param_vals(:,1)), 'exact');
     if nargin>5
         disp('The last input argument is useless!')
@@ -62,7 +56,7 @@ if strcmpi(type,'StructuralShock')
             return
         end
     else% Covariance matrix off-diagonal term
-        offset = nvx+nvn;
+        offset = estim_params_.nvx+estim_params_.nvn;
         try
             list_of_structural_shocks = [ M_.exo_names(estim_params_.corrx(:,1)) , M_.exo_names(estim_params_.corrx(:,2)) ];
             k1 = strmatch(name1, list_of_structural_shocks(:,1), 'exact');
@@ -87,13 +81,13 @@ end
 
 if strcmpi(type,'MeasurementError')
     if nargin<6% Covariance matrix diagonal term
-        i = nvx + strmatch(name1, M_.endo_names(estim_params_.var_endo(:,1)), 'exact');
+        i = estim_params_.nvx + strmatch(name1, M_.endo_names(estim_params_.var_endo(:,1)), 'exact');
         if isempty(i)
             disp(['The standard deviation of the measurement error on ' name1  ' is not an estimated parameter!'])
             return
         end
     else% Covariance matrix off-diagonal term
-        offset = nvx+nvn+ncx;
+        offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx;
         try
             list_of_measurement_errors = [M_.endo_names(estim_params_.corrn(:,1),1) , M_.endo_names(estim_params_.corrn(:,2),1)];
             k1 = strmatch(name1,list_of_measurement_errors(:,1),'exact');

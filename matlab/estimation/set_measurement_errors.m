@@ -35,7 +35,7 @@ function M_ = set_measurement_errors(xparam1,estim_params_,M_)
 H = M_.H;
 Correlation_matrix_ME = M_.Correlation_matrix_ME;
 
-% setting measument error variance; on the diagonal of Covariance matrix; used later
+% setting measurement error variance; on the diagonal of Covariance matrix; used later
 % for updating covariances
 offset = estim_params_.nvx;
 

@@ -1,5 +1,6 @@
 function oo_ = GetPosteriorParametersStatistics(estim_params_, M_, options_, bayestopt_, oo_, pnames)
 % oo_ = GetPosteriorParametersStatistics(estim_params_, M_, options_, bayestopt_, oo_, pnames)
+% -------------------------------------------------------------------------
 % This function prints and saves posterior estimates after the MCMC
 % (+updates of oo_ & TeX output).
 %
@@ -17,7 +18,7 @@ function oo_ = GetPosteriorParametersStatistics(estim_params_, M_, options_, bay
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,13 +34,6 @@ function oo_ = GetPosteriorParametersStatistics(estim_params_, M_, options_, bay
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-TeX     = options_.TeX;
-nvx     = estim_params_.nvx;
-nvn     = estim_params_.nvn;
-ncx     = estim_params_.ncx;
-ncn     = estim_params_.ncn;
-np      = estim_params_.np ;
 
 latexFolder = CheckPath('latex',M_.dname);
 FileName = M_.fname;
@@ -79,16 +73,16 @@ if num_draws<9
     fprintf('posterior_moments: There are not enough draws computes to compute deciles. Skipping their computation.\n')
 end
 
-if np
+if estim_params_.np % estimated structural parameters
     type = 'parameters';
-    if TeX
+    if options_.TeX
         fid = TeXBegin(latexFolder, M_.fname, 1, type);
     end
     skipline()
     disp(type)
     disp(tit2)
-    ip = nvx+nvn+ncx+ncn+1;
-    for i=1:np
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+    for i=1:estim_params_.np
         if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh) || ishssmc(options_) || isonline(options_)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
@@ -110,28 +104,28 @@ if np
                 hpd_interval, ...
                 pnames{bayestopt_.pshape(ip)+1}, ...
                 bayestopt_.p2(ip));
-        if TeX
+        if options_.TeX
             k = estim_params_.param_vals(i,1);
             name = M_.param_names_tex{k};
             TeXCore(fid, name, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p1(ip), bayestopt_.p2(ip), post_mean, sqrt(post_var), hpd_interval);
         end
         ip = ip+1;
     end
-    if TeX
+    if options_.TeX
         TeXEnd(fid, 1, type);
     end
 end
 
-if nvx
+if estim_params_.nvx % estimated stderr parameters for structural shocks
     type = 'shocks_std';
-    if TeX
+    if options_.TeX
         fid = TeXBegin(latexFolder, FileName,2, 'standard deviation of structural shocks');
     end
-    ip = 1;
+    ip = 1; % offset: stderr parameters for structural shocks are ordered first in xparam1
     skipline()
     disp('standard deviation of shocks')
     disp(tit2)
-    for i=1:nvx
+    for i=1:estim_params_.nvx
         if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
@@ -154,27 +148,27 @@ if nvx
             end
         end
         dprintf(pformat, header_width, name, bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
-        if TeX
+        if options_.TeX
             name = M_.exo_names_tex{k};
             TeXCore(fid,name, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p1(ip), bayestopt_.p2(ip), post_mean, sqrt(post_var), hpd_interval);
         end
         ip = ip+1;
     end
-    if TeX
+    if options_.TeX
         TeXEnd(fid, 2, 'standard deviation of structural shocks');
     end
 end
 
-if nvn
+if estim_params_.nvn % estimated stderr parameters for measurement errors
     type = 'measurement_errors_std';
-    if TeX
+    if options_.TeX
         fid = TeXBegin(latexFolder, FileName, 3, 'standard deviation of measurement errors');
     end
     skipline()
     disp('standard deviation of measurement errors')
     disp(tit2)
-    ip = nvx+1;
-    for i=1:nvn
+    ip = estim_params_.nvx+1; % offset: stderr parameters for measurement errors are ordered second in xparam1
+    for i=1:estim_params_.nvn
         if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
@@ -192,28 +186,28 @@ if nvn
             end
         end
         dprintf(pformat, header_width, name,bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
-        if TeX
+        if options_.TeX
             k = estim_params_.var_endo(i,1);
             name = M_.endo_names_tex{k};
             TeXCore(fid, name, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p1(ip), bayestopt_.p2(ip), post_mean, sqrt(post_var), hpd_interval);
         end
         ip = ip+1;
     end
-    if TeX
+    if options_.TeX
         TeXEnd(fid, 3, 'standard deviation of measurement errors');
     end
 end
 
-if ncx
+if estim_params_.ncx % estimated corr parameters for structural shocks
     type = 'shocks_corr';
-    if TeX
+    if options_.TeX
         fid = TeXBegin(latexFolder,FileName,4,'correlation of structural shocks');
     end
     skipline()
     disp('correlation of shocks')
     disp(tit2)
-    ip = nvx+nvn+1;
-    for i=1:ncx
+    ip = estim_params_.nvx+estim_params_.nvn+1; % offset: corr parameters for structural shocks are ordered third in xparam1
+    for i=1:estim_params_.ncx
         if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws,options_.mh_conf_sig);
@@ -244,27 +238,27 @@ if ncx
             end
         end
         dprintf(pformat, header_width,name, bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
-        if TeX
+        if options_.TeX
             name = sprintf('(%s,%s)', M_.exo_names_tex{k1}, M_.exo_names_tex{k2});
             TeXCore(fid, name, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p1(ip), bayestopt_.p2(ip), post_mean, sqrt(post_var), hpd_interval);
         end
         ip = ip+1;
     end
-    if TeX
+    if options_.TeX
         TeXEnd(fid, 4, 'correlation of structural shocks');
     end
 end
 
-if ncn
+if estim_params_.ncn % estimated corr parameters for measurement errors
     type = 'measurement_errors_corr';
-    if TeX
+    if options_.TeX
         fid = TeXBegin(latexFolder, FileName, 5, 'correlation of measurement errors');
     end
     skipline()
     disp('correlation of measurement errors')
     disp(tit2)
-    ip = nvx+nvn+ncx+1;
-    for i=1:ncn
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+1; % offset: corr parameters for measurement errors are ordered fourth in xparam1
+    for i=1:estim_params_.ncn
         if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
             draws = getalldraws(ip);
             [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
@@ -291,13 +285,13 @@ if ncn
             end
         end
         dprintf(pformat, header_width, name, bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
-        if TeX
+        if options_.TeX
             name = sprintf('(%s,%s)', M_.endo_names_tex{k1}, M_.endo_names_tex{k2});
             TeXCore(fid, name, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p1(ip), bayestopt_.p2(ip), post_mean, sqrt(post_var), hpd_interval);
         end
         ip = ip+1;
     end
-    if TeX
+    if options_.TeX
         TeXEnd(fid, 5, 'correlation of measurement errors');
     end
 end

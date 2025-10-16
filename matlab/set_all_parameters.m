@@ -1,39 +1,25 @@
 function M_ = set_all_parameters(xparam1,estim_params_,M_)
+% M_ = set_all_parameters(xparam1,estim_params_,M_)
+% -------------------------------------------------------------------------
+% Update parameter values (deep parameters and covariance matrices) in the
+% Dynare model structure M_ using the estimated parameters xparam1 and
+% the estimation parameter structure estim_params_.
+%
+% Inputs:
+%   xparam1        [N x 1 double]   Vector of N estimated parameter values.
+%   estim_params_  [struct]         Structure describing the estimated parameters.
+%   M_             [struct]         Structure describing the model.
+%
+% Output:
+%   M_             [struct]         Updated model structure with new parameters and covariance matrices.
+%
+% This function is called by:
+%   DsgeSmoother, dynare_estimation_1, gsa.monte_carlo_filtering,
+%   identification.analysis, PosteriorFilterSmootherAndForecast,
+%   prior_posterior_statistics_core, prior_sampler
+% -------------------------------------------------------------------------
 
-%@info:
-%! @deftypefn {Function File} {@var{M_} =} dseries (@var{xparams1},@var{estim_params_},@var{M_})
-%! @anchor{set_all_parameters}
-%! @sp 1
-%! Update parameter values (deep parameters and covariance matrices).
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item xparam1
-%! N*1 vector of doubles, the values of the N estimated parameters.
-%! @item estim_params_
-%! Dynare structure describing the estimated parameters.
-%! @item M_
-%! Dynare structure describing the model.
-%! @end table
-%! @sp 1
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item M_
-%! Dynare structure describing the model, with updated parameters and covariances matrices.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{DsgeSmoother}, @ref{dynare_estimation_1}, @ref{@@gsa.monte_carlo_filtering}, @ref{identification.analysis}, @ref{PosteriorFilterSmootherAndForecast}, @ref{prior_posterior_statistics_core}, @ref{prior_sampler}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 2003-2017 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -50,58 +36,49 @@ function M_ = set_all_parameters(xparam1,estim_params_,M_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-nvx = estim_params_.nvx;
-ncx = estim_params_.ncx;
-nvn = estim_params_.nvn;
-ncn = estim_params_.ncn;
-np = estim_params_.np;
-if nvx || ncx
+if estim_params_.nvx || estim_params_.ncx
     Sigma_e = M_.Sigma_e;
     Correlation_matrix = M_.Correlation_matrix;
 end
+
 H = M_.H;
 Correlation_matrix_ME = M_.Correlation_matrix_ME;
-% setting shocks variance on the diagonal of Covariance matrix; used later
-% for updating covariances
-if nvx
+
+% setting shocks variance on the diagonal of Covariance matrix; used later for updating covariances
+if estim_params_.nvx % stderr VAREXO are ordered first in xparam1
     var_exo = estim_params_.var_exo;
-    for i=1:nvx
-        k =var_exo(i,1);
+    for i=1:estim_params_.nvx
+        k = var_exo(i,1);
         Sigma_e(k,k) = xparam1(i)^2;
     end
 end
-% update offset
-offset = nvx;
 
-% setting measument error variance; on the diagonal of Covariance matrix; used later
-% for updating covariances
-if nvn
-    for i=1:nvn
+% setting measurement error variance; on the diagonal of Covariance matrix; used later for updating covariances
+offset = estim_params_.nvx;
+if estim_params_.nvn % stderr VAROBS are ordered second in xparam1
+    for i=1:estim_params_.nvn
         k = estim_params_.nvn_observable_correspondence(i,1);
         H(k,k) = xparam1(i+offset)^2;
     end
 end
 
-% update offset
-offset = nvx+nvn;
-
-% setting shocks covariances
-if ncx
+% correlations among shocks
+offset = estim_params_.nvx + estim_params_.nvn;
+if estim_params_.ncx % corr among VAREXO are ordered third in xparam1
     corrx = estim_params_.corrx;
-    for i=1:ncx
+    for i=1:estim_params_.ncx
         k1 = corrx(i,1);
         k2 = corrx(i,2);
         Correlation_matrix(k1,k2) = xparam1(i+offset);
         Correlation_matrix(k2,k1) = Correlation_matrix(k1,k2);
     end
 end
-% update offset
-offset = nvx+nvn+ncx;
 
 % setting measurement error covariances
-if ncn
+offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx;
+if estim_params_.ncn % corr among VAROBS are ordered fourth in xparam1
     corrn_observable_correspondence = estim_params_.corrn_observable_correspondence;
-    for i=1:ncn
+    for i=1:estim_params_.ncn
         k1 = corrn_observable_correspondence(i,1);
         k2 = corrn_observable_correspondence(i,2);
         Correlation_matrix_ME(k1,k2) = xparam1(i+offset);
@@ -109,34 +86,30 @@ if ncn
     end
 end
 
-% update offset
-offset = nvx+ncx+nvn+ncn;
 % setting structural parameters
-%
-if np
+offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
+if estim_params_.np % structural parameters are ordered last in xparam1
     M_.params(estim_params_.param_vals(:,1)) = xparam1(offset+1:end);
 end
 
-% updating matrices in M_
-if nvx || ncx
-    %build covariance matrix from correlation matrix and variances already on
-    %diagonal
+% build shock covariance matrix from correlation matrix and variances already on diagonal
+if estim_params_.nvx || estim_params_.ncx
     Sigma_e = diag(sqrt(diag(Sigma_e)))*Correlation_matrix*diag(sqrt(diag(Sigma_e)));
-    %if calibrated covariances, set them now to their stored value
-    if isfield(estim_params_,'calibrated_covariances')
+    if isfield(estim_params_,'calibrated_covariances') % if calibrated covariances, set them now to their stored value
         Sigma_e(estim_params_.calibrated_covariances.position)=estim_params_.calibrated_covariances.cov_value;
     end
+    % updating matrices in M_
     M_.Sigma_e = Sigma_e;
     M_.Correlation_matrix=Correlation_matrix;
 end
-if nvn || ncn
-    %build covariance matrix from correlation matrix and variances already on
-    %diagonal
+
+% build measurement error covariance matrix from correlation matrix and variances already on diagonal
+if estim_params_.nvn || estim_params_.ncn
     H = diag(sqrt(diag(H)))*Correlation_matrix_ME*diag(sqrt(diag(H)));
-    %if calibrated covariances, set them now to their stored value
-    if isfield(estim_params_,'calibrated_covariances_ME')
+    if isfield(estim_params_,'calibrated_covariances_ME') % if calibrated covariances, set them now to their stored value
         H(estim_params_.calibrated_covariances_ME.position)=estim_params_.calibrated_covariances_ME.cov_value;
     end
+    % updating matrices in M_
     M_.H = H;
     M_.Correlation_matrix_ME=Correlation_matrix_ME;
 end

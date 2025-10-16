@@ -1,5 +1,6 @@
 function [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 % [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
+% -------------------------------------------------------------------------
 % Returns name of estimated parameter number k, following the internal ordering of 
 % the estimated parameters.
 % Inputs:
@@ -20,7 +21,7 @@ function [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 % None.
 % 
 
-% Copyright © 2004-2023 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -39,27 +40,22 @@ function [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 
 texnam = [];
 
-nvx = estim_params_.nvx;
-nvn = estim_params_.nvn;
-ncx = estim_params_.ncx;
-ncn = estim_params_.ncn;
-
-if k <= nvx
+if k <= estim_params_.nvx % estimated stderr parameters for structural shocks (ordered first in xparam1)
     vname = M_.exo_names{estim_params_.var_exo(k,1)};
     nam = sprintf('SE_%s', vname);
     if TeX
         tname  = M_.exo_names_tex{estim_params_.var_exo(k,1)};
         texnam = sprintf('$ \\sigma_{%s} $', tname);
     end
-elseif  k <= (nvx+nvn)
+elseif  k <= (estim_params_.nvx+estim_params_.nvn) % estimated stderr parameters for measurement errors (ordered second in xparam1)
     vname = varobs{estim_params_.nvn_observable_correspondence(k-estim_params_.nvx,1)};
     nam = sprintf('SE_EOBS_%s', vname);
     if TeX
         tname  = M_.endo_names_tex{estim_params_.var_endo(k-estim_params_.nvx,1)};
         texnam = sprintf('$ \\sigma^{ME}_{%s} $', tname);
     end
-elseif  k <= (nvx+nvn+ncx)
-    jj = k - (nvx+nvn);
+elseif  k <= (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx) % estimated corr parameters for structural shocks (ordered third in xparam1)
+    jj = k - (estim_params_.nvx+estim_params_.nvn);
     k1 = estim_params_.corrx(jj,1);
     k2 = estim_params_.corrx(jj,2);
     vname = sprintf('%s_%s', M_.exo_names{k1}, M_.exo_names{k2});
@@ -68,8 +64,8 @@ elseif  k <= (nvx+nvn+ncx)
         tname  = sprintf('%s,%s', M_.exo_names_tex{k1}, M_.exo_names_tex{k2});
         texnam = sprintf('$ \\rho_{%s} $', tname);
     end
-elseif  k <= (nvx+nvn+ncx+ncn)
-    jj = k - (nvx+nvn+ncx);
+elseif  k <= (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn) % estimated corr parameters for measurement errors (ordered fourth in xparam1)
+    jj = k - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx);
     k1 = estim_params_.corrn(jj,1);
     k2 = estim_params_.corrn(jj,2);
     vname = sprintf('%s_%s', M_.endo_names{k1}, M_.endo_names{k2});
@@ -78,8 +74,8 @@ elseif  k <= (nvx+nvn+ncx+ncn)
         tname  = sprintf('%s,%s', M_.endo_names_tex{k1}, M_.endo_names_tex{k2});
         texnam = sprintf('$ \\rho^{ME}_{%s} $', tname);
     end
-else
-    jj = k - (nvx+nvn+ncx+ncn);
+else % estimated structural parameters (ordered last in xparam1)
+    jj = k - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn);
     jj1 = estim_params_.param_vals(jj,1);
     nam = M_.param_names{jj1};
     if TeX

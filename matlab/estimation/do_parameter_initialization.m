@@ -23,7 +23,7 @@ function [xparam1,estim_params_,xparam1_explicitly_initialized,xparam1_properly_
 % SPECIAL REQUIREMENTS
 %    None
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -40,26 +40,21 @@ function [xparam1,estim_params_,xparam1_explicitly_initialized,xparam1_properly_
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-nvx = size(estim_params_.var_exo,1);
-nvn = size(estim_params_.var_endo,1);
-ncx = size(estim_params_.corrx,1);
-ncn = size(estim_params_.corrn,1);
-np = size(estim_params_.param_vals,1);
+% set number of estimated parameters according to the type of parameter
+estim_params_.nvx = size(estim_params_.var_exo,1);    % estimated stderr parameters for structural shocks
+estim_params_.nvn = size(estim_params_.var_endo,1);   % estimated stderr parameters for measurement errors
+estim_params_.ncx = size(estim_params_.corrx,1);      % estimated corr parameters for structural shocks
+estim_params_.ncn = size(estim_params_.corrn,1);      % estimated corr parameters for measurement errors
+estim_params_.np  = size(estim_params_.param_vals,1); % estimated structural parameters
 
-estim_params_.nvx = nvx; %exogenous shock variances
-estim_params_.nvn = nvn; %endogenous variances, i.e. measurement error
-estim_params_.ncx = ncx; %exogenous shock correlations
-estim_params_.ncn = ncn; % correlation between endogenous variables, i.e. measurement error.
-estim_params_.np = np;   % other parameters of the model
-
-xparam1_explicitly_initialized = NaN(nvx+nvn+ncx+ncn+np,1);
-xparam1_properly_calibrated = NaN(nvx+nvn+ncx+ncn+np,1);
+xparam1_explicitly_initialized = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
+xparam1_properly_calibrated = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
 
 offset=0;
-if nvx
+if estim_params_.nvx % estimated stderr parameters for structural shocks (ordered first in xparam1)
     initialized_par_index=find(~isnan(estim_params_.var_exo(:,2)));
-    calibrated_par_index=find(isnan(estim_params_.var_exo(:,2)) & ~isnan(xparam1_calib(offset+1:offset+nvx,1)));
-    uninitialized_par_index=find(isnan(estim_params_.var_exo(:,2)) & isnan(xparam1_calib(offset+1:offset+nvx,1)));
+    calibrated_par_index=find(isnan(estim_params_.var_exo(:,2)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.nvx,1)));
+    uninitialized_par_index=find(isnan(estim_params_.var_exo(:,2)) & isnan(xparam1_calib(offset+1:offset+estim_params_.nvx,1)));
     xparam1_explicitly_initialized(offset+initialized_par_index,1) = estim_params_.var_exo(initialized_par_index,2);
     %update estim_params_ with calibrated starting values
     estim_params_.var_exo(calibrated_par_index,2)=xparam1_calib(offset+calibrated_par_index,1);
@@ -77,11 +72,11 @@ if nvx
         fprintf('PARAMETER INITIALIZATION: initialized. They will be initialized with the prior mean.\n')
     end
 end
-offset=offset+nvx;
-if nvn
+offset=offset+estim_params_.nvx;
+if estim_params_.nvn % estimated stderr parameters for measurement errors (ordered second in xparam1)
     initialized_par_index=find(~isnan(estim_params_.var_endo(:,2)));
-    calibrated_par_index=find(isnan(estim_params_.var_endo(:,2)) & ~isnan(xparam1_calib(offset+1:offset+nvn,1)));
-    uninitialized_par_index=find(isnan(estim_params_.var_endo(:,2)) & isnan(xparam1_calib(offset+1:offset+nvn,1)));
+    calibrated_par_index=find(isnan(estim_params_.var_endo(:,2)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.nvn,1)));
+    uninitialized_par_index=find(isnan(estim_params_.var_endo(:,2)) & isnan(xparam1_calib(offset+1:offset+estim_params_.nvn,1)));
     xparam1_explicitly_initialized(offset+initialized_par_index,1) = estim_params_.var_endo(initialized_par_index,2);
     estim_params_.var_endo(calibrated_par_index,2)=xparam1_calib(offset+calibrated_par_index,1);
     %find parameters that are calibrated and do not violate inverse gamma prior
@@ -98,11 +93,11 @@ if nvn
         fprintf('PARAMETER INITIALIZATION: with the prior mean.\n')
     end
 end
-offset=offset+nvn;
-if ncx
+offset=offset+estim_params_.nvn;
+if estim_params_.ncx % estimated corr parameters for structural shocks (ordered third in xparam1)
     initialized_par_index=find(~isnan(estim_params_.corrx(:,3)));
-    calibrated_par_index=find(isnan(estim_params_.corrx(:,3)) & ~isnan(xparam1_calib(offset+1:offset+ncx,1)));
-    uninitialized_par_index=find(isnan(estim_params_.corrx(:,3)) & isnan(xparam1_calib(offset+1:offset+ncx,1)));
+    calibrated_par_index=find(isnan(estim_params_.corrx(:,3)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.ncx,1)));
+    uninitialized_par_index=find(isnan(estim_params_.corrx(:,3)) & isnan(xparam1_calib(offset+1:offset+estim_params_.ncx,1)));
     xparam1_explicitly_initialized(offset+initialized_par_index,1) = estim_params_.corrx(initialized_par_index,3);
     estim_params_.corrx(calibrated_par_index,3)=xparam1_calib(offset+calibrated_par_index,1);
     xparam1_properly_calibrated(offset+calibrated_par_index,1) = xparam1_calib(offset+calibrated_par_index,1);
@@ -111,11 +106,11 @@ if ncx
         fprintf('PARAMETER INITIALIZATION: They will be initialized with the prior mean.\n')
     end
 end
-offset=offset+ncx;
-if ncn
+offset=offset+estim_params_.ncx;
+if estim_params_.ncn % estimated corr parameters for measurement errors (ordered fourth in xparam1)
     initialized_par_index=find(~isnan(estim_params_.corrn(:,3)));
-    calibrated_par_index=find(isnan(estim_params_.corrn(:,3)) & ~isnan(xparam1_calib(offset+1:offset+ncn,1)));
-    uninitialized_par_index=find(isnan(estim_params_.corrn(:,3)) & isnan(xparam1_calib(offset+1:offset+ncn,1)));
+    calibrated_par_index=find(isnan(estim_params_.corrn(:,3)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.ncn,1)));
+    uninitialized_par_index=find(isnan(estim_params_.corrn(:,3)) & isnan(xparam1_calib(offset+1:offset+estim_params_.ncn,1)));
     xparam1_explicitly_initialized(offset+initialized_par_index,1) = estim_params_.corrn(initialized_par_index,3);
     estim_params_.corrn(calibrated_par_index,3)=xparam1_calib(offset+calibrated_par_index,1);
     xparam1_properly_calibrated(offset+calibrated_par_index,1) = xparam1_calib(offset+calibrated_par_index,1);
@@ -124,11 +119,11 @@ if ncn
         fprintf('PARAMETER INITIALIZATION: They will be initialized with the prior mean.\n')
     end
 end
-offset=offset+ncn;
-if np
+offset=offset+estim_params_.ncn;
+if estim_params_.np % estimated structural parameters (ordered last in xparam1)
     initialized_par_index=find(~isnan(estim_params_.param_vals(:,2)));
-    calibrated_par_index=find(isnan(estim_params_.param_vals(:,2)) & ~isnan(xparam1_calib(offset+1:offset+np,1)));
-    uninitialized_par_index=find(isnan(estim_params_.param_vals(:,2)) & isnan(xparam1_calib(offset+1:offset+np,1)));
+    calibrated_par_index=find(isnan(estim_params_.param_vals(:,2)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.np,1)));
+    uninitialized_par_index=find(isnan(estim_params_.param_vals(:,2)) & isnan(xparam1_calib(offset+1:offset+estim_params_.np,1)));
     xparam1_explicitly_initialized(offset+initialized_par_index,1) = estim_params_.param_vals(initialized_par_index,2);
     estim_params_.param_vals(calibrated_par_index,2)=xparam1_calib(offset+calibrated_par_index,1);
     xparam1_properly_calibrated(offset+calibrated_par_index,1) = xparam1_calib(offset+calibrated_par_index,1);
