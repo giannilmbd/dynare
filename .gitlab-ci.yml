@@ -184,6 +184,11 @@ test_matlab:
 
 test_old_matlab:
   stage: test
+  variables:
+    # Allows the stack to be executable, which is not allowed by default in Debian 13.
+    # This is necessary for MATLAB ⩽ R2020a, otherwise it does not start.
+    # This workaround may be dropped when we bump our minimal supported MATLAB version.
+    GLIBC_TUNABLES: glibc.rtld.execstack=2
   script:
     - meson setup -Dbuild_for=matlab -Dmatlab_path=/opt/MATLAB/$OLD_MATLAB_VERSION --buildtype=release -Db_lto=true build-old-matlab
     - meson compile -v -C build-old-matlab
