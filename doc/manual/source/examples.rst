@@ -86,3 +86,10 @@ description, please refer to the comments inside the files themselves.
     Both Frequentist (Maximum Likelihood) and Bayesian (Slice Sampling) approaches are presented.
     Additionally, it is shown how to estimate an AR(2)-process
     by working with the roots of the autoregressive process instead of the coefficients
+
+``perfect_foresight_with_expectation_errors.mod``
+
+    Elementary RBC model (same as ``ramst.mod``), simulated in perfect
+    foresight with expectation errors: agents behave as under perfect
+    foresight, but they can still be surprised by unexpected shocks, and thus
+    recompute their optimal plans when such an unexpected shock happens.
