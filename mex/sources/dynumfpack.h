@@ -25,12 +25,7 @@
 #define DYNUMFPACK_H
 
 #ifdef OCTAVE_MEX_FILE
-# ifdef HAVE_SUITESPARSE_UMFPACK_H
-#  include <suitesparse/umfpack.h>
-# endif
-# ifdef HAVE_UMFPACK_H
-#  include <umfpack.h>
-# endif
+# include <umfpack.h>
 #else
 
 /* Under MATLAB, we have to provide our own header file for functions in

@@ -260,21 +260,9 @@ else # Octave build
   lapack_dep = declare_dependency(link_args : run_command(mkoctfile_exe, '-p', 'LAPACK_LIBS', check : true).stdout().split(),
                                   dependencies : blas_dep)
 
-  # Create a dependency object for UMFPACK.
-  # The dependency returned by find_library('umfpack') is not enough, because we also want the define
-  # that indicates the location of umfpack.h, so we construct a new dependency object.
-  if cpp_compiler.has_header('suitesparse/umfpack.h', args : octave_incflags)
-    umfpack_def = '-DHAVE_SUITESPARSE_UMFPACK_H'
-  elif cpp_compiler.has_header('umfpack.h', args : octave_incflags)
-    umfpack_def = '-DHAVE_UMFPACK_H'
-  else
-    error('Can’t find umfpack.h')
-  endif
   # Do not enforce static linking even if prefer_static is true, since that library is shipped
   # with Octave.
-  # The “dirs” argument is useful when cross-compiling.
-  umfpack_dep_tmp = cpp_compiler.find_library('umfpack', dirs : octlibdir / '../..', static : false)
-  umfpack_dep = declare_dependency(compile_args : umfpack_def, dependencies : [ umfpack_dep_tmp, blas_dep ])
+  umfpack_dep = dependency('UMFPACK', static : false)
 
   # This library does not exist under Octave
   ut_dep = []

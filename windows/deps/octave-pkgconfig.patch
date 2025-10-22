@@ -18,3 +18,36 @@
 -Cflags: -I/usr/include
 +Libs: -L/mingw64/lib -lgsl ${GSL_CBLAS_LIB} -lm -lm 
 +Cflags: -I/mingw64/include
+--- sysroot-octave/mingw64/lib/pkgconfig/UMFPACK.pc.orig	2025-11-04 18:25:50.322276312 +0100
++++ sysroot-octave/mingw64/lib/pkgconfig/UMFPACK.pc	2025-11-04 18:25:57.282214779 +0100
+@@ -2,7 +2,7 @@
+ # All Rights Reserved.
+ # SPDX-License-Identifier: GPL-2.0-or-later
+ 
+-prefix=/usr
++prefix=/mingw64
+ exec_prefix=${prefix}
+ libdir=${exec_prefix}/lib
+ includedir=${prefix}/include/suitesparse
+--- sysroot-octave/mingw64/lib/pkgconfig/AMD.pc.orig	2025-11-04 18:29:23.860382837 +0100
++++ sysroot-octave/mingw64/lib/pkgconfig/AMD.pc	2025-11-04 18:29:33.340298566 +0100
+@@ -2,7 +2,7 @@
+ # All Rights Reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ 
+-prefix=/usr
++prefix=/mingw64
+ exec_prefix=${prefix}
+ libdir=${exec_prefix}/lib
+ includedir=${prefix}/include/suitesparse
+--- sysroot-octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc.orig	2025-11-04 18:29:27.268352546 +0100
++++ sysroot-octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc	2025-11-04 18:29:45.880187057 +0100
+@@ -2,7 +2,7 @@
+ # All Rights Reserved.
+ # SPDX-License-Identifier: BSD-3-clause
+ 
+-prefix=/usr
++prefix=/mingw64
+ exec_prefix=${prefix}
+ libdir=${exec_prefix}/lib
+ includedir=${prefix}/include/suitesparse

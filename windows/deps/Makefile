@@ -133,7 +133,7 @@ sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
 	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse octave/mingw64/include/gsl $@/mingw64/include
 	cp -R octave/mingw64/lib/octave $@/mingw64/lib
 	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a $@/mingw64/lib
-	cp octave/mingw64/lib/pkgconfig/gsl.pc $@/mingw64/lib/pkgconfig
+	cp octave/mingw64/lib/pkgconfig/gsl.pc octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc $@/mingw64/lib/pkgconfig
 	patch -p0 < octave-pkgconfig.patch
 	touch $@
 
