@@ -12,10 +12,10 @@ academic papers for most of them. You should have these files in the
 Here is a short list of the examples included. For a more complete
 description, please refer to the comments inside the files themselves.
 
-``ramst.mod``
+perfect_foresight_rbc.mod``
 
     An elementary real business cycle (RBC) model, simulated in a
-    deterministic setup.
+    perfect foresight setup.
 
 ``example1.mod``
 ``example2.mod``
@@ -87,9 +87,9 @@ description, please refer to the comments inside the files themselves.
     Additionally, it is shown how to estimate an AR(2)-process
     by working with the roots of the autoregressive process instead of the coefficients
 
-``perfect_foresight_with_expectation_errors.mod``
+``perfect_foresight_expectation_errors.mod``
 
-    Elementary RBC model (same as ``ramst.mod``), simulated in perfect
+    Elementary RBC model (same as ``perfect_foresight_rbc.mod``), simulated in perfect
     foresight with expectation errors: agents behave as under perfect
     foresight, but they can still be surprised by unexpected shocks, and thus
     recompute their optimal plans when such an unexpected shock happens.
