@@ -3798,7 +3798,7 @@ speed-up on large models.
 
            ``3``
 
-               Use a Newton algorithm with a Stabilized Bi-Conjugate Gradient
+               Use a Newton algorithm with a Biconjugate Gradient Stabilized
                (BiCGStab) solver at each iteration, applied on the stacked
                system of all equations in all periods. The following options
                can be used to control the behaviour of the algorithm:
