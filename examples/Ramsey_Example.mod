@@ -26,11 +26,6 @@
  *      state, including the steady state inflation rate, based on this value. The initial value 
  *      of the instrument for steady state search must then be defined in an initval-block.
  *
- *  - The optim_weights in the OSR case are based on a second order approximation to the welfare function
- *      as in Gali (2015). The relative weight between inflation and output gap volatility is essentially 
- *      given by the slope of the New Keynesian Phillips Curve. Note that the linear terms that would be 
- *      present in case of a distorted steady state need to be dropped for OSR. 
- *
  *  - Due to divine coincidence, the first best policy involves fully stabilizing inflation  
  *      and thereby the output gap. As a consequence, the optimal inflation feedback coefficient 
  *      in a Taylor rule would be infinity. The OSR command therefore estimates it to be at the 
@@ -199,15 +194,11 @@ end;
     //use Taylor rule
     stoch_simul(order=2) pi_ann log_h R_ann log_C Z r_real y_nat Welfare;
 @#else
+    //define planner objective, which corresponds to utility function of agents
+    planner_objective log(C)-chi/2*h^2;
     @# if !defined(Ramsey) || Ramsey==0
         //use OSR Taylor rule
         
-        //set weights on (co-)variances for OSR
-        optim_weights;
-            pi theta/((theta-1)/phi);
-            y_gap 1;
-        end;
-
         //define OSR parameters to be optimized
         osr_params alpha;
 
@@ -220,14 +211,11 @@ end;
         end;
 
         //compute OSR and provide output
-        osr(opt_algo=9) pi_ann log_h R_ann log_C Z r_real;
+        osr(opt_algo=9,order=2,planner_discount=beta) pi_ann log_h R_ann log_C Z r_real;
 
     @# else
         //use Ramsey optimal policy
-        
-        //define planner objective, which corresponds to utility function of agents
-        planner_objective log(C)-chi/2*h^2;
-        
+       
         //set up Ramsey optimal policy problem with interest rate R as the instrument,...
         // defining the discount factor in the planner objective to be the one of private agents        
         ramsey_model(instruments=(R),planner_discount=beta,planner_discount_latex_name=$\beta$); 
