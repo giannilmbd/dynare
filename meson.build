@@ -329,6 +329,14 @@ if get_option('prefer_static')
     mixed_static_link_args += [ '-lquadmath' ]
   endif
 
+  if get_option('build_for') == 'octave'
+    # Under Octave, we add a .c source file in all MEX files, so any MEX with some Fortran is
+    # mixed language.
+    # Ideally we would add these flags only for MEX with some Fortran, but doing it for all MEX
+    # does no harm (as long as b_asneeded remains to its default value, which is true).
+    static_link_args += mixed_static_link_args
+  endif
+
   if host_machine.system() == 'windows'
     # Hack to avoid dynamically linking against libwinpthread DLL (which is
     # pulled in by libstdc++, even without using threads, since we are using
