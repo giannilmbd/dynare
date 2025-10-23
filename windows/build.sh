@@ -33,11 +33,12 @@ ROOT_DIRECTORY=$(dirname "$(readlink -f "$0")")
 [[ -d "$ROOT_DIRECTORY"/../build-win-matlab ]] && { echo "Please remove the build-win-matlab directory" 2>&1; exit 1; }
 [[ -d "$ROOT_DIRECTORY"/../build-win-octave ]] && { echo "Please remove the build-win-octave directory" 2>&1; exit 1; }
 
-# Create TMP folder and make sure it is deleted upon exit
+# Create temporary folder and make sure it is deleted upon exit (along with /tmp/windeps)
 TMP_DIRECTORY=$(mktemp -d)
 cleanup()
 {
     [[ -z $TMP_DIRECTORY ]] || rm -rf -- "$TMP_DIRECTORY"
+    rm -rf /tmp/windeps
 }
 trap cleanup EXIT
 
