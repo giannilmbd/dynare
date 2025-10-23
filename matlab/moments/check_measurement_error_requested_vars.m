@@ -14,7 +14,7 @@ function [ME_present,observable_pos_requested_vars,index_subset,index_observable
 %   index_subset                    [integer]       index of observables in ivar
 %   index_observables               [integer]       index of requested i_var in observables 
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,11 +38,7 @@ observable_pos_requested_vars=[];
 
 ME_present=false;
 if ~all(diag(M_.H)==0)
-    if isoctave && octave_ver_less_than('8.4') %Octave bug #60347
-        [observable_pos_requested_vars,index_subset,index_observables]=intersect_stable(ivar,options_.varobs_id);
-    else
-        [observable_pos_requested_vars,index_subset,index_observables]=intersect(ivar,options_.varobs_id,'stable');
-    end
+    [observable_pos_requested_vars,index_subset,index_observables]=intersect(ivar,options_.varobs_id,'stable');
     if ~isempty(observable_pos_requested_vars)
         ME_present=true;
     end

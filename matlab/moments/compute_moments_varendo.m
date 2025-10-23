@@ -165,11 +165,7 @@ if options_.order==1
                 skipline();
             end
             if ~all(diag(M_.H)==0)
-                if isoctave && octave_ver_less_than('8.4') %Octave bug #60347
-                    [observable_name_requested_vars, varlist_pos] = intersect_stable(var_list_, options_.varobs);
-                else
-                    [observable_name_requested_vars, varlist_pos] = intersect(var_list_, options_.varobs, 'stable');
-                end
+                [observable_name_requested_vars, varlist_pos] = intersect(var_list_, options_.varobs, 'stable');
                 if ~isempty(observable_name_requested_vars)
                     [hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: variance decomposition with measurement error.', options_.console_mode, 0, 'Endogenous moments: variance decomposition with measurement error.');
                     NumberOfObservedEndogenousVariables = length(observable_name_requested_vars);

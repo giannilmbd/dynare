@@ -192,7 +192,7 @@ if get_option('build_for') == 'matlab'
 else # Octave build
   octave_exe = find_program('octave', required : not meson.is_cross_build(), disabler : true)
   mkoctfile_exe = find_program('mkoctfile')
-  octave_minimal_version = '7.1.0'
+  octave_minimal_version = '8.4.0'
   octave_version = run_command(mkoctfile_exe, '-v', check : true).stdout().replace('mkoctfile, version ', '').strip()
 
   if octave_version.version_compare('<' + octave_minimal_version)
@@ -235,17 +235,7 @@ else # Octave build
   exe_rpath = octlibdir
   exe_link_args = [ '-L' + octlibdir ] + octave_libs
 
-  # Minimal Octave version for which we enable the interleaved API.
-  # Octave 7 is supposed to support it, but it crashes due to this bug:
-  #  https://savannah.gnu.org/bugs/?64687
-  octave_minimal_version_for_interleaved_api = '8.4.0'
-
-  octave_defs = [ '-DOCTAVE_MEX_FILE', '-DMEXEXT=".mex"' ]
-  if octave_version.version_compare('>=' + octave_minimal_version_for_interleaved_api)
-    # Mimic the behaviour of mkoctfile which adds this define when the
-    # interleaved API is requested.
-    octave_defs += '-DMX_HAS_INTERLEAVED_COMPLEX=1'
-  endif
+  octave_defs = [ '-DOCTAVE_MEX_FILE', '-DMEXEXT=".mex"', '-DMX_HAS_INTERLEAVED_COMPLEX=1' ]
   if octave_version.version_compare('>=10')
     octave_defs += '-DOCTAVE_MEX_SOVERSION=1'
   endif
@@ -258,15 +248,9 @@ else # Octave build
                  'c_args' : octave_incflags + octave_defs,
                  'link_args' : octave_link_args,
                  'install' : true,
-                 'install_dir' : 'lib/dynare/mex/octave' }
+                 'install_dir' : 'lib/dynare/mex/octave',
+                 'sources' : [ 'mex/sources/octave_interleaved.c' ]}
 
-  if octave_version.version_compare('>=' + octave_minimal_version_for_interleaved_api)
-    # Mimic the behaviour of mkoctfile which compiles in a similar source file
-    # when interleaved API is requested.
-    mex_kwargs += { 'sources' : [ 'mex/sources/octave_interleaved.c' ] }
-  else
-    mex_kwargs += { 'sources' : [] }
-  endif
   if octave_version.version_compare('>=10')
     mex_kwargs += { 'sources' : mex_kwargs['sources'] + [ 'mex/sources/octave_mex_soversion.c' ] }
   endif

@@ -79,9 +79,9 @@ if isoctave
                  'Octave from www.octave.org, otherwise precompiled MEX files may fail to load, '
                  'leading to an important loss of functionality.'], supported_octave_version())
         skipline()
-    elseif octave_ver_less_than('7.1.0') % Should match the test in meson.build, and also the one in matlab/modules/dseries/src/initialize_dseries_class.m
+    elseif octave_ver_less_than('8.4.0') % Should match the test in meson.build, and also the one in matlab/dseries/src/initialize_dseries_class.m
         skipline()
-        warning('This version of Dynare has only been tested on Octave 7.1.0 and above. Dynare may fail to run or give unexpected result. Consider upgrading your version of Octave.')
+        warning('This version of Dynare has only been tested on Octave 8.4.0 and above. Dynare may fail to run or give unexpected result. Consider upgrading your version of Octave.')
         skipline()
     end
 else

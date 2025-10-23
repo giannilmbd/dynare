@@ -58,11 +58,7 @@ for jm = 1:mom_nbr
         end
     end
     % We replace NaN (due to leads and lags and missing values) with the corresponding mean
-    if isoctave && octave_ver_less_than('8')
-        data_moments(jm,1) = nanmean(m_data_tmp);
-    else
-        data_moments(jm,1) = mean(m_data_tmp,'omitnan');
-    end
+    data_moments(jm,1) = mean(m_data_tmp,'omitnan');
     m_data_tmp(isnan(m_data_tmp)) = data_moments(jm,1);
     m_data(:,jm) = m_data_tmp;
 end

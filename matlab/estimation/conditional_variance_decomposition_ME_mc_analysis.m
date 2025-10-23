@@ -23,7 +23,7 @@ function oo_ = ...
 % OUTPUTS
 %   oo_          [structure]        Dynare structure where the results are saved.
 
-% Copyright © 2017-2024 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -65,11 +65,7 @@ if isempty(exogenous_variable_index)
     end
 end
 
-if isoctave && octave_ver_less_than('8.4') %Octave bug #60347
-    [~,index_subset]=intersect_stable(var_list,options_.varobs);
-else
-    [~,index_subset]=intersect(var_list,options_.varobs,'stable');
-end
+[~,index_subset]=intersect(var_list,options_.varobs,'stable');
 
 matrix_pos=strmatch(endo, var_list(index_subset),'exact');
 name_1 = endo;
