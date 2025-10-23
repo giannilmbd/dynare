@@ -301,26 +301,42 @@ lapack_fortran_dep = declare_dependency(sources : [ 'mex/sources/blas.F08', 'mex
 
 # When static linking is preferred, try to statically link the compiler libraries
 if get_option('prefer_static')
-  static_flags_pre = [ '-static-libgcc', '-static-libstdc++' ]
-  static_flags_post = []
+  static_link_args = [ '-static-libgcc', '-static-libstdc++' ]
+
+  # Flags to statically link libgfortran and libquadmath
+  # Under Debian 13, libgfortran.a and libquadmath.a are not compiled with -fPIC, so can’t be
+  # linked into a MEX, and we do not try to statically link those.
+  if host_machine.system() == 'windows' or host_machine.system() == 'darwin'
+    static_link_args += [ '-static-libgfortran', '-static-libquadmath' ]
+  endif
+
+  # Hacks for statically linking libgfortran and libquadmath in MEX files that are a mix of
+  # Fortran and another language (C++ or C). Those are needed because for
+  # such MEX, meson uses gcc or g++ as linker and manually adds -lgfortran.
+  mixed_static_link_args = []
   if host_machine.system() == 'windows'
-    # Try to statically link libgfortran and libquadmath.
-    # Under Debian 13, libgfortran.a and libquadmath.a are not compiled with -fPIC, so can’t be linked in a MEX.
-    # Under macOS, -static-libgcc implies -static-libgfortran (see gfortran -dumpspecs), and for libquadmath
-    # we use a hack with a local copy of libquadmath.a.
-    # So we only add flags for Windows.
-    # -static-libquadmath was introduced in GCC 13. Until we require the latter, use a hack.
-    static_flags_pre += [ '-static-libgfortran', '-Wl,-Bstatic,--whole-archive', '-lquadmath', '-Wl,-Bdynamic,--no-whole-archive' ]
+    # Under Windows, the -static-libgfortran and -static-libquadmath options do not have any
+    # effect on g++, hence enforce static linking of them.
+    mixed_static_link_args += [ '-Wl,-Bstatic', '-lgfortran', '-lquadmath', '-Wl,-Bdynamic' ]
+  endif
+  if host_machine.system() == 'darwin'
+    # Under macOS, the -static-libgfortran and -static-libquadmath options work as expected when
+    # g++ is used as a linker.
+    # But meson does not pass -lquadmath to g++, hence leading to undefined symbols (only happens
+    # when statically linking, because in dynamic context libquadmath is loaded recursively after
+    # libgfortran).
+    # Fixes https://forum.dynare.org/t/invalid-mex-file-whe-running-sensitivity-analysis-m1-mac-6-1/25829
+    mixed_static_link_args += [ '-lquadmath' ]
   endif
 
   if host_machine.system() == 'windows'
     # Hack to avoid dynamically linking against libwinpthread DLL (which is
     # pulled in by libstdc++, even without using threads, since we are using
     # the POSIX threads version of MinGW).
-    static_flags_pre += [ '-Wl,-Bstatic,--whole-archive', '-lwinpthread', '-Wl,-Bdynamic,--no-whole-archive' ]
+    static_link_args += [ '-Wl,-Bstatic,--whole-archive', '-lwinpthread', '-Wl,-Bdynamic,--no-whole-archive' ]
   endif
 
-  mex_kwargs += { 'link_args' : static_flags_pre + mex_kwargs.get('link_args', []) + static_flags_post }
+  mex_kwargs += { 'link_args' : static_link_args + mex_kwargs.get('link_args', []) }
 
   # NB: constructing a dependency object with link_args : ['-Wl,-Bstatic', '-lgomp', '-Wl,-Bdynamic'] does not work,
   # because it reorders the three arguments and puts -lgomp at the end
@@ -379,22 +395,10 @@ shared_module('disclyap_fast', [ 'mex/sources/disclyap_fast/disclyap_fast.f08' ]
 
 qmc_sequence_src = [ 'mex/sources/sobol/qmc_sequence.cc',
                      'mex/sources/sobol/sobol.f08' ]
-# Hack for statically linking libgfortran
-# Since qmc_sequence is a mix of C++ and Fortran, the linker invoked is the C++ one.
-# Meson then rightly adds -lgfortran, but the -static-libgfortran flag does not work.
 qmc_sequence_mex_kwargs = mex_kwargs
-if get_option('prefer_static') and host_machine.system() == 'windows'
-  qmc_sequence_mex_kwargs += { 'link_args' : qmc_sequence_mex_kwargs.get('link_args') + [ '-Wl,-Bstatic', '-lgfortran', '-Wl,-Bdynamic' ] }
-endif
-# Hack for statically linking libquadmath
-# Fixes https://forum.dynare.org/t/invalid-mex-file-whe-running-sensitivity-analysis-m1-mac-6-1/25829
-# It seems that meson does not link libquadmath (which is needed by libgfortran).
-# When doing dynamic linking, this is not an issue since the dynamic linker loads
-# libquadmath recursively after loading libgfortran. But when doing static linking,
-# libquadmath needs to be explicitly linked.
-# FIXME: Why isn’t this needed under Linux and Windows?
-if get_option('prefer_static') and host_machine.system() == 'darwin'
-  qmc_sequence_mex_kwargs += { 'link_args' : qmc_sequence_mex_kwargs.get('link_args') + [ '-lquadmath' ] }
+if get_option('prefer_static')
+  # This MEX has both Fortran and C++, so use the additional static linking args for mixed languages
+  qmc_sequence_mex_kwargs += { 'link_args' : qmc_sequence_mex_kwargs.get('link_args') + mixed_static_link_args }
 endif
 # Workaround for cross-compiler bug in Debian 13
 # With LTO, one gets a compilation failure with messages such as:

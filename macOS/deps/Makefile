@@ -22,8 +22,6 @@ DEPS_ARCH ?= x86_64 # use x86_64 by default
 
 BREWDIR := $(if $(filter arm64,$(DEPS_ARCH)),/opt/homebrew,/usr/local)
 
-GCC_VERSION = $(shell sed -En "/^c[[:space:]]*=/s/c[[:space:]]*=[[:space:]]*'.*gcc-([0-9]+)'/\1/p" ../homebrew-native-$(DEPS_ARCH).ini)
-
 ROOT_PATH = $(realpath .)
 
 WGET_OPTIONS := --no-verbose --no-use-server-timestamps --retry-connrefused --retry-on-host-error
@@ -81,15 +79,8 @@ $(DEPS_ARCH)/sources64/x13as-$(X13AS_VERSION): tarballs/x13as_asciisrc-v$(X13AS_
 $(DEPS_ARCH)/lib64/x13as/x13as: $(DEPS_ARCH)/sources64/x13as-$(X13AS_VERSION)
 	# Statically link x13as (see #1865).
 	# Using -static is not possible, it does not work under Darwin.
-	# Implement an ugly workaround in the absence of -static-libquadmath flag.
-	# In particular, gcc must be used as the linker, because gfortran does not
-	# honour static linking of libquadmath.
-	# Once the -static-libquadmath flag is added (GCC 13? ; see
-	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=46539), go back to using
-	# gfortran as the linker with -static-libgfortran and
-	# -static-libquadmath flags, and drop the GCC_VERSION variable.
 	cd $< && sed -i '' 's/-static//g' makefile.gf
-	gmake -C $< -f makefile.gf FC=$(BREWDIR)/bin/gfortran LINKER=$(BREWDIR)/bin/gcc-$(GCC_VERSION) FFLAGS="-O3 -std=legacy" LDFLAGS=-static-libgcc LIBS="$(BREWDIR)/lib/gcc/$(GCC_VERSION)/libgfortran.a $(BREWDIR)/lib/gcc/$(GCC_VERSION)/libquadmath.a" PROGRAM=x13as -j$(NTHREADS)
+	gmake -C $< -f makefile.gf FC=$(BREWDIR)/bin/gfortran LINKER=$(BREWDIR)/bin/gfortran FFLAGS="-O3 -std=legacy" LDFLAGS="-static-libgcc -static-libgfortran -static-libquadmath" PROGRAM=x13as -j$(NTHREADS)
 
 	strip $</x13as
 	mkdir -p $(dir $@)
