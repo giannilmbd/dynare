@@ -24,10 +24,7 @@ WGET_OPTIONS := --no-verbose --no-use-server-timestamps --retry-connrefused --re
 # See comments in windows/mingw-cross.ini
 FFLAGS := -O3 -flto=auto -march=nocona -msahf -mtune=generic
 
-.PHONY: all build octave64 matlab64 msys2 x13as \
-	build build-slicot \
-	clean clean-all \
-	lib64-msys2 mingw64
+.PHONY: all build msys2 x13as build build-slicot clean clean-all
 
 all: build octave64 matlab64 msys2 x13as
 
@@ -143,5 +140,6 @@ tarballs/x13as_ascii-v$(X13AS_VERSION).zip:
 lib64/x13as/x13as.exe: tarballs/x13as_ascii-v$(X13AS_VERSION).zip
 	unzip -o -d lib64 $<
 	mv lib64/x13as/x13as_ascii.exe $@
+	touch $@
 
 x13as: lib64/x13as/x13as.exe
