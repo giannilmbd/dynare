@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008-2024 Dynare Team
+ * Copyright © 2008-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -143,27 +143,15 @@ DynamicModelDLL::eval(const Vector& y, const Vector& x, const Vector& modParams,
               int rowval;
               if (o == 1)
                 {
-#if MX_HAS_INTERLEAVED_COMPLEX
                   const int32_T* sparse_rowval {mxGetInt32s(dynamic_g1_sparse_rowval_mx)};
                   const int32_T* sparse_colval {mxGetInt32s(dynamic_g1_sparse_colval_mx)};
-#else
-                  const int32_T* sparse_rowval {
-                      static_cast<const int32_T*>(mxGetData(dynamic_g1_sparse_rowval_mx))};
-                  const int32_T* sparse_colval {
-                      static_cast<const int32_T*>(mxGetData(dynamic_g1_sparse_colval_mx))};
-#endif
                   s[0] = dynToDynpp.at(sparse_colval[k] - 1);
                   rowval = sparse_rowval[k] - 1;
                 }
               else
                 {
                   const mxArray* sparse_indices_mx {dynamic_gN_sparse_indices[o - 2]};
-#if MX_HAS_INTERLEAVED_COMPLEX
                   const int32_T* sparse_indices {mxGetInt32s(sparse_indices_mx)};
-#else
-                  const int32_T* sparse_indices {
-                      static_cast<const int32_T*>(mxGetData(sparse_indices_mx))};
-#endif
                   for (int i {0}; i < o; i++)
                     s[i] = dynToDynpp.at(sparse_indices[k + (i + 1) * nnz] - 1);
                   s.sort();

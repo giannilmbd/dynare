@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -135,11 +135,7 @@ mxArray*
 SylvParams::IntParamItem::createMatlabArray() const
 {
   mxArray* res = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-#if MX_HAS_INTERLEAVED_COMPLEX
   *mxGetInt32s(res) = value;
-#else
-  *static_cast<int*>(mxGetData(res)) = value;
-#endif
   return res;
 }
 

@@ -336,7 +336,7 @@ lapack_fortran_iface = [ 'mex/sources/lapack.F08' ]
 
 ## Various core MEX
 
-shared_module('mjdgges', [ 'mex/sources/mjdgges/mjdgges.F08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface, kwargs : mex_kwargs, dependencies : lapack_dep)
+shared_module('mjdgges', [ 'mex/sources/mjdgges/mjdgges.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface, kwargs : mex_kwargs, dependencies : lapack_dep)
 shared_module('num_procs', 'mex/sources/num_procs/num_procs.cc', kwargs : mex_kwargs)
 
 perfect_foresight_problem_src = [ 'mex/sources/perfect_foresight_problem/perfect_foresight_problem.cc',
@@ -348,7 +348,7 @@ perfect_foresight_block_problem_src = [ 'mex/sources/perfect_foresight_problem/p
 shared_module('perfect_foresight_block_problem', perfect_foresight_block_problem_src, kwargs : mex_kwargs, dependencies : [ openmp_dep, dl_dep ])
 
 block_trust_region_src = [ 'mex/sources/block_trust_region/dulmage_mendelsohn.f08',
-                           'mex/sources/block_trust_region/matlab_fcn_closure.F08',
+                           'mex/sources/block_trust_region/matlab_fcn_closure.f08',
                            'mex/sources/block_trust_region/trust_region.f08',
                            'mex/sources/block_trust_region/mexFunction.f08' ] + mex_fortran_iface + blas_fortran_iface + lapack_fortran_iface
 shared_module('block_trust_region', block_trust_region_src, kwargs : mex_kwargs, dependencies : lapack_dep)
@@ -573,7 +573,7 @@ shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_m
 
 hank_src = [ 'mex/sources/hank/utils/interpolation.f08' ]
 hank_lib = static_library('hank', hank_src, kwargs : static_library_kwargs)
-shared_module('find_bracket_linear_weight', [ 'mex/sources/hank/find_bracket_linear_weight/mexFunction.F08' ] + mex_fortran_iface, kwargs : mex_kwargs, link_with : hank_lib)
+shared_module('find_bracket_linear_weight', [ 'mex/sources/hank/find_bracket_linear_weight/mexFunction.f08' ] + mex_fortran_iface, kwargs : mex_kwargs, link_with : hank_lib)
 
 ### Documentation
 

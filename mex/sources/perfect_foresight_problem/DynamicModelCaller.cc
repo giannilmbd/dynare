@@ -127,13 +127,8 @@ DynamicModelMatlabCaller::copy_jacobian_column(mwIndex col, double* dest) const
 {
   if (jacobian_mx)
     {
-#if MX_HAS_INTERLEAVED_COMPLEX
       const int32_T* g1_sparse_rowval {mxGetInt32s(g1_sparse_rowval_mx)};
       const int32_T* g1_sparse_colptr {mxGetInt32s(g1_sparse_colptr_mx)};
-#else
-      const int32_T* g1_sparse_rowval {static_cast<const int32_T*>(mxGetData(g1_sparse_rowval_mx))};
-      const int32_T* g1_sparse_colptr {static_cast<const int32_T*>(mxGetData(g1_sparse_colptr_mx))};
-#endif
 
       /* We cannot assume that jacobian_mx internally uses
          g1_sparse_{rowval,colval,colptr}, because the call to sparse() in

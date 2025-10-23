@@ -80,13 +80,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    plhs(2) = mxCreateDoubleMatrix(int(nq, mwSize), 1_mwSize, mxREAL)
 
    ! Copy results from Fortran arrays to MATLAB output
-#if MX_HAS_INTERLEAVED_COMPLEX
    xqi(1:nq) => mxGetInt32s(plhs(1))
    xqpi(1:nq) => mxGetDoubles(plhs(2))
-#else
-   call c_f_pointer(mxGetData(plhs(1)), xqi, [ nq ])
-   xqpi(1:nq) => mxGetPr(plhs(2))
-#endif
 
    ! Call the Fortran function
    call bracket_linear_weight(x, n, xq, nq, xqi, xqpi)

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010-2024 Dynare Team
+ * Copyright © 2010-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -45,22 +45,12 @@ DynamicModelMFile::cmplxToReal(mxArray* cmplx_mx)
 {
   mxArray* real_mx = mxCreateDoubleMatrix(mxGetM(cmplx_mx), mxGetN(cmplx_mx), mxREAL);
 
-#if MX_HAS_INTERLEAVED_COMPLEX
   mxComplexDouble* cmplx = mxGetComplexDoubles(cmplx_mx);
-#else
-  double* cmplx_real = mxGetPr(cmplx_mx);
-  double* cmplx_imag = mxGetPi(cmplx_mx);
-#endif
   double* real = mxGetPr(real_mx);
 
   for (size_t i = 0; i < mxGetNumberOfElements(cmplx_mx); i++)
-#if MX_HAS_INTERLEAVED_COMPLEX
     if (cmplx[i].imag == 0.0)
       real[i] = cmplx[i].real;
-#else
-    if (cmplx_imag[i] == 0.0)
-      real[i] = cmplx_real[i];
-#endif
     else
       real[i] = std::numeric_limits<double>::quiet_NaN();
 
@@ -172,11 +162,7 @@ DynamicModelMFile::eval(const Vector& y, const Vector& x, const Vector& modParam
 
       const mxArray* sparse_indices_mx {dynamic_gN_sparse_indices[o - 2]};
       size_t nnz {mxGetM(sparse_indices_mx)};
-#if MX_HAS_INTERLEAVED_COMPLEX
       const int32_T* sparse_indices {mxGetInt32s(sparse_indices_mx)};
-#else
-      const int32_T* sparse_indices {static_cast<const int32_T*>(mxGetData(sparse_indices_mx))};
-#endif
 
       assert(mxGetNumberOfElements(plhs[0]) == nnz);
       double* gN_v {mxGetPr(plhs[0])};

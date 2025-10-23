@@ -18,7 +18,7 @@
 !   eigval       [complex] (n×1) vector of generalized eigenvalues
 !   info         [integer] scalar, error code of dgges (or 30 if eigenvalue close to 0÷0)
 
-! Copyright © 2006-2023 Dynare Team
+! Copyright © 2006-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -34,8 +34,6 @@
 !
 ! You should have received a copy of the GNU General Public License
 ! along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-#include "defines.F08"
 
 module select_fct_mod
   use iso_fortran_env
@@ -72,11 +70,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   ! The pointers used in the LAPACK call are marked as contiguous, to
   ! avoid temporary copies beforehand.
   real(real64), dimension(:), pointer, contiguous :: s, t, z, info, sdim, vsl
-#if MX_HAS_INTERLEAVED_COMPLEX
   complex(real64), dimension(:), pointer :: gev
-#else
-  real(real64), dimension(:), pointer :: gev_r, gev_i
-#endif
 
   if (nrhs < 2 .or. nrhs > 4 .or. nlhs /= 6) then
      call mexErrMsgTxt("MJDGGES: takes 2, 3 or 4 input arguments and exactly 6 output arguments.")
@@ -119,12 +113,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   s => mxGetPr(plhs(1))
   t => mxGetPr(plhs(2))
   sdim => mxGetPr(plhs(4))
-#if MX_HAS_INTERLEAVED_COMPLEX
   gev => mxGetComplexDoubles(plhs(5))
-#else
-  gev_r => mxGetPr(plhs(5))
-  gev_i => mxGetPi(plhs(5))
-#endif
   info => mxGetPr(plhs(6))
   z => mxGetPr(plhs(3))
   vsl => null()
@@ -145,20 +134,11 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   info = info_bl
   sdim = sdim_bl
 
-#if MX_HAS_INTERLEAVED_COMPLEX
   where (alpha_i == 0_real64 .and. beta == 0_real64)
      gev = alpha_r / beta
   elsewhere
      gev = cmplx(alpha_r, alpha_i, real64) / beta
   end where
-#else
-  gev_r = alpha_r / beta
-  where (alpha_i == 0_real64 .and. beta == 0_real64)
-     gev_i = 0_real64
-  elsewhere
-     gev_i = alpha_i / beta
-  end where
-#endif
 
   ! If the ratio of some eigenvalue is too close to 0/0, return specific
   ! error number (only if no other error)

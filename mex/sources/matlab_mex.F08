@@ -7,14 +7,16 @@
 !
 ! Things to be aware of when adding new interfaces this file:
 !
+! – We only support the so-called interleaved API, available since MATLAB R2018a
+!   and Octave 7 (but for the latter broken before 8.4.0).
 ! — The tricky part is to deal with API versioning.
 !   For MATLAB ⩾ R2020a, all versions share the same API (embodied in API_VER
 !   define), but in the past the API would differ across function, so there
 !   was an API_VER2 define for those.
 !   For each function, the information can be retrieved from either matrix.h or
 !   mex.h.
-!   Under Octave, when the interleaved API is used, some functions have a
-!   different symbol name, handled through the API_VER_INTERLEAVED define;
+!   Under Octave, some functions have a different symbol name with the
+!   interleaved API, so we handle them through the API_VER_INTERLEAVED define;
 !   see octave/mexproto.h for the list of affected functions.
 ! — C passes arguments by value, so the “value” keyword is often needed
 ! — Strings passed to C must be null terminated (hence a wrapper is needed to
@@ -51,19 +53,13 @@
 ! You should have received a copy of the GNU General Public License
 ! along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "defines.F08"
-
 #ifdef MATLAB_MEX_FILE
 # define API_VER "_800"
-# define API_VER_INTERLEAVED "_800"
+# define API_VER_INTERLEAVED API_VER
 #else
 ! Octave
 # define API_VER ""
-# if MX_HAS_INTERLEAVED_COMPLEX
-#  define API_VER_INTERLEAVED "_interleaved"
-# else
-#  define API_VER_INTERLEAVED ""
-# endif
+# define API_VER_INTERLEAVED "_interleaved"
 #endif
 
 !!! C Matrix API
@@ -180,12 +176,10 @@ module matlab_mat
        type(c_ptr), intent(in), value :: pm
      end function mxIsDouble
 
-#if MX_HAS_INTERLEAVED_COMPLEX
      pure type(c_ptr) function mxGetDoubles_internal(pm) bind(c, name="mxGetDoubles"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
      end function mxGetDoubles_internal
-#endif
 
      pure type(c_ptr) function mxGetPr_internal(pm) bind(c, name="mxGetPr"//API_VER)
        use iso_c_binding
@@ -199,37 +193,26 @@ module matlab_mat
        type(c_ptr), intent(in), value :: pm
      end function mxIsInt32
 
-#if MX_HAS_INTERLEAVED_COMPLEX
      pure type(c_ptr) function mxGetInt32s_internal(pa) bind(c, name="mxGetInt32s"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pa
      end function mxGetInt32s_internal
-#endif
 
      pure logical(c_bool) function mxIsInt64(pm) bind(c, name="mxIsInt64"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
      end function mxIsInt64
 
-#if MX_HAS_INTERLEAVED_COMPLEX
      pure type(c_ptr) function mxGetInt64s_internal(pa) bind(c, name="mxGetInt64s"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pa
      end function mxGetInt64s_internal
-#endif
 
      ! Complex Float
-#if MX_HAS_INTERLEAVED_COMPLEX
      pure type(c_ptr) function mxGetComplexDoubles_internal(pa) bind(c, name="mxGetComplexDoubles"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pa
      end function mxGetComplexDoubles_internal
-#else
-     pure type(c_ptr) function mxGetPi_internal(pm) bind(c, name="mxGetPi"//API_VER)
-       use iso_c_binding
-       type(c_ptr), intent(in), value :: pm
-     end function mxGetPi_internal
-#endif
 
      ! Sparse
      type(c_ptr) function mxCreateSparse(m, n, nzmax, ComplexFlag) bind(c, name="mxCreateSparse"//API_VER_INTERLEAVED)
@@ -380,13 +363,11 @@ module matlab_mat
 contains
   ! Some helper functions to make the interface more Fortran-ish
 
-#if MX_HAS_INTERLEAVED_COMPLEX
   function mxGetDoubles(pm)
     type(c_ptr), intent(in) :: pm
     real(real64), dimension(:), pointer, contiguous :: mxGetDoubles
     call c_f_pointer(mxGetDoubles_internal(pm), mxGetDoubles, [ mxGetNumberOfElements(pm) ])
   end function mxGetDoubles
-#endif
 
   function mxGetPr(pm)
     type(c_ptr), intent(in) :: pm
@@ -394,7 +375,6 @@ contains
     call c_f_pointer(mxGetPr_internal(pm), mxGetPr, [ mxGetNumberOfElements(pm) ])
   end function mxGetPr
 
-#if MX_HAS_INTERLEAVED_COMPLEX
   function mxGetInt32s(pa)
     type(c_ptr), intent(in) :: pa
     integer(int32), dimension(:), pointer, contiguous :: mxGetInt32s
@@ -406,21 +386,12 @@ contains
     integer(int64), dimension(:), pointer, contiguous :: mxGetInt64s
     call c_f_pointer(mxGetInt64s_internal(pa), mxGetInt64s, [ mxGetNumberOfElements(pa) ])
   end function mxGetInt64s
-#endif
 
-#if MX_HAS_INTERLEAVED_COMPLEX
   function mxGetComplexDoubles(pa)
     type(c_ptr), intent(in) :: pa
     complex(real64), dimension(:), pointer, contiguous :: mxGetComplexDoubles
     call c_f_pointer(mxGetComplexDoubles_internal(pa), mxGetComplexDoubles, [ mxGetNumberOfElements(pa) ])
   end function mxGetComplexDoubles
-#else
-  function mxGetPi(pm)
-    type(c_ptr), intent(in) :: pm
-    real(real64), dimension(:), pointer, contiguous :: mxGetPi
-    call c_f_pointer(mxGetPi_internal(pm), mxGetPi, [ mxGetNumberOfElements(pm) ])
-  end function mxGetPi
-#endif
 
   function mxGetIr(pm)
     type(c_ptr), intent(in) :: pm

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021-2024 Dynare Team
+ * Copyright © 2021-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -133,11 +133,7 @@ ObjectiveMFile::eval(const Vector& y, const Vector& x, const Vector& modParams, 
 
       const mxArray* sparse_indices_mx {objective_gN_sparse_indices[o - 2]};
       size_t nnz {mxGetM(sparse_indices_mx)};
-#if MX_HAS_INTERLEAVED_COMPLEX
       const int32_T* sparse_indices {mxGetInt32s(sparse_indices_mx)};
-#else
-      const int32_T* sparse_indices {static_cast<const int32_T*>(mxGetData(sparse_indices_mx))};
-#endif
 
       assert(mxGetNumberOfElements(plhs[0]) == nnz);
       double* gN_v {mxGetPr(plhs[0])};

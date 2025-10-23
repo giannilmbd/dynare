@@ -11,7 +11,7 @@
 ! be set in order to give the input values for the indices that are not passed
 ! to matlab_fcn.
 
-! Copyright © 2019-2023 Dynare Team
+! Copyright © 2019-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -27,8 +27,6 @@
 !
 ! You should have received a copy of the GNU General Public License
 ! along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-#include "defines.F08"
 
 module matlab_fcn_closure
   use iso_c_binding
@@ -102,23 +100,12 @@ contains
     else ! Complex case. Transform numbers with nonzero imaginary part into NaNs
        block
          real(real64), dimension(:), allocatable :: fvec_all_with_nans
-#if MX_HAS_INTERLEAVED_COMPLEX
          complex(real64), dimension(:), pointer, contiguous :: fvec_all
          fvec_all => mxGetComplexDoubles(call_lhs(1))
-#else
-         real(real64), dimension(:), pointer, contiguous :: fvec_all_real, fvec_all_imag
-         fvec_all_real => mxGetPr(call_lhs(1))
-         fvec_all_imag => mxGetPi(call_lhs(1))
-#endif
          allocate(fvec_all_with_nans(n_all))
 
-#if MX_HAS_INTERLEAVED_COMPLEX
          where (fvec_all%im == 0._real64)
             fvec_all_with_nans = fvec_all%re
-#else
-         where (fvec_all_imag == 0._real64)
-            fvec_all_with_nans = fvec_all_real
-#endif
          elsewhere
             fvec_all_with_nans = ieee_value(0._real64, ieee_quiet_nan)
          end where
@@ -162,23 +149,12 @@ contains
        else ! Complex case. Transform numbers with nonzero imaginary part into NaNs
           block
             real(real64), dimension(:,:), allocatable :: fjac_all_with_nans
-#if MX_HAS_INTERLEAVED_COMPLEX
             complex(real64), dimension(:,:), pointer, contiguous :: fjac_all
             fjac_all(1:n_all,1:n_all) => mxGetComplexDoubles(call_lhs(2))
-#else
-            real(real64), dimension(:,:), pointer, contiguous :: fjac_all_real, fjac_all_imag
-            fjac_all_real(1:n_all,1:n_all) => mxGetPr(call_lhs(2))
-            fjac_all_imag(1:n_all,1:n_all) => mxGetPi(call_lhs(2))
-#endif
             allocate(fjac_all_with_nans(n_all, n_all))
 
-#if MX_HAS_INTERLEAVED_COMPLEX
             where (fjac_all%im == 0._real64)
                fjac_all_with_nans = fjac_all%re
-#else
-            where (fjac_all_imag == 0._real64)
-               fjac_all_with_nans = fjac_all_real
-#endif
             elsewhere
                fjac_all_with_nans = ieee_value(0._real64, ieee_quiet_nan)
             end where

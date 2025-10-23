@@ -151,12 +151,7 @@ DynamicModelMatlabCaller::cmplxToReal(mxArray* cmplx_mx)
       std::ranges::copy_n(mxGetJc(cmplx_mx), mxGetN(cmplx_mx) + 1, mxGetJc(real_mx));
     }
 
-#if MX_HAS_INTERLEAVED_COMPLEX
   mxComplexDouble* cmplx {mxGetComplexDoubles(cmplx_mx)};
-#else
-  double* cmplx_real {mxGetPr(cmplx_mx)};
-  double* cmplx_imag {mxGetPi(cmplx_mx)};
-#endif
   double* real {mxGetPr(real_mx)};
   for (std::conditional_t<sparse, mwSize, size_t> i {0};
        i <
@@ -168,13 +163,8 @@ DynamicModelMatlabCaller::cmplxToReal(mxArray* cmplx_mx)
        }(); // Use a lambda instead of the ternary operator to have the right type (there is no
             // constexpr ternary operator)
        i++)
-#if MX_HAS_INTERLEAVED_COMPLEX
     if (cmplx[i].imag == 0.0)
       real[i] = cmplx[i].real;
-#else
-    if (cmplx_imag[i] == 0.0)
-      real[i] = cmplx_real[i];
-#endif
     else
       real[i] = std::numeric_limits<double>::quiet_NaN();
 

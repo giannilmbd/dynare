@@ -122,11 +122,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   const mxArray* g1_sparse_rowval_mx {mxGetField(M_mx, 0, "dynamic_g1_sparse_rowval")};
   if (!(mxIsInt32(g1_sparse_rowval_mx)))
     mexErrMsgTxt("M_.dynamic_g1_sparse_rowval should be an int32 vector");
-#if MX_HAS_INTERLEAVED_COMPLEX
   const int32_T* g1_sparse_rowval {mxGetInt32s(g1_sparse_rowval_mx)};
-#else
-  const int32_T* g1_sparse_rowval {static_cast<const int32_T*>(mxGetData(g1_sparse_rowval_mx))};
-#endif
 
   const mxArray* g1_sparse_colval_mx {mxGetField(M_mx, 0, "dynamic_g1_sparse_colval")};
   if (!(mxIsInt32(g1_sparse_colval_mx)))
@@ -141,11 +137,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     mexErrMsgTxt(("M_.dynamic_g1_sparse_colptr should be an int32 vector with "
                   + std::to_string(3 * ny + nx + 1) + " elements")
                      .c_str());
-#if MX_HAS_INTERLEAVED_COMPLEX
   const int32_T* g1_sparse_colptr {mxGetInt32s(g1_sparse_colptr_mx)};
-#else
-  const int32_T* g1_sparse_colptr {static_cast<const int32_T*>(mxGetData(g1_sparse_colptr_mx))};
-#endif
   if (static_cast<size_t>(g1_sparse_colptr[3 * ny + nx]) - 1
       != mxGetNumberOfElements(g1_sparse_rowval_mx))
     mexErrMsgTxt("The size of M_.dynamic_g1_sparse_rowval is not consistent with the last element "
