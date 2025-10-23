@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2024 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -108,7 +108,7 @@ Vector::Vector(const Vector& v, int off_arg, int skip, int l) : len(l), data {ne
 }
 
 Vector::Vector(mxArray* p) :
-    len {static_cast<int>(mxGetNumberOfElements(p))}, data {mxGetPr(p)}, destroy {false}
+    len {static_cast<int>(mxGetNumberOfElements(p))}, data {mxGetDoubles(p)}, destroy {false}
 {
   if (!mxIsDouble(p) || mxIsComplex(p) || mxIsSparse(p))
     throw SYLV_MES_EXCEPTION("This is not a dense array of real doubles.");
@@ -268,7 +268,7 @@ ConstVector::ConstVector(const double* d, int skip, int l) : len {l}, s {skip}, 
 }
 
 ConstVector::ConstVector(const mxArray* p) :
-    len {static_cast<int>(mxGetNumberOfElements(p))}, data {mxGetPr(p)}
+    len {static_cast<int>(mxGetNumberOfElements(p))}, data {mxGetDoubles(p)}
 {
   if (!mxIsDouble(p))
     throw SYLV_MES_EXCEPTION("This is not a MATLAB array of doubles.");

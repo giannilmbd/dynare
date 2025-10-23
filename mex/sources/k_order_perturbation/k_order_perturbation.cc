@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008-2024 Dynare Team
+ * Copyright © 2008-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -73,7 +73,7 @@ copy_derivatives(mxArray* destin, const Symmetry& sym, const FGSContainer& deriv
   int n = x_unfolded->nrows();
   int m = x_unfolded->ncols();
   mxArray* tmp = mxCreateDoubleMatrix(n, m, mxREAL);
-  std::ranges::copy_n(x_unfolded->getData().base(), n * m, mxGetPr(tmp));
+  std::ranges::copy_n(x_unfolded->getData().base(), n * m, mxGetDoubles(tmp));
   mxSetField(destin, 0, fieldname, tmp);
 }
 
@@ -193,8 +193,8 @@ extern "C"
           && mxGetNumberOfElements(dynamic_tmp_nbr_mx) >= static_cast<size_t>(kOrder + 1)))
       mexErrMsgTxt("M_.dynamic_tmp_nbr should be a real dense array with strictly more elements "
                    "than the order of derivation");
-    int ntt
-        = std::accumulate(mxGetPr(dynamic_tmp_nbr_mx), mxGetPr(dynamic_tmp_nbr_mx) + kOrder + 1, 0);
+    int ntt = std::accumulate(mxGetDoubles(dynamic_tmp_nbr_mx),
+                              mxGetDoubles(dynamic_tmp_nbr_mx) + kOrder + 1, 0);
 
     // Extract various fields from dr
     const mxArray* ys_mx = mxGetField(dr_mx, 0, "ys"); // and not in order of dr.order_var
@@ -210,8 +210,8 @@ extern "C"
           && mxGetNumberOfElements(order_var_mx) == static_cast<size_t>(nEndo)))
       mexErrMsgTxt("dr.order_var should be a real dense array of M_.endo_nbr elements");
     std::vector<int> dr_order(nEndo);
-    std::ranges::transform(mxGetPr(order_var_mx), mxGetPr(order_var_mx) + nEndo, dr_order.begin(),
-                           [](double x) { return static_cast<int>(x) - 1; });
+    std::ranges::transform(mxGetDoubles(order_var_mx), mxGetDoubles(order_var_mx) + nEndo,
+                           dr_order.begin(), [](double x) { return static_cast<int>(x) - 1; });
 
     // Retrieve sparse indices for dynamic model
 
@@ -303,7 +303,7 @@ extern "C"
             mxArray* tmp = mxCreateDoubleMatrix(t.nrows(), t.ncols(), mxREAL);
             const ConstVector& vec = t.getData();
             assert(vec.skip() == 1);
-            std::ranges::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
+            std::ranges::copy_n(vec.base(), vec.length(), mxGetDoubles(tmp));
             mxSetField(plhs[0], 0, g_fieldnames_c[i], tmp);
           }
 
@@ -322,7 +322,7 @@ extern "C"
                 mxArray* tmp = mxCreateDoubleMatrix(t.nrows(), t.ncols(), mxREAL);
                 const ConstVector& vec = t.getData();
                 assert(vec.skip() == 1);
-                std::ranges::copy_n(vec.base(), vec.length(), mxGetPr(tmp));
+                std::ranges::copy_n(vec.base(), vec.length(), mxGetDoubles(tmp));
                 mxSetField(dr_pruning, 0, g_fieldnames_c[i], tmp);
               }
           }

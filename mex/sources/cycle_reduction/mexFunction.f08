@@ -1,4 +1,4 @@
-! Copyright © 2022-2023 Dynare Team
+! Copyright © 2022-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -170,15 +170,15 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    end if
    
    ! 1. Storing the relevant information in Fortran format
-   A0(1:n,1:n) => mxGetPr(prhs(1))
-   A1(1:n,1:n) => mxGetPr(prhs(2))
-   A2(1:n,1:n) => mxGetPr(prhs(3))
+   A0(1:n,1:n) => mxGetDoubles(prhs(1))
+   A1(1:n,1:n) => mxGetDoubles(prhs(2))
+   A2(1:n,1:n) => mxGetDoubles(prhs(3))
    cvg_tol = mxGetScalar(prhs(4))
    max_it = int(mxGetScalar(prhs(5)))
    info = [0._c_double,0._c_double]
 
    plhs(1) = mxCreateDoubleMatrix(int(n, mwSize), int(n, mwSize), mxREAL)
-   X(1:n,1:n) => mxGetPr(plhs(1))
+   X(1:n,1:n) => mxGetDoubles(plhs(1))
 
    ! 2. Calling the Cycle Reduction algorithm
    call cycle_reduction(A0, A1, A2, X, cvg_tol, check, max_it, info)
@@ -189,7 +189,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
          plhs(2) = mxCreateDoubleScalar(0._c_double)
       else
          plhs(2) = mxCreateDoubleMatrix(1_mwSize, 2_mwSize, mxREAL)
-         mxGetPr(plhs(2)) = info
+         mxGetDoubles(plhs(2)) = info
       end if
    end if
 

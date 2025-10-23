@@ -44,8 +44,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   nA = mxGetN(prhs(1))
   mB = mxGetM(prhs(2))
   nB = mxGetN(prhs(2))
-  A(1:mA,1:nA) => mxGetPr(prhs(1))
-  B(1:mB,1:nB) => mxGetPr(prhs(2))
+  A(1:mA,1:nA) => mxGetDoubles(prhs(1))
+  B(1:mB,1:nB) => mxGetDoubles(prhs(2))
 
   if (nrhs == 3) then
      ! A·(B⊗C) is to be computed.
@@ -58,10 +58,10 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
         call mexErrMsgTxt("Input dimension error!")
      end if
 
-     C(1:mC,1:nC) => mxGetPr(prhs(3))
+     C(1:mC,1:nC) => mxGetDoubles(prhs(3))
 
      plhs(1) = mxCreateDoubleMatrix(mA, nB*nC, mxREAL)
-     D(1:mA,1:nB*nC) => mxGetPr(plhs(1))
+     D(1:mA,1:nB*nC) => mxGetDoubles(plhs(1))
 
      call full_A_times_kronecker_B_C
   else
@@ -71,7 +71,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
      end if
 
      plhs(1) = mxCreateDoubleMatrix(mA, nB*nB, mxREAL)
-     D(1:mA,1:nB*nB) => mxGetPr(plhs(1))
+     D(1:mA,1:nB*nB) => mxGetDoubles(plhs(1))
 
      call full_A_times_kronecker_B_B
   end if

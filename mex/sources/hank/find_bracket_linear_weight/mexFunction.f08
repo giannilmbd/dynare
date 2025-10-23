@@ -70,8 +70,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    end if
 
    ! Convert MATLAB inputs to Fortran variables
-   x => mxGetPr(x_mx)
-   xq => mxGetPr(xq_mx)
+   x => mxGetDoubles(x_mx)
+   xq => mxGetDoubles(xq_mx)
    n = int(mxGetNumberOfElements(x_mx), int32)
    nq = int(mxGetNumberOfElements(xq_mx), int32)
 

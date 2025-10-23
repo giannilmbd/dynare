@@ -181,11 +181,6 @@ module matlab_mat
        type(c_ptr), intent(in), value :: pm
      end function mxGetDoubles_internal
 
-     pure type(c_ptr) function mxGetPr_internal(pm) bind(c, name="mxGetPr"//API_VER)
-       use iso_c_binding
-       type(c_ptr), intent(in), value :: pm
-     end function mxGetPr_internal
-
      ! Noncomplex integer
 
      pure logical(c_bool) function mxIsInt32(pm) bind(c, name="mxIsInt32"//API_VER)
@@ -368,12 +363,6 @@ contains
     real(real64), dimension(:), pointer, contiguous :: mxGetDoubles
     call c_f_pointer(mxGetDoubles_internal(pm), mxGetDoubles, [ mxGetNumberOfElements(pm) ])
   end function mxGetDoubles
-
-  function mxGetPr(pm)
-    type(c_ptr), intent(in) :: pm
-    real(real64), dimension(:), pointer, contiguous :: mxGetPr
-    call c_f_pointer(mxGetPr_internal(pm), mxGetPr, [ mxGetNumberOfElements(pm) ])
-  end function mxGetPr
 
   function mxGetInt32s(pa)
     type(c_ptr), intent(in) :: pa

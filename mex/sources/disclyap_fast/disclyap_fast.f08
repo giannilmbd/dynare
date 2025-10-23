@@ -20,7 +20,7 @@
 ! This is a Fortran translation of a code originally written by Joe Pearlman
 ! and Alejandro Justiniano.
 
-! Copyright © 2020-2023 Dynare Team
+! Copyright © 2020-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -95,7 +95,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
   ! Allocate and initialize temporary variables
   allocate(P0(n,n), P1(n,n), A0(n,n), A1(n,n), Ptmp(n,n))
-  associate (G => mxGetPr(prhs(1)), V => mxGetPr(prhs(2)))
+  associate (G => mxGetDoubles(prhs(1)), V => mxGetDoubles(prhs(2)))
     P0 = reshape(V, [n, n])
     A0 = reshape(G, [n, n])
   end associate
@@ -122,7 +122,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
   ! Allocate and set outputs
   plhs(1) = mxCreateDoubleMatrix(n, n, mxREAL)
-  X(1:n, 1:n) => mxGetPr(plhs(1))
+  X(1:n, 1:n) => mxGetDoubles(plhs(1))
   if (nlhs > 1) plhs(2) = mxCreateLogicalScalar(.false._mxLogical)
 
   if (iter == max_iter) then

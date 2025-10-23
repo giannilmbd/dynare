@@ -34,7 +34,7 @@ init_stacked_jacobian(mwIndex periods, mwIndex njcol, const int32_T* g1_sparse_r
                                     + (g1_sparse_colptr[2 * njcol] - g1_sparse_colptr[njcol]))};
 
   mxArray* stacked_jacobian_mx = mxCreateSparse(periods * njcol, periods * njcol, nzmax, mxREAL);
-  double* stacked_jacobian = mxGetPr(stacked_jacobian_mx);
+  double* stacked_jacobian = mxGetDoubles(stacked_jacobian_mx);
   mwIndex* ir = mxGetIr(stacked_jacobian_mx);
   mwIndex* jc = mxGetJc(stacked_jacobian_mx);
 

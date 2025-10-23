@@ -149,7 +149,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   int unit_hypercube_flag = 1;
   if (type == 0 && nrhs > 4)
     {
-      lower_bounds = mxGetPr(prhs[4]);
+      lower_bounds = mxGetDoubles(prhs[4]);
       upper_bounds = lower_bounds + dimension;
       unit_hypercube_flag = 0;
     }
@@ -157,7 +157,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   int identity_covariance_matrix = 1;
   if (type == 1 && nrhs > 4)
     {
-      cholcov = mxGetPr(prhs[4]);
+      cholcov = mxGetDoubles(prhs[4]);
       identity_covariance_matrix = 0;
     }
   double radius = 1.0;
@@ -173,7 +173,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   ** Initialize outputs of the mex file.
   */
   plhs[0] = mxCreateDoubleMatrix(dimension, sequence_size, mxREAL);
-  double* qmc_draws = mxGetPr(plhs[0]);
+  double* qmc_draws = mxGetDoubles(plhs[0]);
   int64_T seed_out;
 
   if (sequence_size == 1)

@@ -99,11 +99,11 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   if (!(mxIsDouble(y0_mx) && mxGetM(y0_mx) == static_cast<size_t>(ny) && mxGetN(y0_mx) == 1))
     mexErrMsgTxt("y0 should be a double precision column-vector of M_.endo_nbr elements");
-  const double* y0 = mxGetPr(y0_mx);
+  const double* y0 = mxGetDoubles(y0_mx);
 
   if (!(mxIsDouble(yT_mx) && mxGetM(yT_mx) == static_cast<size_t>(ny) && mxGetN(yT_mx) == 1))
     mexErrMsgTxt("yT should be a double precision column-vector of M_.endo_nbr elements");
-  const double* yT = mxGetPr(yT_mx);
+  const double* yT = mxGetDoubles(yT_mx);
 
   if (!(mxIsDouble(exo_path_mx)
         && mxGetM(exo_path_mx) >= static_cast<size_t>(periods + maximum_lag)))
@@ -111,7 +111,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         "exo_path should be a double precision matrix with at least periods+M_.maximum_lag rows");
   auto nx = static_cast<mwIndex>(mxGetN(exo_path_mx));
   size_t nb_row_x = mxGetM(exo_path_mx);
-  const double* exo_path = mxGetPr(exo_path_mx);
+  const double* exo_path = mxGetDoubles(exo_path_mx);
 
   const mxArray* block_structure_mx {mxGetField(M_mx, 0, "block_structure")};
   if (!(block_structure_mx && mxIsStruct(block_structure_mx)))
@@ -169,19 +169,19 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   if (!(mxIsDouble(params_mx) && mxGetN(params_mx) == 1))
     mexErrMsgTxt("params should be a double precision column-vector");
-  const double* params = mxGetPr(params_mx);
+  const double* params = mxGetDoubles(params_mx);
 
   if (!(mxIsDouble(steady_state_mx) && mxGetN(steady_state_mx) == 1))
     mexErrMsgTxt("steady_state should be a double precision column-vector");
-  const double* steady_state = mxGetPr(steady_state_mx);
+  const double* steady_state = mxGetDoubles(steady_state_mx);
 
   // Allocate output matrices
   plhs[0] = mxDuplicateArray(y_mx);
   plhs[1] = mxDuplicateArray(T_mx);
   plhs[2] = mxCreateDoubleMatrix(periods * mfs, 1, mxREAL);
-  double* y = mxGetPr(plhs[0]);
-  double* TT = mxGetPr(plhs[1]); // Named TT to avoid name-clash with mwIndex T (period index)
-  double* stacked_residual = mxGetPr(plhs[2]);
+  double* y = mxGetDoubles(plhs[0]);
+  double* TT = mxGetDoubles(plhs[1]); // Named TT to avoid name-clash with mwIndex T (period index)
+  double* stacked_residual = mxGetDoubles(plhs[2]);
 
   double* stacked_jacobian = nullptr;
   mwIndex *ir = nullptr, *jc = nullptr;

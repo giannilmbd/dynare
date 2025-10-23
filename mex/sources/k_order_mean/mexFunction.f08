@@ -1,4 +1,4 @@
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -132,19 +132,19 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    if (endo_nbr /= int(mxGetM(yhat_start_mx))) then
       call mexErrMsgTxt("yhat_start should have nstat+npred+nboth+nforw rows")
    end if
-   yhat_start => mxGetPr(yhat_start_mx)
+   yhat_start => mxGetDoubles(yhat_start_mx)
 
    if (exo_nbr /= int(mxGetM(shocks_mx))) then
       call mexErrMsgTxt("shocks should have nexog rows")
    end if
    nper = int(mxGetN(shocks_mx))
    allocate(shocks(exo_nbr,nper))
-   shocks = reshape(mxGetPr(shocks_mx),[exo_nbr,nper])
+   shocks = reshape(mxGetDoubles(shocks_mx),[exo_nbr,nper])
 
    if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) then
       call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
    end if
-   ysteady => mxGetPr(ysteady_mx)
+   ysteady => mxGetDoubles(ysteady_mx)
 
    allocate(h(0:order), fdr(0:order), udr(0:order)) 
    do i = 0, order
@@ -156,7 +156,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       m = int(mxGetM(tmp))
       n = int(mxGetN(tmp))
       allocate(fdr(i)%m(m,n), udr(i)%m(endo_nbr, nvar**i), h(i)%m(endo_nbr, nvar**i))
-      fdr(i)%m(1:m,1:n) = reshape(mxGetPr(tmp), [m,n])
+      fdr(i)%m(1:m,1:n) = reshape(mxGetDoubles(tmp), [m,n])
    end do
 
    udr(0)%m = fdr(0)%m
@@ -199,10 +199,10 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    ! Generating output
    plhs(1) = mxCreateDoubleMatrix(int(endo_nbr, mwSize), 1_mwSize, mxREAL)
-   mxGetPr(plhs(1)) = mean
+   mxGetDoubles(plhs(1)) = mean
    if (nlhs > 1) then
       plhs(2) = mxCreateDoubleMatrix(int(endo_nbr, mwSize), int(nper, mwSize), mxREAL)
-      mxGetPr(plhs(2)) = reshape(sim, [size(sim)])
+      mxGetDoubles(plhs(2)) = reshape(sim, [size(sim)])
    end if
 
 end subroutine mexFunction

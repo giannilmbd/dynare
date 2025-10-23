@@ -145,7 +145,7 @@ DynamicModelMatlabCaller::copy_jacobian_column(mwIndex col, double* dest) const
           while (isrc < jc[col + 1] && ir[isrc] < row)
             isrc++;
           if (isrc < jc[col + 1] && ir[isrc] == row)
-            dest[idest] = mxGetPr(jacobian_mx)[isrc];
+            dest[idest] = mxGetDoubles(jacobian_mx)[isrc];
           else
             dest[idest] = 0.0;
         }
@@ -291,7 +291,7 @@ DynamicModelNoblockMatlabCaller::eval(double* resid)
     if (mxIsComplex(plhs[0]))
       plhs[0] = cmplxToReal<false>(plhs[0]);
 
-    std::ranges::copy_n(mxGetPr(plhs[0]), mxGetNumberOfElements(plhs[0]), resid);
+    std::ranges::copy_n(mxGetDoubles(plhs[0]), mxGetNumberOfElements(plhs[0]), resid);
     mxDestroyArray(plhs[0]);
 
     T_order_mx = plhs[1];
@@ -497,7 +497,7 @@ DynamicModelBlockMatlabCaller::eval(double* resid)
   if (mxIsComplex(plhs[2]))
     plhs[2] = cmplxToReal<false>(plhs[2]);
 
-  std::ranges::copy_n(mxGetPr(plhs[2]), mxGetNumberOfElements(plhs[2]), resid);
+  std::ranges::copy_n(mxGetDoubles(plhs[2]), mxGetNumberOfElements(plhs[2]), resid);
   mxDestroyArray(plhs[2]);
 
   if (compute_jacobian)

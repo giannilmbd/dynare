@@ -136,7 +136,7 @@ contains
          if (.not. (c_associated(g_q) .and. mxIsDouble(g_q) .and. .not. mxIsComplex(g_q) .and. .not. mxIsSparse(g_q))) then
             call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr.pruning")
          end if
-         g(q)%m(1:mxGetM(g_q),1:mxGetN(g_q)) => mxGetPr(g_q)
+         g(q)%m(1:mxGetM(g_q),1:mxGetN(g_q)) => mxGetDoubles(g_q)
          q = q+1
       end do
       ! Initialize useful variables
@@ -239,7 +239,7 @@ contains
          if (.not. (c_associated(g_d) .and. mxIsDouble(g_d) .and. .not. mxIsComplex(g_d) .and. .not. mxIsSparse(g_d))) then
             call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
          end if
-         fg(d)%m(1:mxGetM(g_d),1:mxGetN(g_d)) => mxGetPr(g_d)
+         fg(d)%m(1:mxGetM(g_d),1:mxGetN(g_d)) => mxGetDoubles(g_d)
          d = d+1
       end do
       ! Put decision rules matrices in the unfolded form

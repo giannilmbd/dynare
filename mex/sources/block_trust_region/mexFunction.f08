@@ -1,4 +1,4 @@
-! Copyright © 2019-2023 Dynare Team
+! Copyright © 2019-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -83,7 +83,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   block_decompose = mxGetScalar(prhs(7)) == 1._c_double
   debug = mxGetScalar(prhs(8)) == 1._c_double
   extra_args => prhs(9:nrhs) ! Extra arguments to func are in argument 8 and subsequent ones
-  associate (x_mat => mxGetPr(prhs(2)))
+  associate (x_mat => mxGetDoubles(prhs(2)))
     allocate(x(size(x_mat)))
     x = x_mat
   end associate
@@ -161,7 +161,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   end if
 
   plhs(1) = mxCreateDoubleMatrix(int(size(x, 1), mwSize), 1_mwSize, mxREAL)
-  mxGetPr(plhs(1)) = x
+  mxGetDoubles(plhs(1)) = x
   if (info == 1 .or. info == -1) then
      plhs(2) = mxCreateDoubleScalar(0._c_double)
   else

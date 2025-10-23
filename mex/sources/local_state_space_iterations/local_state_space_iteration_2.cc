@@ -1,5 +1,5 @@
 /*
- * Copyright © 2010-2024 Dynare Team
+ * Copyright © 2010-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -268,19 +268,19 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
 
   // Get Input arrays.
-  const double* yhat = mxGetPr(prhs[0]);
-  const double* epsilon = mxGetPr(prhs[1]);
-  const double* ghx = mxGetPr(prhs[2]);
-  const double* ghu = mxGetPr(prhs[3]);
-  const double* constant = mxGetPr(prhs[4]);
-  const double* ghxx = mxGetPr(prhs[5]);
-  const double* ghuu = mxGetPr(prhs[6]);
-  const double* ghxu = mxGetPr(prhs[7]);
+  const double* yhat = mxGetDoubles(prhs[0]);
+  const double* epsilon = mxGetDoubles(prhs[1]);
+  const double* ghx = mxGetDoubles(prhs[2]);
+  const double* ghu = mxGetDoubles(prhs[3]);
+  const double* constant = mxGetDoubles(prhs[4]);
+  const double* ghxx = mxGetDoubles(prhs[5]);
+  const double* ghuu = mxGetDoubles(prhs[6]);
+  const double* ghxu = mxGetDoubles(prhs[7]);
   const double *yhat_ = nullptr, *ss = nullptr;
   if (nrhs > 9)
     {
-      yhat_ = mxGetPr(prhs[8]);
-      ss = mxGetPr(prhs[9]);
+      yhat_ = mxGetDoubles(prhs[8]);
+      ss = mxGetDoubles(prhs[9]);
     }
 
   const mxArray* numthreads_mx = prhs[nrhs == 9 ? 8 : 10];
@@ -297,7 +297,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   if (nrhs == 9)
     {
       plhs[0] = mxCreateDoubleMatrix(m, s, mxREAL);
-      double* y = mxGetPr(plhs[0]);
+      double* y = mxGetDoubles(plhs[0]);
       ss2Iteration(y, yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, static_cast<int>(m),
                    static_cast<int>(n), static_cast<int>(q), static_cast<int>(s), numthreads);
     }
@@ -305,8 +305,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     {
       plhs[0] = mxCreateDoubleMatrix(m, s, mxREAL);
       plhs[1] = mxCreateDoubleMatrix(m, s, mxREAL);
-      double* y = mxGetPr(plhs[0]);
-      double* y_ = mxGetPr(plhs[1]);
+      double* y = mxGetDoubles(plhs[0]);
+      double* y_ = mxGetDoubles(plhs[1]);
       ss2Iteration_pruning(y, y_, yhat, yhat_, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, ss,
                            static_cast<int>(m), static_cast<int>(n), static_cast<int>(q),
                            static_cast<int>(s), numthreads);

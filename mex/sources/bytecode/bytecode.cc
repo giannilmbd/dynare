@@ -80,20 +80,20 @@ Get_Arguments_and_global_variables(int nrhs, const mxArray* prhs[], double* yd[]
               *options_ = prhs[i];
               break;
             case 2:
-              *yd = mxGetPr(prhs[i]);
+              *yd = mxGetDoubles(prhs[i]);
               row_y = mxGetM(prhs[i]);
               col_y = mxGetN(prhs[i]);
               break;
             case 3:
-              *xd = mxGetPr(prhs[i]);
+              *xd = mxGetDoubles(prhs[i]);
               row_x = mxGetM(prhs[i]);
               col_x = mxGetN(prhs[i]);
               break;
             case 4:
-              *params = mxGetPr(prhs[i]);
+              *params = mxGetDoubles(prhs[i]);
               break;
             case 5:
-              *steady_yd = mxGetPr(prhs[i]);
+              *steady_yd = mxGetDoubles(prhs[i]);
               steady_row_y = mxGetM(prhs[i]);
               steady_col_y = mxGetN(prhs[i]);
               break;
@@ -270,8 +270,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
                      "shock_perfect_foresight_");
 
       // Check that there is no 'perfect_foresight' shocks, which are not implemented
-      double* constrained_pf = mxGetPr(constrained_perfect_foresight_);
-      double* shock_pf = mxGetPr(shock_perfect_foresight_);
+      double* constrained_pf = mxGetDoubles(constrained_perfect_foresight_);
+      double* shock_pf = mxGetDoubles(shock_perfect_foresight_);
       if (auto is_pf = [](double v) { return v != 0; };
           ranges::any_of(constrained_pf,
                          constrained_pf + mxGetNumberOfElements(constrained_perfect_foresight_),
@@ -295,8 +295,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         }
       double* controlled_varexo_value = nullptr;
       if (controlled_varexo)
-        controlled_varexo_value = mxGetPr(controlled_varexo);
-      double* constrained_var_value = mxGetPr(constrained_vars_);
+        controlled_varexo_value = mxGetDoubles(controlled_varexo);
+      double* constrained_var_value = mxGetDoubles(constrained_vars_);
       sconditional_extended_path.resize(nb_constrained);
       max_periods = 0;
       if (nb_constrained)
@@ -323,8 +323,9 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
           sconditional_extended_path[i].exo_num = ceil(constrained_var_value[i]) - 1;
           sconditional_extended_path[i].var_num = ceil(controlled_varexo_value[i]) - 1;
           mxArray* Array_constrained_paths_ = mxGetCell(constrained_paths_, i);
-          double* specific_constrained_paths_ = mxGetPr(Array_constrained_paths_);
-          double* specific_constrained_int_date_ = mxGetPr(mxGetCell(constrained_int_date_, i));
+          double* specific_constrained_paths_ = mxGetDoubles(Array_constrained_paths_);
+          double* specific_constrained_int_date_
+              = mxGetDoubles(mxGetCell(constrained_int_date_, i));
           int nb_local_periods
               = mxGetM(Array_constrained_paths_) * mxGetN(Array_constrained_paths_);
           int* constrained_int_date = static_cast<int*>(mxMalloc(nb_local_periods * sizeof(int)));
@@ -357,15 +358,15 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
           mxFree(constrained_int_date);
         }
       vector_table_conditional_local_type vv = table_conditional_global[0];
-      double* shock_var_value = mxGetPr(shock_var_);
+      double* shock_var_value = mxGetDoubles(shock_var_);
       int nb_shocks = mxGetM(shock_var_) * mxGetN(shock_var_);
       sextended_path.resize(nb_shocks);
       for (int i = 0; i < nb_shocks; i++)
         {
           sextended_path[i].exo_num = ceil(shock_var_value[i]);
           mxArray* Array_shock_paths_ = mxGetCell(shock_paths_, i);
-          double* specific_shock_paths_ = mxGetPr(Array_shock_paths_);
-          double* specific_shock_int_date_ = mxGetPr(mxGetCell(shock_int_date_, i));
+          double* specific_shock_paths_ = mxGetDoubles(Array_shock_paths_);
+          double* specific_shock_int_date_ = mxGetDoubles(mxGetCell(shock_int_date_, i));
           int nb_local_periods = mxGetM(Array_shock_paths_) * mxGetN(Array_shock_paths_);
           if (nb_periods < nb_local_periods)
             mexErrMsgTxt(("The total number of simulation periods (" + to_string(nb_periods)
@@ -400,12 +401,12 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     {
       int field = mxGetFieldNumber(M_, "maximum_lag");
       if (field >= 0)
-        y_kmin = static_cast<int>(floor(*(mxGetPr(mxGetFieldByNumber(M_, 0, field)))));
+        y_kmin = static_cast<int>(floor(*(mxGetDoubles(mxGetFieldByNumber(M_, 0, field)))));
       else
         mexErrMsgTxt("maximum_lag is not a field of M_");
       field = mxGetFieldNumber(M_, "maximum_lead");
       if (field >= 0)
-        y_kmax = static_cast<int>(floor(*(mxGetPr(mxGetFieldByNumber(M_, 0, field)))));
+        y_kmax = static_cast<int>(floor(*(mxGetDoubles(mxGetFieldByNumber(M_, 0, field)))));
       else
         mexErrMsgTxt("maximum_lead is not a field of M_");
     }
@@ -438,25 +439,27 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
       else
         mexErrMsgTxt("maxit is not a field of options_.steady");
     }
-  int maxit_ = static_cast<int>(floor(*mxGetPr(mxGetFieldByNumber(temporarystruct, 0, field))));
+  int maxit_
+      = static_cast<int>(floor(*mxGetDoubles(mxGetFieldByNumber(temporarystruct, 0, field))));
 
   field = mxGetFieldNumber(options_, "markowitz");
   if (field < 0)
     mexErrMsgTxt("markowitz is not a field of options_");
-  auto markowitz_c = static_cast<double>(*mxGetPr(mxGetFieldByNumber(options_, 0, field)));
+  auto markowitz_c = static_cast<double>(*mxGetDoubles(mxGetFieldByNumber(options_, 0, field)));
   field = mxGetFieldNumber(options_, "minimal_solving_periods");
   if (field < 0)
     mexErrMsgTxt("minimal_solving_periods is not a field of options_");
-  int minimal_solving_periods = static_cast<int>(*mxGetPr(mxGetFieldByNumber(options_, 0, field)));
+  int minimal_solving_periods
+      = static_cast<int>(*mxGetDoubles(mxGetFieldByNumber(options_, 0, field)));
   field = mxGetFieldNumber(options_, "stack_solve_algo");
   if (field < 0)
     mexErrMsgTxt("stack_solve_algo is not a field of options_");
-  int stack_solve_algo = static_cast<int>(*mxGetPr(mxGetFieldByNumber(options_, 0, field)));
+  int stack_solve_algo = static_cast<int>(*mxGetDoubles(mxGetFieldByNumber(options_, 0, field)));
 
   field = mxGetFieldNumber(options_, "solve_algo");
   if (field < 0)
     mexErrMsgTxt("solve_algo is not a field of options_");
-  int solve_algo = static_cast<int>(*mxGetPr(mxGetFieldByNumber(options_, 0, field)));
+  int solve_algo = static_cast<int>(*mxGetDoubles(mxGetFieldByNumber(options_, 0, field)));
 
   /* Solver tolerance with respect to the residual. Equals options_.solve_tolf
      in the static case, or options_.dynatol.f in the dynamic case */
@@ -466,7 +469,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         int field {mxGetFieldNumber(options_, "solve_tolf")};
         if (field < 0)
           mexErrMsgTxt("solve_tolf is not a field of options_");
-        return *mxGetPr(mxGetFieldByNumber(options_, 0, field));
+        return *mxGetDoubles(mxGetFieldByNumber(options_, 0, field));
       }
     else
       {
@@ -477,7 +480,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         field = mxGetFieldNumber(dynatol, "f");
         if (field < 0)
           mexErrMsgTxt("f is not a field of options_.dynatol");
-        return *mxGetPr(mxGetFieldByNumber(dynatol, 0, field));
+        return *mxGetDoubles(mxGetFieldByNumber(dynatol, 0, field));
       }
   }()};
 
@@ -605,13 +608,13 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         {
           vector<double> residual = interprete.get_residual();
           plhs[0] = mxCreateDoubleMatrix(residual.size() / periods, periods, mxREAL);
-          std::ranges::copy(residual, mxGetPr(plhs[0]));
+          std::ranges::copy(residual, mxGetDoubles(plhs[0]));
         }
       else
         {
           int out_periods = extended_path ? max_periods + y_kmin : col_y;
           plhs[0] = mxCreateDoubleMatrix(row_y, out_periods, mxREAL);
-          std::ranges::copy_n(y, row_y * out_periods, mxGetPr(plhs[0]));
+          std::ranges::copy_n(y, row_y * out_periods, mxGetDoubles(plhs[0]));
         }
       if (nlhs > 1)
         {
@@ -668,14 +671,14 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
           else
             {
               plhs[1] = mxCreateDoubleMatrix(row_x, col_x, mxREAL);
-              double* pind = mxGetPr(plhs[1]);
+              double* pind = mxGetDoubles(plhs[1]);
               for (i = 0; i < row_x * col_x; i++)
                 pind[i] = x[i];
             }
           if (nlhs > 2)
             {
               plhs[2] = mxCreateDoubleMatrix(row_y, col_y, mxREAL);
-              double* pind = mxGetPr(plhs[2]);
+              double* pind = mxGetDoubles(plhs[2]);
               for (i = 0; i < row_y * col_y; i++)
                 pind[i] = y[i];
               if (nlhs > 3)

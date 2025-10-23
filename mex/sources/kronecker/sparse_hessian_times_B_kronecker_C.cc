@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2024 Dynare Team
+ * Copyright © 2007-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -171,12 +171,12 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
   // Get input matrices:
   int numthreads;
-  const double* B = mxGetPr(prhs[1]);
+  const double* B = mxGetDoubles(prhs[1]);
   const double* C;
   const mxArray* numthreads_mx;
   if (nrhs == 4)
     {
-      C = mxGetPr(prhs[2]);
+      C = mxGetDoubles(prhs[2]);
       numthreads_mx = prhs[3];
     }
   else
@@ -191,13 +191,13 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   // Sparse (dynare) hessian matrix.
   const mwIndex* isparseA = mxGetIr(prhs[0]);
   const mwIndex* jsparseA = mxGetJc(prhs[0]);
-  const double* vsparseA = mxGetPr(prhs[0]);
+  const double* vsparseA = mxGetDoubles(prhs[0]);
   // Initialization of the ouput:
   if (nrhs == 4)
     plhs[0] = mxCreateDoubleMatrix(mA, nB * nC, mxREAL);
   else
     plhs[0] = mxCreateDoubleMatrix(mA, nB * nB, mxREAL);
-  double* D = mxGetPr(plhs[0]);
+  double* D = mxGetDoubles(plhs[0]);
 
   // Computational part:
   if (nrhs == 3)

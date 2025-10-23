@@ -148,7 +148,7 @@ Interpreter::Interpreter(Evaluate& evaluator_arg, double* params_arg, double* y_
       else
         GlobalTemporaryTerms = mxCreateDoubleMatrix(periods, ntt, mxREAL);
     }
-  T = mxGetPr(GlobalTemporaryTerms);
+  T = mxGetDoubles(GlobalTemporaryTerms);
 }
 
 void
@@ -1317,10 +1317,10 @@ bool
 Interpreter::Init_Matlab_Sparse_One_Boundary(const mxArray* A_m, const mxArray* b_m,
                                              const mxArray* x0_m) const
 {
-  double* b = mxGetPr(b_m);
+  double* b = mxGetDoubles(b_m);
   if (!b)
     throw FatalException {"In Init_Matlab_Sparse_One_Boundary, can't retrieve b vector"};
-  double* x0 = mxGetPr(x0_m);
+  double* x0 = mxGetDoubles(x0_m);
   if (!x0)
     throw FatalException {"In Init_Matlab_Sparse_One_Boundary, can't retrieve x0 vector"};
   mwIndex* Ai = mxGetIr(A_m);
@@ -1329,7 +1329,7 @@ Interpreter::Init_Matlab_Sparse_One_Boundary(const mxArray* A_m, const mxArray* 
   mwIndex* Aj = mxGetJc(A_m);
   if (!Aj)
     throw FatalException {"In Init_Matlab_Sparse_One_Boundary, can't allocate Aj index vector"};
-  double* A = mxGetPr(A_m);
+  double* A = mxGetDoubles(A_m);
   if (!A)
     throw FatalException {"In Init_Matlab_Sparse_One_Boundary, can't retrieve A matrix"};
 
@@ -1396,7 +1396,7 @@ Interpreter::Init_UMFPACK_Sparse_One_Boundary(const mxArray* x0_m) const
   test_mxMalloc(b, __LINE__, __FILE__, __func__, size * sizeof(double));
   if (!b)
     throw FatalException {"In Init_UMFPACK_Sparse_One_Boundary, can't retrieve b vector"};
-  double* x0 = mxGetPr(x0_m);
+  double* x0 = mxGetDoubles(x0_m);
   if (!x0)
     throw FatalException {"In Init_UMFPACK_Sparse_One_Boundary, can't retrieve x0 vector"};
   SuiteSparse_long* Ap
@@ -1482,7 +1482,7 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
   auto* b = static_cast<double*>(mxMalloc(n * sizeof(double)));
   if (!b)
     throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, can't retrieve b vector"};
-  double* x0 = mxGetPr(x0_m);
+  double* x0 = mxGetDoubles(x0_m);
   if (!x0)
     throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, can't retrieve x0 vector"};
   SuiteSparse_long* Ap
@@ -1518,7 +1518,7 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
     jacob_exo = nullptr;
   else
     {
-      jacob_exo = mxGetPr(jacobian_exo_block[block_num]);
+      jacob_exo = mxGetDoubles(jacobian_exo_block[block_num]);
       row_x = mxGetM(jacobian_exo_block[block_num]);
 #ifdef DEBUG
       col_x = mxGetN(jacobian_exo_block[block_num]);
@@ -1691,11 +1691,11 @@ void
 Interpreter::Init_Matlab_Sparse_Two_Boundaries(const mxArray* A_m, const mxArray* b_m,
                                                const mxArray* x0_m) const
 {
-  double* b = mxGetPr(b_m);
+  double* b = mxGetDoubles(b_m);
 
   if (!b)
     throw FatalException {"In Init_Matlab_Sparse_Two_Boundaries, can't retrieve b vector"};
-  double* x0 = mxGetPr(x0_m);
+  double* x0 = mxGetDoubles(x0_m);
   if (!x0)
     throw FatalException {"In Init_Matlab_Sparse_Two_Boundaries, can't retrieve x0 vector"};
   mwIndex* Aj = mxGetJc(A_m);
@@ -1704,7 +1704,7 @@ Interpreter::Init_Matlab_Sparse_Two_Boundaries(const mxArray* A_m, const mxArray
   mwIndex* Ai = mxGetIr(A_m);
   if (!Ai)
     throw FatalException {"In Init_Matlab_Sparse_Two_Boundaries, can't allocate Ai index vector"};
-  double* A = mxGetPr(A_m);
+  double* A = mxGetDoubles(A_m);
   if (!A)
     throw FatalException {"In Init_Matlab_Sparse_Two_Boundaries, can't retrieve A matrix"};
 
@@ -2318,11 +2318,11 @@ Interpreter::compute_block_time(int my_Per_u_, bool evaluate, bool no_derivative
   double *jacob {nullptr}, *jacob_exo {nullptr}, *jacob_exo_det {nullptr};
   if (evaluate)
     {
-      jacob = mxGetPr(jacobian_block[block_num]);
+      jacob = mxGetDoubles(jacobian_block[block_num]);
       if (!steady_state)
         {
-          jacob_exo = mxGetPr(jacobian_exo_block[block_num]);
-          jacob_exo_det = mxGetPr(jacobian_det_exo_block[block_num]);
+          jacob_exo = mxGetDoubles(jacobian_exo_block[block_num]);
+          jacob_exo_det = mxGetDoubles(jacobian_det_exo_block[block_num]);
         }
     }
 
@@ -2782,7 +2782,7 @@ Interpreter::Solve_Matlab_GMRES(mxArray* A_m, mxArray* b_m, bool is_two_boundari
     }
   else
     {
-      double* res = mxGetPr(z);
+      double* res = mxGetDoubles(z);
       if (is_two_boundaries)
         for (int i = 0; i < static_cast<int>(n); i++)
           {
@@ -2849,7 +2849,7 @@ Interpreter::Solve_Matlab_BiCGStab(mxArray* A_m, mxArray* b_m, bool is_two_bound
     }
   else
     {
-      double* res = mxGetPr(z);
+      double* res = mxGetDoubles(z);
       if (is_two_boundaries)
         for (int i = 0; i < static_cast<int>(n); i++)
           {
@@ -2879,7 +2879,7 @@ Interpreter::Singular_display()
 {
   Simple_Init();
   std::array rhs {mxCreateDoubleMatrix(size, size, mxREAL)};
-  double* pind = mxGetPr(rhs[0]);
+  double* pind = mxGetDoubles(rhs[0]);
   for (int j = 0; j < size * size; j++)
     pind[j] = 0.0;
   for (int ii = 0; ii < size; ii++)
@@ -2897,8 +2897,8 @@ Interpreter::Singular_display()
   mexCallMATLAB(lhs.size(), lhs.data(), rhs.size(), rhs.data(), "svd");
   mxArray* SVD_u = lhs[0];
   mxArray* SVD_s = lhs[1];
-  double* SVD_ps = mxGetPr(SVD_s);
-  double* SVD_pu = mxGetPr(SVD_u);
+  double* SVD_ps = mxGetDoubles(SVD_s);
+  double* SVD_pu = mxGetDoubles(SVD_u);
   for (int i = 0; i < size; i++)
     if (abs(SVD_ps[i * (1 + size)]) < 1e-12)
       {

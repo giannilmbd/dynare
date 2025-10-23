@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2024 Dynare Team
+ * Copyright © 2013-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -1949,13 +1949,13 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
                                     nb_input_arguments, input_arguments, function_name.c_str()))
                     throw FatalException {"External function: " + function_name + " not found"};
 
-                  double* rr = mxGetPr(output_arguments[0]);
+                  double* rr = mxGetDoubles(output_arguments[0]);
                   Stack.push(*rr);
                   if (call_type == ExternalFunctionCallType::levelWithFirstDerivative
                       || call_type == ExternalFunctionCallType::levelWithFirstAndSecondDerivative)
                     {
                       int indx {fc->get_indx()};
-                      double* FD1 = mxGetPr(output_arguments[1]);
+                      double* FD1 = mxGetDoubles(output_arguments[1]);
                       size_t rows = mxGetN(output_arguments[1]);
                       for (int i {0}; i < static_cast<int>(rows); i++)
                         TEFD[{indx, i}] = FD1[i];
@@ -1963,7 +1963,7 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
                   if (call_type == ExternalFunctionCallType::levelWithFirstAndSecondDerivative)
                     {
                       int indx {fc->get_indx()};
-                      double* FD2 = mxGetPr(output_arguments[2]);
+                      double* FD2 = mxGetDoubles(output_arguments[2]);
                       size_t rows = mxGetM(output_arguments[2]);
                       size_t cols = mxGetN(output_arguments[2]);
                       int k {0};
@@ -2006,7 +2006,7 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
                   if (mexCallMATLAB(nb_output_arguments, output_arguments.data(),
                                     nb_input_arguments, input_arguments, function_name.c_str()))
                     throw FatalException {"External function: " + function_name + " not found"};
-                  double* rr = mxGetPr(output_arguments[0]);
+                  double* rr = mxGetDoubles(output_arguments[0]);
 #ifdef DEBUG
                   mexPrintf("*rr=%f\n", *rr);
 #endif
@@ -2029,7 +2029,7 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
                                     nb_input_arguments, input_arguments, function_name.c_str()))
                     throw FatalException {"External function: " + function_name + " not found"};
                   int indx {fc->get_indx()};
-                  double* FD1 = mxGetPr(output_arguments[0]);
+                  double* FD1 = mxGetDoubles(output_arguments[0]);
                   size_t rows = mxGetN(output_arguments[0]);
                   for (int i {0}; i < static_cast<int>(rows); i++)
                     TEFD[{indx, i}] = FD1[i];
@@ -2070,7 +2070,7 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
                   if (mexCallMATLAB(nb_output_arguments, output_arguments.data(),
                                     nb_input_arguments, input_arguments, function_name.c_str()))
                     throw FatalException {"External function: " + function_name + " not found"};
-                  double* rr = mxGetPr(output_arguments[0]);
+                  double* rr = mxGetDoubles(output_arguments[0]);
                   Stack.push(*rr);
                 }
                 break;
@@ -2090,7 +2090,7 @@ Evaluate::evaluateBlock(int it_, int y_kmin, double* __restrict__ y, int y_size,
                                     nb_input_arguments, input_arguments, function_name.c_str()))
                     throw FatalException {"External function: " + function_name + " not found"};
                   int indx {fc->get_indx()};
-                  double* FD2 = mxGetPr(output_arguments[2]);
+                  double* FD2 = mxGetDoubles(output_arguments[2]);
                   size_t rows = mxGetM(output_arguments[0]);
                   size_t cols = mxGetN(output_arguments[0]);
                   int k {0};

@@ -110,16 +110,16 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   plhs(5) = mxCreateDoubleMatrix(n, 1_mwSize, mxCOMPLEX)
   plhs(6) = mxCreateDoubleMatrix(1_mwSize, 1_mwSize, mxREAL)
 
-  s => mxGetPr(plhs(1))
-  t => mxGetPr(plhs(2))
-  sdim => mxGetPr(plhs(4))
+  s => mxGetDoubles(plhs(1))
+  t => mxGetDoubles(plhs(2))
+  sdim => mxGetDoubles(plhs(4))
   gev => mxGetComplexDoubles(plhs(5))
-  info => mxGetPr(plhs(6))
-  z => mxGetPr(plhs(3))
+  info => mxGetDoubles(plhs(6))
+  z => mxGetDoubles(plhs(3))
   vsl => null()
 
   ! Copy input matrices, since we can’t modify them
-  associate (a => mxGetPr(prhs(1)), b => mxGetPr(prhs(2)))
+  associate (a => mxGetDoubles(prhs(1)), b => mxGetDoubles(prhs(2)))
     s = a
     t = b
   end associate

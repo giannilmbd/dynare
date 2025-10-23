@@ -137,16 +137,16 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    end if
 
    ! Import variables
-   a => mxGetPr(a_mx)
+   a => mxGetDoubles(a_mx)
    m = size(a, 1, blint)
    p = int(mxGetM(Y_mx), blint)
    nper = int(mxGetN(Y_mx))
    r = int(mxGetM(Q_mx), blint)
-   Y(1:p,1:nper) => mxGetPr(Y_mx)
-   PP(1:m,1:m) => mxGetPr(P_mx)
-   TT(1:m,1:m) => mxGetPr(T_mx)
-   Q(1:r,1:r) => mxGetPr(Q_mx)
-   RR(1:m,1:r) => mxGetPr(R_mx)
+   Y(1:p,1:nper) => mxGetDoubles(Y_mx)
+   PP(1:m,1:m) => mxGetDoubles(P_mx)
+   TT(1:m,1:m) => mxGetDoubles(T_mx)
+   Q(1:r,1:r) => mxGetDoubles(Q_mx)
+   RR(1:m,1:r) => mxGetDoubles(R_mx)
    kalman_tol = mxGetScalar(kalman_tol_mx)
    riccati_tol = mxGetScalar(riccati_tol_mx)
 
@@ -176,7 +176,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       if ((mxGetM(Z_mx) /= p) .or. (mxGetN(Z_mx) /= m)) then
          call mexErrMsgTxt("Input dimension mismatch in Z")
       end if
-      Z(1:p,1:m) => mxGetPr(Z_mx)
+      Z(1:p,1:m) => mxGetDoubles(Z_mx)
       ! Initialization to avoid compilation warnings 
       ! (-Wmaybe-uninitialized flag)
       allocate (indZ(0))
@@ -189,7 +189,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       if ((mxGetM(Z_mx) /= p) .and. (mxGetN(Z_mx) /= p)) then
          call mexErrMsgTxt("Input dimension mismatch in Z")
       end if
-      Z(1:p,1:1) => mxGetPr(Z_mx)
+      Z(1:p,1:1) => mxGetDoubles(Z_mx)
       indZ = int(Z(1:p,1))
    end if
 
@@ -204,7 +204,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
          if ((mxGetM(H_mx) /= p) .or. (mxGetN(H_mx) /= p)) then
             call mexErrMsgTxt("Input dimension mismatch in H")
          end if
-         H(1:p,1:p) => mxGetPr(H_mx)
+         H(1:p,1:p) => mxGetDoubles(H_mx)
       else
          call mexErrMsgTxt("11th argument (H) should be a real dense matrix or a zero scalar if no measurement error is set")
       end if
@@ -236,7 +236,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
 
    ! Density of each observation
    plhs(2) = mxCreateDoubleMatrix(int(smpl, mwSize), 1_mwSize, mxREAL)
-   likk(1:smpl) => mxGetPr(plhs(2))
+   likk(1:smpl) => mxGetDoubles(plhs(2))
 
    ! Optimal number of blocks for DGETRI
    nb = ilaenv(1_blint, "DGETRI", " ", p, -1_blint, -1_blint, -1_blint)
@@ -386,14 +386,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       call_rhs(2) = mxCreateDoubleScalar(real(t, c_double))
       call_rhs(3) = mxCreateDoubleScalar(real(nper, c_double))
       call_rhs(4) = mxCreateDoubleMatrix(int(m, mwSize), 1_mwSize, mxREAL)
-      a_m => mxGetPr(call_rhs(4))
+      a_m => mxGetDoubles(call_rhs(4))
       a_m = a_iter
       call_rhs(5) = T_mx
       call_rhs(6) = mxCreateDoubleMatrix(int(m, mwSize), int(p, mwSize), mxREAL)
-      K_m(1:m,1:p) => mxGetPr(call_rhs(6)) 
+      K_m(1:m,1:p) => mxGetDoubles(call_rhs(6))
       K_m = K
       call_rhs(7) = mxCreateDoubleMatrix(int(p, mwSize), int(p, mwSize), mxREAL)
-      iF_m(1:p,1:p) => mxGetPr(call_rhs(7)) 
+      iF_m(1:p,1:p) => mxGetDoubles(call_rhs(7))
       iF_m = lu
       call_rhs(8) = mxCreateDoubleScalar(log_dF)
       call_rhs(9) = Z_mx
@@ -407,7 +407,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       if (retval /= 0_c_int) then
          call mexErrMsgTxt("Error calling kalman_filter_ss!")
       end if
-      likk_m(s+1:smpl) => mxGetPr(call_lhs(2))
+      likk_m(s+1:smpl) => mxGetDoubles(call_lhs(2))
       likk(s+1:smpl) = likk_m(s+1:smpl)
    end if
 

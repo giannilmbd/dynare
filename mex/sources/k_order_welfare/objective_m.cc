@@ -47,13 +47,13 @@ ObjectiveMFile::eval(const Vector& y, const Vector& x, const Vector& modParams, 
                      TensorContainer<FSSparseTensor>& derivatives) const
 {
   mxArray* y_mx = mxCreateDoubleMatrix(y.length(), 1, mxREAL);
-  std::ranges::copy_n(y.base(), y.length(), mxGetPr(y_mx));
+  std::ranges::copy_n(y.base(), y.length(), mxGetDoubles(y_mx));
 
   mxArray* x_mx = mxCreateDoubleMatrix(1, x.length(), mxREAL);
-  std::ranges::copy_n(x.base(), x.length(), mxGetPr(x_mx));
+  std::ranges::copy_n(x.base(), x.length(), mxGetDoubles(x_mx));
 
   mxArray* params_mx = mxCreateDoubleMatrix(modParams.length(), 1, mxREAL);
-  std::ranges::copy_n(modParams.base(), modParams.length(), mxGetPr(params_mx));
+  std::ranges::copy_n(modParams.base(), modParams.length(), mxGetDoubles(params_mx));
 
   mxArray *T_order_mx, *T_mx;
 
@@ -94,7 +94,7 @@ ObjectiveMFile::eval(const Vector& y, const Vector& x, const Vector& modParams, 
       throw DynareException(__FILE__, __LINE__, "Trouble calling " + funcname);
 
     assert(static_cast<int>(mxGetN(plhs[0])) == y.length());
-    double* g1_v {mxGetPr(plhs[0])};
+    double* g1_v {mxGetDoubles(plhs[0])};
     mwIndex* g1_ir {mxGetIr(plhs[0])};
     mwIndex* g1_jc {mxGetJc(plhs[0])};
 
@@ -136,7 +136,7 @@ ObjectiveMFile::eval(const Vector& y, const Vector& x, const Vector& modParams, 
       const int32_T* sparse_indices {mxGetInt32s(sparse_indices_mx)};
 
       assert(mxGetNumberOfElements(plhs[0]) == nnz);
-      double* gN_v {mxGetPr(plhs[0])};
+      double* gN_v {mxGetDoubles(plhs[0])};
 
       IntSequence s(o, 0);
       auto tensor = std::make_unique<FSSparseTensor>(o, y.length(), 1);

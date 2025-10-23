@@ -1,7 +1,7 @@
 ! Wrapper around MATLAB’s dmperm to compute the Dulmage-Mendelsohn
 ! decomposition
 
-! Copyright © 2020-2023 Dynare Team
+! Copyright © 2020-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -39,7 +39,7 @@ contains
     integer :: i, j
 
     call_rhs(1) = mxCreateDoubleMatrix(int(size(mat, 1), mwSize), int(size(mat, 2), mwSize), mxREAL)
-    mat_mx(1:size(mat,1), 1:size(mat,2)) => mxGetPr(call_rhs(1))
+    mat_mx(1:size(mat,1), 1:size(mat,2)) => mxGetDoubles(call_rhs(1))
     mat_mx = mat
 
     if (mexCallMATLAB(4_c_int, call_lhs, 1_c_int, call_rhs, "dmperm") /= 0) &
@@ -47,10 +47,10 @@ contains
 
     call mxDestroyArray(call_rhs(1))
 
-    p => mxGetPr(call_lhs(1))
-    q => mxGetPr(call_lhs(2))
-    r => mxGetPr(call_lhs(3))
-    s => mxGetPr(call_lhs(4))
+    p => mxGetDoubles(call_lhs(1))
+    q => mxGetDoubles(call_lhs(2))
+    r => mxGetDoubles(call_lhs(3))
+    s => mxGetDoubles(call_lhs(4))
 
     allocate(blocks(size(r)-1))
     do i = 1, size(r)-1

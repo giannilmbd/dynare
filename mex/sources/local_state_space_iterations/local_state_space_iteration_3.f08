@@ -1,4 +1,4 @@
-! Copyright © 2022-2023 Dynare Team
+! Copyright © 2022-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -496,28 +496,28 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    ! 1. Storing the relevant input variables in Fortran
    if (pruning) then
-      yhatlat(1:3*n,1:s) => mxGetPr(prhs(1))
+      yhatlat(1:3*n,1:s) => mxGetDoubles(prhs(1))
       td3%yhat1 => yhatlat(1:n,1:s)
       td3%yhat2 => yhatlat(n+1:2*n,1:s)
       td3%yhat3 => yhatlat(2*n+1:3*n,1:s)
       ! td3%xx_nbeq => xx_nbeq
    else
-      td3%yhat3(1:n,1:s) => mxGetPr(prhs(1))
+      td3%yhat3(1:n,1:s) => mxGetDoubles(prhs(1))
    end if
-   td3%e(1:q,1:s) => mxGetPr(prhs(2))
-   ghx(1:m,1:n) => mxGetPr(prhs(3))
-   ghu(1:m,1:q) => mxGetPr(prhs(4))
-   ghxx(1:m,1:n*n) => mxGetPr(prhs(5))
-   ghuu(1:m,1:q*q) => mxGetPr(prhs(6))
-   ghxu(1:m,1:n*q) => mxGetPr(prhs(7))
-   td3%ghs2 => mxGetPr(prhs(8))
-   ghxxx(1:m,1:n*n*n) => mxGetPr(prhs(9))
-   ghuuu(1:m,1:q*q*q) => mxGetPr(prhs(10))
-   ghxxu(1:m,1:n*n*q) => mxGetPr(prhs(11))
-   ghxuu(1:m,1:n*q*q) => mxGetPr(prhs(12))
-   ghxss(1:m,1:n) => mxGetPr(prhs(13))
-   ghuss(1:m,1:q) => mxGetPr(prhs(14))
-   td3%ss => mxGetPr(prhs(15))
+   td3%e(1:q,1:s) => mxGetDoubles(prhs(2))
+   ghx(1:m,1:n) => mxGetDoubles(prhs(3))
+   ghu(1:m,1:q) => mxGetDoubles(prhs(4))
+   ghxx(1:m,1:n*n) => mxGetDoubles(prhs(5))
+   ghuu(1:m,1:q*q) => mxGetDoubles(prhs(6))
+   ghxu(1:m,1:n*q) => mxGetDoubles(prhs(7))
+   td3%ghs2 => mxGetDoubles(prhs(8))
+   ghxxx(1:m,1:n*n*n) => mxGetDoubles(prhs(9))
+   ghuuu(1:m,1:q*q*q) => mxGetDoubles(prhs(10))
+   ghxxu(1:m,1:n*n*q) => mxGetDoubles(prhs(11))
+   ghxuu(1:m,1:n*q*q) => mxGetDoubles(prhs(12))
+   ghxss(1:m,1:n) => mxGetDoubles(prhs(13))
+   ghuss(1:m,1:q) => mxGetDoubles(prhs(14))
+   td3%ss => mxGetDoubles(prhs(15))
 
    ! Getting a transposed folded copy of the unfolded tensors
    ! for future loops to be more efficient
@@ -572,10 +572,10 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    ! 3. Implementing the calculations:
 
    plhs(1) = mxCreateDoubleMatrix(int(m, mwSize), int(s, mwSize), mxREAL)
-   td3%y3(1:m,1:s) => mxGetPr(plhs(1))
+   td3%y3(1:m,1:s) => mxGetDoubles(plhs(1))
    if (pruning) then
       plhs(2) = mxCreateDoubleMatrix(int(3*m, mwSize), int(s, mwSize), mxREAL)
-      ylat(1:3*m,1:s) => mxGetPr(plhs(2))
+      ylat(1:3*m,1:s) => mxGetDoubles(plhs(2))
       td3%ylat1 => ylat(1:m,1:s)
       td3%ylat2 => ylat(m+1:2*m,1:s)
       td3%ylat3 => ylat(2*m+1:3*m,1:s)

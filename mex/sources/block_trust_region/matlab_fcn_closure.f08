@@ -60,7 +60,7 @@ contains
        n_all = size(x)
     end if
     call_rhs(2) = mxCreateDoubleMatrix(n_all, 1_mwSize, mxREAL)
-    x_mat => mxGetPr(call_rhs(2))
+    x_mat => mxGetDoubles(call_rhs(2))
     if (associated(x_indices) .and. associated(x_all)) then
        x_mat = x_all
        x_mat(x_indices) = x
@@ -90,7 +90,7 @@ contains
     if (.not. mxIsComplex(call_lhs(1))) then ! Real case
        block
          real(real64), dimension(:), pointer, contiguous :: fvec_all
-         fvec_all => mxGetPr(call_lhs(1))
+         fvec_all => mxGetDoubles(call_lhs(1))
          if (associated(f_indices)) then
             fvec = fvec_all(f_indices)
          else
@@ -139,7 +139,7 @@ contains
        if (.not. mxIsComplex(call_lhs(2))) then ! Real case
           block
             real(real64), dimension(:,:), pointer, contiguous :: fjac_all
-            fjac_all(1:n_all,1:n_all) => mxGetPr(call_lhs(2))
+            fjac_all(1:n_all,1:n_all) => mxGetDoubles(call_lhs(2))
             if (associated(x_indices) .and. associated(f_indices)) then
                fjac = fjac_all(f_indices, x_indices)
             else

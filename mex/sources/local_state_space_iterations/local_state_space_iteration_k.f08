@@ -1,4 +1,4 @@
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -156,7 +156,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
           .or. mxIsComplex(order_var_mx) .or. mxIsSparse(order_var_mx)) then
          call mexErrMsgTxt("Field dr.order_var should be a real dense vector with endo_nbr elements")
       end if
-      order_var => mxGetPr(order_var_mx)
+      order_var => mxGetDoubles(order_var_mx)
    end associate
 
    associate (ys_mx => mxGetField(dr_mx, 1_mwIndex, "ys"))
@@ -164,7 +164,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
           .or. mxIsComplex(ys_mx) .or. mxIsSparse(ys_mx)) then
          call mexErrMsgTxt("Field dr.ys should be a real dense vector with endo_nbr elements")
       end if
-      ys => mxGetPr(ys_mx)
+      ys => mxGetDoubles(ys_mx)
       ! Construct the reordered steady state
       allocate(ys_reordered(endo_nbr))
       do i=1, endo_nbr
@@ -176,8 +176,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       if (.not. mxIsDouble(restrict_var_list_mx) .or. mxIsComplex(restrict_var_list_mx) .or. mxIsSparse(restrict_var_list_mx)) then
          call mexErrMsgTxt("Field dr.restrict_var_list should be a real dense vector")
       end if
-      nrestricted = size(mxGetPr(restrict_var_list_mx))
-      restrict_var_list => mxGetPr(restrict_var_list_mx)
+      nrestricted = size(mxGetDoubles(restrict_var_list_mx))
+      restrict_var_list => mxGetDoubles(restrict_var_list_mx)
    end associate
 
    associate (thread_mx => mxGetField(options_mx, 1_mwIndex, "threads"))
@@ -199,8 +199,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    end if
 
    allocate(yhat(nys, nparticles), e(exo_nbr, nparticles), ynext(nrestricted, nparticles))
-   yhat = reshape(mxGetPr(yhat_mx), [nys, nparticles])
-   e = reshape(mxGetPr(epsilon_mx), [exo_nbr, nparticles])
+   yhat = reshape(mxGetDoubles(yhat_mx), [nys, nparticles])
+   e = reshape(mxGetDoubles(epsilon_mx), [exo_nbr, nparticles])
 
 
    allocate(udr(0:order)) 
@@ -213,7 +213,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       m = int(mxGetM(tmp))
       n = int(mxGetN(tmp))
       allocate(udr(i)%m(m,n))
-      udr(i)%m(1:m,1:n) = reshape(mxGetPr(tmp), [m,n])
+      udr(i)%m(1:m,1:n) = reshape(mxGetDoubles(tmp), [m,n])
    end do
 
    ! Initializing the global structure containing
@@ -251,6 +251,6 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    ! Returning the result
    plhs(1) = mxCreateDoubleMatrix(int(size(restrict_var_list), mwSize), int(nparticles, mwSize), mxREAL)
-   mxGetPr(plhs(1)) = reshape(thread_data%ynext, [size(thread_data%ynext)])
+   mxGetDoubles(plhs(1)) = reshape(thread_data%ynext, [size(thread_data%ynext)])
 
 end subroutine mexFunction

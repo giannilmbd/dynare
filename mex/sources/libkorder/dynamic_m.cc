@@ -46,7 +46,7 @@ DynamicModelMFile::cmplxToReal(mxArray* cmplx_mx)
   mxArray* real_mx = mxCreateDoubleMatrix(mxGetM(cmplx_mx), mxGetN(cmplx_mx), mxREAL);
 
   mxComplexDouble* cmplx = mxGetComplexDoubles(cmplx_mx);
-  double* real = mxGetPr(real_mx);
+  double* real = mxGetDoubles(real_mx);
 
   for (size_t i = 0; i < mxGetNumberOfElements(cmplx_mx); i++)
     if (cmplx[i].imag == 0.0)
@@ -65,16 +65,16 @@ DynamicModelMFile::eval(const Vector& y, const Vector& x, const Vector& modParam
                         TensorContainer<FSSparseTensor>& derivatives) noexcept(false)
 {
   mxArray* y_mx = mxCreateDoubleMatrix(y.length(), 1, mxREAL);
-  std::ranges::copy_n(y.base(), y.length(), mxGetPr(y_mx));
+  std::ranges::copy_n(y.base(), y.length(), mxGetDoubles(y_mx));
 
   mxArray* x_mx = mxCreateDoubleMatrix(1, x.length(), mxREAL);
-  std::ranges::copy_n(x.base(), x.length(), mxGetPr(x_mx));
+  std::ranges::copy_n(x.base(), x.length(), mxGetDoubles(x_mx));
 
   mxArray* params_mx = mxCreateDoubleMatrix(modParams.length(), 1, mxREAL);
-  std::ranges::copy_n(modParams.base(), modParams.length(), mxGetPr(params_mx));
+  std::ranges::copy_n(modParams.base(), modParams.length(), mxGetDoubles(params_mx));
 
   mxArray* steady_state_mx = mxCreateDoubleMatrix(ySteady.length(), 1, mxREAL);
-  std::ranges::copy_n(ySteady.base(), ySteady.length(), mxGetPr(steady_state_mx));
+  std::ranges::copy_n(ySteady.base(), ySteady.length(), mxGetDoubles(steady_state_mx));
 
   mxArray *T_order_mx, *T_mx;
 
@@ -123,7 +123,7 @@ DynamicModelMFile::eval(const Vector& y, const Vector& x, const Vector& modParam
       throw DynareException(__FILE__, __LINE__, "Trouble calling " + funcname);
 
     assert(static_cast<int>(mxGetN(plhs[0])) == y.length() + x.length());
-    double* g1_v {mxGetPr(plhs[0])};
+    double* g1_v {mxGetDoubles(plhs[0])};
     mwIndex* g1_ir {mxGetIr(plhs[0])};
     mwIndex* g1_jc {mxGetJc(plhs[0])};
 
@@ -165,7 +165,7 @@ DynamicModelMFile::eval(const Vector& y, const Vector& x, const Vector& modParam
       const int32_T* sparse_indices {mxGetInt32s(sparse_indices_mx)};
 
       assert(mxGetNumberOfElements(plhs[0]) == nnz);
-      double* gN_v {mxGetPr(plhs[0])};
+      double* gN_v {mxGetDoubles(plhs[0])};
 
       IntSequence s(o, 0);
       auto tensor = std::make_unique<FSSparseTensor>(o, dynToDynpp.size(), residual.length());

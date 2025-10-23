@@ -117,13 +117,13 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         mexErrMsgTxt("kalman_steady_state: The fifth input argument (H) must be a real matrix!");
     }
   // Get input matrices.
-  const double* T = mxGetPr(prhs[0]);
+  const double* T = mxGetDoubles(prhs[0]);
   auto QQ = std::make_unique<double[]>(n * n);
-  std::ranges::copy_n(mxGetPr(prhs[1]), n * n, QQ.get());
-  const double* Z = mxGetPr(prhs[2]);
+  std::ranges::copy_n(mxGetDoubles(prhs[1]), n * n, QQ.get());
+  const double* Z = mxGetDoubles(prhs[2]);
   auto H = std::make_unique<double[]>(p * p);
   if (measurement_error_flag)
-    std::ranges::copy_n(mxGetPr(prhs[3]), p * p, H.get());
+    std::ranges::copy_n(mxGetDoubles(prhs[3]), p * p, H.get());
   // L will not be used.
   auto L = std::make_unique<double[]>(n * p);
   lapack_int nn = 2 * n;
@@ -156,7 +156,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   auto BWORK = std::make_unique<lapack_int[]>(nn);
   // Initialize the output of the mex file
   plhs[0] = mxCreateDoubleMatrix(n, n, mxREAL);
-  double* P = mxGetPr(plhs[0]);
+  double* P = mxGetDoubles(plhs[0]);
   // Call the slicot routine
   sb02od("D", // We want to solve a discrete Riccati equation.
          "B", // Matrices Z and H are given.

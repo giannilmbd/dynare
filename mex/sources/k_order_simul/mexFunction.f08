@@ -1,4 +1,4 @@
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -114,18 +114,18 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    if (endo_nbr /= int(mxGetM(ystart_mx))) then
       call mexErrMsgTxt("ystart should have nstat+npred+nboth+nforw rows")
    end if
-   ystart => mxGetPr(ystart_mx)
+   ystart => mxGetDoubles(ystart_mx)
 
    if (exo_nbr /= int(mxGetM(shocks_mx))) then
       call mexErrMsgTxt("shocks should have nexog rows")
    end if
    nper = int(mxGetN(shocks_mx))
-   shocks(1:exo_nbr,1:nper) => mxGetPr(shocks_mx)
+   shocks(1:exo_nbr,1:nper) => mxGetDoubles(shocks_mx)
 
    if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) then
       call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
    end if
-   ysteady => mxGetPr(ysteady_mx)
+   ysteady => mxGetDoubles(ysteady_mx)
    ! Initial value for between the states' starting value and the states' 
    ! steady-state value
    dy = ystart(nstatic+1:nstatic+nys)-ysteady(nstatic+1:nstatic+nys)
@@ -139,7 +139,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    ! Generating output
    plhs(1) = mxCreateDoubleMatrix(int(endo_nbr, mwSize), int(nper+1, mwSize), mxREAL)
-   sim(1:endo_nbr,1:(nper+1)) => mxGetPr(plhs(1))
+   sim(1:endo_nbr,1:(nper+1)) => mxGetDoubles(plhs(1))
    sim(:,1) = ystart
 
    if (pruning) then

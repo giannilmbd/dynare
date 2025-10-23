@@ -127,12 +127,12 @@ public:
   [[nodiscard]] double*
   y() override
   {
-    return mxGetPr(y_mx);
+    return mxGetDoubles(y_mx);
   }
   [[nodiscard]] double*
   x() override
   {
-    return mxGetPr(x_mx);
+    return mxGetDoubles(x_mx);
   }
   void copy_jacobian_column(mwIndex col, double* dest) const override;
 };
@@ -152,7 +152,7 @@ DynamicModelMatlabCaller::cmplxToReal(mxArray* cmplx_mx)
     }
 
   mxComplexDouble* cmplx {mxGetComplexDoubles(cmplx_mx)};
-  double* real {mxGetPr(real_mx)};
+  double* real {mxGetDoubles(real_mx)};
   for (std::conditional_t<sparse, mwSize, size_t> i {0};
        i <
        [&] {
@@ -257,7 +257,7 @@ public:
   [[nodiscard]] double*
   T() override
   {
-    return mxGetPr(T_mx);
+    return mxGetDoubles(T_mx);
   }
   void eval(double* resid) override;
 };

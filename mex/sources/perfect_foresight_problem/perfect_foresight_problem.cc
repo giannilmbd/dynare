@@ -65,8 +65,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         && mxGetNumberOfElements(dynamic_tmp_nbr_mx) >= 2)
       || mxIsComplex(dynamic_tmp_nbr_mx) || mxIsSparse(dynamic_tmp_nbr_mx))
     mexErrMsgTxt("M_.dynamic_tmp_nbr should be a real dense array of at least 2 elements");
-  size_t ntt {static_cast<size_t>(mxGetPr(dynamic_tmp_nbr_mx)[0])
-              + (compute_jacobian ? static_cast<size_t>(mxGetPr(dynamic_tmp_nbr_mx)[1]) : 0)};
+  size_t ntt {static_cast<size_t>(mxGetDoubles(dynamic_tmp_nbr_mx)[0])
+              + (compute_jacobian ? static_cast<size_t>(mxGetDoubles(dynamic_tmp_nbr_mx)[1]) : 0)};
 
   const mxArray* has_external_function_mx = mxGetField(M_mx, 0, "has_external_function");
   if (!(has_external_function_mx && mxIsLogicalScalar(has_external_function_mx)))
@@ -101,15 +101,15 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   if (!(mxIsDouble(y_mx) && mxGetM(y_mx) == static_cast<size_t>(ny * periods) && mxGetN(y_mx) == 1))
     mexErrMsgTxt("y should be a double precision column-vector of M_.endo_nbr*periods elements");
-  const double* y = mxGetPr(y_mx);
+  const double* y = mxGetDoubles(y_mx);
 
   if (!(mxIsDouble(y0_mx) && mxGetM(y0_mx) == static_cast<size_t>(ny) && mxGetN(y0_mx) == 1))
     mexErrMsgTxt("y0 should be a double precision column-vector of M_.endo_nbr elements");
-  const double* y0 = mxGetPr(y0_mx);
+  const double* y0 = mxGetDoubles(y0_mx);
 
   if (!(mxIsDouble(yT_mx) && mxGetM(yT_mx) == static_cast<size_t>(ny) && mxGetN(yT_mx) == 1))
     mexErrMsgTxt("yT should be a double precision column-vector of M_.endo_nbr elements");
-  const double* yT = mxGetPr(yT_mx);
+  const double* yT = mxGetDoubles(yT_mx);
 
   if (!(mxIsDouble(exo_path_mx)
         && mxGetM(exo_path_mx) >= static_cast<size_t>(periods + maximum_lag)))
@@ -117,7 +117,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         "exo_path should be a double precision matrix with at least periods+M_.maximum_lag rows");
   auto nx = static_cast<mwIndex>(mxGetN(exo_path_mx));
   size_t nb_row_x = mxGetM(exo_path_mx);
-  const double* exo_path = mxGetPr(exo_path_mx);
+  const double* exo_path = mxGetDoubles(exo_path_mx);
 
   const mxArray* g1_sparse_rowval_mx {mxGetField(M_mx, 0, "dynamic_g1_sparse_rowval")};
   if (!(mxIsInt32(g1_sparse_rowval_mx)))
@@ -145,15 +145,15 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   if (!(mxIsDouble(params_mx) && mxGetN(params_mx) == 1))
     mexErrMsgTxt("params should be a double precision column-vector");
-  const double* params = mxGetPr(params_mx);
+  const double* params = mxGetDoubles(params_mx);
 
   if (!(mxIsDouble(steady_state_mx) && mxGetN(steady_state_mx) == 1))
     mexErrMsgTxt("steady_state should be a double precision column-vector");
-  const double* steady_state = mxGetPr(steady_state_mx);
+  const double* steady_state = mxGetDoubles(steady_state_mx);
 
   // Allocate output matrices
   plhs[0] = mxCreateDoubleMatrix(periods * ny, 1, mxREAL);
-  double* stacked_residual = mxGetPr(plhs[0]);
+  double* stacked_residual = mxGetDoubles(plhs[0]);
 
   double* stacked_jacobian = nullptr;
   mwIndex *ir = nullptr, *jc = nullptr;

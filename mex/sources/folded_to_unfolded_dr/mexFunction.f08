@@ -1,4 +1,4 @@
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -73,15 +73,15 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       m = int(mxGetM(tmp))
       n = int(mxGetN(tmp))
       allocate(fdr(d)%m(m,n))
-      fdr(d)%m = reshape(mxGetPr(tmp), [m,n])
+      fdr(d)%m = reshape(mxGetDoubles(tmp), [m,n])
    end do
 
    plhs(1) = mxCreateStructMatrix(1_mwSize, 1_mwSize, fieldnames)
    g = mxCreateDoubleMatrix(int(endo_nbr, mwSize), 1_mwSize, mxREAL)
-   mxGetPr(g) = reshape(fdr(0)%m, [size(fdr(0)%m)])
+   mxGetDoubles(g) = reshape(fdr(0)%m, [size(fdr(0)%m)])
    call mxSetField(plhs(1), 1_mwIndex, "g_0", g)
    g = mxCreateDoubleMatrix(int(endo_nbr, mwSize), int(nvar, mwSize), mxREAL)
-   mxGetPr(g) = reshape(fdr(1)%m, [size(fdr(1)%m)])
+   mxGetDoubles(g) = reshape(fdr(1)%m, [size(fdr(1)%m)])
    call mxSetField(plhs(1), 1_mwIndex, "g_1", g)
 
    if (order > 1) then
@@ -93,7 +93,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
          allocate(matching(d)%folded(nvar**d))
          call fill_folded_indices(matching(d)%folded, nvar, d, p) 
          g = mxCreateDoubleMatrix(int(endo_nbr, mwSize), int(nvar**d, mwSize), mxREAL)
-         mxGetPr(g) = reshape(fdr(d)%m(:,matching(d)%folded), [size(fdr(d)%m(:,matching(d)%folded))])
+         mxGetDoubles(g) = reshape(fdr(d)%m(:,matching(d)%folded), [size(fdr(d)%m(:,matching(d)%folded))])
          call mxSetField(plhs(1), 1_mwIndex, trim(fieldnames(d)), g)
       end do
    end if
