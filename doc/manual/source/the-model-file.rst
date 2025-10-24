@@ -3798,7 +3798,7 @@ speed-up on large models.
 
            ``3``
 
-               Use a Newton algorithm with a Stabilized Bi-Conjugate Gradient
+               Use a Newton algorithm with a Biconjugate Gradient Stabilized
                (BiCGStab) solver at each iteration, applied on the stacked
                system of all equations in all periods. The following options
                can be used to control the behaviour of the algorithm:
@@ -12843,8 +12843,25 @@ Optimal Simple Rules (OSR)
 
     .. option:: analytic_derivation_mode = INTEGER
 
-        See :opt:analytic_derivation_mode. It is only supported for the 
-        linear-quadratic approach at ``order=1``.
+        Different ways to compute derivatives either analytically or numerically.
+        Possible values are:
+
+            * ``0``: efficient sylvester equation method to compute
+              analytical derivatives
+            * ``1``: kronecker products method to compute analytical
+              derivatives (only at order=1)
+            * ``-1``: numerical two-sided finite difference method
+              to compute all identification Jacobians (numerical tolerance
+              level is equal to ``options_.dynatol.x``)
+            * ``-2``: numerical two-sided finite difference method
+              to compute derivatives of steady state and dynamic
+              model numerically, the identification Jacobians are
+              then computed analytically (numerical tolerance
+              level is equal to ``options_.dynatol.x``)
+
+        Default: ``0``.
+
+        It is only supported for the linear-quadratic approach at ``order=1``.
 
     .. option:: silent_optimizer
 
@@ -13498,23 +13515,7 @@ Performing identification analysis
 
     .. option:: analytic_derivation_mode = INTEGER
 
-        Different ways to compute derivatives either analytically or numerically.
-        Possible values are:
-
-            * ``0``: efficient sylvester equation method to compute
-              analytical derivatives
-            * ``1``: kronecker products method to compute analytical
-              derivatives (only at order=1)
-            * ``-1``: numerical two-sided finite difference method
-              to compute all identification Jacobians (numerical tolerance
-              level is equal to ``options_.dynatol.x``)
-            * ``-2``: numerical two-sided finite difference method
-              to compute derivatives of steady state and dynamic
-              model numerically, the identification Jacobians are
-              then computed analytically (numerical tolerance
-              level is equal to ``options_.dynatol.x``)
-
-        Default: ``0``.
+       See :opt:`analytic_derivation_mode = INTEGER`.
 
     .. option:: normalize_jacobians = INTEGER
 
