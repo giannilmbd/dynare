@@ -431,5 +431,9 @@ if ~isempty(M_.det_shocks)
     end
     u([M_.det_shocks(shock_indices).exo_id])=[M_.det_shocks(shock_indices).value];
 else
-    u = oo_.exo_simul(1,:)'; %first value of simulation series (set by simult.m if periods>0), 1 otherwise
+    if ~isempty(oo_.exo_simul)
+        u = oo_.exo_simul(1,:)'; %first value of simulation series (set by simult.m if periods>0), 1 otherwise
+    else
+        u = oo_.exo_steady_state; %steady state if no simulation was conducted, e.g. no stoch_simul before osr
+    end
 end
