@@ -13,12 +13,13 @@ function y_=simult_(M_,options_,y0,dr,ex_,iorder)
 %    iorder   [integer]  order of the taylor approximation.
 %
 % OUTPUTS
-%    y_       [double]   n*(T+1) time series for the endogenous variables.
+%    y_       [double]   n*(T+1) time series for the endogenous variables,
+%                           in declaration order
 %
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

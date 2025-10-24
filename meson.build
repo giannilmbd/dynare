@@ -1515,6 +1515,7 @@ mod_and_m_tests = [
   { 'test' : [ 'stochastic_purely_forward/stochastic_purely_forward_with_static.mod' ] },
   { 'test' : [ 'forecast/example1_varexo_det.mod' ] },
   { 'test' : [ 'forecast/Hansen_exo_det_forecast.mod' ] },
+  { 'test' : [ 'forecast/rbc_basic_forecast_varexo_det.mod' ] },
   { 'test' : [ 'forecast/linear_exo_det_forecast.mod' ] },
   { 'test' : [ 'forecast/ls2003_rolling_window_forecast.mod' ],
     'extra' : [ 'recursive/data_ca1.m' ] },
