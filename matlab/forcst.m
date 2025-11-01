@@ -43,11 +43,6 @@ if options_.order>1
 end
 
 yf = simult_(M_,options_,y0,dr,zeros(horizon,M_.exo_nbr),1); % do point forecast in declaration order, sort later
-nstatic = M_.nstatic;
-nspred = M_.nspred;
-nc = size(dr.ghx,2);
-inv_order_var = dr.inv_order_var;
-[A,B] = kalman_transition_matrix(dr,nstatic+(1:nspred),1:nc);
 
 if isempty(var_list)
     var_list = M_.endo_names(1:M_.orig_endo_nbr);
@@ -64,25 +59,24 @@ for i=1:nvar
     end
 end
 
-ghx1 = dr.ghx(inv_order_var(ivar),:); %make sure that order is consistent with var_list
-ghu1 = dr.ghu(inv_order_var(ivar),:);
+% Define union of requested and state variables
+[var_pos]=union(dr.inv_order_var(dr.state_var),dr.inv_order_var(ivar),'stable');
+% set state_pos to positions of state variables for inner part of
+% variance loop
+[~,state_pos] = ismember(dr.inv_order_var(dr.state_var),var_pos);
+% set var_list_pos to positions of var_list_ for reading out requested
+% variances
+[~,var_list_pos] = ismember(dr.inv_order_var(ivar),var_pos);
+ghx1 = dr.ghx(var_pos,:);
+ghu1 = dr.ghu(var_pos,:);
 
 %initialize recursion
-sigma_u = B*M_.Sigma_e*B';
-sigma_u1 = ghu1*M_.Sigma_e*ghu1';
-sigma_y = 0; %no uncertainty about the states
-
-var_yf = NaN(horizon,nvar); %initialize
-for i = 1:horizon
-    %map uncertainty about states into uncertainty about observables
-    sigma_y1 = ghx1*sigma_y*ghx1'+sigma_u1;
-    var_yf(i,:) = diag(sigma_y1)';
-    if i == horizon
-        break
-    end
-    %update uncertainty about states
-    sigma_u = A*sigma_u*A';
-    sigma_y = sigma_y+sigma_u;
+sigma_y1 = zeros(size(ghx1,1),size(ghx1,1)); %no initial uncertainty about the states
+var_yf = zeros(horizon,nvar); %initialize
+for horizon_iter = 1:horizon
+    % variance recursion
+    sigma_y1 = ghx1*sigma_y1(state_pos,state_pos)*ghx1'+ghu1*M_.Sigma_e*ghu1';
+    var_yf(horizon_iter,:) = diag(sigma_y1(var_list_pos,var_list_pos))'; % first period is initial condition without uncertainty
 end
 if nargout==3
     var_yf_ME=var_yf;

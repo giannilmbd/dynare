@@ -54,7 +54,6 @@ endo_nbr = M_.endo_nbr;
 exo_det_steady_state = oo_.exo_det_steady_state;
 nstatic = M_.nstatic;
 nspred = M_.nspred;
-nc = size(dr.ghx,2);
 iter = size(ex,1);
 if size(ex_det, 1) ~= iter+ykmin
     error('Size mismatch: number of forecasting periods for stochastic exogenous and deterministic exogenous don''t match')
@@ -126,25 +125,23 @@ else
     error('simultxdet.m: order>2 not supported.')
 end
 
-[A,B] = kalman_transition_matrix(dr,nstatic+(1:nspred),1:nc);
+% Define union of requested and state variables
+[var_pos]=union(dr.inv_order_var(dr.state_var),dr.inv_order_var(ivar),'stable');
+% set state_pos to positions of state variables for inner part of
+% variance loop
+[~,state_pos] = ismember(dr.inv_order_var(dr.state_var),var_pos);
+% set var_list_pos to positions of var_list_ for reading out requested
+% variances
+[~,var_list_pos] = ismember(dr.inv_order_var(ivar),var_pos);
+ghx1 = dr.ghx(var_pos,:);
+ghu1 = dr.ghu(var_pos,:);
 
-inv_order_var = dr.inv_order_var;
-ghx1 = dr.ghx(inv_order_var(ivar),:); %make sure that order is consistent with var_list
-ghu1 = dr.ghu(inv_order_var(ivar),:);
 
-sigma_u = B*M_.Sigma_e*B';
-sigma_u1 = ghu1*M_.Sigma_e*ghu1';
-sigma_y = 0;
-
+sigma_y1 = zeros(size(ghx1,1),size(ghx1,1)); %no initial uncertainty about the states
 var_yf=NaN(iter,nvar); %initialize
 for i=1:iter
-    sigma_y1 = ghx1*sigma_y*ghx1'+sigma_u1; %only valid at first order, needs to be fixed, see https://git.dynare.org/Dynare/dynare/-/issues/1940
-    var_yf(i,:) = diag(sigma_y1)';
-    if i == iter
-        break
-    end
-    sigma_u = A*sigma_u*A';
-    sigma_y = sigma_y+sigma_u;
+    sigma_y1 = ghx1*sigma_y1(state_pos,state_pos)*ghx1'+ghu1*M_.Sigma_e*ghu1';%only valid at first order, needs to be fixed, see https://git.dynare.org/Dynare/dynare/-/issues/1940
+    var_yf(i,:) = diag(sigma_y1(var_list_pos,var_list_pos))'; % first period is initial condition without uncertainty
 end
 
 fact = norminv((1-options_.forecasts.conf_sig)/2,0,1);
