@@ -1,5 +1,5 @@
-function forecast = dyn_forecast(var_list,M_,options_,oo_,task,dataset_info)
-% function forecast = dyn_forecast(var_list,M_,options_,oo_,task,dataset_info)
+function forecast = run(var_list,M_,options_,oo_,task,dataset_info)
+% function forecast = run(var_list,M_,options_,oo_,task,dataset_info)
 %   computes mean forecast for a given value of the parameters
 %   computes also confidence bands for the forecast
 %
@@ -45,23 +45,20 @@ function forecast = dyn_forecast(var_list,M_,options_,oo_,task,dataset_info)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if ~isfield(oo_,'dr') || isempty(oo_.dr)
-  error('dyn_forecast: the decision rules have not been computed. Did you forget a stoch_simul-command?')
+  error('forecasts.run: the decision rules have not been computed. Did you forget a stoch_simul-command?')
 end
 
 if nargin<6 && options_.prefilter
-    error('The prefiltering option is not allowed without providing a dataset')
+    error('forecasts.run: The prefiltering option is not allowed without providing a dataset')
 elseif nargin==6
     mean_varobs=dataset_info.descriptive.mean';
 end
 
-if options_.order>1 && M_.exo_det_nbr == 0 
-    error('forecasting without varexo_det does not support order>1.')
-end
 if options_.order>2 && M_.exo_det_nbr > 0
-    error('forecasting with varexo_det does not support order>2.')
+    error('forecasts.run: forecasting with varexo_det does not support order>2.')
 end
-if options_.order==2 && options_.pruning
-    error('forecasting with varexo_det does not support pruning.')
+if options_.order==2 && M_.exo_det_nbr > 0 && options_.pruning 
+    error('forecasts.run: forecasting with varexo_det does not support pruning.')
 end
 
 oo_=make_ex_(M_,options_,oo_);
@@ -162,9 +159,9 @@ end
 
 if M_.exo_det_nbr == 0
     if isequal(M_.H,0)
-        [yf,int_width] = forcst(oo_.dr,y0,horizon,var_list,M_,options_);
+        [yf,yf_CI] = forecasts.stochastic_classical(oo_.dr,y0,horizon,var_list,M_,options_);
     else
-        [yf,int_width,int_width_ME] = forcst(oo_.dr,y0,horizon,var_list,M_,options_);
+        [yf,yf_CI,yf_CI_ME] = forecasts.stochastic_classical(oo_.dr,y0,horizon,var_list,M_,options_);
     end
 else
     exo_det_length = size(oo_.exo_det_simul,1)-M_.maximum_lag;
@@ -182,12 +179,12 @@ else
     else
         iorder = options_.order;
     end
-    if isequal(M_.H,0)
-        [yf,int_width] = simultxdet(y0,ex,oo_.exo_det_simul,...
-                                    iorder,var_list,M_,oo_,options_);
+    if isequal(M_.H,0) || nnz(M_.H)==0
+        [yf,yf_CI] = simult_varexo_det(y0,ex,oo_.exo_det_simul,...
+                            iorder,var_list,M_,oo_.dr,oo_.exo_det_steady_state,options_);
     else
-        [yf,int_width,int_width_ME] = simultxdet(y0,ex,oo_.exo_det_simul,...
-                                                 iorder,var_list,M_,oo_,options_);
+        [yf,yf_CI,yf_CI_ME] = simult_varexo_det(y0,ex,oo_.exo_det_simul,...
+                            iorder,var_list,M_,oo_.dr,oo_.exo_det_steady_state,options_);
     end
 end
 
@@ -208,11 +205,11 @@ end
 for i=1:n_var
     vname = var_list{i};
     forecast.Mean.(vname) = yf(i,maximum_lag+(1:horizon))';
-    forecast.HPDinf.(vname)= yf(i,maximum_lag+(1:horizon))' - int_width(1:horizon,i);
-    forecast.HPDsup.(vname) = yf(i,maximum_lag+(1:horizon))' + int_width(1:horizon,i);
-    if ~isequal(M_.H,0) && ismember(var_list{i},options_.varobs)
-        forecast.HPDinf_ME.(vname)= yf(i,maximum_lag+(1:horizon))' - int_width_ME(1:horizon,i);
-        forecast.HPDsup_ME.(vname) = yf(i,maximum_lag+(1:horizon))' + int_width_ME(1:horizon,i);
+    forecast.HPDinf.(vname)= yf_CI(i,maximum_lag+(1:horizon),1)';
+    forecast.HPDsup.(vname) = yf_CI(i,maximum_lag+(1:horizon),2)';
+    if ~(isequal(M_.H,0) || nnz(M_.H)==0) && ismember(var_list{i},options_.varobs)
+        forecast.HPDinf_ME.(vname)= yf_CI_ME(i,maximum_lag+(1:horizon),1)';
+        forecast.HPDsup_ME.(vname) = yf_CI_ME(i,maximum_lag+(1:horizon),2)';
     end
 end
 
@@ -222,5 +219,5 @@ end
 
 if ~options_.nograph
     oo_.forecast = forecast;
-    forecast_graphs(var_list, M_, oo_, options_)
+    forecasts.graph(var_list, M_, oo_, options_)
 end
