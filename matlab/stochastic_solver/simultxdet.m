@@ -79,6 +79,10 @@ else
         end
     end
 end
+if nargout==3 % add measurement error variance uncertainty for observables
+    [loc_H, loc_varlist] = ismember(options_.varobs, var_list);
+    loc_varlist(loc_varlist==0) = []; %location of observables in variable list
+end
 
 if iorder == 1
     for i = ykmin+1: iter+ykmin
@@ -147,8 +151,10 @@ end
 fact = norminv((1-options_.forecasts.conf_sig)/2,0,1);
 if nargout==3
     var_yf_ME=var_yf;
-    var_yf_ME(:,options_.varobs_id)=var_yf(:,options_.varobs_id)+repmat(diag(M_.H)',horizon,1);
-    int_width_ME = zeros(horizon,M_.endo_nbr);
+    if ~isempty(loc_varlist)
+        var_yf_ME(:,loc_varlist)=var_yf(:,loc_varlist)+repmat(diag(M_.H(loc_H,loc_H))',iter,1);
+    end
+    int_width_ME = zeros(iter,nvar);
 end
 
 int_width = zeros(iter,nvar);

@@ -1530,6 +1530,7 @@ mod_and_m_tests = [
   { 'test' : [ 'forecast/forecast_test_AR1_varexo_det.mod' ] },
   { 'test' : [ 'forecast/fs2000_forecast.mod' ] },
   { 'test' : [ 'forecast/fs2000_forecast_varexo_det.mod' ] },
+  { 'test' : [ 'forecast/forecast_test_AR1_varexo_det_order_2.mod' ] },
   { 'test' : [ 'forecast/example1_varexo_det.mod' ] },
   { 'test' : [ 'forecast/Hansen_exo_det_forecast.mod' ] },
   { 'test' : [ 'forecast/rbc_basic_forecast_varexo_det.mod' ] },
