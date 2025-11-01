@@ -156,7 +156,7 @@ end
 
 int_width = zeros(iter,nvar);
 for i=1:nvar
-    int_width(:,i) = fact*sqrt(var_yf(:,i));
+    int_width(:,i) = -fact*sqrt(var_yf(:,i));
     if nargout==3
         int_width_ME(:,i) = -fact*sqrt(var_yf_ME(:,i));
     end
