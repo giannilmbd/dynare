@@ -1976,6 +1976,7 @@ in this case ``initval`` is used to specify the terminal conditions.
 
 
 .. command:: resid ;
+             resid (OPTIONS...);
 
     |br| This command will display the residuals of the static
     equations of the model, using the values given for the endogenous
