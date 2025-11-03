@@ -14,19 +14,19 @@ function [y_,int_width,int_width_ME]=simultxdet(y0,ex,ex_det, iorder,var_list,M_
 %    options_:  Dynare options structure
 %
 % OUTPUTS:
-%   yf:          mean forecast
+%   yf:          mean forecast (in var_list order)
 %   int_width:   distance between upper bound and
-%                mean forecast
+%                mean forecast (in var_list order)
 %   int_width_ME:distance between upper bound and
-%                mean forecast when considering measurement error
+%                mean forecast when considering measurement error (in var_list order)
 %   int_width_ME:distance between upper bound and
-%                mean forecast when considering measurement error
+%                mean forecast when considering measurement error (in var_list order)
 %
 % The forecast horizon is equal to size(ex, 1).
 % The condition size(ex,1)+M_.maximum_lag=size(ex_det,1) must be verified
 %  for consistency.
 
-% Copyright © 2008-2024 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -104,7 +104,7 @@ elseif iorder == 2
         tempxu = kron(tempx,tempu);
         y_(dr.order_var,i) = dr.ys(dr.order_var)+dr.ghs2/2+dr.ghx*tempx+ ...
             dr.ghu*tempu+0.5*(dr.ghxx*tempxx+dr.ghuu*tempuu)+dr.ghxu* ...
-            tempxu;
+            tempxu; % in declaration order
         for j=1:min(ykmin+dr.exo_det_length+1-i,dr.exo_det_length)
             tempud = ex_det(i+j-1,:)'-exo_det_steady_state;
             tempudud = kron(tempud,tempud);
@@ -129,7 +129,7 @@ end
 [A,B] = kalman_transition_matrix(dr,nstatic+(1:nspred),1:nc);
 
 inv_order_var = dr.inv_order_var;
-ghx1 = dr.ghx(inv_order_var(ivar),:);
+ghx1 = dr.ghx(inv_order_var(ivar),:); %make sure that order is consistent with var_list
 ghu1 = dr.ghu(inv_order_var(ivar),:);
 
 sigma_u = B*M_.Sigma_e*B';
@@ -161,3 +161,5 @@ for i=1:nvar
         int_width_ME(:,i) = -fact*sqrt(var_yf_ME(:,i));
     end
 end
+
+y_ = y_(ivar,:); %reorder from declaration to var_list order

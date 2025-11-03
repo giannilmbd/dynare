@@ -12,16 +12,16 @@ function [yf,int_width,int_width_ME]=forcst(dr,y0,horizon,var_list,M_,options_)
 %   options_:    Dynare options structure
 
 % OUTPUTS:
-%   yf:          mean forecast
+%   yf:          mean forecast (in var_list order)
 %   int_width:   distance between upper bound and
-%                mean forecast
+%                mean forecast (in var_list order)
 %   int_width_ME:distance between upper bound and
-%                mean forecast when considering measurement error
+%                mean forecast when considering measurement error (in var_list order)
 %
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2024 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -42,7 +42,7 @@ if options_.order>1
     error('forcst.m: Only order=1 is supported. Skipping computuations.')
 end
 
-yf = simult_(M_,options_,y0,dr,zeros(horizon,M_.exo_nbr),1);
+yf = simult_(M_,options_,y0,dr,zeros(horizon,M_.exo_nbr),1); % do point forecast in declaration order, sort later
 nstatic = M_.nstatic;
 nspred = M_.nspred;
 nc = size(dr.ghx,2);
@@ -64,7 +64,7 @@ for i=1:nvar
     end
 end
 
-ghx1 = dr.ghx(inv_order_var(ivar),:);
+ghx1 = dr.ghx(inv_order_var(ivar),:); %make sure that order is consistent with var_list
 ghu1 = dr.ghu(inv_order_var(ivar),:);
 
 %initialize recursion
@@ -104,4 +104,4 @@ for i = 1:nvar
     end
 end
 
-yf = yf(ivar,:);
+yf = yf(ivar,:); %reorder from declaration to var_list order
