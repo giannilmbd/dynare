@@ -32,7 +32,7 @@ clean-all-deps:
 	make -C deps clean-all
 
 clean-pkgs:
-	rm -rf exe/ 7z/ zip/
+	rm -rf exe/ 7z/
 
 # Clean everything except downloaded tarballs of dependencies
 clean: clean-pkgs clean-deps

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Produces Windows packages of Dynare (executable installer, 7z and zip archives).
+# Produces Windows packages of Dynare (executable installer and 7z archives).
 #
 # The binaries are cross compiled for Windows (64-bit), Octave and MATLAB
 # (all supported versions).
@@ -107,9 +107,9 @@ mkdir -p exe
 BASENAME=dynare-$VERSION
 mv dynare-"$VERSION"-win.exe "$ROOT_DIRECTORY"/exe/"$BASENAME"-win.exe
 
-## Create 7z and zip archives (for people not allowed to download/execute the installer)
+## Create 7z archive (for people not allowed to download/execute the installer)
 
-# Set name of the root directory in the 7z and zip archives
+# Set name of the root directory in the 7z archive
 ZIPDIR="$TMP_DIRECTORY"/"$BASENAME"
 mkdir -p "$ZIPDIR"
 
@@ -139,9 +139,6 @@ cp -p build-doc/preprocessor/doc/*.pdf "$ZIPDIR"/doc
 cp -pr build-doc/dynare-manual.html "$ZIPDIR"/doc
 
 cd "$TMP_DIRECTORY"
-
-mkdir -p "$ROOT_DIRECTORY"/zip
-zip -9 --quiet --recurse-paths "$ROOT_DIRECTORY"/zip/"$BASENAME"-win.zip "$BASENAME"
 
 mkdir -p "$ROOT_DIRECTORY"/7z
 7zr a -mx=9 "$ROOT_DIRECTORY"/7z/"$BASENAME"-win.7z "$BASENAME"
