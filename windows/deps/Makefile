@@ -26,7 +26,7 @@ FFLAGS := -O3 -flto=auto -march=nocona -msahf -mtune=generic
 
 .PHONY: all clean clean-all
 
-all: octave sysroot-matlab sysroot-octave gcc x13as
+all: sysroot-matlab sysroot-octave gcc x13as
 
 # Clean everything except downloaded tarballs
 clean:
@@ -69,9 +69,6 @@ octave: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
 	rm -rf $@
 	7zr x $< > /dev/null
 	mv octave-${OCTAVE_VERSION}-w64 $@
-	# Clean up MinGW stuff that interferes with our cross-compiler
-	cd $@/mingw64/lib && rm -f libadvapi32.a libkernel32.a libmingw32.a libmingwex.a libmoldname.a libmsvcrt.a libpthread.dll.a libshell32.a libuser32.a
-	cd $@/mingw64/include && rm -f $$(grep -l "This file is part of the \\(mingw-w64 runtime\\|mingw-runtime\\) package" *.h) minwinbase.h omp.h swprintf.inl
 	touch $@
 
 #
@@ -129,11 +126,14 @@ OCTAVE_MSYS2_DEPS := \
 	tarballs/mingw-w64-x86_64-libiconv-$(MINGW64_LIBICONV_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-x86_64-libunistring-$(MINGW64_LIBUNISTRING_VERSION)-any.pkg.tar.zst
 
-sysroot-octave: $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
+sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
 	rm -rf $@
 	mkdir $@
 	for f in $(OCTAVE_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
 	cp src/slicot-octave/libslicot_pic.a $@/mingw64/lib/
+	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse $@/mingw64/include
+	cp -R octave/mingw64/lib/octave $@/mingw64/lib
+	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a $@/mingw64/lib
 	touch $@
 
 GCC_MSYS2_DEPS := \

@@ -11,11 +11,11 @@ set -e
 
 : ${SED="/bin/sed"}
 
-# Get path to the mkoctfile shell script
-MKOCTFILE_PATH=$(dirname $(readlink -f "$0"))
-OCTAVE_PREFIX="$MKOCTFILE_PATH/octave/mingw64"
+# The location where Octave artifacts are going to be copied
+OCTAVE_PREFIX="/tmp/windeps/sysroot-octave/mingw64"
 
 # Get Octave version
+MKOCTFILE_PATH=$(dirname $(readlink -f "$0"))
 current_octave_version=$(grep "^OCTAVE_VERSION" "$MKOCTFILE_PATH/versions.mk")
 eval $(echo "$current_octave_version" | tr -d '[:space:]')
 
@@ -44,7 +44,7 @@ if [ "$INCLUDEDIR" != /usr/include ]; then
   DEFAULT_INCFLAGS="$DEFAULT_INCFLAGS -I$INCLUDEDIR"
 fi
 
-DEFAULT_LDFLAGS="-L$OCTLIBDIR -L$BINDIR"
+DEFAULT_LDFLAGS="-L$OCTLIBDIR"
 if [ "$LIBDIR" != /usr/lib ]; then
   DEFAULT_LDFLAGS="$DEFAULT_LDFLAGS -L$LIBDIR"
 fi
