@@ -109,7 +109,6 @@ sysroot-matlab: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz $(MATLAB_MSYS2_DEPS
 
 OCTAVE_MSYS2_DEPS := \
 	tarballs/mingw-w64-x86_64-boost-$(MINGW64_BOOST_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-x86_64-gsl-$(MINGW64_GSL_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-x86_64-matio-$(MINGW64_MATIO_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-x86_64-zlib-$(MINGW64_ZLIB_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-x86_64-hdf5-$(MINGW64_HDF5_VERSION)-any.pkg.tar.zst \
@@ -131,9 +130,11 @@ sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
 	mkdir $@
 	for f in $(OCTAVE_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
 	cp src/slicot-octave/libslicot_pic.a $@/mingw64/lib/
-	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse $@/mingw64/include
+	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse octave/mingw64/include/gsl $@/mingw64/include
 	cp -R octave/mingw64/lib/octave $@/mingw64/lib
-	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a $@/mingw64/lib
+	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a $@/mingw64/lib
+	cp octave/mingw64/lib/pkgconfig/gsl.pc $@/mingw64/lib/pkgconfig
+	patch -p0 < octave-pkgconfig.patch
 	touch $@
 
 GCC_MSYS2_DEPS := \
