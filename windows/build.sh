@@ -46,9 +46,8 @@ trap cleanup EXIT
 # Meson does not like when dependencies are under the source tree.
 # We use a fixed name to avoid having to regenerate the cross files.
 mkdir /tmp/windeps
-ln -s "$ROOT_DIRECTORY"/deps/lib64 /tmp/windeps/
-ln -s "$ROOT_DIRECTORY"/deps/lib64-msys2 /tmp/windeps/
-ln -s "$ROOT_DIRECTORY"/deps/matlab64 /tmp/windeps/
+ln -s "$ROOT_DIRECTORY"/deps/sysroot-matlab /tmp/windeps/
+ln -s "$ROOT_DIRECTORY"/deps/sysroot-octave /tmp/windeps/
 ln -s "$ROOT_DIRECTORY"/deps/mkoctfile64 /tmp/windeps/
 
 # Go to source root directory
@@ -57,7 +56,7 @@ cd ..
 common_meson_opts=(--buildtype=release -Db_lto=true --cross-file windows/mingw-cross.ini)
 
 # Create Windows 64-bit DLL binaries for MATLAB ≥ R2020a
-meson setup --cross-file windows/mingw-cross-matlab.ini -Dmatlab_path=/tmp/windeps/matlab64/R2020a \
+meson setup --cross-file windows/mingw-cross-matlab.ini -Dmatlab_path=/tmp/windeps/sysroot-matlab/MATLAB/R2020a \
       "${common_meson_opts[@]}" build-win-matlab
 meson compile -v -C build-win-matlab
 
@@ -117,7 +116,7 @@ cd ..
 cp -p NEWS.md "$ZIPDIR"
 cp -p license.txt "$ZIPDIR"
 cp -p windows/README.txt "$ZIPDIR"
-cp -pr windows/deps/mingw64 "$ZIPDIR"
+cp -pr windows/deps/gcc/mingw64 "$ZIPDIR"
 mkdir -p "$ZIPDIR"/contrib/ms-sbvar/TZcode
 cp -pr contrib/ms-sbvar/TZcode/MatlabFiles "$ZIPDIR"/contrib/ms-sbvar/TZcode
 mkdir -p "$ZIPDIR"/mex/matlab/win64-9.8-25.2
@@ -129,7 +128,7 @@ cp -p build-win-matlab/preprocessor/src/dynare-preprocessor.exe "$ZIPDIR"/prepro
 cp -pr matlab "$ZIPDIR"
 cp -p build-win-matlab/dynare_version.m "$ZIPDIR"/matlab
 mkdir -p "$ZIPDIR"/matlab/dseries/externals/x13/windows/64
-cp -p windows/deps/lib64/x13as/x13as.exe "$ZIPDIR"/matlab/dseries/externals/x13/windows/64
+cp -p windows/deps/x13as/x13as.exe "$ZIPDIR"/matlab/dseries/externals/x13/windows/64
 cp -pr examples "$ZIPDIR"
 mkdir -p "$ZIPDIR"/scripts
 cp -p scripts/dynare.el "$ZIPDIR"/scripts

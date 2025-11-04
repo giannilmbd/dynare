@@ -63,7 +63,7 @@ Section "Dynare core (preprocessor and M-files)"
  File ..\matlab\preprocessor64\dynare_m.exe
 
  SetOutPath $INSTDIR\matlab\dseries\externals\x13\windows\64
- File deps\lib64\x13as\x13as.exe
+ File deps\x13as\x13as.exe
 
  SetOutPath $INSTDIR\contrib
  File /r ..\contrib\*.m
@@ -99,7 +99,7 @@ SectionEnd
 
 Section "MinGW compiler for MATLAB 64-bit"
  SetOutPath $INSTDIR\mingw64
- File /r deps\mingw64\*
+ File /r deps\gcc\mingw64\*
 SectionEnd
 
 Section "MEX files for Octave 10.3.0 (64-bit)"

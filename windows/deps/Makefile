@@ -24,15 +24,13 @@ WGET_OPTIONS := --no-verbose --no-use-server-timestamps --retry-connrefused --re
 # See comments in windows/mingw-cross.ini
 FFLAGS := -O3 -flto=auto -march=nocona -msahf -mtune=generic
 
-.PHONY: all build msys2 x13as build build-slicot clean clean-all
+.PHONY: all clean clean-all
 
-all: build octave64 matlab64 msys2 x13as
-
-build: build-slicot
+all: octave sysroot-matlab sysroot-octave gcc x13as
 
 # Clean everything except downloaded tarballs
 clean:
-	rm -rf sources64 lib64 lib64-msys2 mingw64 matlab64 octave64
+	rm -rf src octave sysroot-matlab sysroot-octave gcc x13as
 
 # Clean everything (including downloaded tarballs)
 clean-all: clean
@@ -46,30 +44,18 @@ tarballs/slicot-$(SLICOT_VERSION).tar.gz:
 	mkdir -p tarballs
 	wget $(WGET_OPTIONS) -O $@ https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v$(SLICOT_VERSION).tar.gz
 
-sources64/slicot-$(SLICOT_VERSION)-with-64bit-integer: tarballs/slicot-$(SLICOT_VERSION).tar.gz
-	rm -rf sources64/slicot-*-with-64bit-integer
-	mkdir -p $@
-	tar xf $< --directory $@ --strip-components=1
-	touch $@
+src/slicot-matlab/libslicot64_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
+	rm -rf src/slicot-matlab
+	mkdir -p src/slicot-matlab
+	tar xf $< --directory src/slicot-matlab --strip-components=1
+	make -C src/slicot-matlab -f makefile_Unix lib SLICOTLIB=../libslicot64_pic.a OPTS="$(FFLAGS) -fno-underscoring -fdefault-integer-8" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-gcc-ar
 
-sources64/slicot-$(SLICOT_VERSION)-with-32bit-integer-and-underscore: tarballs/slicot-$(SLICOT_VERSION).tar.gz
-	rm -rf sources64/slicot-*-with-32bit-integer-and-underscore
-	mkdir -p $@
-	tar xf $< --directory $@ --strip-components=1
-	touch $@
+src/slicot-octave/libslicot_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
+	rm -rf src/slicot-octave
+	mkdir -p src/slicot-octave
+	tar xf $< --directory src/slicot-octave --strip-components=1
+	make -C src/slicot-octave -f makefile_Unix lib SLICOTLIB=../libslicot_pic.a OPTS="$(FFLAGS)" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-gcc-ar
 
-lib64/Slicot/without-underscore/libslicot64_pic.a: sources64/slicot-$(SLICOT_VERSION)-with-64bit-integer
-	make -C $< -f makefile_Unix lib SLICOTLIB=../libslicot64_pic.a OPTS="$(FFLAGS) -fno-underscoring -fdefault-integer-8" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-gcc-ar
-	mkdir -p $(dir $@)
-	cp $</libslicot64_pic.a $@
-
-lib64/Slicot/with-underscore/libslicot_pic.a: sources64/slicot-$(SLICOT_VERSION)-with-32bit-integer-and-underscore
-	make -C $< -f makefile_Unix lib SLICOTLIB=../libslicot_pic.a OPTS="$(FFLAGS)" FORTRAN=x86_64-w64-mingw32-gfortran LOADER=x86_64-w64-mingw32-gfortran ARCH=x86_64-w64-mingw32-gcc-ar
-	mkdir -p $(dir $@)
-	cp $</libslicot_pic.a $@
-
-build-slicot: lib64/Slicot/without-underscore/libslicot64_pic.a \
-	lib64/Slicot/with-underscore/libslicot_pic.a
 
 #
 # Octave
@@ -79,7 +65,7 @@ tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z:
 	mkdir -p tarballs
 	wget $(WGET_OPTIONS) -O $@ https://ftpmirror.gnu.org/gnu/octave/windows/$(notdir $@)
 
-octave64: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
+octave: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
 	rm -rf $@
 	7zr x $< > /dev/null
 	mv octave-${OCTAVE_VERSION}-w64 $@
@@ -98,36 +84,81 @@ tarballs/matlab%.tar.xz:
 	gpg --output $@ --decrypt $@.gpg
 	rm $@.gpg
 
-matlab64: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz
-	rm -rf $@
-	mkdir -p $@
-	tar xf $< --directory $@
-	touch $@
-
 #
-# Stuff downloaded from MSYS2:
-# - several build dependencies
-# - the embedded MinGW compiler (for use_dll)
+# The three root directories:
+# - for building MATLAB MEX
+# - for builing Octave MEX
+# - the embedded GCC compiler (for use_dll)
 #
-
-msys2: lib64-msys2 mingw64
 
 MSYS2_EXCLUDES := --exclude .MTREE --exclude .BUILDINFO --exclude .PKGINFO
-
-lib64-msys2: tarballs/mingw-w64-x86_64-boost-$(MINGW64_BOOST_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-gsl-$(MINGW64_GSL_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-matio-$(MINGW64_MATIO_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-zlib-$(MINGW64_ZLIB_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-hdf5-$(MINGW64_HDF5_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libaec-$(MINGW64_LIBAEC_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-openssl-$(MINGW64_OPENSSL_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-curl-$(MINGW64_CURL_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-zstd-$(MINGW64_ZSTD_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-brotli-$(MINGW64_BROTLI_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libidn2-$(MINGW64_LIBIDN2_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libpsl-$(MINGW64_LIBPSL_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libssh2-$(MINGW64_LIBSSH2_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-nghttp2-$(MINGW64_NGHTTP2_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-nghttp3-$(MINGW64_NGHTTP3_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libiconv-$(MINGW64_LIBICONV_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libunistring-$(MINGW64_LIBUNISTRING_VERSION)-any.pkg.tar.zst
-	rm -rf $@
-	mkdir $@
-	for f in $^; do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
-	touch $@
-
-mingw64: tarballs/mingw-w64-x86_64-gcc-$(MINGW64_GCC_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-gcc-libs-$(MINGW64_GCC_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-gmp-$(MINGW64_GMP_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-binutils-$(MINGW64_BINUTILS_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-headers-git-$(MINGW64_HEADERS_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-crt-git-$(MINGW64_CRT_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-winpthreads-git-$(MINGW64_WINPTHREADS_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libwinpthread-git-$(MINGW64_WINPTHREADS_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-zlib-$(MINGW64_ZLIB_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-zstd-$(MINGW64_ZSTD_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-isl-$(MINGW64_ISL_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-mpc-$(MINGW64_MPC_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-mpfr-$(MINGW64_MPFR_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-libiconv-$(MINGW64_LIBICONV_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-windows-default-manifest-$(MINGW64_WINDOWS_DEFAULT_MANIFEST_VERSION)-any.pkg.tar.zst tarballs/mingw-w64-x86_64-gettext-runtime-$(MINGW64_GETTEXT_RUNTIME_VERSION)-any.pkg.tar.zst
-	rm -rf $@
-	for f in $^; do tar xf $$f $(MSYS2_EXCLUDES); done
-	touch $@
 
 tarballs/mingw-w64-x86_64-%-any.pkg.tar.zst:
 	mkdir -p tarballs
 	wget $(WGET_OPTIONS) -O $@ http://repo.msys2.org/mingw/x86_64/$(notdir $@)
+
+MATLAB_MSYS2_DEPS := \
+	tarballs/mingw-w64-x86_64-boost-$(MINGW64_BOOST_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-gsl-$(MINGW64_GSL_VERSION)-any.pkg.tar.zst
+
+sysroot-matlab: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz $(MATLAB_MSYS2_DEPS) src/slicot-matlab/libslicot64_pic.a
+	rm -rf $@
+	mkdir $@
+	for f in $(MATLAB_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
+	mkdir $@/MATLAB
+	tar xf $< --directory $@/MATLAB/
+	cp src/slicot-matlab/libslicot64_pic.a $@/mingw64/lib/
+	touch $@
+
+OCTAVE_MSYS2_DEPS := \
+	tarballs/mingw-w64-x86_64-boost-$(MINGW64_BOOST_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-gsl-$(MINGW64_GSL_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-matio-$(MINGW64_MATIO_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-zlib-$(MINGW64_ZLIB_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-hdf5-$(MINGW64_HDF5_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libaec-$(MINGW64_LIBAEC_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-openssl-$(MINGW64_OPENSSL_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-curl-$(MINGW64_CURL_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-zstd-$(MINGW64_ZSTD_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-brotli-$(MINGW64_BROTLI_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libidn2-$(MINGW64_LIBIDN2_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libpsl-$(MINGW64_LIBPSL_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libssh2-$(MINGW64_LIBSSH2_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-nghttp2-$(MINGW64_NGHTTP2_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-nghttp3-$(MINGW64_NGHTTP3_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libiconv-$(MINGW64_LIBICONV_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libunistring-$(MINGW64_LIBUNISTRING_VERSION)-any.pkg.tar.zst
+
+sysroot-octave: $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
+	rm -rf $@
+	mkdir $@
+	for f in $(OCTAVE_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
+	cp src/slicot-octave/libslicot_pic.a $@/mingw64/lib/
+	touch $@
+
+GCC_MSYS2_DEPS := \
+	tarballs/mingw-w64-x86_64-gcc-$(MINGW64_GCC_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-gcc-libs-$(MINGW64_GCC_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-gmp-$(MINGW64_GMP_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-binutils-$(MINGW64_BINUTILS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-headers-git-$(MINGW64_HEADERS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-crt-git-$(MINGW64_CRT_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-winpthreads-git-$(MINGW64_WINPTHREADS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libwinpthread-git-$(MINGW64_WINPTHREADS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-zlib-$(MINGW64_ZLIB_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-zstd-$(MINGW64_ZSTD_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-isl-$(MINGW64_ISL_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-mpc-$(MINGW64_MPC_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-mpfr-$(MINGW64_MPFR_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-libiconv-$(MINGW64_LIBICONV_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-windows-default-manifest-$(MINGW64_WINDOWS_DEFAULT_MANIFEST_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-x86_64-gettext-runtime-$(MINGW64_GETTEXT_RUNTIME_VERSION)-any.pkg.tar.zst
+
+gcc: $(GCC_MSYS2_DEPS)
+	rm -rf $@
+	mkdir $@
+	for f in $(GCC_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
+	touch $@
 
 #
 # X13AS
@@ -137,9 +168,8 @@ tarballs/x13as_ascii-v$(X13AS_VERSION).zip:
 	mkdir -p tarballs
 	wget $(WGET_OPTIONS) -O $@ https://www2.census.gov/software/x-13arima-seats/x13as/windows/program-archives/$(notdir $@)
 
-lib64/x13as/x13as.exe: tarballs/x13as_ascii-v$(X13AS_VERSION).zip
-	unzip -o -d lib64 $<
-	mv lib64/x13as/x13as_ascii.exe $@
+x13as: tarballs/x13as_ascii-v$(X13AS_VERSION).zip
+	rm -rf $@
+	unzip -o $<
+	mv $@/x13as_ascii.exe $@/x13as.exe
 	touch $@
-
-x13as: lib64/x13as/x13as.exe

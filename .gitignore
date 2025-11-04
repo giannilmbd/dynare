@@ -9,16 +9,15 @@
 /doc/manual/utils/__pycache__/*
 
 # Created by the Windows package build script
-/windows/deps/lib64/
-/windows/deps/lib64-msys2/
-/windows/deps/matlab64/
-/windows/deps/mingw64/
-/windows/deps/octave64/
-/windows/deps/sources64/
+/windows/deps/sysroot-matlab/
+/windows/deps/sysroot-octave/
+/windows/deps/gcc/
+/windows/deps/octave/
+/windows/deps/src/
+/windows/deps/x13as/
 /windows/deps/tarballs/
 /windows/exe/
 /windows/7z/
-/windows/zip/
 /matlab/preprocessor64/
 /matlab/supported_octave_version.m
 
