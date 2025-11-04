@@ -51,15 +51,11 @@ cd ..
 strip usr/local/bin/dynare-preprocessor
 strip usr/local/lib/dynare/mex/matlab/*.mexa64
 
-# Populate staging area for the zip
+# Populate staging area for the .mltbx archive
 cp -pRL usr/local/lib/dynare dynare # -L is needed to dereference the preprocessor symlink
 mkdir -p dynare/matlab/dseries/externals/x13/linux/64
 cp -p x13as/x13as_ascii dynare/matlab/dseries/externals/x13/linux/64/x13as
 
-# zip dynare
-cd dynare
-zip -q -r "$tmpdir"/dynare.zip *
-
 # make toolbox
 popd
-"$MATLABPATH/bin/matlab" -batch "packageDynare('$tmpdir/dynare.zip', '$DYNAREVER', '$DYNAREVER_SANITIZED', '$DYNARE_PNG_LOGO')"
+"$MATLABPATH/bin/matlab" -batch "packageDynare('$tmpdir/dynare', '$DYNAREVER', '$DYNAREVER_SANITIZED', '$DYNARE_PNG_LOGO')"

@@ -1,11 +1,4 @@
-function packageDynare(zipfile, version, version_sanitized, logo)
-
-tfolder = tempname;
-mkdir(tfolder)
-dynarefld = fullfile(tfolder, "Dynare");
-
-% unzip
-unzip(zipfile,dynarefld)
+function packageDynare(dynarefld, version, version_sanitized, logo)
 
 % create tbx options
 opts = matlab.addons.toolbox.ToolboxOptions(dynarefld, "dynare", ...
