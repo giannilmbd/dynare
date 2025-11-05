@@ -59,6 +59,12 @@ end
 const_lik = log(2*pi)*number_of_observed_variables +log(det(ReducedForm.H)) ;
 lik  = NaN(sample_size,1);
 
+% filter out singular measurement error case
+if rcond(ReducedForm.H) < 1e-12
+    LIK = NaN;
+    return
+end
+
 StateVectorVarianceSquareRoot = chol(ReducedForm.StateVectorVariance)';%reduced_rank_cholesky(ReducedForm.StateVectorVariance)';
 state_variance_rank = size(StateVectorVarianceSquareRoot,2); % Get the rank of StateVectorVarianceSquareRoot
 
@@ -122,12 +128,8 @@ for t=1:sample_size
     end
     PredictionError = bsxfun(@minus,Y(:,t),tmp(ReducedForm.mf1,:));
 
-    if rcond(ReducedForm.H) > 1e-16
-        lnw = -.5*(const_lik+sum(PredictionError.*(ReducedForm.H\PredictionError),1));
-    else
-        LIK = NaN;
-        return
-    end
+    lnw = -.5*(const_lik+sum(PredictionError.*(ReducedForm.H\PredictionError),1));
+    
     dfac = max(lnw);
     wtilde = weights.*exp(lnw-dfac);
     lik(t) = log(sum(wtilde))+dfac;
