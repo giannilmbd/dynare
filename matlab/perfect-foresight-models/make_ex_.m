@@ -31,7 +31,7 @@ try
     [periods, first_simulation_period] = get_simulation_periods(options_);
 catch ME
     if strcmp(ME.identifier, 'Dynare:periodsNotSet')
-        % This function is called from dyn_forecast in some contexts where periods is not set
+        % This function is called from forecasts.run in some contexts where periods is not set
         periods = 0;
         first_simulation_period = options_.simul.first_simulation_period;
     else

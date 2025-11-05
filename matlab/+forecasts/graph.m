@@ -1,6 +1,6 @@
-function forecast_graphs(var_list,M_, oo_,options_)
-% function forecast_graphs(var_list,M_, oo_,options_)
-% Plots the classical forecasts created by dyn_forecast.m
+function graph(var_list,M_, oo_,options_)
+% function graph(var_list,M_, oo_,options_)
+% Plots the classical forecasts created by forecasts.run
 %
 % Inputs:
 %   o var_list              character array with variable names

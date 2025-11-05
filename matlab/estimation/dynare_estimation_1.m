@@ -211,7 +211,7 @@ if isequal(options_.mode_compute,0) && isempty(options_.mode_file) && ~options_.
                 end
             end
             if options_.forecast > 0
-                oo_.forecast = dyn_forecast(var_list_,M_,options_,oo_,'smoother',dataset_info);
+                oo_.forecast = forecasts.run(var_list_,M_,options_,oo_,'smoother',dataset_info);
             end
         end
         %reset qz_criterium
@@ -600,12 +600,10 @@ end
 
 if options_.forecast == 0 || options_.mh_replic > 0 || options_.load_mh_file
     % nothing to do
-elseif options_.order>1 && M_.exo_det_nbr == 0 || ...
-        options_.order>2 && M_.exo_det_nbr > 0 || ...
-        options_.order==2 && options_.pruning
+elseif options_.order>2 && M_.exo_det_nbr > 0
     %forecasting not yet supported
 else
-    oo_.forecast = dyn_forecast(var_list_,M_,options_,oo_,'smoother',dataset_info);
+    oo_.forecast = forecasts.run(var_list_,M_,options_,oo_,'smoother',dataset_info);
 end
 
 %reset qz_criterium

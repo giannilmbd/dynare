@@ -320,6 +320,7 @@ options_.sampling_draws = 500;
 options_.forecast = 0;
 options_.forecasts.conf_sig = 0.9;
 options_.conditional_forecast.conf_sig = 0.9;
+options_.forecast_replic = 1000;
 
 % Model
 options_.linear = false;
