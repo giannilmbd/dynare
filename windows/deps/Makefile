@@ -92,7 +92,7 @@ MSYS2_EXCLUDES := --exclude .MTREE --exclude .BUILDINFO --exclude .PKGINFO
 
 tarballs/mingw-w64-x86_64-%-any.pkg.tar.zst:
 	mkdir -p tarballs
-	wget $(WGET_OPTIONS) -O $@ http://repo.msys2.org/mingw/x86_64/$(notdir $@)
+	wget $(WGET_OPTIONS) -O $@ https://mirror.msys2.org/mingw/x86_64/$(notdir $@)
 
 MATLAB_MSYS2_DEPS := \
 	tarballs/mingw-w64-x86_64-boost-$(MINGW64_BOOST_VERSION)-any.pkg.tar.zst \
