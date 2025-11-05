@@ -56,10 +56,21 @@ Q_lower_triangular_cholesky = chol(ReducedForm.Q)';
 % Set seed for randn().
 set_dynare_seed_local_options([],false,'default');
 
-% Initialization of the likelihood.
-const_lik = log(2*pi)*number_of_observed_variables+log(det(ReducedForm.H));
+%initialize output
 lik  = NaN(sample_size,1);
 LIK  = NaN;
+if isempty(ReducedForm.H)
+    ReducedForm.H = 0;
+end
+% filter out singular measurement error case
+if rcond(ReducedForm.H) < 1e-12
+    LIK = NaN;
+    return
+end
+
+% Initialization of the likelihood.
+const_lik = log(2*pi)*number_of_observed_variables+log(det(ReducedForm.H));
+
 
 % Initialization of the weights across particles.
 weights = ones(1,number_of_particles)/number_of_particles ;
