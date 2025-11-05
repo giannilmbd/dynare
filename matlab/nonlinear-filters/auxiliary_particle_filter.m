@@ -40,16 +40,6 @@ if ParticleOptions.resampling.method.smooth
     error('auxiliary_particle_filter: resampling_method=smooth is not supported.')
 end
 % Get perturbation order
-order = options_.order;
-
-% Set flag for prunning
-pruning = ParticleOptions.pruning;
-
-% Get steady state and mean.
-steadystate = ReducedForm.steadystate;
-constant = ReducedForm.constant;
-state_variables_steady_state = ReducedForm.state_variables_steady_state;
-
 mf0 = ReducedForm.mf0;
 mf1 = ReducedForm.mf1;
 sample_size = size(Y,2);
@@ -58,59 +48,30 @@ number_of_observed_variables = length(mf1);
 number_of_structural_innovations = length(ReducedForm.Q);
 number_of_particles = ParticleOptions.number_of_particles;
 
-if ReducedForm.use_k_order_solver
-    dr = ReducedForm.dr;
-    udr = ReducedForm.udr;
-else
-    % Set local state space model (first order approximation).
-    ghx  = ReducedForm.ghx;
-    ghu  = ReducedForm.ghu;
-    % Set local state space model (second order approximation).
-    ghxx = ReducedForm.ghxx;
-    ghuu = ReducedForm.ghuu;
-    ghxu = ReducedForm.ghxu;
-    ghs2 = ReducedForm.ghs2;
-    if (order == 3)
-        % Set local state space model (third order approximation).
-        ghxxx = ReducedForm.ghxxx;
-        ghuuu = ReducedForm.ghuuu;
-        ghxxu = ReducedForm.ghxxu;
-        ghxuu = ReducedForm.ghxuu;
-        ghxss = ReducedForm.ghxss;
-        ghuss = ReducedForm.ghuss;
-    end
-end
-
-% Get covariance matrices
-Q = ReducedForm.Q;
-H = ReducedForm.H;
-
 % Get initial condition for the state vector.
-StateVectorMean = ReducedForm.StateVectorMean;
 StateVectorVarianceSquareRoot = chol(ReducedForm.StateVectorVariance)';
 state_variance_rank = size(StateVectorVarianceSquareRoot,2);
-Q_lower_triangular_cholesky = chol(Q)';
+Q_lower_triangular_cholesky = chol(ReducedForm.Q)';
 
 % Set seed for randn().
 set_dynare_seed_local_options([],false,'default');
 
 % Initialization of the likelihood.
-const_lik = log(2*pi)*number_of_observed_variables+log(det(H));
+const_lik = log(2*pi)*number_of_observed_variables+log(det(ReducedForm.H));
 lik  = NaN(sample_size,1);
 LIK  = NaN;
 
 % Initialization of the weights across particles.
 weights = ones(1,number_of_particles)/number_of_particles ;
-StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),StateVectorMean);
-%StateVectors = bsxfun(@plus,zeros(state_variance_rank,number_of_particles),StateVectorMean);
-if pruning
-    if order == 2
+StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),ReducedForm.StateVectorMean);
+if ParticleOptions.pruning
+    if options_.order == 2
         StateVectors_ = StateVectors;
-        state_variables_steady_state_ = state_variables_steady_state;
+        state_variables_steady_state_ = ReducedForm.state_variables_steady_state;
         mf0_ = mf0;
-    elseif order == 3
+    elseif options_.order == 3
         StateVectors_ = repmat(StateVectors,3,1);
-        state_variables_steady_state_ = repmat(state_variables_steady_state,3,1);
+        state_variables_steady_state_ = repmat(ReducedForm.state_variables_steady_state,3,1);
         mf0_ = repmat(mf0,1,3); 
         mask2 = number_of_state_variables+1:2*number_of_state_variables;
         mask3 = 2*number_of_state_variables+1:3*number_of_state_variables;
@@ -122,59 +83,69 @@ if pruning
 end
 
 for t=1:sample_size
-    yhat = bsxfun(@minus,StateVectors,state_variables_steady_state);
-    if pruning
+    yhat = bsxfun(@minus,StateVectors,ReducedForm.state_variables_steady_state);
+    if ParticleOptions.pruning
         yhat_ = bsxfun(@minus,StateVectors_,state_variables_steady_state_);
-        if order == 2
-            [tmp, ~] = local_state_space_iteration_2(yhat,zeros(number_of_structural_innovations,number_of_particles),ghx,ghu,constant,ghxx,ghuu,ghxu,yhat_,steadystate,ThreadsOptions.local_state_space_iteration_2);
-        elseif order == 3
-            [tmp, ~] = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations,number_of_particles), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, pruning);
+        if options_.order == 2
+            [tmp,~] = local_state_space_iteration_2(yhat,zeros(number_of_structural_innovations,number_of_particles),ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,...
+                ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,yhat_,ReducedForm.steadystate,ThreadsOptions.local_state_space_iteration_2);
+        elseif options_.order == 3
+            [tmp,~] = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations,number_of_particles), ReducedForm.ghx, ReducedForm.ghu, ...
+                ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss,...
+                ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
         else
             error('Pruning is not available for orders > 3');
         end
     else
         if ReducedForm.use_k_order_solver
-            tmp = local_state_space_iteration_k(yhat, zeros(number_of_structural_innovations,number_of_particles), dr, M_, options_, udr);
+            tmp = local_state_space_iteration_k(yhat, zeros(number_of_structural_innovations,number_of_particles), ReducedForm.dr, M_, options_, ReducedForm.udr);
         else
-            if order == 2
-                tmp = local_state_space_iteration_2(yhat,zeros(number_of_structural_innovations,number_of_particles),ghx,ghu,constant,ghxx,ghuu,ghxu,ThreadsOptions.local_state_space_iteration_2);
-            elseif order == 3
-                tmp = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations,number_of_particles), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, pruning);
+            if options_.order == 2
+                tmp = local_state_space_iteration_2(yhat,zeros(number_of_structural_innovations,number_of_particles),ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,...
+                    ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,ThreadsOptions.local_state_space_iteration_2);
+            elseif options_.order == 3
+                tmp = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations,number_of_particles), ReducedForm.ghx, ReducedForm.ghu, ...
+                    ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
             else
                 error('Order > 3: use_k_order_solver should be set to true');
             end
         end
     end
     PredictionError = bsxfun(@minus,Y(:,t),tmp(mf1,:));
-    z = sum(PredictionError.*(H\PredictionError),1) ;
-%    tau_tilde = weights.*(tpdf(z,3*ones(size(z)))+1e-99) ;
+    z = sum(PredictionError.*(ReducedForm.H\PredictionError),1) ;
     ddl = 3 ;
     tau_tilde = weights.*(exp(gammaln((ddl + 1) / 2) - gammaln(ddl/2))./(sqrt(ddl*pi).*(1 + (z.^2)./ddl).^((ddl + 1)/2))+1e-99) ;
     tau_tilde = tau_tilde/sum(tau_tilde) ;
     indx = resample(0,tau_tilde',ParticleOptions);
-    if pruning
+    if ParticleOptions.pruning
         yhat_ = yhat_(:,indx) ;
     end
     yhat = yhat(:,indx) ;
     weights_stage_1 = weights(indx)./tau_tilde(indx) ;
     epsilon = Q_lower_triangular_cholesky*randn(number_of_structural_innovations,number_of_particles);
-    if pruning
-        if order == 2
-            [tmp, tmp_] = local_state_space_iteration_2(yhat,epsilon,ghx,ghu,constant,ghxx,ghuu,ghxu,yhat_,steadystate,ThreadsOptions.local_state_space_iteration_2);
-        elseif order == 3
-            [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, pruning);
+    if ParticleOptions.pruning
+        if options_.order == 2
+            [tmp, tmp_] = local_state_space_iteration_2(yhat,epsilon,ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,yhat_,ReducedForm.steadystate,ThreadsOptions.local_state_space_iteration_2);
+        elseif options_.order == 3
+            [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
+                ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ...
+                ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
         else
             error('Pruning is not available for orders > 3');
         end
         StateVectors_ = tmp_(mf0_,:);
     else
         if ReducedForm.use_k_order_solver
-            tmp = local_state_space_iteration_k(yhat, epsilon, dr, M_, options_, udr);
+            tmp = local_state_space_iteration_k(yhat, epsilon, ReducedForm.dr, M_, options_, ReducedForm.udr);
         else
-            if order == 2
-                tmp = local_state_space_iteration_2(yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, ThreadsOptions.local_state_space_iteration_2);
-            elseif order == 3
-                tmp = local_state_space_iteration_3(yhat, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, pruning);
+            if options_.order == 2
+                tmp = local_state_space_iteration_2(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ...
+                    ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ThreadsOptions.local_state_space_iteration_2);
+            elseif options_.order == 3
+                tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu,...
+                    ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
+                    ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ...
+                    ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
             else
                 error('Order > 3: use_k_order_solver should be set to true');
             end
@@ -182,11 +153,11 @@ for t=1:sample_size
     end
     StateVectors = tmp(mf0,:);
     PredictionError = bsxfun(@minus,Y(:,t),tmp(mf1,:));
-    weights_stage_2 = weights_stage_1.*(exp(-.5*(const_lik+sum(PredictionError.*(H\PredictionError),1))) + 1e-99) ;
+    weights_stage_2 = weights_stage_1.*(exp(-.5*(const_lik+sum(PredictionError.*(ReducedForm.H\PredictionError),1))) + 1e-99) ;
     lik(t) = log(mean(weights_stage_2)) ;
     weights = weights_stage_2/sum(weights_stage_2);
     if (ParticleOptions.resampling.status.generic && neff(weights)<ParticleOptions.resampling.threshold*sample_size) || ParticleOptions.resampling.status.systematic
-        if pruning
+        if ParticleOptions.pruning
             temp = resample([StateVectors' StateVectors_'],weights',ParticleOptions);
             StateVectors = temp(:,1:number_of_state_variables)';
             StateVectors_ = temp(:,number_of_state_variables+1:end)';

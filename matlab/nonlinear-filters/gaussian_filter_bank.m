@@ -5,7 +5,7 @@ function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean,
 %     gaussian_filter_bank(ReducedForm, obs, StateVectorMean, StateVectorVarianceSquareRoot, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ...
 %                          ParticleOptions, ThreadsOptions, options_, M_)
 %
-% Computes the proposal with a gaussian approximation for importance
+% Computes the proposal with a Gaussian approximation for importance
 % sampling. This proposal is a Gaussian distribution calculated à la Kalman
 % Inputs
 %  - ReducedForm                    [structure]    MATLAB's structure describing the reduced form model.
@@ -43,35 +43,6 @@ function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean,
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-order = options_.order;
-
-if ReducedForm.use_k_order_solver
-    dr = ReducedForm.dr;
-    udr = ReducedForm.udr;
-else
-    % Set local state space model (first-order approximation).
-    ghx  = ReducedForm.ghx;
-    ghu  = ReducedForm.ghu;
-    % Set local state space model (second-order approximation).
-    ghxx = ReducedForm.ghxx;
-    ghuu = ReducedForm.ghuu;
-    ghxu = ReducedForm.ghxu;
-    ghs2 = ReducedForm.ghs2;
-    if order == 3
-        % Set local state space model (third order approximation).
-        ghxxx = ReducedForm.ghxxx;
-        ghuuu = ReducedForm.ghuuu;
-        ghxxu = ReducedForm.ghxxu;
-        ghxuu = ReducedForm.ghxuu;
-        ghxss = ReducedForm.ghxss;
-        ghuss = ReducedForm.ghuss;
-    end
-end
-
-constant = ReducedForm.constant;
-steadystate = ReducedForm.steadystate;
-state_variables_steady_state = ReducedForm.state_variables_steady_state;
-
 mf0 = ReducedForm.mf0;
 mf1 = ReducedForm.mf1;
 number_of_state_variables = length(mf0);
@@ -97,14 +68,14 @@ sqr_Px = [ StateVectorVarianceSquareRoot, zeros(number_of_state_variables, numbe
 sigma_points = bsxfun(@plus, xbar, sqr_Px*(nodes'));
 StateVectors = sigma_points(1:number_of_state_variables,:);
 epsilon = sigma_points(number_of_state_variables+1:number_of_state_variables+number_of_structural_innovations,:);
-yhat = bsxfun(@minus, StateVectors, state_variables_steady_state);
+yhat = bsxfun(@minus, StateVectors, ReducedForm.state_variables_steady_state);
 if ReducedForm.use_k_order_solver
-    tmp = local_state_space_iteration_k(yhat, epsilon, dr, M_, options_, udr);
+    tmp = local_state_space_iteration_k(yhat, epsilon, ReducedForm.dr, M_, options_, ReducedForm.udr);
 else
-    if order == 2
-        tmp = local_state_space_iteration_2(yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, ThreadsOptions.local_state_space_iteration_2);
-    elseif order == 3
-        tmp = local_state_space_iteration_3(yhat, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, false);
+    if options_.order == 2
+        tmp = local_state_space_iteration_2(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ThreadsOptions.local_state_space_iteration_2);
+    elseif options_.order == 3
+        tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, false);
     else
         error('Order > 3: use_k_order_solver should be set to true');
     end

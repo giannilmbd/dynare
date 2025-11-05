@@ -42,15 +42,8 @@ if isempty(start)
     start = 1;
 end
 
-% Set flag for prunning
-pruning = ParticleOptions.pruning;
-
 % Get steady state and mean.
-steadystate = ReducedForm.steadystate;
-constant = ReducedForm.constant;
 state_variables_steady_state = ReducedForm.state_variables_steady_state;
-
-order = options_.order;
 
 sample_size = size(Y,2);
 number_of_state_variables = length(ReducedForm.mf0);
@@ -58,70 +51,39 @@ number_of_observed_variables = length(ReducedForm.mf1);
 number_of_structural_innovations = length(ReducedForm.Q);
 number_of_particles = ParticleOptions.number_of_particles;
 
-if ReducedForm.use_k_order_solver
-    dr = ReducedForm.dr;
-    udr = ReducedForm.udr;
-else
-    % Set local state space model (first order approximation).
-    ghx  = ReducedForm.ghx;
-    ghu  = ReducedForm.ghu;
-
-    % Set local state space model (second order approximation).
-    ghxx = ReducedForm.ghxx;
-    ghuu = ReducedForm.ghuu;
-    ghxu = ReducedForm.ghxu;
-    ghs2 = ReducedForm.ghs2;
-    if order == 3
-        % Set local state space model (third order approximation).
-        ghxxx = ReducedForm.ghxxx;
-        ghuuu = ReducedForm.ghuuu;
-        ghxxu = ReducedForm.ghxxu;
-        ghxuu = ReducedForm.ghxuu;
-        ghxss = ReducedForm.ghxss;
-        ghuss = ReducedForm.ghuss;
-    end
-end
-
-% Get covariance matrices.
-Q = ReducedForm.Q; % Covariance matrix of the structural innovations.
-H = ReducedForm.H; % Covariance matrix of the measurement errors.
-if isempty(H)
-    H = 0;
+if isempty(ReducedForm.H)
+    ReducedForm.H = 0;
 end
 
 % Initialization of the likelihood.
-const_lik = log(2*pi)*number_of_observed_variables +log(det(H)) ;
+const_lik = log(2*pi)*number_of_observed_variables +log(det(ReducedForm.H)) ;
 lik  = NaN(sample_size,1);
 
-% Get initial condition for the state vector.
-StateVectorMean = ReducedForm.StateVectorMean;
 StateVectorVarianceSquareRoot = chol(ReducedForm.StateVectorVariance)';%reduced_rank_cholesky(ReducedForm.StateVectorVariance)';
-
-% Get the rank of StateVectorVarianceSquareRoot
-state_variance_rank = size(StateVectorVarianceSquareRoot,2);
+state_variance_rank = size(StateVectorVarianceSquareRoot,2); % Get the rank of StateVectorVarianceSquareRoot
 
 % Factorize the covariance matrix of the structural innovations
-Q_lower_triangular_cholesky = chol(Q)';
+Q_lower_triangular_cholesky = chol(ReducedForm.Q)';
 
 % Set seed for randn().
 set_dynare_seed_local_options([],false,'default');
 
 % Initialization of the weights across particles.
 weights = ones(1,number_of_particles)/number_of_particles ;
-StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),StateVectorMean);
-if pruning
-    if order == 2
+StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),ReducedForm.StateVectorMean);
+if ParticleOptions.pruning
+    if options_.order == 2
         StateVectors_ = StateVectors;
         state_variables_steady_state_ = state_variables_steady_state;
         mf0_ = ReducedForm.mf0;
-    elseif order == 3
+    elseif options_.order == 3
         StateVectors_ = repmat(StateVectors,3,1);
         state_variables_steady_state_ = repmat(state_variables_steady_state,3,1);
         mf0_ = repmat(ReducedForm.mf0,1,3); 
         mask2 = number_of_state_variables+1:2*number_of_state_variables;
         mask3 = 2*number_of_state_variables+1:3*number_of_state_variables;
-        mf0_(mask2) = mf0_(mask2)+size(ghx,1);
-        mf0_(mask3) = mf0_(mask3)+2*size(ghx,1);
+        mf0_(mask2) = mf0_(mask2)+size(ReducedForm.ghx,1);
+        mf0_(mask3) = mf0_(mask3)+2*size(ReducedForm.ghx,1);
     else
         error('Pruning is not available for orders > 3');
     end
@@ -131,35 +93,37 @@ end
 for t=1:sample_size
     yhat = bsxfun(@minus,StateVectors,state_variables_steady_state);
     epsilon = Q_lower_triangular_cholesky*randn(number_of_structural_innovations,number_of_particles);
-    if pruning
+    if ParticleOptions.pruning
         yhat_ = bsxfun(@minus,StateVectors_,state_variables_steady_state_);
-        if order == 2
-            [tmp, tmp_] = local_state_space_iteration_2(yhat,epsilon,ghx,ghu,constant,ghxx,ghuu,ghxu,yhat_,steadystate,ThreadsOptions.local_state_space_iteration_2);
-        elseif order == 3
-            [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, pruning);
+        if options_.order == 2
+            [tmp, tmp_] = local_state_space_iteration_2(yhat,epsilon,ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,...
+                ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,yhat_,ReducedForm.steadystate,ThreadsOptions.local_state_space_iteration_2);
+        elseif options_.order == 3
+            [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ...
+                ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
         else
             error('Pruning is not available for orders > 3');
         end
     else
         if ReducedForm.use_k_order_solver
-            tmp = local_state_space_iteration_k(yhat, epsilon, dr, M_, options_, udr);
+            tmp = local_state_space_iteration_k(yhat, epsilon, ReducedForm.dr, M_, options_, ReducedForm.udr);
         else
-            if order == 2
-                tmp = local_state_space_iteration_2(yhat,epsilon,ghx,ghu,constant,ghxx,ghuu,ghxu,ThreadsOptions.local_state_space_iteration_2);
-            elseif order == 3
-                tmp = local_state_space_iteration_3(yhat, epsilon, ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, ThreadsOptions.local_state_space_iteration_3, pruning);
+            if options_.order == 2
+                tmp = local_state_space_iteration_2(yhat,epsilon,ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,...
+                    ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,ThreadsOptions.local_state_space_iteration_2);
+            elseif options_.order == 3
+                tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ...
+                    ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
+                    ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
             else
                 error('Order > 3: use_k_order_solver should be set to true');
             end
         end
     end
-    %PredictedObservedMean = tmp(mf1,:)*transpose(weights);
     PredictionError = bsxfun(@minus,Y(:,t),tmp(ReducedForm.mf1,:));
-    %dPredictedObservedMean = bsxfun(@minus,tmp(mf1,:),PredictedObservedMean);
-    %PredictedObservedVariance = bsxfun(@times,dPredictedObservedMean,weights)*dPredictedObservedMean' + H;
-    %PredictedObservedVariance = H;
-    if rcond(H) > 1e-16
-        lnw = -.5*(const_lik+sum(PredictionError.*(H\PredictionError),1));
+
+    if rcond(ReducedForm.H) > 1e-16
+        lnw = -.5*(const_lik+sum(PredictionError.*(ReducedForm.H\PredictionError),1));
     else
         LIK = NaN;
         return
@@ -169,7 +133,7 @@ for t=1:sample_size
     lik(t) = log(sum(wtilde))+dfac;
     weights = wtilde/sum(wtilde);
     if (ParticleOptions.resampling.status.generic && neff(weights)<ParticleOptions.resampling.threshold*sample_size) || ParticleOptions.resampling.status.systematic
-        if pruning
+        if ParticleOptions.pruning
             temp = resample([tmp(ReducedForm.mf0,:)' tmp_(mf0_,:)'],weights',ParticleOptions);
             StateVectors = temp(:,1:number_of_state_variables)';
             StateVectors_ = temp(:,number_of_state_variables+1:end)';
@@ -179,7 +143,7 @@ for t=1:sample_size
         weights = ones(1,number_of_particles)/number_of_particles;
     elseif ParticleOptions.resampling.status.none
         StateVectors = tmp(ReducedForm.mf0,:);
-        if pruning
+        if ParticleOptions.pruning
             StateVectors_ = tmp_(mf0_,:);
         end
     end
