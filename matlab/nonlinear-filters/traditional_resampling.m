@@ -1,39 +1,20 @@
 function return_resample = traditional_resampling(particles,weights,noise)
-% Resamples particles.
+% return_resample = traditional_resampling(particles,weights,noise)
+% Resamples particles (Resampling à la Kitagawa or stratified resampling).
+% 
+% INPUTS
+%  - particles              [double]    n*1 vector of particles
+%  - weights                [double]    n*1 vector of particles' weights.
+%  - noise                  [double]    n*1 vector sampled from a [0,1] uniform distribution (stratified resampling) or scalar double
+%                                       sampled from a [0,1] uniform distribution (Kitagawa resampling).
+%
+% OUTPUTS
+%  - resampled_output       [double]    if particles = 0, returns the resampling index (except for smooth resampling)
+%                                       Otherwise, returns the resampled particles set.
+%
+% This function is called by: resample
 
-%@info:
-%! @deftypefn {Function File} {@var{indx} =} traditional_resampling (@var{weights},@var{noise})
-%! @anchor{particle/traditional_resampling}
-%! @sp 1
-%! Resamples particles (Resampling à la Kitagawa or stratified resampling).
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item weights
-%! n*1 vector of doubles, particles' weights.
-%! @item noise
-%! n*1 vector of doubles sampled from a [0,1] uniform distribution (stratified resampling) or scalar double
-%! sampled from a [0,1] uniform distribution (Kitagawa resampling).
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item indx
-%! n*1 vector of integers, indices.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{particle/resample}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

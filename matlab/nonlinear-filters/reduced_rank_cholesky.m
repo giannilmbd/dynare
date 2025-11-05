@@ -1,42 +1,21 @@
 function T = reduced_rank_cholesky(X)
-% Computes the cholesky decomposition of a symetric semidefinite matrix or of a definite positive matrix.
+% T = reduced_rank_cholesky(X)
+% Computes the cholesky decomposition of a symmetric semidefinite matrix or of a definite positive matrix.
+% 
+% INPUTS
+%  - X                      [double]    n*n matrix of doubles to be factorized (X is supposed to be semidefinite positive).
+%
+% OUTPUTS
+%  - T                      [double]    q*n matrix of doubles such that T'*T = X, where q is the number of positive eigenvalues in X.
+%
+% Remarks:
+% - If X is not positive definite, then X has to be a symmetric semidefinite matrix.
+% - The matrix T is upper triangular iff X is positive definite.
+%
+% This function is called by: sequential_importance_particle_filter
 
-%@info:
-%! @deftypefn {Function File} { @var{T} =} reduced_rank_cholesky (@var{X})
-%! @anchor{reduced_rank_cholesky}
-%! @sp 1
-%! Computes the cholesky decomposition of a symetric semidefinite matrix or of a definite positive matrix.
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item X
-%! n*n matrix of doubles to be factorized (X is supposed to be semidefinite positive).
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item T
-%! q*n matrix of doubles such that T'*T = X, where q is the number of positive eigenvalues in X.
-%! @end table
-%! @sp 2
-%! @strong{Remarks}
-%! @sp 1
-%! [1] If X is not positive definite, then X has to be a symetric semidefinite matrix.
-%! @sp 1
-%! [2] The matrix T is upper triangular iff X is positive definite.
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{particle/sequential_importance_particle_filter}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -1,5 +1,7 @@
 function [ProposalStateVector, Weights, flag] = conditional_filter_proposal(ReducedForm, y, StateVectors, SampleWeights, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, ...
                                                   H, ParticleOptions, ThreadsOptions, options_, M_)
+% [ProposalStateVector, Weights, flag] = conditional_filter_proposal(ReducedForm, y, StateVectors, SampleWeights, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, ...
+%                                                   H, ParticleOptions, ThreadsOptions, options_, M_)
 
 % Computes the proposal for each past particle using Gaussian approximations
 % for the state errors and the Kalman filter
@@ -22,7 +24,7 @@ function [ProposalStateVector, Weights, flag] = conditional_filter_proposal(Redu
 % - Weights
 % - flag
 
-% Copyright © 2012-2022 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

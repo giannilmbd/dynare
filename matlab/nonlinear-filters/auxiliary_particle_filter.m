@@ -2,17 +2,29 @@ function [LIK,lik] = auxiliary_particle_filter(ReducedForm,Y,start,ParticleOptio
 % [LIK,lik] = auxiliary_particle_filter(ReducedForm,Y,start,ParticleOptions,ThreadsOptions, options_, M_)
 % Evaluates the likelihood of a nonlinear model with the auxiliary particle filter
 % allowing eventually resampling.
+% INPUTS
+%  - ReducedForm            [structure] decision rules
+%  - Y                      [double]    dataset
+%  - start                  [integer]   first observation for likelihood evaluation
+%  - ParticleOptions        [structure] filter options
+%  - ThreadsOptions         [structure] options for threading of mex files
+%  - options_               [structure] describing the options
+%  - M_                     [structure] describing the model
 %
-% Copyright © 2011-2023 Dynare Team
+% OUTPUTS
+% - LIK                [double]    scalar, likelihood
+% - lik                [double]    (T-s+1)×1 vector, density of observations in each period.
+
+% Copyright © 2011-2025 Dynare Team
 %
-% This file is part of Dynare (particles module).
+% This file is part of Dynare.
 %
 % Dynare is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
 %
-% Dynare particles module is distributed in the hope that it will be useful,
+% Dynare is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.

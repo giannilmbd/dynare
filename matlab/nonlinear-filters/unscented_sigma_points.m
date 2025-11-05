@@ -1,20 +1,19 @@
 function [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
+% [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
 %
-% Computes nodes and weigths for a scaled unscented transform cubature
+% Computes nodes and weights for a scaled unscented transform cubature
 % INPUTS
 %    n                  [integer]   scalar, number of variables.
 %
 % OUTPUTS
 %    nodes          [double]    nodes of the cubature
-%    weigths        [double]    associated weigths
+%    weights        [double]    associated weights
 %
 % REFERENCES
 %
-%
-%
 % NOTES
-%
-% Copyright © 2009-2017 Dynare Team
+
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,4 +36,4 @@ W_m = lambda/(n+lambda) ;
 W_c = W_m + (1-ParticleOptions.unscented.alpha^2+ParticleOptions.unscented.beta) ;
 temp = ones(2*n,1)/(2*(n+lambda)) ;
 W_m = [W_m ; temp] ;
-W_c = [W_c ; temp]  ;
+W_c = [W_c ; temp] ;

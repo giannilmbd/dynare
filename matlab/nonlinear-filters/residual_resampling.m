@@ -1,36 +1,19 @@
 function return_resample = residual_resampling(particles,weights,noise)
+% return_resample = residual_resampling(particles,weights,noise)
 % Resamples particles.
+% 
+% INPUTS
+%  - particles              [double]    n*1 vector of particles
+%  - weights                [double]    n*1 vector of particles' weights.
+%  - noise                  [structure] filter options
+%
+% OUTPUTS
+%  - resampled_output       [double]    if particles = 0, returns the resampling index (except for smooth resampling)
+%                                       Otherwise, returns the resampled particles set.
+%
+% This function is called by: resample
 
-%@info:
-%! @deftypefn {Function File} {@var{indx} =} residual_resampling (@var{weights})
-%! @anchor{particle/residual_resampling}
-%! @sp 1
-%! Resamples particles.
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item weights
-%! n*1 vector of doubles, particles' weights.
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item indx
-%! n*1 vector of intergers, indices.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{particle/resample}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

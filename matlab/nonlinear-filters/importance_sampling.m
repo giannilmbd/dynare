@@ -1,6 +1,16 @@
 function State_Particles = importance_sampling(StateMuPost,StateSqrtPPost,StateWeightsPost,numP)
+% State_Particles = importance_sampling(StateMuPost,StateSqrtPPost,StateWeightsPost,numP)
+%
+% INPUTS
+%    StateMuPost        [double]    posterior state mean
+%    StateSqrtPPost     [double]    square root of posterior covariance
+%    StateWeightsPost   [double]    posterior weights
+%    numP               [integer]   number of particles
+%
+% OUTPUTS
+%    State_Particles  [double]    scalar, likelihood
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

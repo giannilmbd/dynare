@@ -1,41 +1,41 @@
 function [LIK,lik] = conditional_particle_filter(ReducedForm, Y, s, ParticleOptions, ThreadsOptions, options_, M_)
-
+% [LIK,lik] = conditional_particle_filter(ReducedForm, Y, s, ParticleOptions, ThreadsOptions, options_, M_)
 % Evaluates the likelihood of a non-linear model with a particle filter
 %
 % INPUTS
 % - ReducedForm        [structure]    MATLAB's structure describing the reduced form model.
 % - Y                  [double]       p×T matrix of (detrended) data, where p is the number of observed variables.
 % - s                  [integer]      scalar, likelihood evaluation starts at s (has to be smaller than T, the sample length provided in Y).
-% - ParticleOptions    [struct]
-% - ThreadsOptions     [struct]
-% - options_           [struct]
-% - M_                 [struct]
+% - ParticleOptions    [structure]    filter options
+% - ThreadsOptions     [structure]    options for threading of mex files
+% - options_           [structure]    describing the options
+% - M_                 [structure]    describing the model
 %
 % OUTPUTS
-% - LIK                [double]    scalar, likelihood
-% - lik                [double]    (T-s+1)×1 vector, density of observations in each period.
+% - LIK                [double]        scalar, likelihood
+% - lik                [double]        (T-s+1)×1 vector, density of observations in each period.
 %
 % REMARKS
 % - The proposal is built using the Kalman updating step for each particle.
-% - we need draws in the errors distributions
-% Whether we use Monte-Carlo draws from a multivariate gaussian distribution
-% as in Amisano & Tristani (JEDC 2010).
-% Whether we use multidimensional Gaussian sparse grids approximations:
-% - a univariate Kronrod-Paterson Gaussian quadrature combined by the Smolyak
-% operator (ref: Winschel & Kratzig, 2010).
-% - a spherical-radial cubature (ref: Arasaratnam & Haykin, 2009a,2009b).
-% - a scaled unscented transform cubature (ref: Julier & Uhlmann 1997, van der
-% Merwe & Wan 2003).
+% - We need draws of  the errors distributions
+%       - Whether we use Monte-Carlo draws from a multivariate gaussian distribution
+%         as in Amisano & Tristani (JEDC 2010).
+%       - Whether we use multidimensional Gaussian sparse grids approximations:
+%           - a univariate Kronrod-Paterson Gaussian quadrature combined by the Smolyak
+%               operator (ref: Winschel & Kratzig, 2010).
+%           - a spherical-radial cubature (ref: Arasaratnam & Haykin, 2009a,2009b).
+%           - a scaled unscented transform cubature (ref: Julier & Uhlmann 1997, van der
+%               Merwe & Wan 2003).
 %
 % Pros:
 % - Allows using current observable information in the proposal
 % - The use of sparse grids Gaussian approximation is much faster than the Monte-Carlo approach
 % Cons:
 % - The use of the Kalman updating step may bias the proposal distribution since
-% it has been derived in a linear context and is implemented in a nonlinear
-% context. That is why particle resampling is performed.
+%   it has been derived in a linear context and is implemented in a nonlinear
+%   context. That is why particle resampling is performed.
 
-% Copyright © 2009-2020 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

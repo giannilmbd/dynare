@@ -12,6 +12,10 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 % - bayestopt_               [struct]    Prior definition.
 % - oo_                      [struct]    Results.
 %
+% Reference: Liu, Jane and Mike West (2001): “Combined parameter and state estimation in simulation-based filtering”,
+% in Sequential Monte Carlo Methods in Practice, Eds. Doucet, Freitas and Gordon, Springer Verlag, Chapter
+% 10, 197-223.
+
 % Copyright © 2013-2024 Dynare Team
 %
 % This file is part of Dynare.
@@ -275,7 +279,7 @@ for t=1:sample_size
                             end
                             StateVectors_(:,i) = tmp_(mf0_,:);
                         else
-    	                    if order == 1 
+                            if order == 1
                                 tmp = bsxfun(@plus,constant,ghx*yhat)+ghu*epsilon;
                             elseif order == 2
                                 tmp = local_state_space_iteration_2(yhat, epsilon, ghx, ghu, constant, ghxx, ghuu, ghxu, options_.threads.local_state_space_iteration_2);

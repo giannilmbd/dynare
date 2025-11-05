@@ -1,9 +1,27 @@
 function [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
-
+% [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
 % Evaluates the likelihood of a non-linear model approximating the state
-% variables distributions with gaussian mixtures. Gaussian Mixture allows reproducing
-% a wide variety of generalized distributions (when multimodal for instance).
-% Each gaussian distribution is obtained whether
+% variables distributions with Gaussian mixtures.
+%
+% INPUTS
+%    ReducedForm            [structure] MATLAB's structure describing the reduced form model.
+%                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
+%                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
+%                                       reduced_form_model.state.dr        [structure] output of resol.m.
+%  - Y                      [double]    pp*smpl matrix of (detrended) data, where pp is the maximum number of observed variables.
+%  - start                  [integer]   scalar, likelihood evaluation starts at 'start'.
+%  - ParticleOptions        [structure] filter options
+%  - ThreadsOptions         [structure] options for threading of mex files
+%  - options_               [structure] describing the options
+%  - M_                     [structure] describing the model
+%
+% OUTPUTS
+%    LIK                    [double]    scalar, likelihood
+%    lik                    [double]    vector, density of observations in each period.
+%
+% Remarks:
+% Gaussian Mixture allows reproducing a wide variety of generalized distributions (when multimodal for instance).
+% Each Gaussian distribution is obtained whether
 %   - with a radial-spherical cubature
 %   - with scaled unscented sigma-points
 % A Sparse grid Kalman Filter is implemented on each component of the mixture,
@@ -14,19 +32,6 @@ function [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOpt
 %   - reducing the number of particles needed,
 %   - still being faster.
 %
-%
-% INPUTS
-%    reduced_form_model     [structure] MATLAB's structure describing the reduced form model.
-%                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
-%                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
-%                                       reduced_form_model.state.dr        [structure] output of resol.m.
-%    Y                      [double]    pp*smpl matrix of (detrended) data, where pp is the maximum number of observed variables.
-%    start                  [integer]   scalar, likelihood evaluation starts at 'start'.
-%
-% OUTPUTS
-%    LIK        [double]    scalar, likelihood
-%    lik        [double]    vector, density of observations in each period.
-%
 % REFERENCES
 %
 % Van der Meerwe & Wan, Gaussian Mixture Sigma-Point Particle Filters for Sequential
@@ -36,7 +41,8 @@ function [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOpt
 %
 % NOTES
 %   The vector "lik" is used to evaluate the Jacobian of the likelihood.
-% Copyright © 2009-2017 Dynare Team
+
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

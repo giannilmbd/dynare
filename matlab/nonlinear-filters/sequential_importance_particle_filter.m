@@ -1,17 +1,35 @@
 function [LIK,lik] = sequential_importance_particle_filter(ReducedForm,Y,start,ParticleOptions,ThreadsOptions, options_, M_)
-
-% Evaluates the likelihood of a nonlinear model with a particle filter (optionally with resampling).
-
-% Copyright © 2011-2022 Dynare Team
+% [LIK,lik] = sequential_importance_particle_filter(ReducedForm,Y,start,ParticleOptions,ThreadsOptions, options_, M_)
+% Evaluates the likelihood of a nonlinear model with a particle filter employing a sequential importance sampling approach 
 %
-% This file is part of Dynare (particles module).
+% INPUTS
+%  - ReducedForm            [structure] decision rules
+%  - Y                      [double]    dataset
+%  - start                  [integer]   first observation for likelihood evaluation
+%  - ParticleOptions        [structure] filter options
+%  - ThreadsOptions         [structure] options for threading of mex files
+%  - options_               [structure] describing the options
+%  - M_                     [structure] describing the model
+%
+% OUTPUTS
+% - LIK                [double]    scalar, likelihood
+% - lik                [double]    (T-s+1)×1 vector, density of observations in each period.
+%
+% References:
+% Implementation is e.g. described in Godsill/Doucet/West (2004): "Monte Carlo Smoothing for Nonlinear Time Series", 
+% Journal of the American Statistical Association, March 2004, 99(465)
+
+
+% Copyright © 2011-2025 Dynare Team
+%
+% This file is part of Dynare.
 %
 % Dynare is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation, either version 3 of the License, or
 % (at your option) any later version.
 %
-% Dynare particles module is distributed in the hope that it will be useful,
+% Dynare is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.

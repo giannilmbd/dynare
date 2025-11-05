@@ -1,28 +1,32 @@
 function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean, StateVectorVarianceSquareRoot] = ...
     gaussian_filter_bank(ReducedForm, obs, StateVectorMean, StateVectorVarianceSquareRoot, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ...
                          ParticleOptions, ThreadsOptions, options_, M_)
+% [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean, StateVectorVarianceSquareRoot] = ...
+%     gaussian_filter_bank(ReducedForm, obs, StateVectorMean, StateVectorVarianceSquareRoot, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ...
+%                          ParticleOptions, ThreadsOptions, options_, M_)
 %
 % Computes the proposal with a gaussian approximation for importance
-% sampling
-% This proposal is a gaussian distribution calculated à la Kalman
+% sampling. This proposal is a Gaussian distribution calculated à la Kalman
+% Inputs
+%  - ReducedForm                    [structure]    MATLAB's structure describing the reduced form model.
+%  - obs                            [double]       p×1 vector of (detrended) data, where p is the number of observed variables.
+%  - StateVectorMean                [double]       mean of the states
+%  - StateVectorVarianceSquareRoot  [double]       square root of the state covariance matrix
+%  - Q_lower_triangular_cholesky    [double]       Cholesky of shock covariance
+%  - H_lower_triangular_cholesky    [double]       Cholesky of measurement error covariance
+%  - H                              [double]       Measurement error covariance
+%  - ParticleOptions                [structure]    filter options
+%  - ThreadsOptions                 [structure]    options for threading of mex files
+%  - options_                       [structure]    describing the options
+%  - M_                             [structure]    describing the model
 %
-% INPUTS
-%    reduced_form_model     [structure] MATLAB's structure describing the reduced form model.
-%                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
-%                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
-%                                       reduced_form_model.state.dr        [structure] output of resol.m.
-%    Y                      [double]    pp*smpl matrix of (detrended) data, where pp is the maximum number of observed variables.
-%
-% OUTPUTS
-%    LIK        [double]    scalar, likelihood
-%    lik        [double]    vector, density of observations in each period.
-%
-% REFERENCES
-%
-% NOTES
-%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
+% Outputs
+%  - PredictedStateMean                 [double]   one-step ahead predicted mean of the states    
+%  - PredictedStateVarianceSquareRoot   [double]   one-step ahead covariance of the states   
+%  - StateVectorMean                    [double]   updated mean of the states   
+%  - StateVectorVarianceSquareRoot      [double]   updated covariance of the states   
 
-% Copyright © 2009-2022 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -1,42 +1,21 @@
 function resampled_output = resample(particles,weights,ParticleOptions)
+% resampled_output = resample(particles,weights,ParticleOptions)
 % Resamples particles.
 % if particles = 0, returns the resampling index (except for smooth resampling)
 % Otherwise, returns the resampled particles set.
+%
+% INPUTS
+%  - particles              [double]    n*1 vector of particles
+%  - weights                [double]    n*1 vector of particles' weights.
+%  - ParticleOptions        [structure] filter options
+%
+% OUTPUTS
+%  - resampled_output       [double]    vector of resample particles
+%
+% This function is called by: sequential_importance_particle_filter
+% This function calls: residual_resampling, traditional_resampling
 
-%@info:
-%! @deftypefn {Function File} {@var{indx} =} resample (@var{weights}, @var{method})
-%! @anchor{particle/resample}
-%! @sp 1
-%! Resamples particles.
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item weights
-%! n*1 vector of doubles, particles' weights.
-%! @item method
-%! string equal to 'residual' or 'traditional'.
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item indx
-%! n*1 vector of intergers, indices.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{particle/sequantial_importance_particle_filter}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 1
-%! @ref{residual_resampling}, @ref{traditional_resampling}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 2011-2014 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

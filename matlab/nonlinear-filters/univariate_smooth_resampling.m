@@ -1,40 +1,18 @@
 function new_particles = univariate_smooth_resampling(weights,particles,number_of_new_particles)
-% Smooth Resampling of the  particles.
+% new_particles = univariate_smooth_resampling(weights,particles,number_of_new_particles)
+% Smooth Resampling of the particles (univariate version).
+% 
+% INPUTS
+%  - weights                    [double]    n*1 vector of particles' weights.
+%  - particles                  [double]    n*1 vector of particles
+%  - number_of_new_particles    [integer]   number of new particles
+%
+% OUTPUTS
+%  - new_particles              [double]    number_of_new_particles*1 vector of doubles, new particles
+%
+% This function is called by: sequential_importance_particle_filter
 
-%@info:
-%! @deftypefn {Function File} {@var{new_particles} =} univariate_smooth_resampling (@var{weights}, @var{number_of_new_particles})
-%! @anchor{particle/univariate_smooth_resampling}
-%! @sp 1
-%! Smooth Resampling of the  particles (univariate version).
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item weights
-%! n*1 vector of doubles, particles' weights.
-%! @item particles
-%! n*1 vector of doubles, particles.
-%! @item number_of_new_particles
-%! Integer scalar.
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item indx
-%! number_of_new_particles*1 vector of doubles, new particles.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{particle/sequantial_importance_particle_filter}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 2012-2017 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
