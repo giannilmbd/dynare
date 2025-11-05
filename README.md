@@ -387,14 +387,6 @@ meson compile -C build-matlab
 meson test -C build-matlab
 ```
 
-**Note:** The above assumes that you have a 64-bit version of MATLAB. It can be
-adapted to a 32-bit MATLAB with the following modifications:
-
-- run the MSYS MinGW 32-bit shell
-- replace `x86_64` by `i686` in packages names on the `pacman` command-line
-- for SLICOT, remove the `-fdefault-integer-8` option, and instead copy the
-  library into `/usr/local/lib/libslicot_pic.a`
-
 **Note:** Compiling the MEX files for Octave and the documentation under MSYS2 is
 currently not supported.
 
