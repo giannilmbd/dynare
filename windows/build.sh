@@ -116,7 +116,7 @@ cd ..
 cp -p NEWS.md "$ZIPDIR"
 cp -p license.txt "$ZIPDIR"
 cp -p windows/README.txt "$ZIPDIR"
-cp -pr windows/deps/gcc/mingw64 "$ZIPDIR"
+cp -pr windows/deps/gcc/ucrt64 "$ZIPDIR"
 mkdir -p "$ZIPDIR"/contrib/ms-sbvar/TZcode
 cp -pr contrib/ms-sbvar/TZcode/MatlabFiles "$ZIPDIR"/contrib/ms-sbvar/TZcode
 mkdir -p "$ZIPDIR"/mex/matlab/win64-9.8-25.2

@@ -17,107 +17,107 @@ MATLAB64_VERSION = 20250618
 
 ## Build dependencies
 
-# pacman -Ss mingw-w64-x86_64-boost
+# pacman -Ss mingw-w64-ucrt-x86_64-boost
 # (also used by the preprocessor CI, so it can be updated there also)
-MINGW64_BOOST_VERSION = 1.88.0-2
+MSYS2_BOOST_VERSION = 1.88.0-2
 
-# pacman -Ss mingw-w64-x86_64-gsl
-MINGW64_GSL_VERSION = 2.8-1
+# pacman -Ss mingw-w64-ucrt-x86_64-gsl
+MSYS2_GSL_VERSION = 2.8-1
 
-# pacman -Ss mingw-w64-x86_64-matio
-MINGW64_MATIO_VERSION = 1.5.28-1
+# pacman -Ss mingw-w64-ucrt-x86_64-matio
+MSYS2_MATIO_VERSION = 1.5.28-1
 
 # Dependency of matio and libssh2 (and of the MinGW compiler)
-# pacman -Ss mingw-w64-x86_64-zlib
-MINGW64_ZLIB_VERSION = 1.3.1-1
+# pacman -Ss mingw-w64-ucrt-x86_64-zlib
+MSYS2_ZLIB_VERSION = 1.3.1-1
 
 # Dependency of matio
-# pacman -Ss mingw-w64-x86_64-hdf5
-MINGW64_HDF5_VERSION = 1.14.6-3
+# pacman -Ss mingw-w64-ucrt-x86_64-hdf5
+MSYS2_HDF5_VERSION = 1.14.6-3
 
 # Dependency of HDF5 (provides szip library)
-# pacman -Ss mingw-w64-x86_64-libaec
-MINGW64_LIBAEC_VERSION = 1.1.3-4
+# pacman -Ss mingw-w64-ucrt-x86_64-libaec
+MSYS2_LIBAEC_VERSION = 1.1.3-4
 
 # Dependency of HDF5 and libssh2
-# pacman -Ss mingw-w64-x86_64-openssl
-MINGW64_OPENSSL_VERSION = 3.5.0-1
+# pacman -Ss mingw-w64-ucrt-x86_64-openssl
+MSYS2_OPENSSL_VERSION = 3.5.0-1
 
 # Dependency of HDF5
-# pacman -Ss mingw-w64-x86_64-curl
-MINGW64_CURL_VERSION = 8.13.0-2
+# pacman -Ss mingw-w64-ucrt-x86_64-curl
+MSYS2_CURL_VERSION = 8.13.0-2
 
 # Dependency of curl (and of the MinGW compiler)
-# pacman -Ss mingw-w64-x86_64-zstd
-MINGW64_ZSTD_VERSION = 1.5.7-1
+# pacman -Ss mingw-w64-ucrt-x86_64-zstd
+MSYS2_ZSTD_VERSION = 1.5.7-1
 
 # Dependency of curl
-# pacman -Ss mingw-w64-x86_64-brotli
-MINGW64_BROTLI_VERSION = 1.1.0-4
+# pacman -Ss mingw-w64-ucrt-x86_64-brotli
+MSYS2_BROTLI_VERSION = 1.1.0-4
 
 # Dependency of curl
-# pacman -Ss mingw-w64-x86_64-libpsl
-MINGW64_LIBPSL_VERSION = 0.21.5-3
+# pacman -Ss mingw-w64-ucrt-x86_64-libpsl
+MSYS2_LIBPSL_VERSION = 0.21.5-3
 
 # Dependency of curl and of libpsl
-# pacman -Ss mingw-w64-x86_64-libidn2
-MINGW64_LIBIDN2_VERSION = 2.3.8-2
+# pacman -Ss mingw-w64-ucrt-x86_64-libidn2
+MSYS2_LIBIDN2_VERSION = 2.3.8-2
 
 # Dependency of curl
-# pacman -Ss mingw-w64-x86_64-libssh2
-MINGW64_LIBSSH2_VERSION = 1.11.1-1
+# pacman -Ss mingw-w64-ucrt-x86_64-libssh2
+MSYS2_LIBSSH2_VERSION = 1.11.1-1
 
 # Dependency of curl
-# pacman -Ss mingw-w64-x86_64-nghttp2
-MINGW64_NGHTTP2_VERSION = 1.65.0-1
+# pacman -Ss mingw-w64-ucrt-x86_64-nghttp2
+MSYS2_NGHTTP2_VERSION = 1.65.0-1
 
 # Dependency of curl
-# pacman -Ss mingw-w64-x86_64-nghttp3
-MINGW64_NGHTTP3_VERSION = 1.9.0-1
+# pacman -Ss mingw-w64-ucrt-x86_64-nghttp3
+MSYS2_NGHTTP3_VERSION = 1.9.0-1
 
 # Dependency of libpsl and libunistring (and of the MinGW compiler)
-# pacman -Ss mingw-w64-x86_64-libiconv
-MINGW64_LIBICONV_VERSION = 1.18-1
+# pacman -Ss mingw-w64-ucrt-x86_64-libiconv
+MSYS2_LIBICONV_VERSION = 1.18-1
 
 # Dependency of libpsl and libidn2
-# pacman -Ss mingw-w64-x86_64-libunistring
-MINGW64_LIBUNISTRING_VERSION = 1.3-1
+# pacman -Ss mingw-w64-ucrt-x86_64-libunistring
+MSYS2_LIBUNISTRING_VERSION = 1.3-1
 
-## MinGW packages for the embedded compiler
+## Packages for the embedded compiler
 
-# pacman -Ss mingw-w64-x86_64-gcc$
-MINGW64_GCC_VERSION = 15.1.0-1
+# pacman -Ss mingw-w64-ucrt-x86_64-gcc$
+MSYS2_GCC_VERSION = 15.1.0-1
 
 # Dependency of gcc, isl, mpc and mpfr
-# pacman -Ss mingw-w64-x86_64-gmp
-MINGW64_GMP_VERSION = 6.3.0-2
+# pacman -Ss mingw-w64-ucrt-x86_64-gmp
+MSYS2_GMP_VERSION = 6.3.0-2
 
-# pacman -Ss mingw-w64-x86_64-binutils
-MINGW64_BINUTILS_VERSION = 2.44-1
+# pacman -Ss mingw-w64-ucrt-x86_64-binutils
+MSYS2_BINUTILS_VERSION = 2.44-1
 
-# pacman -Ss mingw-w64-x86_64-headers-git
-MINGW64_HEADERS_VERSION = 12.0.0.r679.g71699efcb-1
+# pacman -Ss mingw-w64-ucrt-x86_64-headers-git
+MSYS2_HEADERS_VERSION = 12.0.0.r679.g71699efcb-1
 
-# pacman -Ss mingw-w64-x86_64-crt-git
-MINGW64_CRT_VERSION = 12.0.0.r679.g71699efcb-1
+# pacman -Ss mingw-w64-ucrt-x86_64-crt-git
+MSYS2_CRT_VERSION = 12.0.0.r679.g71699efcb-1
 
-# NB: Renamed to mingw-w64-x86_64-winpthreads recently!
-# pacman -Ss mingw-w64-x86_64-winpthreads-git
-MINGW64_WINPTHREADS_VERSION = 12.0.0.r679.g71699efcb-1
+# NB: Renamed to mingw-w64-ucrt-x86_64-winpthreads recently!
+# pacman -Ss mingw-w64-ucrt-x86_64-winpthreads-git
+MSYS2_WINPTHREADS_VERSION = 12.0.0.r679.g71699efcb-1
 
-# pacman -Ss mingw-w64-x86_64-isl
-MINGW64_ISL_VERSION = 0.27-1
+# pacman -Ss mingw-w64-ucrt-x86_64-isl
+MSYS2_ISL_VERSION = 0.27-1
 
-# pacman -Ss mingw-w64-x86_64-mpc
-MINGW64_MPC_VERSION = 1.3.1-2
+# pacman -Ss mingw-w64-ucrt-x86_64-mpc
+MSYS2_MPC_VERSION = 1.3.1-2
 
 # Dependency of mpc
-# pacman -Ss mingw-w64-x86_64-mpfr
-MINGW64_MPFR_VERSION = 4.2.2-1
+# pacman -Ss mingw-w64-ucrt-x86_64-mpfr
+MSYS2_MPFR_VERSION = 4.2.2-1
 
-# pacman -Ss mingw-w64-x86_64-windows-default-manifest
-MINGW64_WINDOWS_DEFAULT_MANIFEST_VERSION = 6.4-4
+# pacman -Ss mingw-w64-ucrt-x86_64-windows-default-manifest
+MSYS2_WINDOWS_DEFAULT_MANIFEST_VERSION = 6.4-4
 
 # Dependency of binutils
-# pacman -Ss mingw-w64-x86_64-gettext-runtime
-MINGW64_GETTEXT_RUNTIME_VERSION = 0.24.1-1
+# pacman -Ss mingw-w64-ucrt-x86_64-gettext-runtime
+MSYS2_GETTEXT_RUNTIME_VERSION = 0.24.1-1

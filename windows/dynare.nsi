@@ -98,8 +98,8 @@ Section "MEX files for MATLAB 64-bit, version 9.8 to 25.2 (R2020a to R2025b)"
 SectionEnd
 
 Section "MinGW compiler for MATLAB 64-bit"
- SetOutPath $INSTDIR\mingw64
- File /r deps\gcc\mingw64\*
+ SetOutPath $INSTDIR\ucrt64
+ File /r deps\gcc\ucrt64\*
 SectionEnd
 
 Section "MEX files for Octave 10.3.0 (64-bit)"

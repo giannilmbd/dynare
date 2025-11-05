@@ -22,16 +22,10 @@
 
 [[ $(id -u) == 0 ]] || { echo "You must be root" >&2; exit 1; }
 
-PACKAGES=(make 7zip zstd wget meson mingw-w64-tools
-          gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix
-          gfortran-mingw-w64-x86-64-posix flex libfl-dev bison texlive
+PACKAGES=(make 7zip zstd wget meson pkg-config-mingw-w64-ucrt64
+          gcc-mingw-w64-ucrt64 g++-mingw-w64-ucrt64
+          gfortran-mingw-w64-ucrt64 flex libfl-dev bison texlive
           texlive-publishers texlive-latex-extra texlive-science
           texlive-fonts-extra lmodern cm-super python3-sphinx latexmk nsis)
 
 apt install "${PACKAGES[@]}"
-
-# Configure MinGW to use the POSIX threading model (needed for C++11 threads in
-# libkorder, see /usr/share/doc/gcc-mingw-w64-base/README.Debian)
-update-alternatives --set x86_64-w64-mingw32-gfortran /usr/bin/x86_64-w64-mingw32-gfortran-posix
-update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix

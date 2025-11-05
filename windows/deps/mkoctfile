@@ -12,7 +12,7 @@ set -e
 : ${SED="/bin/sed"}
 
 # The location where Octave artifacts are going to be copied
-OCTAVE_PREFIX="/tmp/windeps/sysroot-octave/mingw64"
+OCTAVE_PREFIX="/tmp/windeps/sysroot-octave/ucrt64"
 
 # Get Octave version
 MKOCTFILE_PATH=$(dirname $(readlink -f "$0"))

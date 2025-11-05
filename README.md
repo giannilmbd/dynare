@@ -341,7 +341,8 @@ If you run into errors with GCC libraries/`libstdc++`, you need to prevent MATLA
 ## Windows
 
 - Install [MSYS2](http://www.msys2.org)
-- Run a MSYS MinGW 64-bit shell
+- Run a MSYS MinGW UCRT 64-bit shell (make sure to run the one with “UCRT” in
+  the name)
 - Update the system:
 ```sh
 pacman -Syu
@@ -351,7 +352,7 @@ pacman -Syu
   window to complete the upgrade.
 - Install all needed dependencies:
 ```sh
-pacman -S git bison flex make tar mingw-w64-x86_64-meson mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-boost mingw-w64-x86_64-gsl mingw-w64-x86_64-matio mingw-w64-x86_64-pkgconf
+pacman -S git bison flex make tar mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gcc-fortran mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-gsl mingw-w64-ucrt-x86_64-matio mingw-w64-ucrt-x86_64-pkgconf
 ```
 - Compile and install SLICOT
 ```sh
