@@ -48,7 +48,7 @@ function [fval,info,exit_flag,grad,hess,SteadyState,trend_coeff,PHI_tilde,SIGMA_
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -86,10 +86,7 @@ if ~isempty(xparam1)
 end
 
 % Initialization of of the index for parameter dsge_prior_weight in M_.params.
-dsge_prior_weight_idx = strmatch('dsge_prior_weight', M_.param_names);
-
-% Get the number of estimated (DSGE) parameters.
-nx = estim_params_.nvx + estim_params_.np;
+dsge_prior_weight_idx = strmatch('dsge_prior_weight', M_.param_names,'exact');
 
 % Get the number of observed variables in the VAR model.
 NumberOfObservedVariables = dataset_.vobs;
@@ -122,7 +119,7 @@ end
 % Get the weight of the DSGE prior.
 dsge_prior_weight = M_.params(dsge_prior_weight_idx);
 
-% Is the dsge prior proper?
+% Is the DSGE prior proper?
 if dsge_prior_weight<(NumberOfParameters+NumberOfObservedVariables)/NumberOfObservations
     fval = Inf;
     exit_flag = 0;
@@ -228,7 +225,7 @@ if ~SIGMA_u_star_is_positive_definite
     return
 end
 
-if ~isinf(dsge_prior_weight)% Evaluation of the likelihood of the dsge-var model when the dsge prior weight is finite.
+if ~isinf(dsge_prior_weight)% Evaluation of the likelihood of the DSGE-VAR model when the DSGE prior weight is finite.
     tmp0 = dsge_prior_weight*NumberOfObservations*TheoreticalAutoCovarianceOfTheObservedVariables(:,:,1) + mYY ;  %first term of square bracket in formula (29), DS (2004)
     tmp1 = dsge_prior_weight*NumberOfObservations*GYX + mYX;        %first element of second term of square bracket in formula (29), DS (2004)
     tmp2 = inv(dsge_prior_weight*NumberOfObservations*GXX+mXX);     %middle element of second term of square bracket in formula (29), DS (2004)
