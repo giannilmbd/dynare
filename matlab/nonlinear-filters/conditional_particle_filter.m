@@ -58,7 +58,6 @@ if isempty(s)
 end
 
 T = size(Y,2);
-p = length(ReducedForm.mf1);
 n = ParticleOptions.number_of_particles;
 
 % Get covariance matrices
