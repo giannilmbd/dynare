@@ -35,9 +35,6 @@ function [oo_,M_,options_,bayestopt_,Smoothed_variables_declaration_order_deviat
 % SPECIAL REQUIREMENTS
 %    None
 %
-% REMARKS
-% [1] This function use persistent variables for the dataset and the description of the missing observations. Consequently, if this function
-%     is called more than once (by changing the value of parameters) the sample *must not* change.
 
 % Copyright © 2010-2024 Dynare Team
 %

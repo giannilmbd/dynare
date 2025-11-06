@@ -17,7 +17,7 @@ function X = gensylv_fp(A, B, C, D, block, tol)
 %   MARLLINY MONSALVE (2008): "Block linear method for large scale
 %   Sylvester equations", Computational & Applied Mathematics, Vol 27, n°1,
 %   p47-59
-%   ||A^-1||.||B||.||C|| < 1 is a suffisant condition:
+%   ||A^-1||.||B||.||C|| < 1 is a sufficient condition:
 %    - to get a unique solution for the Sylvester equation
 %    - to get a convergent fixed-point algorithm
 %

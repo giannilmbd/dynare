@@ -1,4 +1,5 @@
 function lpkern = evaluate_posterior_kernel(parameters,M_,estim_params_,oo_,options_,bayestopt_,llik)
+% lpkern = evaluate_posterior_kernel(parameters,M_,estim_params_,oo_,options_,bayestopt_,llik)
 % Evaluate the evaluate_posterior_kernel at parameters.
 %
 % INPUTS
@@ -19,11 +20,9 @@ function lpkern = evaluate_posterior_kernel(parameters,M_,estim_params_,oo_,opti
 %    None
 %
 % REMARKS
-% [1] This function cannot evaluate the prior density of a dsge-var model...
-% [2] This function use persistent variables for the dataset and the description of the missing observations. Consequently, if this function
-%     is called more than once (by changing the value of parameters) the sample *must not* change.
+% [1] This function cannot evaluate the prior density of a DSGE-VAR model...
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
