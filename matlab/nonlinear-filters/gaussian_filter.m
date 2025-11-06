@@ -140,3 +140,19 @@ for t=1:sample_size
 end
 
 LIK = -sum(lik(start:end));
+
+function IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sqr_Pss_t_t_1,particles,H,normconst,weigths1,weigths2,ReducedForm,ThreadsOptions,options_, M_)
+% IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sqr_Pss_t_t_1,particles,H,normconst,weigths1,weigths2,ReducedForm,ThreadsOptions,options_, M_)
+% Elements to calculate the importance sampling ratio
+
+% proposal density
+proposal = probability2(mut_t, sqr_Pss_t_t, particles);
+
+% prior density
+prior = probability2(st_t_1, sqr_Pss_t_t_1, particles);
+
+% likelihood
+yt_t_1_i = measurement_equations(particles, ReducedForm, ThreadsOptions, options_, M_);
+likelihood = probability2(obs, sqrt(H), yt_t_1_i);
+
+IncrementalWeights = likelihood.*prior./proposal;
