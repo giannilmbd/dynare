@@ -208,9 +208,8 @@ method_of_moments(
         , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
 
     % Numerical algorithms options
-        % , aim_solver                             % Use AIM algorithm to compute perturbation approximation
         % , k_order_solver                         % use k_order_solver in higher order perturbation approximations
-        % , dr=default                             % method used to compute the decision rule; possible values are DEFAULT, CYCLE_REDUCTION, LOGARITHMIC_REDUCTION
+        % , dr=default                             % method used to compute the decision rule; possible values are DEFAULT, CYCLE_REDUCTION, LOGARITHMIC_REDUCTION, AIM
         % , dr_cycle_reduction_tol = 1e-7          % convergence criterion used in the cycle reduction algorithm
         % , dr_logarithmic_reduction_tol = 1e-12   % convergence criterion used in the logarithmic reduction algorithm
         % , dr_logarithmic_reduction_maxiter = 100 % maximum number of iterations used in the logarithmic reduction algorithm

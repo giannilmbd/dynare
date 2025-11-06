@@ -41,7 +41,7 @@ var e_ys = 1.89;
 var e_pies = 1.89;
 end;
 
-stoch_simul(aim_solver, order=1,irf=0);
+stoch_simul(dr=aim, order=1,irf=0);
  
 benchmark = load(['ls2003_2L2L' filesep 'Output' filesep 'ls2003_2L2L_results']);
 threshold = 1e-8;

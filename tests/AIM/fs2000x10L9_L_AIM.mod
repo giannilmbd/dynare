@@ -74,7 +74,7 @@ steady;
 
 check;
 
-stoch_simul(aim_solver, order=1,irf=0);
+stoch_simul(dr=aim, order=1,irf=0);
  
 benchmark = load(['fs2000x10L9_L' filesep 'Output' filesep 'fs2000x10L9_L_results']);
 threshold = 1e-8;

@@ -34,7 +34,6 @@ options_.prior_interval= 0.95;
 method_of_moments(mom_method = irf_matching
 %, add_tiny_number_to_cholesky = 1e-14
 %, additional_optimizer_steps = [4]
-%, aim_solver
 %, analytic_jacobian
 %, analytic_standard_errors
 %, bartlett_kernel_lag

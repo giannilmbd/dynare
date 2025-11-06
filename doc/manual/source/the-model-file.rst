@@ -5203,11 +5203,7 @@ Computing the stochastic solution
 
     .. option:: aim_solver
 
-       Use the Anderson-Moore Algorithm (AIM) to compute the decision
-       rules, instead of using Dynare’s default method based on a
-       generalized Schur decomposition. This option is only valid for
-       first order approximation. See `AIM website`_ for more details
-       on the algorithm.
+       Deprecated option equivalent to setting ``dr=aim``.
 
     .. option:: conditional_variance_decomposition = INTEGER
                 conditional_variance_decomposition = [INTEGER1:INTEGER2]
@@ -5293,6 +5289,13 @@ Computing the stochastic solution
                 associated to the endogenous variables in the decision
                 rule. This method is in general slower than the
                 ``cycle_reduction``.
+
+           ``aim``
+                Use the Anderson-Moore Algorithm (AIM) to compute the decision
+                rules, instead of using Dynare’s default method based on a
+                generalized Schur decomposition. This option is only valid for
+                first order approximation. See `AIM website`_ for more details
+                on the algorithm.
 
        |br| Default value is ``default``.
 
@@ -8513,10 +8516,6 @@ observed variables.
        <irf_plot_threshold = DOUBLE>`.
        Only used if :opt:`bayesian_irf` is passed.
 
-    .. option:: aim_solver
-
-       See :opt:`aim_solver`.
-
     .. option:: dr = OPTION
 
         See :opt:`dr <dr = OPTION>`. Default: ``default``, i.e. generalized
@@ -10495,10 +10494,6 @@ Bayesian estimation options
 
 Numerical algorithms options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    .. option:: aim_solver
-
-        See :opt:`aim_solver <aim_solver>`. Default: not set.
 
     .. option:: k_order_solver
 
