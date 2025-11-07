@@ -46,7 +46,7 @@ SimulationFolder = CheckPath('online', M_.dname);
 bounds = prior_bounds(bayestopt_, options_.prior_trunc); % Reset bounds as lb and ub must only be operational during mode-finding
 
 % initialization of state particles
-[~, ~, ReducedForm] = solve_model_for_online_filter(true, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+[~, ~, ReducedForm] = solve_model_for_online_filter(true, xparam1, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
 
 order = options_.order;
 mf0 = ReducedForm.mf0;
@@ -85,7 +85,7 @@ for i=1:number_of_particles
     info = 12042009;
     while info(1)
         candidate = Prior.draw();
-        [info] = solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+        [info] = solve_model_for_online_filter(false, candidate, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
         if ~info(1)
             xparam(:,i) = candidate(:);
         end
@@ -123,7 +123,7 @@ for t=1:sample_size
     for i=1:number_of_particles
         % model resolution
         [info, M_, ReducedForm] = ...
-            solve_model_for_online_filter(false, fore_xparam(:,i), dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+            solve_model_for_online_filter(false, fore_xparam(:,i), options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
         if ~info(1)
             steadystate = ReducedForm.steadystate;
             state_variables_steady_state = ReducedForm.state_variables_steady_state;
@@ -217,7 +217,7 @@ for t=1:sample_size
             if all(candidate>=bounds.lb) && all(candidate<=bounds.ub)
                 % model resolution for new parameters particles
                 [info, M_, ReducedForm] = ...
-                    solve_model_for_online_filter(false, candidate, dataset_, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+                    solve_model_for_online_filter(false, candidate, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
                 if ~info(1)
                     xparam(:,i) = candidate ;
                     steadystate = ReducedForm.steadystate;

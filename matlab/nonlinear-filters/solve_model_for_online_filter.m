@@ -1,14 +1,13 @@
 function [info, M_, ReducedForm] = ...
-    solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
+    solve_model_for_online_filter(setinitialcondition, xparam1, options_, M_, estim_params_, bayestopt_, bounds, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % [info, M_, ReducedForm] = ...
-%     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr , endo_steady_state, exo_steady_state, exo_det_steady_state)
+%     solve_model_for_online_filter(setinitialcondition, xparam1, options_, M_, estim_params_, bayestopt_, bounds, dr , endo_steady_state, exo_steady_state, exo_det_steady_state)
 
 % Solves the DSGE model for an particular parameter set.
 %
 % INPUTS
 % - setinitialcondition      [logical]    return initial condition if true.
 % - xparam1                  [double]     n×1 vector, parameter values.
-% - dataset_                 [struct]     Dataset for estimation.
 % - options_                 [struct]     Dynare options.
 % - M_                       [struct]     Model description.
 % - estim_params_            [struct]     Estimated parameters.
