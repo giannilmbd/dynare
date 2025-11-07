@@ -1,38 +1,39 @@
 function [LIK,lik] = nonlinear_kalman_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
-
-% Evaluates the likelihood of a non-linear model approximating the
-% predictive (prior) and filtered (posterior) densities for state variables
+% [LIK,lik] = nonlinear_kalman_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
+% Evaluates the likelihood of a non-linear model approximating the predictive (prior) and filtered (posterior) densities for state variables
 % by a Kalman filter.
-% Gaussian distribution approximation is done by:
-% - a spherical-radial cubature (ref: Arasaratnam & Haykin, 2009).
-% - a scaled unscented transform cubature (ref: Julier & Uhlmann 1995)
-% - Monte-Carlo draws from a multivariate gaussian distribution.
-% First and second moments of prior and posterior state densities are computed
-% from the resulting nodes/particles and allows to generate new distributions at the
-% following observation.
-% Pros: The use of nodes is much faster than Monte-Carlo Gaussian particle and standard particles
-% filters since it treats a lesser number of particles.
-% Cons: 1. Application a linear projection formula in a nonlinear context.
-% 2. Parameter estimations may be biased if the model is truly non-gaussian since predictive and
-% filtered densities are unimodal.
-%
 % INPUTS
 %    Reduced_Form     [structure] MATLAB's structure describing the reduced form model.
 %    Y                [double]    matrix of original observed variables.
 %    start            [double]    structural parameters.
 %    ParticleOptions  [structure] MATLAB's structure describing options concerning particle filtering.
 %    ThreadsOptions   [structure] MATLAB's structure.
+%    options_         [structure]    describing the options
+%    M_               [structure]    describing the model
 %
 % OUTPUTS
 %    LIK        [double]    scalar, likelihood
 %    lik        [double]    vector, density of observations in each period.
 %
-% REFERENCES
+% Gaussian distribution approximation is done by:
+%  - a spherical-radial cubature (ref: Arasaratnam & Haykin, 2009).
+%  - a scaled unscented transform cubature (ref: Julier & Uhlmann 1995)
+%  - Monte-Carlo draws from a multivariate gaussian distribution.
+%
+% First and second moments of prior and posterior state densities are computed
+% from the resulting nodes/particles and allows to generate new distributions at the
+% following observation.
+% Pros: The use of nodes is much faster than Monte-Carlo Gaussian particle and standard particles
+%       filters since it treats a lesser number of particles.
+% Cons: 
+%   1. Application a linear projection formula in a nonlinear context.
+%   2. Parameter estimations may be biased if the model is truly non-gaussian since predictive and
+%       filtered densities are unimodal.
 %
 % NOTES
 %   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
-% Copyright © 2009-2022 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

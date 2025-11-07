@@ -1,6 +1,18 @@
 function [prior,likelihood,C,posterior] = probability(mu,sqrtP,prior,X)
+% [prior,likelihood,C,posterior] = probability(mu,sqrtP,prior,X)
+% INPUTS
+%    mu             [double]   mean of distribution
+%    sqrtP          [double]   covariance matrix of distribution
+%    prior          [double]   prior to be added
+%    X              [double]   random vector to be evaluated
+%
+% OUTPUTS
+%    prior          [double]   prior
+%    likelihood     [double]   Gaussian pdf of X
+%    C              [double]   posterior
+%    posterior      [double]   posterior of X
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

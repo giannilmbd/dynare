@@ -1,4 +1,5 @@
 function n = neff(w)
+% n = neff(w)
 % Evaluates the criterion for resampling
 
 % Copyright © 2013-2014 Dynare Team

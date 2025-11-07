@@ -1,28 +1,29 @@
 function  IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, StateSqrtPPrior, StateWeightsPrior, ...
                                                       StateMuPost, StateSqrtPPost, StateWeightsPost, StateParticles, H, ...
                                                       ReducedForm, ThreadsOptions, options_, M_)
-
+% IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, StateSqrtPPrior, StateWeightsPrior, ...
+%                                                       StateMuPost, StateSqrtPPost, StateWeightsPost, StateParticles, H, ...
+%                                                       ReducedForm, ThreadsOptions, options_, M_)
 % Elements to calculate the importance sampling ratio
 %
 % INPUTS
-%    reduced_form_model     [structure] MATLAB's structure describing the reduced form model.
-%                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
-%                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
-%                                       reduced_form_model.state.dr        [structure] output of resol.m.
-%    Y                      [double]    pp*smpl matrix of (detrended) data, where pp is the maximum number of observed variables.
-%    start                  [integer]   scalar, likelihood evaluation starts at 'start'.
-%    smolyak_accuracy       [integer]   scalar.
+%  - obs                 [double]   current observation
+%  - StateMuPrior        [double]   prior mean
+%  - StateSqrtPPrior     [double]   prior covariance
+%  - StateWeightsPrior   [double]   prior covariance
+%  - StateMuPost         [double]   posterior mean
+%  - StateSqrtPPost      [double]   posterior covariance
+%  - StateWeightsPost    [double]   weights of the particles
+%  - StateParticles      [double]   particles  
+%  - ReducedForm         [structure] decision rules
+%  - ThreadsOptions      [structure] options for threading of mex files
+%  - options_            [structure] describing the options
+%  - M_                  [structure] describing the model
 %
 % OUTPUTS
-%    LIK        [double]    scalar, likelihood
-%    lik        [double]    vector, density of observations in each period.
-%
-% REFERENCES
-%
-% NOTES
-%   The vector "lik" is used to evaluate the Jacobian of the likelihood.
+%    IncrementalWeights  [double]   updated weights  
 
-% Copyright © 2009-2023 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

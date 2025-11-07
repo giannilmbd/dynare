@@ -1,20 +1,16 @@
 function [density] = probability2(mu,S,X)
-%
+% [density] = probability2(mu,S,X)
 % Multivariate gaussian density
 %
 % INPUTS
-%    n                  [integer]   scalar, number of variables.
+%    mu             [double]   mean of distribution
+%    S              [double]   covariance matrix of distribution
+%    X              [double]   random vector to be evaluated
 %
 % OUTPUTS
-%    nodes          [double]    nodes of the cubature
-%    weigths        [double]    associated weigths
-%
-% REFERENCES
-%
-%
-% NOTES
-%
-% Copyright © 2009-2017 Dynare Team
+%    density        [double]   Gaussian pdf of X
+
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

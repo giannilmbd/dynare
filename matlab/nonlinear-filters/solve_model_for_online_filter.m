@@ -1,14 +1,13 @@
 function [info, M_, ReducedForm] = ...
-    solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
+    solve_model_for_online_filter(setinitialcondition, xparam1, options_, M_, estim_params_, bayestopt_, bounds, dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % [info, M_, ReducedForm] = ...
-%     solve_model_for_online_filter(setinitialcondition, xparam1, dataset_, options_, M_, estim_params_, bayestopt_, bounds, dr , endo_steady_state, exo_steady_state, exo_det_steady_state)
+%     solve_model_for_online_filter(setinitialcondition, xparam1, options_, M_, estim_params_, bayestopt_, bounds, dr , endo_steady_state, exo_steady_state, exo_det_steady_state)
 
-% Solves the dsge model for an particular parameters set.
+% Solves the DSGE model for an particular parameter set.
 %
 % INPUTS
 % - setinitialcondition      [logical]    return initial condition if true.
 % - xparam1                  [double]     n×1 vector, parameter values.
-% - dataset_                 [struct]     Dataset for estimation.
 % - options_                 [struct]     Dynare options.
 % - M_                       [struct]     Model description.
 % - estim_params_            [struct]     Estimated parameters.
@@ -24,7 +23,7 @@ function [info, M_, ReducedForm] = ...
 % - M_                       [struct]     M_ description.
 % - ReducedForm              [struct]     Reduced form model.
 
-% Copyright © 2013-2024 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -131,7 +130,7 @@ if setinitialcondition
         StateVectorVariance = lyapunov_symm(A, B*ReducedForm.Q*B', options_.lyapunov_fixed_point_tol, ...
                                         options_.qz_criterium, options_.lyapunov_complex_threshold, [], options_.debug);
         StateVectorVariance = StateVectorVariance(mf0,mf0);
-      case 2% Initial state vector covariance is a monte-carlo based estimate of the ergodic variance (consistent with a k-order Taylor-approximation of the model).
+      case 2% Initial state vector covariance is a Monte-Carlo based estimate of the ergodic variance (consistent with a k-order Taylor-approximation of the model).
         StateVectorMean = ReducedForm.state_variables_steady_state;%.constant(mf0);
         options_.periods = 5000;
         options_.pruning = options_.particle.pruning;

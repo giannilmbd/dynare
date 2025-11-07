@@ -1,21 +1,21 @@
 function [nodes,weights] = spherical_radial_sigma_points(n)
-%
-% Computes nodes and weigths from a third-degree spherical-radial cubature
+% [nodes,weights] = spherical_radial_sigma_points(n)
+% Computes nodes and weights from a third-degree spherical-radial cubature
 % rule.
 % INPUTS
-%    n                  [integer]   scalar, number of variables.
+%    n              [integer]   scalar, number of variables.
 %
 % OUTPUTS
 %    nodes          [double]    nodes of the cubature
-%    weigths        [double]    associated weigths
+%    weights        [double]    associated weights
 %
 % REFERENCES
-%
-% Arasaratnam & Haykin 2008,2009.
+% Arasaratnam & Haykin (2009): Cubature Kalman Filters,  IEEE Transactions
+% on Automatic Control 54(6), 1254 - 1269
 %
 % NOTES
 %
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

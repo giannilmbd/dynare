@@ -1,6 +1,20 @@
 function [prior,likelihood,C,posterior] = probability3(mu,sqrtP,prior,X,X_weights)
+% [prior,likelihood,C,posterior] = probability3(mu,sqrtP,prior,X,X_weights)
+%
+% INPUTS
+%    mu             [double]   mean of distribution
+%    sqrtP          [double]   covariance matrix of distribution
+%    prior          [double]   prior to be added
+%    X              [double]   random vector to be evaluated
+%    X_weights      [double]   weights for weighted likelihood
+%
+% OUTPUTS
+%    prior          [double]   prior
+%    likelihood     [double]   Gaussian pdf of X
+%    C              [double]   weighted posterior
+%    posterior      [double]   posterior of X
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

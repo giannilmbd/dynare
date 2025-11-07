@@ -1,6 +1,18 @@
 function measure = measurement_equations(StateVectors,ReducedForm,ThreadsOptions, options_, M_)
+% measure = measurement_equations(StateVectors,ReducedForm,ThreadsOptions, options_, M_)
+% Get measurement of var
+% INPUTS
+%  - StateVectors           [double]    value of the state variables
+%  - ReducedForm            [structure] MATLAB's structure describing the reduced form model.
+%  - ThreadsOptions         [structure] options for threading of mex files
+%  - options_               [structure] describing the options
+%  - M_                     [structure] describing the model
+%
+% OUTPUTS
+%  - measure                [double]    scalar, likelihood
 
-% Copyright © 2013-2022 Dynare Team
+
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
