@@ -44,7 +44,7 @@ MATLAB_PATH=/Applications/"$PKG_ARCH"/MATLAB_R2025b.app
 path_prepend PATH /Library/TeX/texbin
 
 # Set dependency directory
-LIB64="$ROOTDIR"/macOS/deps/"$PKG_ARCH"/lib64
+DEPS_DIR="$ROOTDIR"/macOS/deps/"$PKG_ARCH"/
 
 GCC_VERSION=$(sed -En "/^c[[:space:]]*=/s/c[[:space:]]*=[[:space:]]*'.*gcc-([0-9]+)'/\1/p" "$ROOTDIR"/macOS/homebrew-native-"$PKG_ARCH".ini)
 
@@ -54,7 +54,7 @@ GCC_VERSION=$(sed -En "/^c[[:space:]]*=/s/c[[:space:]]*=[[:space:]]*'.*gcc-([0-9
 cd "$ROOTDIR"
 
 # NB: the addition of -Wl,-ld_classic is a workaround for https://github.com/mesonbuild/meson/issues/12282 (see also the native file)
-common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static -Dfortran_args="[ '-B', '$LIB64/Slicot/' ]" \
+common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/' ]" \
                    -Dc_link_args="[ '-Wl,-ld_classic' ]" -Dcpp_link_args="[ '-Wl,-ld_classic' ]" -Dfortran_link_args="[ '-Wl,-ld_classic' ]" \
                    --native-file macOS/homebrew-native-$PKG_ARCH.ini)
 
@@ -140,7 +140,7 @@ cp     "$ROOTDIR"/build-doc/preprocessor/doc/*.pdf                   "$PKGFILES"
 cp -r  "$ROOTDIR"/build-doc/dynare-manual.html                       "$PKGFILES"/doc
 
 mkdir -p                                                             "$PKGFILES"/matlab/dseries/externals/x13/macOS/64
-cp -p  "$ROOTDIR"/macOS/deps/"$PKG_ARCH"/lib64/x13as/x13as           "$PKGFILES"/matlab/dseries/externals/x13/macOS/64
+cp -p  "$DEPS_DIR"/src/x13as/x13as                                   "$PKGFILES"/matlab/dseries/externals/x13/macOS/64
 
 
 cd "$ROOTDIR"/macOS/pkg

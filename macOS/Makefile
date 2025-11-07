@@ -19,24 +19,29 @@ ARCHS = arm64 x86_64
 BUILDS = $(addprefix build-, $(ARCHS))
 DEPS = $(addprefix deps-, $(ARCHS))
 CLEAN_DEPS = $(addprefix clean-deps-, $(ARCHS))
-CLEAN_ALL = $(addprefix clean-all-, $(ARCHS))
+CLEAN_DEPS_ALL = $(addprefix clean-deps-all-, $(ARCHS))
 
-.PHONY: all $(BUILDS) $(DEPS) clean-pkg $(CLEAN_DEPS) $(CLEAN_ALL) clean-all
+.PHONY: build $(BUILDS) $(DEPS) $(CLEAN_DEPS) $(CLEAN_DEPS_ALL) clean-pkgs clean clean-all
 
-all: $(BUILDS)
+build: $(BUILDS)
 
 $(BUILDS): build-%: deps-%
 	./build.sh $*
 
 $(DEPS): deps-%:
-	gmake -C deps DEPS_ARCH=$*
+	gmake -C deps PKG_ARCH=$*
 
 $(CLEAN_DEPS): clean-deps-%:
-	gmake -C deps clean-all DEPS_ARCH=$*
+	gmake -C deps clean PKG_ARCH=$*
 
-clean-pkg:
+$(CLEAN_DEPS_ALL): clean-deps-all-%:
+	gmake -C deps clean-all PKG_ARCH=$*
+
+clean-pkgs:
 	rm -rf pkg
 
-$(CLEAN_ALL): clean-all-%: clean-deps-% clean-pkg
+# Clean everything except downloaded tarballs of dependencies
+clean: clean-pkgs $(CLEAN_DEPS)
 
-clean-all: $(CLEAN_ALL)
+# Clean everything (including downloaded tarballs of dependencies)
+clean-all: clean-pkgs $(CLEAN_DEPS_ALL)
