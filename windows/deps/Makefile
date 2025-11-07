@@ -45,10 +45,10 @@ tarballs/slicot-$(SLICOT_VERSION).tar.gz:
 	wget $(WGET_OPTIONS) -O $@ https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v$(SLICOT_VERSION).tar.gz
 
 src/slicot-matlab/libslicot64_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
-	rm -rf src/slicot-matlab
-	mkdir -p src/slicot-matlab
-	tar xf $< --directory src/slicot-matlab --strip-components=1
-	make -C src/slicot-matlab -f makefile_Unix lib SLICOTLIB=../libslicot64_pic.a OPTS="$(FFLAGS) -fno-underscoring -fdefault-integer-8" FORTRAN=x86_64-w64-mingw32ucrt-gfortran LOADER=x86_64-w64-mingw32ucrt-gfortran ARCH=x86_64-w64-mingw32ucrt-gcc-ar
+	rm -rf $(dir $@)
+	mkdir -p $(dir $@)
+	tar xf $< --directory $(dir $@) --strip-components=1
+	make -C $(dir $@) -f makefile_Unix lib SLICOTLIB=../$(notdir $@) OPTS="$(FFLAGS) -fno-underscoring -fdefault-integer-8" FORTRAN=x86_64-w64-mingw32ucrt-gfortran LOADER=x86_64-w64-mingw32ucrt-gfortran ARCH=x86_64-w64-mingw32ucrt-gcc-ar
 
 src/slicot-octave/libslicot_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
 	rm -rf src/slicot-octave
@@ -62,7 +62,7 @@ src/slicot-octave/libslicot_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
 #
 
 tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z:
-	mkdir -p tarballs
+	mkdir -p $(dir $@)
 	wget $(WGET_OPTIONS) -O $@ https://ftpmirror.gnu.org/gnu/octave/windows/$(notdir $@)
 
 octave: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
@@ -76,7 +76,7 @@ octave: tarballs/octave-${OCTAVE_VERSION}${OCTAVE_W64_BUILD}-w64.7z
 #
 
 tarballs/matlab%.tar.xz:
-	mkdir -p tarballs
+	mkdir -p $(dir $@)
 	wget $(WGET_OPTIONS) -O $@.gpg https://www.dynare.org/pkg-build/$(notdir $@).gpg
 	gpg --output $@ --decrypt $@.gpg
 	rm $@.gpg
@@ -91,7 +91,7 @@ tarballs/matlab%.tar.xz:
 MSYS2_EXCLUDES := --exclude .MTREE --exclude .BUILDINFO --exclude .PKGINFO
 
 tarballs/mingw-w64-ucrt-x86_64-%-any.pkg.tar.zst:
-	mkdir -p tarballs
+	mkdir -p $(dir $@)
 	wget $(WGET_OPTIONS) -O $@ https://mirror.msys2.org/mingw/ucrt64/$(notdir $@)
 
 MATLAB_MSYS2_DEPS := \
@@ -166,7 +166,7 @@ gcc: $(GCC_MSYS2_DEPS)
 #
 
 tarballs/x13as_ascii-v$(X13AS_VERSION).zip:
-	mkdir -p tarballs
+	mkdir -p $(dir $@)
 	wget $(WGET_OPTIONS) -O $@ https://www2.census.gov/software/x-13arima-seats/x13as/windows/program-archives/$(notdir $@)
 
 x13as: tarballs/x13as_ascii-v$(X13AS_VERSION).zip
