@@ -79,9 +79,9 @@ if [[ -z $VERSION ]]; then
 fi
 
 # Strip binaries
-x86_64-w64-mingw32-strip build-win-matlab/preprocessor/src/dynare-preprocessor.exe
-x86_64-w64-mingw32-strip -- build-win-matlab/*.mexw64
-x86_64-w64-mingw32-strip -- build-win-octave/*.mex
+x86_64-w64-mingw32ucrt-strip build-win-matlab/preprocessor/src/dynare-preprocessor.exe
+x86_64-w64-mingw32ucrt-strip -- build-win-matlab/*.mexw64
+x86_64-w64-mingw32ucrt-strip -- build-win-octave/*.mex
 
 # Add a preprocessor copy for backward compatibility
 mkdir -p matlab/preprocessor64/
