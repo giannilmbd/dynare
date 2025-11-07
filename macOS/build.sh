@@ -68,6 +68,10 @@ if [[ -z $CI ]]; then
     ln -s build-macOS-matlab build-doc
 fi
 
+## Strip binaries
+strip build-macOS-matlab/preprocessor/src/dynare-preprocessor
+strip -x -S build-macOS-matlab/*.mex"$MATLAB_ARCH"
+
 ##
 ## Create package
 ##
