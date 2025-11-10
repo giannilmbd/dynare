@@ -49,7 +49,7 @@ prior = prior';
 proposal = proposal';
 
 % Compute the density of the current observation conditionally to each particle
-yt_t_1_i = measurement_equations(StateParticles, ReducedForm, ThreadsOptions, options_, M_);
+yt_t_1_i = measurement_equations(StateParticles, ReducedForm, options_, M_);
 
 % likelihood
 likelihood = probability2(obs, sqrt(H), yt_t_1_i);

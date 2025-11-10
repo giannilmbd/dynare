@@ -62,7 +62,8 @@ liu_west_delta = online_opt.liu_west_delta;
 StateVectorVarianceSquareRoot = chol(ReducedForm.StateVectorVariance)';
 state_variance_rank = size(StateVectorVarianceSquareRoot,2);
 StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),ReducedForm.StateVectorMean);
-if pruning
+if pruning && ~(order==1)
+    % span initial augmented state vectors
     if order == 2
         StateVectors_ = StateVectors;
     elseif order == 3
@@ -70,6 +71,8 @@ if pruning
     else
         error('Pruning is not available for orders > 3');
     end
+else
+    StateVectors_=[];
 end
 
 % parameters for the Liu & West filter
@@ -160,6 +163,11 @@ for t=1:sample_size
                     end
                 end
             end
+            [tmp2]=iterate_law_of_motion(StateVectors(:,i),zeros(number_of_structural_innovations, 1),ReducedForm,M_,options_,ReducedForm.use_k_order_solver,pruning,StateVectors_(:,i));
+            if max(max(abs(tmp2-tmp)))>1e-10
+                error('')
+            end
+            % end
             PredictionError = bsxfun(@minus,Y(t,:)', tmp(mf1,:));
             % Replace Gaussian density with a Student density with 3 degrees of freedom for fat tails.
             z = sum(PredictionError.*(ReducedForm.H\PredictionError), 1) ;
@@ -201,7 +209,7 @@ for t=1:sample_size
                                 state_variables_steady_state_ = repmat(ReducedForm.state_variables_steady_state,3,1);
                                 mf0_ = repmat(mf0,1,3); 
                                 mask2 = number_of_state_variables+1:2*number_of_state_variables;
-                                 mask3 = 2*number_of_state_variables+1:number_of_state_variables;
+                                mask3 = 2*number_of_state_variables+1:number_of_state_variables;
                                 mf0_(mask2) = mf0_(mask2)+size(ReducedForm.ghx,1);
                                 mf0_(mask3) = mf0_(mask3)+2*size(ReducedForm.ghx,1);
                             else
@@ -226,7 +234,6 @@ for t=1:sample_size
                             else
                                 error('Pruning is not available for orders > 3');
                             end
-                            StateVectors_(:,i) = tmp_(mf0_,:);
                         else
                             if order == 1
                                 tmp = bsxfun(@plus,ReducedForm.constant,ReducedForm.ghx*yhat)+ReducedForm.ghu*epsilon;
@@ -239,6 +246,19 @@ for t=1:sample_size
                             end
                         end
                     end
+                    if pruning
+                        [tmp2, tmp2_]=iterate_law_of_motion(StateVectors(:,i),epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,pruning,StateVectors_(:,i));
+                        StateVectors_(:,i) = tmp_(mf0_,:);
+                        if max(max(abs(tmp2-tmp))) || max(max(abs(tmp2_-tmp_)))
+                            error('')
+                        end
+                    else
+                        [tmp2]=iterate_law_of_motion(StateVectors(:,i),epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,pruning);
+                        if max(max(abs(tmp2-tmp)))>1e-10
+                            error('')
+                        end
+                    end
+
                     StateVectors(:,i) = tmp(mf0,:);
                     PredictionError = bsxfun(@minus,Y(t,:)', tmp(mf1,:));
                     wtilde(i) = w_stage1(i)*exp(-.5*(const_lik+log(det(ReducedForm.H))+sum(PredictionError.*(ReducedForm.H\PredictionError), 1)));

@@ -169,6 +169,10 @@ else
         error('Order > 3: use_k_order_solver should be set to true');
     end
 end
+[tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,options_.pruning);
+if norm(abs(tmp2-tmp),'inf')>1e-10
+    error('')
+end
 
 PredictedStateMean = tmp(mf0,:)*weights;
 PredictedObservedMean = tmp(mf1,:)*weights;
@@ -225,6 +229,6 @@ if ParticleOptions.cpf_weights_method.murrayjonesparslow
     end
     Prior = probability2(PredictedStateMean, PredictedStateVarianceSquareRoot, ProposalStateVector);
     Posterior = probability2(StateVectorMean, StateVectorVarianceSquareRoot, ProposalStateVector);
-    Likelihood = probability2(y, H_lower_triangular_cholesky, measurement_equations(ProposalStateVector, ReducedForm, ThreadsOptions, options_, M_));
+    Likelihood = probability2(y, H_lower_triangular_cholesky, measurement_equations(ProposalStateVector, ReducedForm, options_, M_));
     Weights = SampleWeights.*Likelihood.*(Prior./Posterior);
 end

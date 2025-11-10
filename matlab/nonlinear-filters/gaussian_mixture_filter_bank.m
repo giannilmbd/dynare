@@ -86,6 +86,11 @@ else
         error('Order > 3: use_k_order_solver should be set to true');
     end
 end
+[tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,false);
+if max(max(abs(tmp2-tmp)))>1e-10
+    error('')
+end
+
 PredictedStateMean = tmp(mf0,:)*weights3;
 PredictedObservedMean = tmp(mf1,:)*weights3;
 

@@ -71,7 +71,6 @@ end
 % Initialization of the likelihood.
 const_lik = log(2*pi)*number_of_observed_variables+log(det(ReducedForm.H));
 
-
 % Initialization of the weights across particles.
 weights = ones(1,number_of_particles)/number_of_particles ;
 StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),ReducedForm.StateVectorMean);
@@ -91,6 +90,8 @@ if ParticleOptions.pruning
     else
         error('Pruning is not available for orders > 3');
     end
+else
+    StateVectors_=[];
 end
 
 for t=1:sample_size
@@ -122,6 +123,10 @@ for t=1:sample_size
             end
         end
     end
+    [tmp2]=iterate_law_of_motion(StateVectors,zeros(number_of_structural_innovations,number_of_particles),ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning,StateVectors_);
+    if max(abs(tmp2-tmp))>1e-10
+        error('')
+    end
     PredictionError = bsxfun(@minus,Y(:,t),tmp(mf1,:));
     z = sum(PredictionError.*(ReducedForm.H\PredictionError),1) ;
     ddl = 3 ;
@@ -129,7 +134,7 @@ for t=1:sample_size
     tau_tilde = tau_tilde/sum(tau_tilde) ;
     indx = resample(0,tau_tilde',ParticleOptions);
     if ParticleOptions.pruning
-        yhat_ = yhat_(:,indx) ;
+        yhat_ = yhat_(:,indx) ;        
     end
     yhat = yhat(:,indx) ;
     weights_stage_1 = weights(indx)./tau_tilde(indx) ;
@@ -160,6 +165,17 @@ for t=1:sample_size
             else
                 error('Order > 3: use_k_order_solver should be set to true');
             end
+        end
+    end
+    if ParticleOptions.pruning
+        [tmp2, tmp2_]=iterate_law_of_motion(StateVectors(:,indx),epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning,StateVectors_(:,indx));
+        if max(max(abs(tmp2-tmp))) || max(max(abs(tmp2_-tmp_)))
+            error('')
+        end
+    else 
+        [tmp2]=iterate_law_of_motion(StateVectors(:,indx),epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning);
+        if max(max(abs(tmp2-tmp)))>1e-10
+            error('')
         end
     end
     StateVectors = tmp(mf0,:);

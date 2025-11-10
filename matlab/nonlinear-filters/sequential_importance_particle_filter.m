@@ -126,6 +126,18 @@ for t=1:sample_size
             end
         end
     end
+    if ParticleOptions.pruning
+        [tmp2, tmp2_]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning,StateVectors_);
+        if max(max(abs(tmp2-tmp))) || max(max(abs(tmp2_-tmp_)))
+            error('')
+        end
+    else
+        [tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning);
+        if max(max(abs(tmp2-tmp)))>1e-10
+            error('')
+        end
+    end
+
     PredictionError = bsxfun(@minus,Y(:,t),tmp(ReducedForm.mf1,:));
 
     lnw = -.5*(const_lik+sum(PredictionError.*(ReducedForm.H\PredictionError),1));

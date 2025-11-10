@@ -113,6 +113,11 @@ for t=1:sample_size
             tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, false);
         end
     end
+    [tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,false);
+    if max(max(abs(tmp2-tmp)))>1e-10
+        error('')
+    end
+
     PredictedStateMean = tmp(mf0,:)*weights ;
     PredictedObservedMean = tmp(mf1,:)*weights;
     if ParticleOptions.proposal_approximation.cubature || ParticleOptions.proposal_approximation.montecarlo
