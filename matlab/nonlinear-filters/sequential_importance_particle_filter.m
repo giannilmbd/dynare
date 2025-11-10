@@ -42,9 +42,6 @@ if isempty(start)
     start = 1;
 end
 
-% Get steady state and mean.
-state_variables_steady_state = ReducedForm.state_variables_steady_state;
-
 sample_size = size(Y,2);
 number_of_state_variables = length(ReducedForm.mf0);
 number_of_observed_variables = length(ReducedForm.mf1);
@@ -77,14 +74,12 @@ set_dynare_seed_local_options([],false,'default');
 % Initialization of the weights across particles.
 weights = ones(1,number_of_particles)/number_of_particles ;
 StateVectors = bsxfun(@plus,StateVectorVarianceSquareRoot*randn(state_variance_rank,number_of_particles),ReducedForm.StateVectorMean);
-if ParticleOptions.pruning
+if ParticleOptions.pruning && ~(options_.order ==1)
     if options_.order == 2
         StateVectors_ = StateVectors;
-        state_variables_steady_state_ = state_variables_steady_state;
         mf0_ = ReducedForm.mf0;
     elseif options_.order == 3
         StateVectors_ = repmat(StateVectors,3,1);
-        state_variables_steady_state_ = repmat(state_variables_steady_state,3,1);
         mf0_ = repmat(ReducedForm.mf0,1,3); 
         mask2 = number_of_state_variables+1:2*number_of_state_variables;
         mask3 = 2*number_of_state_variables+1:3*number_of_state_variables;
@@ -93,49 +88,18 @@ if ParticleOptions.pruning
     else
         error('Pruning is not available for orders > 3');
     end
+else
+    StateVectors_ = StateVectors;
+    mf0_ = ReducedForm.mf0;
 end
 
 % Loop over observations
 for t=1:sample_size
-    yhat = bsxfun(@minus,StateVectors,state_variables_steady_state);
     epsilon = Q_lower_triangular_cholesky*randn(number_of_structural_innovations,number_of_particles);
     if ParticleOptions.pruning
-        yhat_ = bsxfun(@minus,StateVectors_,state_variables_steady_state_);
-        if options_.order == 2
-            [tmp, tmp_] = local_state_space_iteration_2(yhat,epsilon,ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,...
-                ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,yhat_,ReducedForm.steadystate,ThreadsOptions.local_state_space_iteration_2);
-        elseif options_.order == 3
-            [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ...
-                ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
-        else
-            error('Pruning is not available for orders > 3');
-        end
+        [tmp, tmp_]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning,StateVectors_);
     else
-        if ReducedForm.use_k_order_solver
-            tmp = local_state_space_iteration_k(yhat, epsilon, ReducedForm.dr, M_, options_, ReducedForm.udr);
-        else
-            if options_.order == 2
-                tmp = local_state_space_iteration_2(yhat,epsilon,ReducedForm.ghx,ReducedForm.ghu,ReducedForm.constant,...
-                    ReducedForm.ghxx,ReducedForm.ghuu,ReducedForm.ghxu,ThreadsOptions.local_state_space_iteration_2);
-            elseif options_.order == 3
-                tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ...
-                    ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
-                    ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, ParticleOptions.pruning);
-            else
-                error('Order > 3: use_k_order_solver should be set to true');
-            end
-        end
-    end
-    if ParticleOptions.pruning
-        [tmp2, tmp2_]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning,StateVectors_);
-        if max(max(abs(tmp2-tmp))) || max(max(abs(tmp2_-tmp_)))
-            error('')
-        end
-    else
-        [tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning);
-        if max(max(abs(tmp2-tmp)))>1e-10
-            error('')
-        end
+        tmp=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,ParticleOptions.pruning);
     end
 
     PredictionError = bsxfun(@minus,Y(:,t),tmp(ReducedForm.mf1,:));

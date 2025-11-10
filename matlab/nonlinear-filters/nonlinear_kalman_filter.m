@@ -103,20 +103,7 @@ for t=1:sample_size
     sigma_points = bsxfun(@plus,xbar,sqr_Px*(nodes'));
     StateVectors = sigma_points(1:number_of_state_variables,:);
     epsilon = sigma_points(number_of_state_variables+1:number_of_state_variables+number_of_structural_innovations,:);
-    yhat = bsxfun(@minus,StateVectors,ReducedForm.state_variables_steady_state);
-    if ReducedForm.use_k_order_solver
-        tmp = local_state_space_iteration_k(yhat, epsilon, ReducedForm.dr, M_, options_, ReducedForm.udr);
-    else
-        if options_.order == 2
-            tmp = local_state_space_iteration_2(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ThreadsOptions.local_state_space_iteration_2);
-        elseif options_.order == 3
-            tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, false);
-        end
-    end
-    [tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,false);
-    if max(max(abs(tmp2-tmp)))>1e-10
-        error('')
-    end
+    tmp=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,false);
 
     PredictedStateMean = tmp(mf0,:)*weights ;
     PredictedObservedMean = tmp(mf1,:)*weights;

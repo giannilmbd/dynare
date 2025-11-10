@@ -30,21 +30,4 @@ function measure = measurement_equations(StateVectors,ReducedForm,options_, M_)
 
 number_of_structural_innovations = length(ReducedForm.Q);
 measure=iterate_law_of_motion(StateVectors,zeros(number_of_structural_innovations, size(StateVectors,2)),ReducedForm,M_,options_,ReducedForm.use_k_order_solver,false);
-yhat = bsxfun(@minus, StateVectors, ReducedForm.state_variables_steady_state);
-if ReducedForm.use_k_order_solver
-    tmp = local_state_space_iteration_k(yhat, zeros(number_of_structural_innovations, size(yhat,2)), ReducedForm.dr, M_, options_, ReducedForm.udr);
-    measure2 = tmp(ReducedForm.mf1,:);
-else
-    if options_.order == 2
-        measure2 = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, size(yhat,2)), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, options_.threads.local_state_space_iteration_2);
-    elseif options_.order == 3
-        measure2 = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations, size(yhat,2)), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, false);
-    else
-        error('Order > 3: use_k_order_solver should be set to true');
-    end
-end
-if max(max(abs(measure-measure2)))>1e-10
-    error('')
-end
-
 measure = measure(ReducedForm.mf1,:);

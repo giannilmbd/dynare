@@ -92,7 +92,7 @@ for t=1:T
     flags = false(n, 1);
     for i=1:n
         [StateParticles(:,i), SampleWeights(i), flags(i)] = ...
-            conditional_filter_proposal(ReducedForm, Y(:,t), StateParticles(:,i), SampleWeights(i), Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ParticleOptions, ThreadsOptions, options_, M_);
+            conditional_filter_proposal(ReducedForm, Y(:,t), StateParticles(:,i), SampleWeights(i), Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ParticleOptions, options_, M_);
     end
     if any(flags)
         LIK = -Inf;
@@ -112,7 +112,7 @@ end
 LIK = -sum(lik(s:end));
 
 function [ProposalStateVector, Weights, flag] = conditional_filter_proposal(ReducedForm, y, StateVectors, SampleWeights, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, ...
-                                                  H, ParticleOptions, ThreadsOptions, options_, M_)
+                                                  H, ParticleOptions, options_, M_)
 % Computes the proposal for each past particle using Gaussian approximations
 % for the state errors and the Kalman filter
 %
@@ -125,7 +125,6 @@ function [ProposalStateVector, Weights, flag] = conditional_filter_proposal(Redu
 % - H_lower_triangular_cholesky
 % - H
 % - ParticleOptions
-% - ThreadsOptions
 % - options_
 % - M_
 %
@@ -156,23 +155,7 @@ else
 end
 
 epsilon = Q_lower_triangular_cholesky*nodes';
-yhat = repmat(StateVectors-ReducedForm.state_variables_steady_state, 1, size(epsilon, 2));
-
-if ReducedForm.use_k_order_solver
-    tmp = local_state_space_iteration_k(yhat, epsilon, ReducedForm.dr, M_, options_, ReducedForm.udr);
-else
-    if options_.order == 2
-        tmp = local_state_space_iteration_2(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ThreadsOptions.local_state_space_iteration_2);
-    elseif options_.order == 3
-        tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ThreadsOptions.local_state_space_iteration_3, false);
-    else
-        error('Order > 3: use_k_order_solver should be set to true');
-    end
-end
-[tmp2]=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,options_.pruning);
-if norm(abs(tmp2-tmp),'inf')>1e-10
-    error('')
-end
+tmp=iterate_law_of_motion(StateVectors,epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,options_.pruning);
 
 PredictedStateMean = tmp(mf0,:)*weights;
 PredictedObservedMean = tmp(mf1,:)*weights;
