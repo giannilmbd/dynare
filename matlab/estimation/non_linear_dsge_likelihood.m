@@ -118,9 +118,8 @@ Y = transpose(dataset_.data);
 %------------------------------------------------------------------------------
 
 mf0 = bayestopt_.mf0;
-mf1 = bayestopt_.mf1;
 restrict_variables_idx = dr.restrict_var_list;
-state_variables_idx = restrict_variables_idx(mf0);
+state_variables_idx = restrict_variables_idx(bayestopt_.mf0);
 number_of_state_variables = length(mf0);
 
 ReducedForm.steadystate = dr.ys(dr.order_var(restrict_variables_idx));
@@ -129,7 +128,7 @@ ReducedForm.state_variables_steady_state = dr.ys(dr.order_var(state_variables_id
 ReducedForm.Q = Q;
 ReducedForm.H = H;
 ReducedForm.mf0 = mf0;
-ReducedForm.mf1 = mf1;
+ReducedForm.mf1 = bayestopt_.mf1;
 
 if options_.order>3
     ReducedForm.use_k_order_solver = true;
