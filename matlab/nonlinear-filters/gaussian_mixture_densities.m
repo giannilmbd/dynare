@@ -1,9 +1,9 @@
 function  IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, StateSqrtPPrior, StateWeightsPrior, ...
                                                       StateMuPost, StateSqrtPPost, StateWeightsPost, StateParticles, H, ...
-                                                      ReducedForm, ThreadsOptions, options_, M_)
+                                                      ReducedForm, options_, M_)
 % IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, StateSqrtPPrior, StateWeightsPrior, ...
 %                                                       StateMuPost, StateSqrtPPost, StateWeightsPost, StateParticles, H, ...
-%                                                       ReducedForm, ThreadsOptions, options_, M_)
+%                                                       ReducedForm, options_, M_)
 % Elements to calculate the importance sampling ratio
 %
 % INPUTS
@@ -16,7 +16,6 @@ function  IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, Sta
 %  - StateWeightsPost    [double]   weights of the particles
 %  - StateParticles      [double]   particles  
 %  - ReducedForm         [structure] decision rules
-%  - ThreadsOptions      [structure] options for threading of mex files
 %  - options_            [structure] describing the options
 %  - M_                  [structure] describing the model
 %

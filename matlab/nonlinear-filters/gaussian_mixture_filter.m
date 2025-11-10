@@ -187,7 +187,7 @@ for t=1:sample_size
                     gaussian_mixture_filter_bank(ReducedForm,Y(:,t), StateMu(:,g), StateSqrtP(:,:,g), StateWeights(g),...
                                                  StructuralShocksMu(:,i), StructuralShocksSqrtP(:,:,i), StructuralShocksWeights(i),...
                                                  ObservationShocksWeights(j), H, H_lower_triangular_cholesky, const_lik, ...
-                                                 ParticleOptions, ThreadsOptions, options_, M_);
+                                                 ParticleOptions, options_, M_);
             end
         end
     end
@@ -201,7 +201,7 @@ for t=1:sample_size
             StateParticles = bsxfun(@plus, StateMuPost(:,i), StateSqrtPPost(:,:,i)*nodes');
             IncrementalWeights = gaussian_mixture_densities(Y(:,t), StateMuPrior, StateSqrtPPrior, StateWeightsPrior, ...
                                                             StateMuPost, StateSqrtPPost, StateWeightsPost, StateParticles, H, ...
-                                                            ReducedForm, ThreadsOptions, options_, M_);
+                                                            ReducedForm, options_, M_);
             SampleWeights(i) = sum(StateWeightsPost(i)*weights.*IncrementalWeights);
         end
         SumSampleWeights = sum(SampleWeights);
@@ -219,7 +219,7 @@ for t=1:sample_size
         StateParticles = importance_sampling(StateMuPost,StateSqrtPPost,StateWeightsPost',number_of_particles);
         IncrementalWeights = gaussian_mixture_densities(Y(:,t), StateMuPrior, StateSqrtPPrior, StateWeightsPrior, ...
                                                         StateMuPost, StateSqrtPPost, StateWeightsPost, StateParticles, H, ...
-                                                        ReducedForm, ThreadsOptions, options_, M_);
+                                                        ReducedForm, options_, M_);
         SampleWeights = IncrementalWeights/number_of_particles;
         SumSampleWeights = sum(SampleWeights,1);
         SampleWeights = SampleWeights./SumSampleWeights;

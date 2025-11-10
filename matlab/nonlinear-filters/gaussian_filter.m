@@ -61,19 +61,16 @@ if isempty(start)
     start = 1;
 end
 
-mf0 = ReducedForm.mf0;
-mf1 = ReducedForm.mf1;
 sample_size = size(Y,2);
-number_of_state_variables = length(mf0);
-number_of_observed_variables = length(mf1);
+number_of_state_variables = length(ReducedForm.mf0);
+number_of_observed_variables = length(ReducedForm.mf1);
 number_of_particles = ParticleOptions.number_of_particles;
 
 % compute gaussian quadrature nodes and weights on states and shocks
 if ParticleOptions.distribution_approximation.cubature
     [nodes2, weights2] = spherical_radial_sigma_points(number_of_state_variables);
-    weights_c2 = weights2;
 elseif ParticleOptions.distribution_approximation.unscented
-    [nodes2, weights2, weights_c2] = unscented_sigma_points(number_of_state_variables,ParticleOptions);
+    [nodes2, weights2] = unscented_sigma_points(number_of_state_variables,ParticleOptions);
 else
     if ~ParticleOptions.distribution_approximation.montecarlo
         error('This approximation for the distribution is unknown!')
@@ -85,7 +82,6 @@ if ParticleOptions.distribution_approximation.montecarlo
 end
 
 % Get covariance matrices
-Q = ReducedForm.Q;
 H = ReducedForm.H;
 if isempty(H)
     H = 0;
@@ -98,10 +94,9 @@ end
 StateVectorMean = ReducedForm.StateVectorMean;
 StateVectorVarianceSquareRoot = reduced_rank_cholesky(ReducedForm.StateVectorVariance)';
 state_variance_rank = size(StateVectorVarianceSquareRoot,2);
-Q_lower_triangular_cholesky = reduced_rank_cholesky(Q)';
+Q_lower_triangular_cholesky = reduced_rank_cholesky(ReducedForm.Q)';
 
 % Initialization of the likelihood.
-const_lik = (2*pi)^(number_of_observed_variables/2) ;
 lik  = NaN(sample_size,1);
 LIK  = NaN;
 
@@ -112,15 +107,13 @@ for t=1:sample_size
     if ParticleOptions.distribution_approximation.cubature || ParticleOptions.distribution_approximation.unscented
         StateParticles = bsxfun(@plus, StateVectorMean, StateVectorVarianceSquareRoot*nodes2');
         IncrementalWeights = gaussian_densities(Y(:,t), StateVectorMean, StateVectorVarianceSquareRoot, PredictedStateMean, ...
-                                                PredictedStateVarianceSquareRoot, StateParticles, H, const_lik, ...
-                                                weights2, weights_c2, ReducedForm, ThreadsOptions, ...
+                                                PredictedStateVarianceSquareRoot, StateParticles, H, ReducedForm, ...
                                                 options_, M_);
         SampleWeights = weights2.*IncrementalWeights;
     else
         StateParticles = bsxfun(@plus, StateVectorVarianceSquareRoot*randn(state_variance_rank, number_of_particles), StateVectorMean) ;
         IncrementalWeights = gaussian_densities(Y(:,t), StateVectorMean, StateVectorVarianceSquareRoot, PredictedStateMean, ...
-                                                PredictedStateVarianceSquareRoot,StateParticles,H,const_lik, ...
-                                                1/number_of_particles,1/number_of_particles,ReducedForm,ThreadsOptions, ...
+                                                PredictedStateVarianceSquareRoot,StateParticles,H,ReducedForm, ...
                                                 options_, M_);
         SampleWeights = IncrementalWeights/number_of_particles;
     end
@@ -141,8 +134,8 @@ end
 
 LIK = -sum(lik(start:end));
 
-function IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sqr_Pss_t_t_1,particles,H,normconst,weigths1,weigths2,ReducedForm,ThreadsOptions,options_, M_)
-% IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sqr_Pss_t_t_1,particles,H,normconst,weigths1,weigths2,ReducedForm,ThreadsOptions,options_, M_)
+function IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sqr_Pss_t_t_1,particles,H,ReducedForm,options_, M_)
+% IncrementalWeights = gaussian_densities(obs,mut_t,sqr_Pss_t_t,st_t_1,sqr_Pss_t_t_1,particles,H,ReducedForm,options_, M_)
 % Elements to calculate the importance sampling ratio
 
 % proposal density
