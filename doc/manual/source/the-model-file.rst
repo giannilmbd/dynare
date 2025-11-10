@@ -8722,6 +8722,12 @@ observed variables.
        observed variables. This is equivalent to manually listing all
        the observed variables after the ``estimation`` command.
 
+    .. option:: pruning
+
+       See :opt:`pruning`. Governs the creation of posterior objects during estimation.
+       When using nonlinear filters, it should be consistent with the setting of 
+       the ``pruning`` option of ``particle_filter_options``.
+
     .. option:: number_of_particles = INTEGER
 
        Number of particles used when evaluating the likelihood of a
