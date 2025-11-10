@@ -50,6 +50,9 @@ function [LIK,lik] = nonlinear_kalman_filter(ReducedForm, Y, start, ParticleOpti
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+if ParticleOptions.pruning
+    error('nonlinear_kalman_filter: pruning is not yet implemented.')
+end
 % Set default
 if isempty(start)
     start = 1;

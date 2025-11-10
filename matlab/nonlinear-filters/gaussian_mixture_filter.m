@@ -59,6 +59,9 @@ function [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOpt
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+if ParticleOptions.pruning
+    error('gaussian_mixture_filter: pruning is not yet implemented.')
+end
 % Set default
 if isempty(start)
     start = 1;

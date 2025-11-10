@@ -52,6 +52,9 @@ function [LIK,lik] = conditional_particle_filter(ReducedForm, Y, s, ParticleOpti
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+if ParticleOptions.pruning
+    error('conditional_particle_filter: pruning is not yet implemented.')
+end
 % Set default for third input argument.
 if isempty(s)
     s = 1;
