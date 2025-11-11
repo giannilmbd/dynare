@@ -80,7 +80,7 @@ number_of_structural_innovations = length(ReducedForm.Q);
 
 if ParticleOptions.proposal_approximation.montecarlo
     nodes = randn(ParticleOptions.number_of_particles/10, number_of_structural_innovations);
-    weights = 1.0/ParticleOptions.number_of_particles;
+    weights = 1.0/(ParticleOptions.number_of_particles/10);
     weights_c = weights;
 elseif ParticleOptions.proposal_approximation.cubature
     [nodes, weights] = spherical_radial_sigma_points(number_of_structural_innovations);
