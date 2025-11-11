@@ -4,7 +4,7 @@ function [density] = probability2(mu,S,X)
 %
 % INPUTS
 %    mu             [double]   mean of distribution
-%    S              [double]   covariance matrix of distribution
+%    S              [double]   lower Cholesky factor of covariance matrix of distribution
 %    X              [double]   random vector to be evaluated
 %
 % OUTPUTS
@@ -31,3 +31,16 @@ dim = size(X,1) ;
 normfact = bsxfun(@power,(2*pi),(dim/2)) ;
 foo = S\(bsxfun(@minus,X,mu)) ;
 density = exp(-0.5*sum(foo.*foo)')./abs((normfact*prod(diag(S)))) + 1e-99 ;
+
+%@test:1
+%$ x=[2.3;0.34;0.87];
+%$ x=[2.3;0.34;0.87];
+%$ mu=zeros(3,1);
+%$ Sigma=[1 0.5 0; 0.5 1 0; 0 0 0.05];
+%$ L=chol(Sigma,"lower");
+%$ pdf1=probability2(mu,L,x);
+%$ pdf2=mvnpdf(x,mu,Sigma);
+% Check results.
+%$ t(1) = dassert(pdf1,pdf2,1e-10);
+%$ T = all(t);
+%@eof:2
