@@ -105,7 +105,7 @@ if init
     end
 
     irestrictions = 1:Nsam;
-    [h,length_of_old_string]=waitbar.run(0,[],'Please wait...',options_.console_mode,0,'Sensitivity analysis for calibration criteria.');
+    [h,length_of_old_string]=wait_bar.run(0,[],'Please wait...',options_.console_mode,0,'Sensitivity analysis for calibration criteria.');
     for j=1:Nsam
         M_ = set_all_parameters(lpmat(j,:)',estim_params_,M_);
         if nbr_moment_restrictions
@@ -131,10 +131,10 @@ if init
             irestrictions(j)=0;
         end
         if mod(j,3)==0
-            [~,length_of_old_string]=waitbar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)],options_.console_mode,length_of_old_string);
+            [~,length_of_old_string]=wait_bar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)],options_.console_mode,length_of_old_string);
         end
     end
-    waitbar.close(h,options_.console_mode);
+    wait_bar.close(h,options_.console_mode);
 
     irestrictions=irestrictions(find(irestrictions));
     xmat=lpmat(irestrictions,:);

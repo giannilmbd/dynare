@@ -37,8 +37,8 @@ function [pdraws, STO_REDUCEDFORM, STO_MOMENTS, STO_DYNAMIC, STO_si_dDYNAMIC, ST
 % This function calls
 %    * checkpath
 %    * identification.display
-%    * waitbar.run
-%    * waitbar.close
+%    * wait_bar.run
+%    * wait_bar.close
 %    * get_all_parameters
 %    * get_posterior_parameters
 %    * get_the_name
@@ -533,7 +533,7 @@ if iload <=0
     if SampleSize > 1
         % initializations for Monte Carlo Analysis
         fprintf('\nMonte Carlo Testing\n');
-        [h, length_of_old_string] = waitbar.run(0,[],'Monte Carlo identification checks ...', options_.console_mode, 0,'Monte Carlo Identification Analysis.');
+        [h, length_of_old_string] = wait_bar.run(0,[],'Monte Carlo identification checks ...', options_.console_mode, 0,'Monte Carlo Identification Analysis.');
 
         iteration  = 0; % initialize counter for admissable draws
         run_index  = 0; % initialize counter for admissable draws after saving previous draws to file(s)
@@ -748,13 +748,13 @@ if iload <=0
                 run_index = 0; % reset index
             end
             if SampleSize > 1 && mod(iteration,3)
-                [~, length_of_old_string] = waitbar.run(iteration/SampleSize, h, ['MC identification checks ', int2str(iteration), '/', int2str(SampleSize)], options_.console_mode, length_of_old_string);
+                [~, length_of_old_string] = wait_bar.run(iteration/SampleSize, h, ['MC identification checks ', int2str(iteration), '/', int2str(SampleSize)], options_.console_mode, length_of_old_string);
             end
         end
     end
 
     if SampleSize > 1
-        waitbar.close(h,options_.console_mode);
+        wait_bar.close(h,options_.console_mode);
         normalize_STO_DYNAMIC = std(STO_DYNAMIC,0,2);
         if ~options_MC.no_identification_reducedform
             normalize_STO_REDUCEDFORM = std(STO_REDUCEDFORM,0,2);

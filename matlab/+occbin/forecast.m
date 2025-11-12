@@ -80,7 +80,7 @@ end
 
 if opts.replic
     options_.noprint=true;
-    [h,length_of_old_string] = waitbar.run(0, [], 'Please wait. OccBin forecast replic...', options_.console_mode, 0, 'OccBin forecasts.');
+    [h,length_of_old_string] = wait_bar.run(0, [], 'Please wait. OccBin forecast replic...', options_.console_mode, 0, 'OccBin forecasts.');
 
     ishock = find(sqrt(diag((M_.Sigma_e))));
     options_.occbin.simul.exo_pos=ishock;
@@ -115,9 +115,9 @@ if opts.replic
                 save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag','out','shocks_base')
             end
         end
-        [~,length_of_old_string]=waitbar.run(iter/opts.replic,h,['OccBin MC forecast replic ',int2str(iter),'/',int2str(opts.replic)],options_.console_mode,length_of_old_string);
+        [~,length_of_old_string]=wait_bar.run(iter/opts.replic,h,['OccBin MC forecast replic ',int2str(iter),'/',int2str(opts.replic)],options_.console_mode,length_of_old_string);
     end
-    waitbar.close(h,options_.console_mode);
+    wait_bar.close(h,options_.console_mode);
     if options_.debug
          save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag')
     end

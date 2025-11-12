@@ -144,7 +144,7 @@ if whoiam
     ifil=ifil(:,whoiam);
 end
 waitbar_string=['Taking ',type,' subdraws...'];
-[h, length_of_old_string] = waitbar.run(0, [], waitbar_string, options_.console_mode, 0, 'Prior/posterior objects.', whoiam,Parallel(ThisMatlab));
+[h, length_of_old_string] = wait_bar.run(0, [], waitbar_string, options_.console_mode, 0, 'Prior/posterior objects.', whoiam,Parallel(ThisMatlab));
 
 if RemoteFlag==1
     OutputFileName_smooth = {};
@@ -540,7 +540,7 @@ for b=fpar:B
         irun(irun_index) = 1;
     end
     if mod(b-fpar+1, 5)==0
-        [~,length_of_old_string]=waitbar.run((b-fpar+1)/(B-fpar+1),h,waitbar_string, options_.console_mode, length_of_old_string,[],whoiam,Parallel(ThisMatlab));
+        [~,length_of_old_string]=wait_bar.run((b-fpar+1)/(B-fpar+1),h,waitbar_string, options_.console_mode, length_of_old_string,[],whoiam,Parallel(ThisMatlab));
     end
 end
 
@@ -562,7 +562,7 @@ if RemoteFlag==1
                         OutputFileName_state_uncert];
 end
 
-waitbar.close(h,options_.console_mode);
+wait_bar.close(h,options_.console_mode);
 
 
 function yf=simulate_posterior_forecasts(y0,dr,horizon,stochastic_indicator,Sigma_e,n)

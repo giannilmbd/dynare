@@ -1,14 +1,14 @@
 function [cancel,figh] = multi( label, varargin )
-%waitbar.multi: add, remove or update an entry on the multi waitbar
+%wai_tbar.multi: add, remove or update an entry on the multi waitbar
 %
-%   waitbar.multi(TAG,VALUE) adds a waitbar for the specified label, or
+%   wait_bar.multi(TAG,VALUE) adds a waitbar for the specified label, or
 %   if it already exists updates the value. TAG must be a string and
 %   VALUE a number between zero and one or the string 'Close' to remove the
 %   entry Setting value equal to 0 or 'Reset' will cause the progress bar
 %   to reset and the time estimate to be re-initialized.
 %
-%   waitbar.multi(TAG,COMMAND,VALUE,...)  or
-%   waitbar.multi(TAG,VALUE,COMMAND,VALUE,...)
+%   wait_bar.multi(TAG,COMMAND,VALUE,...)  or
+%   wait_bar.multi(TAG,VALUE,COMMAND,VALUE,...)
 %   passes one or more command/value pairs for changing the named waitbar
 %   entry. Possible commands include:
 %   'Value'       Set the value of the named waitbar entry. The
@@ -32,7 +32,7 @@ function [cancel,figh] = multi( label, varargin )
 %                 bounces back and forth. Return to normal progress display
 %                 using the 'Reset' command.
 %
-%   cancel = waitbar.multi(LABEL,VALUE) also returns whether the user has
+%   cancel = wait_bar.multi(LABEL,VALUE) also returns whether the user has
 %   clicked the "cancel" button for this entry (true or false). Two
 %   mechanisms are provided for cancelling an entry if the 'CanCancel'
 %   setting is 'on'. The first is just to check the return argument and if
@@ -41,25 +41,25 @@ function [cancel,figh] = multi( label, varargin )
 %   MATLAB's built-in WAITBAR. In either case, you can use the
 %   'ResetCancel' command if you don't want to cancel after all.
 %
-%   waitbar.multi('CLOSEALL') closes the waitbar window.
+%   wait_bar.multi('CLOSEALL') closes the waitbar window.
 %
 %   Example:
-%   waitbar.multi( 'CloseAll' );
-%   waitbar.multi( 'Task 1', 0 );
-%   waitbar.multi( 'Task 2', 0.5, 'Color', 'b' );
-%   waitbar.multi( 'Task 3', 'Busy');
-%   waitbar.multi( 'Task 1', 'Value', 0.1 );
-%   waitbar.multi( 'Task 2', 'Increment', 0.2 );
-%   waitbar.multi( 'Task 3', 'Reset' ); % Disables "busy" mode
-%   waitbar.multi( 'Task 3', 'Value', 0.3 );
-%   waitbar.multi( 'Task 2', 'Close' );
-%   waitbar.multi( 'Task 3', 'Close' );
-%   waitbar.multi( 'Task 1', 'Close' );
+%   wait_bar.multi( 'CloseAll' );
+%   wait_bar.multi( 'Task 1', 0 );
+%   wait_bar.multi( 'Task 2', 0.5, 'Color', 'b' );
+%   wait_bar.multi( 'Task 3', 'Busy');
+%   wait_bar.multi( 'Task 1', 'Value', 0.1 );
+%   wait_bar.multi( 'Task 2', 'Increment', 0.2 );
+%   wait_bar.multi( 'Task 3', 'Reset' ); % Disables "busy" mode
+%   wait_bar.multi( 'Task 3', 'Value', 0.3 );
+%   wait_bar.multi( 'Task 2', 'Close' );
+%   wait_bar.multi( 'Task 3', 'Close' );
+%   wait_bar.multi( 'Task 1', 'Close' );
 %
 %   Example:
-%   waitbar.multi( 'Task 1', 0, 'CancelFcn', @(a,b) disp( ['Cancel ',a] ) );
+%   wait_bar.multi( 'Task 1', 0, 'CancelFcn', @(a,b) disp( ['Cancel ',a] ) );
 %   for ii=1:100
-%      abort = waitbar.multi( 'Task 1', ii/100 );
+%      abort = wait_bar.multi( 'Task 1', ii/100 );
 %      if abort
 %         % Here we would normally ask the user if they're sure
 %         break
@@ -67,17 +67,17 @@ function [cancel,figh] = multi( label, varargin )
 %         pause( 1 )
 %      end
 %   end
-%   waitbar.multi( 'Task 1', 'Close' )
+%   wait_bar.multi( 'Task 1', 'Close' )
 %
 %   Example:
-%   waitbar.multi( 'CloseAll' );
-%   waitbar.multi( 'Red...',    7/7, 'Color', [0.8 0.0 0.1] );
-%   waitbar.multi( 'Orange...', 6/7, 'Color', [1.0 0.4 0.0] );
-%   waitbar.multi( 'Yellow...', 5/7, 'Color', [0.9 0.8 0.2] );
-%   waitbar.multi( 'Green...',  4/7, 'Color', [0.2 0.9 0.3] );
-%   waitbar.multi( 'Blue...',   3/7, 'Color', [0.1 0.5 0.8] );
-%   waitbar.multi( 'Indigo...', 2/7, 'Color', [0.4 0.1 0.5] );
-%   waitbar.multi( 'Violet...', 1/7, 'Color', [0.8 0.4 0.9] );
+%   wait_bar.multi( 'CloseAll' );
+%   wait_bar.multi( 'Red...',    7/7, 'Color', [0.8 0.0 0.1] );
+%   wait_bar.multi( 'Orange...', 6/7, 'Color', [1.0 0.4 0.0] );
+%   wait_bar.multi( 'Yellow...', 5/7, 'Color', [0.9 0.8 0.2] );
+%   wait_bar.multi( 'Green...',  4/7, 'Color', [0.2 0.9 0.3] );
+%   wait_bar.multi( 'Blue...',   3/7, 'Color', [0.1 0.5 0.8] );
+%   wait_bar.multi( 'Indigo...', 2/7, 'Color', [0.4 0.1 0.5] );
+%   wait_bar.multi( 'Violet...', 1/7, 'Color', [0.8 0.4 0.9] );
 
 %   Based on the work by Ben Tordoff
 %

@@ -144,8 +144,8 @@ if ~isoctave && PCTInstalled && ~isempty(gcp('nocreate'))
     refresh_rate = sampler_options.parallel_bar_refresh_rate;
 
     % Close all multiwaitbars (if any) and ensure cleanup
-    waitbar.multi('CloseAll');
-    cleanupObj = onCleanup(@() waitbar.multi('CloseAll'));
+    wait_bar.multi('CloseAll');
+    cleanupObj = onCleanup(@() wait_bar.multi('CloseAll'));
 
     % Launch parallel Jobs    
     block_iter = 0;
@@ -219,7 +219,7 @@ if ~isoctave && PCTInstalled && ~isempty(gcp('nocreate'))
         end
 
         % Remove waitbar
-        waitbar.multi(['Chain', int2str(curr_block)], 'Close');
+        wait_bar.multi(['Chain', int2str(curr_block)], 'Close');
 
     end % End of the loop over the mh-blocks.
    
@@ -237,11 +237,11 @@ else % Run in serial as usual
             refresh_rate = sampler_options.parallel_bar_refresh_rate;
             bar_title = sampler_options.parallel_bar_title;
             prc0=(curr_block-fblck)/(nblck-fblck+1)*(isoctave() || options_.console_mode);
-            [hh_fig, length_of_old_string]= waitbar.run(prc0,[],sprintf(Label,bar_title, '...'),options_.console_mode,0, [], whoiam,options_.parallel(ThisMatlab));
+            [hh_fig, length_of_old_string]= wait_bar.run(prc0,[],sprintf(Label,bar_title, '...'),options_.console_mode,0, [], whoiam,options_.parallel(ThisMatlab));
         else
             refresh_rate = sampler_options.serial_bar_refresh_rate;
             bar_title = sampler_options.serial_bar_title;
-            [hh_fig, length_of_old_string] = waitbar.run(0, [], sprintf(Label,bar_title, '...'), options_.console_mode, 0, bar_title, whoiam);
+            [hh_fig, length_of_old_string] = wait_bar.run(0, [], sprintf(Label,bar_title, '...'), options_.console_mode, 0, bar_title, whoiam);
         end
         hh_fig.UserData = sprintf(Label,bar_title, ' %s');
 
@@ -280,7 +280,7 @@ else % Run in serial as usual
             refresh_rate, ...
             false, ...
             hh_fig, ...
-            whoiam,options_.parallel(ThisMatlab),length_of_old_string); %potential inputs for waitbar.run
+            whoiam,options_.parallel(ThisMatlab),length_of_old_string); %potential inputs for wait_bar.run
 
         % Reconcile
         record.LastParameters(curr_block,:) = LastParameters;
@@ -298,7 +298,7 @@ else % Run in serial as usual
             draw_index_current_file = draw_index_current_file_i;
         end
 
-        waitbar.close(hh_fig,options_.console_mode);
+        wait_bar.close(hh_fig,options_.console_mode);
 
     end % End of the loop over the mh-blocks.
 
@@ -324,7 +324,7 @@ function [accepted_draws_this_chain, feval_this_chain, draw_iter, ...
 %   - See parent function for most of them
 %   - UseParallel (true/false) whether to use Parallel Computing Toolbox or
 %   not
-%   - q either the queue or the waitbar.run figure
+%   - q either the queue or the wait_bar.run figure
 
 curr_block_str = int2str(curr_block);
 
@@ -419,7 +419,7 @@ while draw_iter <= nruns_cb
         if UseParallel
             send(q, struct('Initialize', false, 'Block', curr_block_str, 'Text', txt, 'Value', prtfrc))
         else
-            [~, length_of_old_string]=waitbar.run(prtfrc, q, sprintf(q.UserData, txt),options_.console_mode,length_of_old_string,[],whoiam,Parallel_structure);
+            [~, length_of_old_string]=wait_bar.run(prtfrc, q, sprintf(q.UserData, txt),options_.console_mode,length_of_old_string,[],whoiam,Parallel_structure);
         end
 
         if save_tmp_file
@@ -489,9 +489,9 @@ bar_title = sampler_options.parallel_bar_title;
 LabelBase = [bar_title ' ('  task.Block '/' int2str(options_.mh_nblck) ')'];
 Name = ['Chain ', task.Block];
 if task.Initialize    
-    waitbar.multi(Name, 0, 'Color', 'b', 'Relabel', [LabelBase, '...'], 'CanCancel', 'on', 'CancelFcn', @(s,e) cancelAllFutures());
+    wait_bar.multi(Name, 0, 'Color', 'b', 'Relabel', [LabelBase, '...'], 'CanCancel', 'on', 'CancelFcn', @(s,e) cancelAllFutures());
 else
-    waitbar.multi(Name, task.Value, 'Relabel', [LabelBase, ' ', task.Text]);
+    wait_bar.multi(Name, task.Value, 'Relabel', [LabelBase, ' ', task.Text]);
 end
 end
 
