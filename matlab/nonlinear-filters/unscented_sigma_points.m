@@ -1,16 +1,22 @@
 function [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
 % [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
-%
-% Computes nodes and weights for a scaled unscented transform cubature
+% Computes nodes and weights for a scaled unscented transform cubature,
+% i.e. compute the nodes and weights for a second-order accurate propagtion
+% of a Gaussian variable through a nonlinear function
+% 
 % INPUTS
 %    n                  [integer]   scalar, number of variables.
 %
 % OUTPUTS
 %    nodes          [double]    nodes of the cubature
-%    weights        [double]    associated weights
+%    W_m            [double]    associated weights for the mean
+%    W_c            [double]    associated weights for the covariance
 %
 % REFERENCES
-%
+%    Formulas follow the ones in Wan/van der Merwe (2001): "The unscented
+%    Kalman filter", in Haykin (editor): Kalman Filtering and Neural
+%    Networks, Chapter 7, p. 221-280.
+% 
 % NOTES
 
 % Copyright © 2009-2025 Dynare Team
@@ -30,10 +36,11 @@ function [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-lambda = (ParticleOptions.unscented.alpha^2)*(n+ParticleOptions.unscented.kappa) - n ;
-nodes = [ zeros(n,1) ( sqrt(n+lambda).*([ eye(n) -eye(n)]) ) ]' ;
-W_m = lambda/(n+lambda) ;
-W_c = W_m + (1-ParticleOptions.unscented.alpha^2+ParticleOptions.unscented.beta) ;
+lambda = (ParticleOptions.unscented.alpha^2)*(n+ParticleOptions.unscented.kappa) - n ; %below (7.30)
+nodes = [zeros(n,1)  sqrt(n+lambda).*[eye(n) -eye(n)]]' ; %prefactor befor P_x in (7.30) 
+% Implement weights from (7.34)
+W_m = lambda/(n+lambda);
+W_c = W_m + (1-ParticleOptions.unscented.alpha^2+ParticleOptions.unscented.beta);
 temp = ones(2*n,1)/(2*(n+lambda)) ;
 W_m = [W_m ; temp] ;
 W_c = [W_c ; temp] ;
