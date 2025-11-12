@@ -97,8 +97,8 @@ function [MEAN, dMEAN, REDUCEDFORM, dREDUCEDFORM, DYNAMIC, dDYNAMIC, MOMENTS, dM
 %   * identification.numerical_objective (previously thet2tau)
 %   * pruned_state_space_system
 %   * vec
-% =========================================================================
-% Copyright © 2010-2020 Dynare Team
+
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -114,7 +114,6 @@ function [MEAN, dMEAN, REDUCEDFORM, dREDUCEDFORM, DYNAMIC, dDYNAMIC, MOMENTS, dM
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
 
 %get fields from options_ident
 no_identification_moments   = options_ident.no_identification_moments;
@@ -155,11 +154,11 @@ d2flag          = 0; % do not compute second parameter derivatives
 % Get Jacobians (wrt selected params) of steady state, dynamic model derivatives and perturbation solution matrices for all endogenous variables
 dr.derivs = identification.get_perturbation_params_derivs(M_, options_, estim_params, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indpmodel, indpstderr, indpcorr, d2flag);
 
-[I,~] = find(lead_lag_incidence'); %I is used to select nonzero columns of the Jacobian of endogenous variables in dynamic model files
-yy0 = dr.ys(I);           %steady state of dynamic (endogenous and auxiliary variables) in lead_lag_incidence order
+yy0 = repmat(dr.ys, 3, 1);           %steady state of dynamic (endogenous and auxiliary variables) in lead_lag_incidence order
 Yss = dr.ys(dr.order_var); % steady state in DR order
 if order == 1
-    [~, g1 ] = feval([fname,'.dynamic'], yy0, exo_steady_state', params, dr.ys, 1);
+    g1 = feval([fname,'.sparse.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    g1 = identification.legacy_dynamic_g1(g1, M_);
     %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
     DYNAMIC = [Yss;
                vec(g1)]; %add steady state and put rows of g1 in DR order
@@ -176,7 +175,11 @@ if order == 1
     dREDUCEDFORM = [ [zeros(endo_nbr, stderrparam_nbr+corrparam_nbr) dr.derivs.dYss]; dREDUCEDFORM ]; % add steady state
 
 elseif order == 2
-    [~, g1, g2 ] = feval([fname,'.dynamic'], yy0, exo_steady_state', params, dr.ys, 1);
+    [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    g2_v = feval([fname,'.sparse.dynamic_g2'], yy0, exo_steady_state', params, dr.ys, T, T_order);
+    g1 = identification.legacy_dynamic_g1(g1, M_);
+    g2 = identification.legacy_dynamic_g2(g2_v, M_);
+
     %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
     %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
     DYNAMIC = [Yss;
@@ -203,7 +206,12 @@ elseif order == 2
     end
     dREDUCEDFORM = [ [zeros(endo_nbr, stderrparam_nbr+corrparam_nbr) dr.derivs.dYss]; dREDUCEDFORM ]; % add steady state
 elseif order == 3
-    [~, g1, g2, g3 ] = feval([fname,'.dynamic'], yy0, exo_steady_state', params, dr.ys, 1);
+    [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    [g2_v, T, T_order] = feval([fname,'.sparse.dynamic_g2'], yy0, exo_steady_state', params, dr.ys, T, T_order);
+    g3_v = feval([fname,'.sparse.dynamic_g3'], yy0, exo_steady_state', params, dr.ys, T, T_order);
+    g1 = identification.legacy_dynamic_g1(g1, M_);
+    g2 = identification.legacy_dynamic_g2(g2_v, M_);
+    g3 = identification.legacy_dynamic_g3(g3_v, M_);
     %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
     %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
     DYNAMIC = [Yss;

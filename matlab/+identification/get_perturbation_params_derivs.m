@@ -109,8 +109,8 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 %   * sylvester3
 %   * sylvester3a
 %   * get_perturbation_params_derivs_numerical_objective
-% =========================================================================
-% Copyright © 2019-2024 Dynare Team
+
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -126,7 +126,7 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
+
 % Get fields from M_
 Correlation_matrix = M_.Correlation_matrix;
 dname              = M_.dname;
@@ -199,7 +199,7 @@ stderrparam_nbr = length(indpstderr); %number of selected stderr parameters
 corrparam_nbr   = size(indpcorr,1);   %number of selected corr parameters
 totparam_nbr    = modparam_nbr + stderrparam_nbr + corrparam_nbr; %total number of selected parameters
 [I,~]           = find(lead_lag_incidence');                      %I is used to select nonzero columns of the Jacobian of endogenous variables in dynamic model files
-yy0_nbr         = length(ys(I));                                  %number of dynamic variables
+yy0_nbr         = nspred + endo_nbr + M_.nsfwrd;                  %number of dynamic variables
 yy0ex0_nbr      = yy0_nbr+exo_nbr;                                %number of dynamic variables + exogenous variables
 kyy0            = nonzeros(lead_lag_incidence(:,order_var)');     %index for nonzero entries in dynamic files at t-1,t,t+1 in DR order
 kyy0ex0         = [kyy0; length(kyy0)+(1:exo_nbr)'];              %dynamic files include derivatives wrt exogenous variables, note that exo_det is always 0
@@ -393,13 +393,17 @@ if analytic_derivation_mode == -2
 %% Numerical two-sided finite difference method to compute parameter derivatives of steady state and dynamic model,
 % i.e. dYss, dg1, dg2, dg3 as well as d2Yss, d2g1 numerically.
 % The parameter derivatives of perturbation solution matrices are computed analytically below (analytic_derivation_mode=0)
+    y3n = repmat(ys, 3, 1);
+    [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], y3n, exo_steady_state', params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    g1 = identification.legacy_dynamic_g1(g1, M_);
+    if order >= 2
+        [g2_v, T, T_order] = feval([fname,'.sparse.dynamic_g2'], y3n, exo_steady_state', params, ys, T, T_order);
+        g2 = identification.legacy_dynamic_g2(g2_v, M_);
+    end
     if order == 3
-        [~, g1, g2, g3] = feval([fname,'.dynamic'], ys(I), exo_steady_state', params, ys, 1);
+        g3_v = feval([fname,'.sparse.dynamic_g3'], y3n, exo_steady_state', params, ys, T, T_order);
+        g3 = identification.legacy_dynamic_g3(g3_v, M_);
         g3 = identification.unfold_g3(g3, yy0ex0_nbr);
-    elseif order == 2
-        [~, g1, g2] = feval([fname,'.dynamic'], ys(I), exo_steady_state', params, ys, 1);
-    elseif order == 1
-        [~, g1] = feval([fname,'.dynamic'], ys(I), exo_steady_state', params, ys, 1);
     end
 
     if d2flag
@@ -462,22 +466,19 @@ elseif (analytic_derivation_mode == 0 || analytic_derivation_mode == 1)
     if d2flag
         g2_static_v = feval([fname,'.sparse.static_g2'], ys, exo_steady_state', params, T_order_static, T_static);
         g2_static = build_two_dim_hessian(M_.static_g2_sparse_indices, g2_static_v, endo_nbr, endo_nbr); %g2_static is [endo_nbr by endo_nbr^2] second derivative (wrt all endogenous variables) of static model equations f, i.e. d(df/dys)/dys, in declaration order
-        if order < 3
-            [~, g1, g2, g3] = feval([fname,'.dynamic'], ys(I), exo_steady_state', params, ys, 1); %note that g3 does not contain symmetric elements
-            g3 = identification.unfold_g3(g3, yy0ex0_nbr); %add symmetric elements to g3
-        else
-            T  = NaN(sum(dynamic_tmp_nbr(1:5)));
-            T  = feval([fname, '.dynamic_g4_tt'], T, ys(I), exo_steady_state', params, ys, 1);
-            g1 = feval([fname, '.dynamic_g1'],    T, ys(I), exo_steady_state', params, ys, 1, false); %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-            g2 = feval([fname, '.dynamic_g2'],    T, ys(I), exo_steady_state', params, ys, 1, false); %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-            g3 = feval([fname, '.dynamic_g3'],    T, ys(I), exo_steady_state', params, ys, 1, false); %note that g3 does not contain symmetric elements
-            g4 = feval([fname, '.dynamic_g4'],    T, ys(I), exo_steady_state', params, ys, 1, false); %note that g4 does not contain symmetric elements
-            g3 = identification.unfold_g3(g3, yy0ex0_nbr); %add symmetric elements to g3, %g3 is [endo_nbr by yy0ex0_nbr^3] third-derivative (wrt all dynamic variables) of dynamic model equations, i.e. (d(df/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        y3n = repmat(ys, 3, 1);
+        [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], y3n, exo_steady_state', params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+        g1 = identification.legacy_dynamic_g1(g1, M_); %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        [g2_v, T, T_order] = feval([fname,'.sparse.dynamic_g2'], y3n, exo_steady_state', params, ys, T, T_order);
+        g2 = identification.legacy_dynamic_g2(g2_v, M_); %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        [g3_v, T, T_order] = feval([fname,'.sparse.dynamic_g3'], y3n, exo_steady_state', params, ys, T, T_order);
+        g3 = identification.legacy_dynamic_g3(g3_v, M_); %note that g3 does not contain symmetric elements
+        g3 = identification.unfold_g3(g3, yy0ex0_nbr); %add symmetric elements to g3, %g3 is [endo_nbr by yy0ex0_nbr^3] third-derivative (wrt all dynamic variables) of dynamic model equations, i.e. (d(df/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        if order == 3
+            g4_v = feval([fname,'.sparse.dynamic_g4'], y3n, exo_steady_state', params, ys, T, T_order);
+            g4 = identification.legacy_dynamic_g4(g4_v, M_);
             g4 = identification.unfold_g4(g4, yy0ex0_nbr); %add symmetric elements to g4, %g4 is [endo_nbr by yy0ex0_nbr^4] fourth-derivative (wrt all dynamic variables) of dynamic model equations, i.e. ((d(df/dyy0ex0)/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
         end
-        %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-        %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-        %g3 is [endo_nbr by yy0ex0_nbr^3] third-derivative (wrt all dynamic variables) of dynamic model equations, i.e. (d(df/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
         [~, g1p_static, rpp_static] = feval([fname,'.static_params_derivs'], ys, exo_steady_state', params);
         %g1p_static is [endo_nbr by endo_nbr by param_nbr] first derivative (wrt all model parameters) of first-derivative (wrt all endogenous variables) of static model equations f, i.e. (df/dys)/dparams, in declaration order
         %rpp_static is [#second_order_residual_terms by 4] and contains nonzero values and corresponding indices of second derivatives (wrt all model parameters) of static model equations f, i.e. d(df/dparams)/dparams, in declaration order, where
@@ -533,34 +534,34 @@ elseif (analytic_derivation_mode == 0 || analytic_derivation_mode == 1)
         %g1pp are nonzero values and corresponding indices of second-derivatives (wrt all model parameters) of first-derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(d(df/dyy0ex0)/dparam)/dparam, rows are in declaration order, first column in declaration order
         d2Yss = d2ys(order_var,indpmodel,indpmodel); %[endo_nbr by mod_param_nbr by mod_param_nbr], put into DR order and focus only on selected model parameters
     else
+        y3n = repmat(ys, 3, 1);
+        [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], y3n, exo_steady_state', params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+        g1 = identification.legacy_dynamic_g1(g1, M_); %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        [g2_v, T, T_order] = feval([fname,'.sparse.dynamic_g2'], y3n, exo_steady_state', params, ys, T, T_order);
+        g2 = identification.legacy_dynamic_g2(g2_v, M_); %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        if order >= 2
+            [g3_v, T, T_order] = feval([fname,'.sparse.dynamic_g3'], y3n, exo_steady_state', params, ys, T, T_order);
+            g3 = identification.legacy_dynamic_g3(g3_v, M_); %note that g3 does not contain symmetric elements
+            g3 = identification.unfold_g3(g3, yy0ex0_nbr); %add symmetric elements to g3, %g3 is [endo_nbr by yy0ex0_nbr^3] third-derivative (wrt all dynamic variables) of dynamic model equations, i.e. (d(df/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        end
+        if order == 3
+            g4_v = feval([fname,'.sparse.dynamic_g4'], y3n, exo_steady_state', params, ys, T, T_order);
+            g4 = identification.legacy_dynamic_g4(g4_v, M_);
+            g4 = identification.unfold_g4(g4, yy0ex0_nbr); %add symmetric elements to g4, %g4 is [endo_nbr by yy0ex0_nbr^4] fourth-derivative (wrt all dynamic variables) of dynamic model equations, i.e. ((d(df/dyy0ex0)/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
+        end
+
         if order == 1
             [~, g1p] = feval([fname,'.dynamic_params_derivs'], ys(I), exo_steady_state', params, ys, 1, dys, d2ys);
             %g1p is [endo_nbr by yy0ex0_nbr by param_nbr] first-derivative (wrt all model parameters) of first-derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dparam, rows are in declaration order, column in lead_lag_incidence order
-            [~, g1, g2 ] = feval([fname,'.dynamic'], ys(I), exo_steady_state', params, ys, 1);
-                %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-                %g2 is [endo_nbr by yy0ex0_nbr^2] second derivatives (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
         elseif order == 2
             [~, g1p, ~, ~, g2p] = feval([fname,'.dynamic_params_derivs'], ys(I), exo_steady_state', params, ys, 1, dys, d2ys);
             %g1p is [endo_nbr by yy0ex0_nbr by param_nbr] first-derivative (wrt all model parameters) of first-derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dparam, rows are in declaration order, column in lead_lag_incidence order
             %g2p are nonzero values and corresponding indices of first-derivative (wrt all model parameters) of second-derivatives (wrt all dynamic variables) of dynamic model equations, i.e. d(d(df/dyy0ex0)/dyy0ex0)/dparam, rows are in declaration order, first and second column in declaration order
-            [~, g1, g2, g3] = feval([fname,'.dynamic'], ys(I), exo_steady_state', params, ys, 1); %note that g3 does not contain symmetric elements
-            g3 = identification.unfold_g3(g3, yy0ex0_nbr); %add symmetric elements to g3
-                %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-                %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-                %g3 is [endo_nbr by yy0ex0_nbr^3] third-derivative (wrt all dynamic variables) of dynamic model equations, i.e. (d(df/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
         elseif order == 3
             [~, g1p, ~, ~, g2p, g3p] = feval([fname,'.dynamic_params_derivs'], ys(I), exo_steady_state', params, ys, 1, dys, d2ys);
             %g1p is [endo_nbr by yy0ex0_nbr by param_nbr] first-derivative (wrt all model parameters) of first-derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dparam, rows are in declaration order, column in lead_lag_incidence order
             %g2p are nonzero values and corresponding indices of first-derivative (wrt all model parameters) of second-derivatives (wrt all dynamic variables) of dynamic model equations, i.e. d(d(df/dyy0ex0)/dyy0ex0)/dparam, rows are in declaration order, first and second column in declaration order
             %g3p are nonzero values and corresponding indices of first-derivative (wrt all model parameters) of third-derivatives (wrt all dynamic variables) of dynamic model equations, i.e. d(d(d(df/dyy0ex0)/dyy0ex0)/dyy0ex0)/dparam, rows are in declaration order, first, second and third column in declaration order
-            T  = NaN(sum(dynamic_tmp_nbr(1:5)));
-            T  = feval([fname, '.dynamic_g4_tt'], T, ys(I), exo_steady_state', params, ys, 1);
-            g1 = feval([fname, '.dynamic_g1'],    T, ys(I), exo_steady_state', params, ys, 1, false); %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-            g2 = feval([fname, '.dynamic_g2'],    T, ys(I), exo_steady_state', params, ys, 1, false); %g2 is [endo_nbr by yy0ex0_nbr^2] second derivative (wrt all dynamic variables) of dynamic model equations, i.e. d(df/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-            g3 = feval([fname, '.dynamic_g3'],    T, ys(I), exo_steady_state', params, ys, 1, false); %note that g3 does not contain symmetric elements
-            g4 = feval([fname, '.dynamic_g4'],    T, ys(I), exo_steady_state', params, ys, 1, false); %note that g4 does not contain symmetric elements
-            g3 = identification.unfold_g3(g3, yy0ex0_nbr); %add symmetric elements to g3, %g3 is [endo_nbr by yy0ex0_nbr^3] third-derivative (wrt all dynamic variables) of dynamic model equations, i.e. (d(df/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
-            g4 = identification.unfold_g4(g4, yy0ex0_nbr); %add symmetric elements to g4, %g4 is [endo_nbr by yy0ex0_nbr^4] fourth-derivative (wrt all dynamic variables) of dynamic model equations, i.e. ((d(df/dyy0ex0)/dyy0ex0)/dyy0ex0)/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
         end
     end
     % Parameter Jacobian of steady state in different orderings, note dys is in declaration order

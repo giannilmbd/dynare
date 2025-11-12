@@ -33,8 +33,8 @@ function [out,info] = get_perturbation_params_derivs_numerical_objective(params,
 %   * [M_.fname,'.dynamic']
 %   * resol
 %   * dyn_vech
-% =========================================================================
-% Copyright © 2019-2020 Dynare Team
+
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -50,7 +50,6 @@ function [out,info] = get_perturbation_params_derivs_numerical_objective(params,
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
 
 %% Update stderr, corr and model parameters and compute perturbation approximation and steady state with updated parameters
 M_ = set_all_parameters(params,estim_params,M_);
@@ -86,17 +85,20 @@ end
 
 %% out = [Yss; vec(g1); vec(g2); vec(g3)]; of all endogenous variables, in DR order
 if strcmp(outputflag,'dynamic_model')
-    [I,~] = find(M_.lead_lag_incidence'); %I is used to evaluate dynamic model files
-    if options_.order == 1
-        [~, g1] = feval([M_.fname,'.dynamic'], ys(I), exo_steady_state', M_.params, ys, 1);
-        out = [Yss; g1(:)];
-    elseif options_.order == 2
-        [~, g1, g2] = feval([M_.fname,'.dynamic'], ys(I), exo_steady_state', M_.params, ys, 1);
-        out = [Yss; g1(:); g2(:)];
-    elseif options_.order == 3
-        [~, g1, g2, g3] = feval([M_.fname,'.dynamic'], ys(I), exo_steady_state', M_.params, ys, 1);
-        g3 = identification.unfold_g3(g3, length(ys(I))+M_.exo_nbr);
-        out = [Yss; g1(:); g2(:); g3(:)];
+    y3n = repmat(ys, 3, 1);
+    [g1, T, T_order] = feval([M_.fname,'.sparse.dynamic_g1'], y3n, exo_steady_state', M_.params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    g1 = identification.legacy_dynamic_g1(g1, M_);
+    out = [Yss; g1(:)];
+    if options_.order >= 2
+        [g2_v, T, T_order] = feval([M_.fname,'.sparse.dynamic_g2'], y3n, exo_steady_state', M_.params, ys, T, T_order);
+        g2 = identification.legacy_dynamic_g2(g2_v, M_);
+        out = [out; g2(:)];
+    end
+    if options_.order == 3
+        g3_v = feval([M_.fname,'.sparse.dynamic_g3'], y3n, exo_steady_state', M_.params, ys, T, T_order);
+        g3 = identification.legacy_dynamic_g3(g3_v, M_);
+        g3 = identification.unfold_g3(g3, M_.nspred + M_.endo_nbr + M_.nsfwrd + M_.exo_nbr);
+        out = [out; g3(:)];
     end
 end
 
