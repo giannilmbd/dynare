@@ -80,7 +80,7 @@ number_of_particles = ParticleOptions.number_of_particles;
 if ParticleOptions.distribution_approximation.cubature
     [nodes, weights] = spherical_radial_sigma_points(number_of_state_variables);
 elseif ParticleOptions.distribution_approximation.unscented
-    [nodes, weights] = unscented_sigma_points(number_of_state_variables, ParticleOptions);
+    [nodes, weights] = unscented_sigma_points(number_of_state_variables, ParticleOptions.unscented);
 else
     if ~ParticleOptions.distribution_approximation.montecarlo
         error('This approximation for the proposal is unknown!')
@@ -124,7 +124,7 @@ elseif ParticleOptions.mixture_structural_shocks==1
         [StructuralShocksMu, StructuralShocksWeights] = spherical_radial_sigma_points(number_of_structural_innovations);
         StructuralShocksWeights = ones(size(StructuralShocksMu, 1), 1)*StructuralShocksWeights;
     elseif ParticleOptions.proposal_approximation.unscented
-        [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions);
+        [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions.unscented);
     else
         if ~ParticleOptions.proposal_approximation.montecarlo
             error('This approximation for the proposal is unknown!')
@@ -141,7 +141,7 @@ else
         [StructuralShocksMu, StructuralShocksWeights] = spherical_radial_sigma_points(number_of_structural_innovations);
         StructuralShocksWeights = ones(size(StructuralShocksMu, 1), 1)*StructuralShocksWeights ;
     elseif ParticleOptions.proposal_approximation.unscented
-        [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions);
+        [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions.unscented);
     else
         if ~ParticleOptions.proposal_approximation.montecarlo
             error('This approximation for the proposal is unknown!')

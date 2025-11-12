@@ -1,11 +1,12 @@
-function [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
-% [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
+function [nodes,W_m,W_c] = unscented_sigma_points(n,unscented_options)
+% [nodes,W_m,W_c] = unscented_sigma_points(n,unscented_options)
 % Computes nodes and weights for a scaled unscented transform cubature,
 % i.e. compute the nodes and weights for a second-order accurate propagtion
 % of a Gaussian variable through a nonlinear function
 % 
 % INPUTS
 %    n                  [integer]   scalar, number of variables.
+%    unscented_options  [structure] hyperparameters
 %
 % OUTPUTS
 %    nodes          [double]    nodes of the cubature
@@ -36,11 +37,11 @@ function [nodes,W_m,W_c] = unscented_sigma_points(n,ParticleOptions)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-lambda = (ParticleOptions.unscented.alpha^2)*(n+ParticleOptions.unscented.kappa) - n ; %below (7.30)
+lambda = (unscented_options.alpha^2)*(n+unscented_options.kappa) - n ; %below (7.30)
 nodes = [zeros(n,1)  sqrt(n+lambda).*[eye(n) -eye(n)]]' ; %prefactor befor P_x in (7.30) 
 % Implement weights from (7.34)
 W_m = lambda/(n+lambda);
-W_c = W_m + (1-ParticleOptions.unscented.alpha^2+ParticleOptions.unscented.beta);
+W_c = W_m + (1-unscented_options.alpha^2+unscented_options.beta);
 temp = ones(2*n,1)/(2*(n+lambda)) ;
 W_m = [W_m ; temp] ;
 W_c = [W_c ; temp] ;

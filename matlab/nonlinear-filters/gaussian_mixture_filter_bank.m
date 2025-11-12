@@ -66,7 +66,7 @@ if ParticleOptions.proposal_approximation.cubature
     [nodes3, weights3] = spherical_radial_sigma_points(numb);
     weights_c3 = weights3;
 elseif ParticleOptions.proposal_approximation.unscented
-    [nodes3, weights3, weights_c3] = unscented_sigma_points(numb, ParticleOptions);
+    [nodes3, weights3, weights_c3] = unscented_sigma_points(numb, ParticleOptions.unscented);
 else
     error('This approximation for the proposal is unknown!')
 end

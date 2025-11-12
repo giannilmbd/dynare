@@ -70,7 +70,7 @@ number_of_particles = ParticleOptions.number_of_particles;
 if ParticleOptions.distribution_approximation.cubature
     [nodes2, weights2] = spherical_radial_sigma_points(number_of_state_variables);
 elseif ParticleOptions.distribution_approximation.unscented
-    [nodes2, weights2] = unscented_sigma_points(number_of_state_variables,ParticleOptions);
+    [nodes2, weights2] = unscented_sigma_points(number_of_state_variables,ParticleOptions.unscented);
 else
     if ~ParticleOptions.distribution_approximation.montecarlo
         error('This approximation for the distribution is unknown!')

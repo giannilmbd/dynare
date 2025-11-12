@@ -74,7 +74,7 @@ elseif ParticleOptions.proposal_approximation.cubature
     [nodes,weights] = spherical_radial_sigma_points(number_of_state_variables+number_of_structural_innovations);
     weights_c = weights;
 elseif ParticleOptions.proposal_approximation.unscented
-    [nodes,weights,weights_c] = unscented_sigma_points(number_of_state_variables+number_of_structural_innovations,ParticleOptions);
+    [nodes,weights,weights_c] = unscented_sigma_points(number_of_state_variables+number_of_structural_innovations,ParticleOptions.unscented);
 else
     error('Estimation: This approximation for the proposal is not implemented or unknown!')
 end
