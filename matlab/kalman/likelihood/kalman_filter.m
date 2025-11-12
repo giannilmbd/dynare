@@ -1,4 +1,5 @@
 function [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
+% [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
 % Computes the likelihood of a stationary state space model.
 
 %@info:
@@ -113,7 +114,6 @@ end
 smpl = last-start+1;
 
 % Initialize some variables.
-dF   = 1;
 isqvec = false;
 if ndims(Q)>2
     Qvec = Q;
@@ -139,17 +139,9 @@ else
     Da    = zeros(mm,k);                            % Derivative State vector.
     dlikk = zeros(smpl,k);
 
-    if Zflag==0
-        C = zeros(pp,mm);
-        for ii=1:pp, C(ii,Z(ii))=1; end         % SELECTION MATRIX IN MEASUREMENT EQ. (FOR WHEN IT IS NOT CONSTANT)
-    else
-        C=Z;
-    end
-    dC = zeros(pp,mm,k);   % either selection matrix or schur have zero derivatives
     if analytic_derivation==2
         Hess  = zeros(k,k);                             % Initialization of the Hessian
         D2a    = zeros(mm,k,k);                             % State vector.
-        d2C = zeros(pp,mm,k,k);
     else
         asy_hess=D2T;
         Hess=[];
