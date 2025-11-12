@@ -243,8 +243,7 @@ else % Run in serial as usual
             bar_title = sampler_options.serial_bar_title;
             [hh_fig, length_of_old_string] = wait_bar.run(0, [], sprintf(Label,bar_title, '...'), options_.console_mode, 0, bar_title, whoiam);
         end
-        hh_fig.UserData = sprintf(Label,bar_title, ' %s');
-
+        waitbar_title = sprintf(Label,bar_title, ' %s');
         % Compute Block
         [accepted_draws_this_chain, feval_this_chain, draw_iter, ...
             LastSeeds, OutputFileName_cb, LastParameters, LastLogPost, ...
@@ -280,7 +279,7 @@ else % Run in serial as usual
             refresh_rate, ...
             false, ...
             hh_fig, ...
-            whoiam,options_.parallel(ThisMatlab),length_of_old_string); %potential inputs for wait_bar.run
+            whoiam,options_.parallel(ThisMatlab),length_of_old_string,waitbar_title); %potential inputs for wait_bar.run
 
         % Reconcile
         record.LastParameters(curr_block,:) = LastParameters;
@@ -315,7 +314,7 @@ function [accepted_draws_this_chain, feval_this_chain, draw_iter, ...
     LastSeeds_cb, OutputFileName, LastParameters_cb, LastLogPost_cb, ...
     draw_index_current_file, NewFile_cb] = computeMHBlock(curr_block, options_, InitialSeeds_cb, BaseName, OpenOldFile_cb, NewFile_cb, ...
     InitSizeArray_cb, last_draw_cb, last_posterior_cb, objective_function, mh_bounds,dataset_, fline_cb, npar, nruns_cb, MAX_nruns, sampler_options, dataset_info, bayestopt_, estim_params_, ...
-    M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state,save_tmp_file, MetropolisFolder, ModelName, refresh_rate, UseParallel, q, whoiam, Parallel_structure, length_of_old_string)
+    M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state,save_tmp_file, MetropolisFolder, ModelName, refresh_rate, UseParallel, q, whoiam, Parallel_structure, length_of_old_string, waitbar_title)
 %COMPUTEMHBlOCK do the calculation of each block. The logic of the waitbar
 %is different depending on whether we are in serial or using pstools versus
 %using the parallel computing toolbox
@@ -419,7 +418,7 @@ while draw_iter <= nruns_cb
         if UseParallel
             send(q, struct('Initialize', false, 'Block', curr_block_str, 'Text', txt, 'Value', prtfrc))
         else
-            [~, length_of_old_string]=wait_bar.run(prtfrc, q, sprintf(q.UserData, txt),options_.console_mode,length_of_old_string,[],whoiam,Parallel_structure);
+            [~, length_of_old_string]=wait_bar.run(prtfrc, q, sprintf(waitbar_title, txt),options_.console_mode,length_of_old_string,[],whoiam,Parallel_structure);
         end
 
         if save_tmp_file
