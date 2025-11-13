@@ -172,7 +172,7 @@ while notsteady && t<=last
         QQ = R*Qvec(:,:,t+1)*transpose(R);
     end
     if isempty(d_index)
-        a = T*a;
+        a = T*a+C;
         P = T*P*transpose(T)+QQ;
     else
         % Compute the prediction error and its variance
