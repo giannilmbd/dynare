@@ -36,6 +36,13 @@ if issmc(options_)
         mean = sum(posterior.particles, 2)/length(posterior.tlogpostkernel);
         % Compute the posterior covariance
         variance = (posterior.particles-mean)*(posterior.particles-mean)'/length(posterior.tlogpostkernel);
+    elseif isdsmh(options_)
+        % Load draws from the posterior distribution
+        posterior = load(sprintf('%s/dsmh/parameters_particles_final.mat', M_.dname));
+        % Compute the posterior mean
+        mean = sum(posterior.particles, 2)/length(posterior.tlogpostkernel);
+        % Compute the posterior covariance
+        variance = (posterior.particles-mean)*(posterior.particles-mean)'/length(posterior.tlogpostkernel);
     elseif isonline(options_)
         posterior = load(sprintf('%s/online/parameters_particles_final.mat', M_.dname));
         % Compute the posterior mean

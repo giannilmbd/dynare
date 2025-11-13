@@ -1836,7 +1836,10 @@ mod_and_m_tests = [
   { 'test' : [ 'ecb/pooled_fgls/test_param_names.mod' ] },
 
   # Particle files
-  { 'test' : [ 'particle/dsge_base2.mod' ],
+  { 'test' : [ 'particle/dsge_base2.mod',
+               'particle/dsge_base_DSMH.mod',
+               'particle/dsge_base_HSSMC.mod',
+               'particle/dsge_base_Liu_West.mod'],
     'extra' : [ 'particle/risky.m',
                 'particle/extreme.m',
                 'particle/benchmark.m',

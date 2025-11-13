@@ -34,6 +34,8 @@ if ~issmc(options_)
 else
     if ishssmc(options_)
         folder_name='hssmc';
+    elseif isdsmh(options_)
+        folder_name='dsmh';
     elseif isdime(options_)
         folder_name='dime';
     elseif isonline(options_)

@@ -1,11 +1,12 @@
-function dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
-% dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+function mdd = dsmh(objective_function, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
+% function mdd = dsmh(objective_function, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_)
 % Dynamic Striated Metropolis-Hastings algorithm.
+% based on Waggoner/Wu/Zha (2016): "Striated Metropolis–Hastings sampler for high-dimensional models,"
+% Journal of Econometrics, 192(2): 406-420, https://doi.org/10.1016/j.jeconom.2016.02.007
 %
 % INPUTS
 %   o objective_function  [char]     string specifying the name of the objective
 %                           function (posterior kernel).
-%   o xparam1    [double]   (p*1) vector of parameters to be estimated (initial values).
 %   o mh_bounds  [double]   (p*2) matrix defining lower and upper bounds for the parameters.
 %   o dataset_              data structure
 %   o dataset_info          dataset info structure
@@ -17,7 +18,6 @@ function dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, op
 %
 % SPECIAL REQUIREMENTS
 %   None.
-%
 % PARALLEL CONTEXT
 % The most computationally intensive part of this function may be executed
 % in parallel. The code suitable to be executed in
@@ -32,8 +32,7 @@ function dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, op
 % functions have been parallelized using the same methodology.
 % Then the comments write here can be used for all the other pairs of
 % parallel functions and also for management functions.
-
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2024 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -50,118 +49,71 @@ function dsmh(objective_function, xparam1, mh_bounds, dataset_, dataset_info, op
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-opts = options_.posterior_sampler_options.dsmh;
+opts = options_.posterior_sampler_options.current_options;
 
-lambda = exp(bsxfun(@minus,options_.posterior_sampler_options.dsmh.H,1:1:options_.posterior_sampler_options.dsmh.H)/(options_.posterior_sampler_options.dsmh.H-1)*log(options_.posterior_sampler_options.dsmh.lambda1));
+% Set location for the simulated particles.
+SimulationFolder = CheckPath('dsmh', M_.dname);
+%delete old stale files before creating new ones
+delete_stale_file(sprintf('%s%sparticles-*.mat', SimulationFolder,filesep))
+
+% Define prior distribution
+Prior = dprior(bayestopt_, options_.prior_trunc);
+
+% Set function handle for the objective
+eval(sprintf('%s = @(x) %s(x, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, mh_bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);', 'funobj', func2str(objective_function)));
+
+lambda = exp(bsxfun(@minus,opts.H,1:1:opts.H)/(opts.H-1)*log(opts.lambda1));
 c = 0.055 ;
-MM = int64(options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_options.dsmh.G/10) ;
+MM = int64(opts.N*opts.G/10) ;
 
 % Step 0: Initialization of the sampler
-[param, tlogpost_iminus1, loglik, bayestopt_] = ...
-    smc_samplers_initialization(objective_function, 'dsmh', opts.particles, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
+[param, tlogpost_iminus1, loglik] = ...
+    smc_samplers_initialization(funobj, 'dsmh', opts.particles, Prior, SimulationFolder, opts.H) ;
 
-ESS = zeros(options_.posterior_sampler_options.dsmh.H,1) ;
-zhat = 1 ;
+ESS = zeros(opts.H,1) ;
+zhat = 0 ;
 
 % The DSMH starts here
-for i=2:options_.posterior_sampler_options.dsmh.H
-    disp('');
-    disp('Tempered iteration');
-    disp(i) ;
+dprintf('#Iter.       lambda         ESS                 c     Accept. rate       scale      resample    seconds')
+for i=2:opts.H
+    t0 = tic;
     % Step 1: sort the densities and compute IS weights
-    [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1,loglik,param) ;
-    [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param,tlogpost_iminus1,loglik,lambda,i,zhat,ESS) ;
+    [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1, loglik,param) ;
+    [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param, tlogpost_iminus1, loglik, lambda, i, zhat, ESS) ;
     % Step 2: tune c_i
-    c = tune_c(objective_function,param,tlogpost_i,lambda,i,c,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+    [c,acpt] = tune_c(funobj, param, tlogpost_i, lambda, i, c, Omegachol, weights, mh_bounds, opts, Prior) ;
     % Step 3: Metropolis step
-    [param,tlogpost_iminus1,loglik] = mutation_DSMH(objective_function,param,tlogpost_i,tlogpost_iminus1,loglik,lambda,i,c,MM,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+    [param,tlogpost_iminus1,loglik] = mutation_DSMH(funobj, param, tlogpost_i, tlogpost_iminus1, loglik, lambda, i, c, MM, Omegachol, weights, mh_bounds, opts, Prior) ;
+    tt = toc(t0) ;
+    dprintf('%3u          %5.4f     %9.5E         %5.4f        %5.4f        %+5.4f        %3s       %5.2f', i, lambda(i), ESS(i), c, acpt, zhat, 'no', tt)
+    %save(sprintf('%s%sparticles-%u-%u.mat', SimulationFolder, filesep(), i, opts.H), 'param', 'tlogpost', 'loglik')
 end
 
+tlogpost = tlogpost_iminus1 + loglik*(lambda(end)-lambda(end-1));
 weights = exp(loglik*(lambda(end)-lambda(end-1)));
 weights = weights/sum(weights);
-indx_resmpl = smc_resampling(weights,rand(1,1),options_.posterior_sampler_options.dsmh.particles);
-distrib_param = param(:,indx_resmpl);
+iresample = kitagawa(weights);
+particles = param(:,iresample);
+tlogpostkernel = tlogpost(iresample);
+loglikelihood = loglik(iresample);
+save(sprintf('%s%sparameters_particles_final.mat', SimulationFolder, filesep()), 'particles', 'tlogpostkernel', 'loglikelihood')
 
-mean_xparam = mean(distrib_param,2);
-npar  = length(xparam1);
-lb95_xparam = zeros(npar,1) ;
-ub95_xparam = zeros(npar,1) ;
-for i=1:npar
-    temp = sortrows(distrib_param(i,:)') ;
-    lb95_xparam(i) = temp(0.025*options_.posterior_sampler_options.dsmh.particles) ;
-    ub95_xparam(i) = temp(0.975*options_.posterior_sampler_options.dsmh.particles) ;
-end
+mdd = zhat;
 
-TeX = options_.TeX;
-
-str = sprintf(' Param. \t Lower Bound (95%%) \t Mean \t Upper Bound (95%%)');
-for l=1:npar
-    name = get_the_name(l,TeX,M_,estim_params_,options_.varobs);
-    str = sprintf('%s\n %s \t\t %5.4f \t\t %7.5f \t\t %5.4f', str, name, lb95_xparam(l), mean_xparam(l), ub95_xparam(l));
-end
-disp(str)
-disp('')
-
-%% Plot parameters densities
-
-if TeX
-    fidTeX = fopen([M_.fname '_param_density.tex'],'w');
-    fprintf(fidTeX,'%% TeX eps-loader file generated by DSMH.m (Dynare).\n');
-    fprintf(fidTeX,['%% ' datestr(now,0) '\n']);
-    fprintf(fidTeX,' \n');
-end
-
-number_of_grid_points = 2^9;      % 2^9 = 512 !... Must be a power of two.
-bandwidth = 0;                    % Rule of thumb optimal bandwidth parameter.
-kernel_function = 'gaussian';     % Gaussian kernel for Fast Fourier Transform approximation.
-
-plt = 1 ;
-hh_fig = dyn_figure(options_.nodisplay,'Name','Parameters Densities');
-for k=1:npar %min(nstar,npar-(plt-1)*nstar)
-    subplot(ceil(sqrt(npar)),floor(sqrt(npar)),k)
-    %kk = (plt-1)*nstar+k;
-    [name,texname] = get_the_name(k,TeX,M_,estim_params_,options_.varobs);
-    optimal_bandwidth = mh_optimal_bandwidth(distrib_param(k,:)',options_.posterior_sampler_options.dsmh.particles,bandwidth,kernel_function);
-    [density(:,1),density(:,2)] = kernel_density_estimate(distrib_param(k,:)',number_of_grid_points,...
-        options_.posterior_sampler_options.dsmh.particles,optimal_bandwidth,kernel_function);
-    plot(density(:,1),density(:,2));
-    hold on
-    if TeX
-        title(texname,'interpreter','latex')
-    else
-        title(name,'interpreter','none')
-    end
-    hold off
-    axis tight
-    drawnow
-end
-dyn_saveas(hh_fig,[ M_.fname '_param_density' int2str(plt) ],options_.nodisplay,options_.graph_format);
-if TeX && any(strcmp('eps',cellstr(options_.graph_format)))
-    % TeX eps loader file
-    fprintf(fidTeX,'\\begin{figure}[H]\n');
-    fprintf(fidTeX,'\\centering \n');
-    fprintf(fidTeX,'\\includegraphics[width=%2.2f\\textwidth]{%_param_density%s}\n',min(k/floor(sqrt(npar)),1),M_.fname,int2str(plt));
-    fprintf(fidTeX,'\\caption{Parameter densities based on the Dynamic Striated Metropolis-Hastings algorithm.}');
-    fprintf(fidTeX,'\\label{Fig:ParametersDensities:%s}\n',int2str(plt));
-    fprintf(fidTeX,'\\end{figure}\n');
-    fprintf(fidTeX,' \n');
-end
-%end
-
-function [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1,loglik,param)
+function [tlogpost_iminus1,loglik,param] = sort_matrices(tlogpost_iminus1, loglik,param)
 [~,indx_ord] = sortrows(tlogpost_iminus1);
 tlogpost_iminus1 = tlogpost_iminus1(indx_ord);
 param = param(:,indx_ord);
 loglik = loglik(indx_ord);
 
-function [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param,tlogpost_iminus1,loglik,lambda,i,zhat,ESS)
+function [tlogpost_i,weights,zhat,ESS,Omegachol] = compute_IS_weights_and_moments(param, tlogpost_iminus1, loglik, lambda, i, zhat, ESS)
 if i==1
     tlogpost_i = tlogpost_iminus1 + loglik*lambda(i);
 else
     tlogpost_i = tlogpost_iminus1 + loglik*(lambda(i)-lambda(i-1));
 end
 weights = exp(tlogpost_i-tlogpost_iminus1);
-zhat = (mean(weights))*zhat ;
+zhat = zhat + log(mean(weights)) ;
 weights = weights/sum(weights);
 ESS(i) = 1/sum(weights.^2);
 % estimates of mean and variance
@@ -170,61 +122,71 @@ z = bsxfun(@minus,param,mu);
 Omega = z*diag(weights)*z';
 Omegachol = chol(Omega)';
 
-function c = tune_c(objective_function,param,tlogpost_i,lambda,i,c,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
-disp('tuning c_i...');
-disp('Initial value =');
-disp(c) ;
+function [c,acpt] = tune_c(funobj, param, tlogpost_i, lambda, i, c, Omegachol, weights, mh_bounds, opts, Prior)
+%        disp('tuning c_i...');
+%        disp('Initial value =');
+%        disp(c) ;
 npar = size(param,1);
-lower_prob = (.5*(options_.posterior_sampler_options.dsmh.alpha0+options_.posterior_sampler_options.dsmh.alpha1))^5;
-upper_prob = (.5*(options_.posterior_sampler_options.dsmh.alpha0+options_.posterior_sampler_options.dsmh.alpha1))^(1/5);
+lower_prob = (.5*(opts.alpha0+opts.alpha1))^5;
+upper_prob = (.5*(opts.alpha0+opts.alpha1))^(1/5);
 stop=0 ;
-while stop==0
+outer_iter=1;
+while stop==0 && outer_iter<200
     acpt = 0.0;
-    indx_resmpl = smc_resampling(weights,rand(1,1),options_.posterior_sampler_options.dsmh.G);
+    indx_resmpl = kitagawa(weights,rand(1,1),opts.G);
     param0 = param(:,indx_resmpl);
     tlogpost0 = tlogpost_i(indx_resmpl);
-    for j=1:options_.posterior_sampler_options.dsmh.G
-        for l=1:options_.posterior_sampler_options.dsmh.K
+    for j=1:opts.G
+        for l=1:opts.K
             validate = 0;
-            while validate == 0
+            l_iter=1;
+            while validate == 0 && l_iter<200
                 candidate = param0(:,j) + sqrt(c)*Omegachol*randn(npar,1);
+                l_iter=l_iter+1;
                 if all(candidate >= mh_bounds.lb) && all(candidate <= mh_bounds.ub)
-                    [tlogpostx,loglikx] = tempered_likelihood(objective_function,candidate,lambda(i),dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+                    [tlogpostx,loglikx] = tempered_likelihood(funobj, candidate, lambda(i), Prior);
                     if isfinite(loglikx) % if returned log-density is not Inf or Nan (penalized value)
                         validate = 1;
                         if rand(1,1)<exp(tlogpostx-tlogpost0(j)) % accept
-                            acpt = acpt + 1/(options_.posterior_sampler_options.dsmh.G*options_.posterior_sampler_options.dsmh.K);
+                            acpt = acpt + 1/(opts.G*opts.K);
                             param0(:,j)= candidate;
                             tlogpost0(j) = tlogpostx;
                         end
                     end
                 end
             end
+            if l_iter==200
+                error('dsmh: Inner loop reached maximum of iterations.')
+            end
         end
     end
-    disp('Acceptation rate =') ;
-    disp(acpt) ;
-    if options_.posterior_sampler_options.dsmh.alpha0<=acpt && acpt<=options_.posterior_sampler_options.dsmh.alpha1
-        disp('done!');
+    %           disp('Acceptation rate =') ;
+    %           disp(acpt) ;
+    if opts.alpha0<=acpt && acpt<=opts.alpha1
+        %                disp('done!');
         stop=1;
     else
         if acpt<lower_prob
             c = c/5;
         elseif lower_prob<=acpt && acpt<=upper_prob
-            c = c*log(.5*(options_.posterior_sampler_options.dsmh.alpha0+options_.posterior_sampler_options.dsmh.alpha1))/log(acpt);
+            c = c*log(.5*(opts.alpha0+opts.alpha1))/log(acpt);
         else
             c = 5*c;
         end
-        disp('Trying with c= ') ;
-        disp(c)
+        %                disp('Trying with c= ') ;
+        %                disp(c)
     end
+    outer_iter=outer_iter+1;
+end
+if outer_iter==200
+    error('dsmh: Outer loop reached maximum of iterations.')
 end
 
-function [out_param,out_tlogpost_iminus1,out_loglik] = mutation_DSMH(objective_function,param,tlogpost_i,tlogpost_iminus1,loglik,lambda,i,c,MM,Omegachol,weights,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
-indx_levels = (1:1:MM-1)*options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_options.dsmh.G/MM;
+function [out_param,out_tlogpost_iminus1,out_loglik] = mutation_DSMH(funobj, param, tlogpost_i, tlogpost_iminus1, loglik, lambda, i, c, MM, Omegachol, weights, mh_bounds, opts, Prior)
+indx_levels = (1:1:MM-1)*opts.N*opts.G/MM;
 npar = size(param,1) ;
-p = 1/(10*options_.posterior_sampler_options.dsmh.tau);
-disp('Metropolis step...');
+p = 1/(10*opts.tau);
+%        disp('Metropolis step...');
 % build the dynamic grid of levels
 levels = [0.0;tlogpost_iminus1(indx_levels)];
 % initialize the outputs
@@ -232,14 +194,14 @@ out_param = param;
 out_tlogpost_iminus1 = tlogpost_i;
 out_loglik = loglik;
 % resample and initialize the starting groups
-indx_resmpl = smc_resampling(weights,rand(1,1),options_.posterior_sampler_options.dsmh.G);
+indx_resmpl = kitagawa(weights,rand(1,1),opts.G);
 param0 = param(:,indx_resmpl);
 tlogpost_iminus10 = tlogpost_iminus1(indx_resmpl);
 tlogpost_i0 = tlogpost_i(indx_resmpl);
 loglik0 = loglik(indx_resmpl);
 % Start the Metropolis
-for l=1:options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_options.dsmh.tau
-    for j=1:options_.posterior_sampler_options.dsmh.G
+for l=1:opts.N*opts.tau
+    for j=1:opts.G
         u1 = rand(1,1);
         u2 = rand(1,1);
         if u1<p
@@ -250,7 +212,7 @@ for l=1:options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_opt
                     break
                 end
             end
-            indx = floor( (k-1)*options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_options.dsmh.G/MM+1 + u2*(options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_options.dsmh.G/MM-1) );
+            indx = floor( (k-1)*opts.N*opts.G/MM+1 + u2*(opts.N*opts.G/MM-1) );
             if i==1
                 alp = (loglik(indx)-loglik0(j))*lambda(i);
             else
@@ -267,7 +229,7 @@ for l=1:options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_opt
             while validate==0
                 candidate = param0(:,j) + sqrt(c)*Omegachol*randn(npar,1);
                 if all(candidate(:) >= mh_bounds.lb) && all(candidate(:) <= mh_bounds.ub)
-                    [tlogpostx,loglikx] = tempered_likelihood(objective_function,candidate,lambda(i),dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_);
+                    [tlogpostx, loglikx] = tempered_likelihood(funobj, candidate, lambda(i), Prior);
                     if isfinite(loglikx) % if returned log-density is not Inf or Nan (penalized value)
                         validate = 1;
                         if u2<exp(tlogpostx-tlogpost_i0(j)) % accept
@@ -285,8 +247,8 @@ for l=1:options_.posterior_sampler_options.dsmh.N*options_.posterior_sampler_opt
             end
         end
     end
-    if mod(l,options_.posterior_sampler_options.dsmh.tau)==0
-        rang = (l/options_.posterior_sampler_options.dsmh.tau-1)*options_.posterior_sampler_options.dsmh.G+1:l*options_.posterior_sampler_options.dsmh.G/options_.posterior_sampler_options.dsmh.tau;
+    if mod(l,opts.tau)==0
+        rang = (l/opts.tau-1)*opts.G+1:l*opts.G/opts.tau;
         out_param(:,rang) = param0;
         out_tlogpost_iminus1(rang) = tlogpost_i0;
         out_loglik(rang) = loglik0;

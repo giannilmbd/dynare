@@ -18,7 +18,7 @@ function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initializatio
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2022-2024 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,7 +37,7 @@ function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initializatio
 
 dprintf('Estimation:%s: Initialization...', sampler)
 
-% Delete old mat files storign particles if any...
+% Delete old mat files storing particles if any...
 matfiles = sprintf('%s%sparticles*.mat', SimulationFolder, filesep());
 files = dir(matfiles);
 if ~isempty(files)
@@ -45,29 +45,49 @@ if ~isempty(files)
     dprintf('Estimation:%s: Old %s-files successfully erased.', sampler, sampler)
 end
 
-% Simulate a pool of particles characterizing the prior distribution (with the additional constraint that the likelihood is finite)
-set_dynare_seed('default');
 dprintf('Estimation:%s: Searching for initial values...', sampler);
 particles = zeros(Prior.length(), n);
 tlogpostkernel = zeros(n, 1);
 loglikelihood = zeros(n, 1);
 
+% Simulate a pool of particles characterizing the prior distribution (with the additional constraint that the likelihood is finite)
+set_dynare_seed('default');
+
 t0 = tic;
-parfor j=1:n
-    notvalid = true;
-    while notvalid
-        candidate = Prior.draw();
-        if Prior.admissible(candidate)
-            particles(:,j) = candidate;
-            [tlogpostkernel(j), loglikelihood(j)] = tempered_likelihood(objective_function, candidate, 0.0, Prior);
-            if isfinite(loglikelihood(j)) % if returned log-density is Inf or Nan (penalized value)
-                notvalid = false;
+if ~isoctave && matlab.internal.parallel.isPCTInstalled
+    sc = parallel.pool.Constant(RandStream('Threefry'));
+    parfor j=1:n
+        stream = sc.Value;
+        stream.Substream = j;
+        RandStream.setGlobalStream(stream); % set the seed in each iteration of parfor loops
+        notvalid = true;
+        while notvalid
+            candidate = Prior.draw();
+            if Prior.admissible(candidate)
+                particles(:,j) = candidate;
+                [tlogpostkernel(j), loglikelihood(j)] = tempered_likelihood(objective_function, candidate, 0.0, Prior);
+                if isfinite(loglikelihood(j)) % if returned log-density is Inf or Nan (penalized value)
+                    notvalid = false;
+                end
+            end
+        end
+    end
+else
+    for j=1:n
+        notvalid = true;
+        while notvalid
+            candidate = Prior.draw();
+            if Prior.admissible(candidate)
+                particles(:,j) = candidate;
+                [tlogpostkernel(j), loglikelihood(j)] = tempered_likelihood(objective_function, candidate, 0.0, Prior);
+                if isfinite(loglikelihood(j)) % if returned log-density is Inf or Nan (penalized value)
+                    notvalid = false;
+                end
             end
         end
     end
 end
 tt = toc(t0);
-
 save(sprintf('%s%sparticles-1-%u.mat', SimulationFolder, filesep(), nsteps), 'particles', 'tlogpostkernel', 'loglikelihood')
 dprintf('Estimation:%s: Initial values found (%.2fs)', sampler, tt)
 skipline()
