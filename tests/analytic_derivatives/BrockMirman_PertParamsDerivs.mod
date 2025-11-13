@@ -439,7 +439,13 @@ for jj = 1:2
     oo_.dr.Sigma_e = M_.Sigma_e;
     oo_.dr.Correlation_matrix = M_.Correlation_matrix;
     ex0 = oo_.exo_steady_state';
-    [~, oo_.dr.g1, oo_.dr.g2, oo_.dr.g3] = feval([M_.fname,'.dynamic'], oo_.dr.ys(I), oo_.exo_steady_state', M_.params, oo_.dr.ys, 1);
+    y3n = repmat(oo_.dr.ys, 3, 1);
+    [g1, T, T_order] = feval([M_.fname,'.sparse.dynamic_g1'], y3n, ex0, M_.params, oo_.dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    [g2_v, T, T_order] = feval([M_.fname,'.sparse.dynamic_g2'], y3n, ex0, M_.params, oo_.dr.ys, T, T_order);
+    g3_v = feval([M_.fname,'.sparse.dynamic_g3'], y3n, ex0, M_.params, oo_.dr.ys, T, T_order);
+    oo_.dr.g1 = identification.legacy_dynamic_g1(g1, M_);
+    oo_.dr.g2 = identification.legacy_dynamic_g2(g2_v, M_);
+    oo_.dr.g3 = identification.legacy_dynamic_g3(g3_v, M_);
     oo_.dr.g3 = identification.unfold_g3(oo_.dr.g3, length(oo_.dr.ys(I))+length(oo_.exo_steady_state')); %add symmetric elements to g3
 
     fprintf('***** %s: SOME COMMON OBJECTS *****\n', strparamset)
