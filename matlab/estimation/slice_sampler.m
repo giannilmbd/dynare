@@ -50,6 +50,13 @@ if sampler_options.rotated %&& ~isempty(sampler_options.V1),
     end
 end
 
+
+if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
+    fast_likelihood_evaluation_for_rejection = true;
+    rejection_penalty=sampler_options.fast_likelihood_evaluation_for_rejection_penalty;
+else
+    fast_likelihood_evaluation_for_rejection = false;
+end
 theta=theta(:);
 npar = length(theta);
 W1 = sampler_options.W1;
@@ -107,7 +114,11 @@ while it<npar
     while(L > XLB)
         xsim = L;
         theta(it) = xsim;
-        fxl = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxl = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+         else
+            fxl = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (fxl <= Z)
             break
@@ -137,7 +148,11 @@ while it<npar
     while(R < XUB)
         xsim = R;
         theta(it) = xsim;
-        fxr = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxr = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxr = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (fxr <= Z)
             break
@@ -171,7 +186,11 @@ while it<npar
         u = rand(1,1);
         xsim = L + u*(R - L);
         theta(it) = xsim;
-        fxsim = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxsim = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxsim = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (xsim > xold)
             R = xsim;

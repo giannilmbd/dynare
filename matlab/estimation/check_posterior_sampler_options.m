@@ -310,6 +310,14 @@ if init
                   case 'save_iter_info_file'
                     posterior_sampler_options.save_iter_info_file = options_list{i,2};
 
+                  case 'fast_likelihood_evaluation_for_rejection'
+
+                      posterior_sampler_options.fast_likelihood_evaluation_for_rejection = options_list{i,2};
+
+                  case 'fast_likelihood_evaluation_for_rejection_penalty'
+
+                      posterior_sampler_options.fast_likelihood_evaluation_for_rejection_penalty = options_list{i,2};
+
                   case 'maximize'
                     posterior_sampler_options.maximize = options_list{i,2};
                     
