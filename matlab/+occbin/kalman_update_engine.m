@@ -111,6 +111,12 @@ else
     end
 end
 
+if t<options_.occbin.likelihood.first_period_binding_regime_allowed
+    % I do not search further since I started guessing with base regime
+    return
+end
+
+
 diffstart=0;
 if info==0
     if M_.occbin.constraint_nbr==1
@@ -135,7 +141,7 @@ if info==0
         end
     end
 end
-if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation
+if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation_tol_period
     guess_regime = [base_regime base_regime];
     options_.occbin.filter.guess_regime = true;
     guess_regime(1) = regx(1);
@@ -201,7 +207,9 @@ if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use
     options_.occbin.likelihood.loss_function_regime_guess = false;
 end
 
-if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (info==0 &&  ~isequal(regx(1),base_regime))
+% if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (info==0 &&  ~isequal(regx(1),base_regime))
+if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
+        || (options_.occbin.likelihood.brute_force_extra_regime_guess && (info0 || info1)) %|| (info==0 &&  ~isequal(regx(1),base_regime))
 
     guess_regime = [base_regime base_regime];
     options_.occbin.filter.guess_regime = true;
