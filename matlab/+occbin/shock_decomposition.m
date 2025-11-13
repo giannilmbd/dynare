@@ -9,7 +9,7 @@ function oo_ = shock_decomposition(oo_, M_, options_, vname)
 % OUTPUT
 % - oo_           [structure]     MATLAB's structure containing the results
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -27,7 +27,7 @@ function oo_ = shock_decomposition(oo_, M_, options_, vname)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 
-% list of options 
+% list of options
 % T0, use_shock_groups, vname, file_name, nfrcst, init_names_
 
 shock_decomp_options = options_.occbin.shock_decomp;
@@ -64,7 +64,7 @@ else
         ex_names_{i} = shock_groups.(shock_ind{i}).shocks;
     end
 end
-%%  
+%%
 
 if iscell(vname{1})
     vname0=vname;
@@ -79,11 +79,11 @@ if iscell(vname{1})
         if strcmpi(decomp_type{j},'aoa')
             gtrend{j}=vname0{j}{3};
             if strcmpi(vname0{j}{4},'flow')
-            var_type(j)=1;
+                var_type(j)=1;
             elseif strcmpi(vname0{j}{4},'deflator')
-            var_type(j)=2;
+                var_type(j)=2;
             elseif strcmpi(vname0{j}{4},'stock')
-            var_type(j)=0;
+                var_type(j)=0;
             else
                 error('wrong var type for aoa decomp')
             end
@@ -133,32 +133,28 @@ if shock_decomp_options.debug
     end
 else
     etahat=[oo_.occbin.smoother.etahat zeros(size(oo_.occbin.smoother.etahat,1),nfrcst)];
-    as = oo_.occbin.smoother.alphahat;
 end
 gend=size(etahat,2);
 
 %%
-TT= 0:0.25:ceil(gend/4+1);
-TT=TT(1:gend);
 TT1= dates('0Q1'):(dates('0Q1')+gend-1);
 if exist('T','var')
-    TT=T(options_.first_obs)+TT;
     TT1=TT1+T(options_.first_obs)*4;
 end
 
 shock_decomp_options = set_default_option(shock_decomp_options,'TINIT',TT1(1));
 tinit = max([1,find(TT1==shock_decomp_options.TINIT)]);
-TINIT = char(TT1(tinit));
-shock_decomp_options = set_default_option(shock_decomp_options,'file_name',['_' use_shock_groups '_' TINIT]);
-file_name = shock_decomp_options.file_name;
-
-%%
 
 %%%%%%%%%%%%%%%%%%%% LINEAR shock decomp
 as_lin=zeros(M_.endo_nbr,length(tinit:gend)); % linear smoother reconstructed
 att=zeros(M_.endo_nbr,length(tinit:gend)); % linear initial condition effect
 inn=zeros(M_.endo_nbr,length(tinit:gend)); % linear aggreage shocks effect without att, i.e. as_lin = inn+att;
 deco=zeros(M_.endo_nbr,M_.exo_nbr,length(tinit:gend)); % full decomposition into individual shocks
+deco_init = zeros(M_.endo_nbr,M_.endo_nbr+2,length(tinit:gend)); % full decomposition into individual initval
+deco_init(:,end,:) = oo_.occbin.linear_smoother.alphahat(:,tinit:gend);
+for i=1:M_.endo_nbr
+    deco_init(i,i,1) = oo_.occbin.linear_smoother.alphahat(i,tinit);
+end
 
 att(:,1)=oo_.occbin.linear_smoother.alphahat(:,tinit);
 as_lin(:,1)=oo_.occbin.linear_smoother.alphahat(:,tinit);
@@ -169,15 +165,20 @@ for j=2:length(tinit:gend)
     att(:,j) = TM*att(:,j-1);
     inn(:,j) = RM*oo_.occbin.linear_smoother.etahat(:,j+tinit-1);
     if j>1
-        inn(:,j) = inn(:,j) +  TM*inn(:,j-1); 
+        inn(:,j) = inn(:,j) +  TM*inn(:,j-1);
     end
     for iexo=1:M_.exo_nbr
         deco(:,iexo,j) = RM(:,iexo)*oo_.occbin.linear_smoother.etahat(iexo,j+tinit-1);
         if j>1
             deco(:,iexo,j) = deco(:,iexo,j) +  TM*deco(:,iexo,j-1);
         end
-        
+
     end
+    if j>1
+        deco_init(:,1:M_.endo_nbr,j) = TM*deco_init(:,1:M_.endo_nbr,j-1);
+    end
+    deco_init(:,M_.endo_nbr+1,j) = deco_init(:,M_.endo_nbr+2,j) - sum(deco_init(:,1:M_.endo_nbr,j),2);
+
 end
 as_lin=as_lin(oo_.dr.inv_order_var,:); % linear smoother reconstructed
 att=att(oo_.dr.inv_order_var,:); % linear initial condition effect
@@ -186,15 +187,22 @@ deco=deco(oo_.dr.inv_order_var,:,:); % full decomposition into individual shocks
 deco(:,M_.exo_nbr+1,:)=att;
 deco(:,M_.exo_nbr+2,:)=as_lin;
 oo_.occbin.linear_smoother.decomp=deco;
+deco_init=deco_init(oo_.dr.inv_order_var,oo_.dr.inv_order_var,:); % full decomposition into individual initval
+oo_.occbin.linear_smoother.init_decomp=deco_init;
 %%%%%%%%%%%%%%%%%%%% END LINEAR shock decomp
 
 %%
 
-%%%%%%%%%%%%%%%%%%%% piecewise COONDITIONAL shock decomp
+%%%%%%%%%%%%%%%%%%%% piecewise CONDITIONAL shock decomp
 as_p=zeros(M_.endo_nbr,length(tinit:gend)); % smoother reconstructed
 att_p=zeros(M_.endo_nbr,length(tinit:gend)); % initial condition effect
 inn_p=zeros(M_.endo_nbr,length(tinit:gend)); % aggreage shocks effect without att, i.e. as_lin = inn+att;
 deco_p=zeros(M_.endo_nbr,M_.exo_nbr,length(tinit:gend)); % full decomposition into individual shocks
+deco_p_init = zeros(M_.endo_nbr,M_.endo_nbr+2,length(tinit:gend)); % full decomposition into individual initval
+deco_p_init(:,end,:) = oo_.occbin.smoother.alphahat(:,tinit:gend);
+for i=1:M_.endo_nbr
+    deco_p_init(i,i,1) = oo_.occbin.smoother.alphahat(i,tinit);
+end
 reg_p=zeros(M_.endo_nbr,length(tinit:gend)); % pure regime effect (CONST 'shocks')
 
 att_p(:,1)=oo_.occbin.smoother.alphahat(:,tinit);
@@ -212,15 +220,19 @@ for j=2:length(tinit:gend)
     inn_p(:,j) = RM*oo_.occbin.smoother.etahat(:,j+tinit-1);
     reg_p(:,j) = TM*reg_p(:,j-1)+CONST;
     if j>1
-        inn_p(:,j) = inn_p(:,j) +  TM*inn_p(:,j-1) ; 
+        inn_p(:,j) = inn_p(:,j) +  TM*inn_p(:,j-1) ;
     end
     for iexo=1:M_.exo_nbr
         deco_p(:,iexo,j) = RM(:,iexo)*oo_.occbin.smoother.etahat(iexo,j+tinit-1);
         if j>1
             deco_p(:,iexo,j) = deco_p(:,iexo,j) +  TM*deco_p(:,iexo,j-1);
         end
-        
+
     end
+    if j>1
+        deco_p_init(:,1:M_.endo_nbr,j) = TM*deco_p_init(:,1:M_.endo_nbr,j-1);
+    end
+    deco_p_init(:,M_.endo_nbr+1,j) = deco_p_init(:,M_.endo_nbr+2,j) - sum(deco_p_init(:,1:M_.endo_nbr,j),2);
 end
 as_p=as_p(oo_.dr.inv_order_var,:); % occbin smoother reconstructed
 att_p=att_p(oo_.dr.inv_order_var,:); % occbin initial condition effect
@@ -229,12 +241,19 @@ deco_p=deco_p(oo_.dr.inv_order_var,:,:); % occbin full decomposition into indivi
 reg_p=reg_p(oo_.dr.inv_order_var,:); % occbin pure regime effect (CONST 'shocks')
 i_reg=strmatch('EPS_REGIME',M_.exo_names,'exact');
 if ~isempty(i_reg)
-deco_p(:,i_reg,:)=reg_p;
+    deco_p(:,i_reg,:)=reg_p;
+else
+    att_p = att_p + reg_p;
 end
 deco_p(:,M_.exo_nbr+1,:)=att_p;
 deco_p(:,M_.exo_nbr+2,:)=as_p;
-%deco_p(:,M_.exo_nbr+3,:)=as_p-reg_p;
 oo_.occbin.smoother.decomp=deco_p;
+if isempty(i_reg)
+    deco_p(:,M_.exo_nbr+1,:)=att_p-reg_p;
+end
+deco_p_init=deco_p_init(oo_.dr.inv_order_var,oo_.dr.inv_order_var,:); % full decomposition into individual initval
+oo_.occbin.smoother.init_decomp=deco_p_init;
+
 rr=abs(deco_p(:,1:end-1,:));
 if isequal(use_shock_groups,'ALL') && ~isempty(i_reg)
     rr(:,i_reg,:)=0;
@@ -260,7 +279,3 @@ for k=1:size(rr,3)
 end
 oo_.occbin.smoother.wdecomp=wdeco_p;
 %%%%%%%%%%%%%%%%%%%% END CONDITIONAL shock decomp
-%% add here other fetures when ready
-% if shock_decomp_options.conditional_only ==1
-%     return
-% end

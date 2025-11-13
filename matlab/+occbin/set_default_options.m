@@ -177,6 +177,8 @@ if ismember(flag,{'shock_decomp','all'})
     options_occbin_.shock_decomp.shocks_only=false;
     options_occbin_.shock_decomp.total_effect=false;
     options_occbin_.shock_decomp.conditional_only=true;
+    options_occbin_.shock_decomp.use_shock_groups='';
+
     options_occbin_.shock_decomp.TINIT = dates(); % date to initialize states for shock decomp
 %     options_occbin_.shock_decomp.use_shock_groups=options_.plot_shock_decomp.use_shock_groups;
 end
