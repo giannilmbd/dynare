@@ -732,11 +732,12 @@ switch minimizer_algorithm
         end
     end
     optimization_info.runtime = toc(opt_runtime_start);
-    optimization_info.iterations = output.iterations;
-    optimization_info.funcCount = output.funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = strrep(output.message, newline, ' ');
-
+    if ~isoctave
+        optimization_info.iterations = output.iterations;
+        optimization_info.funcCount = output.funcCount;
+        optimization_info.message = strrep(output.message, newline, ' ');
+    end
   case 101
     solveoptoptions = options_.solveopt;
     if ~isempty(options_.optim_opt)
