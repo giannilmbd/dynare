@@ -101,12 +101,19 @@ end
 d = 0;
 decomp = [];
 spinf           = size(Pinf1);
-spstar          = size(Pstar1);
+spstar          = size(Pstar1(:,:,1));
 v               = zeros(pp,smpl);
 a               = zeros(mm,smpl);
 a1              = zeros(mm,smpl+1);
+if size(a_initial,2)>1
+    a(:,1)          = a_initial(:,2);
+    a1(:,1)         = a_initial(:,2);
+    ainit = a_initial(:,1);
+else
 a(:,1)          = a_initial;
 a1(:,1)         = a_initial;
+    ainit = a1(:,1);
+end
 aK              = zeros(nk,mm,smpl+nk);
 
 Fstar           = zeros(pp,smpl);
@@ -123,7 +130,12 @@ else
     PK              = [];
 end
 Pstar           = zeros(spstar(1),spstar(2),smpl);
+Pinit = Pstar1(:,:,1);
+if size(Pstar1,3)>1
+    Pstar(:,:,1)    = Pstar1(:,:,2);
+else
 Pstar(:,:,1)    = Pstar1;
+end
 Pinf            = zeros(spinf(1),spinf(2),smpl);
 Pinf(:,:,1)     = Pinf1;
 Pstar1          = Pstar;
@@ -377,10 +389,6 @@ Pinf1  = Pinf1(:,:,1:d);
 lik=zeros(1,smpl);
 while t<smpl
     t = t+1;
-    if t==1
-        Pinit = P(:,:,1);
-        ainit = a1(:,1);
-    end
     a(:,t) = a1(:,t);
     P1(:,:,t) = P(:,:,t);
     di = data_index{t}';
@@ -825,7 +833,6 @@ if decomp_flag
 end
 
 epsilonhat = Y - Z*alphahat;
-
 
 if (d==smpl)
     warning('missing_DiffuseKalmanSmootherH3_Z:: There isn''t enough information to estimate the initial conditions of the nonstationary variables');

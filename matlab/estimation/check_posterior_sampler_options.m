@@ -324,6 +324,13 @@ if init
                        posterior_sampler_options.use_prior_draws.mh_blck = repmat(options_list{i,2},[1 options_.mh_nblck]);
 
 
+                  
+                  case 'draw_init_state_from_smoother'
+                    posterior_sampler_options.draw_init_state_from_smoother = options_list{i,2};
+
+                  case 'draw_init_state_with_rotated_slice'
+                    posterior_sampler_options.draw_init_state_with_rotated_slice = options_list{i,2};
+
                   case 'maximize'
                     posterior_sampler_options.maximize = options_list{i,2};
                     

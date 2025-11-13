@@ -174,6 +174,9 @@ if run_smoother
     stock_smoothed_constant=NaN(endo_nbr,gend,MAX_n_smoothed_constant);
     stock_smoothed_trend=NaN(endo_nbr,gend,MAX_n_smoothed_trend);
     stock_trend_coeff = zeros(endo_nbr,MAX_n_trend_coeff);
+    if options_.occbin.smoother.status && ~options_.occbin.smoother.inversion_filter && not(options_.lik_init==2 && options_.Harvey_scale_factor==0)
+        % TBD: initialize stock_occbin_regime stock_occbin_realtime_regime
+    end
     if horizon
         stock_forcst_mean= NaN(endo_nbr,horizon,MAX_nforc1);
         stock_forcst_point = NaN(endo_nbr,horizon,MAX_nforc2);
@@ -254,19 +257,84 @@ for b=fpar:B
                     trend_addition=zeros(options_.number_of_observed_variables,gend);        
                     stock_occbin_regime(:,irun(5))=regime_history;
                     stock_occbin_realtime_regime(:,irun(5))=regime_history; 
+                    stock_occbin_regime(:,irun(5))=regime_history;
+                    stock_occbin_realtime_regime(:,irun(5))=regime_history; 
                 end
                 %epsilonhat not available as no measurement error allowed
-            else
+            else % PKF
                 opts_local.verbosity=0;
-                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,~,~,a0T,state_uncertainty0] = ...
+                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
                     occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
                 if oo_.occbin.smoother.error_flag(1)
                     message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
                     fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
                     continue
+                end
+                if options_.smoothed_state_uncertainty && not(opts_local.lik_init==2 && opts_local.Harvey_scale_factor==0)
+
+                    state_uncertainty1 = state_uncertainty0(oo_.dr.inv_order_var,oo_.dr.inv_order_var);
+                    alphahat0 = a0T(oo_.dr.inv_order_var);
+                    alphahat1 = alphahat0(M_.state_var);
+                    state_uncertainty1 = state_uncertainty1(M_.state_var,M_.state_var);
+                    [U,X] = svd(0.5*(state_uncertainty1+state_uncertainty1'));
+                    % P= U*X*U'; % symmetric matrix!
+                    is = find(diag(X)>options_.kalman_tol);
+                    StateVectorVarianceSquareRoot = chol(X(is,is))';
+
+                    % Get the rank of StateVectorVarianceSquareRoot
+                    state_variance_rank = size(StateVectorVarianceSquareRoot,2);
+                    U = U(:,is);
+
+                    if not(isempty(is))
+                        alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
+                    else
+                        alphahat01 = alphahat1;
+                    end
+                    if isfield(M_.occbin,'filter_initial_state') && ~isempty(M_.occbin.filter_initial_state)
+                        error_indicator=true;
+                        M_local = M_;
+                        M_local.filter_initial_state = M_.occbin.filter_initial_state;
+                        opts_local1 = opts_local;
+                        opts_local1.lik_init = 2;
+                        opts_local1.Harvey_scale_factor = 0;
+                        niter=0;
+                        while error_indicator && niter<10
+                            niter=niter+1;
+                            for jj=1:length(M_.state_var)
+                                M_local.params(strcmp([M_.endo_names{M_.state_var(jj)} 'init'],M_.param_names)) = alphahat01(jj);
+                            end
+                            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                            if oo_.occbin.smoother.error_flag(1)
+                                if not(isempty(is)) && niter==1
+                                    % first check if smoother mean works
+                                    for jj=1:length(M_.state_var)
+                                        M_local.params(strcmp([M_.endo_names{M_.state_var(jj)} 'init'],M_.param_names)) = alphahat1(jj);
+                                    end
+                                    [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                        occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                                end
+                                if oo_.occbin.smoother.error_flag(1) && (niter==1 || niter==10)
+                                    % use smoother ?
+                                    [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                        occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+                                else
+                                    % try another draw from smoother distribution
+                                    alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
+                                    oo_.occbin.smoother.error_flag(1) = 1;
+                                end
+                            end
+                            error_indicator = any(oo_.occbin.smoother.error_flag(1));
+                        end                        
+                    end
+                end
+                if oo_.occbin.smoother.error_flag(1)
+                    message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
+                    fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
+                    continue
                 else
-                   stock_occbin_regime(:,irun(5))=oo_.occbin.smoother.regime_history;
-                   stock_occbin_realtime_regime(:,irun(5))=oo_.occbin.smoother.realtime_regime_history;
+                    stock_occbin_regime(:,irun(5))=oo_.occbin.smoother.regime_history;
+                    stock_occbin_realtime_regime(:,irun(5))=oo_.occbin.smoother.realtime_regime_history;
                 end
             end
         else

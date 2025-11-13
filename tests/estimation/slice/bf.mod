@@ -72,6 +72,7 @@ options_.occbin.smoother.periodic_solution=true;
 options_.occbin.likelihood.periodic_solution=true;
 // end occbin options
 
+options_.init_state_endogenous_prior = true;
 steady;
 check;
 // Estimation
@@ -80,27 +81,18 @@ check;
 estimation(datafile='datafile', 
     order=1,
 	use_univariate_filters_if_singularity_is_detected=0,
-	mh_replic=10, 
+	mh_replic=20, 
 	mode_compute=0, 
 	posterior_sampling_method='slice', 
     posterior_sampler_options = ('save_iter_info_file', 0, 
-                                 'use_prior_draws',1,
-                                  'fast_likelihood_evaluation_for_rejection',1),
+                                 'draw_init_state_from_smoother',1,
+                                 'draw_init_state_with_rotated_slice',0,
+                                 'fast_likelihood_evaluation_for_rejection',1),
 	mh_nblocks=1,
-	mh_drop=0);
+	mh_drop=0.5,
+	sub_draws = 10,
+	//bayesian_irf,
+    filter_covariance, smoothed_state_uncertainty,
+	filtered_vars, smoother,consider_all_endogenous);
 
-estimation(datafile='datafile', 
-    order=1,
-	use_univariate_filters_if_singularity_is_detected=0,
-	mh_replic=10, 
-	mode_compute=0,
-    load_mh_file,
-	posterior_sampling_method='slice', 
-    posterior_sampler_options = ('save_iter_info_file', 0, 
-                                 'use_prior_draws',1,
-                                 'rotated',1,
-                                 'use_mh_covariance_matrix',1,
-                                  'fast_likelihood_evaluation_for_rejection',1),
-	mh_nblocks=1,
-	mh_drop=0);
       

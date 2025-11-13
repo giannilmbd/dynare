@@ -64,7 +64,6 @@ smoother_field_list = {'SmoothedVariables', 'UpdatedVariables', 'SmoothedShocks'
 if not(isempty(xparam1))
     M_ = set_all_parameters(xparam1,estim_params_,M_);
 end
-regime_history=[];
 if  options_.occbin.smoother.linear_smoother
     %% linear smoother
     options_.occbin.smoother.status=false;

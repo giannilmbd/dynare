@@ -269,7 +269,7 @@ switch options_.lik_init
     else
         Zflag = 0;
     end
-  case 2% Initialization with large numbers on the diagonal of the covariance matrix if the states (for non stationary models).
+  case 2% Initialization with large numbers on the diagonal of the covariance matrix of the states (for non stationary models).
     if (kalman_algo~=2) && (kalman_algo~=5)
         % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
@@ -278,7 +278,15 @@ switch options_.lik_init
     Pinf  = [];
     a     = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
-    a_0_given_tm1 = T*a; %set state prediction for first Kalman step;
+    a_0_given_tm0 = a;
+    if not(options_.occbin.likelihood.status && options_.occbin.likelihood.first_period_occbin_update==1)
+        a_0_given_tm1 = T*a; %set state prediction for first Kalman step;
+        if options_.Harvey_scale_factor==0
+            Pstar = T*Pstar*T' + R*Q*R';
+        end
+    else
+        a_0_given_tm1 = a; 
+    end
     if options_.occbin.likelihood.status || (kalman_algo == 5)
         Z =zeros(length(bayestopt_.mf),size(T,1));
         for i = 1:length(bayestopt_.mf)
@@ -845,6 +853,14 @@ if options_.endogenous_prior==1
         [lnpriormom]  = endogenous_prior(Y,dataset_info,Pstar,bayestopt_,H);
         fval    = (likelihood-lnprior-lnpriormom);
     end
+elseif options_.init_state_endogenous_prior    
+    if not(options_.lik_init==2 && options_.Harvey_scale_factor==0)
+        error('Init state endogenous prior not supported without conditional likelihood')
+    else
+        [lnpriorendoinitstate, lnpriorinitstate]  = init_state_endogenous_prior(a_0_given_tm0,T,R,Q,xparam1,bayestopt_,M_,options_);
+    end
+    fval    = likelihood-lnpriorendoinitstate - (lnprior-lnpriorinitstate);
+
 else
     fval    = (likelihood-lnprior);
 end
@@ -857,35 +873,6 @@ end
 if analytic_derivation==0 && nargout>3
     lik=lik(start:end,:);
     DLIK=[-lnprior; lik(:)];
-end
-
-function a=set_Kalman_starting_values(a,M_,dr,options_,bayestopt_)
-% function a=set_Kalman_starting_values(a,M_,dr,options_,bayestopt_)
-% Sets initial states guess for Kalman filter/smoother based on M_.filter_initial_state
-%
-% INPUTS
-%   o a             [double]   (p*1) vector of states
-%   o M_            [structure] describing the model
-%   o dr            [structure] storing the decision rules
-%   o options_      [structure] describing the options
-%   o bayestopt_    [structure] describing the priors
-%
-% OUTPUTS
-%   o a             [double]    (p*1) vector of set initial states
-
-if isfield(M_,'filter_initial_state') && ~isempty(M_.filter_initial_state)
-    state_indices=dr.order_var(dr.restrict_var_list(bayestopt_.mf0));
-    for ii=1:size(state_indices,1)
-        if ~isempty(M_.filter_initial_state{state_indices(ii),1})
-            if options_.loglinear && ~options_.logged_steady_state
-                a(bayestopt_.mf0(ii)) = log(eval(M_.filter_initial_state{state_indices(ii),2})) - log(dr.ys(state_indices(ii)));
-            elseif ~options_.loglinear && ~options_.logged_steady_state
-                a(bayestopt_.mf0(ii)) = eval(M_.filter_initial_state{state_indices(ii),2}) - dr.ys(state_indices(ii));
-            else
-                error('The steady state is logged. This should not happen. Please contact the developers')
-            end
-        end
-    end
 end
 
 function occbin_options = set_occbin_options(options_)

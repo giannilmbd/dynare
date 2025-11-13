@@ -536,6 +536,8 @@ options_.posterior_sampler_options.slice.save_tmp_file=1;
 options_.posterior_sampler_options.slice.save_iter_info_file=true;
 options_.posterior_sampler_options.slice.fast_likelihood_evaluation_for_rejection=false;
 options_.posterior_sampler_options.slice.fast_likelihood_evaluation_for_rejection_penalty=10;
+options_.posterior_sampler_options.slice.draw_init_state_from_smoother=false;
+options_.posterior_sampler_options.slice.draw_init_state_with_rotated_slice=false;
 % Independent Metropolis-Hastings
 options_.posterior_sampler_options.imh.proposal_distribution = 'rand_multivariate_normal';
 options_.posterior_sampler_options.imh.use_mh_covariance_matrix=0;
@@ -816,6 +818,8 @@ options_.graph_save_formats.fig = 0;
 options_.endogenous_prior = false;
 options_.endogenous_prior_restrictions.irf={};
 options_.endogenous_prior_restrictions.moment={};
+
+options_.init_state_endogenous_prior = false;
 
 % OSR Optimal Simple Rules
 options_.osr.opt_algo=4;

@@ -54,8 +54,12 @@ mh_bounds = sampler_options.bounds;
 
 switch posterior_sampling_method
   case 'slice'
-      if ~sampler_options.maximize
-
+     if ~sampler_options.maximize
+          if isfield(sampler_options,'draw_init_state_from_smoother') && sampler_options.draw_init_state_from_smoother
+              if not(strcmp(func2str(objective_function),'dsge_likelihood'))
+                  error('draw_init_state_from_smoother:: I cannot determine the input arguments for DsgeSmoother')
+              end
+          end
           if isfield(sampler_options,'use_prior_draws') && sampler_options.use_prior_draws.status
               sampler_options.last_posterior=last_posterior;
           end

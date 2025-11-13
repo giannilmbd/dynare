@@ -82,10 +82,16 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 d = 0;
 decomp = [];
 spinf           = size(Pinf1);
-spstar          = size(Pstar1);
+spstar          = size(Pstar1(:,:,1));
 v               = zeros(pp,smpl);
 a               = zeros(mm,smpl+1);
+if size(a_initial,2)>1
+    a0 = a_initial(:,1);
+    a(:,1)          = a_initial(:,2);
+else
+    a0 = a_initial;
 a(:,1)          = a_initial;
+end
 atilde          = zeros(mm,smpl);
 aK              = zeros(nk,mm,smpl+nk);
 if filter_covariance_flag
@@ -105,7 +111,13 @@ Kstar           = zeros(mm,pp,smpl);
 Kinf            = zeros(mm,pp,smpl);
 P               = zeros(mm,mm,smpl+1);
 Pstar           = zeros(spstar(1),spstar(2),smpl+1);
+if size(Pstar1,3)>1
+    P0    = Pstar1(:,:,1);
+    Pstar(:,:,1)    = Pstar1(:,:,2);
+else
+    P0    = Pstar1;
 Pstar(:,:,1)    = Pstar1;
+end
 Pinf            = zeros(spinf(1),spinf(2),smpl+1);
 Pinf(:,:,1)     = Pinf1;
 rr              = size(Q,1);
@@ -346,8 +358,6 @@ while t>d+1
 end
 
 if d==0 % get smoother in period t=0
-    a0 = a(:,1);
-    P0 = P(:,:,1);
     L0=T;
     r0 = L0'*r(:,1); %compute r_{t-1}, DK (2012), eq. 4.38 with Z=0
     alphahat0       = a0 + P0*r0;                         %DK (2012), eq. 4.35
