@@ -374,6 +374,7 @@ Pstar = Pstar(:,:,1:d);
 Pinf  = Pinf(:,:,1:d);
 Pstar1 = Pstar1(:,:,1:d);
 Pinf1  = Pinf1(:,:,1:d);
+lik=zeros(1,smpl);
 while t<smpl
     t = t+1;
     if t==1
@@ -407,17 +408,18 @@ while t<smpl
             RR01 = cat(3,R,RR(:,:,1));
             CC01 = zeros(size(CC,1),2);
             CC01(:,2) = CC(:,1);
-            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, ~, etaha, aha, V, Fix, Kix, TTx,RRx,CCx] = occbin.kalman_update_engine(a0, a10, P0, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
+            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, likx, etaha, aha, V, Fix, Kix, TTx,RRx,CCx] = occbin.kalman_update_engine(a0, a10, P0, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
                 Fi0,Ki0,kalman_tol,nk);
         else
             if isqvec
                 Qt = Qvec(:,:,t-1:t+1);
             end
-            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, ~, etaha, aha, V, Fix, Kix,TTx,RRx,CCx] = occbin.kalman_update_engine(a(:,t-1),a1(:,t-1:t),P(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,v(:,t-1:t), Y(:,t-1:t), H, Qt, T0, R0, TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t), regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
+            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, tmp, error_flag, M_, likx, etaha, aha, V, Fix, Kix,TTx,RRx,CCx] = occbin.kalman_update_engine(a(:,t-1),a1(:,t-1:t),P(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,v(:,t-1:t), Y(:,t-1:t), H, Qt, T0, R0, TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t), regimes_(t:t+1), base_regime, di, M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options, ...
                 Fi(:,t-1),Ki(:,:,t-1),kalman_tol,nk);
         end
         if ~error_flag
             regimes_(t:t+2)=tmp;
+            lik(t)=likx;
         else
             varargout{1} = [];
             varargout{2} = [];
