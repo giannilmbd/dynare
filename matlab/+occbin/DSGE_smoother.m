@@ -61,6 +61,9 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 
 smoother_field_list = {'SmoothedVariables', 'UpdatedVariables', 'SmoothedShocks'};
 
+if not(isempty(xparam1))
+    M_ = set_all_parameters(xparam1,estim_params_,M_);
+end
 regime_history=[];
 if  options_.occbin.smoother.linear_smoother && nargin==12
     %% linear smoother
@@ -69,7 +72,7 @@ if  options_.occbin.smoother.linear_smoother && nargin==12
         DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
     bayestopt_.mf=mf;
     tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,...
-        aK,P,PK,decomp,Trend,state_uncertainty);
+        aK,P,PK,decomp,Trend,state_uncertainty,alphahat0,state_uncertainty0);
     for jf=1:length(smoother_field_list)
         oo_.occbin.linear_smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
     end
@@ -138,6 +141,7 @@ if error_indicator(1) || isempty(alphahat0)
     else
         etahat= oo_.occbin.linear_smoother.etahat;
         alphahat0= oo_.occbin.linear_smoother.alphahat0;
+        state_uncertainty0 = oo_.occbin.linear_smoother.state_uncertainty0;
     end
     base_regime = struct();
     if M_.occbin.constraint_nbr==1
@@ -424,24 +428,26 @@ if (~is_changed || occbin_smoother_debug) && nargin==12
         TT = sto_TT;
         oo_.occbin.smoother.regime_history=regime_history0(end-1,:);
     end
-    tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,P,PKK,decomp,Trend,state_uncertainty);
-    for jf=1:length(smoother_field_list)
-        oo_.occbin.smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
+    if options_.occbin.smoother.store_results
+        tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,P,PKK,decomp,Trend,state_uncertainty,alphahat0,state_uncertainty0);
+        for jf=1:length(smoother_field_list)
+            oo_.occbin.smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
+        end
+        oo_.occbin.smoother.alphahat=alphahat;
+        oo_.occbin.smoother.etahat=etahat;
+        oo_.occbin.smoother.epsilonhat=epsilonhat;
+        oo_.occbin.smoother.ahat=ahat0;
+        oo_.occbin.smoother.SteadyState=SteadyState;
+        oo_.occbin.smoother.trend_coeff=trend_coeff;
+        oo_.occbin.smoother.aK=aKK;
+        oo_.occbin.smoother.T0=TT;
+        oo_.occbin.smoother.R0=RR;
+        oo_.occbin.smoother.C0=CC;
+        oo_.occbin.smoother.simul.piecewise = out.piecewise(1:end-1,:);
+        if ~options_.occbin.simul.piecewise_only
+            oo_.occbin.smoother.simul.linear = out.linear(1:end-1,:);
+        end        
     end
-    oo_.occbin.smoother.alphahat=alphahat;
-    oo_.occbin.smoother.etahat=etahat;
-    oo_.occbin.smoother.epsilonhat=epsilonhat;
-    oo_.occbin.smoother.ahat=ahat0;
-    oo_.occbin.smoother.SteadyState=SteadyState;
-    oo_.occbin.smoother.trend_coeff=trend_coeff;
-    oo_.occbin.smoother.aK=aKK;
-    oo_.occbin.smoother.T0=TT;
-    oo_.occbin.smoother.R0=RR;
-    oo_.occbin.smoother.C0=CC;
-    oo_.occbin.smoother.simul.piecewise = out.piecewise(1:end-1,:);
-    if ~options_.occbin.simul.piecewise_only
-        oo_.occbin.smoother.simul.linear = out.linear(1:end-1,:);
-    end        
     if options_.occbin.smoother.plot
         GraphDirectoryName = CheckPath('graphs',M_.fname);
         latexFolder = CheckPath('latex',M_.dname);

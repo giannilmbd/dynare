@@ -227,6 +227,7 @@ if ismember(flag,{'smoother','all'})
     options_occbin_.smoother.piecewise_only = true;
     options_occbin_.smoother.plot = true;
     options_occbin_.smoother.status=true;
+    options_occbin_.smoother.store_results=true;
     options_occbin_.smoother.waitbar=true;
 %     options.occbin.smoother.restrict_state_space = 1;
 end

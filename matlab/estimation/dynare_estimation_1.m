@@ -199,15 +199,15 @@ if isequal(options_.mode_compute,0) && isempty(options_.mode_file) && ~options_.
                 end
             else
                 if options_.occbin.smoother.status
-                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_.mf] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
+                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
                     if oo_.occbin.smoother.error_flag(1)==0
-                        [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty);
+                        [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty,a0T,state_uncertainty0);
                     else
                         fprintf('\nOccBin: smoother did not succeed. No results will be written to oo_.\n')
                     end
                 else
-                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_.dr,bayestopt_.mf] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
-                    [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty);
+                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_.dr,bayestopt_.mf,a0T,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+                    [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty,a0T,state_uncertainty0);
                 end
             end
             if options_.forecast > 0

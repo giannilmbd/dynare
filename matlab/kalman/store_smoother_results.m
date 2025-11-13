@@ -1,4 +1,4 @@
-function [oo_, yf]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty)
+function [oo_, yf]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty,a0T,state_uncertainty0)
 % oo_=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend)
 % Writes the smoother results into respective fields in oo_
 %
@@ -26,6 +26,9 @@ function [oo_, yf]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,da
 %   Trend           [double]    [nvarobs*T] matrix of trends in observables
 %   state_uncertainty [double]   (K,K,T) array, storing the uncertainty
 %                                   about the smoothed state (decision-rule order)
+%   a0T             [double]    (m*1) matrix, smoothed endogenous variables (a_{0|T})  (decision-rule order)
+%   state_uncertainty [double]   (K,K,1) array, storing the uncertainty
+%                                   about the smoothed state in t=0 (decision-rule order)
 %
 % Outputs:
 %   oo_             [structure] storing the results:
@@ -154,9 +157,6 @@ if options_.filter_covariance
     oo_.Smoother.Variance = P;
 end
 
-if options_.smoothed_state_uncertainty
-    oo_.Smoother.State_uncertainty=state_uncertainty;
-end
 %get indices of smoothed variables
 i_endo_in_bayestopt_smoother_varlist = bayestopt_.smoother_saved_var_list;
 i_endo_in_dr_matrices=bayestopt_.smoother_var_list(i_endo_in_bayestopt_smoother_varlist);
@@ -197,11 +197,17 @@ for i_endo_in_bayestopt_smoother_varlist=bayestopt_.smoother_saved_var_list'
         constant_current_variable=repmat((ys(i_endo_declaration_order)),gend,1);
     end
     oo_.Smoother.Constant.(M_.endo_names{i_endo_declaration_order})=constant_current_variable;
+    if nargin>18
+        oo_.Smoother.Init_State.(M_.endo_names{i_endo_declaration_order})=a0T(i_endo_in_dr)+constant_current_variable(1);
+    end
     oo_.SmoothedVariables.(M_.endo_names{i_endo_declaration_order})=atT(i_endo_in_dr,:)'+constant_current_variable;
     if ~isempty(options_.nk) && options_.nk > 0 % && ~((any(bayestopt_.pshape > 0) && options_.mh_replic) || (any(bayestopt_.pshape> 0) && options_.load_mh_file))
         oo_.FilteredVariables.(M_.endo_names{i_endo_declaration_order})=squeeze(aK(1,i_endo_in_dr,2:end-(options_.nk-1)))+constant_current_variable;
     end
     oo_.UpdatedVariables.(M_.endo_names{i_endo_declaration_order})=updated_variables(i_endo_in_dr,:)'+constant_current_variable;
+end
+if nargin>18
+    oo_.Smoother.Init_State_Vector(:,1)=a0T(oo_.dr.inv_order_var)+ys;
 end
 
 %% Add trend and constant for observed variables
@@ -256,6 +262,7 @@ if options_.filter_covariance
 end
 if options_.smoothed_state_uncertainty
     oo_.Smoother.State_uncertainty(oo_.dr.order_var,oo_.dr.order_var,:)=state_uncertainty;
+    oo_.Smoother.Init_State_uncertainty(oo_.dr.order_var,oo_.dr.order_var)=state_uncertainty0;
 end
 
 %% get smoothed shocks

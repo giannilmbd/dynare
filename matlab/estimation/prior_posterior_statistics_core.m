@@ -19,9 +19,11 @@ function myoutput=prior_posterior_statistics_core(myinputs,fpar,B,whoiam, ThisMa
 %                          _forc_point_ME;
 %                          _filter_covar;
 %                          _trend_coeff;
+%                          _init_state;
 %                          _smoothed_trend;
 %                          _smoothed_constant;
 %                          _state_uncert;
+%                          _init_state_uncert;
 %
 % ALGORITHM
 %   Portion of prior_posterior.m function.
@@ -79,7 +81,7 @@ naK=myinputs.naK;
 horizon=myinputs.horizon;
 iendo=myinputs.iendo;
 IdObs=myinputs.IdObs; %index of observables
-if horizon && ~options_.occbin.smoother.status
+if horizon
     i_last_obs=myinputs.i_last_obs;
     MAX_nforc1=myinputs.MAX_nforc1;
     MAX_nforc2=myinputs.MAX_nforc2;
@@ -165,13 +167,14 @@ end
 
 %initialize arrays
 if run_smoother
+    stock_init_smooth=NaN(endo_nbr,MAX_n_trend_coeff);
     stock_smooth=NaN(endo_nbr,gend,MAX_nsmoo);
     stock_update=NaN(endo_nbr,gend,MAX_nsmoo);
     stock_innov=NaN(M_.exo_nbr,gend,MAX_ninno);
     stock_smoothed_constant=NaN(endo_nbr,gend,MAX_n_smoothed_constant);
     stock_smoothed_trend=NaN(endo_nbr,gend,MAX_n_smoothed_trend);
     stock_trend_coeff = zeros(endo_nbr,MAX_n_trend_coeff);
-    if horizon && ~options_.occbin.smoother.status
+    if horizon
         stock_forcst_mean= NaN(endo_nbr,horizon,MAX_nforc1);
         stock_forcst_point = NaN(endo_nbr,horizon,MAX_nforc2);
         if ~isequal(M_.H,0)
@@ -193,6 +196,7 @@ if filter_covariance
 end
 if smoothed_state_uncertainty
     stock_smoothed_uncert = zeros(endo_nbr,endo_nbr,gend,MAX_n_smoothed_state_uncertainty);
+    stock_init_smoothed_uncert = zeros(endo_nbr,endo_nbr,MAX_n_smoothed_state_uncertainty);
 end
 
 opts_local = options_;
@@ -230,12 +234,15 @@ for b=fpar:B
             fprintf('prior_posterior_statistics: This should not happen. Please contact the developers.\n')
         end
         if options_.occbin.smoother.status
+            opts_local.occbin.smoother.debug = false;
+            opts_local.occbin.smoother.plot = false;
+            opts_local.occbin.smoother.store_results = false;
             opts_local.occbin.simul.waitbar=0;
-            opts_local.occbin.smoother.waitbar = 0;
+            opts_local.occbin.smoother.waitbar = false;
             opts_local.occbin.smoother.linear_smoother=false; % speed-up
             if options_.occbin.smoother.inversion_filter
                 dataset_.data=Y';
-                [~, info, ~, ~, ~, ~, ~, ~, oo_.dr, alphahat, etahat] = ...
+                [~, info, ~, ~, ~, ~, ~, ~, oo_.dr, alphahat, etahat, regime_history] = ...
                     occbin.IVF_posterior(deep,dataset_,[],options_,M_,estim_params_,bayestopt_,prior_bounds(bayestopt_,options_.prior_trunc),oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                 if info(1)
                     message=get_error_message(info,opts_local);
@@ -244,20 +251,26 @@ for b=fpar:B
                     alphatilde = alphahat*nan;
                     SteadyState=oo_.dr.ys;
                     trend_coeff = zeros(length(options_.varobs_id),1);
-                    trend_addition=zeros(options_.number_of_observed_variables,gend);                    
+                    trend_addition=zeros(options_.number_of_observed_variables,gend);        
+                    stock_occbin_regime(:,irun(5))=regime_history;
+                    stock_occbin_realtime_regime(:,irun(5))=regime_history; 
                 end
                 %epsilonhat not available as no measurement error allowed
             else
                 opts_local.verbosity=0;
-                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_] = ...
+                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,~,~,a0T,state_uncertainty0] = ...
                     occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
                 if oo_.occbin.smoother.error_flag(1)
                     message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
                     fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
+                    continue
+                else
+                   stock_occbin_regime(:,irun(5))=oo_.occbin.smoother.regime_history;
+                   stock_occbin_realtime_regime(:,irun(5))=oo_.occbin.smoother.realtime_regime_history;
                 end
             end
         else
-            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty] = ...
+            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,~,~,a0T,state_uncertainty0] = ...
                 DsgeSmoother(deep,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local,bayestopt_,estim_params_);
         end
 
@@ -275,6 +288,9 @@ for b=fpar:B
                 constant_part;
             stock_update(dr.order_var,:,irun(1)) = alphatilde(1:endo_nbr,:)+ ...
                 constant_part;
+        end
+        if ~(options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter)
+            stock_init_smooth(dr.order_var,irun(9)) = a0T(1:endo_nbr)+constant_part(:,1);
         end
         stock_smoothed_constant(dr.order_var,:,irun(10))=constant_part;
         %% Compute constant for observables
@@ -296,9 +312,11 @@ for b=fpar:B
             stock_smoothed_constant(IdObs,:,irun(10))=stock_smoothed_constant(IdObs,:,irun(10))+mean_correction;
             %smoothed variables are E_T(y_t) so no trend shift is required
             stock_smooth(IdObs,:,irun(1))=stock_smooth(IdObs,:,irun(1))+trend_addition+mean_correction;
+            stock_init_smooth(IdObs,irun(9))=stock_init_smooth(IdObs,irun(9))+trend_addition(:,1)+mean_correction(:,1);
             %updated variables are E_t(y_t) so no trend shift is required
             stock_update(IdObs,:,irun(1))=stock_update(IdObs,:,irun(1))+trend_addition+mean_correction;
         else
+            stock_init_smooth(IdObs,irun(9))=stock_init_smooth(IdObs,irun(9))+trend_addition(:,1);
             stock_smooth(IdObs,:,irun(1))=stock_smooth(IdObs,:,irun(1))+trend_addition;
             stock_update(IdObs,:,irun(1))=stock_update(IdObs,:,irun(1))+trend_addition;
         end
@@ -331,7 +349,7 @@ for b=fpar:B
                 end
             end
         end
-        if horizon && ~options_.occbin.smoother.status
+        if horizon
             yyyy = alphahat(iendo,i_last_obs);
             yf = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
             if options_.prefilter
@@ -387,6 +405,7 @@ for b=fpar:B
         end
         if smoothed_state_uncertainty
             stock_smoothed_uncert(dr.order_var,dr.order_var,:,irun(13)) = state_uncertainty;
+            stock_init_smoothed_uncert(dr.order_var,dr.order_var,irun(13)) = state_uncertainty0;
         end
     else
         [~,~,SteadyState] = dynare_resolve(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
@@ -452,6 +471,16 @@ for b=fpar:B
         if RemoteFlag==1
             OutputFileName_param = [OutputFileName_param; {[DirectoryName filesep], [M_.fname '_param' int2str(ifil(5)) '.mat']}];
         end
+        if options_.occbin.smoother.status
+            stock = stock_occbin_regime(:,1:irun(5)-1);
+            save([DirectoryName '/' M_.fname '_occbin_regime' int2str(ifil(5)) '.mat'],'stock');
+            stock = stock_occbin_realtime_regime(:,1:irun(5)-1);
+            save([DirectoryName '/' M_.fname '_occbin_realtime_regime' int2str(ifil(5)) '.mat'],'stock');
+            if RemoteFlag==1
+                OutputFileName_param = [OutputFileName_param; {[DirectoryName filesep], [M_.fname '_occbin_regime' int2str(ifil(5)) '.mat']}];
+                OutputFileName_param = [OutputFileName_param; {[DirectoryName filesep], [M_.fname '_occbin_realtime_regime' int2str(ifil(5)) '.mat']}];
+            end
+        end
         irun(5) = 1;
     end
 
@@ -487,11 +516,14 @@ for b=fpar:B
 
     irun_index=9;
     if run_smoother && (irun(irun_index) > MAX_n_trend_coeff || b == B)
-        stock = stock_trend_coeff(:,1:irun(irun_index)-1);
         ifil(irun_index) = ifil(irun_index) + 1;
+        stock = stock_trend_coeff(:,1:irun(irun_index)-1);
         save([DirectoryName '/' M_.fname '_trend_coeff' int2str(ifil(irun_index)) '.mat'],'stock');
+        stock = stock_init_smooth(:,1:irun(irun_index)-1);
+        save([DirectoryName '/' M_.fname '_init_state' int2str(ifil(irun_index)) '.mat'],'stock');
         if RemoteFlag==1
             OutputFileName_trend_coeff = [OutputFileName_trend_coeff; {[DirectoryName filesep], [M_.fname '_trend_coeff' int2str(ifil(irun_index)) '.mat']}];
+            OutputFileName_init_state = [OutputFileName_init_state; {[DirectoryName filesep], [M_.fname '_init_state' int2str(ifil(irun_index)) '.mat']}];
         end
         irun(irun_index) = 1;
     end
@@ -531,11 +563,14 @@ for b=fpar:B
 
     irun_index=13;
     if run_smoother && smoothed_state_uncertainty && (irun(irun_index) > MAX_n_smoothed_state_uncertainty || b == B)
-        stock = stock_smoothed_uncert(:,:,:,1:irun(irun_index)-1);
         ifil(irun_index) = ifil(irun_index) + 1;
+        stock = stock_smoothed_uncert(:,:,:,1:irun(irun_index)-1);
         save([DirectoryName '/' M_.fname '_state_uncert' int2str(ifil(irun_index)) '.mat'],'stock');
+        stock = stock_init_smoothed_uncert(:,:,1:irun(irun_index)-1);
+        save([DirectoryName '/' M_.fname '_init_state_uncert' int2str(ifil(irun_index)) '.mat'],'stock');
         if RemoteFlag==1
             OutputFileName_state_uncert = [OutputFileName_state_uncert; {[DirectoryName filesep], [M_.fname '_state_uncert' int2str(ifil(irun_index)) '.mat']}];
+            OutputFileName_init_state_uncert = [OutputFileName_init_state_uncert; {[DirectoryName filesep], [M_.fname '_init_state_uncert' int2str(ifil(irun_index)) '.mat']}];
         end
         irun(irun_index) = 1;
     end
@@ -557,9 +592,11 @@ if RemoteFlag==1
                         OutputFileName_forc_point_ME;
                         OutputFileName_filter_covar;
                         OutputFileName_trend_coeff;
+                        OutputFileName_init_state;
                         OutputFileName_smoothed_trend;
                         OutputFileName_smoothed_constant;
-                        OutputFileName_state_uncert];
+                        OutputFileName_state_uncert;
+                        OutputFileName_init_state_uncert];
 end
 
 wait_bar.close(h,options_.console_mode);

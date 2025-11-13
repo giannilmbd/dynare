@@ -1,5 +1,5 @@
-function oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,name3,DirectoryName,var_type,dispString)
-% oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,name3,DirectoryName,var_type,dispString)
+function [oo_, B1]=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,name3,DirectoryName,var_type,dispString)
+% [oo_, B1]=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,name3,DirectoryName,var_type,dispString)
 % Computes, stores and plots the posterior moment statistics.
 %
 % INPUTS
@@ -22,7 +22,7 @@ function oo_=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,names2,na
 %
 % OUTPUTS
 %  oo_          [structure]     storing the results
-
+%  B1           [integer]       storing number of successful posterior smoother subdraws
 
 % PARALLEL CONTEXT
 % See also the comment in posterior_sampler.m function.
@@ -82,12 +82,19 @@ fprintf(['%s: ' tit1 '\n'],dispString);
 k = 0;
 filter_step_ahead_indicator=0;
 filter_covar_indicator=0;
+init_state_uncert_indicator=0;
 state_uncert_indicator=0;
 
 for file = 1:ifil
     loaded_file=load([DirectoryName '/' M_.fname var_type int2str(file)]);
     stock=loaded_file.stock;
-    if strcmp(var_type,'_filter_step_ahead')
+    if strcmp(var_type,'_param')
+        if file==1 %on first run, initialize variable for storing filter_step_ahead
+            stock1 = zeros(n1,B);
+        end
+        k = k(end)+(1:size(stock,1));
+        stock1(:,k) = stock';
+    elseif strcmp(var_type,'_filter_step_ahead')
         if file==1 %on first run, initialize variable for storing filter_step_ahead
             stock1_filter_step_ahead=NaN(n1,n2,B,length(options_.filter_step_ahead));
             stock1 = zeros(n1,n2,B);
@@ -109,6 +116,18 @@ for file = 1:ifil
         filter_covar_indicator=1;
         k = k(end)+(1:size(stock,4));
         stock1_filter_covar(:,:,:,k) = stock;
+    elseif strcmp(var_type,'_init_state')
+        if file==1 %on first run, initialize variable for storing filter_step_ahead
+            stock1 = zeros(n1,B);
+        end
+        k = k(end)+(1:size(stock,2));
+        stock1(:,k) = stock;
+    elseif strcmp(var_type,'_occbin_regime')
+        k = k(end)+(1:size(stock,2));
+        stock1(:,k) = stock;
+    elseif strcmp(var_type,'_occbin_realtime_regime')
+        k = k(end)+(1:size(stock,2));
+        stock1(:,k) = stock;
     elseif strcmp(var_type,'_trend_coeff')
         if file==1 %on first run, initialize variable for storing filter_step_ahead
             stock1_filter_step_ahead=NaN(n1,n2,B,length(options_.filter_step_ahead));
@@ -123,6 +142,13 @@ for file = 1:ifil
         state_uncert_indicator=1;
         k = k(end)+(1:size(stock,4));
         stock1_state_uncert(:,:,:,k) = stock;
+    elseif strcmp(var_type,'_init_state_uncert')
+        if file==1 %on first run, initialize variable for storing filter_step_ahead
+            stock1_init_state_uncert=NaN(n1,size(stock,2),B);
+        end
+        init_state_uncert_indicator=1;
+        k = k(end)+(1:size(stock,3));
+        stock1_init_state_uncert(:,:,k) = stock;
     else
         if file==1 %on first run, initialize variable for storing filter_step_ahead
             stock1 = zeros(n1,n2,B);
@@ -130,6 +156,10 @@ for file = 1:ifil
         k = k(end)+(1:size(stock,3));
         stock1(:,:,k) = stock;
     end
+end
+if nargout==2
+    B1=max(k);
+    return
 end
 clear stock
 if filter_step_ahead_indicator
@@ -165,8 +195,33 @@ elseif filter_covar_indicator
     oo_.FilterCovariance.HPDsup=squeeze(hpd_interval(:,:,:,2));
     fprintf(['%s: ' tit1 ', done!\n'],dispString);
     return
+elseif init_state_uncert_indicator
+    draw_dimension=3;
+    oo_.Smoother.Init_State_uncertainty=struct();
+    oo_.Smoother.Init_State_uncertainty.Mean = squeeze(mean(stock1_init_state_uncert,draw_dimension));
+    oo_.Smoother.Init_State_uncertainty.Median = squeeze(median(stock1_init_state_uncert,draw_dimension));
+    oo_.Smoother.Init_State_uncertainty.var = squeeze(var(stock1_init_state_uncert,0,draw_dimension));
+    if size(stock1_init_state_uncert,draw_dimension)>2
+        hpd_interval = quantile(stock1_init_state_uncert,[(1-options_.mh_conf_sig)/2 (1-options_.mh_conf_sig)/2+options_.mh_conf_sig],draw_dimension);
+    else
+        size_matrix=size(stock1_init_state_uncert);
+        hpd_interval=NaN([size_matrix(1:2),2]);
+    end
+    if size(stock1_init_state_uncert,draw_dimension)>9
+        post_deciles =quantile(stock1_init_state_uncert,0.1:0.1:0.9,draw_dimension);
+    else
+        size_matrix=size(stock1_init_state_uncert);
+        post_deciles=NaN([size_matrix(1:2),9]);
+    end
+    oo_.Smoother.Init_State_uncertainty.post_deciles=post_deciles;
+    oo_.Smoother.Init_State_uncertainty.HPDinf=squeeze(hpd_interval(:,:,1));
+    oo_.Smoother.Init_State_uncertainty.HPDsup=squeeze(hpd_interval(:,:,2));
+    fprintf(['%s: ' tit1 ', done!\n'],dispString);
+    return
+    
 elseif state_uncert_indicator
     draw_dimension=4;
+    oo_.Smoother.State_uncertainty=struct();
     oo_.Smoother.State_uncertainty.Mean = squeeze(mean(stock1_state_uncert,draw_dimension));
     oo_.Smoother.State_uncertainty.Median = squeeze(median(stock1_state_uncert,draw_dimension));
     oo_.Smoother.State_uncertainty.var = squeeze(var(stock1_state_uncert,0,draw_dimension));
@@ -189,7 +244,7 @@ elseif state_uncert_indicator
     return
 end
 
-if strcmp(var_type,'_trend_coeff') %two dimensional arrays
+if strcmp(var_type,'_trend_coeff') || strcmp(var_type,'_init_state') %two dimensional arrays
     for i = 1:nvar
         if options_.estimation.moments_posterior_density.indicator
             [Mean(1,i),Median(1,i),Var(1,i),HPD(:,1,i),Distrib(:,1,i),Density(:,:,1,i)] = ...
@@ -197,6 +252,25 @@ if strcmp(var_type,'_trend_coeff') %two dimensional arrays
         else
             [Mean(1,i),Median(1,i),Var(1,i),HPD(:,1,i),Distrib(:,1,i)] = ...
                 posterior_moments(squeeze(stock1(SelecVariables(i),:)),options_.mh_conf_sig);
+        end
+    end
+elseif strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime') %two structure arrays
+    for j=1:n1
+        for i = 1:n2
+            for k=1:B
+                if j==1
+                    tmp_regime_info(1,k) = stock1(i,k).regimestart(end)-1;
+                else
+                    if not(isempty(find(stock1(i,k).regime==1,1)))
+                        tmp_regime_info(1,k) = stock1(i,k).regimestart(find(stock1(i,k).regime==1,1))-1; % first period kick in
+                    else
+                        tmp_regime_info(1,k)=0;
+                    end
+                end
+            end
+
+            [Mean(i,j),Median(i,j),Var(i,j),HPD(:,i,j),Distrib(:,i,j)] = ...
+                posterior_moments(tmp_regime_info,options_.mh_conf_sig);
         end
     end
 else %three dimensional arrays
@@ -239,7 +313,7 @@ if filter_step_ahead_indicator %write matrices corresponding to ML
     oo_.FilteredVariablesKStepAheadVariances=FilteredVariablesKStepAheadVariances;
 end
 
-if strcmp(var_type,'_trend_coeff') || strcmp(var_type,'_smoothed_trend') || strcmp(var_type,'_smoothed_trend')
+if strcmp(var_type,'_trend_coeff') || strcmp(var_type,'_init_state') || strcmp(var_type,'_smoothed_trend') || strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime')
     for i = 1:nvar
         name = deblank(names1{SelecVariables(i)});
         oo_.Smoother.(name3).Mean.(name) = Mean(:,i);
@@ -248,7 +322,7 @@ if strcmp(var_type,'_trend_coeff') || strcmp(var_type,'_smoothed_trend') || strc
         oo_.Smoother.(name3).deciles.(name) = Distrib(:,:,i);
         oo_.Smoother.(name3).HPDinf.(name) = HPD(1,:,i)';
         oo_.Smoother.(name3).HPDsup.(name) = HPD(2,:,i)';
-        if options_.estimation.moments_posterior_density.indicator
+        if not(strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime')) && options_.estimation.moments_posterior_density.indicator
             oo_.Smoother.(name3).density.(name) = Density(:,:,:,i);
         end
     end
@@ -281,7 +355,7 @@ else
     end
 end
 
-if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean)))
+if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean))) || strcmp(var_type,'_init_state') || strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime')
     fprintf(['%s: ' tit1 ', done!\n'],dispString);
     return %not do plots
 end
