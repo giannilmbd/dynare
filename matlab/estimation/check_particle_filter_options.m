@@ -76,13 +76,13 @@ if ~isempty(particle_options.particle_filter_options)
                     particle_options.unscented.alpha=options_list{i,2};
                 end
             case 'unscented_beta'
-                if options_list{i,2} <= 0
+                if options_list{i,2} < 0
                     error('check_particle_filter_options:: the unscented_beta option takes a positive argument');
                 else
                     particle_options.unscented.beta=options_list{i,2};
                 end
             case 'unscented_kappa'
-                if options_list{i,2} <= 0
+                if options_list{i,2} < 0
                     error('check_particle_filter_options:: the unscented_kappa option takes a positive argument');
                 else
                     particle_options.unscented.kappa=options_list{i,2};

@@ -45,6 +45,6 @@ prior = probability2(st_t_1, sqr_Pss_t_t_1, particles);
 
 % likelihood
 yt_t_1_i = measurement_equations(particles, ReducedForm, ThreadsOptions, options_, M_);
-likelihood = probability2(obs, sqrt(H), yt_t_1_i);
+likelihood = probability2(obs, chol(H,'lower'), yt_t_1_i);
 
 IncrementalWeights = likelihood.*prior./proposal;
