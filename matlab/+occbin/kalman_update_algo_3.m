@@ -182,6 +182,7 @@ end
 if out.error_flag
     error_flag = out.error_flag;
     etahat=etahat(:,2);
+    lik=inf;
     return;
 end
 
@@ -288,6 +289,8 @@ end
 if ~error_flag
     a = out.piecewise(1:nk+1,my_order_var)' - repmat(out.ys(my_order_var),1,nk+1);
     regimes_=regimes_(1:3);
+else
+    lik = inf;
 end
 T = ss.T(my_order_var,my_order_var,:);
 R = ss.R(my_order_var,:,:);

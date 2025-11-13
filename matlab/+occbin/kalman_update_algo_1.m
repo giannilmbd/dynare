@@ -160,6 +160,7 @@ else
 end
 if error_flag
     etahat=NaN(size(QQQ,1),1);
+    lik=inf;
     warning(orig_warning_state);
     return;
 end
@@ -322,6 +323,8 @@ end
 if ~error_flag
     a = out.piecewise(1:2,my_order_var)' - repmat(out.ys(my_order_var),1,2);
     regimes_=regimes_(1:3);
+else
+    lik=inf;
 end
 T = ss.T(my_order_var,my_order_var,1:2);
 R = ss.R(my_order_var,:,1:2);
@@ -340,7 +343,6 @@ end
 function [a, a1, P, P1, v, alphahat, etahat, lik, V, error_flag] = occbin_kalman_update0(a,a1,P,P1,data_index,Z,v,Y,H,QQQ,TT,RR,CC,iF,L,mm, rescale_prediction_error_covariance, IF_likelihood, state_uncertainty_flag)
 alphahat=NaN(size(a));
 etahat=NaN(size(QQQ,1),2);
-lik=Inf; 
 error_flag=0;
 
 if state_uncertainty_flag
@@ -355,7 +357,7 @@ if nargin<18
     IF_likelihood=0;
 end
 t=2;
-lik=0;
+lik=inf;
 %% forward pass
 % given updated variables and covarnace in t=1, we make the step to t=2
 T = TT(:,:,t);
@@ -373,6 +375,7 @@ if isempty(di)
     a(:,t)     = a1(:,t);
     L(:,:,t)        = eye(mm);
     P1(:,:,t+1)      = T*P(:,:,t)*T' + QQ;                               %p. 111, DK(2012)
+    lik=0; 
 else
     ZZ = Z(di,:);
     v(di,t)      = Y(di,t) - ZZ*a(:,t);
