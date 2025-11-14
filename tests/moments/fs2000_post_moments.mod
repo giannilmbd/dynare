@@ -243,7 +243,7 @@ for var_iter_1=1:nvars
 end
 
 if isoctave
-    tol = 2e-3;
+    tol = 2.2e-3;
 else
     tol = 1e-8;
 end

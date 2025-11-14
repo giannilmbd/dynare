@@ -324,7 +324,7 @@ indtotparam = unique([indparam_dDYNAMIC indparam_dREDUCEDFORM indparam_dMOMENTS 
 
 for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subsets
     waitbar_string=['Brute force collinearity for ' int2str(j) ' parameters.'];
-    [h, length_of_old_string] = waitbar.run(0, [], waitbar_string, console_mode, 0,'Brute force collinearity test.');
+    [h, length_of_old_string] = wait_bar.run(0, [], waitbar_string, console_mode, 0,'Brute force collinearity test.');
 
     %Step1: get all possible unique subsets of j elements
     if ~no_identification_dynamic ...
@@ -427,7 +427,7 @@ for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subset
                 end
             end
         end
-        [~,length_of_old_string]=waitbar.run(k/maxk,h, waitbar_string, console_mode, length_of_old_string);
+        [~,length_of_old_string]=wait_bar.run(k/maxk,h, waitbar_string, console_mode, length_of_old_string);
     end
 
     %Step 4: Compare rank conditions for all possible subsets. If rank condition is violated, then the corresponding numbers of the parameters are stored
@@ -476,7 +476,7 @@ for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subset
 %             indtotparam(ismember(indtotparam,idx2(:,2))) = [];
 %         end
 %     end
-    waitbar.close(h,console_mode);
+    wait_bar.close(h,console_mode);
 end
 
 %% Save output variables

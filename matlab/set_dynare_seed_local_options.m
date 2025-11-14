@@ -2,17 +2,17 @@ function DynareRandomStreams=set_dynare_seed_local_options(DynareRandomStreams,i
 % DynareRandomStreams=set_dynare_seed_local_options(DynareRandomStreams,isHybridMatlabOctave,a,b)
 % Set seeds depending on MATLAB (octave) version
 % Inputs:
-%   o DynareRandomStreams   options structure relating to options_.DynareRandomStreams, 
+%   o DynareRandomStreams   options structure relating to options_.DynareRandomStreams,
 %                           potentially empty for initialization (a=='default')
 %   o isHybridMatlabOctave  bool indicating whether parallel mixed pool is
 %                           used
-%   o a                     first input argument, 
+%   o a                     first input argument,
 %                           for single argument input, either
 %                               [number]       seed
 %                               [string]        'default'
 %                                               'reset'
-%       	                                    'clock'
-%                           for two inputs: 
+%       	                                      'clock'
+%                           for two inputs:
 %                               [string]        indicating feasible RNG algorithm (default: 'mt19937ar')
 %   o b                     second input argument
 %                               [number]        seed for algorithm
@@ -104,6 +104,14 @@ else% Use old MATLAB interface.
             rand(DynareRandomStreams.algo,DynareRandomStreams.seed);
             randn('state',DynareRandomStreams.seed);
             return
+        end
+        if isempty(DynareRandomStreams) || isfield(DynareRandomStreams,'algo')
+        %make sure algorithm is set
+            if isoctave
+                DynareRandomStreams.algo = 'state';
+            else
+                DynareRandomStreams.algo = 'twister';
+            end
         end
         if ischar(a) && strcmpi(a,'reset')
             rand(DynareRandomStreams.algo,DynareRandomStreams.seed);

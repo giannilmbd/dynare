@@ -30,7 +30,7 @@ end
 
 ListOfFiles = dir([ PATH  fname '_' TYPE 'Correlations*.mat']);
 
-[hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: correlation', options_.console_mode, 0);
+[hh_fig, length_of_old_string] = wait_bar.run(0, [], 'Endogenous moments: correlation', options_.console_mode, 0);
 if ~options_.console_mode
     set(hh_fig,'Name', 'Endogenous moments: correlation.' );
 end
@@ -47,7 +47,7 @@ for var_iter_1=1:nvar
     var1=vartan{var_iter_1};
     for var_iter_2=1:nvar
         var2=vartan{var_iter_2};
-        [hh_fig, length_of_old_string] = waitbar.run(((var_iter_1-1)*nvar+var_iter_2)/(nvar^2), hh_fig, 'Endogenous moments: correlation', options_.console_mode, length_of_old_string);
+        [hh_fig, length_of_old_string] = wait_bar.run(((var_iter_1-1)*nvar+var_iter_2)/(nvar^2), hh_fig, 'Endogenous moments: correlation', options_.console_mode, length_of_old_string);
 
         oo_ = initialize_output_structure(var1,var2,nar,TYPE,oo_,options_);
         for nar_iter=1:nar
@@ -70,7 +70,7 @@ for var_iter_1=1:nvar
         end
     end
 end
-waitbar.close(hh_fig,options_.console_mode)
+wait_bar.close(hh_fig,options_.console_mode)
 
 function oo_ = initialize_output_structure(var1,var2,nar,type,oo_,options_)
 oo_.([type, 'TheoreticalMoments']).dsge.correlation.Mean.(var1).(var2) = NaN(nar,1);

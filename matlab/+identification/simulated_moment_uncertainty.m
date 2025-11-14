@@ -34,7 +34,7 @@ mm=zeros(length(indx),replic);
 disp('Evaluating simulated moment uncertainty ... please wait')
 disp(['Doing ',int2str(replic),' replicas of length ',int2str(periods),' periods.'])
 
-[h, length_of_old_string] = waitbar.run(0,[],'Simulated moment uncertainty ...', options_.console_mode, 0, 'Simulated moment uncertainty.');
+[h, length_of_old_string] = wait_bar.run(0,[],'Simulated moment uncertainty ...', options_.console_mode, 0, 'Simulated moment uncertainty.');
 
 %Do check whether simulation is possible
 if options_.periods == 0
@@ -97,9 +97,9 @@ for j=1:replic
         dum=[dum; vec(oo_.autocorr{i}.*(sd*sd'))];
     end
     mm(:,j)=dum(indx);
-    [~, length_of_old_string] = waitbar.run(j/replic,h,['Simulated moment uncertainty. Replic  ',int2str(j),'/',int2str(replic)], options_.console_mode, length_of_old_string);
+    [~, length_of_old_string] = wait_bar.run(j/replic,h,['Simulated moment uncertainty. Replic  ',int2str(j),'/',int2str(replic)], options_.console_mode, length_of_old_string);
 end
-waitbar.close(h,options_.console_mode);
+wait_bar.close(h,options_.console_mode);
 
 cmm = cov(mm');
 disp('Simulated moment uncertainty ... done!')

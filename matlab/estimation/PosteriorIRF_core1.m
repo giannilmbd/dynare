@@ -108,7 +108,7 @@ elseif strcmpi(type,'gsa')
 else
     waitbar_string='Bayesian (prior) IRFs...';
 end
-[h, length_of_old_string] = waitbar.run(0, [], waitbar_string, options_.console_mode, 0, 'Posterior IRFs.', whoiam,Parallel(ThisMatlab));
+[h, length_of_old_string] = wait_bar.run(0, [], waitbar_string, options_.console_mode, 0, 'Posterior IRFs.', whoiam,Parallel(ThisMatlab));
 
 OutputFileName_bvardsge = {};
 OutputFileName_dsge = {};
@@ -275,10 +275,10 @@ while fpar<B
         ifil2 = ifil2 + 1;
         irun2 = 0;
     end
-    [~,length_of_old_string]=waitbar.run((fpar-fpar0)/(B-fpar0),h, waitbar_string, options_.console_mode, length_of_old_string, [], whoiam, Parallel(ThisMatlab));
+    [~,length_of_old_string]=wait_bar.run((fpar-fpar0)/(B-fpar0),h, waitbar_string, options_.console_mode, length_of_old_string, [], whoiam, Parallel(ThisMatlab));
 end
 
-waitbar.close(h,options_.console_mode);
+wait_bar.close(h,options_.console_mode);
 
 if whoiam==0
     if nosaddle

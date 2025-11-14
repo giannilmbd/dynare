@@ -96,7 +96,7 @@ if whoiam
     if Parallel(ThisMatlab).Local==0
         RemoteFlag =1;
     end
-    [hh_fig, length_of_old_string] = waitbar.run(0, [], 'PosteriorIRF: Plots ...', options_.console_mode, 0, 'Posterior IRF plots.', whoiam,Parallel(ThisMatlab));
+    [hh_fig, length_of_old_string] = wait_bar.run(0, [], 'PosteriorIRF: Plots ...', options_.console_mode, 0, 'Posterior IRF plots.', whoiam,Parallel(ThisMatlab));
 end
 
 OutputFileName={};
@@ -169,7 +169,7 @@ for i=fpar:npar
     if whoiam
         fprintf('Done! \n');
         waitbarString = [ 'Exog. shocks ' int2str(i) '/' int2str(npar) ' done.'];
-        [~,length_of_old_string]=waitbar.run((i-fpar+1)/(npar-fpar+1),hh_fig,waitbarString, options_.console_mode, length_of_old_string, [], whoiam, Parallel(ThisMatlab));
+        [~,length_of_old_string]=wait_bar.run((i-fpar+1)/(npar-fpar+1),hh_fig,waitbarString, options_.console_mode, length_of_old_string, [], whoiam, Parallel(ThisMatlab));
     end
 end % loop over exo_var
 

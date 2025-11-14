@@ -76,7 +76,7 @@ if options_.TeX
 end
 
 if whoiam
-    [h, length_of_old_string] = waitbar.run(0, [], 'pm3: Parallel plots ...', options_.console_mode, 0, 'Posterior moments plotting.', whoiam,Parallel(ThisMatlab));
+    [h, length_of_old_string] = wait_bar.run(0, [], 'pm3: Parallel plots ...', options_.console_mode, 0, 'Posterior moments plotting.', whoiam,Parallel(ThisMatlab));
 end
 
 figunumber = 0;
@@ -136,11 +136,11 @@ for i=fpar:nvar
     end
 
     if whoiam
-        [h, length_of_old_string] = waitbar.run((i-fpar+1)/(nvar-fpar+1), h, 'pm3: Parallel plots ...', options_.console_mode, 0, [], whoiam,Parallel(ThisMatlab));
+        [h, length_of_old_string] = wait_bar.run((i-fpar+1)/(nvar-fpar+1), h, 'pm3: Parallel plots ...', options_.console_mode, 0, [], whoiam,Parallel(ThisMatlab));
     end
 end
 
 if whoiam
-    waitbar.close(h,options_.console_mode);
+    wait_bar.close(h,options_.console_mode);
 end
 myoutput.OutputFileName=OutputFileName;

@@ -68,12 +68,12 @@ opts_simul.piecewise_only = 1;
 filtered_errs=zeros(sample_length,n_obs);
 
 if options_.occbin.likelihood.waitbar
-    [hh_fig, length_of_old_string] = waitbar.run(0,[],'IVF_core: Filtering the shocks', options_.console_mode, 0, 'IVF_core: Filtering the shocks.');
+    [hh_fig, length_of_old_string] = wait_bar.run(0,[],'IVF_core: Filtering the shocks', options_.console_mode, 0, 'IVF_core: Filtering the shocks.');
 end
 
 for this_period=1:sample_length
     if options_.occbin.likelihood.waitbar
-        [~,length_of_old_string]=waitbar.run(this_period/sample_length, hh_fig, sprintf('Period %u of %u', this_period,sample_length),options_.console_mode,length_of_old_string);
+        [~,length_of_old_string]=wait_bar.run(this_period/sample_length, hh_fig, sprintf('Period %u of %u', this_period,sample_length),options_.console_mode,length_of_old_string);
     end
     current_obs = obs(this_period,:);
     init_val_old = init_val;
@@ -94,7 +94,7 @@ for this_period=1:sample_length
         if this_period == 1
             regime_history(this_period) = [];
         end
-        if options_.occbin.likelihood.waitbar; waitbar.close(hh_fig,options_.console_mode); end
+        if options_.occbin.likelihood.waitbar; wait_bar.close(hh_fig,options_.console_mode); end
         return
     end
     filtered_errs(this_period,inan)=err_vals_out';
@@ -109,7 +109,7 @@ for this_period=1:sample_length
         error_code(1) = 306;
         error_code(4) = max(abs(err_vals_out))/1000;
         filtered_errs=NaN;
-        if options_.occbin.likelihood.waitbar; waitbar.close(hh_fig,options_.console_mode); end
+        if options_.occbin.likelihood.waitbar; wait_bar.close(hh_fig,options_.console_mode); end
         return
     end
     if max(abs(resids(this_period,:)))>0.001
@@ -118,12 +118,12 @@ for this_period=1:sample_length
         filtered_errs=NaN;
         error_code(1) = 303;
         error_code(4) = max(abs(resids(this_period,:)))*100;
-        if options_.occbin.likelihood.waitbar; waitbar.close(hh_fig,options_.console_mode); end
+        if options_.occbin.likelihood.waitbar; wait_bar.close(hh_fig,options_.console_mode); end
         return
     end
 end
 if options_.occbin.likelihood.waitbar
-    waitbar.close(hh_fig,options_.console_mode);
+    wait_bar.close(hh_fig,options_.console_mode);
 end
 
 end

@@ -236,7 +236,7 @@ if fload==0 %run new MC
         end
     end
     %
-    [h, length_of_old_string] = waitbar.run(0,[],'Please wait. Stability mapping ...', options_.console_mode, 0, 'Stability mapping.');
+    [h, length_of_old_string] = wait_bar.run(0,[],'Please wait. Stability mapping ...', options_.console_mode, 0, 'Stability mapping.');
     istable=1:Nsam;
     jstab=0;
     iunstable=1:Nsam;
@@ -333,10 +333,10 @@ if fload==0 %run new MC
         ys_=real(dr_.ys);
         yys(:,j) = ys_;
         if mod(j,3)
-            [~,length_of_old_string]=waitbar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)],options_.console_mode,length_of_old_string);
+            [~,length_of_old_string]=wait_bar.run(j/Nsam,h,['MC iteration ',int2str(j),'/',int2str(Nsam)],options_.console_mode,length_of_old_string);
         end
     end
-    waitbar.close(h,options_.console_mode);
+    wait_bar.close(h,options_.console_mode);
     if prepSA && jstab
         T=T(:,:,1:jstab);
     else
@@ -389,7 +389,7 @@ else %load old run
     end
 
     if prepSA && isempty(strmatch('T',who('-file', filetoload),'exact'))
-        [h, length_of_old_string] = waitbar.run(0,[],'Please wait...', options_.console_mode, 0, 'Stability mapping.');
+        [h, length_of_old_string] = wait_bar.run(0,[],'Please wait...', options_.console_mode, 0, 'Stability mapping.');
 
         options_.periods=0;
         options_.nomoments=1;
@@ -409,10 +409,10 @@ else %load old run
             ys_=real(dr_.ys);
             yys(:,j) = ys_;
             if mod(j,3)
-                [~, length_of_old_string] = waitbar.run(j/ntrans,h,['MC iteration ',int2str(j),'/',int2str(ntrans)], options_.console_mode, length_of_old_string);
+                [~, length_of_old_string] = wait_bar.run(j/ntrans,h,['MC iteration ',int2str(j),'/',int2str(ntrans)], options_.console_mode, length_of_old_string);
             end
         end
-        waitbar.close(h,options_.console_mode);
+        wait_bar.close(h,options_.console_mode);
         save(filetoload,'T','-append')
     end
 end

@@ -91,23 +91,23 @@ if options_.TeX
 end
 
 % COVARIANCE MATRIX.
-[hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: variance/covariance', options_.console_mode, 0, 'Endogenous moments: variance/covariance.');
+[hh_fig, length_of_old_string] = wait_bar.run(0, [], 'Endogenous moments: variance/covariance', options_.console_mode, 0, 'Endogenous moments: variance/covariance.');
 if posterior
     for i=1:NumberOfEndogenousVariables
         for j=i:NumberOfEndogenousVariables
             oo_ = posterior_analysis('variance', var_list_{i}, var_list_{j}, NumberOfLags, options_, M_, oo_, estim_params_);
-            [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables^2), hh_fig, 'Endogenous moments: variance/covariance', options_.console_mode, length_of_old_string);
+            [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables^2), hh_fig, 'Endogenous moments: variance/covariance', options_.console_mode, length_of_old_string);
         end
     end
 else
     for i=1:NumberOfEndogenousVariables
         for j=i:NumberOfEndogenousVariables
             oo_ = prior_analysis('variance', var_list_{i}, var_list_{j}, NumberOfLags, options_, M_, oo_, estim_params_);
-            [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables^2), hh_fig, 'Endogenous moments: variance/covariance', options_.console_mode, length_of_old_string);
+            [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables^2), hh_fig, 'Endogenous moments: variance/covariance', options_.console_mode, length_of_old_string);
         end
     end
 end
-waitbar.close(hh_fig,options_.console_mode)
+wait_bar.close(hh_fig,options_.console_mode)
 
 % CORRELATION FUNCTION.
 if posterior
@@ -121,14 +121,14 @@ end
 if options_.order==1
     if M_.exo_nbr > 1
         if ~NoDecomposition
-            [hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: variance decomposition', options_.console_mode, 0, 'Endogenous moments: variance decomposition.');
+            [hh_fig, length_of_old_string] = wait_bar.run(0, [], 'Endogenous moments: variance decomposition', options_.console_mode, 0, 'Endogenous moments: variance decomposition.');
             temp=NaN(NumberOfEndogenousVariables,NumberOfExogenousVariables);
             if posterior
                 for i=1:NumberOfEndogenousVariables
                     for j=1:NumberOfExogenousVariables
                         oo_ = posterior_analysis('decomposition', var_list_{i}, M_.exo_names{j}, [], options_, M_, oo_, estim_params_);
                         temp(i,j) = oo_.PosteriorTheoreticalMoments.dsge.VarianceDecomposition.Mean.(var_list_{i}).(M_.exo_names{j});
-                        [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables),...
+                        [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables),...
                             hh_fig, 'Endogenous moments: variance decomposition', options_.console_mode, length_of_old_string);
                     end
                 end
@@ -139,13 +139,13 @@ if options_.order==1
                     for j=1:NumberOfExogenousVariables
                         oo_ = prior_analysis('decomposition', var_list_{i}, M_.exo_names{j}, [], options_, M_, oo_, estim_params_);
                         temp(i,j)=oo_.PriorTheoreticalMoments.dsge.VarianceDecomposition.Mean.(var_list_{i}).(M_.exo_names{j});
-                        [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables), hh_fig, 'Endogenous moments: variance decomposition', options_.console_mode, length_of_old_string);
+                        [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables), hh_fig, 'Endogenous moments: variance decomposition', options_.console_mode, length_of_old_string);
                     end
                 end
                 title='Prior mean variance decomposition (in percent)';
                 save_name_string='dsge_prior_mean_var_decomp_uncond';
             end
-            waitbar.close(hh_fig,options_.console_mode)
+            wait_bar.close(hh_fig,options_.console_mode)
             title=add_filter_subtitle(title, options_);
             headers = M_.exo_names;
             headers = vertcat(' ', headers);
@@ -167,14 +167,14 @@ if options_.order==1
             if ~all(diag(M_.H)==0)
                 [observable_name_requested_vars, varlist_pos] = intersect(var_list_, options_.varobs, 'stable');
                 if ~isempty(observable_name_requested_vars)
-                    [hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: variance decomposition with measurement error.', options_.console_mode, 0, 'Endogenous moments: variance decomposition with measurement error.');
+                    [hh_fig, length_of_old_string] = wait_bar.run(0, [], 'Endogenous moments: variance decomposition with measurement error.', options_.console_mode, 0, 'Endogenous moments: variance decomposition with measurement error.');
                     NumberOfObservedEndogenousVariables = length(observable_name_requested_vars);
                     temp = NaN(NumberOfObservedEndogenousVariables, NumberOfExogenousVariables+1);
                     if posterior
                         for i=1:NumberOfObservedEndogenousVariables
                             for j=1:NumberOfExogenousVariables
                                 temp(i,j,:) = oo_.PosteriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
-                                [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfObservedEndogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig, 'Endogenous moments: variance decomposition with measurement error', options_.console_mode, length_of_old_string);
+                                [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig, 'Endogenous moments: variance decomposition with measurement error', options_.console_mode, length_of_old_string);
                             end
                             endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
                             oo_ = posterior_analysis('decomposition', var_list_{endo_index_varlist}, 'ME', [], options_, M_, oo_, estim_params_);
@@ -186,7 +186,7 @@ if options_.order==1
                         for i=1:NumberOfObservedEndogenousVariables
                             for j=1:NumberOfExogenousVariables
                                 temp(i,j,:) = oo_.PriorTheoreticalMoments.dsge.VarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
-                                [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfObservedEndogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig, 'Endogenous moments: variance decomposition with measurement error', options_.console_mode, length_of_old_string);
+                                [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig, 'Endogenous moments: variance decomposition with measurement error', options_.console_mode, length_of_old_string);
                             end
                             endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
                             oo_ = prior_analysis('decomposition', var_list_{endo_index_varlist}, 'ME', [], options_, M_, oo_);
@@ -195,7 +195,7 @@ if options_.order==1
                         title='Prior mean variance decomposition (in percent) with measurement error';
                         save_name_string='dsge_prior_mean_var_decomp_uncond_ME';
                     end
-                    waitbar.close(hh_fig,options_.console_mode)
+                    wait_bar.close(hh_fig,options_.console_mode)
                     title=add_filter_subtitle(title, options_);
                     headers = M_.exo_names;
                     headers = vertcat(' ', headers, 'ME');
@@ -214,14 +214,14 @@ if options_.order==1
         end
         % CONDITIONAL VARIANCE DECOMPOSITION.
         if Steps
-            [hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: conditional variance decomposition.', options_.console_mode, 0, 'Endogenous moments: variance decomposition with measurement error.');
+            [hh_fig, length_of_old_string] = wait_bar.run(0, [], 'Endogenous moments: conditional variance decomposition.', options_.console_mode, 0, 'Endogenous moments: variance decomposition with measurement error.');
             temp = NaN(NumberOfEndogenousVariables, NumberOfExogenousVariables, length(Steps));
             if posterior
                 for i=1:NumberOfEndogenousVariables
                     for j=1:NumberOfExogenousVariables
                         oo_ = posterior_analysis('conditional decomposition', var_list_{i}, M_.exo_names{j}, Steps, options_, M_, oo_, estim_params_);
                         temp(i,j,:) = oo_.PosteriorTheoreticalMoments.dsge.ConditionalVarianceDecomposition.Mean.(var_list_{i}).(M_.exo_names{j});
-                        [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
+                        [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
                             'Endogenous moments: conditional variance decomposition', options_.console_mode, length_of_old_string);
                     end
                 end
@@ -232,14 +232,14 @@ if options_.order==1
                     for j=1:NumberOfExogenousVariables
                         oo_ = prior_analysis('conditional decomposition', var_list_{i}, M_.exo_names{j}, Steps, options_, M_, oo_);
                         temp(i,j,:) = oo_.PriorTheoreticalMoments.dsge.ConditionalVarianceDecomposition.Mean.(var_list_{i}).(M_.exo_names{j});
-                        [hh_fig, length_of_old_string] = waitbar.run(((i-1)*NumberOfEndogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
+                        [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
                             'Endogenous moments: conditional variance decomposition', options_.console_mode, length_of_old_string);
                     end
                 end
                 title = 'Prior mean conditional variance decomposition (in percent)';
                 save_name_string = 'dsge_prior_mean_var_decomp_cond_h';
             end
-            waitbar.close(hh_fig,options_.console_mode)
+            wait_bar.close(hh_fig,options_.console_mode)
             for step_iter=1:length(Steps)
                 title_print=[title, ' Period ' int2str(Steps(step_iter))];
                 headers = M_.exo_names;
@@ -258,14 +258,14 @@ if options_.order==1
             skipline();
             if ~all(diag(M_.H)==0)
                 if ~isempty(observable_name_requested_vars)
-                    [hh_fig, length_of_old_string] = waitbar.run(0, [], 'Endogenous moments: conditional variance decomposition with measurement error.', options_.console_mode, 0, 'Endogenous moments: conditional variance decomposition with measurement error.');
+                    [hh_fig, length_of_old_string] = wait_bar.run(0, [], 'Endogenous moments: conditional variance decomposition with measurement error.', options_.console_mode, 0, 'Endogenous moments: conditional variance decomposition with measurement error.');
                     NumberOfObservedEndogenousVariables = length(observable_name_requested_vars);
                     temp=NaN(NumberOfObservedEndogenousVariables,NumberOfExogenousVariables+1,length(Steps));
                     if posterior
                         for i=1:NumberOfObservedEndogenousVariables
                             for j=1:NumberOfExogenousVariables
                                 temp(i,j,:) = oo_.PosteriorTheoreticalMoments.dsge.ConditionalVarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
-                                [hh_fig, length_of_old_string] = waitbar.run((+(i-1)*NumberOfObservedEndogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
+                                [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
                                     'Endogenous moments: conditional variance decomposition with measurement error', options_.console_mode, length_of_old_string);
                             end
                             endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
@@ -278,7 +278,7 @@ if options_.order==1
                         for i=1:NumberOfObservedEndogenousVariables
                             for j=1:NumberOfExogenousVariables
                                 temp(i,j,:) = oo_.PriorTheoreticalMoments.dsge.ConditionalVarianceDecompositionME.Mean.(observable_name_requested_vars{i}).(M_.exo_names{j});
-                                [hh_fig, length_of_old_string] = waitbar.run((+(i-1)*NumberOfObservedEndogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
+                                [hh_fig, length_of_old_string] = wait_bar.run(((i-1)*NumberOfExogenousVariables+j)/(NumberOfObservedEndogenousVariables*NumberOfExogenousVariables), hh_fig,...
                                     'Endogenous moments: conditional variance decomposition with measurement error', options_.console_mode, length_of_old_string);
                             end
                             endo_index_varlist = strmatch(observable_name_requested_vars{i}, var_list_, 'exact');
@@ -288,7 +288,7 @@ if options_.order==1
                         title = 'Prior mean conditional variance decomposition (in percent) with measurement error';
                         save_name_string = 'dsge_prior_mean_var_decomp_ME_cond_h';
                     end
-                    waitbar.close(hh_fig,options_.console_mode)
+                    wait_bar.close(hh_fig,options_.console_mode)
                     for step_iter=1:length(Steps)
                         title_print = [title, ' Period ' int2str(Steps(step_iter))];
                         headers = M_.exo_names;

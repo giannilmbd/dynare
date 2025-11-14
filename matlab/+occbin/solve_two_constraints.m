@@ -124,12 +124,12 @@ else
 end
 
 if opts_simul_.waitbar
-    [hh_fig, length_of_old_string] = waitbar.run(0,[],'OccBin: Solving the model', console_mode, 0, 'OccBin: Solving the model.');
+    [hh_fig, length_of_old_string] = wait_bar.run(0,[],'OccBin: Solving the model', console_mode, 0, 'OccBin: Solving the model.');
 end
 
 for shock_period = 1:n_shocks_periods
     if opts_simul_.waitbar
-        [~,length_of_old_string]=waitbar.run(shock_period/n_shocks_periods, hh_fig, sprintf('Period %u of %u', shock_period,n_shocks_periods), console_mode, length_of_old_string);
+        [~,length_of_old_string]=wait_bar.run(shock_period/n_shocks_periods, hh_fig, sprintf('Period %u of %u', shock_period,n_shocks_periods), console_mode, length_of_old_string);
     end
     regime_change_this_iteration=true;
     nperiods_endogenously_increased = false;
@@ -367,7 +367,7 @@ for shock_period = 1:n_shocks_periods
                     disp_verbose(['Max error:' num2str(min_err) '.'],opts_simul_.debug)
                 else
                     error_flag = 310;
-                    if opts_simul_.waitbar; waitbar.close(hh_fig,console_mode); end
+                    if opts_simul_.waitbar; wait_bar.close(hh_fig,console_mode); end
                     return;
                 end
             else
@@ -378,7 +378,7 @@ for shock_period = 1:n_shocks_periods
                     disp_verbose('Did not converge -- increase maxit.',opts_simul_.debug)
                     error_flag = 311;
                 end
-                if opts_simul_.waitbar; waitbar.close(hh_fig,console_mode); end
+                if opts_simul_.waitbar; wait_bar.close(hh_fig,console_mode); end
                 return;
             end
         else
@@ -390,7 +390,7 @@ for shock_period = 1:n_shocks_periods
     if any(error_code_period)
         disp_verbose('Increase nperiods.',opts_simul_.debug)
         error_flag = 312;
-        if opts_simul_.waitbar; waitbar.close(hh_fig,console_mode); end
+        if opts_simul_.waitbar; wait_bar.close(hh_fig,console_mode); end
         return;
     end
     
@@ -415,5 +415,5 @@ if ~opts_simul_.piecewise_only
 end
 
 if opts_simul_.waitbar
-    waitbar.close(hh_fig,console_mode); 
+    wait_bar.close(hh_fig,console_mode); 
 end

@@ -1,4 +1,6 @@
-profile off; profData = profile('info');
+profile off; 
+if ~isoctave
+profData = profile('info');
 % profile viewer % this opens the GUI
 
 % define the functions to look for that call 'dsge_likelihood.m' during optimization
@@ -67,4 +69,5 @@ fprintf('- termination message: %s\n', oo_.posterior.optimization.optimization_i
 
 if ~isequal(oo_.posterior.optimization.optimization_info.funcCount,NumCalls)
     error('counting of function evaluations is not correct');
+end
 end

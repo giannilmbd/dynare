@@ -44,7 +44,7 @@ function [opt_par_values,fval,exitflag,hessian_mat,Scale,new_rat_hess_info,optim
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if isfield(options_,'occbin') && ((options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter) || (options_.occbin.likelihood.status && options_.occbin.likelihood.inversion_filter))
-    warning('off','MATLAB:nearlySingularMatrix')    
+    warning('off','MATLAB:nearlySingularMatrix')
 end
 %% set bounds and parameter names if not already set
 n_params=size(start_par_value,1);
@@ -102,7 +102,7 @@ switch minimizer_algorithm
         if ~isoctave
             optim_options = optimoptions(optim_options,'display','off');
         else
-            optim_options = optimset(optim_options,'display','off');            
+            optim_options = optimset(optim_options,'display','off');
         end
     end
     opt_runtime_start = tic;
@@ -130,11 +130,12 @@ switch minimizer_algorithm
         end
     end
     optimization_info.runtime = toc(opt_runtime_start);
-    optimization_info.iterations = output.iterations;
-    optimization_info.funcCount = output.funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = strrep(output.message, newline, ' ');
-    
+    if ~isoctave
+        optimization_info.funcCount = output.funcCount;
+        optimization_info.iterations = output.iterations;
+        optimization_info.message = strrep(output.message, newline, ' ');
+    end
   case 2
     %simulating annealing
     sa_options = options_.saopt;
@@ -219,7 +220,7 @@ switch minimizer_algorithm
         if ~isoctave
             optim_options = optimoptions(optim_options,'display','off');
         else
-            optim_options = optimset(optim_options,'display','off');            
+            optim_options = optimset(optim_options,'display','off');
         end
     end
     opt_runtime_start = tic;
@@ -247,8 +248,9 @@ switch minimizer_algorithm
     optimization_info.iterations = output.iterations;
     optimization_info.funcCount = output.funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = strrep(output.message, newline, ' ');
-
+    if ~isoctave
+        optimization_info.message = strrep(output.message, newline, ' ');
+    end
   case 4
     % Set default options.
     H0 = 1e-4*eye(n_params);
@@ -425,7 +427,9 @@ switch minimizer_algorithm
     optimization_info.iterations = output.iterations;
     optimization_info.funcCount = output.funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = strrep(output.message, newline, ' ');
+    if ~isoctave
+        optimization_info.message = strrep(output.message, newline, ' ');
+    end
 
   case 8
     % Dynare implementation of the simplex algorithm.
@@ -582,7 +586,7 @@ switch minimizer_algorithm
     optimization_info.message = strrep(output.MESSAGE, newline, ' ');
 
   case 11
-    % waiting for validation 
+    % waiting for validation
     %    options_.cova_compute = 0;
     %    subvarargin = [varargin(1), varargin(3:6), varargin(8)];
     %    opt_par_values = online_auxiliary_filter(start_par_value, subvarargin{:});
@@ -728,11 +732,12 @@ switch minimizer_algorithm
         end
     end
     optimization_info.runtime = toc(opt_runtime_start);
-    optimization_info.iterations = output.iterations;
-    optimization_info.funcCount = output.funcCount;
     optimization_info.exitflag = exitflag;
-    optimization_info.message = strrep(output.message, newline, ' ');
-
+    if ~isoctave
+        optimization_info.iterations = output.iterations;
+        optimization_info.funcCount = output.funcCount;
+        optimization_info.message = strrep(output.message, newline, ' ');
+    end
   case 101
     solveoptoptions = options_.solveopt;
     if ~isempty(options_.optim_opt)
