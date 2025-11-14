@@ -8721,16 +8721,49 @@ observed variables.
        observed variables. This is equivalent to manually listing all
        the observed variables after the ``estimation`` command.
 
+Non-linear filter options
+-------------------------
+
     .. option:: pruning
 
        See :opt:`pruning`. Governs the creation of posterior objects during estimation.
        When using nonlinear filters, it should be consistent with the setting of 
-       the ``pruning`` option of ``particle_filter_options``.
+       the ``pruning`` option of ``particle_filter_options``. Default: not enabled.
 
     .. option:: number_of_particles = INTEGER
 
        Number of particles used when evaluating the likelihood of a
-       non linear state space model. Default: ``1000``.
+       non linear state space model. Default: ``5000``.
+
+    .. option:: filter_algorithm = OPTION
+
+       Sets the particle filter algorithm. Possible values for OPTION
+       are:
+
+           ``sis``
+
+               Sequential importance sampling algorithm of the *Gordon et al.  (1993)* type. This is the default value.
+
+           ``apf``
+
+               Auxiliary particle filter of the *Pitt and Shephard (1999)* type.
+
+           ``gf``
+
+               Gaussian filter of the *Kotecha and Djuric (2003a)* type.
+
+           ``gmf``
+
+               Gaussian mixture filter of the *Kotecha and Djuric (2003a)* type.
+
+           ``cpf``
+
+               Conditional particle filter of the *Ionides (2003)* type as used in, e.g., *Amisano and Tristani (2010)*.
+
+           ``nlkf``
+
+               Use a standard (linear) Kalman filter algorithm with
+               the nonlinear measurement and state equations.
 
     .. option:: resampling = OPTION
 
@@ -8766,57 +8799,42 @@ observed variables.
        Sets the resampling method. Possible values for OPTION are:
        ``kitagawa``, ``stratified`` and ``smooth``.
 
-    .. option:: filter_algorithm = OPTION
-
-       Sets the particle filter algorithm. Possible values for OPTION
-       are:
-
-           ``sis``
-
-               Sequential importance sampling algorithm, this is the
-               default value.
-
-           ``apf``
-
-               Auxiliary particle filter.
-
-           ``gf``
-
-               Gaussian filter.
-
-           ``gmf``
-
-               Gaussian mixture filter.
-
-           ``cpf``
-
-               Conditional particle filter.
-
-           ``nlkf``
-
-               Use a standard (linear) Kalman filter algorithm with
-               the nonlinear measurement and state equations.
-
     .. option:: proposal_approximation = OPTION
 
        Sets the method for approximating the proposal
-       distribution. Possible values for OPTION are: ``cubature``,
-       ``montecarlo`` and ``unscented``. Default value is
-       ``unscented``.
+       distribution in case of the ``filter_algorithm=cpf``, ``gf``, ``gpf`` and ``nlkf`` filters. Possible values for OPTION are: 
+       
+           ``unscented``
+                
+               Unscented transform as in *Julier and Uhlmann (1997)* and *Wan and van der Merwe (2001)*. This is the default.
 
+           ``cubature``
+
+               Cubature method as in *Arasaratnam and Haykin (2009)*.
+
+           ``montecarlo``
+
+               Monte Carlo integration method.
+       
     .. option:: distribution_approximation = OPTION
 
        Sets the method for approximating the particle
-       distribution. Possible values for OPTION are: ``cubature``,
+       distribution for the ``filter_algorithm=gf``, ``gpf`` and ``nlkf`` filters. Possible values for OPTION are: ``cubature``,
        ``montecarlo`` and ``unscented``. Default value is
-       ``unscented``.
+       ``unscented``. For details, see    :opt:`proposal_approximation = OPTION`.
 
     .. option:: cpf_weights = OPTION
 
        Controls the method used to update the weights in conditional
-       particle filter, possible values are ``amisanotristani``
-       (*Amisano et al. (2010)*) or ``murrayjonesparslow`` (*Murray et
-       al. (2013)*). Default value is ``amisanotristani``.
+       particle filter, possible values are 
+       
+           ``amisanotristani``
+
+               Use the approach in *Amisano et al. (2010)*.  This is the default.
+       
+           ``murrayjonesparslow`` 
+           
+               Use the approach in *Murray et al. (2013)*.
 
     .. option:: nonlinear_filter_initialization = INTEGER
 
@@ -8852,7 +8870,7 @@ observed variables.
 
            ``'pruning'``
 
-               Enable pruning for particle filter-related simulations. Default: ``false``.
+               Enable pruning for particle filter-related simulations. It is currently only supported by the ``sis``, ``apf``. Default: ``false``.
 
            ``'liu_west_delta'``
 
@@ -8861,15 +8879,15 @@ observed variables.
 
            ``'unscented_alpha'``
 
-               Set the value for alpha for unscented transforms. Default: ``1``.
+               Set the value for alpha for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. The parameterization follows *Wan and van der Merwe (2001)*. Value must be between 0 and 1. Default: ``1``.
 
            ``'unscented_beta'``
 
-               Set the value for beta for unscented transforms. Default: ``2``.
+               Set the value for beta for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. Governs the covariance approximation. The parameterization follows *Wan and van der Merwe (2001)*. Parameter needs to be  weakly bigger than 0 and should be 2 for a Gaussian distribution. Default: ``2``.
 
            ``'unscented_kappa'``
 
-               Set the value for kappa for unscented transforms. Default: ``1``.
+               Set the value for kappa for ``unscented`` option of ``distribution_approximation`` and ``proposal_approximation``. The parameterization follows *Wan and van der Merwe (2001)*. Value must be weakly bigger than 1. Default: ``1``.
 
            ``'initial_state_prior_std'``
 
@@ -8878,18 +8896,15 @@ observed variables.
 
            ``'mixture_state_variables'``
 
-               Number of mixture components in the Gaussian-mixture filter (gmf)
-               for the state variables. Default: ``5``.
+               Number of mixture components in the Gaussian-mixture filter (``gmf``) for the state variables. Default: ``5``.
 
            ``'mixture_structural_shocks'``
 
-               Number of mixture components in the Gaussian-mixture filter (gmf)
-               for the structural shocks. Default: ``1``.
+               Number of mixture components in the Gaussian-mixture filter (``gmf``) for the structural shocks. Default: ``1``.
 
            ``'mixture_measurement_shocks'``
 
-               Number of mixture components in the Gaussian-mixture filter (gmf)
-               for the measurement errors. Default: ``1``.
+               Number of mixture components in the Gaussian-mixture filter (``gmf``) for the measurement errors. Default: ``1``.
 
     *Note*
 

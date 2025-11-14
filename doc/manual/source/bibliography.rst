@@ -13,6 +13,7 @@ Bibliography
 * Andrle, Michal and Miroslav Plašil (2018): “Econometrics with system priors,” *Economics Letters*, 172, 134-137.
 * Andrews, Donald W.K (1991): “Heteroskedasticity and autocorrelation consistent covariance matrix estimation”, *Econometrica*, 59(3), 817–858.
 * Backus, David K., Patrick J. Kehoe, and Finn E. Kydland (1992): “International Real Business Cycles,” *Journal of Political Economy*, 100(4), 745–775.
+* Arasaratnam Ienkaran and Simon Haykin (2009): “Cubature Kalman Filters”, *IEEE Transactions on Automatic Control*, 54(6), 1254-1269.
 * Baxter, Marianne and Robert G. King (1999): “Measuring Business Cycles: Approximate Band-pass Filters for Economic Time Series,” *Review of Economics and Statistics*, 81(4), 575–593.
 * Bini, Dario A., Guy Latouche, and Beatrice Meini (2002): “Solving matrix polynomial equations arising in queueing problems,” *Linear Algebra and its Applications*, 340, 225–244.
 * Boehl, Gregor (2022): “DIME MCMC: A Swiss Army Knife for Bayesian Inference”, *SSRN No. 4250395*
@@ -46,6 +47,7 @@ Bibliography
 * Geweke, John (1999): “Using simulation methods for Bayesian econometric models: Inference, development and communication,” *Econometric Reviews*, 18(1), 1–73.
 * Giovannini, Massimo, Philipp Pfeiffer, and Marco Ratto (2021), “Efficient and robust inference of models with occasionally binding constraints,” Working Papers 2021-03, Joint Research Centre, European Commission
 * Giordani, Paolo, Michael Pitt, and Robert Kohn (2011): “Bayesian Inference for Time Series State Space Models” in: *The Oxford Handbook of Bayesian Econometrics*, ed. by John Geweke, Gary Koop, and Herman van Dijk, Oxford University Press, 61–124.
+* Gordon, Neil J., Salmond, Daniel J., and Adrien F.M. Smith (1993). “Novel approach to nonlinear/non-Gaussian Bayesian state estimation“. *IEEE Proceedings F - Radar and Signal Processing*, 140 (2), 107–113.
 * Guerrieri, Luca and Matteo Iacoviello (2015): “OccBin: A toolkit for solving dynamic models with occasionally binding constraints easily,” *Journal of Monetary Economics*, 70, 22–38.
 * Goffe, William L., Gary D. Ferrier, and John Rogers (1994): “Global Optimization of Statistical Functions with Simulated Annealing,” *Journal of Econometrics*, 60(1/2), 65–100.
 * Hansen, Lars P. (1982): “Large sample properties of generalized method of moments estimators,” Econometrica, 50(4), 1029–1054.
@@ -53,9 +55,11 @@ Bibliography
 * Harvey, Andrew C. and Garry D.A. Phillips (1979): “Maximum likelihood estimation of regression models with autoregressive-moving average disturbances,” *Biometrika*, 66(1), 49–58.
 * Herbst, Edward and Schorfheide, Frank (2014): “Sequential Monte Carlo Sampling for DSGE Models,” *Journal of Applied Econometrics*, 29, 1073-1098.
 * Herbst, Edward (2015): “Using the “Chandrasekhar Recursions” for Likelihood Evaluation of DSGE Models,” *Computational Economics*, 45(4), 693–705.
+* Ionides, Edward L. (2003). “Inference and Filtering for Partially Observed Diffusion Processes via Sequential Monte Carlo”, University of Michigan Statistics Department Technical Report 405.
 * Ireland, Peter (2004): “A Method for Taking Models to the Data,” *Journal of Economic Dynamics and Control*, 28, 1205–26.
 * Iskrev, Nikolay (2010): “Local identification in DSGE models,” *Journal of Monetary Economics*, 57(2), 189–202.
 * Judd, Kenneth (1996): “Approximation, Perturbation, and Projection Methods in Economic Analysis”, in *Handbook of Computational Economics*, ed. by Hans Amman, David Kendrick, and John Rust, North Holland Press, 511–585.
+* Julier Simon J. and Jeffrey K. Uhlmann (1997): “A New Extension of the Kalman Filter to Nonlinear Systems”, *Proceedings of AeroSense, the 11th Int. Symp. on Aerospace/Defense Sensing, Simulation and Controls*.
 * Juillard, Michel (1996): “Dynare: A program for the resolution and simulation of dynamic models with forward variables through the use of a relaxation algorithm,” CEPREMAP, *Couverture Orange*, 9602.
 * Kanzow, Christian and Stefania Petra (2004): “On a semismooth least squares formulation of complementarity problems with gap reduction,” *Optimization Methods and Software*, 19, 507–525.
 * Kim, Jinill and Sunghyun Kim (2003): “Spurious welfare reversals in international business cycle models,” *Journal of International Economics*, 60, 471–500.
@@ -64,6 +68,8 @@ Bibliography
 * Koop, Gary (2003), *Bayesian Econometrics*, John Wiley & Sons.
 * Koopman, S. J. and J. Durbin (2000): “Fast Filtering and Smoothing for Multivariate State Space Models,” *Journal of Time Series Analysis*, 21(3), 281–296.
 * Koopman, S. J. and J. Durbin (2003): “Filtering and Smoothing of State Vector for Diffuse State Space Models,” *Journal of Time Series Analysis*, 24(1), 85–98.
+* Kotecha Jayesh and Petar M. Djuric (2003a), “Gaussian Particle Filtering”. *IEEE Transactions on Signal Processing*, 51(10), 2592–2601.
+* Kotecha Jayesh and Petar M. Djuric (2003b), “Gaussian Sum Particle Filtering”, *IEEE transactions on signal processing*, 51(10), 2602-2612.
 * Kuntsevich, Alexei V. and Franz Kappel (1997): “SolvOpt - The solver for local nonlinear optimization problems (version 1.1, Matlab, C, FORTRAN)”, University of Graz, Graz, Austria.
 * Laffargue, Jean-Pierre (1990): “Résolution d’un modèle macroéconomique avec anticipations rationnelles”, *Annales d’Économie et Statistique*, 17, 97–119.
 * Liu, Jane and Mike West (2001): “Combined parameter and state estimation in simulation-based filtering”, in *Sequential Monte Carlo Methods in Practice*, Eds. Doucet, Freitas and Gordon, Springer Verlag, Chapter 10, 197-223.
@@ -71,6 +77,7 @@ Bibliography
 * Mutschler, Willi (2015): “Identification of DSGE models - The effect of higher-order approximation and pruning“, *Journal of Economic Dynamics & Control*, 56, 34-54.
 * Mutschler, Willi (2018): “Higher-order statistics for DSGE models”, *Econometrics and Statistics*, 6(C), 44-56.
 * Pearlman, Joseph, David Currie, and Paul Levine (1986): “Rational expectations models with partial information,” *Economic Modelling*, 3(2), 90–105.
+* Pitt, Michael K.; Shephard, Neil (1999). “Filtering Via Simulation: Auxiliary Particle Filters”. Journal of the American Statistical Association. 94 (446),590–591.
 * Planas, Christophe, Marco Ratto and Alessandro Rossi (2015): “Slice sampling in Bayesian estimation of DSGE models”.
 * Pfeifer, Johannes (2013): “A Guide to Specifying Observation Equations for the Estimation of DSGE Models”.
 * Pfeifer, Johannes (2014): “An Introduction to Graphs in Dynare”.
@@ -90,3 +97,4 @@ Bibliography
 * Uhlig, Harald (2001): “A Toolkit for Analysing Nonlinear Dynamic Stochastic Models Easily,” in *Computational Methods for the Study of Dynamic Economies*, Eds. Ramon Marimon and Andrew Scott, Oxford University Press, 30–61.
 * U.S. Census Bureau (2020): “X-13 ARIMA-SEATS Reference Manual, Version 1.1”, Center for Statistical Research and Methodology, U.S. Census Bureau, https://www.census.gov/data/software/x13as.html
 * Villemot, Sébastien (2011): “Solving rational expectations models at first order: what Dynare does,” *Dynare Working Papers*, 2, CEPREMAP.
+* Wan, Eric A. and Rudolph van der Merwe (2001): “The Unscented Kalman Filter,” in Haykin, S. (ed.): "Kalman Filtering and Neural Networks", Wiley, New York, Chapter 7, 221-280.
