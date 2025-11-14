@@ -9903,9 +9903,11 @@ Method of moments specific blocks
     A new statement is started with either the ``var`` or ``varexo`` keyword.
     
     *Example*
+
     You can either enter the values directly or load them from variables in the workspace.
 
         ::
+
             % MATLAB expressions that can be used
             xx = [23,24,25];
             ww = [51,52];
@@ -9928,9 +9930,6 @@ Method of moments specific blocks
             values 2, (xx), 15;
             weights 3, (xx), 4;
             end;
-
-
-    *Limitations*
 
     *Output*
 
@@ -9961,6 +9960,7 @@ Method of moments specific blocks
     and `WEIGHT` is a double value of the weight one wants to assign to the covariance between the two specified IRFs.
     
     *Example*
+
     You can either enter the values directly or load them from variables in the workspace.
 
         ::
@@ -9969,8 +9969,6 @@ Method of moments specific blocks
             c(1), e_A, c(1), e_A, 20;
             y(3), e_R, y(2), e_R, (empIRFsCovInv_yR3_yR2);
             end;
-
-    *Limitations*
 
     *Output*
 
