@@ -139,7 +139,13 @@ aalphahat0=[];
 V0=[];
 
 t = 0;
-if rank(Pinf(:,:,1),diffuse_kalman_tol)
+if ~isempty(Pinf(:,:,1))
+    newRank = rank(Z*Pinf(:,:,1)*Z',diffuse_kalman_tol);
+else
+    newRank = rank(Pinf(:,:,1),diffuse_kalman_tol);
+end
+
+if newRank
     % this is needed to get smoothed states in period 0 with diffuse steps
     % i.e. period 0 is a filter step without observables
     Pinf_init = Pinf(:,:,1);
@@ -150,7 +156,7 @@ if rank(Pinf(:,:,1),diffuse_kalman_tol)
     % hence Pstar on EXIT from diffuse step will NOT change.
     Pstar(:,:,1)  = T*Pstar(:,:,1)*T' + QQ;
 end
-while rank(Pinf(:,:,t+1),diffuse_kalman_tol) && t<smpl
+while newRank && t<smpl
     t = t+1;
     di = data_index{t};
     if isqvec
@@ -211,6 +217,13 @@ while rank(Pinf(:,:,t+1),diffuse_kalman_tol) && t<smpl
         % isn't a meaningless as long as we are in the diffuse part? MJ
         for jnk=2:nk
             aK(jnk,:,t+jnk) = T*dynare_squeeze(aK(jnk-1,:,t+jnk-1));
+        end
+    end
+    if newRank
+        if ~isempty(Pinf(:,:,t+1))
+            newRank = rank(Z*Pinf(:,:,t+1)*Z',diffuse_kalman_tol);
+        else
+            newRank = rank(Pinf(:,:,t+1),diffuse_kalman_tol);
         end
     end
 end
