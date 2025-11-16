@@ -38,7 +38,7 @@ function [ ix2, ilogpo2, ModelName, MetropolisFolder, FirstBlock, FirstLine, npa
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -85,13 +85,13 @@ if ~options_.load_mh_file && ~options_.mh_recover
     end
     % Delete old mh files if any...
     files = dir([BaseName '_mh*_blck*.mat']);
-    if length(files)
+    if ~isempty(files)
         delete([BaseName '_mh*_blck*.mat']);
         fprintf('%s: Old mh-files successfully erased!\n',dispString);
     end
     % Delete old Metropolis log file.
     file = dir([ MetropolisFolder '/metropolis.log']);
-    if length(file)
+    if ~isempty(file)
         delete([ MetropolisFolder '/metropolis.log']);
         fprintf('%s: Old metropolis.log file successfully erased!\n',dispString)
         fprintf('%s: Creation of a new metropolis.log file.\n',dispString)
@@ -338,7 +338,7 @@ elseif options_.load_mh_file && ~options_.mh_recover
     end
     record.MCMCConcludedSuccessfully=0; %reset indicator for this run
     mh_files = dir([ MetropolisFolder filesep ModelName '_mh*.mat']);
-    if ~length(mh_files)
+    if isempty(mh_files)
         error('%s: I cannot find any MH file to load here!',dispString);
     end
     fidlog = fopen([MetropolisFolder '/metropolis.log'],'a');
