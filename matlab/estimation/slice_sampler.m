@@ -127,7 +127,7 @@ while it<npar
                 fxl = -feval(objective_function,theta,varargin{:});
             end
             mytxt{it,1} = sprintf('Getting L for [%s] is taking too long.', varargin{6}.name{it});
-            save(['slice_iter_info_' fname],'mytxt','neval','it','theta','fxl')
+            save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxl')
             %keyboard;
         end
     end
@@ -156,7 +156,7 @@ while it<npar
                 fxr = -feval(objective_function,theta,varargin{:});
             end
             mytxt{it,2} = sprintf('Getting R for [%s] is taking too long.', varargin{6}.name{it});
-            save(['slice_iter_info_' fname],'mytxt','neval','it','theta','fxr')
+            save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxr')
             %keyboard;
         end
     end
