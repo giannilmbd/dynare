@@ -79,7 +79,7 @@ else
     error('Estimation: This approximation for the proposal is not implemented or unknown!')
 end
 
-if ParticleOptions.distribution_approximation.montecarlo
+if ParticleOptions.distribution_approximation.montecarlo % What is the purpose of this if there is no distribution approximation here?
     set_dynare_seed_local_options([],false,'default');
 end
 

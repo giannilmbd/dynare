@@ -129,6 +129,8 @@ elseif ParticleOptions.mixture_structural_shocks==1
         if ~ParticleOptions.proposal_approximation.montecarlo
             error('This approximation for the proposal is unknown!')
         end
+        % this part for proposal_approximation=montecarlo will not work as StructuralShocksMu,
+        % StructuralShocksWeights are not set
     end
     I = size(StructuralShocksWeights, 1);
     StructuralShocksMu = Q_lower_triangular_cholesky*StructuralShocksMu';
