@@ -304,6 +304,9 @@ if init
                   case 'save_tmp_file'
                     posterior_sampler_options.save_tmp_file = options_list{i,2};
 
+                  case 'save_iter_info_file'
+                    posterior_sampler_options.save_iter_info_file = options_list{i,2};
+
                   otherwise
                     warning(['slice_sampler: Unknown option (' options_list{i,1} ')!'])
                 end

@@ -127,8 +127,9 @@ while it<npar
                 fxl = -feval(objective_function,theta,varargin{:});
             end
             mytxt{it,1} = sprintf('Getting L for [%s] is taking too long.', varargin{6}.name{it});
-            save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxl')
-            %keyboard;
+            if sampler_options.save_iter_info_file
+                save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxl')
+            end
         end
     end
     neval1 = neval(it);
@@ -156,8 +157,9 @@ while it<npar
                 fxr = -feval(objective_function,theta,varargin{:});
             end
             mytxt{it,2} = sprintf('Getting R for [%s] is taking too long.', varargin{6}.name{it});
-            save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxr')
-            %keyboard;
+            if sampler_options.save_iter_info_file
+                save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxr')
+            end
         end
     end
     % ------------------------------------------------------
@@ -179,12 +181,15 @@ while it<npar
         if (R-L)<1.e-6 %neval(it)>(30+neval2)
             fprintf('The sampling for parameter [%s] is taking too long as the sampling set is too tight. Check the prior.\n', varargin{6}.name{it})
             mytxt{it,3} = sprintf('Sampling [%s] is taking too long.', varargin{6}.name{it});
-            save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it')
+            if sampler_options.save_iter_info_file
+                save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it')
+            end
             break
         end
     end
-    save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxsim')
-
+    if sampler_options.save_iter_info_file
+        save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxsim')
+    end
     if isinf(fxsim) || isnan(fxsim)
         theta(it) = xold;
         fxsim = fxold;
