@@ -118,9 +118,6 @@ if ep.stochastic.order>0
     options_.no_homotopy = true;
 end
 
-% number of nonzero derivatives
-pfm.nnzA = M_.NNZDerivatives(1);
-
 % setting up integration nodes if order > 0
 if ep.stochastic.order>0
     [nodes,weights,nnodes] = setup_integration_nodes(options_.ep,pfm);
