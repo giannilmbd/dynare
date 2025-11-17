@@ -8148,6 +8148,10 @@ observed variables.
                   See :ref:`use_mh_covariance_matrix <usemhcov>`. Must be
                   used with ``'rotated'``. Default: ``0``.
 
+                  ``'save_iter_info_file'``
+
+                  Save iteration information to the ``metropolis`` subfolder. Default: ``1``.
+
                   ``'save_tmp_file'``
 
                   See :ref:`save_tmp_file <savetmp>`. Default: ``1``.

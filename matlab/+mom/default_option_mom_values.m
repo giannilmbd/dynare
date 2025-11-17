@@ -278,6 +278,7 @@ if do_bayesian_estimation
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode',[]);        
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'initial_step_size',0.8);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_tmp_file',true);
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_iter_info_file',true);                
             case 'independent_metropolis_hastings'
                 if ~isfield(options_mom_.posterior_sampler_options,'imh')
                     options_mom_.posterior_sampler_options.imh = [];
