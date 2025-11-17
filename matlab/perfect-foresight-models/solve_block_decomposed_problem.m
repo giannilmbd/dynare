@@ -98,7 +98,7 @@ for blk = 1:nblocks
         case {3, 4, 6, 7} % solve{Forward,Backward}{Simple,Complete}
             is_forward = M_.block_structure.block(blk).Simulation_Type == 3 || M_.block_structure.block(blk).Simulation_Type == 6;
             y_index = M_.block_structure.block(blk).variable(end-M_.block_structure.block(blk).mfs+1:end);
-            [y, T, success, maxblkerror, iter] = solve_one_boundary(fh_dynamic, y, exo_simul, M_.params, steady_state, T, y_index, M_.block_structure.block(blk).NNZDerivatives, periods, M_.block_structure.block(blk).is_linear, blk, M_.maximum_lag, options_.simul.maxit, options_.dynatol.f, cutoff, options_.stack_solve_algo, is_forward, true, false, M_, options_);
+            [y, T, success, maxblkerror, iter] = solve_one_boundary(fh_dynamic, y, exo_simul, M_.params, steady_state, T, y_index, periods, M_.block_structure.block(blk).is_linear, blk, M_.maximum_lag, options_.simul.maxit, options_.dynatol.f, cutoff, options_.stack_solve_algo, is_forward, true, false, M_, options_);
         case {5, 8} % solveTwoBoundaries{Simple,Complete}
             if ismember(options_.stack_solve_algo, [1 6])
                 [y, T, success, maxblkerror, iter] = solve_two_boundaries_lbj(fh_dynamic, y, exo_simul, steady_state, T, blk, options_, M_);

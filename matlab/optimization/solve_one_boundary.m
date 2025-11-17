@@ -1,5 +1,5 @@
 function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, steady_state, T, ...
-                                                             y_index_eq, nze, periods, is_linear, Block_Num, maximum_lag, maxit_, solve_tolf, cutoff, stack_solve_algo, is_forward, is_dynamic, verbose, M_, options_)
+                                                             y_index_eq, periods, is_linear, Block_Num, maximum_lag, maxit_, solve_tolf, cutoff, stack_solve_algo, is_forward, is_dynamic, verbose, M_, options_)
 % Computes the deterministic simulation or the steady state for a block of equations containing
 % only lags or only leads (but not both).
 %
@@ -12,8 +12,6 @@ function [y, T, success, max_res, iter] = solve_one_boundary(fh, y, x, params, s
 %   T                   [matrix]        Temporary terms
 %   y_index_eq          [vector of int] The index of the endogenous variables of
 %                                       the block
-%   nze                 [integer]       number of non-zero elements in the
-%                                       Jacobian matrix
 %   periods             [integer]       number of simulation periods
 %   is_linear           [logical]       whether the block is linear
 %   Block_Num           [integer]       block number
@@ -75,7 +73,6 @@ end
 for it_=start:incr:finish
     cvg=false;
     iter=0;
-    g1=spalloc( Blck_size, Blck_size, nze);
     while ~(cvg || iter>maxit_)
         if is_dynamic
             [yy, T(:, it_), r, g1] = fh(dynendo(y, it_, M_), x(it_, :), params, steady_state, ...

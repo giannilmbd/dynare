@@ -22,7 +22,7 @@ function [ys,params,info] = evaluate_steady_state(ys_init,exo_ss,M_,options_,ste
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -369,9 +369,8 @@ elseif ~options_.bytecode && options_.block
                     break
                 end
             else
-                nze = length(M_.block_structure_stat.block(b).g1_sparse_rowval);
                 [ys, T, success] = solve_one_boundary(fh_static, ys, exo_ss, ...
-                                                      params, [], T, mfs_idx, nze, 1, false, b, 0, options_.steady.maxit, ...
+                                                      params, [], T, mfs_idx, 1, false, b, 0, options_.steady.maxit, ...
                                                       options_.solve_tolf, ...
                                                       0, options_.solve_algo, true, false, false, M_, options_);
                 if ~success
