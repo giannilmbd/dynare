@@ -1364,7 +1364,7 @@ mod_and_m_tests = [
   { 'test' : [ 'kalman_filter_smoother/check_variable_dimensions/fs2000_ML.mod' ],
     'extra' : [ 'kalman_filter_smoother/fsdat_simul.m' ] },
   { 'test' : [ 'kalman_filter_smoother/rbc_non_stationary_obs.mod' ],
-    'extra' : [ 'kalman_filter_smoother/data_rbc_non_stationary_obs.csv' ] },
+    'extra' : [ 'kalman_filter_smoother/data_rbc_non_stationary_obs.m' ] },
   { 'test' : [ 'kalman/likelihood_from_dynare/fs2000_uncorr_ME.mod',
                'kalman/likelihood_from_dynare/fs2000_corr_ME.mod',
                'kalman/likelihood_from_dynare/fs2000_corr_ME_missing.mod',
