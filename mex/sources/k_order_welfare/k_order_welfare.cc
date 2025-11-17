@@ -199,14 +199,6 @@ extern "C"
     const int nEndo = get_int_field(M_mx, "endo_nbr");
     const int nPar = get_int_field(M_mx, "param_nbr");
 
-    const mxArray* nnzderivatives_mx = mxGetField(M_mx, 0, "NNZDerivatives");
-    if (!(nnzderivatives_mx && mxIsDouble(nnzderivatives_mx)))
-      mexErrMsgTxt("M_.NNZDerivatives should be a double precision array");
-    ConstVector NNZD {nnzderivatives_mx};
-    if (NNZD.length() < kOrder || NNZD[kOrder - 1] == -1)
-      mexErrMsgTxt("The derivatives were not computed for the required order. Make sure that you "
-                   "used the right order option inside the `stoch_simul' command");
-
     const mxArray* endo_names_mx = mxGetField(M_mx, 0, "endo_names");
     if (!(endo_names_mx && mxIsCell(endo_names_mx)
           && mxGetNumberOfElements(endo_names_mx) == static_cast<size_t>(nEndo)))
@@ -324,7 +316,7 @@ extern "C"
 
     // make KordpDynare object
     KordpDynare dynare(endoNames, exoNames, nExog, nPar, ySteady, vCov, modParams, nStat, nPred,
-                       nForw, nBoth, NNZD, nSteps, kOrder, journal, std::move(dynamicModelFile),
+                       nForw, nBoth, nSteps, kOrder, journal, std::move(dynamicModelFile),
                        dr_order);
 
     // construct main K-order approximation class

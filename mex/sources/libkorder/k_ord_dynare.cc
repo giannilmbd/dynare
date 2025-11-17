@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008-2024 Dynare Team
+ * Copyright © 2008-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -28,9 +28,8 @@
 
 KordpDynare::KordpDynare(const std::vector<std::string>& endo, const std::vector<std::string>& exo,
                          int nexog, int npar, Vector& ysteady, TwoDMatrix& vcov, Vector& inParams,
-                         int nstat, int npred, int nforw, int nboth, const ConstVector& nnzd,
-                         int nsteps, int norder, Journal& jr,
-                         std::unique_ptr<DynamicModelAC> dynamicModelFile_arg,
+                         int nstat, int npred, int nforw, int nboth, int nsteps, int norder,
+                         Journal& jr, std::unique_ptr<DynamicModelAC> dynamicModelFile_arg,
                          const std::vector<int>& dr_order) :
     nStat {nstat},
     nBoth {nboth},
@@ -42,7 +41,6 @@ KordpDynare::KordpDynare(const std::vector<std::string>& endo, const std::vector
     nYss {nboth + nforw},
     nY {nstat + npred + nboth + nforw},
     nJcols {nExog + nY + nYs + nYss},
-    NNZD {nnzd},
     nSteps {nsteps},
     nOrder {norder},
     journal {jr},

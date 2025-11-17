@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008-2024 Dynare Team
+ * Copyright © 2008-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -84,12 +84,10 @@ public:
   const int nForw;
   const int nExog;
   const int nPar;
-  const int nYs;           // = npred + nboth
-  const int nYss;          // = nboth + nforw
-  const int nY;            // = nstat + npred + nboth + nforw
-  const int nJcols;        // nb of jacobian columns = nExog+nY+nYs+nYss
-  const ConstVector& NNZD; /* the total number of non-zero derivative elements
-                              where hessian is 2nd : NNZD(order=2) */
+  const int nYs;    // = npred + nboth
+  const int nYss;   // = nboth + nforw
+  const int nY;     // = nstat + npred + nboth + nforw
+  const int nJcols; // nb of jacobian columns = nExog+nY+nYs+nYss
   const int nSteps;
   const int nOrder;
 
@@ -108,8 +106,8 @@ private:
 public:
   KordpDynare(const std::vector<std::string>& endo, const std::vector<std::string>& exo,
               int num_exo, int num_par, Vector& ySteady, TwoDMatrix& vCov, Vector& params,
-              int nstat, int nPred, int nforw, int nboth, const ConstVector& NNZD, int nSteps,
-              int ord, Journal& jr, std::unique_ptr<DynamicModelAC> dynamicModelFile_arg,
+              int nstat, int nPred, int nforw, int nboth, int nSteps, int ord, Journal& jr,
+              std::unique_ptr<DynamicModelAC> dynamicModelFile_arg,
               const std::vector<int>& dr_order);
 
   [[nodiscard]] int
