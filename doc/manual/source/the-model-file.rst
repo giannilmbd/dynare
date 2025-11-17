@@ -11032,6 +11032,14 @@ Shock Decomposition
 
         See :opt:`diffuse_filter <diffuse_filter>`.
 
+    .. option:: kalman_algo = INTEGER
+
+        See :opt:`kalman_algo = INTEGER`.
+
+    .. option:: kalman_tol = DOUBLE
+
+        See :opt:`kalman_tol = DOUBLE`.
+
     .. option:: xls_sheet = QUOTED_STRING
 
         See :opt:`xls_sheet <xls_sheet = QUOTED_STRING>`.
@@ -11236,6 +11244,14 @@ Shock Decomposition
     .. option:: with_epilogue
 
         See :opt:`with_epilogue`.
+
+    .. option:: kalman_algo = INTEGER
+
+        See :opt:`kalman_algo = INTEGER`.
+
+    .. option:: kalman_tol = DOUBLE
+
+        See :opt:`kalman_tol = DOUBLE`.
 
     *Output*
 
@@ -13345,6 +13361,14 @@ Performing sensitivity analysis
     .. option:: diffuse_filter = INTEGER
 
         See :opt:`diffuse_filter`.
+
+   .. option:: kalman_tol = DOUBLE
+
+        See :opt:`kalman_tol = DOUBLE`.
+
+   .. option:: diffuse_kalman_tol = DOUBLE
+
+        See :opt:`diffuse_kalman_tol = DOUBLE`.
 
 .. command:: dynare_sensitivity ;
              dynare_sensitivity(OPTIONS...);
