@@ -38,8 +38,13 @@ if is_multivariate
 else
     [ax, a1x, Px, P1x, vx, Fix, Kix, Tx, Rx, Cx, regx, info, M_, likx, alphahat, etahat,TTx,RRx,CCx] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,struct(),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
 end
-likvec = likx;
-regvec = regx(1);
+if info==0
+    likvec = likx;
+    regvec = regx(1);
+else
+    likx = inf;
+    likvec=[];
+end
 info0=info;
 if info
     if ~isequal(regimes_(1:2),[base_regime base_regime])
@@ -49,8 +54,12 @@ if info
             [ax, a1x, Px, P1x, vx, Fix, Kix, Tx, Rx, Cx, regx, info, M_, likx, alphahat, etahat,TTx,RRx,CCx] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,regimes_(1:2),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
         end
     end
-    likvec = likx;
-    regvec = regx(1);
+    if info==0
+        likvec = likx;
+        regvec = regx(1);
+    else
+        likx = inf;
+    end
     info1=info;
 else
     if ~isequal(regimes_(1:2),[base_regime base_regime])
@@ -102,6 +111,12 @@ else
     end
 end
 
+if t<options_.occbin.likelihood.first_period_binding_regime_allowed
+    % I do not search further since I started guessing with base regime
+    return
+end
+
+
 diffstart=0;
 if info==0
     if M_.occbin.constraint_nbr==1
@@ -126,7 +141,7 @@ if info==0
         end
     end
 end
-if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation
+if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation_tol_period
     guess_regime = [base_regime base_regime];
     options_.occbin.filter.guess_regime = true;
     guess_regime(1) = regx(1);
@@ -192,7 +207,9 @@ if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use
     options_.occbin.likelihood.loss_function_regime_guess = false;
 end
 
-if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (info==0 &&  ~isequal(regx(1),base_regime))
+% if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (info==0 &&  ~isequal(regx(1),base_regime))
+if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
+        || (options_.occbin.likelihood.brute_force_extra_regime_guess && (info0 || info1)) %|| (info==0 &&  ~isequal(regx(1),base_regime))
 
     guess_regime = [base_regime base_regime];
     options_.occbin.filter.guess_regime = true;
@@ -336,8 +353,12 @@ if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (
             end
         end
         if isnew
+            if isempty(likvec)
+                regvec = regx2{use_index}(1);
+            else
+                regvec = [regvec; regx2{use_index}(1)];
+            end
             likvec = [likvec likx2{use_index}];
-            regvec = [regvec; regx2{use_index}(1)];
         end
     end
     if info2==0 && likx2{use_index}<likx
@@ -388,8 +409,12 @@ if options_.occbin.likelihood.loss_function_regime_guess && (info0 || info1) %||
             end
         end
         if isnew
+            if isempty(likvec)
+                regvec = regx2(1);
+            else
+                regvec = [regvec; regx2(1)];
+            end
             likvec = [likvec likx2];
-            regvec = [regvec; regx2(1)];
         end
         if info2==0 && likx2<likx
             ax=ax2;
@@ -420,7 +445,7 @@ if options_.occbin.likelihood.loss_function_regime_guess && (info0 || info1) %||
 end
 if length(likvec)>1
     % sum the likelihood of multiple solutions
-    likx = -2*log(sum(exp(-likvec./2)));
+    likx = -2*log(sum(exp(-(likvec-min(likvec))./2)))+min(likvec);
 end
 
 if info(1)==0

@@ -71,8 +71,10 @@ if ismember(flag,{'irf','all'})
 end
 
 if ismember(flag,{'likelihood','all'})
-    options_occbin_.likelihood.brute_force_regime_guess = true;
+    options_occbin_.likelihood.brute_force_regime_guess = true; %brute force search for any solution
+    options_occbin_.likelihood.brute_force_extra_regime_guess = true; %brute force search for another solution
     options_occbin_.likelihood.curb_retrench = false;
+    options_occbin_.likelihood.first_period_binding_regime_allowed = 1; %rejects draw which would deliver a binding regime for t<first_period_binding_regime_allowed
     options_occbin_.likelihood.first_period_occbin_update = 1;
     options_occbin_.likelihood.full_output = false;
     options_occbin_.likelihood.IF_likelihood = false;

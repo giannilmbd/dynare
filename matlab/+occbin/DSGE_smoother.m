@@ -183,6 +183,11 @@ if out.error_flag
     disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)    
     oo_.occbin.smoother.error_flag=321;
     return;
+elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
+    fprintf('Occbin smoother:: simulation violates first_period_binding_regime_allowed.\n')
+    print_info(out.error_flag, options_.noprint, options_)
+    oo_.occbin.smoother.error_flag=322;
+    return;
 end
 regime_history = out.regime_history;
 if options_.smoother_redux
@@ -244,6 +249,11 @@ while is_changed && maxiter>iter && ~is_periodic
     if out.error_flag
         disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)
         oo_.occbin.smoother.error_flag=321;
+        return;
+    elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
+        fprintf('Occbin smoother:: simulation violates first_period_binding_regime_allowed.\n')
+        print_info(out.error_flag, options_.noprint, options_)
+        oo_.occbin.smoother.error_flag=322;
         return;
     end
     regime_history = out.regime_history;
