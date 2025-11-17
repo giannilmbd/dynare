@@ -36,6 +36,9 @@ function [LIK,lik] = auxiliary_particle_filter(ReducedForm,Y,start,ParticleOptio
 if isempty(start)
     start = 1;
 end
+if ParticleOptions.resampling.method.smooth
+    error('auxiliary_particle_filter: resampling_method=smooth is not supported.')
+end
 % Get perturbation order
 order = options_.order;
 

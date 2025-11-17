@@ -126,7 +126,7 @@ elseif ParticleOptions.mixture_structural_shocks==1
     elseif ParticleOptions.proposal_approximation.unscented
         [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions);
     else
-        if ~ParticleOptions.distribution_approximation.montecarlo
+        if ~ParticleOptions.proposal_approximation.montecarlo
             error('This approximation for the proposal is unknown!')
         end
     end
@@ -143,7 +143,7 @@ else
     elseif ParticleOptions.proposal_approximation.unscented
         [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions);
     else
-        if ~ParticleOptions.distribution_approximation.montecarlo
+        if ~ParticleOptions.proposal_approximation.montecarlo
             error('This approximation for the proposal is unknown!')
         end
     end

@@ -76,7 +76,7 @@ elseif ParticleOptions.distribution_approximation.unscented
     [nodes2, weights2, weights_c2] = unscented_sigma_points(number_of_state_variables,ParticleOptions);
 else
     if ~ParticleOptions.distribution_approximation.montecarlo
-        error('This approximation for the proposal is unknown!')
+        error('This approximation for the distribution is unknown!')
     end
 end
 
