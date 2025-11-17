@@ -8797,7 +8797,8 @@ Non-linear filter options
     .. option:: resampling_method = OPTION
 
        Sets the resampling method. Possible values for OPTION are:
-       ``kitagawa``, ``stratified`` and ``smooth``.
+       ``kitagawa``, ``stratified`` and ``smooth``. The ``smooth`` option is 
+       incompatible with ``filter_algorithm=apf``
 
     .. option:: proposal_approximation = OPTION
 
