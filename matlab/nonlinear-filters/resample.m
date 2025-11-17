@@ -41,7 +41,7 @@ if defaultmethod
         resampled_output = traditional_resampling(particles,weights,rand(size(weights)));
     elseif ParticleOptions.resampling.method.smooth
         if particles==0
-            error('Particle = 0 is incompatible with this resampling method!')
+            error('Particle = 0 is incompatible with the resampling_method=smooth method!')
         end
         resampled_output = multivariate_smooth_resampling(particles,weights);
     else
