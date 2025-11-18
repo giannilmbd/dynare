@@ -354,32 +354,26 @@ end
 mh_recover_flag=0;
 if options_.mh_recover && exist([BaseName '_mh_tmp_blck' curr_block_str '.mat'],'file')==2 && OpenOldFile_cb
     % this should be done whatever value of load_mh_file
-    load([BaseName '_mh_tmp_blck' curr_block_str '.mat']);
-    draw_iter = size(neval_this_chain,2)+1; %#ok<NODEF>
+    tmp_block_load=load([BaseName '_mh_tmp_blck' curr_block_str '.mat']);
+    draw_iter = find(all(tmp_block_load.x2==0,2),1);
     draw_index_current_file = draw_iter+fline_cb-1;
-    feval_this_chain = sum(sum(neval_this_chain));
-    feval_this_file = sum(sum(neval_this_chain));
-    if feval_this_chain>draw_index_current_file-fline_cb
-        % non Metropolis type of sampler
-        accepted_draws_this_chain = draw_index_current_file-fline_cb;
-        accepted_draws_this_file = draw_index_current_file-fline_cb;
-    else
-        accepted_draws_this_chain = 0;
-        accepted_draws_this_file = 0;
-    end
+    x2 = tmp_block_load.x2;
+    logpo2 = tmp_block_load.logpo2;
+    feval_this_chain = tmp_block_load.feval_this_chain;
+    feval_this_file = tmp_block_load.feval_this_file;
+    accepted_draws_this_chain = tmp_block_load.accepted_draws_this_chain;
+    accepted_draws_this_file = tmp_block_load.accepted_draws_this_file;
     mh_recover_flag=1;
-    set_dynare_random_generator_state(LastSeeds.(['file' int2str(NewFile_cb)]).Unifor, LastSeeds.(['file' int2str(NewFile_cb)]).Normal);
-    last_draw_cb=x2(draw_index_current_file-1,:);
-    last_posterior_cb=logpo2(draw_index_current_file-1);
-    OpenOldFile_cb = 0;
+    set_dynare_random_generator_state(tmp_block_load.LastSeeds.(['file' int2str(NewFile_cb)]).Unifor, tmp_block_load.LastSeeds.(['file' int2str(NewFile_cb)]).Normal);
+    last_draw_cb=tmp_block_load.x2(draw_index_current_file-1,:);
+    last_posterior_cb=tmp_block_load.logpo2(draw_index_current_file-1);
+    clear tmp_block_load;
 else
     if (options_.load_mh_file~=0) && (fline_cb>1) && OpenOldFile_cb %load previous draws and likelihood
         load([BaseName '_mh' int2str(NewFile_cb) '_blck' curr_block_str '.mat'])
         x2 = [x2;zeros(InitSizeArray_cb-fline_cb+1,npar)];
         logpo2 = [logpo2;zeros(InitSizeArray_cb-fline_cb+1,1)];
-        OpenOldFile_cb = 0;
     else
-
         x2 = zeros(InitSizeArray_cb,npar);
         logpo2 = zeros(InitSizeArray_cb,1);
     end
@@ -387,6 +381,11 @@ end
 if mh_recover_flag==0
     accepted_draws_this_chain = 0;
     accepted_draws_this_file = 0;
+    if strcmp(sampler_options.posterior_sampling_method,'slice')
+        neval_this_chain = zeros(npar,nruns_cb);
+    else
+        neval_this_chain = zeros(1,nruns_cb);
+    end
     feval_this_chain = 0;
     feval_this_file = 0;
     draw_iter = 1;
