@@ -1,8 +1,6 @@
-function g1_legacy = legacy_dynamic_g1(g1, M_)
-% Given g1 as returned by dynamic_g1.m, construct the g1 matrix in the legacy
-% representation (see issue #1859 for the historical background). Ideally this
-% file should go away when the identification code is adapted to the new model
-% representation.
+function idx_old = legacy_idx(idx_new, M_)
+% Converts a dynamic Jacobian index column from the new (sparse) to the old
+% (legacy) representation (see issue #1859 for the historical background)
 
 % Copyright © 2025 Dynare Team
 %
@@ -21,9 +19,13 @@ function g1_legacy = legacy_dynamic_g1(g1, M_)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-idx = find(M_.lead_lag_incidence')';
-if M_.maximum_lag == 0
-    idx = M_.endo_nbr + idx;
+tmp = idx_new - 3 * M_.endo_nbr;
+if tmp < 1
+    lli = M_.lead_lag_incidence';
+    if M_.maximum_lag == 0
+        idx_new = idx_new - M_.endo_nbr;
+    end
+    idx_old = lli(idx_new);
+else
+    idx_old = tmp + M_.nspred + M_.endo_nbr + M_.nsfwrd;
 end
-
-g1_legacy = full(g1(:,[idx 3*M_.endo_nbr+(1:(M_.exo_nbr+M_.exo_det_nbr))]));

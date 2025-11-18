@@ -24,32 +24,18 @@ function g4_legacy = legacy_dynamic_g4(g4_v, M_)
 nvar = M_.nspred + M_.endo_nbr + M_.nsfwrd + M_.exo_nbr + M_.exo_det_nbr;
 nnz = size(M_.dynamic_g4_sparse_indices, 1);
 
-function idx_old = legacy_idx(idx_new)
-    tmp = idx_new - 3 * M_.endo_nbr;
-    if tmp < 1
-        lli = M_.lead_lag_incidence';
-        if M_.maximum_lag == 0
-            idx_new = idx_new - M_.endo_nbr;
-        end
-        idx_old = lli(idx_new);
-    else
-        idx_old = tmp + M_.nspred + M_.endo_nbr + M_.nsfwrd;
-    end
-end
-
 g4_i = int32(zeros(nnz, 1));
 g4_j = int32(zeros(nnz, 1));
 
 for k = 1:length(g4_v)
     eq = M_.dynamic_g4_sparse_indices(k,1);
-    var1 = legacy_idx(M_.dynamic_g4_sparse_indices(k,2))-1;
-    var2 = legacy_idx(M_.dynamic_g4_sparse_indices(k,3))-1;
-    var3 = legacy_idx(M_.dynamic_g4_sparse_indices(k,4))-1;
-    var4 = legacy_idx(M_.dynamic_g4_sparse_indices(k,5))-1;
+    var1 = identification.legacy_idx(M_.dynamic_g4_sparse_indices(k,2), M_) - 1;
+    var2 = identification.legacy_idx(M_.dynamic_g4_sparse_indices(k,3), M_) - 1;
+    var3 = identification.legacy_idx(M_.dynamic_g4_sparse_indices(k,4), M_) - 1;
+    var4 = identification.legacy_idx(M_.dynamic_g4_sparse_indices(k,5), M_) - 1;
 
     g4_i(k) = eq;
     g4_j(k) = ((var1 * nvar + var2) * nvar + var3) * nvar + var4 + 1;
 end
 
 g4_legacy = sparse(g4_i, g4_j, g4_v, M_.endo_nbr, nvar ^ 4);
-end

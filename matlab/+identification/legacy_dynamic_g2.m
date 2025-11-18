@@ -24,19 +24,6 @@ function g2_legacy = legacy_dynamic_g2(g2_v, M_)
 nvar = M_.nspred + M_.endo_nbr + M_.nsfwrd + M_.exo_nbr + M_.exo_det_nbr;
 nnz = size(M_.dynamic_g2_sparse_indices, 1);
 
-function idx_old = legacy_idx(idx_new)
-    tmp = idx_new - 3 * M_.endo_nbr;
-    if tmp < 1
-        lli = M_.lead_lag_incidence';
-        if M_.maximum_lag == 0
-            idx_new = idx_new - M_.endo_nbr;
-        end
-        idx_old = lli(idx_new);
-    else
-        idx_old = tmp + M_.nspred + M_.endo_nbr + M_.nsfwrd;
-    end
-end
-
 %% The g2_* arrays may be expanded if there are symmetric elements added
 g2_i = int32(zeros(nnz, 1));
 g2_j = int32(zeros(nnz, 1));
@@ -45,8 +32,8 @@ next_sym_idx = nnz + 1; % Index of next symmetric element to be added
 
 for k = 1:length(g2_v)
     eq = M_.dynamic_g2_sparse_indices(k,1);
-    var1 = legacy_idx(M_.dynamic_g2_sparse_indices(k,2))-1;
-    var2 = legacy_idx(M_.dynamic_g2_sparse_indices(k,3))-1;
+    var1 = identification.legacy_idx(M_.dynamic_g2_sparse_indices(k,2), M_) - 1;
+    var2 = identification.legacy_idx(M_.dynamic_g2_sparse_indices(k,3), M_) - 1;
 
     g2_i(k) = eq;
     g2_j(k) = var1 * nvar + var2 + 1;
@@ -61,4 +48,3 @@ for k = 1:length(g2_v)
 end
 
 g2_legacy = sparse(g2_i, g2_j, g2_v, M_.endo_nbr, nvar ^ 2);
-end
