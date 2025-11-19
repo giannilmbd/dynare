@@ -5,7 +5,7 @@ function [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphah
 %                                       a0,a1,P0,P1,t,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,regimes_,base_regime,d_index,M_,
 %                                       dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options, Fi,Ki,kalman_tol,nk)
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -142,14 +142,15 @@ if info==0
     end
 end
 if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use_relaxation_tol_period
+    % suffix R denotes relaxation
     guess_regime = [base_regime base_regime];
     options_.occbin.filter.guess_regime = true;
     guess_regime(1) = regx(1);
-    regx2= regx;
-    while isequal(guess_regime(1),regx2(1))
+    regxR= regx;
+    while isequal(guess_regime(1),regxR(1))
         % we reduce length until the converged regime does not change
 
-        guess_regime(1).(regname)(end) = regx2(1).(regname)(end)-1;
+        guess_regime(1).(regname)(end) = regxR(1).(regname)(end)-1;
         if guess_regime(1).(regname)(end)==1
             % make sure we enforce base regime
             guess_regime(1).(regname)=guess_regime(1).(regname)(end);
@@ -160,45 +161,45 @@ if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use
             end
         end        
         if is_multivariate
-            [ax2, a1x2, Px2, P1x2, vx2, Tx2, Rx2, Cx2, regx2, info2, M_2, likx2, etahat2, alphahat2, V2] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
+            [axR, a1xR, PxR, P1xR, vxR, TxR, RxR, CxR, regxR, infoR, M_R, likxR, etahatR, alphahatR, VR] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
         else
-            [ax2, a1x2, Px2, P1x2, vx2, Fix2, Kix2, Tx2, Rx2, Cx2, regx2, info2, M_2, likx2, alphahat2, etahat2,TTx2,RRx2,CCx2] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
+            [axR, a1xR, PxR, P1xR, vxR, FixR, KixR, TxR, RxR, CxR, regxR, infoR, M_R, likxR, alphahatR, etahatR,TTxR,RRxR,CCxR] = occbin.kalman_update_algo_3(a0,a1,P0,P1,data_index,Z,vv,Fi,Ki,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options,kalman_tol,nk);
         end
         isnew=true;
         for kr=1:length(likvec)
             % make sure likelihood does not differ by rounding issue
             % but due to different regimes
-            if isequal(regx2(1),regvec(kr))
+            if isequal(regxR(1),regvec(kr))
                 isnew = false;
             end
         end
         if isnew
-            likvec = [likvec likx2];
-            regvec = [regvec; regx2(1)];
+            likvec = [likvec likxR];
+            regvec = [regvec; regxR(1)];
         end
-        if info2==0 && likx2<likx
-            ax=ax2;
-            a1x=a1x2;
-            Px=Px2;
-            P1x=P1x2;
-            vx=vx2;
-            Tx=Tx2;
-            Rx=Rx2;
-            Cx=Cx2;
-            regx=regx2;
-            info=info2;
-            likx=likx2;
-            M_= M_2;
-            etahat=etahat2;
-            alphahat=alphahat2;
+        if infoR==0 && likxR<likx
+            ax=axR;
+            a1x=a1xR;
+            Px=PxR;
+            P1x=P1xR;
+            vx=vxR;
+            Tx=TxR;
+            Rx=RxR;
+            Cx=CxR;
+            regx=regxR;
+            info=infoR;
+            likx=likxR;
+            M_= M_R;
+            etahat=etahatR;
+            alphahat=alphahatR;
             if is_multivariate
-                V=V2;
+                V=VR;
             else
-                Fix = Fix2;
-                Kix = Kix2;
-                TTx = TTx2;
-                RRx = RRx2;
-                CCx = CCx2;
+                Fix = FixR;
+                Kix = KixR;
+                TTx = TTxR;
+                RRx = RRxR;
+                CCx = CCxR;
             end
         end
     end
@@ -207,10 +208,9 @@ if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use
     options_.occbin.likelihood.loss_function_regime_guess = false;
 end
 
-% if options_.occbin.likelihood.brute_force_regime_guess && (info0 || info1) %|| (info==0 &&  ~isequal(regx(1),base_regime))
 if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
         || (options_.occbin.likelihood.brute_force_extra_regime_guess && (info0 || info1)) %|| (info==0 &&  ~isequal(regx(1),base_regime))
-
+    %suffix 2 denotes brute force
     guess_regime = [base_regime base_regime];
     options_.occbin.filter.guess_regime = true;
 
