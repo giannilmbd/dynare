@@ -78,6 +78,7 @@ stderr e_m, inv_gamma_pdf, 0.008862, inf;
 end;
 
 varobs gp_obs gy_obs;
+if ~isoctave
 
 estimation(order=1,datafile='../fsdat_simul',nobs=192,silent_optimizer,loglinear,mh_replic=50,mh_nblocks=1,mh_drop=0.2, 
 posterior_sampling_method='slice',
@@ -127,4 +128,5 @@ if max(max(abs(temp1.accepted_draws_this_chain-temp2.accepted_draws_this_chain))
     temp1.accepted_draws_this_chain
     temp2.accepted_draws_this_chain
     error('accepted_draws_this_chain are not the same')
+end
 end
