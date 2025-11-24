@@ -5,7 +5,7 @@ We are pleased to announce the release of Dynare 6.5.
 
 This maintenance release fixes various bugs.
 
-The Windows, macOS, MATLAB online and source packages are available for
+The Windows, macOS, MATLAB Online and source packages are available for
 download at [the Dynare website](https://www.dynare.org/download/).
 
 This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
@@ -82,7 +82,7 @@ We are pleased to announce the release of Dynare 6.4.
 
 This maintenance release fixes various bugs.
 
-The Windows, macOS, MATLAB online and source packages are available for
+The Windows, macOS, MATLAB Online and source packages are available for
 download at [the Dynare website](https://www.dynare.org/download/).
 
 This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
@@ -124,7 +124,7 @@ We are pleased to announce the release of Dynare 6.3.
 
 This maintenance release fixes various bugs.
 
-The Windows, macOS, MATLAB online and source packages are available for
+The Windows, macOS, MATLAB Online and source packages are available for
 download at [the Dynare website](https://www.dynare.org/download/).
 
 This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
@@ -169,7 +169,7 @@ We are pleased to announce the release of Dynare 6.2.
 
 This maintenance release fixes various bugs.
 
-The Windows, macOS, MATLAB online and source packages are available for
+The Windows, macOS, MATLAB Online and source packages are available for
 download at [the Dynare website](https://www.dynare.org/download/).
 
 This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
@@ -224,7 +224,7 @@ We are pleased to announce the release of Dynare 6.1.
 
 This maintenance release fixes various bugs.
 
-The Windows, macOS, MATLAB online and source packages are already available for
+The Windows, macOS, MATLAB Online and source packages are already available for
 download at [the Dynare website](https://www.dynare.org/download/).
 
 This release is compatible with MATLAB versions ranging from 9.5 (R2018b) to
