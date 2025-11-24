@@ -23,7 +23,7 @@ function get_ar_ec_matrices(model_name, model_type)
 %
 %   NONE
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -68,7 +68,7 @@ else
 end
 
 %% Call Dynamic Function
-g1 = feval([M_.fname '.sparse.dynamic_g1'], ones(3*M_.endo_nbr, 1), ones(1, M_.exo_nbr), ...
+g1 = feval([M_.fname '.dynamic_g1'], ones(3*M_.endo_nbr, 1), ones(1, M_.exo_nbr), ...
            M_.params, zeros(M_.endo_nbr, 1), ...
            M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
            M_.dynamic_g1_sparse_colptr);

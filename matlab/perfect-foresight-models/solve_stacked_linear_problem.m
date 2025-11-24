@@ -1,6 +1,6 @@
 function [endogenousvariables, success] = solve_stacked_linear_problem(endogenousvariables, exogenousvariables, steadystate_y, steadystate_x, M_, options_)
 
-% Copyright © 2015-2024 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,9 +33,9 @@ z = endogenousvariables(:,M_.maximum_lag+(1:periods));
 
 % Evaluate the residuals and Jacobian of the dynamic model at the deterministic steady state.
 y3n = repmat(steadystate_y, 3, 1);
-[d1, TT_order, TT] = feval([M_.fname,'.sparse.dynamic_resid'], y3n, steadystate_x', M_.params, ...
+[d1, TT_order, TT] = feval([M_.fname,'.dynamic_resid'], y3n, steadystate_x', M_.params, ...
                            steadystate_y);
-jacobian = feval([M_.fname,'.sparse.dynamic_g1'], y3n, steadystate_x', M_.params, steadystate_y, ...
+jacobian = feval([M_.fname,'.dynamic_g1'], y3n, steadystate_x', M_.params, steadystate_y, ...
                  M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
                  M_.dynamic_g1_sparse_colptr, TT_order, TT);
 

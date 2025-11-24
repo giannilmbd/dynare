@@ -66,7 +66,7 @@ for blk = 1:nblocks
     if options_.bytecode
         fh_dynamic = @(y3n, x, params, ys, sparse_rowval, sparse_colval, sparse_colptr, T) bytecode_wrapper(y3n, x, params, ys, T, blk, M_, options_);
     else
-        fh_dynamic = str2func(sprintf('%s.sparse.block.dynamic_%d', M_.fname, blk));
+        fh_dynamic = str2func(sprintf('%s.block.dynamic_%d', M_.fname, blk));
     end
 
     switch M_.block_structure.block(blk).Simulation_Type

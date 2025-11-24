@@ -18,7 +18,7 @@ function e = euler_equation_error(y0,x,innovations,M_,options_,oo_,pfm,nodes,wei
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-dynamic_resid = str2func([M_.fname '.sparse.dynamic_resid']);
+dynamic_resid = str2func([M_.fname '.dynamic_resid']);
 ep = options_.ep;
 y1 = extended_path_core(ep.periods, ...
                         M_.endo_nbr, M_.exo_nbr, ...

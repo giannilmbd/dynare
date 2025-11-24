@@ -185,9 +185,9 @@ void
 DynamicModelNoblockDllCaller::load_dll(const std::string& basename)
 {
   // Load symbols from dynamic MEX
-  const std::filesystem::path sparse_dir {"+" + basename + "/+sparse/"};
-  const std::filesystem::path resid_mex_name {sparse_dir / ("dynamic_resid"s + MEXEXT)},
-      g1_mex_name {sparse_dir / ("dynamic_g1"s + MEXEXT)};
+  const std::filesystem::path model_dir {"+" + basename};
+  const std::filesystem::path resid_mex_name {model_dir / ("dynamic_resid"s + MEXEXT)},
+      g1_mex_name {model_dir / ("dynamic_g1"s + MEXEXT)};
 #if !defined(__CYGWIN32__) && !defined(_WIN32)
   resid_mex = dlopen(resid_mex_name.c_str(), RTLD_NOW);
   g1_mex = dlopen(g1_mex_name.c_str(), RTLD_NOW);
@@ -270,7 +270,7 @@ DynamicModelNoblockMatlabCaller::eval(double* resid)
 
   {
     // Compute residuals
-    std::string funcname {basename + ".sparse.dynamic_resid"};
+    std::string funcname {basename + ".dynamic_resid"};
     std::array<mxArray*, 3> plhs;
     std::array prhs {y_mx, x_mx, params_mx, steady_state_mx};
 
@@ -301,7 +301,7 @@ DynamicModelNoblockMatlabCaller::eval(double* resid)
   if (compute_jacobian)
     {
       // Compute Jacobian
-      std::string funcname {basename + ".sparse.dynamic_g1"};
+      std::string funcname {basename + ".dynamic_g1"};
       std::array<mxArray*, 1> plhs;
       std::array prhs {y_mx,
                        x_mx,
@@ -358,8 +358,8 @@ void
 DynamicModelBlockDllCaller::load_dll(const std::string& basename, int block_num)
 {
   // Load symbols from dynamic MEX
-  const std::filesystem::path sparse_dir {"+" + basename + "/+sparse/+block"};
-  const std::filesystem::path mex_name {sparse_dir
+  const std::filesystem::path model_dir {"+" + basename + "/+block"};
+  const std::filesystem::path mex_name {model_dir
                                         / ("dynamic_"s + std::to_string(block_num) + MEXEXT)};
 #if !defined(__CYGWIN32__) && !defined(_WIN32)
   mex = dlopen(mex_name.c_str(), RTLD_NOW);
@@ -456,7 +456,7 @@ DynamicModelBlockMatlabCaller::~DynamicModelBlockMatlabCaller()
 void
 DynamicModelBlockMatlabCaller::eval(double* resid)
 {
-  std::string funcname {basename + ".sparse.block.dynamic_" + std::to_string(block_num)};
+  std::string funcname {basename + ".block.dynamic_" + std::to_string(block_num)};
 
   std::array prhs {y_mx,
                    x_mx,

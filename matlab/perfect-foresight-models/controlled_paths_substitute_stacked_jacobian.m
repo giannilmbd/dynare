@@ -19,7 +19,7 @@ function A = controlled_paths_substitute_stacked_jacobian(A, y, y0, yT, exogenou
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-dynamic_g1 = str2func([M_.fname '.sparse.dynamic_g1']);
+dynamic_g1 = str2func([M_.fname '.dynamic_g1']);
 
 periods = numel(controlled_paths_by_period);
 

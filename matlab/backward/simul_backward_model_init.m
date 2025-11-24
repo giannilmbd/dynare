@@ -3,7 +3,7 @@ function [initialconditions, samplesize, innovations, options_, M_, oo_, endonam
 
 % Initialization of the routines simulating backward models.
 
-% Copyright © 2017-2023 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -191,8 +191,8 @@ end
 
 if nargout>8
     % Get function handles to the dynamic model routines.
-    dynamic_resid = str2func([M_.fname,'.sparse.dynamic_resid']);
-    dynamic_g1 = str2func([M_.fname,'.sparse.dynamic_g1']);
+    dynamic_resid = str2func([M_.fname,'.dynamic_resid']);
+    dynamic_g1 = str2func([M_.fname,'.dynamic_g1']);
     % initialization of vector y.
     y = NaN(3*M_.endo_nbr,1);
 end

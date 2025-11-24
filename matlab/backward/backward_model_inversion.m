@@ -17,7 +17,7 @@ function [endogenousvariables, exogenousvariables] = backward_model_inversion(co
 %
 % REMARKS
 
-% Copyright © 2017-2023 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -71,8 +71,8 @@ ModelInversion.x_free_id = freeinnovations_id;
 ModelInversion.J_id = [M_.endo_nbr+ModelInversion.y_free_id ; 3*M_.endo_nbr+ModelInversion.x_free_id];
 
 % Get function handles to the dynamic model routines.
-dynamic_resid = str2func([M_.fname '.sparse.dynamic_resid']);
-dynamic_g1 = str2func([M_.fname '.sparse.dynamic_g1']);
+dynamic_resid = str2func([M_.fname '.dynamic_resid']);
+dynamic_g1 = str2func([M_.fname '.dynamic_g1']);
 
 % Initialization of the returned simulations (endogenous variables).
 Y = NaN(M_.endo_nbr, nobs(constraints));

@@ -18,7 +18,7 @@ function [residuals, info] = calibrateresiduals(dbase, info, M_)
 % The first two input arguments are the output of checkdatabaseforinversion
 % routine.
 
-% Copyright © 2017-2023 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -38,7 +38,7 @@ function [residuals, info] = calibrateresiduals(dbase, info, M_)
 displayresidualsequationmapping = false;
 
 % Get function handle for the dynamic model
-dynamic_resid = str2func([M_.fname,'.sparse.dynamic_resid']);
+dynamic_resid = str2func([M_.fname,'.dynamic_resid']);
 
 % Get data for all the endogenous variables.
 ydata = dbase{info.endonames{:}}.data;

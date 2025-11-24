@@ -13,7 +13,7 @@ function [h_minus_1, h, h_plus_1, h_exo, resid] = get_deriv(M_, ys_)
 % - h_exo      [N by N_exo] derivative matrix with respect to exogenous variables
 % - resid      [N by 1]     vector of residuals
 
-% Copyright © 2021-2024 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,9 +33,9 @@ function [h_minus_1, h, h_plus_1, h_exo, resid] = get_deriv(M_, ys_)
 dyn_endo_ss = repmat(ys_, 3, 1);
 x = zeros(M_.exo_nbr);
 
-[resid, T_order, T] = feval([M_.fname '.sparse.dynamic_resid'], dyn_endo_ss, x, M_.params, ys_);
+[resid, T_order, T] = feval([M_.fname '.dynamic_resid'], dyn_endo_ss, x, M_.params, ys_);
 
-g1 = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, x, M_.params, ys_, ...
+g1 = feval([M_.fname '.dynamic_g1'], dyn_endo_ss, x, M_.params, ys_, ...
            M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
            M_.dynamic_g1_sparse_colptr, T_order, T);
 

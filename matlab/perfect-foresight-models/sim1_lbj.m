@@ -56,8 +56,8 @@ success = false;
 iz = 1:ny+nyp+nyf;
 
 if ~options_.bytecode
-    dynamic_resid = str2func(sprintf('%s.sparse.dynamic_resid', M_.fname));
-    dynamic_g1 = str2func(sprintf('%s.sparse.dynamic_g1', M_.fname));
+    dynamic_resid = str2func(sprintf('%s.dynamic_resid', M_.fname));
+    dynamic_g1 = str2func(sprintf('%s.dynamic_g1', M_.fname));
 end
 
 % NB: working with dense Jacobian matrices with only the relevant columns turns

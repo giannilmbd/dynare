@@ -34,7 +34,7 @@ DynamicModelMFile::DynamicModelMFile(const std::string& modName, int order_arg,
                                      std::vector<const mxArray*> dynamic_gN_sparse_indices_arg) :
     DynamicModelAC {order_arg, dynamic_g1_sparse_rowval_mx_arg, dynamic_g1_sparse_colval_mx_arg,
                     dynamic_g1_sparse_colptr_mx_arg, move(dynamic_gN_sparse_indices_arg)},
-    DynamicMFilename {modName + ".sparse.dynamic"}
+    DynamicMFilename {modName + ".dynamic"}
 {
 }
 

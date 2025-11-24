@@ -68,8 +68,8 @@ end
 pfm.i_cols_j = find(pfm.lead_lag_incidence');
 pfm.i_upd = pfm.ny+(1:pfm.periods*pfm.ny);
 if ~options_.bytecode
-    pfm.dynamic_resid = str2func([M_.fname, '.sparse.dynamic_resid']);
-    pfm.dynamic_g1 = str2func([M_.fname, '.sparse.dynamic_g1']);
+    pfm.dynamic_resid = str2func([M_.fname, '.dynamic_resid']);
+    pfm.dynamic_g1 = str2func([M_.fname, '.dynamic_g1']);
     pfm.sparse_rowval = M_.dynamic_g1_sparse_rowval;
     pfm.sparse_colval = M_.dynamic_g1_sparse_colval;
     pfm.sparse_colptr = M_.dynamic_g1_sparse_colptr;

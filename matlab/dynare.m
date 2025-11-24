@@ -245,11 +245,11 @@ end
 % Under Windows, make sure the MEX file is unloaded (in the use_dll case),
 % otherwise the preprocessor can't recompile it
 if isoctave
-    clear([fname(1:end-4) '.sparse.static_resid'], [fname(1:end-4) '.sparse.static_g1'], [fname(1:end-4) '.sparse.static_g2'])
-    clear([fname(1:end-4) '.sparse.dynamic_resid'], [fname(1:end-4) '.sparse.dynamic_g1'], [fname(1:end-4) '.sparse.dynamic_g2'], [fname(1:end-4) '.sparse.dynamic_g3'])
+    clear([fname(1:end-4) '.static_resid'], [fname(1:end-4) '.static_g1'], [fname(1:end-4) '.static_g2'])
+    clear([fname(1:end-4) '.dynamic_resid'], [fname(1:end-4) '.dynamic_g1'], [fname(1:end-4) '.dynamic_g2'], [fname(1:end-4) '.dynamic_g3'])
 else
-    clear(['+' fname(1:end-4) '/+sparse/static_resid'], ['+' fname(1:end-4) '/+sparse/static_g1'], ['+' fname(1:end-4) '/+sparse/static_g2'])
-    clear(['+' fname(1:end-4) '/+sparse/dynamic_resid'], ['+' fname(1:end-4) '/+sparse/dynamic_g1'], ['+' fname(1:end-4) '/+sparse/dynamic_g2'], ['+' fname(1:end-4) '/+sparse/dynamic_g3'])
+    clear(['+' fname(1:end-4) '/static_resid'], ['+' fname(1:end-4) '/static_g1'], ['+' fname(1:end-4) '/static_g2'])
+    clear(['+' fname(1:end-4) '/dynamic_resid'], ['+' fname(1:end-4) '/dynamic_g1'], ['+' fname(1:end-4) '/dynamic_g2'], ['+' fname(1:end-4) '/dynamic_g3'])
 end
 
 pTic = tic;

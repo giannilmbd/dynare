@@ -25,7 +25,7 @@ function [dr, info] = stochastic_solvers(dr, task, M_, options_, exo_steady_stat
 %                                 info=6 -> The Jacobian matrix evaluated at the steady state is complex.
 %                                 info=9 -> k_order_pert was unable to compute the solution
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -121,7 +121,7 @@ if local_order == 1
         g1(:, 3*M_.endo_nbr+M_.exo_nbr+(1:M_.exo_det_nbr)) = loc_dr.g1_xd;
         g1 = sparse(g1);
     else
-        g1 = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, exo_ss, M_.params, dr.ys, ...
+        g1 = feval([M_.fname '.dynamic_g1'], dyn_endo_ss, exo_ss, M_.params, dr.ys, ...
                    M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
                    M_.dynamic_g1_sparse_colptr);
     end
@@ -129,10 +129,10 @@ elseif local_order == 2
     if (options_.bytecode)
         warning('Option "bytecode" is ignored when computing perturbation solution at order = 2')
     end
-    [g1, T_order, T] = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, exo_ss, M_.params, ...
+    [g1, T_order, T] = feval([M_.fname '.dynamic_g1'], dyn_endo_ss, exo_ss, M_.params, ...
                              dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
                              M_.dynamic_g1_sparse_colptr);
-    g2_v = feval([M_.fname '.sparse.dynamic_g2'], dyn_endo_ss, exo_ss, M_.params, dr.ys, T_order, T);
+    g2_v = feval([M_.fname '.dynamic_g2'], dyn_endo_ss, exo_ss, M_.params, dr.ys, T_order, T);
 
     g2 = build_two_dim_hessian(M_.dynamic_g2_sparse_indices, g2_v, size(g1, 1), size(g1, 2));
 

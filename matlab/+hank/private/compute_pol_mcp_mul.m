@@ -30,7 +30,7 @@
 %   mult_values [struct] : Structure extending `ss.pol.values` with computed policy function
 %                          values for multipliers (e.g. `MULT_L_a`, `MULT_U_c`)
 %
-% Internally, this function uses `M_.fname.sparse.dynamic_het1_resid` to evaluate residuals,
+% Internally, this function uses `M_.fname.dynamic_het1_resid` to evaluate residuals,
 % and relies on complementarity mappings from `M_.fname.dynamic_het1_complementarity_conditions`.
 function mult_values = compute_pol_mcp_mul(M_, ss, sizes, mat)
    % Get complementarity condition bounds
@@ -119,7 +119,7 @@ function mult_values = compute_pol_mcp_mul(M_, ss, sizes, mat)
             % t+1
             yh(2*H_.endo_nbr+all_pol_ind) = mat.pol.x_bar_dash*mat.Phi_tilde_e(:,ind_sm);
             % Residual function call
-            r = feval([M_.fname '.sparse.dynamic_het1_resid'], y, x, M_.params, [], yh, xh, []);
+            r = feval([M_.fname '.dynamic_het1_resid'], y, x, M_.params, [], yh, xh, []);
             mult_values.(mult_name)(ind_sm) = -r(eq);
          end
       end
@@ -144,7 +144,7 @@ function mult_values = compute_pol_mcp_mul(M_, ss, sizes, mat)
             % t+1
             yh(2*H_.endo_nbr+all_pol_ind) = mat.pol.x_bar_dash*mat.Phi_tilde_e(:,ind_sm);
             % Residual function call
-            r = feval([M_.fname '.sparse.dynamic_het1_resid'], y, x, M_.params, [], yh, xh, []);
+            r = feval([M_.fname '.dynamic_het1_resid'], y, x, M_.params, [], yh, xh, []);
             mult_values.(mult_name)(ind_sm) = r(eq);
          end
       end

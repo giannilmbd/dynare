@@ -6,7 +6,7 @@ function [funcs, feedback_vars_idxs] = setup_time_recursive_block_simul(M_)
 % Also precompute indices of feedback variables (also brings some performance gains).
 % By the way, do other sanity checks on block decomposition.
 
-% Copyright © 2022 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -33,7 +33,7 @@ end
 funcs = cell(length(M_.block_structure.block), 1);
 feedback_vars_idxs = cell(length(M_.block_structure.block), 1);
 for blk = 1:length(M_.block_structure.block)
-    funcs{blk} = str2func(sprintf('%s.sparse.block.dynamic_%d', M_.fname, blk));
+    funcs{blk} = str2func(sprintf('%s.block.dynamic_%d', M_.fname, blk));
     feedback_vars_idxs{blk} = M_.endo_nbr+M_.block_structure.block(blk).variable((M_.block_structure.block(blk).endo_nbr-M_.block_structure.block(blk).mfs+1):end); % Indices of feedback variables in the dynamic y vector (of size 3n)
 end
 

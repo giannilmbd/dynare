@@ -37,7 +37,7 @@ function posterior_sampler(objective_function,ProposalFun,xparam1,sampler_option
 % Then the comments write here can be used for all the other pairs of
 % parallel functions and also for management functions.
 
-% Copyright © 2006-2024 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -128,10 +128,10 @@ else
     % Global variables for parallel routines.
     globalVars = struct();
     % which files have to be copied to run remotely
-    NamFileInput(1,:) = {'',[ModelName '.sparse.static_resid.m']};
-    NamFileInput(2,:) = {'',[ModelName '.sparse.static_g1.m']};
-    NamFileInput(3,:) = {'',[ModelName '.sparse.dynamic_resid.m']};
-    NamFileInput(4,:) = {'',[ModelName '.sparse.dynamic_g1.m']};
+    NamFileInput(1,:) = {'',[ModelName '.static_resid.m']};
+    NamFileInput(2,:) = {'',[ModelName '.static_g1.m']};
+    NamFileInput(3,:) = {'',[ModelName '.dynamic_resid.m']};
+    NamFileInput(4,:) = {'',[ModelName '.dynamic_g1.m']};
     if M_.set_auxiliary_variables
         NamFileInput(5,:) = {'',[M_.fname '.set_auxiliary_variables.m']};
     end

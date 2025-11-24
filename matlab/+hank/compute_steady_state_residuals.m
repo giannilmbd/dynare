@@ -38,12 +38,12 @@
 %     - The individual state distribution `ss.d.hist` is reordered to match the policy grid.
 %     - Aggregate variables defined as expectations over the distribution are recomputed
 %       using `mat.pol.x_bar_dash` and the `Phi` basis matrix.
-%     - The residuals are evaluated using the sparse dynamic function `.sparse.dynamic_resid`.
+%     - The residuals are evaluated using the sparse dynamic function `dynamic_resid`.
 %
 % - For the heterogeneous block:
 %     - Constructs the full stacked endogenous (`yh`) and exogenous (`xh`) state vectors
 %       at times t-1, t, and t+1 using the stored policy functions and interpolation structure.
-%     - Calls `.sparse.dynamic_het1_resid` at each point in the tensor-product state space.
+%     - Calls `dynamic_het1_resid` at each point in the tensor-product state space.
 %
 %           dynamic_resid, dynamic_het1_resid
 function [F,G] = compute_steady_state_residuals(M_, oo_)
@@ -87,7 +87,7 @@ function [F,G] = compute_steady_state_residuals(M_, oo_)
    % - Exogenous variables - %
    x = zeros(M_.exo_nbr,1);
    % - Call to the residual function - %
-   G = feval([M_.fname '.sparse.dynamic_resid'], y, x, M_.params, [], yagg);
+   G = feval([M_.fname '.dynamic_resid'], y, x, M_.params, [], yagg);
    % Compute heterogeneous residuals
    N_sp = sizes.N_e*sizes.pol.N_a;
    H_ = M_.heterogeneity(1);
@@ -121,6 +121,6 @@ function [F,G] = compute_steady_state_residuals(M_, oo_)
    % Call the residual function
    F = NaN(H_.endo_nbr, N_sp);
    for j=1:N_sp
-      F(:,j) = feval([M_.fname '.sparse.dynamic_het1_resid'], y, x, M_.params, [], yh(:,j), xh(:,j), []);
+      F(:,j) = feval([M_.fname '.dynamic_het1_resid'], y, x, M_.params, [], yh(:,j), xh(:,j), []);
    end
 end

@@ -157,7 +157,7 @@ dr.derivs = identification.get_perturbation_params_derivs(M_, options_, estim_pa
 yy0 = repmat(dr.ys, 3, 1);           %steady state of dynamic (endogenous and auxiliary variables) in lead_lag_incidence order
 Yss = dr.ys(dr.order_var); % steady state in DR order
 if order == 1
-    g1 = feval([fname,'.sparse.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    g1 = feval([fname,'.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
     g1 = identification.legacy_dynamic_g1(g1, M_);
     %g1 is [endo_nbr by yy0ex0_nbr first derivative (wrt all dynamic variables) of dynamic model equations, i.e. df/dyy0ex0, rows are in declaration order, columns in lead_lag_incidence order
     DYNAMIC = [Yss;
@@ -175,8 +175,8 @@ if order == 1
     dREDUCEDFORM = [ [zeros(endo_nbr, stderrparam_nbr+corrparam_nbr) dr.derivs.dYss]; dREDUCEDFORM ]; % add steady state
 
 elseif order == 2
-    [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
-    g2_v = feval([fname,'.sparse.dynamic_g2'], yy0, exo_steady_state', params, dr.ys, T, T_order);
+    [g1, T, T_order] = feval([fname,'.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    g2_v = feval([fname,'.dynamic_g2'], yy0, exo_steady_state', params, dr.ys, T, T_order);
     g1 = identification.legacy_dynamic_g1(g1, M_);
     g2 = identification.legacy_dynamic_g2(g2_v, M_);
 
@@ -206,9 +206,9 @@ elseif order == 2
     end
     dREDUCEDFORM = [ [zeros(endo_nbr, stderrparam_nbr+corrparam_nbr) dr.derivs.dYss]; dREDUCEDFORM ]; % add steady state
 elseif order == 3
-    [g1, T, T_order] = feval([fname,'.sparse.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
-    [g2_v, T, T_order] = feval([fname,'.sparse.dynamic_g2'], yy0, exo_steady_state', params, dr.ys, T, T_order);
-    g3_v = feval([fname,'.sparse.dynamic_g3'], yy0, exo_steady_state', params, dr.ys, T, T_order);
+    [g1, T, T_order] = feval([fname,'.dynamic_g1'], yy0, exo_steady_state', params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    [g2_v, T, T_order] = feval([fname,'.dynamic_g2'], yy0, exo_steady_state', params, dr.ys, T, T_order);
+    g3_v = feval([fname,'.dynamic_g3'], yy0, exo_steady_state', params, dr.ys, T, T_order);
     g1 = identification.legacy_dynamic_g1(g1, M_);
     g2 = identification.legacy_dynamic_g2(g2_v, M_);
     g3 = identification.legacy_dynamic_g3(g3_v, M_);

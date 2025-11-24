@@ -25,7 +25,7 @@ function oo_=PosteriorIRF(type,options_,estim_params_,oo_,M_,bayestopt_,dataset_
 % functions associated with it(the _core1 and _core2).
 % See also the comments posterior_sampler.m function.
 
-% Copyright © 2006-2024 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -216,10 +216,10 @@ else
     localVars.ifil2=ifil2;
 
     % which files have to be copied to run remotely
-    NamFileInput(1,:) = {'',[M_.fname '.sparse.static_resid.m']};
-    NamFileInput(2,:) = {'',[M_.fname '.sparse.static_g1.m']};
-    NamFileInput(3,:) = {'',[M_.fname '.sparse.dynamic_resid.m']};
-    NamFileInput(4,:) = {'',[M_.fname '.sparse.dynamic_g1.m']};
+    NamFileInput(1,:) = {'',[M_.fname '.static_resid.m']};
+    NamFileInput(2,:) = {'',[M_.fname '.static_g1.m']};
+    NamFileInput(3,:) = {'',[M_.fname '.dynamic_resid.m']};
+    NamFileInput(4,:) = {'',[M_.fname '.dynamic_g1.m']};
     if M_.set_auxiliary_variables
         NamFileInput(5,:) = {'',[M_.fname '.set_auxiliary_variables.m']};
     end

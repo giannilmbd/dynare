@@ -86,16 +86,16 @@ end
 %% out = [Yss; vec(g1); vec(g2); vec(g3)]; of all endogenous variables, in DR order
 if strcmp(outputflag,'dynamic_model')
     y3n = repmat(ys, 3, 1);
-    [g1, T, T_order] = feval([M_.fname,'.sparse.dynamic_g1'], y3n, exo_steady_state', M_.params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    [g1, T, T_order] = feval([M_.fname,'.dynamic_g1'], y3n, exo_steady_state', M_.params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
     g1 = identification.legacy_dynamic_g1(g1, M_);
     out = [Yss; g1(:)];
     if options_.order >= 2
-        [g2_v, T, T_order] = feval([M_.fname,'.sparse.dynamic_g2'], y3n, exo_steady_state', M_.params, ys, T, T_order);
+        [g2_v, T, T_order] = feval([M_.fname,'.dynamic_g2'], y3n, exo_steady_state', M_.params, ys, T, T_order);
         g2 = identification.legacy_dynamic_g2(g2_v, M_);
         out = [out; g2(:)];
     end
     if options_.order == 3
-        g3_v = feval([M_.fname,'.sparse.dynamic_g3'], y3n, exo_steady_state', M_.params, ys, T, T_order);
+        g3_v = feval([M_.fname,'.dynamic_g3'], y3n, exo_steady_state', M_.params, ys, T, T_order);
         g3 = identification.legacy_dynamic_g3(g3_v, M_);
         g3 = identification.unfold_g3(g3, M_.nspred + M_.endo_nbr + M_.nsfwrd + M_.exo_nbr);
         out = [out; g3(:)];

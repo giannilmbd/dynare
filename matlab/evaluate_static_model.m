@@ -18,7 +18,7 @@ function [residuals,jacob] = evaluate_static_model(ys,exo_ss,params,M_,options_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -45,8 +45,8 @@ if options_.bytecode
         jacob = junk.g1;
     end      
 else
-    [residuals, T_order, T] = feval([M_.fname '.sparse.static_resid'], ys, exo_ss, params);
+    [residuals, T_order, T] = feval([M_.fname '.static_resid'], ys, exo_ss, params);
     if nargout >= 2
-        jacob = feval([M_.fname '.sparse.static_g1'], ys, exo_ss, params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
+        jacob = feval([M_.fname '.static_g1'], ys, exo_ss, params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
     end
 end

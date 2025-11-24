@@ -65,8 +65,8 @@ verbatim;
   x = randn(M_.exo_nbr,1);
   y = substitution.set_auxiliary_variables(y, x, M_.params);
   y3n = repmat(y, 3, 1);
-  [residual, T_order, T] = substitution.sparse.dynamic_resid(y3n, x', M_.params, oo_.steady_state);
-  g1 = substitution.sparse.dynamic_g1(y3n, x', M_.params, oo_.steady_state, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, T_order, T);
+  [residual, T_order, T] = substitution.dynamic_resid(y3n, x', M_.params, oo_.steady_state);
+  g1 = substitution.dynamic_g1(y3n, x', M_.params, oo_.steady_state, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, T_order, T);
   example1 = load('example1.mat');
 
   if max(abs(example1.TrueData.data(:)-TrueData.data(:)))>1e-9

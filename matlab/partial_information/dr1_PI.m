@@ -36,7 +36,7 @@ function [dr,info,oo_] = dr1_PI(dr,M_,options_,oo_)
 %   none.
 %
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -71,7 +71,7 @@ if M_.exo_nbr == 0
 end
 
 
-g1 = feval([M_.fname '.sparse.dynamic_g1'], repmat(dr.ys, 3, 1), [oo_.exo_steady_state; oo_.exo_det_steady_state], ...
+g1 = feval([M_.fname '.dynamic_g1'], repmat(dr.ys, 3, 1), [oo_.exo_steady_state; oo_.exo_det_steady_state], ...
            M_.params, dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
            M_.dynamic_g1_sparse_colptr);
 

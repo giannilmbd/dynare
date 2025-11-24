@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021-2024 Dynare Team
+ * Copyright © 2021-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -28,7 +28,7 @@
 #include "sparse_tensor.hh"
 #include "t_container.hh"
 
-// Handles calls to <model>/+objective/+sparse/static*.m
+// Handles calls to <model>/+objective/static*.m
 class ObjectiveMFile
 {
 private:

@@ -13,7 +13,7 @@ function [dr, info, params]=discretionary_policy_1(M_, options_, dr, endo_steady
 % - info          [integer]       scalar or vector, error code.
 % - params        [double]        vector of potentially updated parameters
 
-% Copyright © 2007-2024 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -51,7 +51,7 @@ end
 params=M_.params;
 
 y = zeros(M_.endo_nbr,1);
-[Uy, T_order, T] = feval([M_.fname,'.objective.sparse.static_g1'], y, [], params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr);
+[Uy, T_order, T] = feval([M_.fname,'.objective.static_g1'], y, [], params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr);
 
 if any(any(isnan(Uy)))
     info = 64 ; %the derivatives of the objective function contain NaN
@@ -73,19 +73,19 @@ if any(any(Uy~=0))
     return;
 end
 
-g2_v = feval([M_.fname,'.objective.sparse.static_g2'], y, [], params, T_order, T);
+g2_v = feval([M_.fname,'.objective.static_g2'], y, [], params, T_order, T);
 W = build_two_dim_hessian(M_.objective_g2_sparse_indices, g2_v, 1, M_.endo_nbr);
 W=reshape(W,M_.endo_nbr,M_.endo_nbr);
 
 % Find the Jacobian
 y3n = repmat(ys, 1, 3);
 x = zeros(M_.exo_nbr+M_.exo_det_nbr, 1);
-[resid, T_order, T] = feval([M_.fname '.sparse.dynamic_resid'], y3n, x, M_.params, ys);
+[resid, T_order, T] = feval([M_.fname '.dynamic_resid'], y3n, x, M_.params, ys);
 if max(abs(resid)) > options_.solve_tolf
      info = 65; %the model must be written in deviation form and not have constant terms or have a steady state provided
      return;
 end
-g1 = feval([M_.fname '.sparse.dynamic_g1'], y3n, x, M_.params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, T_order, T);
+g1 = feval([M_.fname '.dynamic_g1'], y3n, x, M_.params, ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr, T_order, T);
 
 A.lag = full(g1(:,1:M_.endo_nbr));
 A.contemp = full(g1(:,M_.endo_nbr+(1:M_.endo_nbr)));

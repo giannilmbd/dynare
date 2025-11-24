@@ -2,8 +2,7 @@
 % True policy functions and their exact derivatives (ghx,ghu,ghxx,ghxu,ghuu,ghs2,ghxxx,ghxxu,ghxuu,ghuuu,ghxss,ghuss) are computed using Matlab's symbolic toolbox and saved to a mat file
 % Created by @wmutschl (Willi Mutschler, willi@mutschler.eu)
 
-% =========================================================================
-% Copyright © 2019-2020 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -19,7 +18,6 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
 
 
 @#define CREATE_SYMBOLIC = 0
@@ -440,9 +438,9 @@ for jj = 1:2
     oo_.dr.Correlation_matrix = M_.Correlation_matrix;
     ex0 = oo_.exo_steady_state';
     y3n = repmat(oo_.dr.ys, 3, 1);
-    [g1, T, T_order] = feval([M_.fname,'.sparse.dynamic_g1'], y3n, ex0, M_.params, oo_.dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
-    [g2_v, T, T_order] = feval([M_.fname,'.sparse.dynamic_g2'], y3n, ex0, M_.params, oo_.dr.ys, T, T_order);
-    g3_v = feval([M_.fname,'.sparse.dynamic_g3'], y3n, ex0, M_.params, oo_.dr.ys, T, T_order);
+    [g1, T, T_order] = feval([M_.fname,'.dynamic_g1'], y3n, ex0, M_.params, oo_.dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, M_.dynamic_g1_sparse_colptr);
+    [g2_v, T, T_order] = feval([M_.fname,'.dynamic_g2'], y3n, ex0, M_.params, oo_.dr.ys, T, T_order);
+    g3_v = feval([M_.fname,'.dynamic_g3'], y3n, ex0, M_.params, oo_.dr.ys, T, T_order);
     oo_.dr.g1 = identification.legacy_dynamic_g1(g1, M_);
     oo_.dr.g2 = identification.legacy_dynamic_g2(g2_v, M_);
     oo_.dr.g3 = identification.legacy_dynamic_g3(g3_v, M_);

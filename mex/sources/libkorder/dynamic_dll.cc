@@ -44,7 +44,7 @@ DynamicModelDLL::DynamicModelDLL(const std::string& modName, int order_arg,
 #if !defined(__CYGWIN32__) && !defined(_WIN32)
           "./"s +
 #endif
-          "+"s + modName + "/+sparse/" + func_name + MEXEXT};
+          "+"s + modName + "/"s + func_name + MEXEXT};
 
       mex_handle_t handle {load_mex(mex_filename)};
       if (handle)

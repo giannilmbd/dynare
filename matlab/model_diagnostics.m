@@ -16,7 +16,7 @@ function model_diagnostics(M_,options_,oo_)
 %   none.
 %
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -164,14 +164,14 @@ for b=1:nb
     else
         if options_.block
             T = NaN(M_.block_structure_stat.tmp_nbr, 1);
-            fh_static = str2func(sprintf('%s.sparse.block.static_%d', M_.fname, b));
+            fh_static = str2func(sprintf('%s.block.static_%d', M_.fname, b));
             [~, ~,~, jacob] = fh_static(dr.ys, exo, M_.params, M_.block_structure_stat.block(b).g1_sparse_rowval, ...
                 M_.block_structure_stat.block(b).g1_sparse_colval, ...
                 M_.block_structure_stat.block(b).g1_sparse_colptr, T);
             n_vars_jacob=size(jacob,2);
         else
-            [~, T_order, T] = feval([M_.fname '.sparse.static_resid'], dr.ys, exo, M_.params);
-            jacob = feval([M_.fname '.sparse.static_g1'], dr.ys, exo, M_.params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
+            [~, T_order, T] = feval([M_.fname '.static_resid'], dr.ys, exo, M_.params);
+            jacob = feval([M_.fname '.static_g1'], dr.ys, exo, M_.params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
             n_vars_jacob=M_.endo_nbr;
         end
         jacob=full(jacob);
@@ -292,16 +292,16 @@ if options_.order == 1
         g1(:, 3*M_.endo_nbr+M_.exo_nbr+(1:M_.exo_det_nbr)) = loc_dr.g1_xd;
         g1 = sparse(g1);
     else
-        g1 = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, exo, M_.params, dr.ys, ...
+        g1 = feval([M_.fname '.dynamic_g1'], dyn_endo_ss, exo, M_.params, dr.ys, ...
                    M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
                    M_.dynamic_g1_sparse_colptr);
     end
 elseif options_.order >= 2
-    [g1, T_order, T] = feval([M_.fname '.sparse.dynamic_g1'], dyn_endo_ss, exo, M_.params, ...
+    [g1, T_order, T] = feval([M_.fname '.dynamic_g1'], dyn_endo_ss, exo, M_.params, ...
                              dr.ys, M_.dynamic_g1_sparse_rowval, M_.dynamic_g1_sparse_colval, ...
                              M_.dynamic_g1_sparse_colptr);
-    if isfile(['+' M_.fname '/+sparse/dynamic_g2.m']) || isfile(['+' M_.fname '/+sparse/dynamic_g2.' mexext])
-        g2_v = feval([M_.fname '.sparse.dynamic_g2'], dyn_endo_ss, exo, M_.params, dr.ys, T_order, T);
+    if isfile(['+' M_.fname '/dynamic_g2.m']) || isfile(['+' M_.fname '/dynamic_g2.' mexext])
+        g2_v = feval([M_.fname '.dynamic_g2'], dyn_endo_ss, exo, M_.params, dr.ys, T_order, T);
     end
 end
 

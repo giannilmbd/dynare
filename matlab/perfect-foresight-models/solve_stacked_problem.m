@@ -62,8 +62,8 @@ if (options_.solve_algo == 10 || options_.solve_algo == 11)% mixed complementari
         options_.mcppath.lb = repmat(lb,periods,1);
         options_.mcppath.ub = repmat(ub,periods,1);
     end
-    dynamic_resid_function = str2func([M_.fname,'.sparse.dynamic_resid']);
-    dynamic_g1_function = str2func([M_.fname,'.sparse.dynamic_g1']);
+    dynamic_resid_function = str2func([M_.fname,'.dynamic_resid']);
+    dynamic_g1_function = str2func([M_.fname,'.dynamic_g1']);
     [y, check, res, ~, errorcode] = dynare_solve(@perfect_foresight_mcp_problem, z(:), ...
                                                  options_.simul.maxit, options_.dynatol.f, options_.dynatol.x, ...
                                                  options_, ...

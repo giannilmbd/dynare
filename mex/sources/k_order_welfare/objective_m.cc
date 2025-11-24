@@ -32,7 +32,7 @@ ObjectiveMFile::ObjectiveMFile(const std::string& modName, int kOrder_arg,
                                const mxArray* objective_g1_sparse_colval_mx_arg,
                                const mxArray* objective_g1_sparse_colptr_mx_arg,
                                std::vector<const mxArray*> objective_gN_sparse_indices_arg) :
-    ObjectiveMFilename {modName + ".objective.sparse.static"},
+    ObjectiveMFilename {modName + ".objective.static"},
     kOrder {kOrder_arg},
     objective_g1_sparse_rowval_mx {objective_g1_sparse_rowval_mx_arg},
     objective_g1_sparse_colval_mx {objective_g1_sparse_colval_mx_arg},

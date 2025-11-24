@@ -92,11 +92,11 @@ end
 
 if options_.ramsey_policy && oo_.gui.ran_perfect_foresight
     T = size(oo_.endo_simul,2);
-    U_term = feval([M_.fname '.objective.sparse.static_resid'], oo_.endo_simul(:,T-M_.maximum_lead), oo_.exo_simul(T-M_.maximum_lead,:), M_.params);
+    U_term = feval([M_.fname '.objective.static_resid'], oo_.endo_simul(:,T-M_.maximum_lead), oo_.exo_simul(T-M_.maximum_lead,:), M_.params);
     EW = U_term/(1-beta);
     W = EW;
     for t=T-M_.maximum_lead:-1:1+M_.maximum_lag
-        U = feval([M_.fname '.objective.sparse.static_resid'], oo_.endo_simul(:,t), oo_.exo_simul(t,:), M_.params);
+        U = feval([M_.fname '.objective.static_resid'], oo_.endo_simul(:,t), oo_.exo_simul(t,:), M_.params);
         W = U + beta*W;
     end
     planner_objective_value = struct('conditional', W, 'unconditional', EW);
@@ -113,8 +113,8 @@ else
     end
     if options_.order == 1 && ~options_.discretionary_policy
         % order one for non-discretionary
-        [U, T_order, T] = feval([M_.fname '.objective.sparse.static_resid'], ys, zeros(1,exo_nbr), M_.params);
-        Uy = feval([M_.fname '.objective.sparse.static_g1'], ys, zeros(1,exo_nbr), M_.params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr, T_order, T);
+        [U, T_order, T] = feval([M_.fname '.objective.static_resid'], ys, zeros(1,exo_nbr), M_.params);
+        Uy = feval([M_.fname '.objective.static_g1'], ys, zeros(1,exo_nbr), M_.params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr, T_order, T);
 
         Gy = dr.ghx(nstatic+(1:nspred),:);
         Gu = dr.ghu(nstatic+(1:nspred),:);
@@ -146,9 +146,9 @@ else
             planner_objective_value.conditional = W_L_SS;
         end
     elseif options_.order == 2 && ~M_.hessian_eq_zero %full second order approximation
-        [U, T_order, T] = feval([M_.fname '.objective.sparse.static_resid'], ys, zeros(1,exo_nbr), M_.params);
-        [Uy, T_order, T] = feval([M_.fname '.objective.sparse.static_g1'], ys, zeros(1,exo_nbr), M_.params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr, T_order, T);
-        Uyy_v = feval([M_.fname '.objective.sparse.static_g2'], ys, zeros(1,exo_nbr), M_.params, T_order, T);
+        [U, T_order, T] = feval([M_.fname '.objective.static_resid'], ys, zeros(1,exo_nbr), M_.params);
+        [Uy, T_order, T] = feval([M_.fname '.objective.static_g1'], ys, zeros(1,exo_nbr), M_.params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr, T_order, T);
+        Uyy_v = feval([M_.fname '.objective.static_g2'], ys, zeros(1,exo_nbr), M_.params, T_order, T);
 
         Gy = dr.ghx(nstatic+(1:nspred),:);
         Gu = dr.ghu(nstatic+(1:nspred),:);
@@ -243,9 +243,9 @@ else
             planner_objective_value.conditional = W_L_SS;
         end
     elseif (options_.order == 2 && M_.hessian_eq_zero) || options_.discretionary_policy %linear quadratic problem
-        [U, T_order, T] = feval([M_.fname '.objective.sparse.static_resid'], ys, zeros(1,exo_nbr), M_.params);
-        [Uy, T_order, T] = feval([M_.fname '.objective.sparse.static_g1'], ys, zeros(1,exo_nbr), M_.params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr, T_order, T);
-        Uyy_v = feval([M_.fname '.objective.sparse.static_g2'], ys, zeros(1,exo_nbr), M_.params, T_order, T);
+        [U, T_order, T] = feval([M_.fname '.objective.static_resid'], ys, zeros(1,exo_nbr), M_.params);
+        [Uy, T_order, T] = feval([M_.fname '.objective.static_g1'], ys, zeros(1,exo_nbr), M_.params, M_.objective_g1_sparse_rowval, M_.objective_g1_sparse_colval, M_.objective_g1_sparse_colptr, T_order, T);
+        Uyy_v = feval([M_.fname '.objective.static_g2'], ys, zeros(1,exo_nbr), M_.params, T_order, T);
 
         Gy = dr.ghx(nstatic+(1:nspred),:);
         Gu = dr.ghu(nstatic+(1:nspred),:);
@@ -329,7 +329,7 @@ else
             dr.(['g_' num2str(i)]) = [dr.(['g_' num2str(i)]); W.(['W_' num2str(i)])];
         end
         % Amends the steady-state vector accordingly
-        U = feval([M_.fname '.objective.sparse.static_resid'], ys, zeros(1,exo_nbr), M_.params);
+        U = feval([M_.fname '.objective.static_resid'], ys, zeros(1,exo_nbr), M_.params);
         ysteady = [ys(oo_.dr.order_var); U/(1-beta)];
 
         % Generates the sequence of shocks to compute unconditional welfare

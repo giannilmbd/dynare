@@ -25,7 +25,7 @@ function [steady_state, params, check] = dyn_ramsey_static(ys_init, exo_ss, M_, 
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2024 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -139,7 +139,7 @@ end
 if options_.bytecode
     res = bytecode('static', M_, options_, xx, exo_ss, M_.params, 'evaluate');
 else
-    res = feval([M_.fname '.sparse.static_resid'], xx, exo_ss, M_.params);
+    res = feval([M_.fname '.static_resid'], xx, exo_ss, M_.params);
 end
 A = feval([M_.fname '.ramsey_multipliers_static_g1'], xx, exo_ss, M_.params, M_.ramsey_multipliers_static_g1_sparse_rowval, M_.ramsey_multipliers_static_g1_sparse_colval, M_.ramsey_multipliers_static_g1_sparse_colptr);
 y = res(1:M_.ramsey_orig_endo_nbr);
@@ -169,7 +169,7 @@ result = false;
 if (options_.bytecode)
     res = bytecode('static', M_, options_, ys, exo_ss, M_.params, 'evaluate');
 else
-    res = feval([M_.fname '.sparse.static_resid'], ys, exo_ss, M_.params);
+    res = feval([M_.fname '.static_resid'], ys, exo_ss, M_.params);
 end
 if norm(res) < options_.solve_tolf
     result = true;

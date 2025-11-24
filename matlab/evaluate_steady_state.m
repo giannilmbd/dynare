@@ -275,8 +275,8 @@ elseif steadystate_flag
         return
     end
 elseif ~options_.bytecode && ~options_.block
-    static_resid = str2func(sprintf('%s.sparse.static_resid', M_.fname));
-    static_g1 = str2func(sprintf('%s.sparse.static_g1', M_.fname));
+    static_resid = str2func(sprintf('%s.static_resid', M_.fname));
+    static_g1 = str2func(sprintf('%s.static_g1', M_.fname));
     if ~options_.linear
         % non linear model
         if  ismember(options_.solve_algo,[10,11])
@@ -356,7 +356,7 @@ elseif ~options_.bytecode && options_.block
     ys = ys_init;
     T = NaN(M_.block_structure_stat.tmp_nbr, 1);
     for b = 1:length(M_.block_structure_stat.block)
-        fh_static = str2func(sprintf('%s.sparse.block.static_%d', M_.fname, b));
+        fh_static = str2func(sprintf('%s.block.static_%d', M_.fname, b));
         if M_.block_structure_stat.block(b).Simulation_Type ~= 1 && ...
                 M_.block_structure_stat.block(b).Simulation_Type ~= 2
             mfs_idx = M_.block_structure_stat.block(b).variable(end-M_.block_structure_stat.block(b).mfs+1:end);
@@ -461,7 +461,7 @@ if M_.static_and_dynamic_models_differ
         zx = repmat(exo_ss', M_.maximum_lead + M_.maximum_lag + 1, 1);
         r = bytecode('dynamic','evaluate', M_, options_, z, zx, params, ys, 1);
     else
-        r = feval([M_.fname '.sparse.dynamic_resid'], repmat(ys, 3, 1), exo_ss, params, ys);
+        r = feval([M_.fname '.dynamic_resid'], repmat(ys, 3, 1), exo_ss, params, ys);
     end
     % Fail if residual greater than tolerance
     if max(abs(r)) > options_.solve_tolf

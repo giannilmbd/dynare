@@ -2,7 +2,7 @@ function [endogenousvariables, success] = sim1_purely_backward(endogenousvariabl
 
 % Performs deterministic simulation of a purely backward model
 
-% Copyright © 2012-2024 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -24,8 +24,8 @@ periods = get_simulation_periods(options_);
 if ismember(options_.solve_algo, [12,14])
     [funcs, feedback_vars_idxs] = setup_time_recursive_block_simul(M_);
 else
-    dynamic_resid = str2func([M_.fname '.sparse.dynamic_resid']);
-    dynamic_g1 = str2func([M_.fname '.sparse.dynamic_g1']);
+    dynamic_resid = str2func([M_.fname '.dynamic_resid']);
+    dynamic_g1 = str2func([M_.fname '.dynamic_g1']);
 end
 
 function [r, J] = block_wrapper(z, feedback_vars_idx, func, y_dynamic, x, sparse_rowval, sparse_colval, sparse_colptr, T)

@@ -15,7 +15,7 @@ function write(M_)
 % REMARKS
 % - The trends are assumed to be multiplicative.
 
-% Copyright © 2019-2024 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -134,8 +134,8 @@ fprintf(fid, 'F = NaN(%u, 1);\n', 2*M_.endo_nbr);
 fprintf(fid, 'x = zeros(1, %u);\n\n', M_.exo_nbr);
 
 % Evaluate the residuals and Jacobian of the dynamic model in periods t and t+1.
-fprintf(fid, '[F(1:%u), T0_order, T0] = %s.sparse.dynamic_resid(Y0, x, p, y);\n', M_.endo_nbr, M_.fname);
-fprintf(fid, '[F(%u:%u), T1_order, T1] = %s.sparse.dynamic_resid(Y1, x, p, y);\n', M_.endo_nbr+1, 2*M_.endo_nbr, M_.fname);
+fprintf(fid, '[F(1:%u), T0_order, T0] = %s.dynamic_resid(Y0, x, p, y);\n', M_.endo_nbr, M_.fname);
+fprintf(fid, '[F(%u:%u), T1_order, T1] = %s.dynamic_resid(Y1, x, p, y);\n', M_.endo_nbr+1, 2*M_.endo_nbr, M_.fname);
 fprintf(fid, 'if nargout>1\n');
 fprintf(fid, '    sparse_rowval = [');
 fprintf(fid, '%u ', M_.dynamic_g1_sparse_rowval);
@@ -146,8 +146,8 @@ fprintf(fid, '];\n');
 fprintf(fid, '    sparse_colptr = [');
 fprintf(fid, '%u ', M_.dynamic_g1_sparse_colptr);
 fprintf(fid, '];\n');
-fprintf(fid, '    J0 = %s.sparse.dynamic_g1(Y0, x, p, y, sparse_rowval, sparse_colval, sparse_colptr, T0_order, T0);\n', M_.fname);
-fprintf(fid, '    J1 = %s.sparse.dynamic_g1(Y1, x, p, y, sparse_rowval, sparse_colval, sparse_colptr, T1_order, T1);\n', M_.fname);
+fprintf(fid, '    J0 = %s.dynamic_g1(Y0, x, p, y, sparse_rowval, sparse_colval, sparse_colptr, T0_order, T0);\n', M_.fname);
+fprintf(fid, '    J1 = %s.dynamic_g1(Y1, x, p, y, sparse_rowval, sparse_colval, sparse_colptr, T1_order, T1);\n', M_.fname);
 
 % Transform back the Jacobians J0 and J1 in the legacy format (non-sparse)
 % NB: it is probably possible to simplify the rest of this file, but maintaining

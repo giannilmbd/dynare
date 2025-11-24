@@ -46,7 +46,7 @@ end
 [periods, first_simulation_period, last_simulation_period] = get_simulation_periods(options_);
 
 if options_.debug
-    model_static = str2func([M_.fname,'.sparse.static_resid']);
+    model_static = str2func([M_.fname,'.static_resid']);
     for ii=1:size(oo_.exo_simul,1)
         [residual(:,ii)] = model_static(oo_.steady_state, oo_.exo_simul(ii,:),M_.params);
     end
