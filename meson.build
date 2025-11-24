@@ -876,6 +876,7 @@ mod_and_m_tests = [
                 'estimation/fsdat_simul.m' ] },
   { 'test' : [ 'estimation/MH_recover/fs2000_recover_tmp.mod' ],
     'extra' : [ 'estimation/MH_recover/fs2000_recover_tmp_mh_tmp_blck1.mat',
+                'estimation/MH_recover/fs2000_recover_tmp_mode.mat',
                 'estimation/MH_recover/fs2000.common.inc',
                 'estimation/fsdat_simul.m' ] },
   { 'test' : [ 'estimation/fs2000.mod' ],
