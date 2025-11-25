@@ -179,7 +179,7 @@ for i=1:length(k)
         fprintf('Prior distribution for parameter %s has unbounded density!\n',bayestopt_.name{k(i)})
     end
     m = compute_prior_mode([ bayestopt_.p6(k(i)) , bayestopt_.p7(k(i)) , bayestopt_.p3(k(i)) , bayestopt_.p4(k(i)) ],1);
-    if length(m)==1
+    if isscalar(m)
         bayestopt_.p5(k(i)) = m;
     else
         disp(['Prior distribution for parameter ' bayestopt_.name{k(i)}  ' has two modes!'])

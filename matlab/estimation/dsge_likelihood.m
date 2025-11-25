@@ -422,9 +422,7 @@ switch options_.lik_init
     [eigenvect, eigenv] = eig(T);
     eigenv = diag(eigenv);
     nstable = length(find(abs(abs(eigenv)-1) > 1e-7));
-    unstable = find(abs(abs(eigenv)-1) < 1e-7);
-    V = eigenvect(:,unstable);
-    indx_unstable = find(sum(abs(V),2)>1e-5);
+    V = eigenvect(:,abs(abs(eigenv)-1) < 1e-7);
     stable = find(sum(abs(V),2)<1e-5);
     nunit = length(eigenv) - nstable;
     Pstar = options_.Harvey_scale_factor*eye(nunit);
@@ -468,7 +466,6 @@ if analytic_derivation
         analytic_derivation=1;
     end
     DLIK = [];
-    AHess = [];
     iv = dr.restrict_var_list;
     if nargin<13 || isempty(derivatives_info)
         [~,~,~,~,dr, M_.params] = dynare_resolve(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
@@ -581,9 +578,7 @@ if analytic_derivation
                     D2Omij = dyn_unvech(D2Om(:,jcount));
                     tmp = D2Tij*Pstar*T' + T*Pstar*D2Tij' + DTi*DPj*T' + DTj*DPi*T' + T*DPj*DTi' + T*DPi*DTj' + DTi*Pstar*DTj' + DTj*Pstar*DTi' + D2Omij;
                     dum = lyapunov_symm(T,tmp,options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-                    %             dum(abs(dum)<1.e-12) = 0;
                     D2P(:,jcount) = dyn_vech(dum);
-                    %             D2P(:,:,j+offset,i) = dum;
                 end
             end
         end
