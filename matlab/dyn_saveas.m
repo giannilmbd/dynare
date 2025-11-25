@@ -64,6 +64,7 @@ end
 if any(strcmp('none',cellstr(graph_format)))
     % don't save
     % check here as a reminder that none is an option to graph_format
+    drawnow; %put figure on screen; otherwise done by saveas
 end
 if nodisplay
     close(h);
