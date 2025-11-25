@@ -476,13 +476,17 @@ DynamicModelBlockMatlabCaller::eval(double* resid)
       return; // Avoid manipulating null pointers in plhs, see #1832
     }
 
-  mxDestroyArray(y_mx);
+  if (mxGetDoubles(y_mx) != mxGetDoubles(plhs[0])) // Under Octave, plhs[0] and prhs[0] share the
+                                                   // same data array if y is unchanged (see #1996)
+    mxDestroyArray(y_mx);
   if (mxIsComplex(plhs[0]))
     y_mx = cmplxToReal<false>(plhs[0]);
   else
     y_mx = plhs[0];
 
-  mxDestroyArray(T_mx);
+  if (mxGetDoubles(T_mx) != mxGetDoubles(plhs[1])) // Under Octave, plhs[1] and prhs[7] share the
+                                                   // same data array if T is unchanged (see #1996)
+    mxDestroyArray(T_mx);
   if (mxIsComplex(plhs[1]))
     T_mx = cmplxToReal<false>(plhs[1]);
   else
