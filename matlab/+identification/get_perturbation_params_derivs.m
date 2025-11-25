@@ -130,7 +130,6 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 % Get fields from M_
 Correlation_matrix = M_.Correlation_matrix;
 dname              = M_.dname;
-dynamic_tmp_nbr    = M_.dynamic_tmp_nbr;
 endo_nbr           = M_.endo_nbr;
 exo_nbr            = M_.exo_nbr;
 exo_det_nbr        = M_.exo_det_nbr;
