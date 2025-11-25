@@ -2846,7 +2846,7 @@ blocks.
     NOTE: ``scales`` and ``values`` cannot be simultaneously set for the same shock in the same period, but it is 
     possible to set ``values`` for some periods and ``scales`` for other periods for the same shock. There can be
     only one ``scales`` and ``values`` directive each for a given shock, so all affected periods must be set in one
-    statement.
+    statement. This option is not compatible with :opt:`analytic_derivation`.
 
     *Example*
 
@@ -8373,8 +8373,8 @@ observed variables.
        described by ``Herbst (2015)``. This setting is only used with
        ``kalman_algo=1`` or ``kalman_algo=3``. In case of using the
        diffuse Kalman filter (``kalman_algo=3/lik_init=3``), the
-       observables must be stationary. This option is not yet
-       compatible with :opt:`analytic_derivation`.
+       observables must be stationary. This option is neither
+       compatible with :opt:`analytic_derivation` nor ``heteroskedastic_shocks``.
 
     .. option:: kalman_tol = DOUBLE
 
@@ -8609,8 +8609,7 @@ observed variables.
        Triggers estimation with analytic gradient at ``order=1``.
        The final hessian at the mode is also computed analytically.
        Only works for stationary models without missing observations,
-       i.e. for ``kalman_algo<3``. Optimizers that rely on analytic
-       gradients are ``mode_compute=1,3,4,5,101``.
+       i.e. for ``kalman_algo<3``. Incompatible with ``heteroskedastic_shocks``. Optimizers that rely on analytic gradients are ``mode_compute=1,3,4,5,101``.
 
     .. option:: ar = INTEGER
 
