@@ -64,7 +64,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 % SPECIAL REQUIREMENTS
 %   None
 
-% Copyright © 2006-2023 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -187,13 +187,13 @@ end
 expanded_state_vector_for_univariate_filter=0;
 kalman_algo = options_.kalman_algo;
 if options_.lik_init == 1               % Kalman filter
-    if kalman_algo ~= 2
+    if (kalman_algo~=2) && (kalman_algo~=5) % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     Pstar=lyapunov_solver(T,R,Q,options_);
     Pinf        = [];
 elseif options_.lik_init == 2           % Old Diffuse Kalman filter
-    if kalman_algo ~= 2
+    if (kalman_algo~=2) && (kalman_algo~=5) % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     Pstar = options_.Harvey_scale_factor*eye(np);
@@ -219,7 +219,7 @@ elseif options_.lik_init == 3           % Diffuse Kalman filter
 elseif options_.lik_init == 4           % Start from the solution of the Riccati equation.
     Pstar = kalman_steady_state(transpose(T),R*Q*transpose(R),transpose(build_selection_matrix(mf,np,vobs)),H);
     Pinf  = [];
-    if kalman_algo~=2
+    if (kalman_algo~=2) && (kalman_algo~=5) % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
 elseif options_.lik_init == 5            % Old diffuse Kalman filter only for the non stationary variables
@@ -228,7 +228,7 @@ elseif options_.lik_init == 5            % Old diffuse Kalman filter only for th
     V = eigenvect(:,abs(abs(eigenv)-1) < 1e-7);
     stable = find(sum(abs(V),2)<1e-5);
     Pstar = options_.Harvey_scale_factor*eye(np);
-    if kalman_algo ~= 2
+    if (kalman_algo~=2) && (kalman_algo~=5) % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     R_tmp = R(stable, :);
@@ -266,14 +266,25 @@ if options_.occbin.smoother.status
     end
 end
 
-if kalman_algo == 1 || kalman_algo == 3
+if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
     a_initial     = zeros(np,1);
     a_initial=set_Kalman_smoother_starting_values(a_initial,M_,oo_,options_);
-    a_initial=T*a_initial; %set state prediction for first Kalman step;
-    [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,ST, ...
-        Z,R1,Q,H,Pinf,Pstar, ...
-        data1,vobs,np,smpl,data_index, ...
-        options_.nk,kalman_tol,diffuse_kalman_tol,options_.filter_decomposition,options_.smoothed_state_uncertainty,options_.filter_covariance,options_.smoother_redux);
+    if kalman_algo == 5
+        Gamma_0 = zeros(size(Pstar)); nu_0 = zeros(size(a_initial)); Delta_0 = eye(size(a_initial,1)); % initialize at Gaussian distribution
+        [alphahat, epsilonhat, etahat, ahat, P, aK, PK, decomp, state_uncertainty, aahat, eehat] = ...
+            kalman_smoother_pruned_skewed(data1, ... % data
+                                          a_initial, Pstar, Gamma_0, nu_0, Delta_0, ... % initialize CSN at Gaussian distribution
+                                          ST, R1, Z, ... % state space matrices
+                                          M_.csn.mu_e, M_.csn.Sigma_e, M_.csn.Gamma_e, M_.csn.nu_e, M_.csn.Delta_e, H, ... % shock CSN parameters, measurement error covariance
+                                          kalman_tol, options_.skewed_kalman.prune_tol, options_.skewed_kalman.mvnlogcdf, ... % skewed Kalman filter and smoother options
+                                          options_.console_mode); % console mode for waitbar
+    else
+        a_initial=T*a_initial; %set state prediction for first Kalman step;
+        [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,ST, ...
+            Z,R1,Q,H,Pinf,Pstar, ...
+            data1,vobs,np,smpl,data_index, ...
+            options_.nk,kalman_tol,diffuse_kalman_tol,options_.filter_decomposition,options_.smoothed_state_uncertainty,options_.filter_covariance,options_.smoother_redux);
+    end
     if isinf(alphahat)
         if kalman_algo == 1
             fprintf('\nDsgeSmoother: Switching to univariate filter. This may be a sign of stochastic singularity.\n')
@@ -282,6 +293,9 @@ if kalman_algo == 1 || kalman_algo == 3
             fprintf('\nDsgeSmoother: Switching to univariate filter. This is usually due to co-integration in diffuse filter,\n')
             fprintf('otherwise it may be a sign of stochastic singularity.\n')
             kalman_algo = 4;
+        elseif kalman_algo == 5
+            fprintf('\nDsgeSmoother: Switching to univariate filter. This may be a sign of stochastic singularity.\n');
+            error('DsgeSmoother: Univariate pruned skewed Kalman filter is not yet implemented.')
         else
             error('This case shouldn''t happen')
         end
