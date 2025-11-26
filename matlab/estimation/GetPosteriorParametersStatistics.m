@@ -135,7 +135,6 @@ if estim_params_.nvx % estimated stderr parameters for structural shocks
             k = estim_params_.var_exo(i,1);
             name = M_.exo_names{k};
             oo_ = Filloo(oo_, name, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
-            M_.Sigma_e(k,k) = post_mean*post_mean;
         else
             try
                 k = estim_params_.var_exo(i,1);
@@ -147,7 +146,6 @@ if estim_params_.nvx % estimated stderr parameters for structural shocks
                 k = estim_params_.var_exo(i,1);
                 name = M_.exo_names{k};
                 oo_ = Filloo(oo_, name, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
-                M_.Sigma_e(k,k) = post_mean*post_mean;
             end
         end
         dprintf(pformat, header_width, name, bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
@@ -219,8 +217,6 @@ if estim_params_.ncx % estimated corr parameters for structural shocks
             name = sprintf('%s,%s', M_.exo_names{k1}, M_.exo_names{k2});
             NAME = sprintf('%s_%s', M_.exo_names{k1}, M_.exo_names{k2});
             oo_ = Filloo(oo_, NAME, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
-            M_.Sigma_e(k1,k2) = post_mean*sqrt(M_.Sigma_e(k1,k1)*M_.Sigma_e(k2,k2));
-            M_.Sigma_e(k2,k1) = M_.Sigma_e(k1,k2);
         else
             try
                 k1 = estim_params_.corrx(i,1);
@@ -236,8 +232,6 @@ if estim_params_.ncx % estimated corr parameters for structural shocks
                 name = sprintf('%s,%s', M_.exo_names{k1}, M_.exo_names{k2});
                 NAME = sprintf('%s_%s', M_.exo_names{k1}, M_.exo_names{k2});
                 oo_ = Filloo(oo_, NAME, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
-                M_.Sigma_e(k1,k2) = post_mean*sqrt(M_.Sigma_e(k1,k1)*M_.Sigma_e(k2,k2));
-                M_.Sigma_e(k2,k1) = M_.Sigma_e(k1,k2);
             end
         end
         dprintf(pformat, header_width,name, bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
