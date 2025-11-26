@@ -17,7 +17,7 @@ function oo_=execute_prior_posterior_function(posterior_function_name,M_,options
 % OUTPUTS
 %   oo_          [structure]     MATLAB/Octave structure gathering the results
 
-% Copyright © 2013-2024 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,7 +62,7 @@ if strcmpi(type,'posterior')
 elseif strcmpi(type,'prior')
     % Get information about the prior distribution.
     if isempty(bayestopt_)
-        if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.param_vals,1))==0)
+        if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.param_vals,1))==0)
             [~,estim_params_,bayestopt_,~,~,M_] = set_prior(estim_params_,M_,options_);
         else
             error('The prior distributions are not properly set up.')

@@ -11,7 +11,7 @@ function generate_trace_plots(chain_number)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -74,4 +74,9 @@ for ii=1:size(estim_params_.corrx, 1)
     parameter_name_1 = M_.exo_names{estim_params_.corrx(ii,1)};
     parameter_name_2 = M_.exo_names{estim_params_.corrx(ii,2)};
     trace_plot(options_, M_, estim_params_, 'StructuralShock', chain_number, parameter_name_1, parameter_name_2)
+end
+
+for ii=1:size(estim_params_.skew_exo, 1)
+    parameter_name_1 = M_.exo_names{estim_params_.skew_exo(ii,1)};
+    trace_plot(options_, M_, estim_params_, 'StructuralShock', chain_number, parameter_name_1, parameter_name_1, parameter_name_1);
 end

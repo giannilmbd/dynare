@@ -59,6 +59,16 @@ if estim_params_.ncx % corr among VAREXO are ordered third in xparam1
     end
 end
 
+% setting skewness coefficients of structural shocks
+offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
+if estim_params_.nsx % skew among VAREXO are ordered fifth in xparam1
+    skew_exo = estim_params_.skew_exo;
+    for i=1:estim_params_.nsx
+        k = skew_exo(i,1);
+        M_.Skew_e(k,k,k) = xparam1(i+offset);
+    end
+end
+
 % setting structural parameters
 offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
 if estim_params_.np % structural parameters are ordered last in xparam1
@@ -73,3 +83,6 @@ end
 % updating matrices in M_
 M_.Sigma_e = Sigma_e;
 M_.Correlation_matrix = Correlation_matrix;
+
+% update specification of independent closed skew normal distributed shocks
+M_.csn = csn_update_specification(M_.Sigma_e, M_.Skew_e);

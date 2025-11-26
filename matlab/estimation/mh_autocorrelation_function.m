@@ -1,5 +1,5 @@
-function mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,name2)
-% mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,name2)
+function mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,name2,name3)
+% mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,name2,name3)
 % This function plots the autocorrelation of the sampled draws in the
 % posterior distribution.
 %
@@ -11,6 +11,7 @@ function mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,n
 %   blck            [integer]      Number of the mh chain.
 %   name1           [string]       Object name.
 %   name2           [string]       Object name.
+%   name3           [string]       Object name.
 %
 % OUTPUTS
 %   None
@@ -34,11 +35,13 @@ function mh_autocorrelation_function(options_,M_,estim_params_,type,blck,name1,n
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-% Cet the column index:
+% Get the column index:
 if nargin<7
     column = name2index(M_, estim_params_, type, name1);
-else
+elseif nargin<8
     column = name2index(M_, estim_params_, type, name1, name2);
+elseif nargin<9
+    column = name2index(M_, estim_params_, type, name1, name2, name3);
 end
 
 if isempty(column)
@@ -58,8 +61,14 @@ if strcmpi(type,'DeepParameter')
 elseif strcmpi(type,'StructuralShock')
     if nargin<7
         TYPE = 'the standard deviation of structural shock ';
-    else
+    elseif nargin<8
         TYPE = 'the correlation between structural shocks ';
+    elseif nargin<9
+        if strcmp(name1,name2) && strcmp(name1,name3)
+            TYPE = 'the skewness coefficient of structural shock ';
+        else
+            TYPE = 'the skewness coefficient between structural shocks ';
+        end
     end
 elseif strcmpi(type,'MeasurementError')
     if nargin<7
@@ -71,8 +80,14 @@ end
 
 if nargin<7
     FigureName = ['Autocorrelogram for ' TYPE name1];
-else
+elseif nargin<8
     FigureName = ['Autocorrelogram for ' TYPE name1 ' and ' name2];
+elseif nargin<9
+    if strcmp(name1,name2) && strcmp(name1,name3)
+        FigureName = ['Autocorrelogram for ' TYPE name1];
+    else
+        FigureName = ['Autocorrelogram for ' TYPE name1 ', ' name2 ', and ' name3];
+    end
 end
 
 if options_.mh_nblck>1
@@ -92,4 +107,4 @@ if ~isfolder([M_.dname filesep 'graphs'])
 end
 
 plot_name=get_the_name(column,0,M_,estim_params_,options_.varobs);
-dyn_saveas(hh_fig,[M_.dname, filesep, 'graphs', filesep, 'MH_Autocorrelation_' plot_name],options_.nodisplay,options_.graph_format)
+dyn_saveas(hh_fig,[M_.dname, filesep, 'graphs', filesep, 'MH_Autocorrelation_' plot_name],options_.nodisplay,options_.graph_format);

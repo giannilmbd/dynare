@@ -146,7 +146,7 @@ else
 end
 
 % Set priors over the estimated parameters.
-if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.param_vals,1))==0)
+if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.param_vals,1))==0)
     [xparam1,estim_params_,bayestopt_,lb,ub,M_] = set_prior(estim_params_,M_,options_);
 end
 
@@ -160,12 +160,12 @@ if isfile([M_.fname '_prior_restrictions.m'])
 end
 
 % Check that the provided mode_file is compatible with the current estimation settings.
-if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np)==0) && ~isempty(options_.mode_file) && ~options_.mh_posterior_mode_estimation
+if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0) && ~isempty(options_.mode_file) && ~options_.mh_posterior_mode_estimation
     [xparam1, hh] = check_mode_file(xparam1, hh, options_, bayestopt_);
 end
 
 %check for calibrated covariances before updating parameters
-if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np)==0)
+if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0)
     estim_params_=check_for_calibrated_covariances(estim_params_,M_);
 end
 
@@ -188,7 +188,7 @@ if ~isempty(bayestopt_) && all(bayestopt_.pshape==0) && any(isnan(xparam1))
     error('ML estimation requires all estimated parameters to be initialized, either in an estimated_params or estimated_params_init-block ')
 end
 
-if ~isempty(estim_params_) && ~(all(strcmp(fieldnames(estim_params_),'full_calibration_detected'))  || (isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np)==0))
+if ~isempty(estim_params_) && ~(all(strcmp(fieldnames(estim_params_),'full_calibration_detected'))  || (isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0))
     if ~isempty(bayestopt_) && any(bayestopt_.pshape > 0)
         % Plot prior densities.
         if ~options_.nograph && options_.plot_priors
@@ -208,17 +208,17 @@ if ~isempty(estim_params_) && ~(all(strcmp(fieldnames(estim_params_),'full_calib
     % Test if initial values of the estimated parameters are all between the prior lower and upper bounds.
     if options_.use_calibration_initialization
         try
-            check_prior_bounds(xparam1,bounds,M_,estim_params_,options_,bayestopt_)
+            check_prior_bounds(xparam1,bounds,M_,estim_params_,options_,bayestopt_);
         catch e
             fprintf('Cannot use parameter values from calibration as they violate the prior bounds.')
             rethrow(e);
         end
     else
-        check_prior_bounds(xparam1,bounds,M_,estim_params_,options_,bayestopt_)
+        check_prior_bounds(xparam1,bounds,M_,estim_params_,options_,bayestopt_);
     end
 end
 
-if isempty(estim_params_) || all(strcmp(fieldnames(estim_params_),'full_calibration_detected')) || (isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np)==0) % If estim_params_ is empty (e.g. when running the smoother on a calibrated model)
+if isempty(estim_params_) || all(strcmp(fieldnames(estim_params_),'full_calibration_detected')) || (isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0) % If estim_params_ is empty (e.g. when running the smoother on a calibrated model)
     if ~options_.smoother
         error('Estimation: the ''estimated_params'' block is mandatory (unless you are running a smoother)')
     end
@@ -237,11 +237,13 @@ if isempty(estim_params_) || all(strcmp(fieldnames(estim_params_),'full_calibrat
     estim_params_.var_endo=[];
     estim_params_.corrx=[];
     estim_params_.corrn=[];
+    estim_params_.skew_exo=[];
     estim_params_.param_vals=[];
     estim_params_.nvx = 0;
     estim_params_.nvn = 0;
     estim_params_.ncx = 0;
     estim_params_.ncn = 0;
+    estim_params_.nsx = 0;
     estim_params_.np = 0;
     bounds.lb = [];
     bounds.ub = [];
@@ -337,7 +339,7 @@ if options_.analytic_derivation
         if isfield(options_,'identification_check_endogenous_params_with_no_prior')
             M_local.params = M_local.params*1.01; %vary parameters
         else
-            M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.ncn+1:end); %set parameters
+            M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.nsx+estim_params_.ncn+1:end); %set parameters
             M_local.params(estim_params_.param_vals(:,1)) = M_local.params(estim_params_.param_vals(:,1))*1.01; %vary parameters
         end
         if options_.diffuse_filter || options_.steadystate.nocheck
@@ -417,7 +419,7 @@ end
 %check steady state at initial parameters
 M_local = M_;
 if estim_params_.np
-    M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.ncn+1:end);
+    M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.ncn+estim_params_.nsx+1:end);
 end
 [oo_.steady_state, params,info] = evaluate_steady_state(oo_.steady_state,[oo_.exo_steady_state; oo_.exo_det_steady_state],M_local,options_,steadystate_check_flag);
 
