@@ -49,6 +49,7 @@ Bibliography
 * Giordani, Paolo, Michael Pitt, and Robert Kohn (2011): “Bayesian Inference for Time Series State Space Models” in: *The Oxford Handbook of Bayesian Econometrics*, ed. by John Geweke, Gary Koop, and Herman van Dijk, Oxford University Press, 61–124.
 * Gordon, Neil J., Salmond, Daniel J., and Adrien F.M. Smith (1993). “Novel approach to nonlinear/non-Gaussian Bayesian state estimation“. *IEEE Proceedings F - Radar and Signal Processing*, 140 (2), 107–113.
 * Guerrieri, Luca and Matteo Iacoviello (2015): “OccBin: A toolkit for solving dynamic models with occasionally binding constraints easily,” *Journal of Monetary Economics*, 70, 22–38.
+* Guljanov, Gaygysyz, Willi Mutschler, and Mark Trede (2025): “Pruned skewed Kalman filter and smoother with application to DSGE models”.
 * Goffe, William L., Gary D. Ferrier, and John Rogers (1994): “Global Optimization of Statistical Functions with Simulated Annealing,” *Journal of Econometrics*, 60(1/2), 65–100.
 * Hansen, Lars P. (1982): “Large sample properties of generalized method of moments estimators,” Econometrica, 50(4), 1029–1054.
 * Hansen, Nikolaus and Stefan Kern (2004): “Evaluating the CMA Evolution Strategy on Multimodal Test Functions”. In: *Eighth International Conference on Parallel Problem Solving from Nature PPSN VIII*, Proceedings, Berlin: Springer, 282–291.

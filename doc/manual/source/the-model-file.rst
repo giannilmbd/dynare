@@ -8349,6 +8349,7 @@ observed variables.
            ``FilteredVariablesKStepAheadVariances``, ``Variance``, and ``State_uncertainty`` cannot be recovered, and ZERO is provided as output.
 
        If you need variances for those variables, either do not set the option, or declare the variable as observed, using NaNs as data points.
+       Currently not compatible with the pruned skewed Kalman filter (``kalman_algo=5``).
 
     .. option:: forecast = INTEGER
 
@@ -8359,7 +8360,8 @@ observed variables.
        the posterior mode. If a Metropolis-Hastings is computed, the
        distribution of forecasts is stored in variables
        ``oo_.PointForecast`` and ``oo_.MeanForecast``. See
-       :ref:`fore`, for a description of these variables. Not compatible with OccBin.
+       :ref:`fore`, for a description of these variables. Not compatible with OccBin,
+       and currently not compatible with the pruned skewed Kalman filter (``kalman_algo=5``).
 
     .. option:: tex
 
@@ -8389,6 +8391,10 @@ observed variables.
 
                Use the Univariate Diffuse Kalman Filter.
 
+           ``5``
+
+               Use the Pruned Skewed Kalman Filter.
+
        Default value is ``0``. In case of missing observations of
        single or all series, Dynare treats those missing values as
        unobserved states and uses the Kalman filter to infer their
@@ -8407,6 +8413,11 @@ observed variables.
        :opt:`use_univariate_filters_if_singularity_is_detected
        <use_univariate_filters_if_singularity_is_detected = INTEGER>`
        option.
+       In case of skew normally distributed shocks, the Pruned Skewed
+       Kalman filter of *Guljanov, Mutschler, and Trede (2025)* can
+       be used by setting ``kalman_algo=5``. This filter is currently
+       not compatible with missing observations and does not switch to
+       a univariate filter in case of singularity.
 
     .. option:: fast_kalman_filter
 
@@ -8439,6 +8450,8 @@ observed variables.
        :mvar:`oo_.FilterCovariance`, otherwise in
        :mvar:`oo_.Smoother.Variance`. Saves also k-step ahead error of
        forecast covariance matrices if ``filter_step_ahead`` is set.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
 
     .. option:: filter_step_ahead = [INTEGER1:INTEGER2]
                 filter_step_ahead = [INTEGER1 INTEGER2 ...]
@@ -8449,18 +8462,24 @@ observed variables.
        values in
        ``oo_.FilteredVariables``. ``oo_.FilteredVariablesKStepAheadVariances``
        is stored if ``filter_covariance``.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
 
     .. option:: filter_decomposition
 
        Triggers the computation of the shock decomposition of the
        above k-step ahead filtered values. Stores results in
        ``oo_.FilteredVariablesShockDecomposition``.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
 
     .. option:: smoothed_state_uncertainty
 
        Triggers the computation of the variance of smoothed estimates,
        i.e. :math:`var_T(y_t)`. Stores results in
        ``oo_.Smoother.State_uncertainty``.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
 
     .. option:: diffuse_filter
 
@@ -8508,6 +8527,35 @@ observed variables.
 
        Runs filter, likelihood, and smoother using heteroskedastic definitions provided in
        a ``heteroskedastic_shocks`` block.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
+
+    .. option:: skewed_kalman_prune_tol = DOUBLE
+
+       Tolerance for pruning redundant skewness dimensions in closed skew normal distribution
+       during the skewed Kalman filter and smoother. Default is ``0.01``.
+       Only relevant for ``kalman_algo=5``.
+
+    .. option:: skewed_kalman_rank_deficiency_transform
+
+       In case of singular transition matrix, compute CSN parameters
+       for joint distribution of states and shocks from state transition
+       equation. Does either rank deficient or full rank linear transformation
+       which might speed up or robustify the pruned skewed Kalman filter.
+       Only relevant for ``kalman_algo=5``.
+
+    .. option:: skewed_kalman_mvnlogcdf = QUOTED_STRING
+
+       Name of function to compute log Gaussian cdf, possible values:
+       ``'gaussian_log_mvncdf_mendell_elston'`` (default) or ``'mvncdf'``.
+       Only relevant for ``kalman_algo=5``.
+
+    .. option:: skewed_kalman_smoother_skip
+
+       Skip the computation of the classical smoother after an estimation
+       with the pruned skewed Kalman filter. Might be useful to skip this,
+       because computing the mean of CSN distributed states and shocks takes some time.
+       Only relevant for ``kalman_algo=5``.
 
     .. option:: selected_variables_only
 
