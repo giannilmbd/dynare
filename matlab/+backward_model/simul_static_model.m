@@ -88,8 +88,8 @@ else
     oo_.exo_simul = Innovations;
 end
 
-static_resid = str2func(sprintf('%s.sparse.static_resid', M_.fname));
-static_g1 = str2func(sprintf('%s.sparse.static_g1', M_.fname));
+static_resid = str2func(sprintf('%s.static_resid', M_.fname));
+static_g1 = str2func(sprintf('%s.static_g1', M_.fname));
 function [resid, g1] = staticmodel(y, x, params)
     [resid, T_order, T] = static_resid(y, x, params);
     g1 = static_g1(y, x, params, M_.static_g1_sparse_rowval, M_.static_g1_sparse_colval, M_.static_g1_sparse_colptr, T_order, T);
