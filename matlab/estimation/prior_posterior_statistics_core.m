@@ -227,7 +227,7 @@ for b=fpar:B
         if info(1)
             message=get_error_message(info,opts_local);
             fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
-            fprintf('prior_posterior_statistics: This should not happen. Please contact the developers.\n',message)
+            fprintf('prior_posterior_statistics: This should not happen. Please contact the developers.\n')
         end
         if options_.occbin.smoother.status
             opts_local.occbin.simul.waitbar=0;
@@ -322,12 +322,12 @@ for b=fpar:B
                     squeezed = reshape(stock_filter_step_ahead(ii,IdObs,:,irun(4)), [zdim(2:end) 1]);
                     stock_filter_step_ahead(ii,IdObs,:,irun(4)) = squeezed ...
                         +repmat(mean_correction(:,1),1,gend+max(options_.filter_step_ahead)) ... %constant correction
-                        +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*[1:max(options_.filter_step_ahead)]]; %trend
+                        +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*(1:max(options_.filter_step_ahead))]; %trend
                 else
                     zdim = size(stock_filter_step_ahead(ii,IdObs,:,irun(4)));
                     squeezed = reshape(stock_filter_step_ahead(ii,IdObs,:,irun(4)), [zdim(2:end) 1]);
                     stock_filter_step_ahead(ii,IdObs,:,irun(4)) = squeezed ...
-                        +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*[1:max(options_.filter_step_ahead)]]; %trend
+                        +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*(1:max(options_.filter_step_ahead))]; %trend
                 end
             end
         end
@@ -339,11 +339,11 @@ for b=fpar:B
                 yf(:,IdObs) = yf(:,IdObs)+repmat(mean_varobs, ...
                                                  horizon+maxlag,1);
                 % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+[1-maxlag:horizon]')*trend_coeff'-...
-                    repmat(mean(trend_coeff*[options_.first_obs:options_.first_obs+gend-1],2)',length(1-maxlag:horizon),1); %center trend
+                yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff'-...
+                    repmat(mean(trend_coeff*(options_.first_obs:options_.first_obs+gend-1),2)',length(1-maxlag:horizon),1); %center trend
             else
                 % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+[1-maxlag:horizon]')*trend_coeff';
+                yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff';
             end
             if options_.loglinear
                 yf = yf+repmat(log(SteadyState'),horizon+maxlag,1);
@@ -356,11 +356,11 @@ for b=fpar:B
                 yf1(:,IdObs,:) = yf1(:,IdObs,:)+ ...
                     repmat(mean_varobs,[horizon+maxlag,1,1]);
                 % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf1(:,IdObs) = yf1(:,IdObs)+((options_.first_obs-1)+gend+[1-maxlag:horizon]')*trend_coeff'-...
-                    repmat(mean(trend_coeff*[options_.first_obs:options_.first_obs+gend-1],2)',length(1-maxlag:horizon),1); %center trend
+                yf1(:,IdObs) = yf1(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff'-...
+                    repmat(mean(trend_coeff*(options_.first_obs:options_.first_obs+gend-1),2)',length(1-maxlag:horizon),1); %center trend
             else
                 % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf1(:,IdObs,:) = yf1(:,IdObs,:)+repmat(((options_.first_obs-1)+gend+[1-maxlag:horizon]')* ...
+                yf1(:,IdObs,:) = yf1(:,IdObs,:)+repmat(((options_.first_obs-1)+gend+(1-maxlag:horizon)')* ...
                                                        trend_coeff',[1,1,1]);
             end
             if options_.loglinear

@@ -1,5 +1,5 @@
 function [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,bayestopt_, bounds] = dynare_estimation_init(var_list_, dname, gsa_flag, M_, options_, oo_, estim_params_, bayestopt_)
-
+% [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,bayestopt_, bounds] = dynare_estimation_init(var_list_, dname, gsa_flag, M_, options_, oo_, estim_params_, bayestopt_)
 % Performs initialization tasks before estimation or global sensitivity analysis
 %
 % INPUTS
@@ -12,7 +12,7 @@ function [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,
 %   estim_params_:  structure storing information about estimated
 %                   parameters
 %   bayestopt_:     structure storing information about priors
-
+%
 % OUTPUTS
 %   dataset_:       the dataset after required transformation
 %   dataset_info:   Various information about the dataset (descriptive statistics and missing observations).
@@ -294,29 +294,25 @@ for i=1:options_.number_of_observed_variables
 end
 
 k3 = [];
-k3p = [];
 if options_.selected_variables_only
     if options_.forecast > 0 && options_.mh_replic == 0 && ~options_.load_mh_file
         fprintf('\nEstimation: The selected_variables_only option is incompatible with classical forecasts. It will be ignored.\n')
         k3 = (1:M_.endo_nbr)';
-        k3p = (1:M_.endo_nbr)';
     else
         for i=1:length(var_list_)
             k3 = [k3; strmatch(var_list_{i}, M_.endo_names(dr.order_var), 'exact')];
-            k3p = [k3; strmatch(var_list_{i}, M_.endo_names, 'exact')];
         end
     end
 else
     k3 = (1:M_.endo_nbr)';
-    k3p = (1:M_.endo_nbr)';
 end
 
 % Define union of observed and state variables
-k2 = union(var_obs_index_dr,[M_.nstatic+1:M_.nstatic+M_.nspred]', 'rows');
+k2 = union(var_obs_index_dr,(M_.nstatic+1:M_.nstatic+M_.nspred)', 'rows');
 % Set restrict_state to position of observed + state variables in expanded state vector.
 oo_.dr.restrict_var_list = k2;
 % set mf0 to positions of state variables in restricted state vector for likelihood computation.
-[~,bayestopt_.mf0] = ismember([M_.nstatic+1:M_.nstatic+M_.nspred]',k2);
+[~,bayestopt_.mf0] = ismember((M_.nstatic+1:M_.nstatic+M_.nspred)',k2);
 % Set mf1 to positions of observed variables in restricted state vector for likelihood computation.
 [~,bayestopt_.mf1] = ismember(var_obs_index_dr,k2);
 % Set mf2 to positions of observed variables in expanded state vector for filtering and smoothing.

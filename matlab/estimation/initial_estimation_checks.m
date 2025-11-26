@@ -282,7 +282,7 @@ if ~isempty(options_.conditional_variance_decomposition) && ~options_.moments_va
     disp('The conditional_variance_decomposition-option will be ignored. You need to set moments_varendo');
 end
 
-function evaluate_expression(expression,M_,oo_)
+function evaluate_expression(expression,M_,oo_)%#ok<INUSL>
 % function evaluate_expression(expression,M_,oo_)
 %evaluates expressions relying on M_ and oo_ having their original names
 eval(expression);
