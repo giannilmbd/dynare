@@ -2566,17 +2566,19 @@ value of one or several exogenous variables in the model. Temporary
 shocks are specified with the command ``shocks``.
 
 In a stochastic framework, the exogenous variables take random values
-in each period. In Dynare, these random values follow a normal
-distribution with zero mean, but it belongs to the user to specify the
-variability of these shocks. The non-zero elements of the matrix of
-variance-covariance of the shocks can be entered with the ``shocks``
-command.
+in each period. In Dynare, these random values follow a skew normal
+distribution with zero mean, but the user must specify the
+variability and skewness of these shocks. The non-zero elements of
+the covariance matrix and the coskewness tensor can be entered with
+the ``shocks`` command.
 
 If the variance of an exogenous variable is set to zero, this variable
 will appear in the report on policy and transition functions, but
 isn’t used in the computation of moments and of Impulse Response
 Functions. Setting a variance to zero is an easy way of removing an
 exogenous shock.
+If not specified, all skewness coefficients are assumed to be zero,
+and thus the shocks follow a Gaussian distribution.
 
 Note that, by default, if there are several ``shocks`` or ``mshocks``
 blocks in the same ``.mod`` file, then they are cumulative: all the
@@ -2684,8 +2686,8 @@ blocks.
     |br| *In stochastic context*
 
     For stochastic simulations, the ``shocks`` block specifies the non
-    zero elements of the covariance matrix of the shocks of exogenous
-    variables.
+    zero elements of the covariance matrix and coskewnes tensor of the
+    shocks of exogenous variables.
 
     You can use the following types of entries in the block:
 
@@ -2717,8 +2719,20 @@ blocks.
 
          corr VARIABLE_NAME, VARIABLE_NAME = EXPRESSION;
 
+    * Specification of the skewness of an exogenous variable.
+
+      ::
+
+         skew VARIABLE_NAME = EXPRESSION;
+
+    * Specification of the co-skewness of three exogenous variables.
+
+      ::
+
+         skew VARIABLE_NAME, VARIABLE_NAME, VARIABLE_NAME = EXPRESSION;
+
     In an estimation context, it is also possible to specify variances
-    and covariances on endogenous variables: in that case, these
+    and covariances (but not skewness) on endogenous variables: in that case, these
     values are interpreted as the calibration of the measurement
     errors on these variables. This requires the ``varobs`` command to
     be specified before the ``shocks`` block.
@@ -2732,6 +2746,8 @@ blocks.
        var u; stderr 0.009;
        corr e, u = 0.8;
        var v, w = 2;
+       skew e = 1;
+       skew u, v, w = 2;
        end;
 
     |br| *In stochastic optimal policy context*   
@@ -2879,6 +2895,18 @@ blocks.
    essentially the same as setting the standard error via a ``shocks`` block,
    except that it accepts arbitrary MATLAB/Octave expressions, and that it
    works from MATLAB/Octave scripts.
+
+.. matcomm:: get_shock_skew_by_name ('EXOGENOUS_NAME1', 'EXOGENOUS_NAME2', 'EXOGENOUS_NAME3');
+
+   |br| Given the name of a single exogenous variable, returns its skewness
+   coefficient, as set by a previous ``shocks`` block.
+   Given the names of three exogenous variables, returns the co-skewness
+   coefficient, as set by a previous ``shocks`` block.
+
+.. matcomm:: set_shock_skew_value ('EXOGENOUS_NAME1', 'EXOGENOUS_NAME2', 'EXOGENOUS_NAME3', MATLAB_EXPRESSION);
+
+   |br| Sets the skewness coefficient of an exogenous variable, or the co-skewness
+   coefficient of three exogenous variables, as set by a previous ``shocks`` block.
 
 Other general declarations
 ==========================
@@ -6456,17 +6484,17 @@ observed variables.
 
     In a maximum likelihood or a method of moments estimation, each line follows this syntax::
 
-        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | PARAMETER_NAME
+        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | skew VARIABLE_NAME | PARAMETER_NAME
         , INITIAL_VALUE [, LOWER_BOUND, UPPER_BOUND ];
 
     In a Bayesian MCMC or a penalized method of moments estimation, each line follows this syntax::
 
-        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | PARAMETER_NAME | DSGE_PRIOR_WEIGHT
+        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | skew VARIABLE_NAME | PARAMETER_NAME | DSGE_PRIOR_WEIGHT
         [, INITIAL_VALUE [, LOWER_BOUND, UPPER_BOUND]], PRIOR_SHAPE,
         PRIOR_MEAN, PRIOR_STANDARD_ERROR [, PRIOR_3RD_PARAMETER [,
         PRIOR_4TH_PARAMETER [, SCALE_PARAMETER ] ] ];
 
-    The first part of the line consists of one of the four following
+    The first part of the line consists of one of the five following
     alternatives:
 
     * ``stderr VARIABLE_NAME``
@@ -6489,6 +6517,13 @@ observed variables.
       again subsequently. Thus, the treatment is the same as in
       the case of deep parameters set during model calibration
       and not estimated.
+
+    * ``skew VARIABLE_NAME``
+
+      Indicates that the skewness coefficient of the exogenous variable
+      VARIABLE_NAME is to be estimated. Dynare subsequently assumes that
+      the shocks are skew normally distributed. Estimating co-skewness is
+      currently not supported.
 
     * ``PARAMETER_NAME``
 
@@ -6524,10 +6559,16 @@ observed variables.
        truncated Gaussian density is not implemented in Dynare). If
        unset, defaults to minus infinity (ML) or the natural lower
        bound of the prior (Bayesian estimation).
+       Lower bounds for estimated ``corr`` parameters are automatically set to -1,
+       while lower bounds for estimated ``skew`` parameters are automatically set
+       to -0.995 (theoretical bound for skew normal distribution).
 
     .. option:: UPPER_BOUND
 
        Same as ``lower_bound``, but specifying an upper bound instead.
+       Upper bounds for estimated ``corr`` parameters are automatically set to 1,
+       while upper bounds for estimated ``skew`` parameters are automatically set
+       to 0.995 (theoretical bound for skew normal distribution).
 
     .. option:: PRIOR_SHAPE
 
@@ -6658,7 +6699,7 @@ observed variables.
 
     Each line has the following syntax::
 
-        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | PARAMETER_NAME, INITIAL_VALUE;
+        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | skew VARIABLE_NAME | PARAMETER_NAME, INITIAL_VALUE;
 
     *Options*
 
@@ -6681,7 +6722,7 @@ observed variables.
 
     Each line has the following syntax::
 
-        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | PARAMETER_NAME, LOWER_BOUND, UPPER_BOUND;
+        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | skew VARIABLE_NAME | PARAMETER_NAME, LOWER_BOUND, UPPER_BOUND;
 
     See :bck:`estimated_params`, for the meaning and syntax of the
     various components.
@@ -6693,7 +6734,7 @@ observed variables.
 
     Each line has the following syntax::
 
-        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | PARAMETER_NAME;
+        stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | skew VARIABLE_NAME | PARAMETER_NAME;
 
 .. _estim-comm:
 
