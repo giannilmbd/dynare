@@ -39,7 +39,7 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr] = dsge_li
 % This function calls: dynare_resolve, lyapunov_symm, lyapunov_solver, compute_Pinf_Pstar, kalman_filter_d, missing_observations_kalman_filter_d,
 % univariate_kalman_filter_d, kalman_steady_state, get_perturbation_params_deriv, kalman_filter, missing_observations_kalman_filter, univariate_kalman_filter, priordens
 
-% Copyright © 2004-2024 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -138,7 +138,12 @@ if options_.occbin.likelihood.status
     occbin_.info= {options_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, M_, occbin_options, TTx, RRx, CCx,T0,R0};
 else
     % Linearize the model around the deterministic steady state and extract the matrices of the state equation (T and R).
-    [T,R,SteadyState,info,dr, M_.params] = dynare_resolve(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,'restrict');
+    if options_.kalman_algo == 5 % pruned skewed Kalman filter
+        is_restrict_state_space = false;
+        [T,R,SteadyState,info,dr, M_.params] = dynare_resolve(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+    else
+        [T,R,SteadyState,info,dr, M_.params] = dynare_resolve(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,'restrict');
+    end
     occbin_.status = false;
 end
 
@@ -245,8 +250,8 @@ end
 
 switch options_.lik_init
   case 1% Standard initialization with the steady state of the state equation.
-    if kalman_algo~=2
-        % Use standard Kalman filter except if the univariate filter is explicitly chosen.
+    if (kalman_algo~=2) && (kalman_algo~=5)
+        % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     Pstar=lyapunov_solver(T,R,Q,options_);
@@ -255,7 +260,7 @@ switch options_.lik_init
     a=set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1=T*a; %set state prediction for first Kalman step;
 
-    if options_.occbin.likelihood.status
+    if options_.occbin.likelihood.status || (kalman_algo == 5)
         Z =zeros(length(bayestopt_.mf),size(T,1));
         for i = 1:length(bayestopt_.mf)
             Z(i,bayestopt_.mf(i))=1;
@@ -265,8 +270,8 @@ switch options_.lik_init
         Zflag = 0;
     end
   case 2% Initialization with large numbers on the diagonal of the covariance matrix if the states (for non stationary models).
-    if kalman_algo ~= 2
-        % Use standard Kalman filter except if the univariate filter is explicitly chosen.
+    if (kalman_algo~=2) && (kalman_algo~=5)
+        % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     Pstar = options_.Harvey_scale_factor*eye(mm);
@@ -274,7 +279,7 @@ switch options_.lik_init
     a     = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1 = T*a; %set state prediction for first Kalman step;
-    if options_.occbin.likelihood.status
+    if options_.occbin.likelihood.status || (kalman_algo == 5)
         Z =zeros(length(bayestopt_.mf),size(T,1));
         for i = 1:length(bayestopt_.mf)
             Z(i,bayestopt_.mf(i))=1;
@@ -284,10 +289,10 @@ switch options_.lik_init
         Zflag = 0;
     end
   case 3% Diffuse Kalman filter (Durbin and Koopman)
-        % Use standard Kalman filter except if the univariate filter is explicitly chosen.
+    % Use standard Kalman filter except if the univariate filter is explicitly chosen.
     if kalman_algo == 0
         kalman_algo = 3;
-    elseif ~((kalman_algo == 3) || (kalman_algo == 4))
+    elseif ~( (kalman_algo==3) || (kalman_algo==4) )
         error(['The model requires Diffuse filter, but you specified a different Kalman filter. You must set options_.kalman_algo ' ...
                'to 0 (default), 3 or 4'])
     end
@@ -390,7 +395,8 @@ switch options_.lik_init
     end
 
   case 4% Start from the solution of the Riccati equation.
-    if kalman_algo ~= 2
+    if (kalman_algo~=2) && (kalman_algo~=5)
+        % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     try
@@ -409,7 +415,7 @@ switch options_.lik_init
     a     = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1 = T*a;
-    if options_.occbin.likelihood.status
+    if options_.occbin.likelihood.status || (kalman_algo == 5)
         Z =zeros(length(bayestopt_.mf),size(T,1));
         for i = 1:length(bayestopt_.mf)
             Z(i,bayestopt_.mf(i))=1;
@@ -426,7 +432,8 @@ switch options_.lik_init
     stable = find(sum(abs(V),2)<1e-5);
     nunit = length(eigenv) - nstable;
     Pstar = options_.Harvey_scale_factor*eye(nunit);
-    if kalman_algo ~= 2
+    if (kalman_algo~=2) && (kalman_algo~=5)
+        % Use standard Kalman filter except if the univariate filter or pruned skewed filter is explicitly chosen.
         kalman_algo = 1;
     end
     R_tmp = R(stable, :);
@@ -437,7 +444,7 @@ switch options_.lik_init
     a = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1 = T*a;
-    if options_.occbin.likelihood.status
+    if options_.occbin.likelihood.status || (kalman_algo == 5)
         Z =zeros(length(bayestopt_.mf),size(T,1));
         for i = 1:length(bayestopt_.mf)
             Z(i,bayestopt_.mf(i))=1;
@@ -602,7 +609,7 @@ end
 
 singularity_has_been_detected = false;
 % First test multivariate filter if specified; potentially abort and use univariate filter instead
-if ((kalman_algo==1) || (kalman_algo==3))% Multivariate Kalman Filter
+if ((kalman_algo==1) || (kalman_algo==3)) || (kalman_algo == 5) % Multivariate Kalman Filter
     if no_missing_data_flag && ~options_.occbin.likelihood.status
         if options_.fast_kalman_filter
             if diffuse_periods
@@ -621,19 +628,28 @@ if ((kalman_algo==1) || (kalman_algo==3))% Multivariate Kalman Filter
                                            options_.presample, ...
                                            T,H,Z,pp,Zflag,diffuse_periods);
         else
-            if options_.kalman_filter_mex
-                [LIK,lik] = kalman_filter_mex(Y,a_0_given_tm1,Pstar, ...
+            if options_.kalman_algo == 5 % multivariate pruned skewed Kalman filter
+                [LIK, lik] = kalman_filter_pruned_skewed(Y, diffuse_periods+1, size(Y,2), options_.presample, ... % data, start, last, presample
+                                                         a, Pstar, zeros(size(Pstar)), zeros(size(a)), eye(size(a,1)), ... % initialize CSN at Gaussian distribution
+                                                         T, R, Z, ... % state space matrices
+                                                         M_.csn.mu_e, M_.csn.Sigma_e, M_.csn.Gamma_e, M_.csn.nu_e, M_.csn.Delta_e, H, ... % shock CSN parameters, measurement error covariance
+                                                         kalman_tol, options_.rescale_prediction_error_covariance,... % Gaussian Kalman filter options
+                                                         options_.skewed_kalman.prune_tol, options_.skewed_kalman.mvnlogcdf, options_.skewed_kalman.rank_deficiency_transform, options_.debug); % skewed Kalman filter options
+            else % multivariate Gaussian Kalman filter
+                if options_.kalman_filter_mex
+                    [LIK,lik] = kalman_filter_mex(Y,a_0_given_tm1,Pstar, ...
+                                                  kalman_tol, riccati_tol, ...
+                                                  T,Q,R,Z,Zflag,H,diffuse_periods, ...
+                                                  options_.presample);
+                else
+                    [LIK,lik] = kalman_filter(Y,diffuse_periods+1,size(Y,2), ...
+                                              a_0_given_tm1,Pstar, ...
                                               kalman_tol, riccati_tol, ...
-                                              T,Q,R,Z,Zflag,H,diffuse_periods, ...
-                                              options_.presample);
-            else
-                [LIK,lik] = kalman_filter(Y,diffuse_periods+1,size(Y,2), ...
-                                          a_0_given_tm1,Pstar, ...
-                                          kalman_tol, riccati_tol, ...
-                                          options_.rescale_prediction_error_covariance, ...
-                                          options_.presample, ...
-                                          T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods, ...
-                                          analytic_deriv_info{:});
+                                              options_.rescale_prediction_error_covariance, ...
+                                              options_.presample, ...
+                                              T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods, ...
+                                              analytic_deriv_info{:});
+                end
             end
         end
     else

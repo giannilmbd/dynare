@@ -109,12 +109,48 @@ if options_.fast_kalman_filter && ~ismember(options_.kalman_algo, [0,1,3])
 end
 
 % Set options_.lik_init equal to 3 if diffuse filter is used or kalman_algo refers to a diffuse filter algorithm.
-if isequal(options_.diffuse_filter,1) || (options_.kalman_algo>2)
+if isequal(options_.diffuse_filter,1) || options_.kalman_algo==3 || options_.kalman_algo == 4
     if isequal(options_.lik_init,2)
         error('options diffuse_filter, lik_init and/or kalman_algo have contradictory settings')
     else
         options_.lik_init = 3;
     end
+end
+
+% Checks for pruned skewed Kalman filter
+if isequal(options_.kalman_algo, 5)
+    % Enforce correct setting: univariate PSKF is not implemented yet, so disable this option
+    if options_.use_univariate_filters_if_singularity_is_detected == 1
+        options_.use_univariate_filters_if_singularity_is_detected = 0;
+    end
+    if options_.smoother_redux
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the smoother_redux option.')
+    end
+    if options_.smoothed_state_uncertainty
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the smoothed_state_uncertainty option.')
+    end
+    if options_.forecast > 0
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the forecast option.')
+    end
+    if options_.filter_covariance
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the filter_covariance option.')
+    end
+    if options_.filter_decomposition
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the filter_decomposition option.')
+    end
+    if ~isempty(options_.filter_step_ahead)
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the filter_step_ahead option.')
+    end
+    if options_.heteroskedastic_filter
+        error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the heteroskedastic_filter option.')
+    end
+else
+    if nnz(M_.Skew_e) > 0
+        error('dynare_estimation_init: Skewed shocks have been declared (M_.Skew_e ≠ 0), but estimation with skewed shocks is only supported with the pruned skewed Kalman filter. You need to set kalman_algo=5.')
+    end
+    if isfield(estim_params_,'skew_exo') && ~isempty(estim_params_.skew_exo)
+        error('dynare_estimation_init: Skewness parameters have been declared in the estimated_params block, but estimation of skewness parameters is only supported with the pruned skewed Kalman filter. You need to set kalman_algo=5.')
+    end 
 end
 
 if strcmp('slice',options_.posterior_sampler_options.posterior_sampling_method)
@@ -329,6 +365,9 @@ bayestopt_.smoother_restrict_columns = ic;
 [~,bayestopt_.smoother_mf] = ismember(var_obs_index_dr, bayestopt_.smoother_var_list);
 
 if options_.analytic_derivation
+    if options_.kalman_algo == 5
+        error('analytic derivation is incompatible with pruned skewed Kalman filter');
+    end
     if options_.lik_init == 3
         error('analytic derivation is incompatible with diffuse filter')
     end

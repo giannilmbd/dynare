@@ -115,6 +115,14 @@ switch info(1)
         message = 'You are estimating a DSGE-VAR model, but the implied covariance matrix of the VAR''s innovations, based on the artificial sample, is not positive definite!';
     case 55
         message = 'Fast Kalman filter only works with stationary models [lik_init=1] or stationary observables for non-stationary models [lik_init=3]';
+    case 56
+        message = 'Cannot compute the CSN density due to error in the computation of the Gaussian probability density function';
+    case 57
+        message = 'Cannot compute the CSN density due to error in the computation of the bottom Gaussian cumulative distribution function';
+    case 58
+        message = 'Cannot compute the CSN density due to error in the computation of the top Gaussian cumulative distribution function';
+    case 60
+        message = 'The variance of the forecast error remains singular until the end of the sample';
     case 61
         message = 'Discretionary policy: maximum number of iterations has been reached. Procedure failed.';
     case 62

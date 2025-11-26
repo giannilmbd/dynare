@@ -327,6 +327,11 @@ Copyright: 2015 Dietmar Bauer (original implementation)
            2025 Dynare Team
 License: GPL-3+
 
+Files: matlab/kalman/likelihood/kalman_filter_pruned_skewed.m
+Copyright: 2024-2025 Gaygysyz Guljanov, Willi Mutschler, Mark Trede
+           2025 Dynare Team
+License: GPL-3+
+
 Files: doc/*.rst doc/*.tex doc/*.svg doc/*.pdf doc/*.bib
 Copyright: 1996-2025 Dynare Team
 License: GFDL-NIV-1.3+
