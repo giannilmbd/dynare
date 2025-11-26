@@ -296,6 +296,37 @@ Copyright: 2007-2013 Frank Smets and Raf Wouters
            2025 Dynare Team
 License: GPL-3+
 
+Files: matlab/distributions/closed_skew_normal/csn_mean.m
+       matlab/distributions/closed_skew_normal/csn_variance.m
+       matlab/distributions/gaussian/gaussian_cdf_derivative.m
+Copyright: 2022-2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/csn_prune_distribution.m
+       matlab/distributions/closed_skew_normal/csn_quantile.m
+Copyright: 2022-2023 Gaygysyz Guljanov, Willi Mutschler
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/csn_singular_to_csn_proper.m
+       matlab/distributions/closed_skew_normal/csn_statespace_linear_transform.m
+Copyright: 2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/rand_multivariate_csn.m
+Copyright: 2015 Dmitry Pavlyuk, Eugene Girtcius (rcsn.R function in the "csn" R package)
+           2022-2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/gaussian/gaussian_log_mvncdf_mendell_elston.m
+Copyright: 2015 Dietmar Bauer (original implementation)
+           2022-2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
 Files: doc/*.rst doc/*.tex doc/*.svg doc/*.pdf doc/*.bib
 Copyright: 1996-2025 Dynare Team
 License: GFDL-NIV-1.3+
