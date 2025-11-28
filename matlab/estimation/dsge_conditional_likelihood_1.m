@@ -30,7 +30,7 @@ function [fval, info, exitflag, DLIK, Hess, SteadyState, trend_coeff, M_, dr] = 
 % - M_                      [struct]        Updated M_ structure described in INPUTS section.
 % - dr                      [structure]     Reduced form model.
 
-% Copyright (C) 2017-2025 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

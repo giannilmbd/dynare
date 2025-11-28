@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2007-2013 Frank Smets and Raf Wouters
- * Copyright (C) 2013-24 Johannes Pfeifer
- * Copyright (C) 2025 Dynare Team
+ * Copyright © 2007-2013 Frank Smets and Raf Wouters
+ * Copyright © 2013-24 Johannes Pfeifer
+ * Copyright © 2025 Dynare Team
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
