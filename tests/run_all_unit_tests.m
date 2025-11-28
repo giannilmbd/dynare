@@ -32,8 +32,8 @@ mlist = get_directory_description(matlab_dir);
 % Also skip load_m_data_file_legacy.m: it fails in the first test, but
 % this is impossible to reproduce outside the runners.
 if isoctave
-    mlist = mlist(find(~strncmp([matlab_dir filesep 'missing/stats/'], mlist, 24)));
-    mlist = mlist(find(~strcmp([matlab_dir filesep 'load_m_file_data_legacy.m'], mlist)));
+    mlist = mlist(~strncmp([matlab_dir filesep 'missing/stats/'], mlist, 24));
+    mlist = mlist(~strcmp([matlab_dir filesep 'load_m_file_data_legacy.m'], mlist));
 end
 
 failedtests = {};
@@ -50,8 +50,8 @@ for i = 1:length(mlist)
     end
 end
 
-if length(failedtests) > 0
+if ~isempty(failedtests)
     fprintf('\n*** Failed tests: %s\n', failedtests{:})
 end
 
-quit(length(failedtests) > 0)
+quit(~isempty(failedtests))
