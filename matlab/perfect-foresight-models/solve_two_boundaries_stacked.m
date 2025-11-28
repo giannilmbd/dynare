@@ -1,4 +1,5 @@
 function [y, T, success, max_res, iter] = solve_two_boundaries_stacked(y, x, steady_state, T, Block_Num, cutoff, options_, M_)
+% [y, T, success, max_res, iter] = solve_two_boundaries_stacked(y, x, steady_state, T, Block_Num, cutoff, options_, M_)
 % Computes the deterministic simulation of a block of equations containing
 % both lead and lag variables, using a Newton method over the stacked Jacobian
 % (in particular, this excludes LBJ).
@@ -153,7 +154,7 @@ while ~(cvg || iter > options_.simul.maxit)
             stpmax = stpmx*max([sqrt(ya'*ya);size(y_index,2)]);
             nn=1:size(ra,1);
             g = (ra'*g1a)';
-            f = 0.5*ra'*ra;
+            f = 0.5*(ra'*ra);
             p = -g1a\ra;
             yn = lnsrch1(ya,f,g,p,stpmax,@lnsrch1_wrapper_two_boundaries,nn,nn, options_.solve_tolx, y_index, Block_Num, yy, y0, yT, x, M_.params, steady_state, T, periods, M_, options_);
             dx = ya - yn;
@@ -184,9 +185,6 @@ end
 
 success = true;
 
-
-function y3n = dynendo(y, it_, M_)
-    y3n = reshape(y(:, it_+(-1:1)), 3*M_.endo_nbr, 1);
 
 function ra = lnsrch1_wrapper_two_boundaries(ya, y_index, Block_Num, yy, y0, yT, x, ...
                                              params, steady_state, T, periods, M_, options_)
