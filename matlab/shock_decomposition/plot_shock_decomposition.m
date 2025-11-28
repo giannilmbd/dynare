@@ -585,7 +585,8 @@ if ~isempty(options_.plot_shock_decomp.plot_end_date)
     if options_.plot_shock_decomp.plot_end_date<=(max(initial_date:initial_date+b-1))
         b = find((initial_date:initial_date+b-1)==options_.plot_shock_decomp.plot_end_date);
     else
-        warning('You set plot_end_date larger than smoother size!!');
+        warning(['You set plot_end_date larger than the last observation. The last observation is %s,\n' ...
+            'while you requested as the last observation %s. Setting the last observation to %s.'],initial_date+b,options_.plot_shock_decomp.plot_end_date,initial_date+b);
     end
 end
 z = z(:,:,a:b);
