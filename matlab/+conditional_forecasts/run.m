@@ -225,6 +225,10 @@ end
 % Get indices of controlled varexo.
 [~, controlled_varexo] =  ismember(options_cond_fcst.controlled_varexo,M_.exo_names);
 
+if any(controlled_varexo==0)
+    error('conditional_forecast: Declared controlled shock %s is not a shock in the model.\n',options_cond_fcst.controlled_varexo{controlled_varexo==0})
+end
+
 mv = zeros(n1, NumberOfStates);
 mu = zeros(ExoSize, n2);
 for i=1:n1
