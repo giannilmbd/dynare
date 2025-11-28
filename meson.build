@@ -477,7 +477,7 @@ korder_src = [ 'mex/sources/libkorder/kord/approximation.cc',
                'mex/sources/libkorder/tl/twod_matrix.cc',
                'mex/sources/libkorder/utils/pascal_triangle.cc',
                'mex/sources/libkorder/utils/int_power.cc',
-               'mex/sources/libkorder/utils/sthread.cc',
+               'mex/sources/libkorder/utils/thread_pool.cc',
                'mex/sources/libkorder/k_ord_dynare.cc',
                'mex/sources/libkorder/dynamic_dll.cc',
                'mex/sources/libkorder/dynamic_m.cc' ]

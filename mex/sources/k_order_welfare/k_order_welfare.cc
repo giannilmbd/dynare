@@ -311,8 +311,8 @@ extern "C"
     // intiate tensor library
     TLStatic::init(kOrder, nStat + 2 * nPred + 3 * nBoth + 2 * nForw + nExog);
 
-    // Set number of parallel threads
-    sthread::detach_thread_group::max_parallel_threads = num_threads;
+    // Initialize thread pool
+    thread_pool::initialize(num_threads);
 
     // make KordpDynare object
     KordpDynare dynare(endoNames, exoNames, nExog, nPar, ySteady, vCov, modParams, nStat, nPred,

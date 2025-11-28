@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -1081,6 +1081,8 @@ main()
      it does not pass the check on maximum problem size. */
   for (const auto& test : all_tests)
     TLStatic::init(test->dim, test->nvar);
+
+  thread_pool::initialize();
 
   // Launch the tests
   int success = 0;

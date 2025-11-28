@@ -1,6 +1,6 @@
 /*
  * Copyright © 2005 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -127,7 +127,7 @@ FaaDiBruno::calculate(const UnfoldedStackContainer& cont, const UGSContainer& g,
 std::tuple<int, int, int>
 FaaDiBruno::estimRefinement(const TensorDimens& tdims, int nr, int l)
 {
-  int nthreads = sthread::detach_thread_group::max_parallel_threads;
+  int nthreads {thread_pool::get_thread_number()};
   long per_size1 = tdims.calcUnfoldMaxOffset();
   long per_size2 = static_cast<long>(std::pow(tdims.getNVS().getMax(), l));
   double lambda = 0.0;

@@ -54,13 +54,13 @@ FoldedStackContainer::multAndAdd(int dim, const FGSContainer& c, FGSTensor& out)
   TL_RAISE_IF(c.num() != numStacks(),
               "Wrong symmetry length of container for FoldedStackContainer::multAndAdd");
 
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
 
   for (auto& si : SymmetrySet(dim, c.num()))
     if (c.check(si))
-      gr.insert(std::make_unique<WorkerFoldMAADense>(*this, si, c, out));
+      job_group.push_back(std::make_unique<WorkerFoldMAADense>(*this, si, c, out));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 /* This is analogous to WorkerUnfoldMAADense::operator()() code. */
@@ -84,12 +84,12 @@ WorkerFoldMAADense::WorkerFoldMAADense(const FoldedStackContainer& container, Sy
 void
 FoldedStackContainer::multAndAddSparse1(const FSSparseTensor& t, FGSTensor& out) const
 {
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
   UFSTensor dummy(0, numStacks(), t.dimen());
   for (Tensor::index ui = dummy.begin(); ui != dummy.end(); ++ui)
-    gr.insert(std::make_unique<WorkerFoldMAASparse1>(*this, t, out, ui.getCoor()));
+    job_group.push_back(std::make_unique<WorkerFoldMAASparse1>(*this, t, out, ui.getCoor()));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 /* This is analogous to WorkerUnfoldMAASparse1::operator()() code.
@@ -152,12 +152,12 @@ WorkerFoldMAASparse1::WorkerFoldMAASparse1(const FoldedStackContainer& container
 void
 FoldedStackContainer::multAndAddSparse2(const FSSparseTensor& t, FGSTensor& out) const
 {
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
   FFSTensor dummy_f(0, numStacks(), t.dimen());
   for (Tensor::index fi = dummy_f.begin(); fi != dummy_f.end(); ++fi)
-    gr.insert(std::make_unique<WorkerFoldMAASparse2>(*this, t, out, fi.getCoor()));
+    job_group.push_back(std::make_unique<WorkerFoldMAASparse2>(*this, t, out, fi.getCoor()));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 /* Here we make a sparse slice first and then call multAndAddStacks()
@@ -244,12 +244,12 @@ FoldedStackContainer::multAndAddSparse3(const FSSparseTensor& t, FGSTensor& out)
 void
 FoldedStackContainer::multAndAddSparse4(const FSSparseTensor& t, FGSTensor& out) const
 {
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
   FFSTensor dummy_f(0, numStacks(), t.dimen());
   for (Tensor::index fi = dummy_f.begin(); fi != dummy_f.end(); ++fi)
-    gr.insert(std::make_unique<WorkerFoldMAASparse4>(*this, t, out, fi.getCoor()));
+    job_group.push_back(std::make_unique<WorkerFoldMAASparse4>(*this, t, out, fi.getCoor()));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 /* The WorkerFoldMAASparse4 is the same as WorkerFoldMAASparse2
@@ -382,12 +382,12 @@ UnfoldedStackContainer::multAndAdd(int dim, const UGSContainer& c, UGSTensor& ou
   TL_RAISE_IF(c.num() != numStacks(),
               "Wrong symmetry length of container for UnfoldedStackContainer::multAndAdd");
 
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
   for (auto& si : SymmetrySet(dim, c.num()))
     if (c.check(si))
-      gr.insert(std::make_unique<WorkerUnfoldMAADense>(*this, si, c, out));
+      job_group.push_back(std::make_unique<WorkerUnfoldMAADense>(*this, si, c, out));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 void
@@ -422,12 +422,12 @@ WorkerUnfoldMAADense::WorkerUnfoldMAADense(const UnfoldedStackContainer& contain
 void
 UnfoldedStackContainer::multAndAddSparse1(const FSSparseTensor& t, UGSTensor& out) const
 {
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
   UFSTensor dummy(0, numStacks(), t.dimen());
   for (Tensor::index ui = dummy.begin(); ui != dummy.end(); ++ui)
-    gr.insert(std::make_unique<WorkerUnfoldMAASparse1>(*this, t, out, ui.getCoor()));
+    job_group.push_back(std::make_unique<WorkerUnfoldMAASparse1>(*this, t, out, ui.getCoor()));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 /* This does a step of UnfoldedStackContainer::multAndAddSparse1() for
@@ -519,12 +519,12 @@ WorkerUnfoldMAASparse1::WorkerUnfoldMAASparse1(const UnfoldedStackContainer& con
 void
 UnfoldedStackContainer::multAndAddSparse2(const FSSparseTensor& t, UGSTensor& out) const
 {
-  sthread::detach_thread_group gr;
+  thread_pool::job_group_t job_group;
   FFSTensor dummy_f(0, numStacks(), t.dimen());
   for (Tensor::index fi = dummy_f.begin(); fi != dummy_f.end(); ++fi)
-    gr.insert(std::make_unique<WorkerUnfoldMAASparse2>(*this, t, out, fi.getCoor()));
+    job_group.push_back(std::make_unique<WorkerUnfoldMAASparse2>(*this, t, out, fi.getCoor()));
 
-  gr.run();
+  thread_pool::run(move(job_group));
 }
 
 /* This does a step of UnfoldedStackContainer::multAndAddSparse2() for a given

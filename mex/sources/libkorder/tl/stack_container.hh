@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2025 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -82,8 +82,8 @@
 #include "int_sequence.hh"
 #include "kron_prod.hh"
 #include "permutation.hh"
-#include "sthread.hh"
 #include "t_container.hh"
+#include "thread_pool.hh"
 #include "tl_static.hh"
 
 /* Here is the general interface to stack container. The subclasses
@@ -709,7 +709,7 @@ public:
   }
 };
 
-class WorkerFoldMAADense : public sthread::detach_thread
+class WorkerFoldMAADense : public thread_pool::job
 {
   const FoldedStackContainer& cont;
   Symmetry sym;
@@ -722,7 +722,7 @@ public:
   void operator()(std::mutex& mut) override;
 };
 
-class WorkerFoldMAASparse1 : public sthread::detach_thread
+class WorkerFoldMAASparse1 : public thread_pool::job
 {
   const FoldedStackContainer& cont;
   const FSSparseTensor& t;
@@ -735,7 +735,7 @@ public:
   void operator()(std::mutex& mut) override;
 };
 
-class WorkerFoldMAASparse2 : public sthread::detach_thread
+class WorkerFoldMAASparse2 : public thread_pool::job
 {
   const FoldedStackContainer& cont;
   const FSSparseTensor& t;
@@ -748,7 +748,7 @@ public:
   void operator()(std::mutex& mut) override;
 };
 
-class WorkerFoldMAASparse4 : public sthread::detach_thread
+class WorkerFoldMAASparse4 : public thread_pool::job
 {
   const FoldedStackContainer& cont;
   const FSSparseTensor& t;
@@ -761,7 +761,7 @@ public:
   void operator()(std::mutex& mut) override;
 };
 
-class WorkerUnfoldMAADense : public sthread::detach_thread
+class WorkerUnfoldMAADense : public thread_pool::job
 {
   const UnfoldedStackContainer& cont;
   Symmetry sym;
@@ -774,7 +774,7 @@ public:
   void operator()(std::mutex& mut) override;
 };
 
-class WorkerUnfoldMAASparse1 : public sthread::detach_thread
+class WorkerUnfoldMAASparse1 : public thread_pool::job
 {
   const UnfoldedStackContainer& cont;
   const FSSparseTensor& t;
@@ -787,7 +787,7 @@ public:
   void operator()(std::mutex& mut) override;
 };
 
-class WorkerUnfoldMAASparse2 : public sthread::detach_thread
+class WorkerUnfoldMAASparse2 : public thread_pool::job
 {
   const UnfoldedStackContainer& cont;
   const FSSparseTensor& t;
