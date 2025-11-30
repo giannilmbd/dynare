@@ -3772,7 +3772,7 @@ speed-up on large models.
 
                Use a Newton algorithm with a direct sparse LU solver at each
                iteration, applied to the stacked system of all equations in all
-               periods (Default).
+               periods (Default). Termination criterion: ``tolf``.
 
            ``1``
 
@@ -3785,7 +3785,7 @@ speed-up on large models.
                in all periods, is used for blocks which are purely backward or
                forward (of type ``SOLVE BACKWARD`` or ``SOLVE FORWARD``, see
                :comm:`model_info`), since LBJ only makes sense on blocks with
-               both leads and lags (of type ``SOLVE TWO BOUNDARIES``).
+               both leads and lags (of type ``SOLVE TWO BOUNDARIES``). Termination criterion: ``tolx``.
 
            ``2``
 
@@ -3795,7 +3795,8 @@ speed-up on large models.
                used to control the behaviour of the algorithm:
                :opt:`preconditioner <preconditioner = OPTION>`,
                :opt:`iter_tol <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`,
-               :opt:`gmres_restart <gmres_restart = INTEGER>`.
+               :opt:`gmres_restart <gmres_restart = INTEGER>`. 
+               Termination criterion: ``tolf``.
 
            ``3``
 
@@ -3805,6 +3806,7 @@ speed-up on large models.
                can be used to control the behaviour of the algorithm:
                :opt:`preconditioner <preconditioner = OPTION>`,
                :opt:`iter_tol <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`.
+               Termination criterion: ``tolf``.
 
            ``4``
 
