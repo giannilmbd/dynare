@@ -117,16 +117,13 @@ for i=fpar:nvar
             set(gca,'yticklabel',yticklabels_new)
         end
     end
-    if whoiam
-        if Parallel(ThisMatlab).Local==0
-            DirectoryName = CheckPath('Output',dname);
-        end
-    end
+
+    DirectoryName = CheckPath('graphs',dname);
 
     if subplotnum == MaxNumberOfPlotsPerFigure || i == nvar
-        dyn_saveas(hh_fig,[dname '/Output/'  fname '_' name3 '_' tit2{i}],options_.nodisplay,options_.graph_format);
+        dyn_saveas(hh_fig,[dname '/graphs/'  fname '_' name3 '_' tit2{i}],options_.nodisplay,options_.graph_format);
         if RemoteFlag==1
-            OutputFileName = [OutputFileName; {[dname, filesep, 'Output',filesep], [fname '_' name3 '_' deblank(tit2(i,:)) '.*']}];
+            OutputFileName = [OutputFileName; {[dname, filesep, 'graphs',filesep], [fname '_' name3 '_' deblank(tit2(i,:)) '.*']}];
         end
         subplotnum = 0;
         figunumber = figunumber+1;
