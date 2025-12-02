@@ -1,4 +1,5 @@
 function [y, success, maxerror, per_block_status] = solve_block_decomposed_problem(y, exo_simul, steady_state, options_, M_)
+% [y, success, maxerror, per_block_status] = solve_block_decomposed_problem(y, exo_simul, steady_state, options_, M_)
 % Computes deterministic simulation with block option without bytecode
 %
 % INPUTS
@@ -84,7 +85,7 @@ for blk = 1:nblocks
                 elseif it_ < size(y, 2) % Purely forward model (in first period)
                     y3n = [ NaN(M_.endo_nbr, 1); reshape(y(:, it_+(0:1)), 2*M_.endo_nbr, 1) ];
                 else % Static model
-                    y3n = [ NaN(M_.endo_nbr, 1); y(:, it_); NaN(M_.endo_nbr, 1) ]
+                    y3n = [ NaN(M_.endo_nbr, 1); y(:, it_); NaN(M_.endo_nbr, 1) ];
                 end
                 [y3n, T(:, it_)] = fh_dynamic(y3n, exo_simul(it_, :), M_.params, steady_state, ...
                                               M_.block_structure.block(blk).g1_sparse_rowval, ...

@@ -174,7 +174,7 @@ for it_=start:incr:finish
                 stpmax = stpmx*max([sqrt(ya'*ya);size(y_index_eq,2)]);
                 nn=1:size(y_index_eq,2);
                 g = (r'*g1)';
-                f = 0.5*r'*r;
+                f = 0.5*(r'*r);
                 p = -g1\r ;
                 ya = lnsrch1(ya,f,g,p,stpmax, ...
                              @lnsrch1_wrapper_one_boundary,nn, ...
@@ -258,7 +258,7 @@ function y3n = dynendo(y, it_, M_)
     elseif it_ < size(y, 2) % Purely forward model (in first period)
         y3n = [ NaN(M_.endo_nbr, 1); reshape(y(:, it_+(0:1)), 2*M_.endo_nbr, 1) ];
     else % Static model
-        y3n = [ NaN(M_.endo_nbr, 1); y(:, it_); NaN(M_.endo_nbr, 1) ]
+        y3n = [ NaN(M_.endo_nbr, 1); y(:, it_); NaN(M_.endo_nbr, 1) ];
     end
 
 function r = lnsrch1_wrapper_one_boundary(ya, y_index, fh, Block_Num, y, x, params, steady_state, T, it_, M_)
