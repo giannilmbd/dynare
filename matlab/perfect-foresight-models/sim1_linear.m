@@ -181,7 +181,7 @@ if ~isempty(controlled_paths_by_period)
         if isempty(endogenize_id)
             continue
         end
-        Y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values - steadystate_y(exogenize_id);
+        Y(exogenize_id+(p-1)*M_.endo_nbr) = controlled_paths_by_period(p).values' - steadystate_y(exogenize_id);
         exogenousvariables(p+M_.maximum_lag,endogenize_id) = exogenousvariables(p+M_.maximum_lag,endogenize_id) + dY(exogenize_id+(p-1)*M_.endo_nbr)';
     end
 end

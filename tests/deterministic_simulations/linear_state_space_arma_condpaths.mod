@@ -50,6 +50,12 @@ perfect_foresight_controlled_paths;
   periods 50;
   values 0.5;
   endogenize u;
+
+  // Regression test: add a 2nd endogeneized variable in the same period
+  exogenize x;
+  periods 50;
+  values 0.2;
+  endogenize v;
 end;
 
 perfect_foresight_setup(periods=100);
@@ -59,6 +65,7 @@ if ~oo_.deterministic_simulation.status
    error('Perfect foresight simulation failed')
 end
 
-if ~(oo_.endo_simul(3, 51) == 0.5 && isequal(find(oo_.exo_simul(:,1) ~= 0.1), [1; 51]))
+if ~(oo_.endo_simul(3, 51) == 0.5 && isequal(find(oo_.exo_simul(:,1) ~= 0.1), [1; 51]) ...
+     && oo_.endo_simul(1, 51) == 0.2)
    error('Linear perfect foresight simulation with controlled paths failed')
 end
