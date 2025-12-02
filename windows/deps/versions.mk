@@ -19,13 +19,13 @@ MATLAB64_VERSION = 20250618
 
 # pacman -Ss mingw-w64-ucrt-x86_64-boost
 # (also used by the preprocessor CI, so it can be updated there also)
-MSYS2_BOOST_VERSION = 1.88.0-2
+MSYS2_BOOST_VERSION = 1.89.0-2
 
 # pacman -Ss mingw-w64-ucrt-x86_64-gsl
 MSYS2_GSL_VERSION = 2.8-1
 
 # pacman -Ss mingw-w64-ucrt-x86_64-matio
-MSYS2_MATIO_VERSION = 1.5.28-1
+MSYS2_MATIO_VERSION = 1.5.29-1
 
 # Dependency of matio and libssh2 (and of the MinGW compiler)
 # pacman -Ss mingw-w64-ucrt-x86_64-zlib
@@ -37,15 +37,15 @@ MSYS2_HDF5_VERSION = 1.14.6-3
 
 # Dependency of HDF5 (provides szip library)
 # pacman -Ss mingw-w64-ucrt-x86_64-libaec
-MSYS2_LIBAEC_VERSION = 1.1.3-4
+MSYS2_LIBAEC_VERSION = 1.1.4-1
 
 # Dependency of HDF5 and libssh2
 # pacman -Ss mingw-w64-ucrt-x86_64-openssl
-MSYS2_OPENSSL_VERSION = 3.5.0-1
+MSYS2_OPENSSL_VERSION = 3.6.0-1
 
 # Dependency of HDF5
 # pacman -Ss mingw-w64-ucrt-x86_64-curl
-MSYS2_CURL_VERSION = 8.13.0-2
+MSYS2_CURL_VERSION = 8.17.0-1
 
 # Dependency of curl (and of the MinGW compiler)
 # pacman -Ss mingw-w64-ucrt-x86_64-zstd
@@ -53,7 +53,7 @@ MSYS2_ZSTD_VERSION = 1.5.7-1
 
 # Dependency of curl
 # pacman -Ss mingw-w64-ucrt-x86_64-brotli
-MSYS2_BROTLI_VERSION = 1.1.0-4
+MSYS2_BROTLI_VERSION = 1.2.0-1
 
 # Dependency of curl
 # pacman -Ss mingw-w64-ucrt-x86_64-libpsl
@@ -61,7 +61,7 @@ MSYS2_LIBPSL_VERSION = 0.21.5-3
 
 # Dependency of curl and of libpsl
 # pacman -Ss mingw-w64-ucrt-x86_64-libidn2
-MSYS2_LIBIDN2_VERSION = 2.3.8-2
+MSYS2_LIBIDN2_VERSION = 2.3.8-4
 
 # Dependency of curl
 # pacman -Ss mingw-w64-ucrt-x86_64-libssh2
@@ -69,11 +69,15 @@ MSYS2_LIBSSH2_VERSION = 1.11.1-1
 
 # Dependency of curl
 # pacman -Ss mingw-w64-ucrt-x86_64-nghttp2
-MSYS2_NGHTTP2_VERSION = 1.65.0-1
+MSYS2_NGHTTP2_VERSION = 1.68.0-1
 
 # Dependency of curl
 # pacman -Ss mingw-w64-ucrt-x86_64-nghttp3
-MSYS2_NGHTTP3_VERSION = 1.9.0-1
+MSYS2_NGHTTP3_VERSION = 1.13.1-1
+
+# Dependency of curl
+# pacman -Ss mingw-w64-ucrt-x86_64-ngtcp2
+MSYS2_NGTCP2_VERSION = 1.18.0-1
 
 # Dependency of libpsl and libunistring (and of the MinGW compiler)
 # pacman -Ss mingw-w64-ucrt-x86_64-libiconv
@@ -86,24 +90,23 @@ MSYS2_LIBUNISTRING_VERSION = 1.3-1
 ## Packages for the embedded compiler
 
 # pacman -Ss mingw-w64-ucrt-x86_64-gcc$
-MSYS2_GCC_VERSION = 15.1.0-1
+MSYS2_GCC_VERSION = 15.2.0-8
 
 # Dependency of gcc, isl, mpc and mpfr
 # pacman -Ss mingw-w64-ucrt-x86_64-gmp
 MSYS2_GMP_VERSION = 6.3.0-2
 
 # pacman -Ss mingw-w64-ucrt-x86_64-binutils
-MSYS2_BINUTILS_VERSION = 2.44-1
+MSYS2_BINUTILS_VERSION = 2.45.1-1
 
 # pacman -Ss mingw-w64-ucrt-x86_64-headers-git
-MSYS2_HEADERS_VERSION = 12.0.0.r679.g71699efcb-1
+MSYS2_HEADERS_VERSION = 13.0.0.r338.gc1c6b0ff3-1
 
 # pacman -Ss mingw-w64-ucrt-x86_64-crt-git
-MSYS2_CRT_VERSION = 12.0.0.r679.g71699efcb-1
+MSYS2_CRT_VERSION = 13.0.0.r338.gc1c6b0ff3-1
 
-# NB: Renamed to mingw-w64-ucrt-x86_64-winpthreads recently!
-# pacman -Ss mingw-w64-ucrt-x86_64-winpthreads-git
-MSYS2_WINPTHREADS_VERSION = 12.0.0.r679.g71699efcb-1
+# pacman -Ss mingw-w64-ucrt-x86_64-winpthreads
+MSYS2_WINPTHREADS_VERSION = 13.0.0.r338.gc1c6b0ff3-1
 
 # pacman -Ss mingw-w64-ucrt-x86_64-isl
 MSYS2_ISL_VERSION = 0.27-1
@@ -120,4 +123,4 @@ MSYS2_WINDOWS_DEFAULT_MANIFEST_VERSION = 6.4-4
 
 # Dependency of binutils
 # pacman -Ss mingw-w64-ucrt-x86_64-gettext-runtime
-MSYS2_GETTEXT_RUNTIME_VERSION = 0.24.1-1
+MSYS2_GETTEXT_RUNTIME_VERSION = 0.26-2

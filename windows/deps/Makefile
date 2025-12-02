@@ -122,6 +122,7 @@ OCTAVE_MSYS2_DEPS := \
 	tarballs/mingw-w64-ucrt-x86_64-libssh2-$(MSYS2_LIBSSH2_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-nghttp2-$(MSYS2_NGHTTP2_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-nghttp3-$(MSYS2_NGHTTP3_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-ucrt-x86_64-ngtcp2-$(MSYS2_NGTCP2_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-libiconv-$(MSYS2_LIBICONV_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-libunistring-$(MSYS2_LIBUNISTRING_VERSION)-any.pkg.tar.zst
 
@@ -144,8 +145,8 @@ GCC_MSYS2_DEPS := \
 	tarballs/mingw-w64-ucrt-x86_64-binutils-$(MSYS2_BINUTILS_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-headers-git-$(MSYS2_HEADERS_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-crt-git-$(MSYS2_CRT_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-winpthreads-git-$(MSYS2_WINPTHREADS_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libwinpthread-git-$(MSYS2_WINPTHREADS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-ucrt-x86_64-winpthreads-$(MSYS2_WINPTHREADS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-ucrt-x86_64-libwinpthread-$(MSYS2_WINPTHREADS_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-zlib-$(MSYS2_ZLIB_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-zstd-$(MSYS2_ZSTD_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-isl-$(MSYS2_ISL_VERSION)-any.pkg.tar.zst \
