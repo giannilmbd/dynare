@@ -20,7 +20,7 @@ function oo_ = initial_estimation_checks(objective_function,xparam1,dataset_,dat
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -177,9 +177,9 @@ end
 % check and display warnings if steady-state solves static model (except if diffuse_filter == 1) and if steady-state changes estimated parameters
 [oo_.steady_state] = check_steady_state_changes_parameters(M_,estim_params_,oo_,options_, [options_.diffuse_filter==0 options_.diffuse_filter==0] );
 
-% check and display warning if negative values of stderr or corr params are outside unit circle for Bayesian estimation
+% check and display warning if prior implies that stderr, corr, or skew params are outside theoretical bounds
 if any(bayestopt_.pshape)
-    check_prior_stderr_corr(estim_params_,bayestopt_);
+    check_prior_stderr_corr_skew(estim_params_,bayestopt_);
 end
 
 % display warning if some parameters are still NaN

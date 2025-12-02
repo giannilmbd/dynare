@@ -45,13 +45,13 @@ tstath = abs(xparam1)./stdh;
 header_width = row_header_width(M_, estim_params_, bayestopt_);
 if contains(field_name,'posterior')
     tit1 = sprintf('%-*s %10s %8s %7s %6s %6s\n', header_width, ' ', 'prior mean', ...
-                   'mode', 's.d.', 'prior', 'pstdev');
+                    'mode', 's.d.', 'prior', 'pstdev');
 else
     tit1 = sprintf('%-*s %10s %7s %6s\n', header_width, ' ', 'Estimate', 's.d.', 't-stat');
 end
 
 if estim_params_.np % number of estimated structural parameters
-    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
     disp('parameters')
     disp(tit1)
     for i=1:estim_params_.np
@@ -169,6 +169,29 @@ if estim_params_.ncn % number of estimated corr parameters for measurement error
     skipline()
 end
 
+if estim_params_.nsx % number of estimated skew parameters for structural shocks
+    disp('skewness of shocks')
+    disp(tit1)
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: skew of shocks are ordered fifth in xparam1
+    for i=1:estim_params_.nsx
+        k = estim_params_.skew_exo(i,1);
+        name = sprintf('%s', M_.exo_names{k});
+        NAME = sprintf('%s', M_.exo_names{k});
+        if contains(field_name,'posterior')
+            fprintf('%-*s %10.4f %8.4f %7.4f %6s %6.4f \n', ...
+                    header_width, name, bayestopt_.p1(ip), xparam1(ip), stdh(ip), ...
+                    pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
+        else
+            fprintf('%-*s %10.4f %7.4f %7.4f \n',header_width, name, xparam1(ip), ...
+                    stdh(ip), tstath(ip));
+        end
+        oo_.(sprintf('%s_mode', field_name)).shocks_skew.(NAME) = xparam1(ip);
+        oo_.(sprintf('%s_std_at_mode', field_name)).shocks_skew.(NAME) = stdh(ip);
+        ip = ip+1;
+    end
+    skipline()
+end
+
 if any(xparam1(1:estim_params_.nvx+estim_params_.nvn)<0)
     warning(sprintf('Some estimated standard deviations are negative.\n         Dynare internally works with variances so that the sign does not matter.\n         Nevertheless, it is recommended to impose either prior restrictions (Bayesian Estimation)\n         or a lower bound (ML) to assure positive values.'))
 end
@@ -180,7 +203,7 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         filename = [latexDirectoryName '/' M_.fname '_Posterior_Mode_1.tex'];
         fidTeX = fopen(filename,'w');
         TeXBegin_Bayesian(fidTeX,1,'parameters')
-        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
         for i=1:estim_params_.np
             fprintf(fidTeX,'$%s$ & %s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
                     M_.param_names_tex{estim_params_.param_vals(i,1)}, ...
@@ -267,12 +290,31 @@ if any(bayestopt_.pshape > 0) && options_.TeX %% Bayesian estimation (posterior 
         end
         TeXEnd(fidTeX)
     end
+    if estim_params_.nsx % skew of shocks
+        TeXfile = [latexDirectoryName '/' M_.fname '_Posterior_Mode_6.tex'];
+        fidTeX = fopen(TeXfile,'w');
+        TeXBegin_Bayesian(fidTeX,6,'skeweness of structural shocks')
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: skew of shocks are ordered fifth in xparam1
+        for i=1:estim_params_.nsx
+            k = estim_params_.skew_exo(i,1);
+            name = [M_.exo_names_tex{k}];
+            fprintf(fidTeX,'$%s$ & %4s & %7.3f & %6.4f & %8.4f & %7.4f \\\\ \n',...
+                    name, ...
+                    pnames{bayestopt_.pshape(ip)+1}, ...
+                    bayestopt_.p1(ip), ...
+                    bayestopt_.p2(ip), ...
+                    xparam1(ip), ...
+                    stdh(ip));
+            ip = ip+1;
+        end
+        TeXEnd(fidTeX)
+    end
 elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
     if estim_params_.np % structural parameters
         filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_1.tex'];
         fidTeX = fopen(filename, 'w');
         TeXBegin_ML(fidTeX, 1, 'parameters', table_title, LaTeXtitle)
-        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
         for i=1:estim_params_.np
             fprintf(fidTeX,'$%s$ & %8.4f & %7.4f & %7.4f\\\\ \n',...
                     M_.param_names_tex{estim_params_.param_vals(i,1)}, ...
@@ -342,6 +384,23 @@ elseif all(bayestopt_.pshape == 0) && options_.TeX %% MLE and GMM Latex output
             k2 = estim_params_.corrn(i,2);
             fprintf(fidTeX, '$%s$  & %8.4f & %7.4f & %7.4f \\\\ \n', ...
                     [ M_.endo_names_tex{k1} ',' M_.endo_names_tex{k2}], ...
+                    xparam1(ip), ...
+                    stdh(ip), ...
+                    tstath(ip));
+            ip = ip+1;
+        end
+        TeXEnd(fidTeX)
+    end
+    if estim_params_.nsx % skew of shocks
+        filename = [latexDirectoryName '/' M_.fname '_' LaTeXtitle '_Mode_6.tex'];
+        fidTeX = fopen(filename, 'w');
+        TeXBegin_ML(fidTeX, 6, 'skewness of structural shocks', table_title, LaTeXtitle)
+        ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: skew of shocks are ordered fifth in xparam1
+        for i=1:estim_params_.nsx
+            k = estim_params_.skew_exo(i,1);
+            name = [M_.exo_names_tex{k}];
+            fprintf(fidTeX, '$%s$  & %8.4f & %7.4f & %7.4f \\\\ \n', ...
+                    name, ...
                     xparam1(ip), ...
                     stdh(ip), ...
                     tstath(ip));

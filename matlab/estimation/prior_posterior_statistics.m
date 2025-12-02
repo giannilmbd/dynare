@@ -47,7 +47,7 @@ localVars=[];
 Y = transpose(dataset_.data);
 gend = dataset_.nobs;
 
-npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np;
+npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np;
 naK = length(options_.filter_step_ahead);
 
 MaxNumberOfBytes=options_.MaxNumberOfBytes;

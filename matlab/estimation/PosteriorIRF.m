@@ -67,7 +67,7 @@ end
 irf_shocks_indx = getIrfShocksIndx(M_, options_);
 
 % Set various parameters & Check or create directories
-npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np ;
+npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np ;
 
 nvobs = dataset_.vobs;
 gend = dataset_.nobs;

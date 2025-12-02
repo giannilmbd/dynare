@@ -74,8 +74,17 @@ elseif  k <= (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params
         tname  = sprintf('%s,%s', M_.endo_names_tex{k1}, M_.endo_names_tex{k2});
         texnam = sprintf('$ \\rho^{ME}_{%s} $', tname);
     end
-else % estimated structural parameters (ordered last in xparam1)
+elseif k <= (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx) % estimated skew parameters for structural shocks (ordered fifth in xparam1)
     jj = k - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn);
+    k = estim_params_.skew_exo(jj,1);
+    vname = sprintf('%s', M_.exo_names{k});
+    nam = sprintf('SKEW_%s', vname);
+    if TeX
+        tname  = sprintf('%s', M_.exo_names_tex{k});
+        texnam = sprintf('$ skew({%s}) $', tname);
+    end
+else % estimated structural parameters (ordered last in xparam1)
+    jj = k - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx);
     jj1 = estim_params_.param_vals(jj,1);
     nam = M_.param_names{jj1};
     if TeX

@@ -55,3 +55,9 @@ if estim_params_.ncn % estimated corr parameters for measurement errors
         w = max(w, length(M_.endo_names{k1})+length(M_.endo_names{k2}));
     end
 end
+if estim_params_.nsx % estimated skew parameters for structural shocks
+    for i=1:estim_params_.nsx
+        k = estim_params_.skew_exo(i,1);
+        w = max(w, length(M_.exo_names{k}));
+    end
+end

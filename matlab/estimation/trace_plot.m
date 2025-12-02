@@ -1,4 +1,4 @@
-function trace_plot(options_,M_,estim_params_,type,blck,name1,name2)
+function trace_plot(options_,M_,estim_params_,type,blck,name1,name2,name3)
 % This function builds trace plot for the Metropolis-Hastings draws.
 %
 % INPUTS
@@ -13,6 +13,7 @@ function trace_plot(options_,M_,estim_params_,type,blck,name1,name2)
 %                                  vector
 %   name1           [string]       Object name.
 %   name2           [string]       Object name.
+%   name3           [string]       Object name.
 %
 % OUTPUTS
 %   None
@@ -36,15 +37,17 @@ function trace_plot(options_,M_,estim_params_,type,blck,name1,name2)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-% Cet the column index:
+% Get the column index:
 if strcmpi(type,'PosteriorDensity')
     column=0;
     name1='';
 else
     if nargin<7
         column = name2index(M_, estim_params_, type, name1);
-    else
+    elseif nargin<8
         column = name2index(M_, estim_params_, type, name1, name2);
+    elseif nargin<9
+        column = name2index(M_, estim_params_, type, name1, name2, name3);
     end
 end
 
@@ -94,8 +97,14 @@ if strcmpi(type,'DeepParameter')
 elseif strcmpi(type,'StructuralShock')
     if nargin<7
         TYPE = 'the standard deviation of structural shock ';
-    else
+    elseif nargin<8
         TYPE = 'the correlation between structural shocks ';
+    elseif nargin<9
+        if strcmp(name1,name2) && strcmp(name1,name3)
+            TYPE = 'the skewness coefficient of structural shock ';
+        else
+            TYPE = 'the skewness coefficient between structural shocks ';
+        end
     end
 elseif strcmpi(type,'MeasurementError')
     if nargin<7
@@ -109,8 +118,14 @@ end
 
 if nargin<7
     FigureName = ['Trace plot for ' TYPE name1];
-else
+elseif nargin<8
     FigureName = ['Trace plot for ' TYPE name1 ' and ' name2];
+elseif nargin<9
+    if strcmp(name1,name2) && strcmp(name1,name3)
+        FigureName = ['Trace plot for ' TYPE name1];
+    else
+        FigureName = ['Trace plot for ' TYPE name1 ', ' name2 ', and ' name3];
+    end
 end
 
 
@@ -181,8 +196,14 @@ if options_.TeX
     else
         if nargin<7
             FigureName = ['Trace plot for ' TYPE '$' tex_names{strmatch(name1,base_names,'exact')} '$'];
-        else
+        elseif nargin<8
             FigureName = ['Trace plot for ' TYPE '$' tex_names{strmatch(name1,base_names,'exact')} '$ and $' tex_names{strmatch(name2,base_names,'exact')} '$'];
+        elseif nargin<9
+            if strcmp(name1,name2) && strcmp(name1,name3)
+                FigureName = ['Trace plot for ' TYPE '$' tex_names{strmatch(name1,base_names,'exact')} '$'];
+            else
+                FigureName = ['Trace plot for ' TYPE '$' tex_names{strmatch(name1,base_names,'exact')} '$, $' tex_names{strmatch(name2,base_names,'exact')} '$, and $' tex_names{strmatch(name3,base_names,'exact')} '$'];
+            end
         end
     end
     if n_nblocks_to_plot==1

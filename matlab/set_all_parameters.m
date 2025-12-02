@@ -1,8 +1,8 @@
 function M_ = set_all_parameters(xparam1,estim_params_,M_)
 % M_ = set_all_parameters(xparam1,estim_params_,M_)
 % -------------------------------------------------------------------------
-% Update parameter values (deep parameters and covariance matrices) in the
-% Dynare model structure M_ using the estimated parameters xparam1 and
+% Update parameter values (deep parameters, covariance and skewness matrices)
+% in the Dynare model structure M_ using the estimated parameters xparam1 and
 % the estimation parameter structure estim_params_.
 %
 % Inputs:
@@ -86,8 +86,18 @@ if estim_params_.ncn % corr among VAROBS are ordered fourth in xparam1
     end
 end
 
-% setting structural parameters
+% setting skewness coefficients of structural shocks
 offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
+if estim_params_.nsx % skew among VAREXO are ordered fifth in xparam1
+    skew_exo = estim_params_.skew_exo;
+    for i=1:estim_params_.nsx
+        k = skew_exo(i,1);
+        M_.Skew_e(k,k,k) = xparam1(i+offset);
+    end
+end
+
+% setting structural parameters
+offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + estim_params_.nsx;
 if estim_params_.np % structural parameters are ordered last in xparam1
     M_.params(estim_params_.param_vals(:,1)) = xparam1(offset+1:end);
 end
@@ -113,3 +123,6 @@ if estim_params_.nvn || estim_params_.ncn
     M_.H = H;
     M_.Correlation_matrix_ME=Correlation_matrix_ME;
 end
+
+% update specification of independent closed skew normal distributed shocks
+M_.csn = csn_update_specification(M_.Sigma_e, M_.Skew_e);

@@ -230,6 +230,37 @@ Copyright: 1993-1996 Kurt Hornik
            2016-2023 Dynare Team
 License: GPL-3+
 
+Files: matlab/missing/stats/mvncdf.m
+       matlab/missing/stats/tvncdf.m
+Copyright: 2008 Arno Onken <asnelt@asnelt.org>
+           2022-2023 Andreas Bertsatos <abertsatos@biol.uoa.gr>
+           2025 Dynare Team
+License: GPL-3+
+Comment: Code adapted from the GNU Octave statistics package (version 1.7.7):
+ https://github.com/gnu-octave/statistics
+
+Files: matlab/missing/stats/mvtcdfqmc.m
+Copyright: 2022 Andreas Bertsatos <abertsatos@biol.uoa.gr>
+           2025 Dynare Team
+License: GPL-3+
+Comment: Code adapted from the GNU Octave statistics package (version 1.7.7):
+ https://github.com/gnu-octave/statistics
+
+Files: matlab/missing/stats/bvncdf.m
+Copyright: 2022-2023 Andreas Bertsatos <abertsatos@biol.uoa.gr>
+           2025 Dynare Team
+License: GPL-3+
+Comment: Code adapted from the GNU Octave statistics package (version 1.7.7):
+ https://github.com/gnu-octave/statistics
+
+Files: matlab/missing/stats/skewness.m
+       matlab/missing/stats/kurtosis.m
+Copyright: 1996-2025 The Octave Project Developers
+           2025 Dynare Team
+License: GPL-3+
+Comment: Algorithm adapted from GNU Octave (version 9.x):
+ https://github.com/gnu-octave/octave
+
 Files: matlab/lmmcp/catstruct.m
 Copyright: 2005 Jos van der Geest <jos@jasen.nl>
            2013 Christophe Gouel
@@ -262,6 +293,43 @@ License: CC-BY-SA-4.0
 Files: examples/usmodel_data.mat tests/estimation/pct/SW_2007_fmincon_parallel.m
 Copyright: 2007-2013 Frank Smets and Raf Wouters
            2013-24 Johannes Pfeifer
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/csn_mean.m
+       matlab/distributions/closed_skew_normal/csn_variance.m
+       matlab/distributions/gaussian/gaussian_cdf_derivative.m
+Copyright: 2022-2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/csn_prune_distribution.m
+       matlab/distributions/closed_skew_normal/csn_quantile.m
+Copyright: 2022-2023 Gaygysyz Guljanov, Willi Mutschler
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/csn_singular_to_csn_proper.m
+       matlab/distributions/closed_skew_normal/csn_statespace_linear_transform.m
+Copyright: 2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/closed_skew_normal/rand_multivariate_csn.m
+Copyright: 2015 Dmitry Pavlyuk, Eugene Girtcius (rcsn.R function in the "csn" R package)
+           2022-2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/distributions/gaussian/gaussian_log_mvncdf_mendell_elston.m
+Copyright: 2015 Dietmar Bauer (original implementation)
+           2022-2023 Gaygysyz Guljanov
+           2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/kalman/likelihood/kalman_filter_pruned_skewed.m
+       matlab/kalman/kalman_smoother_pruned_skewed.m
+Copyright: 2024-2025 Gaygysyz Guljanov, Willi Mutschler, Mark Trede
            2025 Dynare Team
 License: GPL-3+
 

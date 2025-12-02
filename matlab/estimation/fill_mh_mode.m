@@ -35,7 +35,7 @@ function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, fie
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if estim_params_.np % estimated structural parameters
-    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: structural parameters are ordered last in xparam1
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
     for i=1:estim_params_.np
         k = estim_params_.param_vals(i,1);
         name = M_.param_names{k};
@@ -86,6 +86,17 @@ if estim_params_.ncn % estimated corr parameters for measurement errors
         name = [M_.endo_names{k1} '_' M_.endo_names{k2}];
         oo_.([field_name '_mode']).measurement_errors_corr.(name) = xparam1(ip);
         oo_.([field_name '_std_at_mode']).measurement_errors_corr.(name) = stdh(ip);
+        ip = ip+1;
+    end
+end
+
+if estim_params_.nsx % estimated skew parameters for structural shocks
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1; % offset: skew parameters for structural shocks are ordered fifth in xparam1
+    for i=1:estim_params_.nsx
+        k = estim_params_.skew_exo(i,1);
+        name = M_.exo_names{k};
+        oo_.([field_name '_mode']).shocks_skew.(name)= xparam1(ip);
+        oo_.([field_name '_std_at_mode']).shocks_skew.(name) = stdh(ip);
         ip = ip+1;
     end
 end

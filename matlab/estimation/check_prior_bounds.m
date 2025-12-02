@@ -9,7 +9,7 @@ function check_prior_bounds(xparam1,bounds,M_,estim_params_,options_,bayestopt_)
 %   -options_       [structure] characterizing the options
 %   -bayestopt_     [structure] characterizing priors
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -35,7 +35,19 @@ if ~isempty(outside_bound_pars)
     for ii=2:size(outside_bound_par_names,1)
         disp_string=[disp_string,', ',outside_bound_par_names{ii,:}];
     end
-    error(['Initial value(s) of ', disp_string ,' are outside parameter bounds. Potentially, you should set prior_trunc=0. If you used the mode_file-option, check whether your mode-file is consistent with the priors.'])
+    error_msg = sprintf('Initial value(s) of %s are outside parameter bounds.\nPotentially, you should set', disp_string);
+    if any(contains(outside_bound_par_names,'CC_'))
+        error_msg = sprintf('%s\n- correlations to be within theoretical bound of [-1;1]', error_msg);
+    end
+    if any(contains(outside_bound_par_names,'SKEW_'))
+        error_msg = sprintf('%s\n- skewness coefficients to be within theoretical bound of [-%.4f;%.4f] of the skew normal distribution', error_msg, abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)), abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)));
+    end
+    if ~( any(contains(outside_bound_par_names,'CC_')) || any(contains(outside_bound_par_names,'SKEW_')) )
+        error_msg = sprintf('%s prior_trunc = 0. ', error_msg);
+    else
+        error_msg = sprintf('%s\n- prior_trunc = 0\n', error_msg);
+    end
+    error('%sIf you used the mode_file-option, check whether your mode-file is consistent with the priors.', error_msg);
 end
 inadmissible_inverse_gamma_values=find(bayestopt_.pshape==4 & xparam1 == 0);
 if ~isempty(inadmissible_inverse_gamma_values)

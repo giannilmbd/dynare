@@ -62,7 +62,7 @@ function [oo_, options_mom_, M_] = run(bayestopt_, options_, oo_, estim_params_,
 %  o check_mode_file
 %  o check_posterior_sampler_options
 %  o check_prior_bounds
-%  o check_prior_stderr_corr
+%  o check_prior_stderr_corr_skew
 %  o check_steady_state_changes_parameters
 %  o check_varobs_are_endo_and_declared_once
 %  o check_hessian_at_the_mode
@@ -398,9 +398,9 @@ if do_bayesian_estimation_mcmc
         error('method_of_moments: Using the slice sampler with the ''use_mh_covariance_matrix'' option requires also setting the ''rotated'' option!');
     end
 end
-% warning if prior allows that stderr parameters are negative or corr parameters are outside the unit circle
+% warning if prior allows that stderr parameters are negative or corr parameters are outside the unit circle or skewness parameters are outside theoretical bounds
 if do_bayesian_estimation
-    check_prior_stderr_corr(estim_params_,bayestopt_);
+    check_prior_stderr_corr_skew(estim_params_,bayestopt_);
     % check value of prior density
     [~,~,~,info] = priordens(xparam0,bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7,bayestopt_.p3,bayestopt_.p4);
     if any(info)

@@ -37,10 +37,11 @@ if isempty(estim_params_)
     estim_params_.ncx = 0;
     estim_params_.nvn = 0;
     estim_params_.ncn = 0;
+    estim_params_.nsx = 0;
     estim_params_.np  = 0;
 end
 
-xparam1 = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
+xparam1 = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1);
 
 % standard deviation of exogenous shocks (stderr on varexo, ordered first in xparam1)
 if estim_params_.nvx
@@ -82,6 +83,16 @@ if estim_params_.ncn
     end
 end
 offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn;
+
+% skewness of exogenous shocks (skew on varexo, ordered fifth in xparam1)
+if estim_params_.nsx
+    skew_exo = estim_params_.skew_exo;
+    for i = 1:estim_params_.nsx
+        k = skew_exo(i,1);
+        xparam1(i+offset) = M_.Skew_e(k,k,k);
+    end
+end
+offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx;
 
 % structural parameters (ordered last in xparam1)
 if estim_params_.np

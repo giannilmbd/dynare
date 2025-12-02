@@ -14,7 +14,7 @@ function [info, oo_, options_, M_] = stoch_simul(M_, options_, oo_, var_list)
 % - options_      [structure]     MATLAB's structure describing the current options
 % - M             [structure]     MATLAB's structure describing the model
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -141,6 +141,31 @@ if ~options_.noprint
             lh = cellofchararraymaxlength(labels)+2;
             dyn_latex_table(M_, options_, my_title, 'covar_ex_shocks', headers, labels, M_.Sigma_e, lh, 10, 6);
         end
+        if ~all(M_.Skew_e(:)==0)
+            my_title='MATRIX OF COSKEWNESS OF EXOGENOUS SHOCKS';
+            labels = {}; idx = 1;
+            for j1 = 1:M_.exo_nbr
+                for j2 = 1:M_.exo_nbr
+                    labels{idx,1} = sprintf('%s * %s', M_.exo_names{j1}, M_.exo_names{j2});
+                    idx = idx + 1;
+                end
+            end
+            headers = vertcat('Variables', M_.exo_names);
+            lh = cellofchararraymaxlength(labels)+2;
+            dyntable(options_, my_title, headers, labels, reshape(M_.Skew_e(:), M_.exo_nbr, M_.exo_nbr^2)', lh, 10, 4);
+            if options_.TeX
+                labels = {}; idx = 1;
+                for j1 = 1:M_.exo_nbr
+                    for j2 = 1:M_.exo_nbr
+                        labels{idx,1} = sprintf('%s \\cdot %s', M_.exo_names_tex{j1}, M_.exo_names_tex{j2});
+                        idx = idx + 1;
+                    end
+                end
+                headers = vertcat('Variables', M_.exo_names_tex);
+                lh = cellofchararraymaxlength(labels)+2;
+                dyn_latex_table(M_, options_, my_title, 'coskew_ex_shocks', headers, labels, reshape(M_.Skew_e(:), M_.exo_nbr, M_.exo_nbr^2)', lh, 10, 6);
+            end
+        end
         if ~all(diag(M_.H)==0)
             my_title='MATRIX OF COVARIANCE OF MEASUREMENT ERRORS';
             labels = cellfun(@(x) horzcat('SE_', x), options_.varobs, 'UniformOutput', false);
@@ -196,6 +221,7 @@ if options_.periods > 0 && ~PI_PCL_solver
             y0 = M_.endo_histval;
         end
     end
+    M_.csn = csn_update_specification(M_.Sigma_e, M_.Skew_e);
     [oo_.endo_simul, oo_.exo_simul] = simult(y0,oo_.dr,M_,options_);
 end
 

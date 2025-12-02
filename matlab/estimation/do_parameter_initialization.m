@@ -45,10 +45,11 @@ estim_params_.nvx = size(estim_params_.var_exo,1);    % estimated stderr paramet
 estim_params_.nvn = size(estim_params_.var_endo,1);   % estimated stderr parameters for measurement errors
 estim_params_.ncx = size(estim_params_.corrx,1);      % estimated corr parameters for structural shocks
 estim_params_.ncn = size(estim_params_.corrn,1);      % estimated corr parameters for measurement errors
+estim_params_.nsx = size(estim_params_.skew_exo,1);   % estimated skew parameters for structural shocks
 estim_params_.np  = size(estim_params_.param_vals,1); % estimated structural parameters
 
-xparam1_explicitly_initialized = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
-xparam1_properly_calibrated = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
+xparam1_explicitly_initialized = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1);
+xparam1_properly_calibrated = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1);
 
 offset=0;
 if estim_params_.nvx % estimated stderr parameters for structural shocks (ordered first in xparam1)
@@ -120,6 +121,19 @@ if estim_params_.ncn % estimated corr parameters for measurement errors (ordered
     end
 end
 offset=offset+estim_params_.ncn;
+if estim_params_.nsx % estimated skew parameters for structural shocks (ordered fifth in xparam1)
+    initialized_par_index=find(~isnan(estim_params_.skew_exo(:,2)));
+    calibrated_par_index=find(isnan(estim_params_.skew_exo(:,2)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.nsx,1)));
+    uninitialized_par_index=find(isnan(estim_params_.skew_exo(:,2)) & isnan(xparam1_calib(offset+1:offset+estim_params_.nsx,1)));
+    xparam1_explicitly_initialized(offset+initialized_par_index,1) = estim_params_.skew_exo(initialized_par_index,2);
+    estim_params_.skew_exo(calibrated_par_index,2)=xparam1_calib(offset+calibrated_par_index,1);
+    xparam1_properly_calibrated(offset+calibrated_par_index,1) = xparam1_calib(offset+calibrated_par_index,1);
+    if uninitialized_par_index
+        fprintf('PARAMETER INITIALIZATION: Warning, some estimated skewness coefficients of shocks are not\n')
+        fprintf('PARAMETER INITIALIZATION: initialized. They will be initialized with the prior mean.\n')
+    end
+end
+offset=offset+estim_params_.nsx;
 if estim_params_.np % estimated structural parameters (ordered last in xparam1)
     initialized_par_index=find(~isnan(estim_params_.param_vals(:,2)));
     calibrated_par_index=find(isnan(estim_params_.param_vals(:,2)) & ~isnan(xparam1_calib(offset+1:offset+estim_params_.np,1)));

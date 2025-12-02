@@ -40,6 +40,7 @@ estim_params_.nvx = size(estim_params_.var_exo,1);    % number of estimated stde
 estim_params_.nvn = size(estim_params_.var_endo,1);   % number of estimated stderr parameters for measurement errors
 estim_params_.ncx = size(estim_params_.corrx,1);      % number of estimated corr parameters for structural shocks
 estim_params_.ncn = size(estim_params_.corrn,1);      % number of estimated corr parameters for measurement errors
+estim_params_.nsx = size(estim_params_.skew_exo,1);   % number of estimated skew parameters for structural shocks
 estim_params_.np  = size(estim_params_.param_vals,1); % number of estimated structural parameters
 
 xparam1 = [];
@@ -50,7 +51,7 @@ bayestopt_.p1 = []; % prior mean
 bayestopt_.p2 = []; % prior standard deviation
 bayestopt_.p3 = []; % lower bound of the distribution, only considering whether a generalized distribution is used, not when the prior is truncated
 bayestopt_.p4 = []; % upper bound of the distribution, only considering whether a generalized distribution is used, not when the prior is truncated
-bayestopt_.p5 = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1); % prior mode
+bayestopt_.p5 = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1); % prior mode
 bayestopt_.p6 = []; % first hyper-parameter (\alpha for the BETA and GAMMA distributions, s for the INVERSE GAMMAs, expectation for the GAUSSIAN distribution, lower bound for the UNIFORM distribution).
 bayestopt_.p7 = []; % second hyper-parameter (\beta for the BETA and GAMMA distributions, \nu for the INVERSE GAMMAs, standard deviation for the GAUSSIAN distribution, upper bound for the UNIFORM distribution).
 
@@ -142,6 +143,25 @@ if estim_params_.ncn % estimated corr parameters for measurement errors (ordered
         obsi2 = strmatch(M_.endo_names{k2}, options_.varobs, 'exact');
         % save correspondence
         estim_params_.corrn_observable_correspondence(i,:)=[obsi1, obsi2];
+    end
+end
+
+if estim_params_.nsx % estimated skew parameters for structural shocks (ordered fifth in xparam1)
+    xparam1 = [xparam1; estim_params_.skew_exo(:,2)];
+    sn_skewness_bound = abs((sqrt(2)*(pi-4))/(pi-2)^(3/2));
+    ub = [ub; max(min(estim_params_.skew_exo(:,4),sn_skewness_bound),-sn_skewness_bound)];
+    lb = [lb; min(max(estim_params_.skew_exo(:,3),-sn_skewness_bound),sn_skewness_bound)];
+    bayestopt_.pshape = [ bayestopt_.pshape; estim_params_.skew_exo(:,5)];
+    bayestopt_.p1 = [ bayestopt_.p1; estim_params_.skew_exo(:,6) ];
+    bayestopt_.p2 = [ bayestopt_.p2; estim_params_.skew_exo(:,7) ];
+    bayestopt_.p3 = [ bayestopt_.p3; estim_params_.skew_exo(:,8) ]; %take generalized distribution into account
+    bayestopt_.p4 = [ bayestopt_.p4; estim_params_.skew_exo(:,9) ]; %take generalized distribution into account
+    bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.skew_exo(:,10) ];
+    baseid = length(bayestopt_.name);
+    bayestopt_.name = [bayestopt_.name; cell(estim_params_.nsx, 1)];
+    for i = 1:estim_params_.nsx
+        k = estim_params_.skew_exo(i,1);
+        bayestopt_.name(baseid+i) = {sprintf('skew %s', M_.exo_names{k})};
     end
 end
 

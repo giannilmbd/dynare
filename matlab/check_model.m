@@ -2,7 +2,7 @@ function check_model(M_)
 % check_model(M_)
 % Performs various consistency checks on the model
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -36,4 +36,8 @@ if ~isequal(M_.H,0)
     if ~check_consistency_covariances(M_.H)
         error('The specified covariances for the measurement errors are not consistent with the variances as they imply a correlation larger than +-1')
     end
+end
+
+if any(abs(nonzeros(M_.Skew_e)) > abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)))
+    error('Skewness parameters are larger than theoretical bound of skew normal distribution of ±%f.', abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)));
 end

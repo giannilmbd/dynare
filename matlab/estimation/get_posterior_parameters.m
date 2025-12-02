@@ -38,7 +38,7 @@ if nargin<6
     field1='posterior_';
 end
 
-xparam = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.np,1);
+xparam = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1);
 ip = 1; % initialize index in xparam
 
 for i=1:estim_params_.nvx % estimated stderr parameters for structural shocks (ordered first in xparam1)
@@ -70,6 +70,13 @@ for i=1:estim_params_.ncn % estimated corr parameters for measurement errors (or
     name1 = options_.varobs{k1};
     name2 = options_.varobs{k2};
     xparam(ip) = oo_.([field1 type]).measurement_errors_corr.([name1 '_' name2]);
+    ip = ip + 1;
+end
+
+for i=1:estim_params_.nsx % estimated skew parameters for structural shocks (ordered fifth in xparam1)
+    k = estim_params_.skew_exo(i,1);
+    name1 = M_.exo_names{k};
+    xparam(ip) = oo_.([field1 type]).shocks_skew.(name1);
     ip = ip + 1;
 end
 
