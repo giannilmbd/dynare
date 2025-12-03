@@ -39,7 +39,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %                              (a_{0}) for initial period from PKF
 %   o state_uncertainty0 [double] (K,K) matrix storing the uncertainty about 
 %                                   the smoothed state for the initial
-%                                   period from the PKF
+%                                   period from the KF
 %   o d             [integer]   number of diffuse periods
 %   o info          [1 by 4 double]   error code and penalty
 

@@ -90,7 +90,7 @@ eetahat = []; %       updated shocks in t|t
 % get dimensions
 x_nbr = length(G);
 eta_nbr = size(mu_eta, 1);
-[y_nbr, obs_nbr] = size(Y);
+[~, obs_nbr] = size(Y);
 if rcond(G) < kalman_tol
     G_singular = true;
 else
@@ -106,12 +106,10 @@ A = [-inv(R'*R)*R'*G, inv(R'*R)*R'];
 mu_0 = mu_tm1_tm1;
 Sigma_0 = Sigma_tm1_tm1;
 Gamma_0 = Gamma_tm1_tm1;
-nu_0 = nu_tm1_tm1;
 Delta_0 = Delta_tm1_tm1;
 
 % initialize CSN parameters of predicted and filtered states;
 % use cell for skewness parameters as dimensions are time-varying
-x_t_tm1 = nan(x_nbr,obs_nbr+1);
 x_t_t = nan(x_nbr,obs_nbr);
 x_t_T = nan(x_nbr,obs_nbr);
 mu_t_tm1 = nan(x_nbr, obs_nbr+1);
@@ -124,7 +122,6 @@ Sigma_t_t = nan(x_nbr, x_nbr, obs_nbr);
 Sigma_t_T = nan(x_nbr, x_nbr, obs_nbr);
 Sigma_yt = nan(eta_nbr, eta_nbr, obs_nbr);
 Sigma_jt = nan(2*x_nbr, 2*x_nbr, obs_nbr);
-J_t = Sigma_t_tm1;
 Gamma_t_tm1 = cell(obs_nbr+1,1);
 Gamma_t_t = cell(obs_nbr,1);
 Gamma_t_T = cell(obs_nbr,1);
