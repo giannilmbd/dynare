@@ -74,7 +74,7 @@ below. Basic operations can be performed on dates:
 
     Can be used to create a range of dates. For instance, ``r =
     1950Q1:1951Q1`` creates a ``dates`` object with five elements:
-    ``1950Q1``, ``1950Q2``, ``1950Q3``, ``1950Q4`` and ``1951Q1``. By default the
+    ``1950Q1``, ``1950Q2``, ``1950Q3``, ``1950Q4`` and ``1951Q1``. By default, the
     increment between each element is one period. This default can be
     changed using, for instance, the following instruction:
     ``1950Q1:2:1951Q1`` which will instantiate a ``dates`` object with
@@ -95,42 +95,42 @@ below. Basic operations can be performed on dates:
     Tests if two ``dates`` objects are equal. ``+1950Q1==1950Q2``
     returns ``true``, ``1950Q1==1950Q2`` returns ``false``. If the compared
     objects have both ``n>1`` elements, the ``eq`` operator returns a
-    column vector, ``n`` by ``1``, of logicals.
+    column vector, ``n`` by ``1``, of Booleans.
 
 **ne operator (not equal, ~=)**
 
     Tests if two ``dates`` objects are not equal. ``+1950Q1~=``
     returns ``false`` while ``1950Q1~=1950Q2`` returns ``true``. If the
     compared objects both have ``n>1`` elements, the ``ne`` operator
-    returns an ``n`` by ``1`` column vector of logicals.
+    returns an ``n`` by ``1`` column vector of Booleans.
 
 **lt operator (less than, <)**
 
-    Tests if a ``dates`` object preceeds another ``dates`` object. For
+    Tests if a ``dates`` object precedes another ``dates`` object. For
     instance, ``1950Q1<1950Q3`` returns ``true``. If the compared objects
     have both ``n>1`` elements, the ``lt`` operator returns a column
-    vector, ``n`` by ``1``, of logicals.
+    vector, ``n`` by ``1``, of Booleans.
 
 **gt operator (greater than, >)**
 
     Tests if a ``dates`` object follows another ``dates`` object. For
     instance, ``1950Q1>1950Q3`` returns ``false``. If the compared objects
     have both ``n>1`` elements, the ``gt`` operator returns a column
-    vector, ``n`` by ``1``, of logicals.
+    vector, ``n`` by ``1``, of Booleans.
 
 **le operator (less or equal, <=)**
 
-    Tests if a ``dates`` object preceeds another ``dates`` object or
+    Tests if a ``dates`` object precedes another ``dates`` object or
     is equal to this object. For instance, ``1950Q1<=1950Q3`` returns
     ``true``. If the compared objects have both ``n>1`` elements, the
-    ``le`` operator returns a column vector, ``n`` by ``1``, of logicals.
+    ``le`` operator returns a column vector, ``n`` by ``1``, of Booleans.
 
 **ge operator (greater or equal, >=)**
 
     Tests if a ``dates`` object follows another ``dates`` object or is
     equal to this object. For instance, ``1950Q1>=1950Q3`` returns
     ``false``. If the compared objects have both ``n>1`` elements, the
-    ``ge`` operator returns a column vector, ``n`` by ``1``, of logicals.
+    ``ge`` operator returns a column vector, ``n`` by ``1``, of Booleans.
 
 One can select an element, or some elements, in a ``dates`` object as
 he would extract some elements from a vector in MATLAB/Octave. Let ``a
@@ -191,7 +191,7 @@ The dates class
         argument). ``FREQ`` is a character equal to ’Y’ or ’A’ for
         annual dates, ’S’ or ’H’ for bi-annual dates, ’Q’ for
         quarterly dates, ’M’ for monthly dates, or ’D’ for daily
-        dates. Note that ``FREQ`` is not case sensitive, so that, for
+        dates. Note that ``FREQ`` is not case-sensitive, so that, for
         instance, ’q’ is also allowed for quarterly dates. The
         frequency can also be set with an integer scalar equal to 1
         (annual), 2 (bi-annual), 4 (quarterly), 12 (monthly), or 365
@@ -422,12 +422,12 @@ The dates class
 
     .. datesmethod:: disp (A)
 
-        |br| Overloads the MATLAB/Octave disp function for ``dates`` object.
+        |br| Overloads the MATLAB/Octave ``disp`` function for ``dates`` object.
 
 
     .. datesmethod:: display (A)
 
-        |br| Overloads the MATLAB/Octave display function for ``dates`` object.
+        |br| Overloads the MATLAB/Octave ``display`` function for ``dates`` object.
 
         *Example*
 
@@ -472,7 +472,7 @@ The dates class
         |br| Overloads the MATLAB/Octave ``eq`` (equal, ``==``)
         operator. ``dates`` objects ``A`` and ``B`` must have the same
         number of elements (say, ``n``). The returned argument is a
-        ``n`` by ``1`` vector of logicals. The i-th element of
+        ``n`` by ``1`` vector of Booleans. The `i` -th element of
         ``C`` is equal to ``true`` if and only if the dates ``A(i)`` and
         ``B(i)`` are the same.
 
@@ -497,8 +497,8 @@ The dates class
         |br| Overloads the MATLAB/Octave ``ge`` (greater or equal,
         ``>=``) operator. ``dates`` objects ``A`` and ``B`` must have
         the same number of elements (say, ``n``). The returned
-        argument is a ``n`` by ``1`` vector of logicals. The
-        i-th element of ``C`` is equal to ``true`` if and only if the
+        argument is a ``n`` by ``1`` vector of Booleans. The
+        `i` -th element of ``C`` is equal to ``true`` if and only if the
         date ``A(i)`` is posterior or equal to the date ``B(i)``.
 
         *Example*
@@ -522,7 +522,7 @@ The dates class
         |br| Overloads the MATLAB/Octave ``gt`` (greater than, ``>``)
         operator. ``dates`` objects ``A`` and ``B`` must have the same
         number of elements (say, ``n``). The returned argument is a
-        ``n`` by ``1`` vector of logicals. The i-th element of
+        ``n`` by ``1`` vector of Booleans. The `i` -th element of
         ``C`` is equal to ``1`` if and only if the date ``A(i)`` is
         posterior to the date ``B(i)``.
 
@@ -633,8 +633,8 @@ The dates class
         |br| Overloads the MATLAB/Octave ``le`` (less or equal,
         ``<=``) operator. ``dates`` objects ``A`` and ``B`` must have
         the same number of elements (say, ``n``). The returned
-        argument is a ``n`` by ``1`` vector of logicals. The
-        i-th element of ``C`` is equal to ``true`` if and only if the
+        argument is a ``n`` by ``1`` vector of Booleans. The
+        `i` -th element of ``C`` is equal to ``true`` if and only if the
         date ``A(i)`` is anterior or equal to the date ``B(i)``.
 
         *Example*
@@ -675,8 +675,8 @@ The dates class
         |br| Overloads the MATLAB/Octave ``lt`` (less than,
         ``<``) operator. ``dates`` objects ``A`` and ``B`` must have
         the same number of elements (say, ``n``). The returned
-        argument is a ``n`` by ``1`` vector of logicals. The
-        i-th element of ``C`` is equal to ``true`` if and only if the
+        argument is a ``n`` by ``1`` vector of Booleans. The
+        `i` -th element of ``C`` is equal to ``true`` if and only if the
         date ``A(i)`` is anterior or equal to the date ``B(i)``.
 
         *Example*
@@ -778,7 +778,7 @@ The dates class
         operator. ``dates`` objects ``A`` and ``B`` must have the same
         number of elements (say, ``n``) or one of the inputs must be a
         single element ``dates`` object. The returned argument is a
-        ``n`` by ``1`` vector of logicals. The i-th element of
+        ``n`` by ``1`` vector of Booleans. The `i` -th element of
         ``C`` is equal to ``true`` if and only if the dates ``A(i)`` and
         ``B(i)`` are different.
 
@@ -980,7 +980,7 @@ The dates class
 
         |br| Overloads the MATLAB/Octave ``unique`` function. Returns
         a ``dates`` object with repetitions removed (only the last
-        occurence of a date is kept).
+        occurrence of a date is kept).
 
         *Example*
 
@@ -1080,7 +1080,7 @@ The dseries class
             yuiop = randn(100,1);
 
         If a ``.mat`` file is used instead, it should provide the same
-        informations, except that the data should not be given as a
+        information, except that the data should not be given as a
         set of vectors, but as a single matrix of doubles named
         ``DATA__``. This array should have as many columns as elements
         in ``NAMES__`` (the number of variables). Note that the
@@ -1091,7 +1091,7 @@ The dseries class
         ``dates('1Y')``. If a second input argument is passed to the
         constructor, ``dates`` object *INITIAL_DATE*, the initial date
         defined in *FILENAME* is reset to *INITIAL_DATE*. This is
-        typically usefull if ``INIT__`` is not provided in the data
+        typically useful if ``INIT__`` is not provided in the data
         file.
 
         If an ``.xlsx`` file is used, the first row should be a header
@@ -1105,7 +1105,7 @@ The dseries class
 
         |br| If the data is not read from a file, it can be provided
         via a :math:`T \times N` matrix as the first argument to
-        ``dseries`` ’ constructor, with :math:`T` representing the
+        ``dseries`` constructor, with :math:`T` representing the
         number of observations on :math:`N` variables. The optional
         second argument, *INITIAL_DATE*, can be either a ``dates``
         object representing the period of the first observation or a
@@ -1457,7 +1457,7 @@ The dseries class
 
         |br| Sanity check of ``dseries`` object ``A``. Returns ``1``
         if there is an error, ``0`` otherwise. The second output
-        argument is a string giving brief informations about the
+        argument is a string giving brief information about the
         error.
 
 
@@ -1679,12 +1679,12 @@ The dseries class
 
     .. datesmethod:: disp (A)
 
-        |br| Overloads the MATLAB/Octave disp function for ``dseries`` object.
+        |br| Overloads the MATLAB/Octave ``disp`` function for ``dseries`` object.
 
 
     .. datesmethod:: display (A)
 
-        |br| Overloads the MATLAB/Octave display function for
+        |br| Overloads the MATLAB/Octave ``display`` function for
         ``dseries`` object. ``display`` is the function called by
         MATLAB/Octave to print the content of an object if a semicolon is
         missing at the end of a MATLAB/Octave statement. If the ``dseries``
@@ -1701,7 +1701,7 @@ The dseries class
         operator. ``dseries`` objects ``A`` and ``B`` must have the
         same number of observations (say, :math:`T`) and variables
         (:math:`N`). The returned argument is a :math:`T \times N`
-        matrix of logicals. Element :math:`(i,j)` of ``C`` is
+        matrix of Booleans. Element :math:`(i,j)` of ``C`` is
         equal to ``true`` if and only if observation :math:`i` for
         variable :math:`j` in ``A`` and ``B`` are the same.
 
@@ -1836,11 +1836,11 @@ The dseries class
     .. dseriesmethod:: fill_(name, v)
 
        |br| Assign the value ``v`` to the variable ``name`` in a
-       dseries object. If ``name`` is a character row array, it should
-       correspond to an existing variable within the dseries
+       ``dseries`` object. If ``name`` is a character row array, it should
+       correspond to an existing variable within the ``dseries``
        object. When ``v`` is a scalar, its value will be applied to
        all periods uniformly. If ``v`` is a vector, its length must
-       match the number of observations in the dseries object. You can
+       match the number of observations in the ``dseries`` object. You can
        invoke this method for a batch of variables by providing a
        :math:`1 \times n`
        cell array of character row arrays as the first argument. When

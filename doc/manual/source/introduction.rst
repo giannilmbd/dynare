@@ -63,8 +63,8 @@ to bear the concomitant performance loss.
 The development of Dynare is mainly done at `CEPREMAP`_ by a core team
 of researchers who devote part of their time to software
 development. Increasingly, the developer base is expanding, as
-tools developed by researchers outside of CEPREMAP are integrated into
-Dynare. Financial support is provided by CEPREMAP, Banque de France
+tools developed by researchers outside CEPREMAP are integrated into
+Dynare. Financial support is provided by CEPREMAP, Banque de France,
 and DSGE-net (an international research network for DSGE modeling).
 
 Interaction between developers and users of Dynare is central to the
@@ -92,7 +92,7 @@ Citing Dynare in your research
 ==============================
 
 You should cite Dynare if you use it in your research. The
-recommended way todo this is to cite the present manual, as:
+recommended way to do this is to cite the present manual, as:
 
     Stéphane Adjemian, Michel Juillard, Frédéric Karamé, Willi Mutschler,
     Johannes Pfeifer, Marco Ratto, Normann Rion and Sébastien Villemot (2024),

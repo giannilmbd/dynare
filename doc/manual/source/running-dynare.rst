@@ -35,7 +35,7 @@ by the ``dynare`` command.
     command line, following the name of the ``.mod`` file or in the
     first line of the ``.mod`` file itself (see below).
 
-    dynare begins by launching the preprocessor on the ``.mod
+    Dynare begins by launching the preprocessor on the ``.mod
     file``. By default (unless the :opt:`use_dll` option has been given to
     ``model``), the preprocessor creates three intermediary files:
 
@@ -75,8 +75,8 @@ by the ``dynare`` command.
         :ref:`aux-variables`). Outputs are the residuals of the static
         model equations in the order the equations were declared and
         the Jacobian of the static equations. Entry ``(i,j)`` of the
-        Jacobian represents the derivative of the ith static model
-        equation with respect to the jth model variable in declaration
+        Jacobian represents the derivative of the `i` -th static model
+        equation with respect to the `j` -th model variable in declaration
         order.
 
 
@@ -87,7 +87,7 @@ by the ``dynare`` command.
     ``+FILENAME/driver.m``. If a user needs to rerun the computing
     tasks without calling the preprocessor (or without calling the
     :mcomm:`dynare` command), for
-    instance because he has modified the script, he just have to type
+    instance because he has modified the script, he just has to type
     the following on the command line:
 
     .. code-block:: matlab
@@ -109,7 +109,7 @@ by the ``dynare`` command.
     .. note::
        Note on Quotes
 
-       When passing command line options that contains a space (or, under
+       When passing command line options that contain a space (or, under
        Octave, a double quote), you must surround the entire option (keyword
        and argument) with single quotes, as in the following example.
 
@@ -185,8 +185,8 @@ by the ``dynare`` command.
 
     .. option:: nolog
 
-        Instructs Dynare to no create a logfile of this run in
-        ``FILENAME.log.`` The default is to create the logfile.
+        Instructs Dynare to not create a log file of this run in
+        ``FILENAME.log.`` The default is to create the log file.
 
     .. option:: output=first|second|third
 
@@ -287,7 +287,7 @@ by the ``dynare`` command.
     .. option:: console
 
         Activate console mode. In addition to the behavior of
-        ``nodisplay``, Dynare will not use graphical waitbars for long
+        ``nodisplay``, Dynare will not use graphical wait bars for long
         computations.
 
     .. option:: nograph
@@ -302,12 +302,12 @@ by the ``dynare`` command.
 
     .. option:: nopathchange
 
-        By default Dynare will change MATLAB/Octave’s path if
+        By default, Dynare will change MATLAB/Octave’s path if
         ``dynare/matlab`` directory is not on top and if Dynare’s
-        routines are overriden by routines provided in other
+        routines are overridden by routines provided in other
         toolboxes. If one wishes to override Dynare’s routines, the
         ``nopathchange`` options can be used. Alternatively, the path
-        can be temporarly modified by the user at the top of the
+        can be temporarily modified by the user at the top of the
         ``.mod`` file (using MATLAB/Octave’s ``addpath`` command).
 
     .. option:: nopreprocessoroutput
@@ -364,7 +364,7 @@ by the ``dynare`` command.
         set ``parallel_use_psexec=false`` to use ``start``
         instead of ``psexec``, to properly allocate affinity when there are
         more than 32 cores in the local machine. This option is also helpful if
-        ``psexec`` cannot be executed due to missing admininstrator privileges. [default=true]
+        ``psexec`` cannot be executed due to missing administrator privileges. [default=true]
 
     .. option:: -DMACRO_VARIABLE[=MACRO_EXPRESSION]
 
@@ -375,12 +375,12 @@ by the ``dynare`` command.
         that an expression passed on the command line can reference variables
         defined before it. If ``MACRO_EXPRESSION`` is omitted, the variable is
         assigned the ``true`` logical value. Strings assigned to a macro variable
-        need to be enclosed in double quoted strings. This also allows for passing
+        need to be enclosed in double-quoted strings. This also allows for passing
         single quotes within the strings.
 
         *Example*
 
-        Call dynare with command line defines
+        Call Dynare with command line defines
 
             .. code-block:: matlab
 
@@ -391,7 +391,7 @@ by the ``dynare`` command.
         Defines a path to search for files to be included by the macro
         processor (using the ``@#include`` command). Multiple ``-I`` flags can
         be passed on the command line. The paths will be searched in the order
-        that the ``-I`` flags are passed and the first matching file will be
+        that the ``-I`` flags are passed, and the first matching file will be
         used. The flags passed here take priority over those passed to
         ``@#includepath``. See the :ref:`note on quotes<quote-note>` for info
         on passing a ``<<path>>`` argument containing spaces.
@@ -422,14 +422,14 @@ by the ``dynare`` command.
     .. option:: minimal_workspace
 
         Instructs Dynare not to write parameter assignments to
-        parameter names in the .m file produced by the
+        parameter names in the ``.m`` file produced by the
         preprocessor. This is potentially useful when running
         ``dynare`` on a large ``.mod`` file that runs into workspace
         size limitations imposed by MATLAB.
 
     .. option:: compute_xrefs
 
-        Tells Dynare to compute the equation cross references, writing
+        Tells Dynare to compute the equation cross-references, writing
         them to the output ``.m`` file.
 
     .. option:: stochastic
@@ -449,11 +449,11 @@ by the ``dynare`` command.
        equations, when `exclude_eqs` is passed, certain rules are followed for
        excluding endogenous variables. If the ``endogenous`` tag has been set
        for the excluded equation, the variable it specifies is
-       excluded. Otherwise, if the left hand side of the excluded equation is
+       excluded. Otherwise, if the left-hand side of the excluded equation is
        an expression that contains only one endogenous variable, that variable
        is excluded. If neither of these conditions hold, processing stops with
        an error. If an endogenous variable has been excluded by the
-       `exclude_eqs` option and it exists in an equation that has not been
+       `exclude_eqs` option, and it exists in an equation that has not been
        excluded, it is transformed into an exogenous variable.
 
        To specify which equations to exclude, you must pass the argument
@@ -596,7 +596,7 @@ by the ``dynare`` command.
 
     *Example*
 
-    Call dynare from the MATLAB or Octave prompt, without or with options:
+    Call Dynare from the MATLAB or Octave prompt, without or with options:
 
             .. code-block:: matlab
 
@@ -610,7 +610,7 @@ by the ``dynare`` command.
 
                // --+ options: savemacro, json=compute +--
 
-    and then dynare called without passing options on the command line:
+    and then call Dynare without passing options on the command line:
 
             .. code-block:: matlab
 
@@ -627,11 +627,11 @@ as MATLAB scripts. The script ``MODFILENAME/hooks/priorprocessing.m``
 is executed before the call to Dynare’s preprocessor, and can be used
 to programmatically transform the mod file that will be read by the
 preprocessor. The script ``MODFILENAME/hooks/postprocessing.m`` is
-gexecuted just after the call to Dynare’s preprocessor, and can be used
+executed just after the call to Dynare’s preprocessor, and can be used
 to programmatically transform the files generated by Dynare’s
 preprocessor before actual computations start. The pre and/or post
-dynare preprocessor hooks are executed if and only if the
-aforementioned scripts are detected in the same folder as the the
+Dynare preprocessor hooks are executed if and only if the
+aforementioned scripts are detected in the same folder as the
 model file, ``FILENAME.mod``.
 
 

@@ -22,11 +22,10 @@ user-specific configuration and ``/etc/xdg/dynare/dynare.ini`` for the
 system-wide configuration, the former having precedence over the latter). Under
 Windows, the configuration file is searched by default in
 ``%APPDATA%\dynare\dynare.ini`` (typically
-``c:\Users\USERNAME\AppData\Roaming\dynare\dynare.ini``). You can specify a non
-standard location using the ``conffile`` option of the ``dynare`` command (see
+``c:\Users\USERNAME\AppData\Roaming\dynare\dynare.ini``). You can specify a non-standard location using the ``conffile`` option of the ``dynare`` command (see
 :ref:`dyn-invoc`).
 
-The parsing of the configuration file is case-sensitive and it should
+The parsing of the configuration file is case-sensitive, and it should
 take the following form, with each option/choice pair placed on a
 newline::
 
@@ -48,7 +47,7 @@ conventions such as ``USER_NAME`` have been excluded for concision):
 
 ``DRIVE_NAME``
 
-    Indicates a valid drive name in Windows, without the trailing
+    Indicates a valid drive name on Windows, without the trailing
     colon (e.g. ``C``).
 
 ``PATH``
@@ -102,7 +101,7 @@ processing. Currently, there is only one option available.
 .. confblock:: [paths]
 
     |br| This block can be used to specify paths that will be used
-    when running dynare.
+    when running Dynare.
 
     *Options*
 
@@ -133,7 +132,7 @@ The parallelization is done by running several MATLAB or Octave
 processes, either on local or on remote machines. Communication
 between leader and follower processes are done through SMB on Windows and
 SSH on UNIX. Input and output data, and also some short status
-messages, are exchanged through network filesystems. Currently the
+messages, are exchanged through network file systems. Currently, the
 system works only with homogenous grids: only Windows or only Unix
 machines.
 
@@ -204,7 +203,7 @@ lines starting with a hashtag (#).
         the others (e.g. ``n1(2) n2(1) n3(3)`` means that ``n1`` is
         two times more powerful than ``n2`` whereas ``n3`` is three
         times more powerful than ``n2``). Each node is separated by at
-        least one space and the weights are in parenthesis with no
+        least one space and the weights are in parentheses with no
         spaces separating them from their node.
 
     *Example*
@@ -240,7 +239,7 @@ lines starting with a hashtag (#).
         to use (processor counting is defined to begin at one as
         opposed to zero). Note that using specific processors is only
         possible under Windows; under Linux and macOS, if a range is
-        passed the same number of processors will be used but the
+        passed the same number of processors will be used, but the
         range will be adjusted to begin at one.
 
     .. option:: ComputerName = COMPUTER_NAME
@@ -276,7 +275,7 @@ lines starting with a hashtag (#).
 
     .. option:: DynarePath = PATH
 
-        The path to the matlab subdirectory within the Dynare
+        The path to the ``matlab`` subdirectory within the Dynare
         installation directory. The default is the empty string.
 
     .. option:: MatlabOctavePath = PATH_AND_FILE
@@ -364,14 +363,14 @@ required unless parallel execution is confined to a local pool
 with the ``parallel_use_psexec=false`` option. 
 
     1. Write a configuration file containing the options you want. A
-       mimimum working example setting up a cluster consisting of two
+       minimum working example setting up a cluster consisting of two
        local CPU cores that allows for e.g. running two Monte Carlo
        Markov Chains in parallel is shown below.
-    2. Save the configuration file somwhere. The name and file ending
+    2. Save the configuration file somewhere. The name and file ending
        do not matter if you are providing it with the ``conffile``
        command line option. The only restrictions are that the path
        must be a valid filename, not contain non-alpha-numeric
-       characters, and not contain any whitespaces. For the
+       characters, and not contain any whitespace. For the
        configuration file to be accessible without providing an
        explicit path at the command line, you must save it under the
        name ``dynare.ini`` into your user account’s ``Application

@@ -12,7 +12,7 @@ academic papers for most of them. You should have these files in the
 Here is a short list of the examples included. For a more complete
 description, please refer to the comments inside the files themselves.
 
-perfect_foresight_rbc.mod``
+``perfect_foresight_rbc.mod``
 
     An elementary real business cycle (RBC) model, simulated in a
     perfect foresight setup.
@@ -37,7 +37,7 @@ perfect_foresight_rbc.mod``
 
 ``fs2000_nonstationary.mod``
 
-    The same model than ``fs2000.mod``, but written in non-stationary
+    The same model as ``fs2000.mod``, but written in non-stationary
     form. Detrending of the equations is done by Dynare.
 
 ``bkk.mod``
@@ -65,7 +65,7 @@ perfect_foresight_rbc.mod``
 ``Occbin_example.mod``
 
     RBC model with two occasionally binding constraints. Demonstrates
-    how to set up Occbin.
+    how to set up OccBin.
 
 ``Ramsey_Example.mod``
 

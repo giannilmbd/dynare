@@ -121,7 +121,7 @@ to this rule might yield hard-to-debug error messages or
 crashes. Second, when employing user-defined steady state files it is 
 recommended to avoid using the name of MATLAB functions as this may cause 
 conflicts. In particular, when working with user-defined steady state files, do not
-use correctly-spelled greek names like ``alpha``, because there are
+use correctly-spelled Greek names like ``alpha``, because there are
 MATLAB functions of the same name. Rather go for ``alppha`` or
 ``alph``. Lastly, please do not name a variable or parameter
 ``i``. This may interfere with the imaginary number i and the index in
@@ -161,7 +161,7 @@ for declaring variables and parameters are described below.
         the corresponding endogenous variable(s). For example, given a
         ``var(log) y`` statement, two endogenous will be created (``y`` and
         ``LOG_y``), and an auxiliary equation linking the two will also be
-        added (equal to ``LOG_y = log(y)``). Moreover, every occurence of ``y``
+        added (equal to ``LOG_y = log(y)``). Moreover, every occurrence of ``y``
         in the model will be replaced by ``exp(LOG_y)``. This option is for
         example useful when one wants to perform a loglinear approximation of
         some variable(s) in the context of a first-order stochastic
@@ -587,7 +587,7 @@ when doing a simulation, or are the estimated variables when doing an
 estimation.
 
 Variables used in a MODEL_EXPRESSION denote current period values when
-neither a lead or a lag is given. A lead or a lag can be given by
+neither a lead nor a lag is given. A lead or a lag can be given by
 enclosing an integer between parenthesis just after the variable name:
 a positive integer means a lead, a negative one means a lag. Leads or
 lags of more than one period are allowed. For example, if ``c`` is an
@@ -653,7 +653,7 @@ not in EXPRESSION):
     .. warning::
 
         The concept of a steady state is ambiguous in a perfect foresight
-        context with permament and potentially anticipated shocks occuring.
+        context with permanent and potentially anticipated shocks occurring.
         Dynare will use the contents of ``oo_.steady_state`` as its reference
         for calls to the ``STEADY_STATE()`` operator. In the presence of
         ``endval``, this implies that the terminal state provided by the
@@ -661,7 +661,7 @@ not in EXPRESSION):
         is followed by ``steady``) or simply the terminal state provided by the
         user (if ``endval`` is not followed by ``steady``). Put differently,
         Dynare will not automatically compute the steady state conditional on
-        the specificed value of the exogenous variables in the respective periods.
+        the specified value of the exogenous variables in the respective periods.
 
 .. operator:: EXPECTATION (INTEGER) (MODEL_EXPRESSION)
 
@@ -718,7 +718,7 @@ MODEL_EXPRESSION and EXPRESSION:
                   \end{cases}
 
 
-    Note that this function is not continuous, hence not  differentiable, at
+    Note that this function is not continuous, hence not differentiable, at
     :math:`x=0`. However, for facilitating convergence of Newton-type
     methods, Dynare assumes that the derivative at :math:`x=0` is
     equal to :math:`0`. This assumption comes from the observation
@@ -734,7 +734,7 @@ MODEL_EXPRESSION and EXPRESSION:
     :math:`x=0`. However, for facilitating convergence of Newton-type
     methods, Dynare assumes that the derivative at :math:`x=0` is
     equal to :math:`0` (even if the derivative does not exist). The
-    rational for this mathematically unfounded definition, rely on the
+    rationale for this mathematically unfounded definition, rely on the
     observation that the derivative of :math:`\mathrm{abs}(x)` is equal to
     :math:`\mathrm{sign}(x)` for any :math:`x\neq 0` in :math:`\mathbb R` and
     from the convention for the value of :math:`\mathrm{sign}(x)` at
@@ -806,7 +806,7 @@ function has a scalar argument as a return value.
 
 To use an external function in a MODEL_EXPRESSION, one must declare
 the function using the ``external_function`` statement. This is not
-required for external functions used in an EXPRESSION outside of a
+required for external functions used in an EXPRESSION outside a
 ``model`` block or ``steady_state_model`` block.
 
 .. command:: external_function (OPTIONS...);
@@ -954,7 +954,7 @@ The model is declared inside a ``model`` block:
         MODEL_EXPRESSION = MODEL_EXPRESSION;
 
     |br| When the equations are written in homogenous form, it is possible
-    to omit the ‘=0’ part and write only the left hand side of the
+    to omit the ‘=0’ part and write only the left-hand side of the
     equation. A homogenous equation looks like:
 
         MODEL_EXPRESSION;
@@ -990,7 +990,7 @@ The model is declared inside a ``model`` block:
 
     |br| It is possible to tag equations written in the model block. A tag
     can serve different purposes by allowing the user to attach
-    arbitrary informations to each equation and to recover them at
+    arbitrary information to each equation and to recover them at
     runtime. For instance, it is possible to name the equations with a
     ``name`` tag, using a syntax like::
 
@@ -1059,7 +1059,7 @@ The model is declared inside a ``model`` block:
 
     .. option:: cutoff = DOUBLE
 
-        Threshold under which a jacobian element is considered as null
+        Threshold under which a Jacobian element is considered as null
         during the model normalization. Only available with option
         ``block``. Default: ``1e-15``
 
@@ -1084,7 +1084,7 @@ The model is declared inside a ``model`` block:
 
         ``2``
 
-            In addition of variables with ``mfs = 1`` the endogenous
+            In addition to variables with ``mfs = 1``. the endogenous
             variables related to linear equations which could be
             normalized are potential recursive variables. All the
             other variables are forced to belong to the set of
@@ -1092,7 +1092,7 @@ The model is declared inside a ``model`` block:
 
         ``3``
 
-            In addition of variables with ``mfs = 2`` the endogenous
+            In addition to variables with ``mfs = 2``, the endogenous
             variables related to non-linear equations which could be
             normalized are potential recursive variables. All the
             other variables are forced to belong to the set of
@@ -1127,7 +1127,7 @@ The model is declared inside a ``model`` block:
         there is a list, the transformation is restricted to
         endogenous with a lead that also appear in the list.
 
-        This option can useful for some deterministic simulations
+        This option can be useful for some deterministic simulations
         where convergence is hard to obtain. Bad values for terminal
         conditions in the case of very persistent dynamics or
         permanent shocks can hinder correct solutions or any
@@ -1212,7 +1212,7 @@ The model is declared inside a ``model`` block:
     has all these tags with the corresponding values.
 
     Each removed equation must either have an ``endogenous`` tag, or have a
-    left hand side containing a single endogenous variable. The corresponding
+    left-hand side containing a single endogenous variable. The corresponding
     endogenous variable will be either turned into an exogenous (if it is still
     used in somewhere in the model at that point), otherwise it will be removed
     from the model.
@@ -1369,7 +1369,7 @@ equations using the ``write_latex_static_model`` command.
     plain text names will be used.
 
     Note that the model written in the TeX file will differ from the
-    model declared by the user in the some dimensions (see
+    model declared by the user in some dimensions (see
     :comm:`write_latex_dynamic_model` for details).
 
     Also note that this command will not output the contents of the
@@ -1593,8 +1593,8 @@ in this case ``initval`` is used to specify the terminal conditions.
     stochastic variables, since it is the only possible value.
 
     The subsequently computed steady state (not the initial values,
-    use histval for this) will be used as the initial condition at all
-    the periods preceeding the first simulation period for the three
+    use ``histval`` for this) will be used as the initial condition at all
+    the periods preceding the first simulation period for the three
     possible types of simulations in stochastic mode:
 
         * :comm:`stoch_simul`, if the ``periods`` option is specified.
@@ -1904,7 +1904,7 @@ in this case ``initval`` is used to specify the terminal conditions.
         conditions for the two lags of the endogenous variable ``x``,
         stored in the first column of ``oo_.endo_simul``. The
         ``initval`` block is used to set the terminal condition for
-        the forward looking variable ``c``, stored in the last column
+        the forward-looking variable ``c``, stored in the last column
         of ``oo_.endo_simul``. Moreover, the ``initval`` block defines
         the starting values for the perfect foresight solver for both
         endogenous variables ``c`` and ``x``.
@@ -2061,7 +2061,7 @@ in this case ``initval`` is used to specify the terminal conditions.
 
 	The observation number in the file or the date (see
 	:ref:`dates <dates-members>`) at which the simulation (or the forecast) is
-	ending. This option avoids to have to compute the maximum
+	ending. This option avoids having to compute the maximum
 	number of leads in the model.
 
     .. option:: last_obs = {INTEGER | DATE}
@@ -2105,7 +2105,7 @@ in this case ``initval`` is used to specify the terminal conditions.
 	The initial and terminal values are taken from file
 	``mydata.csv`` (nothing guarantees that these vales are the
 	steady state of the model). The guess value for the
-	trajectories are also taken from the file. The file must
+	trajectories is also taken from the file. The file must
 	contain at least 203 observations of variables ``c``, ``x``
 	and ``e``. If there are more than 203 observations available
 	in the file, the first 203 are used by
@@ -2228,7 +2228,7 @@ in this case ``initval`` is used to specify the terminal conditions.
 	    perfect_foresight_solver;
 
 	The initial and terminal values are taken from file
-	``mydata.csv``. The first 212 observations are loaded and the
+	``mydata.csv``. The first 212 observations are loaded, and the
 	first 203 observations will be used by
 	``perfect_foresight_setup(periods=200)``.
 
@@ -2327,7 +2327,7 @@ in this case ``initval`` is used to specify the terminal conditions.
 
 	The observation number in the file or the date (see
 	:ref:`dates-members`) at which the simulation (or the forecast) is
-	starting. This option avoids to have to compute the maximum
+	starting. This option avoids having to compute the maximum
 	number of lags in the model.  The observation corresponding to
 	the first period of simulation doesn’t need to exist in the
 	file as the only dates necessary for initialization are before
@@ -2685,8 +2685,7 @@ blocks.
 
     |br| *In stochastic context*
 
-    For stochastic simulations, the ``shocks`` block specifies the non
-    zero elements of the covariance matrix and coskewnes tensor of the
+    For stochastic simulations, the ``shocks`` block specifies the non-zero elements of the covariance matrix and coskewnes tensor of the
     shocks of exogenous variables.
 
     You can use the following types of entries in the block:
@@ -2891,7 +2890,7 @@ blocks.
 
 .. matcomm:: set_shock_stderr_value ('EXOGENOUS_NAME', MATLAB_EXPRESSION);
 
-   |br| Sets the standard deviation of an exgonous variable. This does
+   |br| Sets the standard deviation of an exogenous variable. This does
    essentially the same as setting the standard error via a ``shocks`` block,
    except that it accepts arbitrary MATLAB/Octave expressions, and that it
    works from MATLAB/Octave scripts.
@@ -2927,7 +2926,7 @@ steady state using a nonlinear Newton-type solver; this should work
 for most models, and is relatively simple to use. The second way is to
 give more guidance to Dynare, using your knowledge of the model, by
 providing it with a method to compute the steady state, either using a
-`steady_state_model` block or writing matlab routine.
+`steady_state_model` block or writing a MATLAB routine.
 
 
 Finding the steady state with Dynare nonlinear solver
@@ -3225,7 +3224,7 @@ After computation, the steady state is available in the following variable:
     authors) is to subdivide the problem of finding the steady state
     into smaller problems. It assumes that you know how to compute the
     steady state for a given set of parameters, and it helps you
-    finding the steady state for another set of parameters, by
+    to find the steady state for another set of parameters, by
     incrementally moving from one to another set of parameters.
 
     The purpose of the ``homotopy_setup`` block is to declare the
@@ -3244,7 +3243,7 @@ After computation, the steady state is available in the following variable:
 
     Here only the final value is specified for a given
     parameter/exogenous; the initial value is taken from the
-    preceeding ``initval`` block (or from the preceeding ``endval`` block if
+    preceding ``initval`` block (or from the preceding ``endval`` block if
     there is one before the ``homotopy_setup`` block).
 
     A necessary condition for a successful homotopy is that Dynare
@@ -3319,7 +3318,7 @@ using ``steady``. Again, there are two options for doing that:
   * You can write the corresponding MATLAB function by hand. If your
     ``.mod`` file is called ``FILENAME.mod``, the steady state file must be
     called ``FILENAME_steadystate.m``. See
-    ``NK_baseline_steadystate.m`` in the examples directory for an
+    ``NK_baseline_steadystate.m`` in the ``examples`` directory for an
     example. This option gives a bit more flexibility (loops and
     conditional structures can be used), at the expense of a heavier
     programming burden and a lesser efficiency.
@@ -3355,7 +3354,7 @@ parameters with new values as it will lead to wrong results.
         VARIABLE_NAME = EXPRESSION;
 
     Note that it is also possible to assign several variables at the
-    same time, if the main function in the right hand side is a
+    same time, if the main function in the right-hand side is a
     MATLAB/Octave function returning several arguments::
 
         [ VARIABLE_NAME, VARIABLE_NAME... ] = EXPRESSION;
@@ -3475,8 +3474,7 @@ Getting information about the model
 
     A necessary condition for the uniqueness of a stable equilibrium
     in the neighborhood of the steady state is that there are as many
-    eigenvalues larger than one in modulus as there are forward
-    looking variables in the system. An additional rank condition
+    eigenvalues larger than one in modulus as there are forward-looking variables in the system. An additional rank condition
     requires that the square submatrix of the right Schur vectors
     corresponding to the forward looking variables (jumpers) and to
     the explosive eigenvalues must have full rank.
@@ -4386,7 +4384,7 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
 
     |br| The ``shocks(learnt_in=INTEGER|DATE)`` syntax can be used to specify temporary
     shocks that are learnt in a specific period. It should contain one or more
-    occurences of the following group of three lines, with the same semantics
+    occurrences of the following group of three lines, with the same semantics
     as a regular :bck:`shocks` block::
 
       var VARIABLE_NAME;
@@ -4477,7 +4475,7 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     the exogenous variable (using an equal symbol, as in a regular
     :bck:`endval` blocks without the ``learnt_in`` option). But it is also
     possible to express the terminal condition as an addition to the value
-    expected from the perspective of the previous previous period (using the
+    expected from the perspective of the previous period (using the
     ``+=`` operator), or as a multiplicative factor over that previously
     expected value (using the ``*=`` operator).
 
@@ -4524,7 +4522,7 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
 
     |br| The ``mshocks(learnt_in=INTEGER|DATE)`` syntax can be used to specify temporary
     shocks that are learnt in a specific period, specified in a multiplicative
-    way. It should contain one or more occurences of the following group of
+    way. It should contain one or more occurrences of the following group of
     three lines, with the same semantics as a regular :bck:`mshocks` block::
 
       var VARIABLE_NAME;
@@ -4742,7 +4740,7 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
     of the model.
 
     Note that ``perfect_foresight_with_expectation_errors_setup`` must be
-    called before this command, in order to setup the environment for the
+    called before this command, in order to set up the environment for the
     simulation.
 
     *Options*
@@ -4970,8 +4968,7 @@ Computing the stochastic solution
     perturbation techniques.
 
     More precisely, ``stoch_simul`` computes a Taylor approximation of
-    the model around the deterministic steady state and solves of the
-    the decision and transition functions for the approximated
+    the model around the deterministic steady state and solves the decision and transition functions for the approximated
     model. Using this, it computes impulse response functions and
     various descriptive statistics (moments, variance decomposition,
     correlation and autocorrelation coefficients). For correlated
@@ -5017,7 +5014,7 @@ Computing the stochastic solution
 
     .. option:: drop = INTEGER
 
-       Number of points (burnin) dropped at the beginning of
+       Number of points (burn-in) dropped at the beginning of
        simulation before computing the summary statistics. Note that
        this option does not affect the simulated series stored in
        ``oo_.endo_simul`` and the workspace. Here, no periods are
@@ -5033,7 +5030,7 @@ Computing the stochastic solution
     .. option:: one_sided_hp_filter = DOUBLE
 
        Uses the one-sided HP filter with :math:`\lambda =` ``DOUBLE``
-       described in  :cite:t:`Stock:1999` before computing
+       described in :cite:t:`Stock:1999` before computing
        moments. This option is only available with simulated
        moments. Default: no filter.
 
@@ -5168,7 +5165,7 @@ Computing the stochastic solution
     .. option:: order = INTEGER
 
        Order of Taylor approximation. Note that for third order and above, the
-       ``k_order_solver`` option is implied and only empirical moments are
+       ``k_order_solver`` option is implied, and only empirical moments are
        available (you must provide a value for ``periods`` option). Default:
        ``2`` (except after an ``estimation`` command, in which case the default
        is the value used for the estimation).
@@ -5283,7 +5280,7 @@ Computing the stochastic solution
        command. Note that if ``varobs`` is not present or contains all
        endogenous variables, then this is the full information case
        and this option has no effect. More references can be found
-       `here <https://archives.dynare.org/DynareWiki/PartialInformation>`__ .
+       `here <https://archives.dynare.org/DynareWiki/PartialInformation>`__.
 
 
     .. option:: dr = OPTION
@@ -5436,7 +5433,7 @@ Computing the stochastic solution
     |br| After a run of ``stoch_simul``, contains the
     variance-covariance of the endogenous variables. Contains
     theoretical variance if the ``periods`` option is not present and simulated variance
-    otherwise. Only available for ``order<4``. At ``order=2`` it will be be
+    otherwise. Only available for ``order<4``. At ``order=2`` it will be
     a second-order accurate approximation (i.e. ignoring terms of order 3 and 4 that would
     arise when using the full second-order policy function). At ``order=3``, theoretical moments
     are only available with ``pruning``. The variables are arranged in declaration order.
@@ -5467,18 +5464,17 @@ Computing the stochastic solution
     autocorrelation. The option ar specifies the number of
     autocorrelation matrices available. Contains theoretical
     autocorrelations if the ``periods`` option is not present and simulated
-    autocorrelations otherwise. Only available for ``order<4``. At ``order=2`` it will be be
+    autocorrelations otherwise. Only available for ``order<4``. At ``order=2`` it will be
     a second-order accurate approximation. At ``order=3``, theoretical moments
     are only available with ``pruning``.  The field is only created if
     stationary variables are present.
 
-    The element ``oo_.autocorr{i}(k,l)`` is equal to the correlation
-    between :math:`y^k_t` and :math:`y^l_{t-i}`, where :math:`y^k`
+    The element ``oo_.autocorr{i}(k,l)`` is equal to the correlation between :math:`y^k_t` and :math:`y^l_{t-i}`, where :math:`y^k`
     (resp. :math:`y^l`) is the :math:`k`-th (resp. :math:`l`-th)
     endogenous variable in the declaration order.
 
     Note that if theoretical moments have been requested,
-    ``oo_.autocorr{i}`` is the same than ``oo_.gamma_y{i+1}``.
+    ``oo_.autocorr{i}`` is the same as ``oo_.gamma_y{i+1}``.
 
 .. matvar:: oo_.gamma_y
 
@@ -5554,7 +5550,7 @@ Computing the stochastic solution
     corresponds to the exogenous variables (in the order of
     declaration). In the presence of measurement error, the field will
     contain the variance contribution after measurement error has been
-    taken out, *i.e.* the decomposition will be conductedof the actual
+    taken out, *i.e.* the decomposition will be conducted of the actual
     as opposed to the measured variables.
 
 .. matvar:: oo_.conditional_variance_decomposition_ME
@@ -5654,7 +5650,7 @@ which is described below.
 
     .. option:: order = INTEGER
 
-       If order is greater than ``0`` Dynare uses a gaussian
+       If order is greater than ``0`` Dynare uses a Gaussian
        quadrature to take into account the effects of future
        uncertainty; this is called *stochastic* extended path, see :cite:t:`Adjemian:2025`. If ``order`` :math:`=S` then the time series for
        the endogenous variables are generated by assuming that the
@@ -5673,7 +5669,7 @@ which is described below.
     .. option:: lmmcp
 
        Solves the perfect foresight model with a Levenberg-Marquardt
-       mixed complementarity problem (LMMCP) solver :cite:p:`kanzow/petra:2004`, which allows to consider inequality constraints on
+       mixed complementarity problem (LMMCP) solver :cite:p:`kanzow/petra:2004`, which allows considering inequality constraints on
        the endogenous variables (such as a ZLB on the nominal interest
        rate or a model with irreversible investment). For specifying the
        necessary complementarity conditions, see :opt:`lmmcp`.
@@ -5748,7 +5744,7 @@ according to the declaration order.
 
 .. matvar:: oo_.dr.order_var
 
-       This variables maps DR-order to declaration order.
+       This variable maps DR-order to declaration order.
 
 .. matvar:: oo_.dr.inv_order_var
 
@@ -5813,7 +5809,7 @@ way Dynare deals with differences between declaration and DR-order, is
 
 where :math:`\mathrm{k2}` selects the state variables, :math:`y_t` and
 :math:`y^s` are in declaration order and the coefficient matrices are
-in DR-order. Effectively, all variables on the right hand side are
+in DR-order. Effectively, all variables on the right-hand side are
 brought into DR order for computations and then assigned to
 :math:`y_t` in declaration order.
 
@@ -5927,7 +5923,7 @@ multidimensional indices of state variables, in such a way that symmetric
 elements are never repeated (for more details, see the description of
 ``oo_.dr.g_3`` in the third-order case).
 
-Occasionally binding constraints (OCCBIN)
+Occasionally binding constraints (OccBin)
 =========================================
 
 Dynare allows simulating models with up to two occasionally-binding constraints by
@@ -5940,7 +5936,7 @@ occasionally-binding constraints requires
 #. defining and naming the occasionally-binding constraints using an ``occbin_constraints`` block
 #. specifying the model equations for the respective regimes in the ``model`` block using appropriate equation tags.
 #. potentially specifying a sequence of surprise shocks using a ``shocks(surprise)`` block
-#. setting up Occbin simulations or estimation with ``occbin_setup``
+#. setting up OccBin simulations or estimation with ``occbin_setup``
 #. triggering a simulation with ``occbin_solver`` or running ``estimation`` or ``calib_smoother``.
 
 All of these elements are discussed in the following.
@@ -5976,16 +5972,16 @@ All of these elements are discussed in the following.
     First, feasible expressions may only contain contemporaneous endogenous variables.
     If you want to include leads/lags or exogenous variables, you need to define
     an auxiliary variable. Second, Dynare will at the current stage not linearly
-    approximate the entered expressions. Because Occbin will work with a linearized
+    approximate the entered expressions. Because OccBin will work with a linearized
     model, consistency will often require the user to enter a linearized constraint.
     Otherwise, the condition employed for checking constraint violations may differ
     from the one employed within model simulations based on the piecewise-linear
-    model solution. Third, in contrast to the original Occbin replication codes, the
+    model solution. Third, in contrast to the original OccBin replication codes, the
     variables used in expressions are not automatically demeaned, i.e. they refer to
     the levels, not deviations from the steady state. To access the steady state
     level of a variable, the ``STEADY_STATE()`` operator can be used.
 
-    Finally, it's worth keeping in mind that for each simulation period, Occbin will check 
+    Finally, it's worth keeping in mind that for each simulation period, OccBin will check 
     the respective conditions for whether the current regime should be left. Small numerical 
     differences from the cutoff point for a regime can sometimes lead to oscillations between
     regimes and cause a spurious periodic solution. Such cases may be prevented by introducing 
@@ -6000,7 +5996,7 @@ All of these elements are discussed in the following.
     The ``error_bind`` and ``error_relax`` options are optional and allow specifying
     numerical criteria for the size of the respective constraint violations employed
     in numerical routines. By default, Dynare will simply use the absolute value of
-    the ``bind`` and ``relax`` inequalities. But occasionnally, user-specified
+    the ``bind`` and ``relax`` inequalities. But occasionally, user-specified
     expressions perform better.
 
     *Example*
@@ -6119,8 +6115,8 @@ All of these elements are discussed in the following.
     evaluation and the smoother, while also accounting for ``heteroskedastic_shocks`` using the
     ``heteroskedastic_filter`` option.
 
-    Be aware that Occbin has largely command-specific options, i.e. there are separate
-    options to control the behavior of Occbin when called by the smoother or when
+    Be aware that OccBin has largely command-specific options, i.e. there are separate
+    options to control the behavior of OccBin when called by the smoother or when
     computing the likelihood. These latter commands will not inherit the options
     potentially previously set for simulations.
 
@@ -6138,7 +6134,7 @@ All of these elements are discussed in the following.
     .. option:: simul_check_ahead_periods = INTEGER
 
        Number of periods for which to check ahead for return to the baseline regime.
-       This number should be chosen large enough, because Occbin requires the simulation
+       This number should be chosen large enough, because OccBin requires the simulation
        to return to the baseline regime at the end of time. Default: 200.
 
     .. option:: simul_reset_check_ahead_periods
@@ -8824,6 +8820,7 @@ Non-linear filter options
            ``gmf``
 
                Gaussian mixture filter of the :cite:t:`Kotecha:2003:Sum` type.
+               
            ``cpf``
 
                Conditional particle filter of the :cite:t:`Ionides:2003` type as used in, e.g., :cite:t:`Amisano:2010`.
@@ -9843,7 +9840,7 @@ conditions fits the data sufficiently well. If the null hypothesis of a
 or selection of orthogonality conditions.
 
 In case the (presumed) global minimum of the moment distance function is
-located  in a region of the parameter space that
+located in a region of the parameter space that
 is typically considered unlikely (`dilemma of absurd parameters`), you may
 opt to choose the :opt:`penalized_estimator <penalized_estimator>` option.
 Similar to adding priors to the likelihood, this option incorporates prior
@@ -9857,7 +9854,7 @@ adding prior information comes at the cost of a loss in efficiency of the estima
 
 Dynare employs a user-specified `simulation_method` to compute the impulse response function (IRF)
 for observable variables with respect to the structural shocks.
-Currently, only stochastic simulations based on the perturbation method are supported
+Currently, only stochastic simulations based on the perturbation method are supported,
 and it is advised to fine-tune the perturbation approximation as much as possible for optimal results
 (see :ref:`stoch-sol-simul` for guidance).
 
@@ -12298,7 +12295,7 @@ If the model contains strong non-linearities or if some perfectly
 expected shocks are considered, the forecasts and the conditional
 forecasts can be computed using an extended path method. The forecast
 scenario describing the shocks and/or the constrained paths on some
-endogenous variables should be build. The first step is the forecast
+endogenous variables should be built. The first step is the forecast
 scenario initialization using the function ``init_plan``:
 
 .. matcomm:: HANDLE = init_plan (DATES);
@@ -12309,7 +12306,7 @@ scenario initialization using the function ``init_plan``:
     forecast scenario.
 
 The forecast scenario can contain some simple shocks on the exogenous
-variables. This shocks are described using the function
+variables. These shocks are described using the function
 ``basic_plan``:
 
 .. matcomm:: HANDLE = basic_plan (HANDLE, 'VAR_NAME', 'SHOCK_TYPE', DATES, MATLAB VECTOR OF DOUBLE);
@@ -13934,7 +13931,7 @@ hereafter) are stored in separate directories named as:
     * ``<namendo>_vs_<namexo>``, for entries of the matrix of the shocks.
 
 The following files are stored in each directory (we stick with prior
-sample but similar conventions are used for MC samples):
+sample, but similar conventions are used for MC samples):
 
     * ``<mod_file>_prior_<namendo>_vs_<namexo>.fig``: histogram and
       CDF plot of the MC sample of the individual entry of the shock
@@ -15657,7 +15654,7 @@ be a linear combination of the scalar variables in
 :math:`y_t = \alpha'\mathcal{Y}_t` (:math:`\alpha` is a selection
 vector if :math:`y_t` is a variable in :math:`\mathcal{Y}_t`, *i.e.* a
 column of an identity matrix, or an arbitrary vector defining the
-weights of a linear combination). Then the best prediction, in the sense of the minimisation of the RMSE, for
+weights of a linear combination). Then the best prediction, in the sense of the minimization of the RMSE, for
 :math:`y_{t+h}` given the information set at :math:`t-\tau` (which we assume to include all observables
 up to time :math:`t-\tau`, :math:`\mathcal{Y}_{\underline{t-\tau}}`) is:
 
@@ -15764,7 +15761,7 @@ Finite discounted sums can also be considered.
 
 .. matcomm::  var_expectation.initialize(NAME_OF_VAR_EXPECTATION_MODEL);
 
-  |br| Initialise the ``var_expectation_model`` by building the companion matrix
+  |br| Initialize the ``var_expectation_model`` by building the companion matrix
   of the associated auxiliary ``var_model``. Needs to be executed before attempts to simulate or
   estimate the model.
 
@@ -15804,7 +15801,7 @@ and (*iii*) the expected changes in the target :math:`y^{\star}`:
       \Delta y_t = a_0(y_{t-1}^{\star}-y_{t-1}) + \sum_{i=1}^{m-1} a_i \Delta y_{t-i} + \sum_{i=0}^{\infty} d_i \Delta y^{\star}_{t+i}  +\varepsilon_t
 
 :cite:t:`Brayton:2000` shows how such an equation can be derived from the
-minimisation of a quadratic cost function penalising expected deviations from
+minimization of a quadratic cost function penalizing expected deviations from
 the target and non-smoothness of :math:`y`, where future costs are discounted
 (with discount factor :math:`\beta`). They also show that the parameters
 :math:`(d_i)_{i\in\mathbb N}` are non-linear functions of the :math:`m`
@@ -15828,16 +15825,16 @@ are in logs) we must have:
 
 
 Unless additional restrictions are placed on the coefficients
-:math:`(a_i)_{i=0}^{m-1}`, i.e. on the form of the minimised cost function, there is
+:math:`(a_i)_{i=0}^{m-1}`, i.e. on the form of the minimized cost function, there is
 no reason for the right-hand side to be zero. Instead, we can optionally add the
-right hand side to the PAC equation, to ensure that the error correction term is
+right-hand side to the PAC equation, to ensure that the error correction term is
 asymptotically zero.
 
-The PAC equations can be generalised by adding exogenous variables. This can be
-done in two, non exclusive, manners. We can replace the PAC equation by a convex
-combination of the original PAC equation (derived from an optimisation program)
+The PAC equations can be generalized by adding exogenous variables. This can be
+done in two, non-exclusive, manners. We can replace the PAC equation by a convex
+combination of the original PAC equation (derived from an optimization program)
 and a linear expression involving exogenous variables (referred as the rule of thumb part as
-opposed to the part derived from the minimisation of a cost function; not to be confused with
+opposed to the part derived from the minimization of a cost function; not to be confused with
 exogenous shocks):
 
   .. math ::
@@ -15918,7 +15915,7 @@ simply add the exogenous variables to the PAC equation (without the weight
 
 
 The PAC equation target can be composite and defined as a weighted sum
-of stationary and non stationary components. Such a target requires an
+of stationary and non-stationary components. Such a target requires an
 additional equation in the model block, with the target variable on
 the left hand-side and the components in the right hand-side. Each
 component must be an endogenous variable in the auxiliary model. The
@@ -15928,7 +15925,7 @@ characteristics of each component must be described in the
 correction term of the PAC equation to link the target to the provided
 description. Note that composite targets make only sense if the
 auxiliary model is not a trend component model (where all the
-variables are non stationary).
+variables are non-stationary).
 
 .. block:: pac_target_info (NAME_OF_PAC_MODEL);
 
@@ -15947,8 +15944,8 @@ variables are non stationary).
    associated equation is not part of the auxiliary model but all the
    components (the variables on the right hand-side) must be defined
    in the auxiliary model. Next, the following line declares the name
-   of the auxilary variable that will appear in the error correction
-   term, this variable contains only the non stationary components of
+   of the auxiliary variable that will appear in the error correction
+   term, this variable contains only the non-stationary components of
    the target::
 
      auxname_target_nonstationary NAME ;
@@ -15996,14 +15993,14 @@ variables are non stationary).
 
    |br| This operator is only required in presence of a composite
    target in the PAC equation. The operator, used in the error
-   correction term of the PAC equation, selects the non stationary
+   correction term of the PAC equation, selects the non-stationary
    components of the target.
 
 
 .. matcomm::  pac.initialize(NAME_OF_PAC_MODEL);
 .. matcomm::  pac.update(NAME_OF_PAC_MODEL);
 
-  |br| Same as in the previous section for the VAR expectations, initialise the
+  |br| Same as in the previous section for the VAR expectations, initialize the
   PAC model, by building the companion matrix of the auxiliary model, and
   computes the reduced form parameters of the PAC equation (the weights in the
   linear combination of the variables involved in the companion representation
@@ -16127,7 +16124,7 @@ of the auxiliary model.
               `varexo`) must also be a member of ``DATA``,
               but filled with ``NaN`` values. ``RANGE`` is a ``dates`` object
               defining the time span of the sample. ``ALGO`` is a row char array
-              used to select the method (or minimisation algorithm) for NLS.
+              used to select the method (or minimization algorithm) for NLS.
               Possible values are : ``'fmincon'``, ``'fminunc'``,
               ``'fminsearch'``, ``'lsqnonlin'``, ``'particleswarm'``,
               ``'csminwel'``, ``'simplex'``, ``'annealing'``, and
@@ -16237,7 +16234,7 @@ produce no output, but give instructions to the macro processor. In most cases,
 directives occupy exactly one line of text. If needed, two backslashes (``\\``)
 at the end of the line indicate that the directive is continued on the next
 line. Macro directives following ``//`` are not interpreted by the macro
-processor. For historical reasons, directives in commented blocks, *ie*
+processor. For historical reasons, directives in commented blocks, *i.e.*
 surrounded by ``/*`` and ``*/``, are interpreted by the macro processor. The
 user should not rely on this behavior. The main directives are:
 
@@ -16250,7 +16247,7 @@ user should not rely on this behavior. The main directives are:
 The macro processor maintains its own list of variables (distinct from model
 variables and MATLAB/Octave variables). These macro-variables are assigned
 using the ``@#define`` directive and can be of the following basic types:
-boolean, real, string, tuple, function, and array (of any of the previous
+boolean, real, string, tuple, function, and array (of the previous
 types).
 
 
@@ -16278,7 +16275,7 @@ operators.
 
 .. rubric:: Boolean
 
-The following operators can be used on booleans:
+The following operators can be used on Booleans:
 
     * Comparison operators: ``==``, ``!=``
     * Logical operators: ``&&``, ``||``, ``!``
@@ -16827,7 +16824,7 @@ After macro processing, this is equivalent to::
 Multi-country models
 ^^^^^^^^^^^^^^^^^^^^
 
-Here is a bare bones example for a multi-country model::
+Here is a bare-bones example for a multi-country model::
 
     @#define countries = [ "US", "EA", "AS", "JP", "RC" ]
     @#define nth_co = "US"
@@ -16872,7 +16869,7 @@ In the model, :math:`\alpha` is a (share) parameter and :math:`lab\_rat_t` is an
 endogenous variable.
 
 It is clear that setting a value for :math:`\alpha` is not straightforward. But 
-we have real world data for :math:`lab\_rat_t` and it
+we have real world data for :math:`lab\_rat_t`, and it
 is clear that these two objects are economically linked.
 
 The solution is to use a method called *variable flipping*, which
