@@ -10,7 +10,7 @@ function k = commutation(n, m, sparseflag)
 %   sparseflag: [integer] whether to use sparse matrices (=1) or not (else)
 % -------------------------------------------------------------------------
 % OUTPUTS
-%   k:          [n by m] commutation matrix
+%   k:          [n*m by n*m] commutation matrix
 % -------------------------------------------------------------------------
 % This function is called by
 %   * get_perturbation_params_derivs.m (previously getH.m)
@@ -21,7 +21,7 @@ function k = commutation(n, m, sparseflag)
 %   * vec (embedded)
 % =========================================================================
 % Copyright © 1997 Tom Minka <minka@microsoft.com>
-% Copyright © 2019-2020 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
