@@ -117,10 +117,20 @@ module matlab_mat
        type(c_ptr), intent(in), value :: pm
      end function mxIsComplex
 
+     pure integer(c_size_t) function mxGetNumberOfDimensions(pm) bind(c, name="mxGetNumberOfDimensions"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: pm
+     end function mxGetNumberOfDimensions
+
      pure integer(c_size_t) function mxGetNumberOfElements(pm) bind(c, name="mxGetNumberOfElements"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
      end function mxGetNumberOfElements
+
+     pure type(c_ptr) function mxGetDimensions_internal(pm) bind(c, name="mxGetDimensions"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: pm
+     end function mxGetDimensions_internal
 
      pure integer(c_size_t) function mxGetM(pm) bind(c, name="mxGetM"//API_VER)
        use iso_c_binding
@@ -158,7 +168,17 @@ module matlab_mat
        integer(mwSize), intent(in), value :: m, n
        integer(mxClassID), intent(in), value :: ClassID
        integer(mxComplexity), intent(in), value :: ComplexFlag
-     end
+     end function mxCreateNumericMatrix
+
+     type(c_ptr) function mxCreateNumericArray(ndim, dims, ClassID, ComplexFlag) &
+       bind(c, name="mxCreateNumericArray"//API_VER_INTERLEAVED)
+       use iso_c_binding
+       import :: mwSize, mxClassID, mxComplexity
+       integer(mwSize), intent(in), value :: ndim
+       integer(mwSize), dimension(*), intent(in) :: dims
+       integer(mxClassID), intent(in), value :: ClassID
+       integer(mxComplexity), intent(in), value :: ComplexFlag
+     end function mxCreateNumericArray
 
      ! Noncomplex Float
      pure logical(c_bool) function mxIsScalar(array_ptr) bind(c, name="mxIsScalar"//API_VER)
@@ -352,11 +372,17 @@ module matlab_mat
 
      subroutine mxFree(ptr) bind(c, name="mxFree"//API_VER)
        use iso_c_binding
-       type(c_ptr), intent(in) :: ptr
+       type(c_ptr), intent(in), value :: ptr
      end subroutine mxFree
   end interface
 contains
   ! Some helper functions to make the interface more Fortran-ish
+
+  function mxGetDimensions(pm)
+    type(c_ptr), intent(in) :: pm
+    integer(mwSize), dimension(:), pointer, contiguous :: mxGetDimensions
+    call c_f_pointer(mxGetDimensions_internal(pm), mxGetDimensions, [ mxGetNumberOfDimensions(pm) ])
+  end function mxGetDimensions
 
   function mxGetDoubles(pm)
     type(c_ptr), intent(in) :: pm

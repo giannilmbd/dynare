@@ -380,10 +380,22 @@ options_.k_order_solver = false; % by default do not use k_order_perturbation bu
 options_.partial_information = false;
 options_.conditional_variance_decomposition = [];
 
-% Heterogeneous agents
-options_.hank.tol_check_sum = 1e-6;
-options_.hank.nowarningredundant = true;
-options_.hank.nowarningdgrids = true;
+% Heterogenity
+% - Steady-state file and variable
+options_.heterogeneity.steady_state_file_name = '';
+options_.heterogeneity.steady_state_variable_name = 'steady_state';
+
+% - Steady-state structure checks
+options_.heterogeneity.check.tol_check_sum = 1e-6;
+options_.heterogeneity.check.no_warning_redundant = true;
+options_.heterogeneity.check.no_warning_d_grids = true;
+
+% - Jacobians computation
+options_.heterogeneity.solve.truncation_horizon = 300;
+
+% - Rouwenhorst discretization options for i.i.d shocks
+options_.heterogeneity.rouwenhorst.grid_size = 7;
+options_.heterogeneity.rouwenhorst.max_iter = 1000;
 
 % Ramsey policy
 options_.ramsey_policy = false;

@@ -125,6 +125,16 @@ if isoctave
     p{end+1} = '/missing/datetime';
 end
 
+% pagemtimes was introduced in MATLAB R2020b, doesn't exist in Octave
+if isoctave || (~isoctave && matlab_ver_less_than('9.9'))
+    p{end+1} = '/missing/pagemtimes';
+end
+
+% pagemldivide was introduced in MATLAB R2022a, doesn't exist in Octave
+if isoctave || (~isoctave && matlab_ver_less_than('9.12'))
+    p{end+1} = '/missing/pagemldivide';
+end
+
 P = cellfun(@(c)[dynareroot(1:end-1) c], p, 'uni',false);
 
 % Get mex files folder(s)
