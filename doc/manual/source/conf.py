@@ -473,16 +473,21 @@ class MyStyle(BaseStyle):
 
     def format_url(self, e):
         # based on urlbst format.url
-        url = field('url', raw=True)
         return words [
             'URL:',
-            href(url) [ url ]
+            href [
+                field('url', raw=True),		
+                field('url', raw=True)		
+                ]
         ]
 
     def format_pubmed(self, e):
         # based on urlbst format.pubmed
-        url = join [ 'https://www.ncbi.nlm.nih.gov/pubmed/', field('pubmed', raw=True) ]
-        return href(url) [
+        return href [            
+            join [
+                'https://www.ncbi.nlm.nih.gov/pubmed/',		
+                field('pubmed', raw=True)		
+                ],
             join [
                 'PMID:',
                 field('pubmed', raw=True)
@@ -491,8 +496,11 @@ class MyStyle(BaseStyle):
 
     def format_doi(self, e):
         # based on urlbst format.doi
-        url = join [ 'https://doi.org/', field('doi', raw=True) ]
-        return href(url) [
+        return href [
+            join [
+                'https://doi.org/',		
+                field('doi', raw=True)		
+                ],
             join [
                 'doi:',
                 field('doi', raw=True)
@@ -501,8 +509,11 @@ class MyStyle(BaseStyle):
 
     def format_eprint(self, e):
         # based on urlbst format.eprint
-        url = join [ 'https://arxiv.org/abs/', field('eprint', raw=True) ]
-        return href(url) [
+        return href [
+            join [
+                'https://arxiv.org/abs/',		
+                field('eprint', raw=True)		
+                ],
             join [
                 'arXiv:',
                 field('eprint', raw=True)
