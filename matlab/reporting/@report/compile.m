@@ -65,9 +65,12 @@ middle = ' ./';
 if isempty(opts.compiler)
     status = 1;
     if ismac
-        % Add most likely places for pdflatex to exist outside of default $PATH
-        [status, opts.compiler] = ...
-            system('PATH=$PATH:/usr/texbin:/usr/local/bin:/usr/local/sbin:/Library/TeX/texbin;which pdflatex');
+        [status, opts.compiler] = system('command -v pdflatex'); % will work for both POSIX and non-POSIX shells
+        if status ~= 0
+            % Add most likely places for pdflatex to exist outside of default $PATH, use env to also detect in non-POSIX shells
+            [status, opts.compiler] = ...
+                system('env PATH="$PATH:/usr/texbin:/usr/local/bin:/usr/local/sbin:/Library/TeX/texbin" which pdflatex');
+        end
     elseif ispc
         [status, opts.compiler] = system('findtexmf --file-type=exe pdflatex');
         if status == 1
