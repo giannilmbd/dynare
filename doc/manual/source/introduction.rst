@@ -9,7 +9,8 @@ What is Dynare?
 
 Dynare is a software platform for handling a wide class of economic
 models, in particular dynamic stochastic general equilibrium (DSGE)
-and overlapping generations (OLG) models. The models solved by Dynare
+and overlapping generations (OLG) models. Its history is described in
+:cite:t:`Cherrier:2023`. The models solved by Dynare
 include those relying on the *rational expectations* hypothesis,
 wherein agents form their expectations about the future in a way
 consistent with the model. But Dynare is also able to handle models
