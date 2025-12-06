@@ -85,7 +85,11 @@ def dashify(text):
 
 pages = field('pages', apply_func=dashify)
 
-date = words [field('year')]
+# Keep the year stripped so parentheses render as "(1998)" instead of "( 1998 )".
+# Some backends pass a rich Text object; coerce to str before stripping to avoid attribute errors.
+date = field('year', apply_func=lambda y: str(y).strip())
+# Prebuild a no-space parenthesized year to avoid template spacing adding gaps.
+date_in_parens = field('year', apply_func=lambda y: f"({str(y).strip()})")
 
 class MyStyle(BaseStyle):
     default_sorting_style = 'author_year_title'
@@ -93,7 +97,7 @@ class MyStyle(BaseStyle):
     def format_names(self, role, as_sentence=True):
         formatted_names = names(role, sep=', ', sep2 = ' and ', last_sep=', and ')
         if as_sentence:
-            return sentence [formatted_names , together["(", date, ")"]]
+            return sentence [formatted_names , date_in_parens]
         else:
             return formatted_names
 
