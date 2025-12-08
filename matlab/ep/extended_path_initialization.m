@@ -62,6 +62,9 @@ end
 
 % Set default initial conditions.
 if isempty(initial_conditions)
+    if M_.maximum_lag==0
+        error('extended_path_initialization: you cannot use an initial condition in a model without lags.')
+    end
     if isempty(M_.endo_histval)
         initial_conditions = oo_.steady_state;
     else
