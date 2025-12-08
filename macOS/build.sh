@@ -23,6 +23,16 @@ set -ex
 # Set root directory
 ROOTDIR=$(dirname "$(readlink -f "$0")")/..
 
+# Check that build directories do not already exist
+[[ -d "$ROOTDIR"/build-macOS-matlab ]] && { echo "Please remove the build-macOS-matlab directory" 2>&1; exit 1; }
+[[ -d "$ROOTDIR"/build-doc ]] && { echo "Please remove the build-doc directory" 2>&1; exit 1; }
+
+cleanup()
+{
+    rm -rf "$ROOTDIR"/build-macOS-matlab "$ROOTDIR"/build-doc
+}
+trap cleanup EXIT
+
 ##
 ## Set settings based on architecture
 ##
@@ -61,7 +71,7 @@ common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static -Dfort
                    --native-file macOS/homebrew-native-$PKG_ARCH.ini)
 
 # Build for MATLAB ⩾ R2020a (x86_64) and MATLAB ⩾ R2023b (arm64)
-arch -"$PKG_ARCH" meson setup "${common_meson_opts[@]}" -Dmatlab_path="$MATLAB_PATH" build-macOS-matlab --wipe
+arch -"$PKG_ARCH" meson setup "${common_meson_opts[@]}" -Dmatlab_path="$MATLAB_PATH" build-macOS-matlab
 arch -"$PKG_ARCH" meson compile -v -C build-macOS-matlab
 
 # If not in CI, build the docs

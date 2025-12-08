@@ -27,7 +27,6 @@
 /macOS/deps/tarballs/
 /macOS/deps/arm64/lib64/
 /macOS/deps/x86_64/lib64/
-build-doc
 
 # Emacs stuff
 TAGS
