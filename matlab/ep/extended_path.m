@@ -45,6 +45,20 @@ end
 [initialconditions, innovations, pfm, options_, oo_] = ...
     extended_path_initialization(initialconditions, samplesize, exogenousvariables, options_, M_, oo_);
 
+
+% Set the initial period.
+if isdates(options_.initial_period)
+    if ischar(options_.initial_period)
+        initial_period = dates(options_.initial_period);
+    else
+        initial_period = options_.initial_period;
+    end
+elseif isnan(options_.initial_period)
+    initial_period = dates(1,1);
+else
+    error('Type of option initial_period is wrong.')
+end
+
 [shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innovations, exogenousvariables, samplesize, M_, options_, oo_);
 
 % Initialize the matrix for the paths of the endogenous variables.
@@ -103,19 +117,6 @@ end % (while) loop over t
 
 % Close waitbar.
 wait_bar.close(hh_fig,options_.console_mode);
-
-% Set the initial period.
-if isdates(options_.initial_period)
-    if ischar(options_.initial_period)
-        initial_period = dates(options_.initial_period);
-    else
-        initial_period = options_.initial_period;
-    end
-elseif isnan(options_.initial_period)
-    initial_period = dates(1,1);
-else
-    error('Type of option initial_period is wrong.')
-end
 
 % Return the simulated time series.
 if any(isnan(endogenous_variables_paths(:)))
