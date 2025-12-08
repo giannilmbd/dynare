@@ -1,6 +1,18 @@
-function e = euler_equation_error(y0,x,innovations,M_,options_,oo_,pfm,nodes,weights)
-% e = euler_equation_error(y0,x,innovations,M_,options_,oo_,pfm,nodes,weights)
+function e = euler_equation_error(y0,x,M_,options_,oo_,pfm,nodes,weights)
+% e = euler_equation_error(y0,x,M_,options_,oo_,pfm,nodes,weights)
 %
+%  o  y0               [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
+%  o  x                [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
+%  o  M_               [structure] describing the model
+%  o  options_         [structure] describing the options
+%  o  oo_              [structure] describing the options
+%  o  pfm              [struct]    perfect foresight model description
+%  o  nodes            [double]    integration nodes
+%  o  weights          [double]    weights of nodes
+%
+% Outputs: 
+%  o  e                [double]    matrix of Euler equation errors  
+
 % Called by ep_accuracy_check.m
 
 % Copyright © 2016-2025 Dynare Team
@@ -21,28 +33,14 @@ function e = euler_equation_error(y0,x,innovations,M_,options_,oo_,pfm,nodes,wei
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 dynamic_resid = str2func([M_.fname '.dynamic_resid']);
-ep = options_.ep;
-y1 = extended_path_core(ep.periods, ...
-                        M_.endo_nbr, M_.exo_nbr, ...
-                        innovations.positive_var_indx, ...
-                        x, ep.use_first_order_solution_as_initial_guess, y0, oo_.steady_state, ...
-                        0, ...
-                        ep.stochastic.order, M_, ...
-                        pfm, ep.stochastic.algo, ...
-                        ep.solve_algo, ...
-                        ep.stack_solve_algo, ...
-                        options_.lmmcp, options_, oo_, ...
-                        []);
-x1 = [x(2:end,:); zeros(1,M_.exo_nbr)];
+[y1, ~, ~, ~, pfm, options_] = extended_path_core(x,oo_.steady_state, pfm, M_, options_, oo_, []);
+
+x1 = [x(2:end,:); zeros(M_.maximum_lead,M_.exo_nbr)];
+res=NaN(M_.endo_nbr,size(x1,1));
 for i=1:length(nodes)
     x2 = x1;
     x2(2,innovations.positive_var_indx) = x2(2,innovations.positive_var_indx) + nodes(i,:);
-    y2 = extended_path_core(ep.periods, M_.endo_nbr, M_.exo_nbr, ...
-                            innovations.positive_var_indx, x2, ep.use_first_order_solution_as_initial_guess, ...
-                            y1, oo_.steady_state, 0, ...
-                            ep.stochastic.order, M_, pfm, ep.stochastic.algo, ...
-                            ep.solve_algo, ep.stack_solve_algo, options_.lmmcp, ...
-                            options_, oo_, []);
+    y2 = extended_path_core(x2, y1, pfm, M_, options_, oo_, []);
     res(:,i) = dynamic_resid([y0; y1; y2],x(2,:),M_.params,oo_.steady_state);
 end
 e = res*weights;
