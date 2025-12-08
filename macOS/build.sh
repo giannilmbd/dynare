@@ -20,7 +20,9 @@
 set -ex
 #exec > >(tee build-logfile.log) 2>&1 # uncomment for debugging
 
-ROOTDIR=$(pwd)/..
+# Set root directory
+ROOTDIR=$(dirname "$(readlink -f "$0")")/..
+
 ##
 ## Set settings based on architecture
 ##
