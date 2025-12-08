@@ -381,6 +381,7 @@ options_mom_.markowitz               = options_.markowitz;
 options_mom_.solve_algo              = options_.solve_algo;
 options_mom_.solve_tolf              = options_.solve_tolf;
 options_mom_.solve_tolx              = options_.solve_tolx;
+options_mom_.solve_randomize_initial_guess = options_.solve_randomize_initial_guess;
 options_mom_.steady                  = options_.steady;
 options_mom_.steadystate             = options_.steadystate;
 options_mom_.steadystate_flag        = options_.steadystate_flag;
