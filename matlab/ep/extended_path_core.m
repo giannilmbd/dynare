@@ -60,7 +60,7 @@ else
         % Note that the first column of initialguess should be equal to initial_conditions.
         endo_simul = initialguess;
     else
-        endo_simul = [initial_conditions repmat(steady_state,1,periods+1)];
+        endo_simul = [initial_conditions repmat(steady_state,1,periods+M_.maximum_lead)];
     end
 end
 
