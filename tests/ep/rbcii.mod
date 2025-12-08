@@ -52,9 +52,11 @@ end;
 
     //options_.ep.stochastic.order = 0;
     set_dynare_seed(2009);
-    Simulated_time_series = extended_path([], 200, [], options_, M_, oo_);
+    [Simulated_time_series, oo_ ]= extended_path([], 200, [], options_, M_, oo_);
     Simulated_time_series.save('rbcii-sim-data');
-
+    if ~oo_.extended_path.status
+        error('Extended path did not find solution in rbcii.mod')
+    end
 @#else
 
     shocks;

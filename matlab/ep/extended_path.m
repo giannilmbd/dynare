@@ -1,5 +1,5 @@
-function [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
-% [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
+function [ts,oo_] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
+% [ts,oo_] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
 % Stochastic simulation of a non linear DSGE model using the Extended Path method (Fair and Taylor 1983). A time
 % series of size T  is obtained by solving T perfect foresight models.
 %
@@ -14,7 +14,6 @@ function [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exoge
 % OUTPUTS
 % - ts                     [dseries]   m*samplesize array, the simulations.
 % - oo_                    [struct]    Dynare's results structure
-% - errorflag              [logical]   scalar, true if the nonlinear solver for the auxiliary model failed in some period.
 %
 % REMARKS
 % If errorflag==true, because the nonlinear solver failed in period T<samplesize, ts holds the simulations for periods 1 to T-1.
@@ -36,7 +35,7 @@ function [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exoge
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-errorflag = false;
+oo_.extended_path.status=true;
 
 if ~isempty(M_.perfect_foresight_controlled_paths)
     error('extended_path: command is not compatible with perfect_foresight_controlled_paths block.')
@@ -109,7 +108,7 @@ while (t <= samplesize)
     end
     if ~info_convergence
         warning('extended_path: No convergence of the (stochastic) perfect foresight solver (in period %s)!', int2str(t))
-        errorflag = true;
+        oo_.extended_path.status = false;
         break
     end
 end % (while) loop over t

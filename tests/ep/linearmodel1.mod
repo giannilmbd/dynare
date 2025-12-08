@@ -29,13 +29,16 @@ steady;
 
 // Extended path simulation
 options_.ep.order = 0;
-ts = extended_path([], 100, [], options_, M_, oo_);
+[ts,oo_] = extended_path([], 100, [], options_, M_, oo_);
+if ~oo_.extended_path.status
+   error('extended path algorithm failed in ./tests/ep/linearmodel1.mod')
+end
 
 // Stochastic extended path simulation
 options_.ep.order = 1;
-sts = extended_path([], 100, [], options_, M_, oo_);
+[sts,oo_] = extended_path([], 100, [], options_, M_, oo_);
 
 // The generated paths should be identical (because the model is linear)
-if max(max(abs(ts.data-sts.data))) > 1e-12
-   error('extended path algorithm fails in ./tests/ep/linearmodel.mod')
+if max(max(abs(ts.data-sts.data))) > 1e-12 || ~oo_.extended_path.status
+   error('extended path algorithm fails in ./tests/ep/linearmodel1.mod')
 end

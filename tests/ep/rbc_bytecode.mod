@@ -75,3 +75,7 @@ end;
 steady(nocheck);
 
 extended_path(periods=10, order=0);
+
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in rbc_bytecode.mod')
+end

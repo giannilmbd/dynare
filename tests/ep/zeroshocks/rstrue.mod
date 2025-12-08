@@ -148,15 +148,29 @@ end;
 options_.ep.stochastic.IntegrationAlgorithm = 'Unscented';
 
 extended_path(periods=10, order=1);
+
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in rstrue.mod')
+end
+
 Simulated_time_series.save('rstrue1');
 
 extended_path(periods=10, order=2);
 Simulated_time_series.save('rstrue2');
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in rstrue.mod')
+end
 
 options_.ep.stochastic.algo = 1;
 
 extended_path(periods=10, order=2);
 Simulated_time_series.save('rstrue2s');
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in rstrue.mod')
+end
 
 extended_path(periods=10, order=2, hybrid);
 Simulated_time_series.save('rstrue2sh');
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in rstrue.mod')
+end

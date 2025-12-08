@@ -33,8 +33,8 @@ oo = oo_;
 options_.simul.maxit = 100;
 options_.ep.order = 0;
 
-ts = extended_path([], 200, oo_.exo_simul, options_, M_, oo_);
+[ts,oo_] = extended_path([], 200, oo_.exo_simul, options_, M_, oo_);
 
-if max(max(abs(transpose(ts.data(2:end,:))-oo.endo_simul))) > 1e-6
+if max(max(abs(transpose(ts.data(2:end,:))-oo.endo_simul))) > 1e-6 || ~oo_.extended_path.status
    error('extended path algorithm fails in ./tests/ep/linearmodel.mod')
 end

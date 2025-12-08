@@ -195,7 +195,7 @@ extended_path(periods=10, order=2, hybrid);
 
 Simulated_time_series2sh = dseries('rstrue2sh.mat');
 
-if max((abs(Simulated_time_series.data(:)-Simulated_time_series2sh.data(:))))>1e-12
+if max((abs(Simulated_time_series.data(:)-Simulated_time_series2sh.data(:))))>1e-12 ||  ~oo_.extended_path.status
     error('SEP(2, sparse, hybrid): the simulated time series do not match the expected results.');
 end
 

@@ -152,3 +152,6 @@ end;
 
 
 extended_path(order=0,periods=3);
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in rs2.mod')
+end

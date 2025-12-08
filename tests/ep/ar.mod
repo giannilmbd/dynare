@@ -37,13 +37,21 @@ end;
 steady;
 
 options_.ep.stochastic.order = 0;
-ts = extended_path([], 100, [], options_, M_, oo_);
+[ts,oo_] = extended_path([], 100, [], options_, M_, oo_);
+
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in ar.mod')
+end
 
 options_.ep.stochastic.order = 1;
-sts = extended_path([], 100, [], options_, M_, oo_);
+[sts, oo_]= extended_path([], 100, [], options_, M_, oo_);
+
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in ar.mod')
+end
 
 // The model is backward, we do not care about future uncertainty, extended path and stochastic extended path
 // should return the same results.
 if max(max(abs(ts.data-sts.data)))>pi*options_.dynatol.x
-   disp('Stochastic Extended Path:: Something is wrong here (potential bug in extended_path.m)!!!')
+   error('Stochastic Extended Path:: Something is wrong here (potential bug in extended_path.m)!!!')
 end
