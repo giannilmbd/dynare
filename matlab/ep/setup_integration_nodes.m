@@ -62,4 +62,8 @@ if EpOptions.stochastic.order
       otherwise
         error('Stochastic extended path:: Unknown integration algorithm %s!',EpOptions.stochastic.IntegrationAlgorithm)
     end
+else
+    nodes=[];
+    weights=[];
+    nnodes=[];
 end
