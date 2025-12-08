@@ -95,7 +95,7 @@ function pruned_state_space = pruned_state_space_system(M_, options_, dr, indy, 
 %   * quadruplication.m
 %   * vec.m
 % =========================================================================
-% Copyright © 2019-2020 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -423,7 +423,7 @@ if order > 1
 
     %Compute unique fourth order product moments of u, i.e. unique(E[kron(kron(kron(u,u),u),u)],'stable')
     u_nbr4    = u_nbr*(u_nbr+1)/2*(u_nbr+2)/3*(u_nbr+3)/4;
-    if isempty(QPu)
+    if isempty(QPu) || ~isequal(size(QPu,1),u_nbr^4)
         QPu       = pruned_SS.quadruplication(u_nbr);
         COMBOS4   = flipud(pruned_SS.allVL1(u_nbr, 4)); %all possible (unique) combinations of powers that sum up to four
     end
@@ -595,7 +595,7 @@ if order > 1
 
     if order > 2
         % Some common and useful objects for order > 2
-        if isempty(K_u_xx)
+        if isempty(K_u_xx) || ~isequal(size(K_u_xx,1),u_nbr*x_nbr^2)
             K_u_xx   = pruned_SS.commutation(u_nbr,x_nbr^2,1);
             K_u_ux   = pruned_SS.commutation(u_nbr,u_nbr*x_nbr,1);
             K_xx_x   = pruned_SS.commutation(x_nbr^2,x_nbr);
@@ -669,7 +669,7 @@ if order > 1
 
         % Compute unique sixth-order product moments of u, i.e. unique(E[kron(kron(kron(kron(kron(u,u),u),u),u),u)],'stable')
         u_nbr6        = u_nbr*(u_nbr+1)/2*(u_nbr+2)/3*(u_nbr+3)/4*(u_nbr+4)/5*(u_nbr+5)/6;       
-        if isempty(Q6Pu)
+        if isempty(Q6Pu) || ~isequal(size(Q6Pu,1),u_nbr^6)
             Q6Pu          = pruned_SS.Q6_plication(u_nbr);
             COMBOS6       = flipud(pruned_SS.allVL1(u_nbr, 6)); %all possible (unique) combinations of powers that sum up to six
         end
