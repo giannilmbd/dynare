@@ -201,5 +201,5 @@ end
 
 % Some solvers do not compute the maximum error, so do it here if needed
 if nargout > 2 && isempty(maxerror)
-    maxerror = compute_maxerror(y, exo_simul, steady_state, M_, options_)
+    maxerror = compute_maxerror(y, exo_simul, steady_state, M_, options_);
 end
