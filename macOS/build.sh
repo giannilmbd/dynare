@@ -25,11 +25,12 @@ ROOTDIR=$(dirname "$(readlink -f "$0")")/..
 
 # Check that build directories do not already exist
 [[ -d "$ROOTDIR"/build-macOS-matlab ]] && { echo "Please remove the build-macOS-matlab directory" 2>&1; exit 1; }
-[[ -d "$ROOTDIR"/build-doc ]] && { echo "Please remove the build-doc directory" 2>&1; exit 1; }
+[[ -z $CI ]] && [[ -d "$ROOTDIR"/build-doc ]] && { echo "Please remove the build-doc directory" 2>&1; exit 1; }
 
 cleanup()
 {
-    rm -rf "$ROOTDIR"/build-macOS-matlab "$ROOTDIR"/build-doc
+    rm -rf "$ROOTDIR"/build-macOS-matlab
+    [[ -n $CI ]] || rm -rf "$ROOTDIR"/build-doc
 }
 trap cleanup EXIT
 
