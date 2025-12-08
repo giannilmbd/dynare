@@ -1,4 +1,22 @@
 function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm)
+% [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm)
+% Uses algo=1, i.e. full tree
+%
+% INPUTS
+%  o  endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
+%  o  exo_simul        [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
+%  o  options_         [structure] describing the options
+%  o  y                [vector]    initial guess
+%  o  M_               [structure] describing the model
+%  o  pfm              [struct]    perfect foresight model description
+%
+% OUTPUTS
+%  o  errorflag        [logical]   scalar, true if the nonlinear solver for the auxiliary model failed in some period.
+%  o  endo_simul       [matrix]    path of endogenous
+%  o  errorcode        [integer]   error code
+%  o  y                [vector]    solution for current period
+%  o  pfm              [struct]    perfect foresight model description
+%  o  options_         [structure] describing the options
 
 % Copyright © 2012-2025 Dynare Team
 %

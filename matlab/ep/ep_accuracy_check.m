@@ -21,7 +21,7 @@ function e = ep_accuracy_check(M_,options_,oo_)
 endo_simul = oo_.endo_simul;
 n = size(endo_simul,2);
 [~, innovations, pfm, ~, ~, options_, oo_] = ...
-    extended_path_initialization([], n-1, [], options_, M_, oo_);
+    extended_path_initialization([], [], options_, M_, oo_);
 
 options_.ep.accuracy.stochastic.order = options_.ep.stochastic.order;
 [nodes,weights] = setup_integration_nodes(options_.ep.accuracy,pfm);

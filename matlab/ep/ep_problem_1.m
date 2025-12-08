@@ -1,5 +1,5 @@
 function [res, A, info] = ep_problem_1(y, x, pfm)
-
+% [res, A, info] = ep_problem_1(y, x, pfm)
 % Evaluate the residuals and stacked Jacobian of a stochastic perfect
 % foresight, considering sequences of future innovations in a sparse tree.
 %

@@ -1,4 +1,19 @@
-function [shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innovations, exogenousvariables, sample_size, M_, options_, oo_)
+function [shocks, spfm_exo_simul, oo_] = extended_path_shocks(innovations, exogenousvariables, sample_size, M_, options_, oo_)
+% [shocks, spfm_exo_simul, oo_] = extended_path_shocks(innovations, exogenousvariables, sample_size, M_, options_, oo_)
+% INPUTS
+%  o innovations         [struct]    description of innovations (potentially empty if path has been set with exogenousvariables)
+%  o exogenousvariables  [matrix]    path of exogenous variables, potentially empty
+%  o sample_size         [integer]   sample size
+%  o M_                  [structure] describing the model
+%  o options_            [structure] describing the options
+%  o oo_                 [structure] storing the results
+%
+% OUTPUTS
+%  o shocks             [matrix]    path of exogenous variables
+%  o spfm_exo_simul     [matrix]    steady state
+%  o oo_                [structure] storing the results
+%
+% Called by: extended_path.m, extended_path_mc.m
 
 % Copyright © 2016-2025 Dynare Team
 %
@@ -33,7 +48,6 @@ if isempty(exogenousvariables)
     end
 else
     shocks = exogenousvariables;
-    innovations.positive_var_indx = find(sum(abs(shocks)>0));
 end
 
 % Copy the shocks in exo_simul

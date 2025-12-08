@@ -1,5 +1,7 @@
 function e = euler_equation_error(y0,x,innovations,M_,options_,oo_,pfm,nodes,weights)
 % e = euler_equation_error(y0,x,innovations,M_,options_,oo_,pfm,nodes,weights)
+%
+% Called by ep_accuracy_check.m
 
 % Copyright © 2016-2025 Dynare Team
 %

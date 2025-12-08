@@ -1,4 +1,5 @@
 function [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, marginal_linearization_previous_raw_sims)
+% [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, marginal_linearization_previous_raw_sims)
 % Computes deterministic simulations
 %
 % INPUTS
@@ -236,7 +237,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
     end
     extra_share = completed_share - options_.simul.homotopy_marginal_linearization_fallback;
     if ~options_.noprint
-        fprintf('Only %.1f%% of the shock could be simulated. Since marginal linearization was requested as a fallback, now running an extra simulation for %.1f%% of the shock\n\n', completed_share*100, extra_share*100)
+        fprintf('Only %.1f%% of the shock could be simulated. Since marginal linearization was requested as a fallback,\nnow running an extra simulation for %.1f%% of the shock.\n\n', completed_share*100, extra_share*100)
         fprintf('%s\n\n', repmat('*', 1, 80))
     end
     extra_simul_time_counter = tic;
@@ -254,7 +255,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
     end
     if ~extra_success
         if ~options_.noprint
-            fprintf('The extra simulation for %.1f%% of the shock did not run when using the first simulation as a guess value. Now trying a full homotopy loop to get that extra simulation working\n\n', extra_share*100)
+            fprintf('The extra simulation for %.1f%% of the shock did not run when using the first simulation as a guess value.\nNow trying a full homotopy loop to get that extra simulation working.\n\n', extra_share*100)
             fprintf('%s\n\n', repmat('*', 1, 80))
         end
         [extra_completed_share, extra_endo_simul, extra_exo_simul, extra_steady_state, extra_exo_steady_state] = homotopy_loop(M_,options_,oo_,extra_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, simperiods, lastperiods, recompute_final_steady_state, oo_.steady_state, oo_.exo_steady_state);
@@ -283,7 +284,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
         maxerror = compute_maxerror(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, M_, options_);
 
         if ~options_.noprint
-            fprintf('Perfect foresight solution found for %.1f%% of the shock, then extrapolation was performed using marginal linearization (extra simulation took %.1f seconds)\n\n', completed_share*100, extra_simul_time_elapsed)
+            fprintf('Perfect foresight solution found for %.1f%% of the shock, then extrapolation\nwas performed using marginal linearization (extra simulation took %.1f seconds).\n\n', completed_share*100, extra_simul_time_elapsed)
         end
         oo_.deterministic_simulation.homotopy_marginal_linearization = true;
     else
@@ -292,7 +293,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
         oo_.exo_simul = exo_simul;
         oo_.steady_state = steady_state;
         oo_.exo_steady_state = exo_steady_state;
-        fprintf('perfect_foresight_solver: marginal linearization failed, unable to find solution for %.1f%% of the shock (extra simulation took %.1f seconds). Try to modify the value of homotopy_marginal_linearization_fallback option\n\n', extra_share*100, extra_simul_time_elapsed)
+        fprintf('perfect_foresight_solver: marginal linearization failed, unable to\nfind solution for %.1f%% of the shock (extra simulation took %.1f seconds).\nTry to modify the value of homotopy_marginal_linearization_fallback option.\n\n', extra_share*100, extra_simul_time_elapsed)
     end
     oo_.deterministic_simulation.status = extra_success;
 else
@@ -322,7 +323,8 @@ end
 oo_.gui.ran_perfect_foresight = oo_.deterministic_simulation.status;
 
 
-function [completed_share, endo_simul, exo_simul, steady_state, exo_steady_state, iteration, maxerror, solver_iter, per_block_status] = homotopy_loop(M_,options_,oo_,max_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, simperiods, lastperiods, recompute_final_steady_state, steady_state, exo_steady_state)
+function [completed_share, endo_simul, exo_simul, steady_state, exo_steady_state, iteration, maxerror, solver_iter, per_block_status] =...
+    homotopy_loop(M_,options_,oo_,max_share, shareorig, endoorig, exoorig, endobase, exobase, initperiods, simperiods, lastperiods, recompute_final_steady_state, steady_state, exo_steady_state)
 % INPUTS
 %   M_               [structure] describing the model
 %   options_         [structure] describing the options
@@ -526,7 +528,7 @@ exo_simul = exoorig*share/shareorig + exobase*(1-share/shareorig);
 if ~isempty(options_.simul.homotopy_exclude_varexo)
     [is_exo, excluded_exo_ids] = ismember(options_.simul.homotopy_exclude_varexo, M_.exo_names);
     if ~all(is_exo)
-        error('Option homotopy_exclude_varexo must be given exogenous variable names')
+        error('perfect_foresight_solver: the variable list homotopy_exclude_varexo must only contain exogenous variable names.')
     end
     exo_simul(:, excluded_exo_ids) = exoorig(:, excluded_exo_ids);
 end
