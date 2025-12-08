@@ -27,7 +27,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
               'sphinxcontrib.bibtex']
 
-bibtex_bibfiles = ['../../dr.bib']
+bibtex_bibfiles = ['../../dynare.bib']
 
 # define author_year_round style, see https://github.com/mcmtroffaes/sphinxcontrib-bibtex/blob/develop/test/roots/test-citation_style_round_brackets/conf.py
 import dataclasses

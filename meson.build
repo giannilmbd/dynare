@@ -664,7 +664,7 @@ bvar_a_la_sims_pdf = custom_target('bvar-a-la-sims.pdf',
 dr_pdf = custom_target('dr.pdf', output : 'dr.pdf', input : 'doc/dr.tex',
                        command : latexmk_command,
                        env : { 'BIBINPUTS': meson.current_source_dir() / 'doc' },
-                       depend_files : 'doc/dr.bib',
+                       depend_files : 'doc/dynare.bib',
                        build_by_default : false,
                        install : true, install_dir : 'share/doc/dynare')
 
