@@ -90,6 +90,6 @@ end;
 perfect_foresight_setup(periods=40);
 perfect_foresight_solver(maxit=1000);
 
-if oo_.deterministic_simulation.status==1
+if oo_.deterministic_simulation.status==0
     error('This model has no solution');
 end
