@@ -1,9 +1,49 @@
 function pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
-% pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
+
+% Sets up the structure for the stochastic perfect foresight model solver.
+%
 % INPUTS
-%  o M_                     [struct]    Dynare's model structure
-%  o options_               [struct]    Dynare's options structure
-%  o oo_                    [struct]    Dynare's results structure
+% - M_                     [struct]    Dynare's model structure
+% - options_               [struct]    Dynare's options structure
+% - oo_                    [struct]    Dynare's results structure
+%
+% OUTPUTS
+% - pfm                    [struct]    Structure containing model information for the perfect foresight solver:
+%                                        * lead_lag_incidence: matrix indicating which variables appear with leads/lags
+%                                        * ny: number of endogenous variables
+%                                        * Sigma: covariance matrix of structural shocks
+%                                        * Omega: upper Cholesky factor of Sigma (Sigma = Omega'*Omega)
+%                                        * number_of_shocks: number of structural shocks
+%                                        * stochastic_order: order of stochastic extended path approximation
+%                                        * max_lag: maximum lag in the model
+%                                        * nyp: number of predetermined (lagged) variables
+%                                        * iyp: indices of predetermined variables
+%                                        * ny0: number of contemporaneous variables
+%                                        * iy0: indices of contemporaneous variables
+%                                        * nyf: number of forward-looking (lead) variables
+%                                        * iyf: indices of forward-looking variables
+%                                        * periods: number of periods for extended path simulation
+%                                        * steady_state: steady state values of endogenous variables
+%                                        * params: model parameters
+%                                        * i_cols_A1: column indices for first block of Jacobian
+%                                        * i_cols_1: shifted column indices for first period
+%                                        * i_cols_T: column indices for terminal period
+%                                        * i_cols_j: column indices for generic period
+%                                        * i_upd: indices of variables to update in simulation
+%                                        * dynamic_resid: function handle for dynamic residuals (if not bytecode)
+%                                        * dynamic_g1: function handle for dynamic Jacobian (if not bytecode)
+%                                        * sparse_rowval: row indices for sparse Jacobian (if not bytecode)
+%                                        * sparse_colval: column indices for sparse Jacobian (if not bytecode)
+%                                        * sparse_colptr: column pointers for sparse Jacobian (if not bytecode)
+%                                        * verbose: verbosity level
+%                                        * maxit_: maximum iterations for solver
+%                                        * tolerance: convergence tolerance
+%
+% ALGORITHM
+% None.
+%
+% SPECIAL REQUIREMENTS
+% None.
 
 % Copyright © 2013-2025 Dynare Team
 %
