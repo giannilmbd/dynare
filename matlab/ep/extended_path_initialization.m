@@ -1,20 +1,32 @@
 function [initial_conditions, innovations, pfm, options_, oo_] = extended_path_initialization(initial_conditions, sample_size, exogenousvariables, options_, M_, oo_)
-% [initial_conditions, innovations, pfm, ep, verbosity, options_, oo_] = extended_path_initialization(initial_conditions, sample_size, exogenousvariables, options_, M_, oo_)
+
 % Initialization of the extended path routines.
 %
 % INPUTS
-%  o initial_conditions     [double]    m*1 array, where m is the number of endogenous variables in the model.
-%  o sample_size            [integer]   scalar, size of the sample to be simulated.
-%  o exogenousvariables     [double]    T*n array, values for the structural innovations.
-%  o options_               [struct]    Dynare's options structure
-%  o M_                     [struct]    Dynare's model structure
-%  o oo_                    [struct]    Dynare's result structure
+% - initial_conditions     [double]    m×1 array, where m is the number of endogenous variables in the model.
+% - sample_size            [integer]   scalar, size of the sample to be simulated.
+% - exogenousvariables     [double]    T×n array, values for the structural innovations.
+% - options_               [struct]    Dynare's options structure
+% - M_                     [struct]    Dynare's model structure
+% - oo_                    [struct]    Dynare's result structure
 %
 % OUTPUTS
+% - initial_conditions     [double]    m*1 array, initial conditions (if empty on input, set to steady state or histval).
+% - innovations            [struct]    Structure with fields:
+%                                        * positive_var_indx: indices of shocks with positive variance
+%                                        * effective_number_of_shocks: number of shocks with positive variance
+%                                        * covariance_matrix: covariance matrix of effective shocks
+%                                        * covariance_matrix_upper_cholesky: upper Cholesky factor of covariance matrix
+%                                      Empty struct if exogenousvariables is provided.
+% - pfm                    [struct]    Structure for the perfect foresight model solver.
+% - options_               [struct]    Modified Dynare's options structure.
+% - oo_                    [struct]    Modified Dynare's result structure.
 %
 % ALGORITHM
+% None.
 %
 % SPECIAL REQUIREMENTS
+% None.
 
 % Copyright © 2016-2025 Dynare Team
 %
