@@ -55,7 +55,8 @@
 ;; Also include "end" in this list
 (defvar dynare-statements
   '("var" "varexo" "varexo_det" "trend_var" "log_trend_var"
-    "predetermined_variables" "parameters" "model_local_variable" "model_info"
+    "predetermined_variables" "parameters" "model_local_variable" "heterogeneity_dimension"
+    "model_info"
     "estimation" "set_time" "data" "varobs" "varexobs" "unit_root_vars" "rplot"
     "osr_params" "osr" "dynatype" "dynasave" "model_comparison" "change_type"
     "load_params_and_steady_state" "save_params_and_steady_state"
@@ -78,15 +79,19 @@
     "perfect_foresight_setup" "perfect_foresight_solver"
     "perfect_foresight_with_expectation_errors_setup"
     "perfect_foresight_with_expectation_errors_solver" "compilation_setup"
-    "model_remove" "model_options" "var_remove" "resid" "std" "corr"
+    "model_remove" "model_options" "var_remove"
+    "heterogeneity_load_steady_state" "heterogeneity_solve" "heterogeneity_simulate"
+    "resid" "std" "corr"
     "prior_function" "posterior_function" "end")
   "Dynare statement keywords.")
 
 ;; Keywords that may appear in blocks, and that begin a statement which will be
 ;; closed by a semicolon
+;; NB: "var", "varexo", and "corr" are not repeated here, because they are also
+;; proper statements.
 (defvar dynare-statements-like
-  '("stderr" "values" "periods" "scales" "restriction" "exclusion"
-    "upper_cholesky" "lower_cholesky" "equation" "bind" "relax" "error_bind"
+  '("stderr" "skew" "values" "periods" "scales" "restriction" "exclusion"
+    "upper_cholesky" "lower_cholesky" "equation" "name" "bind" "relax" "error_bind"
     "error_relax" "add" "multiply" "target" "auxname_target_nonstationary"
     "component" "growth" "auxname" "kind" "weights" "exogenize" "endogenize")
   "Dynare statements-like keywords.")
@@ -109,12 +114,14 @@
       "matched_irfs_weights" "perfect_foresight_controlled_paths" "verbatim")
     "Dynare block keywords."))
 
-;; Mathematical functions and operators used in model equations (see "hand_side" in Bison file)
+;; Mathematical functions and operators used in model equations (see
+;; “expression” and “model_expression” rules in Bison file)
 (defvar dynare-functions
-  '("expectation" "var_expectation" "pac_expectation" "exp" "diff" "adl" "log"
+  '("expectation" "var_expectation" "pac_expectation" "pac_target_nonstationary"
+    "exp" "diff" "adl" "log"
     "ln" "log10" "sin" "cos" "tan" "asin" "acos" "atan"
     "sinh" "cosh" "tanh" "asinh" "acosh" "atanh" "sqrt" "cbrt" "abs"
-    "sign" "max" "min" "normcdf" "normpdf" "erf" "erfc" "steady_state")
+    "sign" "max" "min" "normcdf" "normpdf" "erf" "erfc" "steady_state" "sum")
   "Dynare mathematical functions and operators.")
 
 (defvar dynare-constants
