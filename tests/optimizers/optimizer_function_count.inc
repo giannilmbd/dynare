@@ -5,44 +5,33 @@ profData = profile('info');
 
 % define the functions to look for that call 'dsge_likelihood.m' during optimization
 switch options_.mode_compute
-    case 1
-        if options_.analytic_derivation
-            fun = {'analytic_gradient_wrapper'};
-        else
-            fun = {'objfunEvaluator', 'objfunFinDiffEvaluator'};
-        end
+    case {1, 3, 7, 12, 102}
+        % These are optimization algorithms provided by MATLAB
+        % The direct caller of our function is not documented and can change
+        % across MATLAB versions.
+        % In any case, we do not have to test that MATLAB optimizers correctly
+        % counts function calls, that’s not the purpose of our testsuite.
+        fun = {};
     case 2
         fun = {'simulated_annealing'};
-    case 3
-        if options_.analytic_derivation
-            fun = {'analytic_gradient_wrapper'};
-        else
-            fun = {'fminunc', 'finDiffEvalAndChkErr', 'lineSearch'};
-        end
     case 4
         fun = {'penalty_objective_function'};
     case 5
         fun = {'penalty_objective_function'};
     case 6
         fun = {'gmhmaxlik','gmhmaxlik_core'};
-    case 7
-        fun = {'fminsearch'};
     case 8
         fun = {'simplex_optimization_routine', 'simplex_optimization_routine>simplex_initialization'};
     case 9
         fun = {'cmaes'};
     case 10
         fun = {'simpsa>CALCULATE_COST'};
-    case 12
-        fun = {'penalty_objective_function'};
     case 101
         if options_.analytic_derivation
             fun = {'analytic_gradient_wrapper'};
         else
             fun = {'solvopt', 'apprgrdn'};
         end
-    case 102
-        fun = {'dynare_minimize_objective>@(x)objective_function(x,varargin{:})'};
     otherwise
         fun = {'penalty_objective_function'};
 end
@@ -67,7 +56,7 @@ fprintf('- iterations: %d\n', oo_.posterior.optimization.optimization_info.itera
 fprintf('- exitflag: %d\n', oo_.posterior.optimization.optimization_info.exitflag);
 fprintf('- termination message: %s\n', oo_.posterior.optimization.optimization_info.message);
 
-if ~isequal(oo_.posterior.optimization.optimization_info.funcCount,NumCalls)
+if ~isempty(fun) && ~isequal(oo_.posterior.optimization.optimization_info.funcCount,NumCalls)
     error('counting of function evaluations is not correct');
 end
 end
