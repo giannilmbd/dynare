@@ -162,7 +162,7 @@ meson test -C <builddir>
 
 Depending on the performance of your machine, this can take several hours.
 
-Note that running the testsuite with Octave requires the additional packages `pstoedit`, `epstool`, `xfig`, and `gnuplot`. 
+Note that running the testsuite with Octave requires the additional packages `pstoedit`, `epstool`, `xfig`, and `gnuplot`.
 
 Often, it does not make sense to run the complete testsuite. For instance, if you modify codes only related to the perfect foresight model solver, you can decide to run only a subset of the integration tests, with:
 ```sh
@@ -319,7 +319,7 @@ Now configure dynare as above.
 
 ## Arch Linux
 
-The following steps show how to install Dynare on Arch Linux from source. 
+The following steps show how to install Dynare on Arch Linux from source.
 - Install all needed dependencies:
 ```sh
 pacman -S git make meson boost blas gsl libmatio gcc-fortran gcc-libs
@@ -502,7 +502,7 @@ tar xf v5.9.tar.gz
 cd SLICOT-Reference-5.9
 make -f makefile_Unix -j$(sysctl -n hw.ncpu) FORTRAN=$BREWDIR/bin/gfortran OPTS="-O2" LOADER=gfortran lib
 cp slicot.a $DYNAREDIR/slicot/lib/libslicot_pic.a
-make clean
+make -f makefile_Unix clean
 make -f makefile_Unix -j$(sysctl -n hw.ncpu) FORTRAN=$BREWDIR/bin/gfortran OPTS="-O2 -fdefault-integer-8" LOADER=gfortran lib
 cp slicot.a $DYNAREDIR/slicot/lib/libslicot64_pic.a
 ```
@@ -516,14 +516,10 @@ tar xf x13as_asciisrc-v1-1-b62.tar.gz
 cd x13as_asciisrc-v1-1-b62
 sed -i '' 's/-static//g' makefile.gf
 make -j$(sysctl -n hw.ncpu) -f makefile.gf FC=$BREWDIR/bin/gfortran LINKER=$BREWDIR/bin/gcc-15 FFLAGS="-O2 -std=legacy" LDFLAGS=-static-libgcc LIBS="$BREWDIR/lib/gcc/current/libgfortran.a /$BREWDIR/lib/gcc/current/libquadmath.a" PROGRAM=x13as
-sudo cp $DYNAREDIR/x13as/x13as /usr/local/bin/x13as
-# test x13as
-cd $DYNAREDIR
-x13as
-# X-13ARIMA-SEATS Seasonal Adjustment Program
-# Version Number 1.1 Build 62
+mkdir -p $HOME/.local/bin
+cp x13as $HOME/.local/bin/x13as
 ```
-Alternatively, if you don't have admin privileges you can install it into `$HOME/.local/bin` and add this folder to your PATH.
+Alternatively, if you have admin privileges: `sudo cp x13as /usr/local/bin/x13as`.
 
 ### Compile Dynare from source
 The following commands will download the Dynare source code and compile
