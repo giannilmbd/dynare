@@ -276,6 +276,9 @@ if do_bayesian_estimation
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'WR',[]);        
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode_files',[]);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode',[]);        
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'maximize',false);
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'maximize_using_mh_bounds',false);
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode_compute',5);     
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'initial_step_size',0.8);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_tmp_file',true);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_iter_info_file',true);                

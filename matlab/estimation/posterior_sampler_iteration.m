@@ -1,6 +1,5 @@
 function  [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
-
-% function [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_)
+% [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
 % posterior samplers
 %
 % INPUTS
@@ -31,7 +30,7 @@ function  [par, logpost, accepted, neval] = posterior_sampler_iteration(objectiv
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -54,9 +53,27 @@ mh_bounds = sampler_options.bounds;
 
 switch posterior_sampling_method
   case 'slice'
-
-    [par, logpost, neval] = slice_sampler(objective_function,last_draw, [mh_bounds.lb mh_bounds.ub], sampler_options,varargin{:});
-    accepted = 1;
+      if ~sampler_options.maximize
+        [par, logpost, neval] = slice_sampler(objective_function,last_draw, [mh_bounds.lb mh_bounds.ub], sampler_options,varargin{:});
+        accepted = 1;         
+      else
+          options_=varargin{3};
+          bayestopt_=varargin{6};
+          options_.mode_compute = sampler_options.mode_compute;
+          if options_.mode_compute==5
+              if options_.analytic_derivation
+                  options_.analytic_derivation = -1;
+              end
+          end
+          options_.newrat.Save_files = sampler_options.curr_block;
+          [par, fval] = ...
+              dynare_minimize_objective(objective_function,last_draw(:),options_.mode_compute,options_,[mh_bounds.lb mh_bounds.ub],bayestopt_.name,bayestopt_,[], ...
+                  varargin{:}); %inputs for objective
+          logpost = -fval;
+          accepted = 1;
+          neval = 1;         
+      end
+  
   case 'random_walk_metropolis_hastings'
     neval = 1;
     ProposalFun = sampler_options.proposal_distribution;

@@ -1,10 +1,13 @@
 function [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options(posterior_sampler_options, fname, dname, options_, bounds, bayestopt_, outputFolderName)
-
+% [posterior_sampler_options, options_, bayestopt_] = check_posterior_sampler_options(posterior_sampler_options, fname, dname, options_, bounds, bayestopt_, outputFolderName)
 % Initialization of posterior samplers
 %
 % INPUTS
 % - posterior_sampler_options   [struct]       posterior sampler options
 % - options_                    [struct]       options
+% - dname                       [string]       directory name
+% - fname                       [string]       file name
+% - outputFolderName            [string]       folder name
 % - bounds                      [struct]       prior bounds
 % - bayestopt_                  [struct]       information about priors
 %
@@ -16,7 +19,7 @@ function [posterior_sampler_options, options_, bayestopt_] = check_posterior_sam
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -307,6 +310,16 @@ if init
                   case 'save_iter_info_file'
                     posterior_sampler_options.save_iter_info_file = options_list{i,2};
 
+                  case 'maximize'
+                    posterior_sampler_options.maximize = options_list{i,2};
+                    
+                  case 'maximize_using_mh_bounds'
+                      
+                      posterior_sampler_options.maximize_using_mh_bounds = options_list{i,2};
+                    
+                  case 'mode_compute'
+                    posterior_sampler_options.mode_compute = options_list{i,2};
+                    
                   otherwise
                     warning(['slice_sampler: Unknown option (' options_list{i,1} ')!'])
                 end
@@ -565,6 +578,27 @@ if strcmp(posterior_sampler_options.posterior_sampling_method,'slice')
         if ~options_.load_mh_file && ~posterior_sampler_options.slice_initialize_with_mode
             posterior_sampler_options.invhess=[];
         end
+    end
+    if posterior_sampler_options.maximize_using_mh_bounds 
+        if ~posterior_sampler_options.maximize
+            error('check_posterior_sampler_options:: the maximize_using_mh_bounds requires the maximize option.')
+        end
+        if ~options_.load_mh_file
+            error('check_posterior_sampler_options:: the maximize_using_mh_bounds requires the load_mh_file option.')
+        end
+        if options_.mh_recover
+            error('check_posterior_sampler_options:: the maximize_using_mh_bounds is incompatible with the mh_recover option.')
+        end
+    end
+    if posterior_sampler_options.maximize && posterior_sampler_options.maximize_using_mh_bounds && options_.load_mh_file && not(options_.mh_recover)
+        % restrict maximization within slice in the range of mcmc posterior draws 
+                             
+        params1 = GetAllPosteriorDraws(options_, dname, fname, 'all');
+        opt_bounds.lb=min(params1)';
+        opt_bounds.ub=max(params1)';
+        opt_bounds.lb=max(min(opt_bounds.lb.*0.99,opt_bounds.lb-1.e-6),0.5*(opt_bounds.lb+posterior_sampler_options.bounds.lb));
+        opt_bounds.ub=min(max(opt_bounds.ub.*1.01,opt_bounds.ub+1.e-6),0.5*(opt_bounds.ub+posterior_sampler_options.bounds.ub));
+        posterior_sampler_options.bounds = opt_bounds;
     end
     % needs to be re-set to zero otherwise posterior analysis is filtered
     % out in dynare_estimation_1.m
