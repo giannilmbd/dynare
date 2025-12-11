@@ -54,6 +54,7 @@ h_correction = pfm.h_correction;
 nodes = pfm.nodes;
 weights = pfm.weights;
 nnodes = pfm.nnodes;
+positive_var_indx = pfm.positive_var_indx;
 
 i_cols_p = pfm.i_cols_p;
 i_cols_s = pfm.i_cols_s;
@@ -76,7 +77,7 @@ for i = 1:order+1
     for j = 1:nnodes^(i-1)
         innovation = x;
         if i > 1
-            innovation(i+1,:) = nodes(mod(j-1,nnodes)+1,:);
+            innovation(i+1,positive_var_indx) = nodes(mod(j-1,nnodes)+1,:);
         end
         if i <= order
             for k=1:nnodes

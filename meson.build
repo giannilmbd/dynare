@@ -1419,6 +1419,8 @@ mod_and_m_tests = [
                'ep/rbcii_MCP.mod' ],
     'extra' : [ 'ep/rbcii-calibration.inc',
                 'ep/rbcii_steadystate.m' ] },
+  { 'test' : [ 'ep/zeroshocks/rstrue.mod',
+               'ep/zeroshocks/rs.mod' ] },
   { 'test' : [ 'ep/linearmodel0.mod' ] },
   { 'test' : [ 'ep/linearmodel1.mod' ] },
   { 'test' : [ 'ep/rbc_bytecode.mod' ] },

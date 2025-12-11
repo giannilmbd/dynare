@@ -97,10 +97,10 @@ options_.minimal_solving_period = options_.ep.periods;
 % Set the covariance matrix of the structural innovations.
 if isempty(exogenousvariables)
     innovations = struct();
-    innovations.positive_var_indx = find(diag(M_.Sigma_e)>0);
-    innovations.effective_number_of_shocks = length(innovations.positive_var_indx);
-    innovations.covariance_matrix = M_.Sigma_e(innovations.positive_var_indx,innovations.positive_var_indx);
-    innovations.covariance_matrix_upper_cholesky = chol(innovations.covariance_matrix);
+    innovations.positive_var_indx = pfm.positive_var_indx;
+    innovations.effective_number_of_shocks = pfm.effective_number_of_shocks;
+    innovations.covariance_matrix = pfm.Sigma;
+    innovations.covariance_matrix_upper_cholesky = pfm.Omega;
 else
     innovations = struct();
 end

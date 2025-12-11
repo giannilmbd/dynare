@@ -11,9 +11,11 @@ function pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
 % - pfm                    [struct]    Structure containing model information for the perfect foresight solver:
 %                                        * lead_lag_incidence: matrix indicating which variables appear with leads/lags
 %                                        * ny: number of endogenous variables
-%                                        * Sigma: covariance matrix of structural shocks
+%                                        * number_of_shocks: total number of structural shocks
+%                                        * positive_var_indx: indices of shocks with positive variance
+%                                        * effective_number_of_shocks: number of shocks with positive variance
+%                                        * Sigma: covariance matrix of shocks with positive variance
 %                                        * Omega: upper Cholesky factor of Sigma (Sigma = Omega'*Omega)
-%                                        * number_of_shocks: number of structural shocks
 %                                        * stochastic_order: order of stochastic extended path approximation
 %                                        * max_lag: maximum lag in the model
 %                                        * nyp: number of predetermined (lagged) variables
@@ -64,15 +66,16 @@ function pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
 
 pfm.lead_lag_incidence = M_.lead_lag_incidence;
 pfm.ny = M_.endo_nbr;
-pfm.Sigma = M_.Sigma_e;
-if det(pfm.Sigma) > 0
+pfm.number_of_shocks = M_.exo_nbr;
+pfm.positive_var_indx = find(diag(M_.Sigma_e)>0);
+pfm.effective_number_of_shocks = length(pfm.positive_var_indx);
+if pfm.effective_number_of_shocks>0
+    pfm.Sigma = M_.Sigma_e(pfm.positive_var_indx,pfm.positive_var_indx);
     pfm.Omega = chol(pfm.Sigma,'upper'); % Sigma = Omega'*Omega
 else
-    if options_.ep.stochastic.order>0
-        error('setup_stochastic_perfect_foresight_model_solver:: the covariance matrix of shocks must be positive definite when using stochastic extended path')
-    end
+    pfm.Sigma = [];
+    pfm.Omega = [];
 end
-pfm.number_of_shocks = length(pfm.Sigma);
 pfm.stochastic_order = options_.ep.stochastic.order;
 pfm.max_lag = M_.maximum_endo_lag;
 if pfm.max_lag > 0

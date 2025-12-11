@@ -48,6 +48,7 @@ order = pfm.stochastic_order;
 nodes = pfm.nodes;
 nnodes = pfm.nnodes;
 weights = pfm.weights;
+positive_var_indx = pfm.positive_var_indx;
 h_correction = pfm.h_correction;
 dimension = pfm.dimension;
 world_nbr = pfm.world_nbr;
@@ -108,7 +109,7 @@ for i = 1:order+1
                     end
                 end
                 if i > 1
-                    innovation(i+1,:) = nodes(k,:);
+                    innovation(i+1,positive_var_indx) = nodes(k,:);
                 end
                 if k == 1
                     k1 = 1;
@@ -153,7 +154,7 @@ for i = 1:order+1
                 i_cols_Af = i_cols_Af0 + ny*(i+(nnodes-1)*i*(i-1)/2+j-2);
             end
             k = j - (nnodes-1)*(i-2);
-            innovation(i+1,:) = nodes(k,:);
+            innovation(i+1,positive_var_indx) = nodes(k,:);
             z = [Y(i_cols_p,1);
                  Y(i_cols_s,j);
                  Y(i_cols_f,j)];
