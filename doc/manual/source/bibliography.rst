@@ -1,3 +1,13 @@
 .. default-domain:: dynare
 
-.. bibliography::
+.. raw:: latex
+
+   \begingroup
+   \renewcommand\chapter[1]{\endgroup}
+   \phantomsection
+
+############
+Bibliography
+############
+
+    .. bibliography::
