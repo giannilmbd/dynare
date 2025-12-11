@@ -73,6 +73,7 @@ var EfficiencyInnovation = 1;
 end;
 
 steady(nocheck);
+options_.ep.stack_solve_algo=0;
 
 extended_path(periods=10, order=0);
 

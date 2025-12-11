@@ -76,5 +76,6 @@ end;
 
 steady;
 
+options_.ep.stack_solve_algo=0;
 extended_path(periods=10);
 
