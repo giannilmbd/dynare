@@ -28,6 +28,10 @@
 /macOS/deps/arm64/lib64/
 /macOS/deps/x86_64/lib64/
 
+# Created by the MATLAB Online package build script
+/scripts/matlab-online/x13as_ascii-v*.tar.gz
+/scripts/matlab-online/dynare-*.mltbx
+
 # Emacs stuff
 TAGS
 scripts/dynare.elc
