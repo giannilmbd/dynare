@@ -66,9 +66,7 @@ GCC_VERSION=$(sed -En "/^c[[:space:]]*=/s/c[[:space:]]*=[[:space:]]*'.*gcc-([0-9
 ##
 cd "$ROOTDIR"
 
-# NB: the addition of -Wl,-ld_classic is a workaround for https://github.com/mesonbuild/meson/issues/12282 (see also the native file)
 common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/' ]" \
-                   -Dc_link_args="[ '-Wl,-ld_classic' ]" -Dcpp_link_args="[ '-Wl,-ld_classic' ]" -Dfortran_link_args="[ '-Wl,-ld_classic' ]" \
                    --native-file macOS/homebrew-native-$PKG_ARCH.ini)
 
 # Build for MATLAB ⩾ R2020a (x86_64) and MATLAB ⩾ R2023b (arm64)
