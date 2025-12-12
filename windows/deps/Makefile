@@ -26,7 +26,7 @@ FFLAGS := -O3 -flto=auto -march=nocona -msahf -mtune=generic
 
 .PHONY: all clean clean-all
 
-all: sysroot-matlab sysroot-octave gcc x13as
+all: sysroot-matlab sysroot-octave gcc x13as src/suitesparse
 
 # Clean everything except downloaded tarballs
 clean:
@@ -134,8 +134,8 @@ sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a pa
 	cp src/slicot-octave/libslicot_pic.a $@/ucrt64/lib/
 	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse octave/mingw64/include/gsl $@/ucrt64/include
 	cp -R octave/mingw64/lib/octave $@/ucrt64/lib
-	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a $@/ucrt64/lib
-	cp octave/mingw64/lib/pkgconfig/gsl.pc octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc $@/ucrt64/lib/pkgconfig
+	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a octave/mingw64/lib/libopenblas.dll.a $@/ucrt64/lib
+	cp octave/mingw64/lib/pkgconfig/gsl.pc octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc octave/mingw64/lib/pkgconfig/openblas.pc $@/ucrt64/lib/pkgconfig
 	cp panua-pardiso/lib/libpardiso.dll $@/ucrt64/lib
 	patch -p0 < octave-pkgconfig.patch
 	touch $@
@@ -192,4 +192,17 @@ panua-pardiso: tarballs/panua-pardiso-$(PANUA_PARDISO_VERSION)-win.zip
 	rm -rf $@
 	unzip -o $<
 	mv $(basename $(notdir $<)) $@
+	touch $@
+
+#
+# SuiteSparse
+#
+
+tarballs/SuiteSparse-$(SUITESPARSE_VERSION).tar.gz:
+	wget $(WGET_OPTIONS) -O $@ https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v$(SUITESPARSE_VERSION).tar.gz
+
+src/suitesparse: tarballs/SuiteSparse-$(SUITESPARSE_VERSION).tar.gz
+	rm -rf $@
+	mkdir -p $@
+	tar xf $< --directory $@ --strip-components=1
 	touch $@

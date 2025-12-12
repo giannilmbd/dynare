@@ -51,6 +51,7 @@ mkdir /tmp/windeps
 ln -s "$ROOT_DIRECTORY"/deps/sysroot-matlab /tmp/windeps/
 ln -s "$ROOT_DIRECTORY"/deps/sysroot-octave /tmp/windeps/
 ln -s "$ROOT_DIRECTORY"/deps/mkoctfile /tmp/windeps/
+ln -s "$ROOT_DIRECTORY"/deps/src /tmp/windeps/
 
 # Go to source root directory
 cd ..

@@ -30,7 +30,7 @@ NTHREADS=$(shell sysctl -n hw.perflevel0.physicalcpu)
 
 .PHONY: all clean clean-all
 
-all: $(PKG_ARCH)/src/slicot-matlab/libslicot64_pic.a $(PKG_ARCH)/src/x13as/x13as $(PKG_ARCH)/panua-pardiso
+all: $(PKG_ARCH)/src/slicot-matlab/libslicot64_pic.a $(PKG_ARCH)/src/x13as/x13as $(PKG_ARCH)/panua-pardiso $(PKG_ARCH)/src/suitesparse
 
 # Clean everything except downloaded tarballs
 clean:
@@ -81,4 +81,17 @@ $(PKG_ARCH)/panua-pardiso: tarballs/panua-pardiso-$(PANUA_PARDISO_VERSION)-mac_$
 	rm -rf $@
 	unzip -o $<
 	mv $(basename $(notdir $<)) $@
+	touch $@
+
+#
+# SuiteSparse
+#
+
+tarballs/SuiteSparse-$(SUITESPARSE_VERSION).tar.gz:
+	wget $(WGET_OPTIONS) -O $@ https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v$(SUITESPARSE_VERSION).tar.gz
+
+$(PKG_ARCH)/src/suitesparse: tarballs/SuiteSparse-$(SUITESPARSE_VERSION).tar.gz
+	rm -rf $@
+	mkdir -p $@
+	tar xf $< --directory $@ --strip-components=1
 	touch $@

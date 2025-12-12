@@ -51,3 +51,16 @@
  exec_prefix=${prefix}
  libdir=${exec_prefix}/lib
  includedir=${prefix}/include/suitesparse
+--- sysroot-octave/ucrt64/lib/pkgconfig/openblas.pc.orig	2025-11-07 12:40:34.182221621 +0100
++++ sysroot-octave/ucrt64/lib/pkgconfig/openblas.pc	2025-11-07 12:40:48.571837307 +0100
+@@ -1,8 +1,8 @@
+-libdir=/usr/lib
++libdir=/ucrt64/lib
+ libprefix=
+ libnamesuffix=
+ libsuffix=
+-includedir=/usr/include
++includedir=/ucrt64/include
+ omp_opt=
+ openblas_config= USE_64BITINT= DYNAMIC_ARCH=1 DYNAMIC_OLDER=1 NO_CBLAS=1 NO_LAPACK=1 NO_LAPACKE=1 NO_AFFINITY=1 USE_OPENMP= GENERIC MAX_THREADS=24
+ version=0.3.29

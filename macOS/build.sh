@@ -69,7 +69,7 @@ cd "$ROOTDIR"
 common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static \
                    -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/', '-B', '$DEPS_DIR/panua-pardiso/lib/' ]" \
                    --native-file macOS/homebrew-native-$PKG_ARCH.ini \
-                   -Dpardiso=enabled)
+                   -Dpardiso=enabled -Dsuitesparse_src_path="macOS/deps/$PKG_ARCH/src/suitesparse")
 
 # Build for MATLAB ⩾ R2020a (x86_64) and MATLAB ⩾ R2023b (arm64)
 arch -"$PKG_ARCH" meson setup "${common_meson_opts[@]}" -Dmatlab_path="$MATLAB_PATH" build-macOS-matlab

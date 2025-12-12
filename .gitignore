@@ -30,6 +30,7 @@
 
 # Created by the MATLAB Online package build script
 /scripts/matlab-online/x13as_ascii-v*.tar.gz
+/scripts/matlab-online/SuiteSparse-*.tar.gz
 /scripts/matlab-online/dynare-*.mltbx
 
 # Emacs stuff

@@ -7,6 +7,7 @@ set -exo pipefail
 # MATLAB Online.
 
 X13AS_VERSION=1-1-b62
+SUITESPARSE_VERSION=7.11.0
 MATLAB_VERSION=R2025b
 
 MATLAB_PATH=/opt/MATLAB/${MATLAB_VERSION}
@@ -29,8 +30,15 @@ if [[ ! -f ${X13AS_TARBALL} ]]; then
 fi
 tar -xf ${X13AS_TARBALL} -C "${tmpdir}"
 
+# Download SuiteSparse source
+SUITESPARSE_TARBALL=SuiteSparse-${SUITESPARSE_VERSION}.tar.gz
+if [[ ! -f ${SUITESPARSE_TARBALL} ]]; then
+    wget --no-verbose --retry-connrefused --retry-on-host-error https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v${SUITESPARSE_VERSION}.tar.gz -O ${SUITESPARSE_TARBALL}
+fi
+tar -xf ${SUITESPARSE_TARBALL} -C "${tmpdir}"
+
 pushd ../..
-meson setup -Dbuild_for=matlab -Dmatlab_path="$MATLAB_PATH" --buildtype=release -Db_lto=true --prefer-static "$tmpdir"/build-matlab-online
+meson setup -Dbuild_for=matlab -Dmatlab_path="$MATLAB_PATH" --buildtype=release -Db_lto=true --prefer-static -Dsuitesparse_src_path="$tmpdir/SuiteSparse-${SUITESPARSE_VERSION}" "$tmpdir"/build-matlab-online
 
 cd "$tmpdir"/build-matlab-online
 meson compile -v

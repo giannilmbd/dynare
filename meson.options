@@ -2,3 +2,4 @@ option('build_for', type : 'combo', choices : [ 'matlab', 'octave' ], descriptio
 option('matlab_path', type : 'string', description : 'Absolute directory containing the MATLAB installation')
 option('mathjax_path', type : 'string', description : 'Path to the MathJax JavaScript file to include in the HTML documentation produced by Sphinx; leave empty to use the default CDN')
 option('pardiso', type : 'feature', description : 'Whether to compile the interface to PARDISO')
+option('suitesparse_src_path', type : 'string', description : 'Path to the SuiteSparse source; leave empty if not available')

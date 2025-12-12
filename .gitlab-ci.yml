@@ -165,6 +165,7 @@ pkg_matlab_online:
       # This cache is shared between all branches, to save space
       paths:
         - scripts/matlab-online/x13as*.tar.gz
+        - scripts/matlab-online/SuiteSparse-*.tar.gz
   artifacts:
     paths:
       - scripts/matlab-online/*.mltbx
