@@ -62,7 +62,6 @@ fi
 
 export DYNARE_BUILD_DIR=$build_root
 export source_root
-export dynare_args="${dynare_args:-}"
 
 for test_file in "${test_files[@]}"; do
     test_basename=${test_file##*/}
