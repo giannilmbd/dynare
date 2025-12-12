@@ -30,7 +30,7 @@ all: sysroot-matlab sysroot-octave gcc x13as
 
 # Clean everything except downloaded tarballs
 clean:
-	rm -rf src octave sysroot-matlab sysroot-octave gcc x13as
+	rm -rf src octave sysroot-matlab sysroot-octave gcc x13as panua-pardiso
 
 # Clean everything (including downloaded tarballs)
 clean-all: clean
@@ -98,13 +98,14 @@ MATLAB_MSYS2_DEPS := \
 	tarballs/mingw-w64-ucrt-x86_64-boost-$(MSYS2_BOOST_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-gsl-$(MSYS2_GSL_VERSION)-any.pkg.tar.zst
 
-sysroot-matlab: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz $(MATLAB_MSYS2_DEPS) src/slicot-matlab/libslicot64_pic.a
+sysroot-matlab: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz $(MATLAB_MSYS2_DEPS) src/slicot-matlab/libslicot64_pic.a panua-pardiso
 	rm -rf $@
 	mkdir $@
 	for f in $(MATLAB_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
 	mkdir $@/MATLAB
 	tar xf $< --directory $@/MATLAB/
 	cp src/slicot-matlab/libslicot64_pic.a $@/ucrt64/lib/
+	cp panua-pardiso/lib/libpardiso.dll $@/ucrt64/lib
 	touch $@
 
 OCTAVE_MSYS2_DEPS := \
@@ -126,7 +127,7 @@ OCTAVE_MSYS2_DEPS := \
 	tarballs/mingw-w64-ucrt-x86_64-libiconv-$(MSYS2_LIBICONV_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-libunistring-$(MSYS2_LIBUNISTRING_VERSION)-any.pkg.tar.zst
 
-sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
+sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a panua-pardiso
 	rm -rf $@
 	mkdir $@
 	for f in $(OCTAVE_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
@@ -135,6 +136,7 @@ sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/libslicot_pic.a
 	cp -R octave/mingw64/lib/octave $@/ucrt64/lib
 	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a $@/ucrt64/lib
 	cp octave/mingw64/lib/pkgconfig/gsl.pc octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc $@/ucrt64/lib/pkgconfig
+	cp panua-pardiso/lib/libpardiso.dll $@/ucrt64/lib
 	patch -p0 < octave-pkgconfig.patch
 	touch $@
 
@@ -174,4 +176,20 @@ x13as: tarballs/x13as_ascii-v$(X13AS_VERSION).zip
 	rm -rf $@
 	unzip -o $<
 	mv $@/x13as_ascii.exe $@/x13as.exe
+	touch $@
+
+#
+# Panua PARDISO
+#
+
+tarballs/panua-pardiso-%-win.zip:
+	mkdir -p $(dir $@)
+	wget $(WGET_OPTIONS) -O $@.gpg https://www.dynare.org/pkg-build/$(notdir $@).gpg
+	gpg --output $@ --decrypt $@.gpg
+	rm $@.gpg
+
+panua-pardiso: tarballs/panua-pardiso-$(PANUA_PARDISO_VERSION)-win.zip
+	rm -rf $@
+	unzip -o $<
+	mv $(basename $(notdir $<)) $@
 	touch $@

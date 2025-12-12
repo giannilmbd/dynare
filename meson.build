@@ -587,6 +587,14 @@ shared_module('compute_expected_y',  'mex/sources/heterogeneity/compute_expected
 shared_module('compute_curlyDs',  'mex/sources/heterogeneity/compute_curlyDs.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 shared_module('compute_transition_matrices',  'mex/sources/heterogeneity/compute_transition_matrices.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 
+
+## Optionally build PARDISO MEX files
+
+pardiso_dep = fortran_compiler.find_library('pardiso', required : get_option('pardiso'), disabler : true)
+shared_module('pardiso_init', [ 'mex/sources/pardiso/pardiso_init.f08', 'mex/sources/pardiso/pardiso.f08' ], kwargs : mex_kwargs, dependencies : [ mex_fortran_dep, pardiso_dep ])
+shared_module('pardiso_free', [ 'mex/sources/pardiso/pardiso_free.f08', 'mex/sources/pardiso/pardiso.f08' ], kwargs : mex_kwargs, dependencies : [ mex_fortran_dep, pardiso_dep ])
+shared_module('pardiso_solve', [ 'mex/sources/pardiso/pardiso_solve.f08', 'mex/sources/pardiso/pardiso.f08' ], kwargs : mex_kwargs, dependencies : [ mex_fortran_dep, pardiso_dep ])
+
 ### Documentation
 
 # Documentation is not built by default. A special-purpose target named “doc” triggers it.

@@ -66,8 +66,10 @@ GCC_VERSION=$(sed -En "/^c[[:space:]]*=/s/c[[:space:]]*=[[:space:]]*'.*gcc-([0-9
 ##
 cd "$ROOTDIR"
 
-common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/' ]" \
-                   --native-file macOS/homebrew-native-$PKG_ARCH.ini)
+common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static \
+                   -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/', '-B', '$DEPS_DIR/panua-pardiso/lib/' ]" \
+                   --native-file macOS/homebrew-native-$PKG_ARCH.ini \
+                   -Dpardiso=enabled)
 
 # Build for MATLAB ⩾ R2020a (x86_64) and MATLAB ⩾ R2023b (arm64)
 arch -"$PKG_ARCH" meson setup "${common_meson_opts[@]}" -Dmatlab_path="$MATLAB_PATH" build-macOS-matlab

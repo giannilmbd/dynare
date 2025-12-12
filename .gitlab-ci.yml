@@ -80,7 +80,7 @@ pkg_windows:
   stage: pkg
   script:
     - meson rewrite kwargs set project / version "$VERSION"
-    - mkdir -p windows/deps/tarballs && cp /usr/lib/dynare-runner/matlab64-* windows/deps/tarballs/
+    - mkdir -p windows/deps/tarballs && cp /usr/lib/dynare-runner/matlab64-* /usr/lib/dynare-runner/panua-pardiso-*-win.zip windows/deps/tarballs/
     - make -C windows
     - rm windows/deps/tarballs/matlab64-* # No need to cache these files
   cache:

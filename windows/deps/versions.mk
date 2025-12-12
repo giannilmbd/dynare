@@ -6,6 +6,7 @@ OCTAVE_W64_BUILD =
 
 MATLAB64_VERSION = 20250618
 
+PANUA_PARDISO_VERSION = 20240630
 
 ### MSYS2 packages
 # Determine the versions by:

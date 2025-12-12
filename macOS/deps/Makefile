@@ -30,11 +30,11 @@ NTHREADS=$(shell sysctl -n hw.perflevel0.physicalcpu)
 
 .PHONY: all clean clean-all
 
-all: $(PKG_ARCH)/src/slicot-matlab/libslicot64_pic.a $(PKG_ARCH)/src/x13as/x13as
+all: $(PKG_ARCH)/src/slicot-matlab/libslicot64_pic.a $(PKG_ARCH)/src/x13as/x13as $(PKG_ARCH)/panua-pardiso
 
 # Clean everything except downloaded tarballs
 clean:
-	rm -rf $(PKG_ARCH)/src
+	rm -rf $(PKG_ARCH)/src $(PKG_ARCH)/panua-pardiso
 
 # Clean everything (including downloaded tarballs)
 clean-all: clean
@@ -72,3 +72,13 @@ $(PKG_ARCH)/src/x13as/x13as: tarballs/x13as_asciisrc-v$(X13AS_VERSION).tar.gz
 	cd $(dir $@) && sed -i '' 's/-static//g' makefile.gf
 	gmake -C $(dir $@) -f makefile.gf FC=$(BREWDIR)/bin/gfortran LINKER=$(BREWDIR)/bin/gfortran FFLAGS="-O3 -std=legacy" LDFLAGS="-static-libgcc -static-libgfortran -static-libquadmath" PROGRAM=x13as -j$(NTHREADS)
 	strip $@
+
+#
+# Panua PARDISO
+#
+
+$(PKG_ARCH)/panua-pardiso: tarballs/panua-pardiso-$(PANUA_PARDISO_VERSION)-mac_$(if $(filter x86_64,$(PKG_ARCH)),x86,arm64).zip
+	rm -rf $@
+	unzip -o $<
+	mv $(basename $(notdir $<)) $@
+	touch $@
