@@ -35,8 +35,8 @@ function Simulations = extended_path_mc(initialconditions, samplesize, replic, e
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-[initialconditions, innovations, pfm, options_, oo_] = ...
-    extended_path_initialization(initialconditions, exogenousvariables, options_, M_, oo_);
+[initialconditions, pfm, options_, oo_] = ...
+    extended_path_initialization(initialconditions, options_, M_, oo_);
 
 % Check the dimension of the first input argument
 if isequal(size(initialconditions, 2), 1)
@@ -60,19 +60,18 @@ if ~isequal(size(exogenousvariables, 3), replic)
 end
 
 data = NaN(size(initialconditions, 1), samplesize+1, replic);
-vexo = NaN(innovations.effective_number_of_shocks, samplesize+1, replic);
+vexo = NaN(pfm.effective_number_of_shocks, samplesize+1, replic);
 info = NaN(replic, 1);
 
 if options_.ep.parallel
     % Use the Parallel toolbox.
     initialconditions_parfor=initialconditions(:,1);
     parfor i=1:replic
-        innovations_ = innovations;
         oo__ = oo_;
-        [shocks, spfm_exo_simul, oo__] = extended_path_shocks(innovations_, exogenousvariables(:,:,i), samplesize, M_, options_, oo__);
+        [shocks, spfm_exo_simul, oo__] = extended_path_shocks(pfm, exogenousvariables(:,:,i), samplesize, M_, options_, oo__);
         endogenous_variables_paths = NaN(M_.endo_nbr,samplesize+1);
         endogenous_variables_paths(:,1) = initialconditions_parfor;
-        exogenous_variables_paths = NaN(innovations_.effective_number_of_shocks,samplesize+1);
+        exogenous_variables_paths = NaN(pfm.effective_number_of_shocks,samplesize+1);
         exogenous_variables_paths(:,1) = 0;
         info_convergence = true;
         t = 1;
@@ -108,10 +107,10 @@ if options_.ep.parallel
 else
     % Sequential approach.
     for i=1:replic
-        [shocks, spfm_exo_simul, oo_] = extended_path_shocks(innovations, exogenousvariables(:,:,i), samplesize, M_, options_, oo_);
+        [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables(:,:,i), samplesize, M_, options_, oo_);
         endogenous_variables_paths = NaN(M_.endo_nbr,samplesize+1);
         endogenous_variables_paths(:,1) = initialconditions(:,1);
-        exogenous_variables_paths = NaN(innovations.effective_number_of_shocks,samplesize+1);
+        exogenous_variables_paths = NaN(pfm.effective_number_of_shocks,samplesize+1);
         exogenous_variables_paths(:,1) = 0;
         t = 1;
         while t<=samplesize

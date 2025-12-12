@@ -1,7 +1,7 @@
-function [shocks, spfm_exo_simul, oo_] = extended_path_shocks(innovations, exogenousvariables, sample_size, M_, options_, oo_)
-% [shocks, spfm_exo_simul, oo_] = extended_path_shocks(innovations, exogenousvariables, sample_size, M_, options_, oo_)
+function [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, sample_size, M_, options_, oo_)
+% [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, sample_size, M_, options_, oo_)
 % INPUTS
-%  o innovations         [struct]    description of innovations (potentially empty if path has been set with exogenousvariables)
+%  o pfm                 [struct]    description of pfm, containing information on innovations
 %  o exogenousvariables  [matrix]    path of exogenous variables, potentially empty
 %  o sample_size         [integer]   sample size
 %  o M_                  [structure] describing the model
@@ -37,7 +37,7 @@ if isempty(exogenousvariables)
     switch options_.ep.innovation_distribution
       case 'gaussian'
         shocks = zeros(sample_size, M_.exo_nbr);
-        shocks(:,innovations.positive_var_indx) = transpose(transpose(innovations.covariance_matrix_upper_cholesky)*randn(innovations.effective_number_of_shocks,sample_size));
+        shocks(:,pfm.positive_var_indx) = transpose(transpose(pfm.Omega)*randn(pfm.effective_number_of_shocks,sample_size)); %Omega is covariance_matrix_upper_cholesky 
       case 'calibrated'
         options = options_;
         options.periods = options.ep.periods;

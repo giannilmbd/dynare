@@ -28,13 +28,13 @@ function e = ep_accuracy_check(M_,options_,oo_)
 
 endo_simul = oo_.endo_simul;
 n = size(endo_simul,2);
-[~, innovations, pfm, options_, oo_] = ...
-    extended_path_initialization([], [], options_, M_, oo_);
+[~, pfm, options_, oo_] = ...
+    extended_path_initialization([], options_, M_, oo_);
  
 options_.ep.accuracy.stochastic.order = options_.ep.stochastic.order;
 [nodes,weights] = setup_integration_nodes(options_.ep.accuracy,pfm);
 
-[~, spfm_exo_simul, oo_] = extended_path_shocks(innovations, oo_.exo_simul, options_.ep.periods, M_, options_, oo_);
+[~, spfm_exo_simul, oo_] = extended_path_shocks(pfm, oo_.exo_simul, options_.ep.periods, M_, options_, oo_);
 
 e = zeros(M_.endo_nbr,n);
 for i=1:n

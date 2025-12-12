@@ -41,8 +41,8 @@ if ~isempty(M_.perfect_foresight_controlled_paths)
     error('extended_path: command is not compatible with perfect_foresight_controlled_paths block.')
 end
 
-[initialconditions, innovations, pfm, options_, oo_] = ...
-    extended_path_initialization(initialconditions, exogenousvariables, options_, M_, oo_);
+[initialconditions, pfm, options_, oo_] = ...
+    extended_path_initialization(initialconditions, options_, M_, oo_);
 
 
 % Set the initial period.
@@ -58,7 +58,7 @@ else
     error('extended_path: option initial_period be a date.')
 end
 
-[shocks, spfm_exo_simul, oo_] = extended_path_shocks(innovations, exogenousvariables, samplesize, M_, options_, oo_);
+[shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, samplesize, M_, options_, oo_);
 
 % Initialize the matrix for the paths of the endogenous variables.
 endogenous_variables_paths = NaN(M_.endo_nbr, samplesize+1);

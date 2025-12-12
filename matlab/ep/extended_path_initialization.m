@@ -1,23 +1,21 @@
-function [initial_conditions, innovations, pfm, options_, oo_] = extended_path_initialization(initial_conditions, exogenousvariables, options_, M_, oo_)
+function [initial_conditions, pfm, options_, oo_] = extended_path_initialization(initial_conditions, options_, M_, oo_)
 
 % Initialization of the extended path routines.
 %
 % INPUTS
 % - initial_conditions     [double]    m×1 array, where m is the number of endogenous variables in the model.
-% - exogenousvariables     [double]    T×n array, values for the structural innovations.
 % - options_               [struct]    Dynare's options structure
 % - M_                     [struct]    Dynare's model structure
 % - oo_                    [struct]    Dynare's result structure
 %
 % OUTPUTS
 % - initial_conditions     [double]    m*1 array, initial conditions (if empty on input, set to steady state or histval).
-% - innovations            [struct]    Structure with fields:
+% - pfm                    [struct]    Structure for the perfect foresight
+%                                      model solver, containing:
 %                                        * positive_var_indx: indices of shocks with positive variance
 %                                        * effective_number_of_shocks: number of shocks with positive variance
 %                                        * covariance_matrix: covariance matrix of effective shocks
 %                                        * covariance_matrix_upper_cholesky: upper Cholesky factor of covariance matrix
-%                                      Empty struct if exogenousvariables is provided.
-% - pfm                    [struct]    Structure for the perfect foresight model solver.
 % - options_               [struct]    Modified Dynare's options structure.
 % - oo_                    [struct]    Modified Dynare's result structure.
 %
@@ -95,17 +93,6 @@ end
 
 % Do not use a minimal number of periods for the perfect foresight solver (with bytecode and blocks)
 options_.minimal_solving_period = options_.ep.periods;
-
-% Set the covariance matrix of the structural innovations.
-if isempty(exogenousvariables)
-    innovations = struct();
-    innovations.positive_var_indx = pfm.positive_var_indx;
-    innovations.effective_number_of_shocks = pfm.effective_number_of_shocks;
-    innovations.covariance_matrix = pfm.Sigma;
-    innovations.covariance_matrix_upper_cholesky = pfm.Omega;
-else
-    innovations = struct();
-end
 
 % Set seed.
 if ep.set_dynare_seed_to_default
