@@ -4,7 +4,6 @@ Upstream-Contact: Dynare Team, whose members in 2025 are:
                   - Stéphane Adjemian <stephane.adjemian@univ-lemans.fr>
                   - Michel Juillard <michel.juillard@mjui.fr>
                   - Frédéric Karamé <frederic.karame@univ-lemans.fr>
-                  - Junior Maih <junior.maih@gmail.com>
                   - Willi Mutschler <willi@mutschler.eu>
                   - Johannes Pfeifer <jpfeifer@gmx.de>
                   - Marco Ratto <marco.ratto@ec.europa.eu>
@@ -18,6 +17,7 @@ Upstream-Contact: Dynare Team, whose members in 2025 are:
                   - Assia Ezzeroug
                   - Dóra Kocsis
                   - Stéphane Lhuissier
+                  - Junior Maih
                   - Ferhat Mihoubi
                   - George Perendia
 Source: https://www.dynare.org
