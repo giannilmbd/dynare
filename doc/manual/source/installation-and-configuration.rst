@@ -233,6 +233,29 @@ The compiler can be installed via Homebrew_. In a terminal, run::
 
   brew install gcc
 
+
+.. _panua-pardiso-install:
+
+Optional installation of Panua PARDISO
+======================================
+
+In order to use the values ``9`` or ``10`` of
+:opt:`stack_solve_algo <stack_solve_algo = INTEGER>`, the user must manually copy the
+PARDISO library into the directory containing Dynare MEX files, and also
+provide a license file. This is needed because Panua PARDISO is a
+proprietary software, and thus cannot be distributed alongside Dynare.
+
+On Windows
+----------
+
+The library file ``libpardiso.dll`` from the Panua PARDISO distribution should
+be copied under the MEX directory, which by default has the form
+``C:\dynare\<version>\mex\matlab\win64-<version_range>\`` for MATLAB or
+``C:\dynare\<version>\mex\octave\win64\`` for Octave. Then the license file
+``panua.lic`` should go into the home directory (typically
+``C:\Users\<YOUR_LOGIN>\``).
+
+
 Configuration
 =============
 

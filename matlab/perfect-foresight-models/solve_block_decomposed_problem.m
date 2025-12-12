@@ -37,7 +37,7 @@ cutoff = 1e-15;
 
 switch options_.stack_solve_algo
     case 0
-        mthd='Sparse LU on stacked system';
+        mthd='Sparse LU on stacked system, using mldivide';
     case {1,6}
         mthd='LBJ with LU solver';
     case 2
@@ -48,6 +48,12 @@ switch options_.stack_solve_algo
         mthd='Sparse LU solver with optimal path length on stacked system';
     case 7
         mthd='Solver from solve_algo option on stacked system';
+    case 8
+        mthd='Sparse LU on stacked system, using ParU';
+    case 9
+        mthd='Sparse LU on stacked system, using PARDISO';
+    case 10
+        mthd='CGS on stacked system with preconditioner computed at first iteration with PARDISO';
     otherwise
         error('Unsupported stack_solve_algo value')
 end

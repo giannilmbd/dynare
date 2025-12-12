@@ -87,6 +87,13 @@ A number of tools and libraries are needed in order to recompile everything. You
   - [Sphinx](https://www.sphinx-doc.org/)
   - [MathJax](https://www.mathjax.org/)
 - [X-13ARIMA-SEATS Seasonal Adjustment Program](https://www.census.gov/data/software/x13as.html)
+- Optionally, the unpacked source tree of
+  [SuiteSparse](https://www.suitesparse.com), for compiling the ParU MEX file
+  (needed for `stack_solve_algo=8`); see the `-Dsuitesparse_src_path` option
+  documented below
+- Optionally, the [Panua PARDISO](https://www.panua.ch) library, for compiling
+  the PARDISO MEX files (needed for `stack_solve_algo=9` and
+  `stack_solve_algo=10`); see the `-Dpardiso` option documented below
 
 ### Preparing the sources
 
@@ -119,6 +126,15 @@ Note that if you do not chose `build-matlab` (under MATLAB) or `build-octave`
 variable `DYNARE_BUILD_DIR` to the full path of your build tree, before running
 MATLAB or Octave, if you want Dynare to be able to find the preprocessor and
 the MEX files.
+
+The `-Dsuitesparse_src_path=…` option can be used to pass the path to the
+unpacked SuiteSparse source tree, so that the ParU MEX file can be compiled.
+
+The `-Dpardiso=enabled` option can be set to force the detection of Panua
+PARDISO in the library path and compile the corresponding MEX files.
+Conversely, `-Dpardiso=disabled` can be used to ignore it. The default,
+`-Dpardiso=auto` will compile the PARDISO MEX files if the PARDISO library is
+detected, otherwise it will ignore it.
 
 It is possible to specify various Meson options, see the Meson documentation
 for more details. Modifying options of an existing build directory can be

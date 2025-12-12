@@ -49,7 +49,7 @@ y_index = M_.block_structure.block(Block_Num).variable(end-Blck_size+1:end);
 periods = get_simulation_periods(options_);
 stack_solve_algo = options_.stack_solve_algo;
 
-if ~ismember(stack_solve_algo, [0 2 3 4])
+if ~ismember(stack_solve_algo, [0:4 8:10])
     error('Unsupported stack_solve_algo value')
 end
 
@@ -139,7 +139,7 @@ while ~(cvg || iter > options_.simul.maxit)
         ya_save=ya;
         ra_save=ra;
         g1aa=g1a;
-        if ismember(stack_solve_algo, [0, 2, 3])
+        if ismember(stack_solve_algo, [0 2 3 8:10])
             % Fallback to LU if block too small for block_diagonal_lu
             force_lu = ismember(stack_solve_algo, [2 3]) ...
                 && strcmp(options_.simul.preconditioner, 'block_diagonal_lu') ...

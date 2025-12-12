@@ -11,7 +11,7 @@ function set_dynare_threads(mexname,n)
 %  none.
 % Documented standalone function, not to be removed
 
-% Copyright © 2009-2024 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -50,6 +50,8 @@ switch mexname
     options_.threads.perfect_foresight_problem = n;
   case 'k_order_perturbation'
     options_.threads.k_order_perturbation = n;
+  case 'pardiso'
+    options_.threads.pardiso = n;
   otherwise
     message = [ mexname ' is not a known parallel mex file.' ];
     message_id  = 'Dynare:Threads:UnknownParallelMex';

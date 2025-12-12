@@ -3800,7 +3800,11 @@ speed-up on large models.
 
                Use a Newton algorithm with a direct sparse LU solver at each
                iteration, applied to the stacked system of all equations in all
-               periods (Default). Termination criterion: ``tolf``.
+               periods. The direct sparse LU solver is the ``mldivide``
+               MATLAB/Octave function (unless the :opt:`bytecode` option is
+               used, in which case the sparse LU solver is UMFPACK from
+               `SuiteSparse <https://www.suitesparse.com>`__).
+               Termination criterion: ``tolf``. (Default)
 
            ``1``
 
@@ -3875,6 +3879,39 @@ speed-up on large models.
                trigger the computation of the solution with a trust
                region algorithm.
 
+           ``8``
+
+               Use a Newton algorithm with a direct sparse LU solver at each
+               iteration, applied to the stacked system of all equations in all
+               periods. The sparse LU solver is ParU from
+               `SuiteSparse <https://www.suitesparse.com>`__.
+               Termination criterion: ``tolf``. Not available with the
+               :opt:`bytecode` option.
+
+           ``9``
+
+               Use a Newton algorithm with a direct sparse LU solver at each
+               iteration, applied to the stacked system of all equations in all
+               periods. The direct sparse LU solver is PARDISO. Termination
+               criterion: ``tolf``. See :ref:`panua-pardiso-install` for
+               PARDISO installation instructions. Not available with the
+               :opt:`bytecode` option.
+
+           ``10``
+
+               Use a Newton algorithm applied on the stacked system of all
+               equations in all periods. The direct linear solver in PARDISO is
+               used to compute the solution in the first iteration; in further
+               iterations, use a Conjugate Gradient Squared (CGS) iterative
+               linear solver as implemented in PARDISO, with the LU
+               decomposition from the first iteration as preconditioner. The
+               :opt:`iter_tol <iter_tol = DOUBLE>` option can be used to
+               control the termination criterion of the iterative linear
+               solver. Termination criterion: ``tolf``. See
+               :ref:`panua-pardiso-install` for PARDISO installation
+               instructions. Not available with the :opt:`bytecode` option.
+
+
     .. option:: preconditioner = OPTION
 
        When :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` is equal to
@@ -3916,13 +3953,16 @@ speed-up on large models.
     .. option:: iter_tol = DOUBLE
 
        When :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` is equal to
-       ``2`` or ``3``, this option controls the relative tolerance of the
-       iterative linear solver (either GMRES or BiCGStab). It corresponds to
+       ``2``, ``3`` or ``10``, this option controls the relative tolerance of the
+       iterative linear solver (either GMRES, BiCGStab or CGS). It corresponds to
        the ``tol`` option of the ``gmres`` and ``bicgstab`` MATLAB/Octave
-       functions. Note that the perfect foresight solver uses an *absolute*
+       functions when ``stack_solve_algo`` is equal to ``2`` or ``3``, or to
+       the stopping criterion of the Krylov-Subspace iteration as documented in
+       ``IPARM(4)`` of the PARDISO routine. Note that the perfect foresight
+       solver uses an *absolute*
        tolerance for determining convergence, so this option should be used
        with care, and the default is meant to suit most situations.
-       Default: the value of the :opt:``tolf <tolf = DOUBLE>`` option, divided
+       Default: the value of the :opt:`tolf <tolf = DOUBLE>` option, divided
        by 10 times the infinite norm of the right-hand side of the linear system.
 
     .. option:: iter_maxit = INTEGER

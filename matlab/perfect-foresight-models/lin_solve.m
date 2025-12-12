@@ -1,13 +1,17 @@
 function [x, first_iter_lu] = lin_solve(A, b, options_, first_iter_lu, force_lu)
 % [x, first_iter_lu] = lin_solve(A, b, options_, first_iter_lu, force_lu)
 % Solves the linear system A·x=b. Used at the heart of the perfect foresight solver when
-% stack_solve_algo equals 0 (LU), 2 (GMRES) or 3 (BiCGStab).
+% stack_solve_algo equals 0 (mldivide), 2 (GMRES), 3 (BiCGStab), 8 (ParU), 9 (PARDISO),
+% 10 (CGS with PARDISO at first iteration).
 %
-% If force_lu is true, then the value of options_.stack_solve_algo is ignored and a LU is used.
+% If force_lu is true, then the value of options_.stack_solve_algo is ignored
+% and mldivide is used.
 %
 % first_iter_lu corresponds to the preconditioner used when preconditioner=first_iter_lu.
 % If empty on input, then the routine computes the preconditioner and returns on output.
 % If not empty, use that preconditioner without recomputing it, and pass it unmodified on output.
+%
+% If using CGS+PARDISO, first_iter_lu contains the class handle to the pardiso structure.
 
 % Copyright © 1996-2025 Dynare Team
 %
@@ -40,7 +44,7 @@ end
 
 if options_.stack_solve_algo == 0 || force_lu
     x = A\b;
-else % Iterative algorithm
+elseif ismember(options_.stack_solve_algo, [2, 3])
     if strcmp(options_.simul.preconditioner, 'first_iter_lu')
         if isempty(first_iter_lu)
             [L, U, P, Q] = lu(A);
@@ -62,14 +66,7 @@ else % Iterative algorithm
         y = U\z;
         first_iter_lu = struct('L', L, 'U', U, 'P', P, 'Q', Q);
     else
-        iter_tol = options_.simul.iter_tol;
-        if isempty(iter_tol)
-            % The tolerance passed to gmres and bicgstab is a relative one (‖Ax−b‖/‖b‖).
-            % However, we test the convergence of algorithms via options_.dynatol.f, which is an
-            % absolute error (‖Ax−b‖). Hence the need to rescale by the norm of the RHS (‖b‖).
-            iter_tol = options_.dynatol.f / norm(b, 'Inf') / 10;
-        end
-
+        iter_tol = get_iter_tol(options_, b);
         iter_maxit = min(options_.simul.iter_maxit, size(A, 1));
 
         if options_.stack_solve_algo == 2
@@ -84,6 +81,26 @@ else % Iterative algorithm
     end
 
     x = Q*y;
+elseif options_.stack_solve_algo == 8
+    if exist('paru') ~= 3
+        error('Cannot find the ParU MEX file. If you are compiling from source, pass -Dsuitesparse_src_path=... to meson.')
+    end
+
+    opts.strategy = 'unsymmetric';
+    opts.ordering = 'amd';
+    opts.prescale = 'max';
+    x = paru(A, b, opts);
+elseif options_.stack_solve_algo == 9
+    p = pardiso(options_.threads.pardiso);
+    x = p.solve(A, b);
+elseif options_.stack_solve_algo == 10
+    if isempty(first_iter_lu)
+        first_iter_lu = pardiso(options_.threads.pardiso);
+        x = first_iter_lu.solve(A, b);
+    else
+        iter_tol = get_iter_tol(options_, b);
+        x = first_iter_lu.solve_cgs(A, b, iter_tol);
+    end
 end
 if ~options_.simul.allow_nonfinite_values
     x(~isfinite(x)) = 0; %prevent non-finite values from propagating, see #1975
@@ -154,4 +171,16 @@ switch flag
         error('No progress between two successive iterations in GMRES/BiCGStab. You may want to increase the iter_tol option.')
     case 4
         error('One of the scalar quantities calculated by GMRES/BiCGStab became too small or too large. Try another preconditioner or algorithm.')
+end
+
+
+function iter_tol = get_iter_tol(options_, b)
+iter_tol = options_.simul.iter_tol;
+if isempty(iter_tol)
+    % The tolerance passed to gmres and bicgstab is a relative one (‖Ax−b‖/‖b‖).
+    % Same for CGS in PARDISO (seems to be ‖x−A⁻¹b‖/‖A⁻¹b‖ according to the
+    % manual, assuming that initial guess is 0).
+    % However, we test the convergence of algorithms via options_.dynatol.f, which is an
+    % absolute error (‖Ax−b‖). Hence the need to rescale by the norm of the RHS (‖b‖).
+    iter_tol = options_.dynatol.f / norm(b, 'Inf') / 10;
 end

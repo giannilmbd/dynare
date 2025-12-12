@@ -2410,7 +2410,11 @@ mod_and_m_tests = [
                 'simulateddata.m' ] },
   { 'test' : [ 'run_block_bytecode_tests.m' ],
     'extra' : [ 'block_bytecode/run_ls2003.m',
-                'block_bytecode/ls2003.mod' ] },
+                'block_bytecode/ls2003.mod' ],
+    'env' : { 'HAS_PARU' : (get_option('suitesparse_src_path') != '').to_string(),
+              # Only enable PARDISO test if presence of the library is explicitly required,
+              # to avoid cases where the library might be there but no license is configured.
+              'HAS_PARDISO' : get_option('pardiso').enabled().to_string() } },
   { 'test' : [ 'run_reporting_tests.m' ],
     'extra' : [ 'reporting/AnnualTable.m',
                 'reporting/CommResidTablePage.m',
@@ -2447,16 +2451,21 @@ foreach t : mod_and_m_tests
   endif
   test_name = t['test'][-1] # Use the last test file as the test name
 
+  test_env = {}
+
   # Handle optional dynare_args field for passing -D options to preprocessor
   if t.has_key('dynare_args')
     # Pass each argument as a separate environment variable
     args_list = t['dynare_args']
-    test_env = { 'dynare_arg_count': args_list.length().to_string() }
+    test_env += { 'dynare_arg_count': args_list.length().to_string() }
     foreach i : range(args_list.length())
       test_env += { f'dynare_arg_@i@': args_list[i] }
     endforeach
-  else
-    test_env = {}
+  endif
+
+  # Handle optional environment variables
+  if t.has_key('env')
+    test_env += t['env']
   endif
 
   # Construct the suite name(s) using the path to the test file

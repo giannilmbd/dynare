@@ -66,8 +66,8 @@ if options_.simul.check_jacobian_singularity
     if M_.maximum_endo_lead == 0 || M_.maximum_endo_lag == 0
         warning('perfect_foresight_solver: check_jacobian_singularity is not compatible with purely backward or forward models and will be ignored.')
     end
-    if ~ismember(options_.stack_solve_algo,[0 2 3])
-        warning('perfect_foresight_solver: check_jacobian_singularity is only compatible with stack_solve_algo=[0,2,3] and will be ignored.')
+    if ~ismember(options_.stack_solve_algo,[0 2 3 8:10])
+        warning('perfect_foresight_solver: check_jacobian_singularity is only compatible with stack_solve_algo=[0,2,3,8,9,10] and will be ignored.')
     end
 end
 
@@ -103,8 +103,8 @@ end
 
 if ~isempty(controlled_paths_by_period)
     assert(nargout >= 6); % Ensure modified exos are used
-    if ~ismember(options_.stack_solve_algo, [0 1 2 3 6 7])
-        error('perfect_foresight_controlled_paths is only available with stack_solve_algo option equal to 0, 1, 2, 3, 6 or 7')
+    if ~ismember(options_.stack_solve_algo, [0:3 6:10])
+        error('perfect_foresight_controlled_paths is only available with stack_solve_algo option equal to 0, 1, 2, 3, 6, 7, 8, 9, 10')
     end
     if options_.stack_solve_algo == 7 && ismember(options_.solve_algo, [10, 11])
         error('perfect_foresight_controlled_paths is not available for mixed-complementarity problems (LMMCP or PATH solvers)')
@@ -121,9 +121,13 @@ if ~isempty(controlled_paths_by_period)
 end
 
 
-if options_.linear && ismember(options_.stack_solve_algo, [0, 2, 3, 7]) && ~options_.block ...
+if options_.linear && ismember(options_.stack_solve_algo, [0 2 3 7:10]) && ~options_.block ...
         && ~options_.bytecode && M_.maximum_endo_lead > 0 && M_.maximum_endo_lag > 0
     options_.linear_approximation = true;
+end
+
+if options_.bytecode && ismember(options_.stack_solve_algo, 8:10)
+    error(['perfect_foresight_solver: bytecode is not compatible with stack_solve_algo=' options_.stack_solve_algo])
 end
 
 maxerror = [];
@@ -167,7 +171,7 @@ else
             [y, success] = sim1_purely_static(y, exo_simul, steady_state, M_, options_);
         else % General case
             switch options_.stack_solve_algo
-              case {0 2 3}
+              case {0 2 3 8 9 10}
                 if options_.linear_approximation
                     [y, success, maxerror, exo_simul] = sim1_linear(y, exo_simul, steady_state, exo_steady_state, controlled_paths_by_period, M_, options_);
                 else

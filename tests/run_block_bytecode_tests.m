@@ -54,6 +54,14 @@ for blockFlag = 0:1
             solve_algos = [ 0 solve_algos ];
         end
 
+        if isequal(getenv('HAS_PARU'), 'true') && storageFlag ~= 2
+            stack_solve_algos = [stack_solve_algos, 8];
+        end
+
+        if isequal(getenv('HAS_PARDISO'), 'true') && storageFlag ~= 2
+            stack_solve_algos = [stack_solve_algos, 9:10];
+        end
+
         % Workaround for strange race condition related to the static/dynamic
         % files (especially when we switch to/from use_dll)
         if isoctave && isfolder('+ls2003_tmp')

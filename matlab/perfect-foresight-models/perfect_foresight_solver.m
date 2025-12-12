@@ -609,12 +609,12 @@ function check_input_arguments(options_, M_, oo_)
 
 periods = get_simulation_periods(options_);
 
-if options_.stack_solve_algo < 0 || options_.stack_solve_algo > 7
-    error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: stack_solve_algo must be between 0 and 7')
+if options_.stack_solve_algo < 0 || options_.stack_solve_algo > 10
+    error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: stack_solve_algo must be between 0 and 10')
 end
 
-if ~options_.block && ~options_.bytecode && ~ismember(options_.stack_solve_algo, [0:3 6 7])
-    error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: you must use stack_solve_algo={0,1,2,3,6,7} when not using block nor bytecode option')
+if ~options_.block && ~options_.bytecode && ~ismember(options_.stack_solve_algo, [0:3 6:10])
+    error('perfect_foresight_solver:ArgCheck','PERFECT_FORESIGHT_SOLVER: you must use stack_solve_algo={0,1,2,3,6,7,8,9,10} when not using block nor bytecode option')
 end
 
 if options_.block && ~options_.bytecode && options_.stack_solve_algo == 5
