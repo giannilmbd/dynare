@@ -120,11 +120,10 @@ end % (while) loop over t
 wait_bar.close(hh_fig,options_.console_mode);
 
 % Return the simulated time series.
-if any(isnan(endogenous_variables_paths(:)))
-    sl = find(~isnan(endogenous_variables_paths));
-    nn = size(endogenous_variables_paths, 1);
-    endogenous_variables_paths = reshape(endogenous_variables_paths(sl), nn, length(sl)/nn);
+if any(~isfinite(endogenous_variables_paths(:)))
+    display_critical_variables(endogenous_variables_paths, M_.endo_names, 'extended_path', false,1)
 end
+
 ts = dseries(transpose(endogenous_variables_paths), initial_period, M_.endo_names);
 
 oo_.endo_simul = transpose(ts.data);
