@@ -146,12 +146,9 @@ var epsG; stderr 0.004;
 var epsInt; stderr 0.003;
 end;
 
-
-options_.ep.stochastic.IntegrationAlgorithm = 'Unscented';
-
 // Test SEP(1)
 
-extended_path(periods=10, order=1);
+extended_path(periods=10, order=1,integration=unscented);
 
 Simulated_time_series1 = dseries('rstrue1.mat');
 
@@ -191,9 +188,7 @@ delete('rstrue2.mat');
 
 // Test SEP(2, sparse)
 
-options_.ep.stochastic.algo = 1;
-
-extended_path(periods=10, order=2);
+extended_path(periods=10, order=2, tree=sparse);
 
 Simulated_time_series2s = dseries('rstrue2s.mat');
 
@@ -211,10 +206,7 @@ end
 delete('rstrue2s.mat');
 
 // Test SEP(2, sparse, hybrid)
-
-options_.ep.stochastic.algo = 1;
-
-extended_path(periods=10, order=2, hybrid);
+extended_path(periods=10, order=2, hybrid,tree=sparse);
 
 Simulated_time_series2sh = dseries('rstrue2sh.mat');
 
