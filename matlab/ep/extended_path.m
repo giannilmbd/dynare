@@ -44,6 +44,9 @@ end
 [initialconditions, pfm, options_, oo_] = ...
     extended_path_initialization(initialconditions, options_, M_, oo_);
 
+if ~isempty(exogenousvariables) && strcmp(options_.ep.innovation_distribution,'gaussian') && ~all(iszero(oo_.exo_steady_state))
+    error('extended_path: a Gaussian innovation_distribution is incompatible with non-mean 0 exogenous variables.')
+end
 
 % Set the initial period.
 if isdates(options_.initial_period)

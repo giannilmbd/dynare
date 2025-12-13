@@ -36,7 +36,7 @@ function [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvari
 if isempty(exogenousvariables)
     switch options_.ep.innovation_distribution
       case 'gaussian'
-        shocks = zeros(sample_size, M_.exo_nbr);
+        shocks = zeros(sample_size, M_.exo_nbr); %non-zero mean steady states are filtered out in extended_path.m
         shocks(:,pfm.positive_var_indx) = transpose(transpose(pfm.Omega)*randn(pfm.effective_number_of_shocks,sample_size)); %Omega is covariance_matrix_upper_cholesky 
       case 'calibrated'
         options = options_;
@@ -52,4 +52,4 @@ end
 
 % Copy the shocks in exo_simul
 oo_.exo_simul = shocks;
-spfm_exo_simul = repmat(oo_.exo_steady_state',options_.ep.periods+2,1);
+spfm_exo_simul = repmat(oo_.exo_steady_state',options_.ep.periods+M_.maximum_lag+M_.maximum_lead,1);
