@@ -61,7 +61,7 @@ end
 [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, samplesize, M_, options_, oo_);
 
 % Initialize the matrix for the paths of the endogenous variables.
-endogenous_variables_paths = NaN(M_.endo_nbr, samplesize+1);
+endogenous_variables_paths = NaN(M_.endo_nbr, samplesize+M_.maximum_lag); % extended_path_initialization will error out if no lag is present
 endogenous_variables_paths(:,1) = initialconditions;
 
 % Set waitbar (graphic or text  mode)
