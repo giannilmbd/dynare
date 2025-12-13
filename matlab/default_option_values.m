@@ -193,8 +193,6 @@ options_.irf_opt.irf_shocks = [];
 %
 % Set debug flag
 ep.debug = 0;
-% Set memory flag
-ep.memory = 0;
 % Set verbose mode
 ep.verbosity = 0;
 % Set bytecode flag
@@ -207,14 +205,6 @@ ep.use_first_order_solution_as_initial_guess = false;
 ep.maxit = 500;
 % Number of periods for the perfect foresight model.
 ep.periods = 200;
-% Default step for increasing the number of periods if needed
-ep.step = 50;
-% Set check_stability flag
-ep.check_stability = 0;
-% Define last periods used to test if the solution is stable with respect to an increase in the number of periods.
-ep.lp = 5;
-% Define first periods used to test if the solution is stable with respect to an increase in the number of periods.
-ep.fp = 2;
 % Define the distribution for the structural innovations.
 ep.innovation_distribution = 'gaussian';
 % Set flag for the seed
@@ -230,15 +220,9 @@ ep.parallel = false;
 ep.stochastic.IntegrationAlgorithm = 'Tensor-Gaussian-Quadrature'; % Other possible values are 'Stroud-Cubature-3' and 'Stroud-Cubature-5'
 ep.stochastic.method = '';
 ep.stochastic.algo = 0;
-ep.stochastic.quadrature.ortpol = 'hermite';
 ep.stochastic.order = 0;
 ep.stochastic.quadrature.nodes = 5;
-ep.stochastic.quadrature.pruned.status = 0;
-ep.stochastic.quadrature.pruned.relative = 1e-5;
-ep.stochastic.quadrature.pruned.level = 1e-5;
 ep.stochastic.hybrid_order = 0;
-% homotopic step in extended path simulations
-ep.stochastic.homotopic_steps = true;
 % Copy ep structure in options_ global structure
 options_.ep = ep;
 
