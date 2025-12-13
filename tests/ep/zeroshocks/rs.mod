@@ -155,9 +155,17 @@ extended_path(periods=10, order=1);
 
 Simulated_time_series1 = dseries('rstrue1.mat');
 
-if max((abs(Simulated_time_series.data(:)-Simulated_time_series1.data(:))))>1e-12
+if max((abs(Simulated_time_series.data(:)-Simulated_time_series1.data(:))))>1e-12 ||  ~oo_.extended_path.status
     error('SEP(1): the simulated time series do not match the expected results.');
 end
+
+if size(oo_.exo_simul,1)~=size(oo_.endo_simul,2)
+    error('Variable dimensions are incorrect')
+end
+if size(oo_.exo_simul,2)~=M_.exo_nbr
+    error('Dimension of exo_simul is incorrect')
+end
+
 
 delete('rstrue1.mat')
 
@@ -167,9 +175,17 @@ extended_path(periods=10, order=2);
 
 Simulated_time_series2 = dseries('rstrue2.mat');
 
-if max((abs(Simulated_time_series.data(:)-Simulated_time_series2.data(:))))>1e-12
+if max((abs(Simulated_time_series.data(:)-Simulated_time_series2.data(:))))>1e-12 ||  ~oo_.extended_path.status
     error('SEP(2): the simulated time series do not match the expected results.');
 end
+
+if size(oo_.exo_simul,1)~=size(oo_.endo_simul,2)
+    error('Variable dimensions are incorrect')
+end
+if size(oo_.exo_simul,2)~=M_.exo_nbr
+    error('Dimension of exo_simul is incorrect')
+end
+
 
 delete('rstrue2.mat');
 
@@ -181,8 +197,15 @@ extended_path(periods=10, order=2);
 
 Simulated_time_series2s = dseries('rstrue2s.mat');
 
-if max((abs(Simulated_time_series.data(:)-Simulated_time_series2s.data(:))))>1e-12
+if max((abs(Simulated_time_series.data(:)-Simulated_time_series2s.data(:))))>1e-12 ||  ~oo_.extended_path.status
     error('SEP(2, sparse): the simulated time series do not match the expected results.');
+end
+
+if size(oo_.exo_simul,1)~=size(oo_.endo_simul,2)
+    error('Variable dimensions are incorrect')
+end
+if size(oo_.exo_simul,2)~=M_.exo_nbr
+    error('Dimension of exo_simul is incorrect')
 end
 
 delete('rstrue2s.mat');
@@ -197,6 +220,13 @@ Simulated_time_series2sh = dseries('rstrue2sh.mat');
 
 if max((abs(Simulated_time_series.data(:)-Simulated_time_series2sh.data(:))))>1e-12 ||  ~oo_.extended_path.status
     error('SEP(2, sparse, hybrid): the simulated time series do not match the expected results.');
+end
+
+if size(oo_.exo_simul,1)~=size(oo_.endo_simul,2)
+    error('Variable dimensions are incorrect')
+end
+if size(oo_.exo_simul,2)~=M_.exo_nbr
+    error('Dimension of exo_simul is incorrect')
 end
 
 delete('rstrue2sh.mat');

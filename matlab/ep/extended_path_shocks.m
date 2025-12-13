@@ -51,5 +51,5 @@ else
 end
 
 % Copy the shocks in exo_simul
-oo_.exo_simul = shocks;
+oo_.exo_simul = [repmat(oo_.exo_steady_state',M_.maximum_lag,1); shocks];
 spfm_exo_simul = repmat(oo_.exo_steady_state',options_.ep.periods+M_.maximum_lag+M_.maximum_lead,1);

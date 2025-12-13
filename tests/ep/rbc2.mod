@@ -79,3 +79,9 @@ steady;
 options_.ep.stack_solve_algo=0;
 extended_path(periods=10);
 
+if size(oo_.exo_simul,1)~=size(oo_.endo_simul,2)
+    error('Variable dimensions are incorrect')
+end
+if size(oo_.exo_simul,2)~=M_.exo_nbr
+    error('Dimension of exo_simul is incorrect')
+end
