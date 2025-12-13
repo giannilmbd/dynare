@@ -42,25 +42,17 @@ function [y1, info_convergence, endo_simul, y, pfm, options_] = ...
 
 ep = options_.ep;
 
-periods = ep.periods;
-endo_nbr = M_.endo_nbr;
-init = options_.ep.use_first_order_solution_as_initial_guess;
-steady_state = oo_.steady_state;
 debug = options_.verbosity;
 order = options_.ep.stochastic.order;
 
-algo = ep.stochastic.algo;
-solve_algo = ep.solve_algo;
-stack_solve_algo = ep.stack_solve_algo;
-
-if init% Compute first order solution (Perturbation)...
+if options_.ep.use_first_order_solution_as_initial_guess% Compute first order solution (Perturbation)...
     endo_simul = simult_(M_,options_,initial_conditions,oo_.dr,exo_simul(2:end,:),1);
 else
     if nargin>6 && ~isempty(initialguess)
         % Note that the first column of initialguess should be equal to initial_conditions.
         endo_simul = initialguess;
     else
-        endo_simul = [initial_conditions repmat(steady_state,1,periods+M_.maximum_lead)];
+        endo_simul = [initial_conditions repmat(oo_.steady_state,1,ep.periods+M_.maximum_lead)];
     end
 end
 
@@ -83,17 +75,16 @@ end
 
 if order == 0
     % Extended Path
-    options_.periods = periods;
+    options_.periods = ep.periods;
     options_.block = pfm.block;
     oo_.endo_simul = endo_simul;
     oo_.exo_simul = exo_simul;
-    oo_.steady_state = steady_state;
-    options_.solve_algo = solve_algo;
-    options_.stack_solve_algo = stack_solve_algo;
+    options_.solve_algo = ep.solve_algo;
+    options_.stack_solve_algo = ep.stack_solve_algo;
     [endo_simul, info_convergence] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, [], M_, options_);
 else
     % Stochastic Extended Path
-    switch(algo)
+    switch(ep.stochastic.algo)
       case 0
         % Full tree of future trajectories.
         if nargout>4
@@ -113,11 +104,11 @@ else
 end
 
 if ~info_convergence && ~options_.no_homotopy
-    [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, algo, 2, debug);
+    [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, ep.stochastic.algo, 2, debug);
 end
 
 if info_convergence
     y1 = endo_simul(:,2);
 else
-    y1 = NaN(size(endo_nbr,1));
+    y1 = NaN(size(M_.endo_nbr,1));
 end
