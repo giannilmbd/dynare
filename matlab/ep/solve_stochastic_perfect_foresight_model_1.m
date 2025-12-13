@@ -114,15 +114,24 @@ if update_pfm_struct
         k = n1:n2;
         for j=1:(1+(nnodes-1)*min(i-1,order))
             i_upd_r(i1:i2) = k+(j-1)*ny*periods;
-            i_upd_y(i1:i2) = k+ny+(j-1)*ny*(periods+2);
+            i_upd_y(i1:i2) = k+ny+(j-1)*ny*(periods+(M_.maximum_lag+M_.maximum_lead));
             i1 = i2+1;
             i2 = i2+ny;
         end
         n1 = n2+1;
         n2 = n2+ny;
     end
-    icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ...
-           find(lead_lag_incidence(3,:))+2*world_nbr*ny]';
+
+    if rows(lead_lag_incidence)>2
+        icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ...
+            find(lead_lag_incidence(3,:))+2*world_nbr*ny]';
+    else
+        if pfm.nyf
+            icA = [find(lead_lag_incidence(2,:))+world_nbr*ny find(lead_lag_incidence(3,:))+2*world_nbr*ny ]';
+        else
+            icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ]';
+        end
+    end
 
     pfm.i_rows = 1:ny;
     pfm.i_cols = find(lead_lag_incidence');

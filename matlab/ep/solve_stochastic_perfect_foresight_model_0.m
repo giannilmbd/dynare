@@ -111,7 +111,7 @@ if update_pfm_struct
     for i=2:periods
         for j=1:nnodes^min(i-1,order)
             i_upd_r(i1:i2) = (n1:n2)+(j-1)*ny*periods;
-            i_upd_y(i1:i2) = (n1:n2)+ny+(j-1)*ny*(periods+2);
+            i_upd_y(i1:i2) = (n1:n2)+ny+(j-1)*ny*(periods+M_.maximum_lag+M_.maximum_lead);
             i1 = i2+1;
             i2 = i2+ny;
         end
