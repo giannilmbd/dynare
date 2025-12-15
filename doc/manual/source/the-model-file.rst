@@ -8235,6 +8235,14 @@ observed variables.
 
                   Save iteration information to the ``metropolis`` subfolder. Default: ``1``.
 
+                  ``'fast_likelihood_evaluation_for_rejection'``
+
+                  For OccBin, computes, for each ``t`` a 'predictive' upper bound of the likelihood density from ``t+1,...,T`` assuming perfect fit and rejects parameter draws worse ty more than ``'fast_likelihood_evaluation_for_rejection_penalty'`` log points. This can save a lot of computation time by quickly rejecting poor parameter draws without evaluating the future regime sequence for additional ``t``. Default: ``0``.
+
+                  ``'use_prior_draws'``
+
+                  Use up to 10 Metropolis draws using the prior as proposal, within slice (Gibbs) sampling: in the first few slice iterations, prior sampling may already provide acceptable draws. Up to 10 new prior draws are tried for each slice iteration. If no prior draw is accepted after 10 attempts, prior samping is stopped for all subsequent slice iterations. Particularly useful if the initial draw is infeasible. Default: ``0``.
+
                   ``'save_tmp_file'``
 
                   See :ref:`save_tmp_file <savetmp>`. Default: ``1``.
