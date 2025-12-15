@@ -2424,7 +2424,8 @@ mod_and_m_tests = [
                 'reporting/dc_a.csv',
                 'reporting/dc_q.csv',
                 'reporting/ResidTablePage.m',
-                'reporting/runDynareReport.m' ] }
+                'reporting/runDynareReport.m' ] },
+  { 'test' : [ 'run_example_tests.m' ] }
 ]
 
 base_test_driver_args = [ get_option('build_for') ]
