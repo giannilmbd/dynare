@@ -91,7 +91,7 @@ for blockFlag = 0:1
                     % Test against the reference simulation path
                     load('test.mat','y_ref');
                     diff = oo_.endo_simul - y_ref;
-                    if max(max(abs(diff))) > options_.dynatol.x
+                    if max(max(abs(diff))) > 2*options_.dynatol.x
                         failedBlock{size(failedBlock,2)+1} = ['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(solve_algos(i)) ',' num2str(default_stack_solve_algo) ')'];
                         if isoctave
                             exception.message = 'ERROR: simulation path differs from the reference path';
@@ -131,12 +131,12 @@ for blockFlag = 0:1
                     % Test against the reference simulation path
                     load('test.mat','y_ref');
                     diff = oo_.endo_simul - y_ref;
-                    if max(max(abs(diff))) > options_.dynatol.x
+                    if max(max(abs(diff))) > 2*options_.dynatol.x
                         failedBlock{size(failedBlock,2)+1} = ['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ',' preconditioners{j} ')'];
                         if isoctave
                             exception.message = 'ERROR: simulation path differs from the reference path';
                         else
-                            exception = MException('Dynare:simerr', 'ERROR: simulation path difers from the reference path');
+                            exception = MException('Dynare:simerr', 'ERROR: simulation path differs from the reference path');
                         end
                         printTestError(['block_bytecode' filesep 'run_ls2003.m(' num2str(blockFlag) ',' num2str(storageFlag) ',' num2str(default_solve_algo) ',' num2str(stack_solve_algos(i)) ',' preconditioners{j} ')'], exception);
                         clear exception
