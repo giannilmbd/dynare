@@ -435,6 +435,8 @@ options_mom_.trust_region_initial_step_bound_factor = options_.trust_region_init
 options_mom_.threads = options_.threads;
 options_mom_.MaxNumberOfBytes = options_.MaxNumberOfBytes;
 options_mom_.marginal_data_density = options_.marginal_data_density;
+options_mom_.occbin.likelihood.status = false;
+options_mom_.occbin.smoother.status = false;
 
 
 % -------------------------------------------------------------------------
