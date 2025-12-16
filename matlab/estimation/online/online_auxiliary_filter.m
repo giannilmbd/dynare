@@ -15,7 +15,7 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 % in Sequential Monte Carlo Methods in Practice, Eds. Doucet, Freitas and Gordon, Springer Verlag, Chapter
 % 10, 197-223.
 
-% Copyright © 2013-2024 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -169,9 +169,9 @@ for t=1:sample_size
                 if pruning
                     yhat_ = bsxfun(@minus,StateVectors_(:,i),state_variables_steady_state_);
                     if order == 2
-                        tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, constant, ghxx, ghuu, ghxu, yhat_, steadystate, options_.threads.local_state_space_iteration_2);
+                        [tmp, ~] = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ghx, ghu, constant, ghxx, ghuu, ghxu, yhat_, steadystate, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
-                        tmp = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations, 1), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                        [tmp, ~] = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations, 1), ghx, ghu, ghxx, ghuu, ghxu, ghs2, ghxxx, ghuuu, ghxxu, ghxuu, ghxss, ghuss, steadystate, options_.threads.local_state_space_iteration_3, pruning);
                     else
                     error('Pruning is not available for orders > 3');
                     end

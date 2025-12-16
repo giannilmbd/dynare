@@ -387,10 +387,6 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       call mexErrMsgTxt("Must have exactly 17 inputs")
    end if
 
-   if (nlhs > 2) then
-      call mexErrMsgTxt("Too many output arguments.")
-   end if
-
    do i=1,15
       if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. &
           (.not. mxIsComplex(prhs(i))) .and. (.not. mxIsSparse(prhs(i))))) then
@@ -413,6 +409,12 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       call mexErrMsgTxt("Argument 17 should be a logical scalar")
    end if
    pruning = mxGetScalar(prhs(17)) == 1._c_double
+
+   if (pruning) then
+      if (nlhs /= 2) call mexErrMsgTxt("Must have exactly two output arguments with pruning.")
+   else
+      if (nlhs /= 1) call mexErrMsgTxt("Must have exactly one output arguments without pruning.")
+   end if
 
    if (pruning) then
       n = int(mxGetM(prhs(1)))/3   ! Number of states.

@@ -225,8 +225,13 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   if (nrhs != 9 && nrhs != 11)
     mexErrMsgTxt("Nine or eleven input arguments are required.");
 
-  if (nlhs > 2)
-    mexErrMsgTxt("Too many output arguments.");
+  if (nrhs == 9 && nlhs != 1)
+    mexErrMsgTxt(
+        "One output argument is required if there is no pruning (9 input arguments passed)");
+
+  if (nrhs == 11 && nlhs != 2)
+    mexErrMsgTxt(
+        "Two output arguments are required if there is pruning (11 input arguments passed).");
 
   auto check_input_real_dense_array = [=](int i) {
     if (!mxIsDouble(prhs[i]) || mxIsComplex(prhs[i]) || mxIsSparse(prhs[i]))
