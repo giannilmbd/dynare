@@ -1,11 +1,11 @@
-function [x_t_T, epsilonhat, eta_t_T, x_t_t,atilde,P,aK,PK,decomp,V,aalphahat,eetahat] = kalman_smoother_pruned_skewed( ...
+function [x_t_T, epsilonhat, eta_t_T, x_t_t,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,x_0_T,state_uncertainty0] = kalman_smoother_pruned_skewed( ...
     Y, ...
     mu_tm1_tm1, Sigma_tm1_tm1, Gamma_tm1_tm1, nu_tm1_tm1, Delta_tm1_tm1, ...
     G, R, F, ...
     mu_eta, Sigma_eta, Gamma_eta, nu_eta, Delta_eta, Sigma_eps, ...
     kalman_tol, prune_tol, mvnlogcdf, ...
     console_mode)
-% [x_t_T, epsilonhat, eta_t_T, x_t_t,atilde,P,aK,PK,decomp,V,aalphahat,eetahat] = kalman_smoother_pruned_skewed(Y,mu_tm1_tm1,Sigma_tm1_tm1,Gamma_tm1_tm1,nu_tm1_tm1,Delta_tm1_tm1,G,R,F,mu_eta,Sigma_eta,Gamma_eta,nu_eta,Delta_eta,Sigma_eps,kalman_tol,prune_tol,mvnlogcdf,console_mode)
+% [x_t_T, epsilonhat, eta_t_T, x_t_t,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,x_0_T,state_uncertainty0] = kalman_smoother_pruned_skewed(Y,mu_tm1_tm1,Sigma_tm1_tm1,Gamma_tm1_tm1,nu_tm1_tm1,Delta_tm1_tm1,G,R,F,mu_eta,Sigma_eta,Gamma_eta,nu_eta,Delta_eta,Sigma_eps,kalman_tol,prune_tol,mvnlogcdf,console_mode)
 % -------------------------------------------------------------------------
 % Skewed Kalman state and shock smoother for linear state space model
 % with skew normally distributed innovations and normally distributed noise:
@@ -58,6 +58,8 @@ function [x_t_T, epsilonhat, eta_t_T, x_t_t,atilde,P,aK,PK,decomp,V,aalphahat,ee
 % - V               []                             (not used yet, included for future use and for compatibility)
 % - aalphahat       []                             (not used yet, included for future use and for compatibility)
 % - eetahat         []                             (not used yet, included for future use and for compatibility)
+% - x_0_T           [x_nbr by 1]                   initial smoothed state
+% - state_uncertainty0 []                           (not used yet, included for future use and for compatibility)
 
 % Copyright © 2024-2025 Gaygysyz Guljanov, Willi Mutschler, Mark Trede
 % Copyright © 2025 Dynare Team
@@ -86,7 +88,7 @@ decomp = []; % decomposition of the effect of shocks on filtered values
 V = []; % 3D array of state uncertainty matrices
 aalphahat = [];%     filtered states in t-1|t
 eetahat = []; %       updated shocks in t|t
-
+state_uncertainty0 =[] ;
 % get dimensions
 x_nbr = length(G);
 eta_nbr = size(mu_eta, 1);
@@ -188,7 +190,7 @@ for t = 1:(obs_nbr+1)
     invOmega = inv(Omega); % compute the inverse of Omega directly
     K_Gauss = Sigma_t_tm1(:,:,t)*F'*invOmega;
     K_Skewed = Gamma_t_tm1{t}*K_Gauss; % Skewed Kalman Gain
-    
+
     if t <= obs_nbr
         % update
         prediction_error = Y(:,t)-F*mu_t_tm1(:,t);
@@ -269,16 +271,28 @@ end
 
 % first period for eta_t_T
 J0 = Sigma_0*G'*pinv(Sigma_t_tm1(:,:,1));
+mu_0_T = mu_0 + J0*(mu_t_T(:,1)-mu_t_tm1(:,1));
 mu_j0 = [mu_0 + J0*(mu_t_T(:,1)-mu_t_tm1(:,1)); mu_t_T(:,1)];
+Sigma_0_T = Sigma_0 + J0*(Sigma_t_T(:,:,1)-Sigma_t_tm1(:,:,1))*J0';
 Sigma_j0 = [Sigma_0+J0*(Sigma_t_T(:,:,1)-Sigma_t_tm1(:,:,1))*J0', J0*Sigma_t_T(:,:,1);Sigma_t_T(:,:,1)*J0', Sigma_t_T(:,:,1)];
+M_0 = Sigma_t_T(:,:,1)*J0'*pinv(Sigma_0_T);
+N_0 = -Gamma_eta*G + Gamma_eta*M_0;
+O_0 = [N_0; O_t{1}*M_0];
+temp_mat = [Gamma_eta; O_t{1}];
+Delta_tilde_0 = blkdiag(Delta_eta, Delta_tilde_t{1}) + temp_mat*(Sigma_t_T(:,:,1) - M_0*Sigma_0_T*M_0')*temp_mat';
+Gamma_j0 = [Gamma_0, zeros(size(Gamma_0,1), size(Gamma_eta, 2)); -Gamma_eta*G, Gamma_eta; zeros(size(O_t{1},1), size(Gamma_eta, 2)), O_t{1}];
+Gamma_0_T = [Gamma_0; O_0];
+nu_0_T = nu_t_t{obs_nbr, 1};
+Delta_0_T = blkdiag(Delta_0, Delta_tilde_0);
+Delta_j0 = blkdiag(Delta_0, Delta_eta, Delta_tilde_t{1});
 mu_y0 = A*mu_j0;
 Sigma_y0 = A*Sigma_j0*A';
-Gamma_j0 = [Gamma_0, zeros(size(Gamma_0,1), size(Gamma_eta, 2)); -Gamma_eta*G, Gamma_eta];
 Gamma_X_Sigma_At = Gamma_j0*Sigma_j0*A';
 Gamma_y0 = Gamma_X_Sigma_At * pinv(Sigma_y0);
-Delta_j0 = blkdiag(Delta_0, Delta_eta);
 Delta_y0 = Delta_j0+Gamma_j0*Sigma_j0*Gamma_j0'-Gamma_X_Sigma_At*pinv(Sigma_y0)*Gamma_X_Sigma_At';
-[Sgm, Gam, nu, Dlt] = csn_prune_distribution(Sigma_y0,Gamma_y0,nu_t_t{1, 1},Delta_y0,prune_tol);
+[Sgm, Gam, nu, Dlt] = csn_prune_distribution(Sigma_0_T,Gamma_0_T,nu_0_T,Delta_0_T,prune_tol);
+x_0_T = csn_mean(mu_0_T, Sgm, Gam, nu, Dlt, mvnlogcdf);
+[Sgm, Gam, nu, Dlt] = csn_prune_distribution(Sigma_y0,Gamma_y0,nu_0_T,Delta_y0,prune_tol);
 eta_t_T(:,1) = csn_mean(mu_y0, Sgm, Gam, nu, Dlt, mvnlogcdf);
 
 wait_bar.close(hh_fig, console_mode);
