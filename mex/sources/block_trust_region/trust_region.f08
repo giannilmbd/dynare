@@ -243,7 +243,7 @@ contains
          end if
 
          ! Tests for termination and stringent tolerances
-         if (max(0.1_real64*delta, pnorm) <= 10*epsilon(xnorm)*xnorm) then
+         if (tolx_actual > 0 .and. max(0.1_real64*delta, pnorm) <= 10*epsilon(xnorm)*xnorm) then
             info = 5
             cycle
          end if

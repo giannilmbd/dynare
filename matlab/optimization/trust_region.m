@@ -238,7 +238,7 @@ while iter<=maxiter && ~info
         continue
     end
     % Tests for termination and stringent tolerances.
-    if max(.1*delta, pnorm)<=10*eps(xnorm)*xnorm
+    if tolx>0 && max(.1*delta, pnorm)<=10*eps(xnorm)*xnorm
         % xtol is too small. no further improvement in
         % the approximate solution x is possible.
         info = 5;
