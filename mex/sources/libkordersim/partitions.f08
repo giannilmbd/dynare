@@ -1,4 +1,4 @@
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -113,11 +113,11 @@ contains
       type(index), intent(in) :: idx
       integer :: i
       i = 1
-      if (d>1) then
-         do while ((i < d) .and. (idx%coor(i+1) == idx%coor(1)))
-            i = i+1
-         end do
-      end if
+      do
+         if (i >= d) exit
+         if (idx%coor(i+1) /= idx%coor(1)) exit
+         i = i+1
+      end do
       get_prefix_length = i
    end function get_prefix_length
 
