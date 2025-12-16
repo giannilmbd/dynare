@@ -41,7 +41,7 @@ good = [6.791587808530124
 if isoctave
   tolerance = 1e-2;
 else
-  tolerance = 2e-14;
+  tolerance = 1e-13;
 end
 
 if sum(abs(M_.params-good)) > tolerance

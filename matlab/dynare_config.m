@@ -104,6 +104,10 @@ if isoctave
         error('You must install the "statistics" package from Octave Forge, either with your distribution package manager or with "pkg install -forge io statistics"')
     end
 else
+    % These functions are not standalone in MATLAB (they are built into mvncdf),
+    % but they are standalone in Octave's statistics package, so we only add them
+    % under MATLAB to avoid conflicts
+    p{end+1} = '/missing/stats_matlab/';
     if ~user_has_matlab_license('statistics_toolbox')
         p{end+1} = '/missing/stats/';
     end

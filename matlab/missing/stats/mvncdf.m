@@ -475,7 +475,7 @@ try
     Sigma = [0.25, 0.3; 0.3, 1];
     [p, err] = mvncdf([0, 0], [1, 1], mu, Sigma);
     t(1) = abs(p - 0.2097424404755626) < 1e-16;
-    t(2) = isnan(err); % bivariate returns NaN for error
+    t(2) = isnan(err) || isequal(err,1e-8); % bivariate returns NaN (Octave) or 1e-8 (MATLAB) for error
 catch
     t = false(2, 1);
 end

@@ -115,7 +115,7 @@ Section "Documentation and examples"
  File /r ..\build-doc\dynare-manual.html\*
 
  SetOutPath $INSTDIR\examples
- File ..\examples\*.mod ..\examples\*.m
+ File /r ..\examples\*
 
  # Create start menu entries
  CreateDirectory "${SMLOC}"
