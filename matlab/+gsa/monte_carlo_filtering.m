@@ -179,7 +179,7 @@ if ~loadSA
             yss(i,:,:)=repmat(sto_ys(:,js(i))',[gend,1]);
         end
         if exist('xparam1','var')
-            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
             y0 = reshape( squeeze(aK(1,jxj,1:gend)),[gend length(jxj)]);
             yobs = transpose( ahat(jxj,:));
             rmse_mode = sqrt(mean((yobs(istart:end,:)-y0(istart:end,:)).^2));
@@ -211,7 +211,7 @@ if ~loadSA
             r2_MC(j,:) = 1-mean((yobs(:,istart:end,j)'-y0(:,istart:end,j)').^2)./mean((yobs(:,istart:end,j)').^2);
         end
         if exist('xparam1_mean','var')
-            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1_mean,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1_mean,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
             y0 = reshape( squeeze(aK(1,jxj,1:gend)),[gend length(jxj)]);
             yobs = transpose( ahat(jxj,:));
             rmse_pmean = sqrt(mean((yobs(istart:end,:)-y0(istart:end,:)).^2));

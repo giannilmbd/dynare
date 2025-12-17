@@ -249,7 +249,7 @@ for b=fpar:B
                 %epsilonhat not available as no measurement error allowed
             else
                 opts_local.verbosity=0;
-                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_] = ...
+                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_] = ...
                     occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
                 if oo_.occbin.smoother.error_flag(1)
                     message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
@@ -257,8 +257,8 @@ for b=fpar:B
                 end
             end
         else
-            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_] = ...
-                DsgeSmoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty] = ...
+                DsgeSmoother(deep,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local,bayestopt_,estim_params_);
         end
 
         stock_trend_coeff(options_.varobs_id,irun(9))=trend_coeff;
