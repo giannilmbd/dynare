@@ -3,7 +3,8 @@ function varargout = prior(varargin)
 % Computes various prior statistics and display them in the command window.
 %
 % INPUTS
-%   'table', 'moments', 'optimize', 'simulate', 'plot', 'moments(distribution)'
+%   'table', 'moments', 'optimize', 'simulate', 'plot',
+%   'moments(distribution)', 'irfs(distribution)'
 %
 % OUTPUTS
 %   none
@@ -31,6 +32,7 @@ function varargout = prior(varargin)
 if isempty(varargin) || ( isequal(length(varargin), 1) && isequal(varargin{1},'help'))
     skipline()
     disp('Possible options are:')
+    disp(' + irfs(distribution)    Saves the implied prior for the impulse response function of all endogenous variables.')
     disp(' + moments               Computes and displays moments of the endogenous variables at the prior mode.')
     disp(' + moments(distribution) Print tables describing the implied prior for the first and second order unconditional')
     disp('                         moments of all the endogenous variables.')
@@ -94,7 +96,7 @@ if ismember('table', varargin)
 end
 
 if ismember('simulate', varargin) % Prior simulations (BK).
-    if ismember('moments(distribution)', varargin)
+    if ismember('moments(distribution)', varargin) || ismember('irfs(distribution)', varargin)
         results = prior_sampler(1, M_local, BayesOptions, options_, oo_, estim_params_);
     else
         results = prior_sampler(0, M_local, BayesOptions, options_, oo_, estim_params_);
@@ -153,14 +155,22 @@ if ismember('moments', varargin) % Prior simulations (2nd order moments at prior
     donesomething = true;
 end
 
-if ismember('moments(distribution)', varargin) % Prior simulations (for BK passed parameters).
+if ismember('moments(distribution)', varargin) || ismember('irfs(distribution)', varargin) % Prior simulations (BK).
     if ~ismember('simulate', varargin)
         results = prior_sampler(1, M_local, BayesOptions, options_, oo_, estim_params_);
     end
     priorpath = [M_local.dname filesep() 'prior' filesep() 'draws' filesep()];
     list_of_files = dir([priorpath 'prior_draws*']);
-    FirstOrderMoments = NaN(M_local.orig_endo_nbr, options_.prior_mc);
-    SecondOrderMoments = NaN(M_local.orig_endo_nbr, M_local.orig_endo_nbr, options_.prior_mc);
+    if ismember('moments(distribution)', varargin)
+        FirstOrderMoments = NaN(M_local.orig_endo_nbr, options_.prior_mc);
+        SecondOrderMoments = NaN(M_local.orig_endo_nbr, M_local.orig_endo_nbr, options_.prior_mc);
+    end
+    if ismember('irfs(distribution)', varargin)
+        irf_shocks_indx = getIrfShocksIndx(M_local, options_);
+        for ii = irf_shocks_indx
+            ImpulseResponseFunctions.(M_local.exo_names{ii}) = NaN(M_local.orig_endo_nbr, options_.irf, options_.prior_mc);
+        end
+    end
     iter = 1;
     noprint = options_.noprint;
     options_.noprint = 1;
@@ -172,32 +182,57 @@ if ismember('moments(distribution)', varargin) % Prior simulations (for BK passe
                 oo__ = oo_;
                 oo__.dr = dr;
                 M_local=set_parameters_locally(M_local,tmp.pdraws{j,1});% Needed to update the covariance matrix of the state innovations.
-                oo__ = disp_th_moments(oo__.dr, [], M_local, options_, oo__);
-                FirstOrderMoments(:,iter) = oo__.mean;
-                SecondOrderMoments(:,:,iter) = oo__.var;
-                iter = iter+1;
+                if ismember('moments(distribution)', varargin)
+                    oo__ = disp_th_moments(oo__.dr, [], M_local, options_, oo__);
+                    FirstOrderMoments(:,iter) = oo__.mean;
+                    SecondOrderMoments(:,:,iter) = oo__.var;
+                end
+                if ismember('irfs(distribution)', varargin)
+                    cs = get_lower_cholesky_covariance(M_local.Sigma_e,options_.add_tiny_number_to_cholesky);
+                    for ii = irf_shocks_indx
+                        if cs(ii,ii) > 5e-7
+                            y__ = irf(M_local, options_, dr, cs(:,ii), options_.irf, options_.drop, options_.replic, options_.order);
+                            if options_.relative_irf
+                                if options_.order==1 % multiply with 100 for backward compatibility
+                                    y__ = 100*y__/cs(ii,ii);
+                                end
+                            end
+                            ImpulseResponseFunctions.(M_local.exo_names{ii})(:,:,iter) = y__;
+                        end
+                    end
+                end
             end
+            iter = iter+1;
         end
     end
-    save([M_.dname filesep() 'prior' filesep() M_.fname '_endogenous_variables_prior_draws.mat'], 'FirstOrderMoments', 'SecondOrderMoments');
-    skipline(2)
-    options_.noprint = noprint;
-    % First order moments
-    FirstOrderMoments = FirstOrderMoments(:,1:iter-1);
-    SecondOrderMoments = SecondOrderMoments(:,:,1:iter-1);
-    PriorExpectationOfFirstOrderMoments = mean(FirstOrderMoments, 2);
-    PriorVarianceOfFirstOrderMoments = ...
-        mean(bsxfun(@minus, FirstOrderMoments, PriorExpectationOfFirstOrderMoments).^2, 2);
-    % Second order moments
-    PriorExpectationOfSecondOrderMoments = mean(SecondOrderMoments, 3);
-    PriorVarianceOfSecondOrderMoments = ...
-        mean(bsxfun(@minus, SecondOrderMoments, PriorExpectationOfSecondOrderMoments).^2, 3);
-    % Display first and second order moments implied priors (expectation and variance)
-    print_moments_implied_prior(M_, PriorExpectationOfFirstOrderMoments, ...
-                                PriorVarianceOfFirstOrderMoments, ...
-                                PriorExpectationOfSecondOrderMoments, ...
-                                PriorVarianceOfSecondOrderMoments);
-    donesomething = true;
+    if ismember('moments(distribution)', varargin)
+        save([M_.dname filesep() 'prior' filesep() M_.fname '_endogenous_variables_prior_draws.mat'], 'FirstOrderMoments', 'SecondOrderMoments');
+        skipline(2)
+        options_.noprint = noprint;
+        % First order moments
+        FirstOrderMoments(:, any(isnan(FirstOrderMoments), 1)) = [];
+        SecondOrderMoments(:, :, any(isnan(SecondOrderMoments), [1 2])) = [];
+        PriorExpectationOfFirstOrderMoments = mean(FirstOrderMoments, 2);
+        PriorVarianceOfFirstOrderMoments = ...
+            mean(bsxfun(@minus, FirstOrderMoments, PriorExpectationOfFirstOrderMoments).^2, 2);
+        % Second order moments
+        PriorExpectationOfSecondOrderMoments = mean(SecondOrderMoments, 3);
+        PriorVarianceOfSecondOrderMoments = ...
+            mean(bsxfun(@minus, SecondOrderMoments, PriorExpectationOfSecondOrderMoments).^2, 3);
+        % Display first and second order moments implied priors (expectation and variance)
+        print_moments_implied_prior(M_, PriorExpectationOfFirstOrderMoments, ...
+                                    PriorVarianceOfFirstOrderMoments, ...
+                                    PriorExpectationOfSecondOrderMoments, ...
+                                    PriorVarianceOfSecondOrderMoments);
+        donesomething = true;
+        save_append = '-append';
+    else
+        save_append = '';
+    end
+    if ismember('irfs(distribution)', varargin)
+        save([M_.dname filesep() 'prior' filesep() M_.fname '_endogenous_variables_prior_draws.mat'], 'ImpulseResponseFunctions', save_append);
+        donesomething = true;
+    end
 end
 
 if changed_qz_criterium_flag

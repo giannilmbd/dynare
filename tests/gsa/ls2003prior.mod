@@ -24,5 +24,5 @@ options_.prior_mc=5000;
 
 % tests the prior command
 prior plot table moments;
-prior simulate moments(distribution);
+prior simulate moments(distribution) irfs(distribution);
 prior optimize;
