@@ -48,6 +48,13 @@ W1=[];
 if isfield(sampler_options,'WR')
     W1 = sampler_options.WR;
 end
+
+if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
+    fast_likelihood_evaluation_for_rejection = true;
+    rejection_penalty=sampler_options.fast_likelihood_evaluation_for_rejection_penalty;
+else
+    fast_likelihood_evaluation_for_rejection = false;
+end
 if ~isempty(sampler_options.mode)
     mm = sampler_options.mode;
     n = length(mm);
@@ -109,7 +116,11 @@ for it=1:npar
     while(L > XLB)
         xsim = L;
         theta = theta0+xsim*V1(:,it);
-        fxl = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxl = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxl = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (fxl <= Z)
             break
@@ -119,7 +130,11 @@ for it=1:npar
     while(R < XUB)
         xsim = R;
         theta = theta0+xsim*V1(:,it);
-        fxr = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxr = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxr = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (fxr <= Z)
             break
@@ -134,7 +149,11 @@ for it=1:npar
         u = rand(1,1);
         xsim = L + u*(R - L);
         theta = theta0+xsim*V1(:,it);
-        fxsim = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxsim = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxsim = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (xsim > xold)
             R = xsim;

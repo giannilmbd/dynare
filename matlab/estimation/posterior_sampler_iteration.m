@@ -1,5 +1,5 @@
-function  [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
-% [par, logpost, accepted, neval] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
+function  [par, logpost, accepted, neval, sampler_options] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
+% [par, logpost, accepted, neval, sampler_options] = posterior_sampler_iteration(objective_function,last_draw, last_posterior, sampler_options,varargin)
 % posterior samplers
 %
 % INPUTS
@@ -26,6 +26,7 @@ function  [par, logpost, accepted, neval] = posterior_sampler_iteration(objectiv
 %   logpost:                value of the posterior after current iteration
 %   accepted:               share of proposed draws that were accepted
 %   neval:                  number of evaluations (>1 only for slice)
+%   sampler_options:        posterior sampler options
 %
 % SPECIAL REQUIREMENTS
 %   none
@@ -54,8 +55,12 @@ mh_bounds = sampler_options.bounds;
 switch posterior_sampling_method
   case 'slice'
       if ~sampler_options.maximize
-        [par, logpost, neval] = slice_sampler(objective_function,last_draw, [mh_bounds.lb mh_bounds.ub], sampler_options,varargin{:});
-        accepted = 1;         
+
+          if isfield(sampler_options,'use_prior_draws') && sampler_options.use_prior_draws.status
+              sampler_options.last_posterior=last_posterior;
+          end
+          [par, logpost, neval, sampler_options] = slice_sampler(objective_function,last_draw, [mh_bounds.lb mh_bounds.ub], sampler_options,varargin{:});
+          accepted = 1;
       else
           options_=varargin{3};
           bayestopt_=varargin{6};
@@ -68,12 +73,12 @@ switch posterior_sampling_method
           options_.newrat.Save_files = sampler_options.curr_block;
           [par, fval] = ...
               dynare_minimize_objective(objective_function,last_draw(:),options_.mode_compute,options_,[mh_bounds.lb mh_bounds.ub],bayestopt_.name,bayestopt_,[], ...
-                  varargin{:}); %inputs for objective
+              varargin{:}); %inputs for objective
           logpost = -fval;
           accepted = 1;
-          neval = 1;         
+          neval = 1;
       end
-  
+
   case 'random_walk_metropolis_hastings'
     neval = 1;
     ProposalFun = sampler_options.proposal_distribution;

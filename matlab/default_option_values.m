@@ -530,8 +530,12 @@ options_.posterior_sampler_options.slice.maximize=false;
 options_.posterior_sampler_options.slice.maximize_using_mh_bounds=false;
 options_.posterior_sampler_options.slice.mode_compute=5;
 options_.posterior_sampler_options.slice.initial_step_size=0.8;
+options_.posterior_sampler_options.slice.use_prior_draws.status=false;
+options_.posterior_sampler_options.slice.use_prior_draws.mh_blck = [];
 options_.posterior_sampler_options.slice.save_tmp_file=1;
 options_.posterior_sampler_options.slice.save_iter_info_file=true;
+options_.posterior_sampler_options.slice.fast_likelihood_evaluation_for_rejection=false;
+options_.posterior_sampler_options.slice.fast_likelihood_evaluation_for_rejection_penalty=10;
 % Independent Metropolis-Hastings
 options_.posterior_sampler_options.imh.proposal_distribution = 'rand_multivariate_normal';
 options_.posterior_sampler_options.imh.use_mh_covariance_matrix=0;

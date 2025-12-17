@@ -310,6 +310,20 @@ if init
                   case 'save_iter_info_file'
                     posterior_sampler_options.save_iter_info_file = options_list{i,2};
 
+                  case 'fast_likelihood_evaluation_for_rejection'
+
+                      posterior_sampler_options.fast_likelihood_evaluation_for_rejection = options_list{i,2};
+
+                  case 'fast_likelihood_evaluation_for_rejection_penalty'
+
+                      posterior_sampler_options.fast_likelihood_evaluation_for_rejection_penalty = options_list{i,2};
+
+                   case 'use_prior_draws'
+ 
+                       posterior_sampler_options.use_prior_draws.status = options_list{i,2};
+                       posterior_sampler_options.use_prior_draws.mh_blck = repmat(options_list{i,2},[1 options_.mh_nblck]);
+
+
                   case 'maximize'
                     posterior_sampler_options.maximize = options_list{i,2};
                     

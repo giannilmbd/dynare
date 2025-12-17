@@ -1,5 +1,5 @@
-function [theta, fxsim, neval] = slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
-% function [theta, fxsim, neval] = slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
+function [theta, fxsim, neval, sampler_options] = slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
+% [theta, fxsim, neval, sampler_options] = slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
 % ----------------------------------------------------------
 % UNIVARIATE SLICE SAMPLER - stepping out (Neal, 2003)
 % W: optimal value in the range (3,10)*std(x)
@@ -20,6 +20,7 @@ function [theta, fxsim, neval] = slice_sampler(objective_function,theta,thetapri
 %   theta:       new theta sample
 %   fxsim:       value of the objective function for the new sample
 %   neval:       number of function evaluations
+%   sampler_options:          posterior sampler options
 %
 % SPECIAL REQUIREMENTS
 %   none
@@ -50,6 +51,20 @@ if sampler_options.rotated %&& ~isempty(sampler_options.V1),
     end
 end
 
+thetaprior0=thetaprior;
+if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
+    fast_likelihood_evaluation_for_rejection = true;
+    rejection_penalty=sampler_options.fast_likelihood_evaluation_for_rejection_penalty;
+else
+    fast_likelihood_evaluation_for_rejection = false;
+end
+
+use_prior_draws = false;
+if isfield(sampler_options,'use_prior_draws') && sampler_options.use_prior_draws.status
+    use_prior_draws = sampler_options.use_prior_draws.status;
+    try_prior_draws = sampler_options.use_prior_draws.mh_blck(sampler_options.curr_block);
+end
+
 theta=theta(:);
 npar = length(theta);
 W1 = sampler_options.W1;
@@ -58,6 +73,43 @@ neval = zeros(npar,1);
 fname = [ int2str(sampler_options.curr_block)];
 
 Prior = dprior(varargin{6},varargin{3}.prior_trunc);
+
+if use_prior_draws && try_prior_draws
+    fxsim = sampler_options.last_posterior;
+    Z1 = fxsim + log(rand(1,1));
+    ilogpo2=-inf;
+    nattempts=0;
+    while ilogpo2<Z1 && nattempts<10
+        nattempts=nattempts+1;
+        validate=false;
+        while not(validate)
+            candidate = Prior.draw();
+            if all(candidate >= thetaprior0(:,1)) && all(candidate <= thetaprior0(:,2))
+                if fast_likelihood_evaluation_for_rejection
+                    itest = -rejection_objective_function(objective_function,theta,Z1-rejection_penalty,varargin{:});
+                else
+                    itest = -feval(objective_function,candidate,varargin{:});
+                end
+                if isfinite(itest)
+                    validate=true;
+                end
+            end
+        end
+        if itest>ilogpo2
+            ilogpo2= itest;
+            best_candidate = candidate;
+        end
+    end
+    if ilogpo2>=Z1
+        theta= best_candidate;
+        fxsim = ilogpo2;
+    else
+        % prior draw is worse than current draw, so I stop drawing from
+        % prior in this chain
+        sampler_options.use_prior_draws.mh_blck(sampler_options.curr_block)=false;
+    end
+end
+
 
 it=0;
 while it<npar
@@ -107,7 +159,11 @@ while it<npar
     while(L > XLB)
         xsim = L;
         theta(it) = xsim;
-        fxl = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxl = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+         else
+            fxl = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (fxl <= Z)
             break
@@ -137,7 +193,11 @@ while it<npar
     while(R < XUB)
         xsim = R;
         theta(it) = xsim;
-        fxr = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxr = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxr = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (fxr <= Z)
             break
@@ -171,7 +231,11 @@ while it<npar
         u = rand(1,1);
         xsim = L + u*(R - L);
         theta(it) = xsim;
-        fxsim = -feval(objective_function,theta,varargin{:});
+        if fast_likelihood_evaluation_for_rejection
+            fxsim = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
+        else
+            fxsim = -feval(objective_function,theta,varargin{:});
+        end
         neval(it) = neval(it) + 1;
         if (xsim > xold)
             R = xsim;

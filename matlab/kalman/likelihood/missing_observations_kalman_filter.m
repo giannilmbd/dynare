@@ -151,6 +151,18 @@ else
     C=0;
 end
 
+check_rejection = false;
+if occbin_.status && isfield(options_,'likelihood_base_value') && not(isempty(options_.likelihood_base_value))
+    %  compute upper bound data density
+    check_rejection = true;
+    likUB = lik;
+    if isqvec
+        likUB = max_data_density(likUB, t, start, last, options_, P, Q, R, T, H, data_index, Zflag, Z, kalman_tol, rescale_prediction_error_covariance, no_more_missing_observations, riccati_tol, isqvec, Qvec);
+    else
+        likUB = max_data_density(likUB, t, start, last, options_, P, Q, R, T, H, data_index, Zflag, Z, kalman_tol, rescale_prediction_error_covariance, no_more_missing_observations, riccati_tol, isqvec);
+    end
+end
+
 while notsteady && t<=last
     if occbin_.status
         a1(:,t) = a;
@@ -305,6 +317,20 @@ while notsteady && t<=last
         P = Px(:,:,2);
 
     end
+    if check_rejection
+        likUB(s) = lik(s);
+        if presample>=diffuse_periods
+            LIKUB = -sum(0.5*likUB(1+presample-diffuse_periods:end));
+        else
+            LIKUB = -sum(0.5*likUB);
+        end        
+        if LIKUB < options_.likelihood_base_value
+            t=last+1;
+            s  = t-start;
+            lik=likUB;
+            break
+        end
+    end
     t = t+1;
 end
 
@@ -325,4 +351,71 @@ if presample>=diffuse_periods
     LIK = sum(lik(1+presample-diffuse_periods:end));
 else
     LIK = sum(lik);
+end
+
+end
+
+function lik = max_data_density(lik, t, start, last, options_, P, Q, R, T, H, data_index, Zflag, Z, kalman_tol, rescale_prediction_error_covariance, no_more_missing_observations, riccati_tol, isqvec, Qvec)
+
+if t==1 && options_.lik_init==2 && options_.Harvey_scale_factor==0 && (options_.occbin.likelihood.status && options_.occbin.likelihood.first_period_occbin_update==1)
+    P = T*P*T' + R*Q*R';
+end
+
+oldK = Inf;
+notsteady = 1;
+if ~(isqvec)
+    QQ = R*Q*transpose(R);   % Variance of R times the vector of structural innovations.
+end
+
+while t<=last
+    s  = t-start+1;
+    d_index = data_index{t};
+    if isqvec
+        QQ = R*Qvec(:,:,t+1)*transpose(R);
+    end
+    if notsteady==0
+        lik(s) = log_dF + length(d_index)*log(2*pi);
+    else
+        if isempty(d_index)
+            P = T*P*transpose(T)+QQ;
+        else
+            % Compute the prediction error and its variance
+            if Zflag
+                z = Z(d_index,:);
+                F = z*P*z' + H(d_index,d_index);
+            else
+                z = Z(d_index);
+                F = P(z,z) + H(d_index,d_index);
+            end
+            if rescale_prediction_error_covariance
+                sig=sqrt(diag(F));
+            else
+                if rcond(F)<kalman_tol
+                    sig=sqrt(diag(F));
+                end
+            end
+            if rescale_prediction_error_covariance
+                log_dF = log(det(F./(sig*sig')))+2*sum(log(sig));
+                iF = inv(F./(sig*sig'))./(sig*sig');
+            else
+                log_dF = log(det(F));
+                iF = inv(F);
+            end
+            lik(s) = log_dF + length(d_index)*log(2*pi);
+            if Zflag
+                K = P*z'*iF;
+                P = T*(P-K*z*P)*transpose(T)+QQ;
+            else
+                K = P(:,z)*iF;
+                P = T*(P-K*P(z,:))*transpose(T)+QQ;
+            end
+            if t>=no_more_missing_observations && ~isqvec
+                notsteady = max(abs(K(:)-oldK))>riccati_tol;
+                oldK = K(:);
+            end
+        end
+    end
+    t = t+1;
+end
+
 end
