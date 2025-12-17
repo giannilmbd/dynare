@@ -10,7 +10,9 @@ var nnu = 0.03^2;
 var q = 0.01^2;
 var ca = 0.01^2;
 end;
-if ~isoctave
+
+
+if ~isoctave % Disabled under Octave because it takes too much time
 stoch_simul(order=3,periods=200, irf=0);
 send_endogenous_variables_to_workspace;
 save('my_data.mat','q','ca');
