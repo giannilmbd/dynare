@@ -89,7 +89,7 @@ and a clarifying example.
 
     .. option:: maketoc, BOOLEAN
 
-        Whether or not to make the table of contents. One entry is made per
+        Whether to make the table of contents. One entry is made per
         page containing a title. Default: ``false``.
 
     .. option:: margin, DOUBLE
@@ -142,7 +142,7 @@ and a clarifying example.
     .. option:: latex, STRING
 
         The valid :math:`\text{\LaTeX}` code to be used for this
-        page. Alows the user to create a page to be included in the
+        page. Allows the user to create a page to be included in the
         report by passing :math:`\text{\LaTeX}` code directly. If this option is
         passed, the page itself will be saved in the :opt:`pageDirName
         <pageDirName, FILENAME>` directory in the form ``page_X.tex``
@@ -237,16 +237,16 @@ and a clarifying example.
 
     .. option:: showGrid, BOOLEAN
 
-        Whether or not to display the major grid on the
+        Whether to display the major grid on the
         graph. Default: ``true``.
 
     .. option:: showLegend, BOOLEAN
 
-        Whether or not to display the legend.
+        Whether to display the legend.
 
         Unless you use the :opt:`graphLegendName <graphLegendName, STRING>`
-        option, the name displayed in the legend is the tex
-        name associated with the ``dseries``. You can modify this tex
+        option, the name displayed in the legend is the TeX
+        name associated with the ``dseries``. You can modify this TeX
         name by using :dsermeth:`tex_rename <B = tex_rename>`.
         Default: ``false``.
 
@@ -372,7 +372,7 @@ and a clarifying example.
 
     .. option:: writeCSV, BOOLEAN
 
-        Whether or not to write a CSV file with only the plotted
+        Whether to write a CSV file with only the plotted
         data. The file will be saved in the directory specified by
         :opt:`graphDirName <graphDirName, FILENAME>` with the same base
         name as specified by :opt:`graphName <graphName, STRING>` with
@@ -388,7 +388,7 @@ and a clarifying example.
 
     .. option:: xAxisTight, BOOLEAN
 
-        Use a tight x axis. If false, uses ``PGFPLOTS/TikZ`` ``enlarge
+        Use a tight x-axis. If false, uses ``PGFPLOTS/TikZ`` ``enlarge
         x limits`` to choose appropriate axis size. Default: ``true``.
 
     .. option:: xrange, dates
@@ -422,7 +422,7 @@ and a clarifying example.
 
     .. option:: yAxisTight, BOOLEAN
 
-        Use a tight y axis. If false, uses ``PGFPLOTS/TikZ`` ``enlarge
+        Use a tight y-axis. If false, uses ``PGFPLOTS/TikZ`` ``enlarge
         y limits`` to choose appropriate axis size. Default:
         ``false``.
 
@@ -443,12 +443,12 @@ and a clarifying example.
 
     .. option:: yTickLabelScaled, BOOLEAN
 
-        Determines whether or not there is a common scaling factor for
-        the y axis. Default: ``true``.
+        Determines whether there is a common scaling factor for
+        the y-axis. Default: ``true``.
 
     .. option:: yTickLabelZeroFill, BOOLEAN
 
-        Whether or not to fill missing precision spots with
+        Whether to fill missing precision spots with
         zeros. Default: ``true``.
 
     .. option:: showZeroline, BOOLEAN
@@ -484,7 +484,7 @@ and a clarifying example.
 
     .. option:: showHlines, BOOLEAN
 
-        Whether or not to show horizontal lines separating the
+        Whether to show horizontal lines separating the
         rows. Default: ``false``.
 
     .. option:: precision, INTEGER
@@ -534,12 +534,12 @@ and a clarifying example.
 
     .. option:: showVlines, BOOLEAN
 
-        Whether or not to show vertical lines separating the
+        Whether to show vertical lines separating the
         columns. Default: ``false``.
 
     .. option:: writeCSV, BOOLEAN
 
-        Whether or not to write a CSV file containing the data
+        Whether to write a CSV file containing the data
         displayed in the table. The file will be saved in the
         directory specified by :opt:`tableDirName
         <tableDirName, FILENAME>` with the same base name as
@@ -563,7 +563,7 @@ and a clarifying example.
 
     .. option:: graphBar, BOOLEAN
 
-        Whether or not to display this series as a bar graph as oppsed
+        Whether to display this series as a bar graph as opposed
         to the default of displaying it as a line graph. Default:
         ``false``.
 
@@ -684,8 +684,8 @@ and a clarifying example.
     .. option:: tableDataRhs, dseries
 
         A series to be added to the right of the current
-        series. Usefull for displaying aggregate data for a
-        series. e.g if the series is quarterly ``tableDataRhs`` could
+        series. Useful for displaying aggregate data for a
+        series, e.g, if the series is quarterly ``tableDataRhs`` could
         point to the yearly averages of the quarterly series. This
         would cause quarterly data to be displayed followed by annual
         data. Default: ``empty``.
@@ -710,15 +710,15 @@ and a clarifying example.
 
     .. option:: tableAlignRight, BOOLEAN
 
-        Whether or not to align the series name to the right of the
+        Whether to align the series name to the right of the
         cell. Default: ``false``.
 
     .. option:: tableMarkerLimit, DOUBLE
 
         For values less than :math:`-1*\texttt{tableMarkerLimit}`,
-        mark the cell with the color denoted by tableNegColor. For
+        mark the cell with the color denoted by ``tableNegColor``. For
         those greater than ``tableMarkerLimit``, mark the cell with
-        the color denoted by tablePosColor. Default: ``1e-4``.
+        the color denoted by ``tablePosColor``. Default: ``1e-4``.
 
     .. option:: tableNaNSymb, STRING
 
@@ -842,7 +842,7 @@ and a clarifying example.
 
 *Example*
 
-The following code creates a one page report. The first part of the
+The following code creates a one-page report. The first part of the
 page contains two graphs displayed across two columns and one row. The
 bottom of the page displays a centered table::
 

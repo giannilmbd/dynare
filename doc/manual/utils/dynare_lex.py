@@ -108,6 +108,7 @@ class DynareLexer(RegexLexer):
 
             (r'\s*(-|\+|\*|\/|\^)\s*', Operator),
             (r'\s*(==|<=|>=|~=|<|>|&&|!)\s*', Operator),
+            (r'\s*⟂\s*', Operator),
 
             (r'\s*[\[\](){}:@.,\|]\s*', Punctuation),
             (r'\s*(=|:|;|>>|#|\$)\s*', Punctuation),

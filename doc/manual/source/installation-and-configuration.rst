@@ -64,7 +64,7 @@ shortcut to the documentation files and uninstaller.
 
 Note that you can have several versions of Dynare coexisting (for
 example in ``c:\dynare``), as long as you correctly adjust your path
-settings (see see :ref:`words-warning`).
+settings (see :ref:`words-warning`).
 
 Also note that it is possible to do a silent installation, by passing the
 ``/S`` flag to the installer on the command line. This can be useful when
@@ -126,7 +126,7 @@ The default installation directory is ``/Applications/Dynare/x.y-arch``.
 It is recommended to install the Xcode Command Line Tools (this is an Apple product)
 and GCC via Homebrew_ (see :ref:`prerequisites-macos`).
 
-To deinstall Dynare, simply delete the folder where you installed the program. The package installer does 
+To uninstall Dynare, simply delete the folder where you installed the program. The package installer does 
 not put any files anywhere else in the system.
 
 
@@ -213,7 +213,7 @@ Additionally, to make MATLAB aware that you agree to the terms of Xcode, run the
   defaults write com.apple.dt.Xcode IDEXcodeVersionForAgreedToGMLicense "${CLT_VERSION}"
   defaults read com.apple.dt.Xcode IDEXcodeVersionForAgreedToGMLicense
 
-Otherwise you will see a warning that Xcode is installed, but its license has not been accepted.
+Otherwise, you will see a warning that Xcode is installed, but its license has not been accepted.
 You can check this e.g. by running the following command in the MATLAB command window::
 
   mex -setup
@@ -343,7 +343,7 @@ your configuration). You must verify that there is no directory coming
 from another version of Dynare than the one you are planning to use.
 
 You have to be aware that adding other directories (on top of the
-dynare folders) to your MATLAB or Octave path can potentially create
+Dynare folders) to your MATLAB or Octave path can potentially create
 problems if any of your M-files have the same name as a Dynare
 file. Your routine would then override the Dynare routine, making
 Dynare unusable.
@@ -354,7 +354,7 @@ Dynare unusable.
    Never add all the subdirectories of the ``matlab`` folder to the
    MATLAB or Octave path. You must let Dynare decide which subdirectories
    have to be added to the MATLAB or Octave path. Otherwise, you may
-   end up with a non optimal or un-usable installation of Dynare.
+   end up with a non-optimal or unusable installation of Dynare.
 
 
 .. _Package status in Debian: https://packages.debian.org/sid/dynare
