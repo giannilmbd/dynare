@@ -128,8 +128,8 @@ if estimated_model
     %store qz_criterium
     options_=select_qz_criterium_value(options_);
     options_smoothed_state_uncertainty_old = options_.smoothed_state_uncertainty;
-    [atT, ~, ~, ~,ys, ~, ~, ~, ~, ~, ~, ~, ~, ~,oo_,bayestopt_] = ...
-        DsgeSmoother(xparam, gend, data, data_index, missing_value, M_, oo_, options_, bayestopt_, estim_params_);
+    [atT, ~, ~, ~,ys, ~, ~, ~, ~, ~, ~, ~, ~, ~,oo_.dr,bayestopt_.mf] = ...
+        DsgeSmoother(xparam, gend, data, data_index, missing_value, M_, oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state, options_, bayestopt_, estim_params_);
     options_.smoothed_state_uncertainty = options_smoothed_state_uncertainty_old;
     %get constant part
     if options_.noconstant

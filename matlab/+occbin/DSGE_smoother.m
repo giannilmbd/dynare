@@ -1,4 +1,4 @@
-function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info)
+function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,mf,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info)
 % [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info)
 % Runs a DSGE smoother with occasionally binding constraints
 %
@@ -65,8 +65,9 @@ regime_history=[];
 if  options_.occbin.smoother.linear_smoother && nargin==12
     %% linear smoother
     options_.occbin.smoother.status=false;
-    [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = ...
-        DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+    [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0] = ...
+        DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+    bayestopt_.mf=mf;
     tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,...
         aK,P,PK,decomp,Trend,state_uncertainty);
     for jf=1:length(smoother_field_list)
@@ -125,13 +126,14 @@ occbin_options.opts_regime.regime_history=options_.occbin.smoother.init_regime_h
 
 options_.noprint = true;
 
-[alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0,~,error_indicator] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+[alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0,~,error_indicator,oo_.occbin.smoother.regime_history] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+bayestopt_.mf=mf;
 
 if error_indicator(1) || isempty(alphahat0)
     if ~options_.occbin.smoother.linear_smoother || nargin~=12 %make sure linear smoother results are set before using them
         options_.occbin.smoother.status=false;
         [~,etahat,~,~,~,~,~,~,~,~,~,~,~,~,~,~,alphahat0] = ...
-            DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+            DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
          options_.occbin.smoother.status=true;
     else
         etahat= oo_.occbin.linear_smoother.etahat;
@@ -230,8 +232,8 @@ while is_changed && maxiter>iter && ~is_periodic
     iter=iter+1;
     disp_verbose(sprintf('OccBin smoother iteration %u.', iter),options_.verbosity)
     occbin_options.opts_regime.regime_history=regime_history;
-    [alphahat,etahat,epsilonhat,~,SteadyState,trend_coeff,~,T0,R0,P,~,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0]...
-        = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
+    [alphahat,etahat,epsilonhat,~,SteadyState,trend_coeff,~,T0,R0,P,~,decomp,Trend,state_uncertainty,oo_.dr,~,alphahat0,state_uncertainty0]...
+        = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
     sto_etahat(iter)={etahat};
     regime_history0(iter,:) = regime_history;
     if occbin_smoother_debug
