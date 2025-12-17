@@ -39,7 +39,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %                              (a_{0}) for initial period from PKF
 %   o state_uncertainty0 [double] (K,K) matrix storing the uncertainty about 
 %                                   the smoothed state for the initial
-%                                   period from the PKF
+%                                   period from the KF
 %   o d             [integer]   number of diffuse periods
 %   o info          [1 by 4 double]   error code and penalty
 
@@ -271,7 +271,7 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
     a_initial=set_Kalman_smoother_starting_values(a_initial,M_,oo_,options_);
     if kalman_algo == 5
         Gamma_0 = zeros(size(Pstar)); nu_0 = zeros(size(a_initial)); Delta_0 = eye(size(a_initial,1)); % initialize at Gaussian distribution
-        [alphahat, epsilonhat, etahat, ahat, P, aK, PK, decomp, state_uncertainty, aahat, eehat] = ...
+        [alphahat, epsilonhat, etahat, ahat, P, aK, PK, decomp, state_uncertainty, aahat, eehat, alphahat0, state_uncertainty0] = ...
             kalman_smoother_pruned_skewed(data1, ... % data
                                           a_initial, Pstar, Gamma_0, nu_0, Delta_0, ... % initialize CSN at Gaussian distribution
                                           ST, R1, Z, ... % state space matrices

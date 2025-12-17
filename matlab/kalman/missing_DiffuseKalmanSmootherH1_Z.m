@@ -44,6 +44,11 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 %    aalphahat:     filtered states in t-1|t
 %    eetahat:       updated shocks in t|t
 %    d:             number of diffuse periods
+%    alphahat0      (m*1) matrix, smoothed endogenous variables (a_{0|T})  (decision-rule order)
+%    aalphahat0     smoothed endogenous variables (a_{0|T}) from
+%                   smoother_redux option
+%    V0             (K,K,1) array, storing the uncertainty
+%                     about the smoothed state in t=0 (decision-rule order)
 %
 % Notes:
 %   Outputs are stored in decision-rule order, i.e. to get variables in order of declaration
