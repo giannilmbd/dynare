@@ -84,7 +84,8 @@ A number of tools and libraries are needed in order to recompile everything. You
 - A decent LaTeX distribution (if you want to compile PDF documentation),
   ideally with Beamer
 - For building the reference manual:
-  - [Sphinx](https://www.sphinx-doc.org/)
+  - [Sphinx](https://www.sphinx-doc.org/), with the [extension for BibTeX style
+    citations](https://github.com/mcmtroffaes/sphinxcontrib-bibtex)
   - [MathJax](https://www.mathjax.org/)
 - [X-13ARIMA-SEATS Seasonal Adjustment Program](https://www.census.gov/data/software/x13as.html)
 - Optionally, the unpacked source tree of
