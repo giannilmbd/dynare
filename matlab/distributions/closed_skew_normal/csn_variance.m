@@ -63,14 +63,14 @@ for ii = 1:q
 end
 
 % denominator in psi and Lambda of eq. (1) and (3) of Dominguez-Molina, Gonzalez-Farias, Gupta (2003, p. 10-11)
-if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
+if strcmp(mvnlogcdf,"gaussian_log_mvncdf_mendell_elston")
     % requires zero mean and correlation matrix as inputs
     normalization3 = diag(1 ./ sqrt(diag(Delta2)));
     eval_point3 = normalization3 * (zeros(q, 1) - nu);
     Corr_mat3 = normalization3 * Delta2 * normalization3;
     Corr_mat3 = 0.5 * (Corr_mat3 + Corr_mat3');
     term3 = exp(gaussian_log_mvncdf_mendell_elston(eval_point3, Corr_mat3));
-elseif mvnlogcdf == "mvncdf"
+elseif strcmp(mvnlogcdf,"mvncdf")
     term3 = mvncdf(zeros(1, q), nu', Delta2);
 end
 

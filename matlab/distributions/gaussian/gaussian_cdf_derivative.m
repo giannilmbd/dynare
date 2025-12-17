@@ -74,13 +74,13 @@ term1 = normpdf(evalp_t1, 0, sqrt(covar_t1));
 if isempty(cond_var)
     term2 = 1;
 else
-    if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
+    if strcmp(mvnlogcdf,"gaussian_log_mvncdf_mendell_elston")
         stdnrd   = diag(1./sqrt(diag(cond_var)));
         haspl    = stdnrd * evalp_t2;
         Uytgesme = stdnrd * cond_var * stdnrd;
         Uytgesme = 0.5 * (Uytgesme + Uytgesme');
         term2    = exp(gaussian_log_mvncdf_mendell_elston(haspl, Uytgesme));
-    elseif mvnlogcdf == "mvncdf"
+    elseif strcmp(mvnlogcdf,"mvncdf")
         term2 = mvncdf(eval_point(1:p-1)', cond_mean', cond_var);
     end
 end

@@ -60,7 +60,15 @@ end
 csn = csn_update_specification(M_.Sigma_e, M_.Skew_e);
 csn_q16 = csn_quantile(0.16, csn.mu_e(4,1), csn.Sigma_e(4,4), csn.Gamma_e(4,4), 0, 1, 'mvncdf');
 csn_q84 = csn_quantile(0.84, csn.mu_e(4,1), csn.Sigma_e(4,4), csn.Gamma_e(4,4), 0, 1, 'mvncdf');
-if abs(csn_q16 - (-0.273121782371810)) > 1e-15 || abs(csn_q84 - (0.283270501374202)) > 1e-15
+csn_target=[-0.273121782371810, 0.283270501374202];
+
+if isoctave
+    tol=[1e-10 1e-06];
+else
+    tol=[1e-15 1e-15];
+end
+
+if abs(csn_q16 - csn_target(1)) > tol(1) || abs(csn_q84 - csn_target(2)) > tol(2)
     error('CSN quantiles have not been computed correctly');
 end
 
@@ -79,7 +87,7 @@ end;
 stoch_simul(order=1, periods=0, irf=15, nodecomposition, nomoments, nocorr, nofunctions, nograph) rAnnualized piAnnualized xhat;
 irfs_csn_neg = oo_.irfs;
 
-% showcase how to simulate positive shocks, i.e. 84th quantile 
+% showcase how to simulate positive shocks, i.e. 84th quantile
 SIGN_SHOCKS = 1; % don't flip sign of shocks for 84th quantiles as they are positive
 shocks;
 var eta_r; stderr (csn_q84);
@@ -114,13 +122,14 @@ set_dynare_seed(132);
 stoch_simul(order=1,periods=500000,irf=0,nodecomposition,nomoments,nocorr,nofunctions,nograph);
 send_exogenous_variables_to_workspace;
 exo_@{DISTRIB} = oo_.exo_simul;
-hh_fig = dyn_figure(options_.nodisplay,'Name','Histogram of @{DISTRIB} shocks');
-subplot(2,2,1); histogram(eta_a,'normalization','pdf'); title('\eta_a');
-subplot(2,2,2); histogram(eta_e,'normalization','pdf'); title('\eta_e');
-subplot(2,2,3); histogram(eta_z,'normalization','pdf'); title('\eta_z');
-subplot(2,2,4); histogram(eta_r,'normalization','pdf'); title('\eta_r');
-sgtitle(hh_fig.Name);
-
+if ~isoctave % histogram is not available in Octave
+  hh_fig = dyn_figure(options_.nodisplay,'Name','Histogram of @{DISTRIB} shocks');
+  subplot(2,2,1); histogram(eta_a,'normalization','pdf'); title('\eta_a');
+  subplot(2,2,2); histogram(eta_e,'normalization','pdf'); title('\eta_e');
+  subplot(2,2,3); histogram(eta_z,'normalization','pdf'); title('\eta_z');
+  subplot(2,2,4); histogram(eta_r,'normalization','pdf'); title('\eta_r');
+  sgtitle(hh_fig.Name);
+end
 @#endfor
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,7 +140,7 @@ stats_N = nan(M_.exo_nbr, length(statNames));
 stats_SN = nan(M_.exo_nbr, length(statNames));
 for i = 1:M_.exo_nbr
     @#for DISTRIB in ["N", "SN"]
-    stats_@{DISTRIB}(i, 1) = mean(exo_@{DISTRIB}(:, i)); 
+    stats_@{DISTRIB}(i, 1) = mean(exo_@{DISTRIB}(:, i));
     stats_@{DISTRIB}(i, 2) = median(exo_@{DISTRIB}(:, i));
     stats_@{DISTRIB}(i, 3) = std(exo_@{DISTRIB}(:, i));
     stats_@{DISTRIB}(i, 4) = var(exo_@{DISTRIB}(:, i));
@@ -141,11 +150,12 @@ for i = 1:M_.exo_nbr
     stats_@{DISTRIB}(i, 8) = max(exo_@{DISTRIB}(:, i));
     @#endfor
 end
-fprintf('<strong>DESCRIPTIVE STATISTICS FOR NORMAL SHOCKS</strong>\n');
-disp(array2table(stats_N, 'VariableNames', statNames, 'RowNames', M_.exo_names));
-fprintf('<strong>DESCRIPTIVE STATISTICS FOR SKEW NORMAL SHOCKS</strong>\n');
-disp(array2table(stats_SN, 'VariableNames', statNames, 'RowNames', M_.exo_names));
-
+if ~isoctave % array2table is not available in Octave
+  fprintf('<strong>DESCRIPTIVE STATISTICS FOR NORMAL SHOCKS</strong>\n');
+  disp(array2table(stats_N, 'VariableNames', statNames, 'RowNames', M_.exo_names));
+  fprintf('<strong>DESCRIPTIVE STATISTICS FOR SKEW NORMAL SHOCKS</strong>\n');
+  disp(array2table(stats_SN, 'VariableNames', statNames, 'RowNames', M_.exo_names));
+end
 % error out if something is not close to theoretical value
 if any((abs(mean(exo_N)) > 1e-3))
     error('Mean of normal shocks should be close to zero!')
