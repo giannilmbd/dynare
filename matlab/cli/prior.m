@@ -11,7 +11,7 @@ function varargout = prior(varargin)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -31,13 +31,13 @@ function varargout = prior(varargin)
 if isempty(varargin) || ( isequal(length(varargin), 1) && isequal(varargin{1},'help'))
     skipline()
     disp('Possible options are:')
-    disp(' + table                 Prints a table describing the priors.')
     disp(' + moments               Computes and displays moments of the endogenous variables at the prior mode.')
-    disp(' + optimize              Optimizes the prior density (starting from a random initial guess).')
-    disp(' + simulate              Computes the effective prior mass (using a Monte-Carlo).')
-    disp(' + plot                  Plots the marginal prior densities.')
     disp(' + moments(distribution) Print tables describing the implied prior for the first and second order unconditional')
     disp('                         moments of all the endogenous variables.')
+    disp(' + optimize              Optimizes the prior density (starting from a random initial guess).')
+    disp(' + plot                  Plots the marginal prior densities.')
+    disp(' + simulate              Computes the effective prior mass (using a Monte-Carlo).')
+    disp(' + table                 Prints a table describing the priors.')
     skipline()
     return
 end
@@ -123,8 +123,7 @@ if ismember('optimize', varargin) % Prior optimization.
     donesomething = true;
 end
 
-if ismember('moments', varargin) % Prior simulations (2nd order moments).
-                                 % Set estimated parameters to the prior mode...
+if ismember('moments', varargin) % Prior simulations (2nd order moments at prior mode).
     xparam1 = BayesOptions.p5;
     % ... Except for uniform priors (use the prior mean)!
     k = find(isnan(xparam1));
@@ -139,7 +138,7 @@ if ismember('moments', varargin) % Prior simulations (2nd order moments).
     % Solve model
     [T,R,~,info,oo__.dr, M_local.params] = dynare_resolve(M_local , options_ , oo__.dr, oo__.steady_state, oo__.exo_steady_state, oo__.exo_det_steady_state,'restrict');
     if ~info(1)
-        info=endogenous_prior_restrictions(T,R,M_local , options__ , oo__.dr,oo__.steady_state,oo__.exo_steady_state,oo__.exo_det_steady_state);
+        info=endogenous_prior_restrictions(T,R,M_local , options_ , oo__.dr,oo__.steady_state,oo__.exo_steady_state,oo__.exo_det_steady_state);
     end
     if info
         skipline()
@@ -149,12 +148,12 @@ if ismember('moments', varargin) % Prior simulations (2nd order moments).
         return
     end
     % Compute and display second order moments
-    oo__ = disp_th_moments(oo__.dr, [], M_local, options__, oo__);
+    oo__ = disp_th_moments(oo__.dr, [], M_local, options_, oo__);
     skipline(2)
     donesomething = true;
 end
 
-if ismember('moments(distribution)', varargin) % Prior simulations (BK).
+if ismember('moments(distribution)', varargin) % Prior simulations (for BK passed parameters).
     if ~ismember('simulate', varargin)
         results = prior_sampler(1, M_local, BayesOptions, options_, oo_, estim_params_);
     end
@@ -180,7 +179,7 @@ if ismember('moments(distribution)', varargin) % Prior simulations (BK).
             end
         end
     end
-    save([M_.dname filesep() 'prior' filesep() M_.fname '_endogenous_variables_prior_draws.mat'], 'FirstOrderMoments', 'SecondOrderMoments')
+    save([M_.dname filesep() 'prior' filesep() M_.fname '_endogenous_variables_prior_draws.mat'], 'FirstOrderMoments', 'SecondOrderMoments');
     skipline(2)
     options_.noprint = noprint;
     % First order moments

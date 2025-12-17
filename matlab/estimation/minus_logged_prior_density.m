@@ -1,20 +1,24 @@
-function [fval, info, exitflag, fake1, fake2] = minus_logged_prior_density(xparams, Prior, options_, M_, estim_params_, oo_)
-
+function [fval, info, exitflag, fake1, fake2] = minus_logged_prior_density(xparams, bayestopt_, options_, M_, estim_params_, oo_)
+% [fval, info, exitflag, fake1, fake2] = minus_logged_prior_density(xparams, bayestopt_, options_, M_, estim_params_, oo_)
+% -------------------------------------------------------------------------
 % Evaluates minus the logged prior density.
- %
+%
 % INPUTS
-% - xparams            [double]   vector of parameters.
-% - Prior              [dprior]   vector specifying prior densities shapes.
-% - DynareOptions      [struct]   Options, AKA options_
-% - DynareModel        [struct]   Model description, AKA M_
-% - EstimatedParams    [struct]   Info about estimated parameters, AKA estimated_params_
-% - DynareResults      [struct]   Results, AKA oo_
+% - xparams            [double]   vector of parameters
+% - bayestopt_         [struct]   structure describing the priors
+% - options_           [struct]   structure describing the options
+% - M_                 [struct]   structure describing the model
+% - estim_params_      [struct]   structure describing the estimated parameters
+% - oo_                [struct]   structure describing the results
 %
 % OUTPUTS
-% - fval               [double]  value of minus the logged prior density.
-% - info               [double]  4×1 vector, second entry stores penalty, first entry the error code, last entry a penalty (used for optimization).
+% - fval               [double]   scalar, value of minus the logged prior density.
+% - info               [double]   4×1 vector, second entry stores penalty, first entry the error code, last entry a penalty (used for optimization).
+% - exitflag           [integer]  integer flag indicating if the evaluation was successful
+% - fake1              [empty]    empty output
+% - fake2              [empty]    empty output
 
-% Copyright © 2009-2023 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -41,22 +45,22 @@ fake2 = [];
 %------------------------------------------------------------------------------
 
 % Return, with endogenous penalty, if some parameters are smaller than the lower bound of the prior domain.
-if ~isequal(options_.mode_compute, 1) && any(xparams<Prior.p3)
-    k = find(xparams<Prior.p3);
+if ~isequal(options_.mode_compute, 1) && any(xparams<bayestopt_.p3)
+    k = find(xparams<bayestopt_.p3);
     fval = Inf;
     exitflag = false;
     info(1) = 41;
-    info(4) = sum((Prior.p3(k)-xparams(k)).^2);
+    info(4) = sum((bayestopt_.p3(k)-xparams(k)).^2);
     return
 end
 
 % Return, with endogenous penalty, if some parameters are greater than the upper bound of the prior domain.
-if ~isequal(options_.mode_compute, 1) && any(xparams>Prior.p4)
-    k = find(xparams>Prior.p4);
+if ~isequal(options_.mode_compute, 1) && any(xparams>bayestopt_.p4)
+    k = find(xparams>bayestopt_.p4);
     fval = Inf;
     exitflag = false;
     info(1) = 42;
-    info(4) = sum((xparams(k)-Prior.p4(k)).^2);
+    info(4) = sum((xparams(k)-bayestopt_.p4(k)).^2);
     return
 end
 
@@ -146,6 +150,7 @@ if info(1)
     end
 end
 
+Prior = dprior(bayestopt_, options_.prior_trunc, false);
 fval = - Prior.density(xparams);
 
 if isinf(fval)
