@@ -1,7 +1,7 @@
 ! Provides a subroutine to sort integer arrays in ascending order
 ! As the addressed arrays are small, I use the insertion sort algorithm
 
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2025 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -28,7 +28,9 @@ contains
       do i=2,size(l)
          x = l(i)
          j = i
-         do while (j > 1 .and. l(j-1) > x)
+         do
+            if (j <= 1) exit
+            if (l(j-1) <= x) exit
             l(j) = l(j-1)
             j = j-1
          end do
