@@ -106,7 +106,6 @@ if ~options_.nograph
             else
                 title(var_list{j}, 'Interpreter', 'none');
             end
-            xlabel('Period');
             xlim([1 T]);
             remove_fractional_xticks;
         end
@@ -134,7 +133,6 @@ if ~options_.nograph
                 else
                     title(var_list{idx}, 'Interpreter', 'none');
                 end
-                xlabel('Period');
                 xlim([1 T]);
                 remove_fractional_xticks;
             end
@@ -164,7 +162,6 @@ if ~options_.nograph
             else
                 title(var_list{idx}, 'Interpreter', 'none');
             end
-            xlabel('Period');
             xlim([1 T]);
             remove_fractional_xticks;
         end
