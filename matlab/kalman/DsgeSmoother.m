@@ -276,7 +276,7 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
     a_initial=set_Kalman_smoother_starting_values(a_initial,M_,dr,options_);
     if kalman_algo == 5
         Gamma_0 = zeros(size(Pstar)); nu_0 = zeros(size(a_initial)); Delta_0 = eye(size(a_initial,1)); % initialize at Gaussian distribution
-        [alphahat, epsilonhat, etahat, ahat, P, aK, PK, decomp, state_uncertainty, aahat, eehat, alphahat0, state_uncertainty0] = ...
+        [alphahat, epsilonhat, etahat, ahat, ~, P, aK, PK, decomp, state_uncertainty, aahat, eehat, alphahat0, state_uncertainty0] = ...
             kalman_smoother_pruned_skewed(data1, ... % data
                                           a_initial, Pstar, Gamma_0, nu_0, Delta_0, ... % initialize CSN at Gaussian distribution
                                           ST, R1, Z, ... % state space matrices
