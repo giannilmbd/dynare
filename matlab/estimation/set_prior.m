@@ -42,6 +42,12 @@ estim_params_.ncx = size(estim_params_.corrx,1);      % number of estimated corr
 estim_params_.ncn = size(estim_params_.corrn,1);      % number of estimated corr parameters for measurement errors
 estim_params_.nsx = size(estim_params_.skew_exo,1);   % number of estimated skew parameters for structural shocks
 estim_params_.np  = size(estim_params_.param_vals,1); % number of estimated structural parameters
+if isfield(estim_params_,'endo_init_vals') && ~isempty(estim_params_.endo_init_vals)
+    estim_params_.nendoinit  = size(estim_params_.endo_init_vals,1); % number of estimated initial states
+else
+    estim_params_.nendoinit = 0;
+    estim_params_.endo_init_vals = zeros(0,10);
+end
 
 xparam1 = [];
 ub = []; % Upper bound imposed for optimization.
@@ -51,7 +57,7 @@ bayestopt_.p1 = []; % prior mean
 bayestopt_.p2 = []; % prior standard deviation
 bayestopt_.p3 = []; % lower bound of the distribution, only considering whether a generalized distribution is used, not when the prior is truncated
 bayestopt_.p4 = []; % upper bound of the distribution, only considering whether a generalized distribution is used, not when the prior is truncated
-bayestopt_.p5 = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1); % prior mode
+bayestopt_.p5 = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np+estim_params_.nendoinit,1); % prior mode
 bayestopt_.p6 = []; % first hyper-parameter (\alpha for the BETA and GAMMA distributions, s for the INVERSE GAMMAs, expectation for the GAUSSIAN distribution, lower bound for the UNIFORM distribution).
 bayestopt_.p7 = []; % second hyper-parameter (\beta for the BETA and GAMMA distributions, \nu for the INVERSE GAMMAs, standard deviation for the GAUSSIAN distribution, upper bound for the UNIFORM distribution).
 
@@ -162,6 +168,24 @@ if estim_params_.nsx % estimated skew parameters for structural shocks (ordered 
     for i = 1:estim_params_.nsx
         k = estim_params_.skew_exo(i,1);
         bayestopt_.name(baseid+i) = {sprintf('skew %s', M_.exo_names{k})};
+    end
+end
+
+if estim_params_.nendoinit % estimated endo init state (ordered sixth in xparam1)
+    xparam1 = [xparam1; estim_params_.endo_init_vals(:,2)];
+    ub = [ub; estim_params_.endo_init_vals(:,4)];
+    lb = [lb; estim_params_.endo_init_vals(:,3)];
+    bayestopt_.pshape = [ bayestopt_.pshape; estim_params_.endo_init_vals(:,5)];
+    bayestopt_.p1 = [ bayestopt_.p1; estim_params_.endo_init_vals(:,6)];
+    bayestopt_.p2 = [ bayestopt_.p2; estim_params_.endo_init_vals(:,7)];
+    bayestopt_.p3 = [ bayestopt_.p3; estim_params_.endo_init_vals(:,8)]; %take generalized distribution into account
+    bayestopt_.p4 = [ bayestopt_.p4; estim_params_.endo_init_vals(:,9)]; %take generalized distribution into account
+    bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.endo_init_vals(:,10)];
+    baseid = length(bayestopt_.name);
+    bayestopt_.name = [bayestopt_.name; cell(estim_params_.nendoinit, 1)];
+    for i = 1:estim_params_.nendoinit
+        k = estim_params_.endo_init_vals(i,1);
+        bayestopt_.name(baseid+i) = {sprintf('init %s', M_.endo_names{k})};
     end
 end
 

@@ -80,3 +80,8 @@ for ii=1:size(estim_params_.skew_exo, 1)
     parameter_name_1 = M_.exo_names{estim_params_.skew_exo(ii,1)};
     trace_plot(options_, M_, estim_params_, 'StructuralShock', chain_number, parameter_name_1, parameter_name_1, parameter_name_1);
 end
+
+for ii=1:size(estim_params_.endo_init_vals, 1)
+    parameter_name = M_.endo_names{estim_params_.endo_init_vals(ii,1)};
+    trace_plot(options_, M_, estim_params_, 'InitialState', chain_number, parameter_name);
+end

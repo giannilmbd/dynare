@@ -290,42 +290,38 @@ for b=fpar:B
                     else
                         alphahat01 = alphahat1;
                     end
-                    if isfield(M_.occbin,'filter_initial_state') && ~isempty(M_.occbin.filter_initial_state)
-                        error_indicator=true;
-                        M_local = M_;
-                        M_local.filter_initial_state = M_.occbin.filter_initial_state;
-                        opts_local1 = opts_local;
-                        opts_local1.lik_init = 2;
-                        opts_local1.Harvey_scale_factor = 0;
-                        niter=0;
-                        while error_indicator && niter<10
-                            niter=niter+1;
-                            for jj=1:length(M_.state_var)
-                                M_local.params(strcmp([M_.endo_names{M_.state_var(jj)} 'init'],M_.param_names)) = alphahat01(jj);
+                    error_indicator=true;
+                    M_local = M_;
+                    % set direct assignment of initial states
+                    M_local.endo_initial_state.status = true;
+                    M_local.endo_initial_state.values = zeros(M_.endo_nbr,1);
+                    opts_local1 = opts_local;
+                    opts_local1.lik_init = 2;
+                    opts_local1.Harvey_scale_factor = 0;
+                    niter=0;
+                    while error_indicator && niter<10
+                        niter=niter+1;
+                        M_local.endo_initial_state.values(M_.state_var) = alphahat01;
+                        [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                            occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                        if oo_.occbin.smoother.error_flag(1)
+                            if not(isempty(is)) && niter==1
+                                % first check if smoother mean works
+                                M_local.endo_initial_state.values(M_.state_var) = alphahat1;
+                                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
                             end
-                            [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                                occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
-                            if oo_.occbin.smoother.error_flag(1)
-                                if not(isempty(is)) && niter==1
-                                    % first check if smoother mean works
-                                    for jj=1:length(M_.state_var)
-                                        M_local.params(strcmp([M_.endo_names{M_.state_var(jj)} 'init'],M_.param_names)) = alphahat1(jj);
-                                    end
-                                    [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                                        occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
-                                end
-                                if oo_.occbin.smoother.error_flag(1) && (niter==1 || niter==10)
-                                    % use smoother ?
-                                    [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                                        occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
-                                else
-                                    % try another draw from smoother distribution
-                                    alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
-                                    oo_.occbin.smoother.error_flag(1) = 1;
-                                end
+                            if oo_.occbin.smoother.error_flag(1) && (niter==1 || niter==10)
+                                % use smoother ?
+                                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+                            else
+                                % try another draw from smoother distribution
+                                alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
+                                oo_.occbin.smoother.error_flag(1) = 1;
                             end
-                            error_indicator = any(oo_.occbin.smoother.error_flag(1));
-                        end                        
+                        end
+                        error_indicator = any(oo_.occbin.smoother.error_flag(1));
                     end
                 end
                 if oo_.occbin.smoother.error_flag(1)

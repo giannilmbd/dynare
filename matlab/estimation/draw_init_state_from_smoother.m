@@ -2,29 +2,54 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
 % [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
 %     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
-% Computes the endogenous log prior addition to the initial prior
+% Draws the Kalman filter initial state from the DSGE smoother.
+%
+% The function runs an unconditional state smoother (OccBin or linear)
+% to obtain the smoothed state mean and covariance, then proposes an
+% initial state draw. If init is false, it performs a short Metropolis–
+% Hastings step to update the endogenous initial state parameters in
+% xparam1 (independent MH centered at the smoothed state when
+% options_.init_state_endogenous_prior is true; otherwise a RW-MH around
+% the current state), honoring parameter bounds. If init is true, it
+% directly sets the initial state parameters in xparam1 from the smoothed
+% draw without acceptance testing.
 %
 % INPUTS
-% - xparam1             [double]        current values for the estimated parameters.
-% - mh_bounds           [structure]     containing mh_bounds
+% - init                [logical|double] when logical, selects mode:
+%                        true  → initialize from smoothed draw without MH;
+%                        false → sample via MH around smoothed/current state.
+%                        When a 2-element vector [flag, target], uses
+%                        flag as above and sets target_accepted=target.
+% - sampler_options     [structure]     MCMC/sampler options; uses fields
+%                                       .bounds.lb/.ub and optionally
+%                                       .fast_likelihood_evaluation_for_rejection.
+% - xparam1             [double]        current values for the estimated parameters
+%                                       (includes endogenous initial state parameters).
+% - logpost0            [double]        current log-posterior at xparam1.
+% - mh_bounds           [structure]     optional; when struct, may be tightened
+%                                       to pin initial state parameters after sampling.
 % - dataset_            [structure]     dataset after transformations
-% - dataset_info        [structure]     storing informations about the
-%                                       sample; not used but required for interface
-% - options_            [structure]     Matlab's structure describing the current options
-% - M_                  [structure]     Matlab's structure describing the model
-% - estim_params_       [structure]     characterizing parameters to be estimated
-% - bayestopt_          [structure]     describing the priors
-% - BoundsInfo          [structure]     containing prior bounds
-% - dr                  [structure]     Reduced form model.
-% - endo_steady_state   [vector]        steady state value for endogenous variables
-% - exo_steady_state    [vector]        steady state value for exogenous variables
-% - exo_det_steady_state [vector]       steady state value for exogenous deterministic variables
+% - dataset_info        [structure]     information about the sample (missing data, indices)
+% - options_            [structure]     options; toggles lik_init and smoother controls
+% - M_                  [structure]     model structure (updated endo_initial_state)
+% - estim_params_       [structure]     parameters to be estimated
+% - bayestopt_          [structure]     priors and state indexing (mf0)
+% - BoundsInfo          [structure]     prior bounds info
+% - dr                  [structure]     reduced-form decision rules
+% - endo_steady_state   [vector]        steady state for endogenous variables
+% - exo_steady_state    [vector]        steady state for exogenous variables
+% - exo_det_steady_state [vector]       steady state for deterministic exogenous variables
 % - derivatives_info    [structure]     derivative info for identification
 %
 % OUTPUTS
-% - xparam1             [double]        current values for the estimated parameters.
-% - mh_bounds           [structure]     containing mh_bounds
-% - M_                  [structure]     Matlab's structure describing the model
+% - xparam1             [double]        updated parameter vector with initial state entries set.
+% - logpost0            [double]        updated log-posterior at returned xparam1.
+% - mh_bounds           [structure]     possibly tightened bounds for initial state parameters.
+% - M_                  [structure]     updated model with endo_initial_state values.
+%
+% SEE ALSO
+%   get_init_state_prior - computes Pstar-based constraints for initial-state consistency.
+%   set_init_state - enforces null-space projection on init-state parameters.
 
 % Copyright © 2024-2025 Dynare Team
 %
@@ -63,8 +88,10 @@ if not(islogical(init))
     init=logical(init(1));
 end
 
-filter_initial_state=M_.filter_initial_state;
-M_.filter_initial_state = [];
+% here I run unconditional smoother, so I need to undo the init state
+% estimation setup and set lik_init = 1
+store_endo_initial_state=M_.endo_initial_state;
+M_.endo_initial_state.status = false;
 error_flag=0;
 options_.lik_init=1;
 if init
@@ -109,6 +136,7 @@ if options_.occbin.smoother.status
         end
     end
     if init || (oo_.occbin.smoother.error_flag && isempty(alphahat0))
+        % use linear smoother to initialize or if error
         options_.occbin.smoother.status=false;
         [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
         options_.occbin.smoother.status=true;
@@ -116,12 +144,12 @@ if options_.occbin.smoother.status
 else
     [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
 end
-% end
-M_.filter_initial_state = filter_initial_state;
+% end unconditional smoother to get mean (alphahat0) and covariance (state_uncertainty0) of the proposal for init state 
+% now I reset init state estimation stuff
+M_.endo_initial_state = store_endo_initial_state;
 options_.lik_init=2;
 if error_flag==0
     % smoother converged!
-    params0 = M_.params;
     % draw initial state from smoothed distribution
     [U,X] = svd(0.5*(state_uncertainty0(dr.restrict_var_list(bayestopt_.mf0),dr.restrict_var_list(bayestopt_.mf0))+state_uncertainty0(dr.restrict_var_list(bayestopt_.mf0),dr.restrict_var_list(bayestopt_.mf0))'));
     is = find(diag(X)>options_.kalman_tol);
@@ -131,47 +159,39 @@ if error_flag==0
     state_variance_rank = size(StateVectorVarianceSquareRoot,2);
     U = U(:,is);
 
-    pvec=[];
-    for ii=1:size(M_.filter_initial_state,1)
-        if ~isempty(M_.filter_initial_state{ii,1})
-            tmp1 = strrep(M_.filter_initial_state{ii,2},');','');
-            tmp1 = strrep(tmp1,'M_.params(','');
-            pvec = [pvec eval(tmp1)];
-        end
-    end
-    [~,~,IB] = intersect(M_.param_names(pvec),bayestopt_.name,'stable');
-    M_.params(pvec) = xparam1(IB);
+    % store current init state values
+    IB = startsWith(bayestopt_.name, 'init ');
+    M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
 
     fast_likelihood_evaluation_for_rejection = false;
     if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
         fast_likelihood_evaluation_for_rejection = true;
     end
 
-    alphahat00 = alphahat0;
     if not(init)
         if options_.init_state_endogenous_prior
             % independent MH
             % check probability of smoothed in t=0 (which is the mode for
             % linear case, but how about occbin?)
             yhat = alphahat0(dr.restrict_var_list(bayestopt_.mf0));
-            alphahat01=alphahat00;
+            % build declaration order init states alphahat01
+            alphahat01=alphahat0;
             alphahat01(dr.restrict_var_list(bayestopt_.mf0))=yhat;
             alphahat01 = alphahat01(dr.inv_order_var);
 
-            M_=update_parameters_filter_initial_state(M_,alphahat01,dr.ys,options_);
-            xparam11=xparam1;
-            xparam11(IB) = M_.params(pvec);
-            if not(all(xparam11(:)>=sampler_options.bounds.lb) && all(xparam11(:)<=sampler_options.bounds.ub))
-                xparam11(xparam11(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xparam11(:)<sampler_options.bounds.lb)+sqrt(eps);
-                xparam11(xparam11(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xparam11(:)>sampler_options.bounds.ub)-sqrt(eps);
+            xproposal=xparam1;
+            xproposal(IB) = alphahat01(M_.state_var);
+            if not(all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub))
+                xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
+                xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
             end
 
             is_smoothed_state_optimal=true;
-            [xcheck, icheck]=set_init_state(xparam11,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xcheck, icheck]=set_init_state(xproposal,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if icheck
-                xparam11=xcheck;
+                xproposal=xcheck;
             end
-            logpost1 = -dsge_likelihood(xparam11,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+            logpost1 = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
             if logpost1<logpost0
                 is_smoothed_state_optimal=false;
             end
@@ -179,18 +199,8 @@ if error_flag==0
         end
         if not(options_.init_state_endogenous_prior) || not(is_smoothed_state_optimal)
             % use previous draw RW MH
-            for ii=1:size(M_.filter_initial_state,1)
-                if ~isempty(M_.filter_initial_state{ii,1})
-                    if options_.loglinear && ~options_.logged_steady_state
-                        eval(['alphahat0(ii) = log(' strrep(M_.filter_initial_state{ii,2},';','') ') - log(dr.ys(ii));']);
-                    elseif ~options_.loglinear && ~options_.logged_steady_state
-                        eval(['alphahat0(ii) = ' strrep(M_.filter_initial_state{ii,2},';','') '- dr.ys(ii);'])
-                    else
-                        error('The steady state is logged. This should not happen. Please contact the developers')
-                    end
-                end
-            end
-            alphahat0=alphahat0(dr.order_var);
+            alphahat0=store_endo_initial_state.values;
+            alphahat0=alphahat0(dr.order_var); % decision rule order
         end
     end
     naccepted=0;
@@ -210,75 +220,69 @@ if error_flag==0
                 else
                     yhat = alphahat0(dr.restrict_var_list(bayestopt_.mf0));
                 end
-                alphahat01=alphahat00;
+                alphahat01=alphahat0;
                 alphahat01(dr.restrict_var_list(bayestopt_.mf0))=yhat;
                 alphahat01 = alphahat01(dr.inv_order_var);
 
                 M_=update_parameters_filter_initial_state(M_,alphahat01,dr.ys,options_);
-                xparam11=xparam1;
-                xparam11(IB) = M_.params(pvec);
-                if all(xparam11(:)>=sampler_options.bounds.lb) && all(xparam11(:)<=sampler_options.bounds.ub)
+                xproposal=xparam1;
+                xproposal(IB) = M_.endo_initial_state.values(M_.state_var);
+                if all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub)
                     new_draw_out_of_bounds = false;
                 end
             end
             if new_draw_out_of_bounds
-                xparam11(xparam11(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xparam11(:)<sampler_options.bounds.lb)+sqrt(eps);
-                xparam11(xparam11(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xparam11(:)>sampler_options.bounds.ub)-sqrt(eps);
+                xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
+                xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
             end
-            [xcheck, icheck]=set_init_state(xparam11,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xcheck, icheck]=set_init_state(xproposal,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if icheck
-                xparam11=xcheck;
+                % if init states have been modified to match the null space
+                % of Pstar
+                xproposal=xcheck;
             end
             if init
-                xparam1=xparam11;
+                xparam1=xproposal;
                 break
             end
             lnrand = log(rand);
             if fast_likelihood_evaluation_for_rejection
                 fval=lnrand+logpost0-10;
-                logpost1  = -rejection_objective_function(@dsge_likelihood,xparam11,fval,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                logpost1  = -rejection_objective_function(@dsge_likelihood,xproposal,fval,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
                 if (logpost1 >= fval)
-                    logcheck = -dsge_likelihood(xparam11,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                    logcheck = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
                     logpost1 = logcheck;
                 end
             else
-                logpost1 = -dsge_likelihood(xparam11,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                logpost1 = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
             end
             if logpost1<logpost0
                 r = logpost1-logpost0;
                 if (logpost1 > -inf) && (lnrand < r)
                     accepted = 1;
-                    xparam1 = xparam11;
+                    xparam1 = xproposal;
                 else
                     accepted = 0;
-                    M_.params = params0;
+                    M_.endo_initial_state = store_endo_initial_state;
                     logpost1 = logpost0;
                 end
             else
-                xparam1 = xparam11;
+                xparam1 = xproposal;
                 accepted = 1;
             end
             if accepted
                 logpost0 = logpost1;
                 naccepted = naccepted+1;
-                M_.params(pvec) = xparam1(IB);
+                M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
+                store_endo_initial_state = M_.endo_initial_state;
                 if options_.init_state_endogenous_prior && logpostSMO<logpost0
+                    % switch from independent to RW Metropolis
                     is_smoothed_state_optimal=false;
                 end
 
                 if not(options_.init_state_endogenous_prior && is_smoothed_state_optimal) %nattempts==1)
-                    for ii=1:size(M_.filter_initial_state,1)
-                        if ~isempty(M_.filter_initial_state{ii,1})
-                            if options_.loglinear && ~options_.logged_steady_state
-                                eval(['alphahat0(ii) = log(' strrep(M_.filter_initial_state{ii,2},';','') ') - log(dr.ys(ii));']);
-                            elseif ~options_.loglinear && ~options_.logged_steady_state
-                                eval(['alphahat0(ii) = ' strrep(M_.filter_initial_state{ii,2},';','') '- dr.ys(ii);'])
-                            else
-                                error('The steady state is logged. This should not happen. Please contact the developers')
-                            end
-                        end
-                    end
-                    alphahat0=alphahat0(dr.order_var);
+                    alphahat0=store_endo_initial_state.values;
+                    alphahat0=alphahat0(dr.order_var); % decision rule order
                 end
             end
         end
@@ -286,33 +290,35 @@ if error_flag==0
             break
         end
         if naccepted==0 && options_.init_state_endogenous_prior
-            if not(is_smoothed_state_optimal)
-                M_.params(pvec) = xparam1(IB);
-                alphahat00 = alphahat0;
-
-                for ii=1:size(M_.filter_initial_state,1)
-                    if ~isempty(M_.filter_initial_state{ii,1})
-                        if options_.loglinear && ~options_.logged_steady_state
-                            eval(['alphahat0(ii) = log(' strrep(M_.filter_initial_state{ii,2},';','') ') - log(dr.ys(ii));']);
-                        elseif ~options_.loglinear && ~options_.logged_steady_state
-                            eval(['alphahat0(ii) = ' strrep(M_.filter_initial_state{ii,2},';','') '- dr.ys(ii);'])
-                        else
-                            error('The steady state is logged. This should not happen. Please contact the developers')
-                        end
-                    end
-                end
-                alphahat0=alphahat0(dr.order_var);
-            else
-                StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;
-            end
+            % try reducing variance of state uncertainty in the
+            % proposal and continue with MH centered on alphahat0 
+            StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;
         end
     end
 end
 if not(init)
     if isstruct(mh_bounds)
+        % set ub=lb
         mh_bounds.lb(IB)= xparam1(IB);
         mh_bounds.ub(IB)= xparam1(IB);
     end
     disp_verbose(['naccepted=' int2str(naccepted) '| niter=' int2str(niter) '| nattempts=' int2str(nattempts)],options_.debug)
 end
 
+%% Local helper function
+function M_=update_parameters_filter_initial_state(M_,alphahat01,ys,options_)
+% Updates M_.endo_initial_state.values from state deviations.
+%
+% Given a state vector `alphahat01` in declaration order (representing
+% deviations from steady state), this routine updates
+% `M_.endo_initial_state.values` by adding the deviations to the steady
+% state `ys`. In log-linear mode it uses exponential transformation;
+% otherwise a direct level addition.
+
+if options_.loglinear && ~options_.logged_steady_state
+    M_.endo_initial_state.values(M_.state_var) = exp(log(ys(M_.state_var))+alphahat01(M_.state_var));
+elseif ~options_.loglinear && ~options_.logged_steady_state
+    M_.endo_initial_state.values(M_.state_var)= ys(M_.state_var)+alphahat01(M_.state_var);
+else
+    error('The steady state is logged. This should not happen. Please contact the developers')
+end

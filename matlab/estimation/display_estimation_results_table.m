@@ -51,7 +51,7 @@ else
 end
 
 if estim_params_.np % number of estimated structural parameters
-    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+1; % offset: structural parameters are ordered last in xparam1
     disp('parameters')
     disp(tit1)
     for i=1:estim_params_.np
@@ -187,6 +187,29 @@ if estim_params_.nsx % number of estimated skew parameters for structural shocks
         end
         oo_.(sprintf('%s_mode', field_name)).shocks_skew.(NAME) = xparam1(ip);
         oo_.(sprintf('%s_std_at_mode', field_name)).shocks_skew.(NAME) = stdh(ip);
+        ip = ip+1;
+    end
+    skipline()
+end
+
+if estim_params_.nendoinit % number of initial state variables
+    disp('initial states')
+    disp(tit1)
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: skew of shocks are ordered fifth in xparam1
+    for i=1:estim_params_.nendoinit
+        k = estim_params_.endo_init_vals(i,1);
+        name = sprintf('%s', M_.endo_names{k});
+        NAME = sprintf('%s', M_.endo_names{k});
+        if contains(field_name,'posterior')
+            fprintf('%-*s %10.4f %8.4f %7.4f %6s %6.4f \n', ...
+                    header_width, name, bayestopt_.p1(ip), xparam1(ip), stdh(ip), ...
+                    pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
+        else
+            fprintf('%-*s %10.4f %7.4f %7.4f \n',header_width, name, xparam1(ip), ...
+                    stdh(ip), tstath(ip));
+        end
+        oo_.(sprintf('%s_mode', field_name)).init_states.(NAME) = xparam1(ip);
+        oo_.(sprintf('%s_std_at_mode', field_name)).init_states.(NAME) = stdh(ip);
         ip = ip+1;
     end
     skipline()

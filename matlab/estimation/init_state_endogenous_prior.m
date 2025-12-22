@@ -1,22 +1,38 @@
-function [lnpriorendoinitstate, lnpriorinitstate] = init_state_endogenous_prior(a_0_given_tm0,T,R,Q,xparam1,bayestopt_,M_,options_)
-% [lnpriorendoinitstate, lnpriorinitstate] = init_state_endogenous_prior(a_0_given_tm0,T,R,Q,xparam1,bayestopt_,M_,options_)
-% Computes the endogenous log prior addition to the initial prior
+function [lnpriorendoinitstate, lnpriorinitstate] = init_state_endogenous_prior(a_0_given_tm0,T,R,Q,xparam1,bayestopt_,options_)
+% [lnpriorendoinitstate, lnpriorinitstate] = init_state_endogenous_prior(a_0_given_tm0,T,R,Q,xparam1,bayestopt_,options_)
+% Computes log-prior densities for endogenous initial states.
+%
+% This routine evaluates the endogenous prior for initial states by
+% comparing `a_0_given_tm0` against the model-implied unconditional
+% covariance `Pstar` (computed via Lyapunov solution). It returns the
+% Gaussian log-density under the endogenous prior, and optionally the
+% standard user-declared log-prior for the 'init ' parameters.
 %
 % INPUTS
-%    a_0_given_tm0      [double]     k vector of initial states
-%    T                  [double]     k*k state matrix
-%    R                  [double]     k*n impact shock matric
-%    Q                  [double]     k*n impact shock matric
-%    xparam1            [double]     n vector of estimated params
-%    bayestopt_         [structure]  describing the priors
-%    M_                 [structure]  Matlab's structure describing the model
-%    options_           [structure]  Matlab's structure describing the options
+% - a_0_given_tm0       [double]     initial state vector at time t=0|t=-1.
+% - T                   [double]     state transition matrix from decision rules.
+% - R                   [double]     shock impact matrix from decision rules.
+% - Q                   [double]     shock covariance matrix.
+% - xparam1             [double]     parameter vector (includes 'init ' entries).
+% - bayestopt_          [structure]  priors and state indexing (uses mf0, pshape, etc.).
+% - M_                  [structure]  model structure (not actively used here).
+% - options_            [structure]  options; uses kalman_tol for SVD threshold.
 %
 % OUTPUTS
-%    lnpriorendoinitstate [double]     scalar of log init state endogenous prior value
-%    lnpriorinitstate    [double]     scalar of log init state prior value
+% - lnpriorendoinitstate[double]     log-density under the endogenous (Pstar-based) prior.
+% - lnpriorinitstate    [double]     (optional) log-density under user-declared priors for 'init ' parameters.
+%
+% NOTES
+% - The endogenous prior is a multivariate normal with covariance Pstar
+%   restricted to state variables (mf0), retaining only directions above
+%   `options_.kalman_tol` via SVD.
+% - If second output is requested, extracts 'init ' parameters and computes
+%   their prior density using the declared prior shapes.
+%
+% SEE ALSO
+%   get_init_state_prior - derives the Pstar subspace (UP, XP) used similarly.
 
-% Copyright © 2024-2025 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,16 +63,7 @@ lnpriorendoinitstate = -(log_dS + transpose(vv)/S*vv + ns*log(2*pi))/2;
 
 if nargout>1
     % now I remove original state prior declared
-    pvec=[];
-    for ii=1:size(M_.filter_initial_state,1)
-        if ~isempty(M_.filter_initial_state{ii,1})
-            tmp1 = strrep(M_.filter_initial_state{ii,2},');','');
-            tmp1 = strrep(tmp1,'M_.params(','');
-            pvec = [pvec eval(tmp1)];
-        end
-    end
-    [~,~,IB] = intersect(M_.param_names(pvec),bayestopt_.name,'stable');
-
+    IB = startsWith(bayestopt_.name, 'init ');
     lnpriorinitstate = priordens(xparam1(IB),bayestopt_.pshape(IB),bayestopt_.p6(IB),bayestopt_.p7(IB),bayestopt_.p3(IB),bayestopt_.p4(IB));
 end
 

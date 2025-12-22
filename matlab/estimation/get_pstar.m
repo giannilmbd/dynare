@@ -1,23 +1,36 @@
 function [Pstar, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % [Pstar, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
-% Evaluates the unconditional variance of states
+% Computes the initial state covariance Pstar used by the Kalman filter.
+%
+% Based on the chosen `options_.lik_init` strategy, this routine
+% constructs the unconditional/state-initial covariance matrix for the
+% state vector implied by the linearized model and shock covariance. It
+% updates the model parameters from `xparam1`, resolves the model, and
+% returns `Pstar` along with an `info` code (with `info(1)~=0` on error).
 %
 % INPUTS
 % - xparam1             [double]        current values for the estimated parameters.
-% - options_            [structure]     Matlab's structure describing the current options
-% - M_                  [structure]     Matlab's structure describing the model
-% - estim_params_       [structure]     characterizing parameters to be estimated
-% - bayestopt_          [structure]     describing the priors
-% - BoundsInfo          [structure]     containing prior bounds
-% - dr                  [structure]     Reduced form model.
-% - endo_steady_state   [vector]        steady state value for endogenous variables
-% - exo_steady_state    [vector]        steady state value for exogenous variables
-% - exo_det_steady_state [vector]       steady state value for exogenous deterministic variables
-% - derivatives_info    [structure]     derivative info for identification
+% - options_            [structure]     options controlling filter init via `lik_init`.
+% - M_                  [structure]     model structure (updated via `set_all_parameters`).
+% - estim_params_       [structure]     parameters to be estimated.
+% - bayestopt_          [structure]     priors and measurement mapping (uses mf1/mf0).
+% - BoundsInfo          [structure]     prior bounds and definiteness checks.
+% - dr                  [structure]     reduced-form decision rules container.
+% - endo_steady_state   [vector]        steady state for endogenous variables.
+% - exo_steady_state    [vector]        steady state for exogenous variables.
+% - exo_det_steady_state [vector]       steady state for deterministic exogenous variables.
 %
 % OUTPUTS
-% - Pstar               [double]        state matrix covariance
-% - info                [double]        error code structure
+% - Pstar               [double]        initial state covariance matrix.
+% - info                [double]        info vector; `info(1)~=0` indicates an error.
+%
+% NOTES ON `options_.lik_init` MODES
+% - 0: Start from states in first_period-1 (uses `set_Kalman_starting_state`).
+% - 1: Steady-state initialization (Lyapunov solution for covariance).
+% - 2: Large diagonal covariance (Harvey scaling) for non-stationary models.
+% - 3: Diffuse Kalman filter (Durbin/Koopman) — not used here to start the filter.
+% - 4: Riccati steady state solution (falls back to 1 if Riccati fails).
+% - 5: Old diffuse approach only for non-stationary variables.
 %
 % This function is called by: posterior_sampler_iteration
 

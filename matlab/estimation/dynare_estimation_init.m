@@ -91,6 +91,41 @@ if options_.discretionary_policy
     end
 end
 
+% Check init state estimation with endogenous prior
+if options_.init_state_endogenous_prior
+    if not(isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice'))
+        error('Init state estimation with endogenous prior is only compatible with slice sampler')
+    else
+        M_.endo_initial_state.status = true;
+        M_.endo_initial_state.values = zeros(M_.endo_nbr,1);
+        options_.Harvey_scale_factor = 0;
+        options_.lik_init = 2;
+        if ~isfield(estim_params_,'endo_init_vals') || isempty(estim_params_.endo_init_vals)
+            % add init state list
+            estim_params_.nendoinit = length(M_.state_var);
+            tmp_prior = nan(1,10);
+            tmp_prior(3) = -Inf;
+            tmp_prior(4) = Inf;
+            tmp_prior(5) = 5;
+            tmp_prior(8) = -100000000;
+            tmp_prior(9) = 100000000;
+            estim_params_.endo_init_vals=zeros(0,10);
+            for k=1:estim_params_.nendoinit
+                estim_params_.endo_init_vals(k,:) = tmp_prior;
+                estim_params_.endo_init_vals(k,1) = M_.state_var(k);
+            end
+            
+        end
+    end
+elseif ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.param_vals,1))==0)
+    % Endogenous-initial-state prior is OFF: if any estimation blocks
+    % are declared, explicitly disable initial-state estimation.
+    % Setting nendoinit=0 and endo_init_vals to an empty (0x10) matrix
+    % ensures initial states are not treated as estimated parameters.
+    estim_params_.nendoinit = 0;
+    estim_params_.endo_init_vals = zeros(0,10);
+end
+
 % Check the perturbation order for pruning (k order perturbation based nonlinear filters are not yet implemented for k>3).
 if options_.order>3 && options_.particle.pruning
     error('Higher order nonlinear filters are not compatible with pruning option.')
@@ -182,7 +217,7 @@ else
 end
 
 % Set priors over the estimated parameters.
-if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.param_vals,1))==0)
+if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.endo_init_vals,1)+size(estim_params_.param_vals,1))==0)
     [xparam1,estim_params_,bayestopt_,lb,ub,M_] = set_prior(estim_params_,M_,options_);
 end
 
@@ -196,12 +231,12 @@ if isfile([M_.fname '_prior_restrictions.m'])
 end
 
 % Check that the provided mode_file is compatible with the current estimation settings.
-if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0) && ~isempty(options_.mode_file) && ~options_.mh_posterior_mode_estimation
+if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+estim_params_.np)==0) && ~isempty(options_.mode_file) && ~options_.mh_posterior_mode_estimation
     [xparam1, hh] = check_mode_file(xparam1, hh, options_, bayestopt_);
 end
 
 %check for calibrated covariances before updating parameters
-if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0)
+if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+estim_params_.np)==0)
     estim_params_=check_for_calibrated_covariances(estim_params_,M_);
 end
 
@@ -254,7 +289,7 @@ if ~isempty(estim_params_) && ~(all(strcmp(fieldnames(estim_params_),'full_calib
     end
 end
 
-if isempty(estim_params_) || all(strcmp(fieldnames(estim_params_),'full_calibration_detected')) || (isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np)==0) % If estim_params_ is empty (e.g. when running the smoother on a calibrated model)
+if isempty(estim_params_) || all(strcmp(fieldnames(estim_params_),'full_calibration_detected')) || (isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+estim_params_.np)==0) % If estim_params_ is empty (e.g. when running the smoother on a calibrated model)
     if ~options_.smoother
         error('Estimation: the ''estimated_params'' block is mandatory (unless you are running a smoother)')
     end
@@ -274,12 +309,14 @@ if isempty(estim_params_) || all(strcmp(fieldnames(estim_params_),'full_calibrat
     estim_params_.corrx=[];
     estim_params_.corrn=[];
     estim_params_.skew_exo=[];
+    estim_params_.endo_init_vals=[];
     estim_params_.param_vals=[];
     estim_params_.nvx = 0;
     estim_params_.nvn = 0;
     estim_params_.ncx = 0;
     estim_params_.ncn = 0;
     estim_params_.nsx = 0;
+    estim_params_.nendoinit = 0;
     estim_params_.np = 0;
     bounds.lb = [];
     bounds.ub = [];
@@ -458,7 +495,7 @@ end
 %check steady state at initial parameters
 M_local = M_;
 if estim_params_.np
-    M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.ncn+estim_params_.nsx+1:end);
+    M_local.params(estim_params_.param_vals(:,1)) = xparam1(estim_params_.nvx+estim_params_.ncx+estim_params_.nvn+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+1:end);
 end
 [oo_.steady_state, params,info] = evaluate_steady_state(oo_.steady_state,[oo_.exo_steady_state; oo_.exo_det_steady_state],M_local,options_,steadystate_check_flag);
 

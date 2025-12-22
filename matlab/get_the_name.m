@@ -83,8 +83,17 @@ elseif k <= (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_
         tname  = sprintf('%s', M_.exo_names_tex{k});
         texnam = sprintf('$ skew({%s}) $', tname);
     end
-else % estimated structural parameters (ordered last in xparam1)
+elseif k <= (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit) % estimated initial states (ordered sixth in xparam1)
     jj = k - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx);
+    k = estim_params_.endo_init_vals(jj,1);
+    vname = sprintf('%s', M_.endo_names{k});
+    nam = sprintf('INIT_%s', vname);
+    if TeX
+        tname  = sprintf('%s', M_.endo_names_tex{k});
+        texnam = sprintf('$ init({%s}) $', tname);
+    end
+else % estimated structural parameters (ordered last in xparam1)
+    jj = k - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit);
     jj1 = estim_params_.param_vals(jj,1);
     nam = M_.param_names{jj1};
     if TeX

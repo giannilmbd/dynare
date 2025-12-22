@@ -347,6 +347,14 @@ if init
             end
         end
 
+        % check if we estimate init state with endogenous prior
+        if isfield(options_, 'init_state_endogenous_prior') && options_.init_state_endogenous_prior
+            if ~posterior_sampler_options.draw_init_state_with_rotated_slice && ~posterior_sampler_options.draw_init_state_from_smoother
+                % this is the default to be used in this case, that
+                % overrides the one set in occbin.set_default_options
+                posterior_sampler_options.draw_init_state_from_smoother=true;
+            end
+        end
         % slice posterior sampler does not require mode or Hessian to run
         % needs to be set to 1 to skip parts in dynare_estimation_1.m or mom.run.m
         % requiring posterior maximization/calibrated smoother before MCMC

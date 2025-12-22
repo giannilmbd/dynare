@@ -17,7 +17,7 @@ function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, fie
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2005-2025 Dynare Team
+% Copyright © 2005-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -35,7 +35,7 @@ function oo_ = fill_mh_mode(xparam1, stdh, M_, options_, estim_params_, oo_, fie
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 if estim_params_.np % estimated structural parameters
-    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+1; % offset: structural parameters are ordered last in xparam1
     for i=1:estim_params_.np
         k = estim_params_.param_vals(i,1);
         name = M_.param_names{k};
@@ -97,6 +97,17 @@ if estim_params_.nsx % estimated skew parameters for structural shocks
         name = M_.exo_names{k};
         oo_.([field_name '_mode']).shocks_skew.(name)= xparam1(ip);
         oo_.([field_name '_std_at_mode']).shocks_skew.(name) = stdh(ip);
+        ip = ip+1;
+    end
+end
+
+if estim_params_.nendoinit % estimated initial states
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+1+estim_params_.nsx; % offset: initial states are ordered sixth in xparam1
+    for i=1:estim_params_.nendoinit
+        k = estim_params_.endo_init_vals(i,1);
+        name = M_.endo_names{k};
+        oo_.([field_name '_mode']).init_state.(name)= xparam1(ip);
+        oo_.([field_name '_std_at_mode']).init_state.(name) = stdh(ip);
         ip = ip+1;
     end
 end

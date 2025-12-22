@@ -84,7 +84,7 @@ if estim_params_.np % estimated structural parameters
     skipline()
     disp(type)
     disp(tit2)
-    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: structural parameters are ordered last in xparam1
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+1; % offset: structural parameters are ordered last in xparam1
     for i=1:estim_params_.np
         if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh) || ishssmc(options_) || isdsmh(options_) || isonline(options_)
             draws = getalldraws(ip);
@@ -337,6 +337,49 @@ if estim_params_.nsx % estimated skew parameters for structural shocks
     end
 end
 
+if estim_params_.nendoinit % estimated initial states
+    type = 'init_state';
+    if options_.TeX
+        fid = TeXBegin(latexFolder, FileName, 7, 'initial state variables');
+    end
+    skipline()
+    disp('initial state variables')
+    disp(tit2)
+    ip = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+1; % offset: initial states are ordered sixth in xparam1
+    for i=1:estim_params_.nendoinit
+        if options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)
+            draws = getalldraws(ip);
+            [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
+            k = estim_params_.endo_init_vals(i,1);
+            name = sprintf('%s', M_.endo_names{k});
+            NAME = sprintf('%s', M_.endo_names{k});
+            oo_ = Filloo(oo_, NAME, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
+        else
+            try
+                k = estim_params_.endo_init(i,1);
+                name = sprintf('%s', M_.endo_names{k});
+                NAME = sprintf('%s', M_.endo_names{k});
+                [post_mean, hpd_interval, post_var] = Extractoo(oo_, NAME, type);
+            catch
+                draws = getalldraws(ip);
+                [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(draws, options_.mh_conf_sig);
+                k = estim_params_.endo_init(i,1);
+                name = sprintf('%s', M_.endo_names{k});
+                NAME = sprintf('%s', M_.endo_names{k});
+                oo_ = Filloo(oo_, NAME, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
+            end
+        end
+        dprintf(pformat, header_width, name, bayestopt_.p1(ip), post_mean, hpd_interval, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p2(ip));
+        if options_.TeX
+            name = M_.endo_names_tex{k};
+            TeXCore(fid,name, pnames{bayestopt_.pshape(ip)+1}, bayestopt_.p1(ip), bayestopt_.p2(ip), post_mean, sqrt(post_var), hpd_interval);
+        end
+        ip = ip+1;
+    end
+    if options_.TeX
+        TeXEnd(fid, 7, 'initial state variables');
+    end
+end
 %
 %% subfunctions:
 %
