@@ -15,7 +15,7 @@ function results = prior_sampler(drsave,M_,bayestopt_,options_,oo_,estim_params_
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2009-2024 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -88,7 +88,7 @@ waitbar_string='Please wait. Prior sampler...';
 
 % Simulations.
 while iteration < NumberOfSimulations
-    if ~mod(iteration,10)
+    if ~mod(iteration,10) && iteration>0
         [~, length_of_old_string] = wait_bar.run(iteration/NumberOfSimulations,hh_fig,waitbar_string, options_.console_mode, length_of_old_string);
     end
     loop_indx = loop_indx+1;
