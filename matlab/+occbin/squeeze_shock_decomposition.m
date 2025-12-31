@@ -22,7 +22,18 @@ options_.occbin.shock_decomp.i_var = i_var;
 if isfield (oo_.occbin.smoother,'decomp')
     oo_.occbin.smoother.decomp = oo_.occbin.smoother.decomp(i_var,:,:);
     oo_.occbin.smoother.wdecomp = oo_.occbin.smoother.wdecomp(i_var,:,:);
+    if isfield (oo_.occbin,'linear_smoother')
+        oo_.occbin.linear_smoother.decomp = oo_.occbin.linear_smoother.decomp(i_var,:,:);
 end
+end
+
+if isfield (oo_.occbin.smoother,'init_decomp')
+    oo_.occbin.smoother.init_decomp = oo_.occbin.smoother.init_decomp(i_var,:,:);
+    if isfield (oo_.occbin,'linear_smoother')
+        oo_.occbin.linear_smoother.init_decomp = oo_.occbin.linear_smoother.init_decomp(i_var,:,:);
+    end
+end
+
 
 if isfield(oo_.occbin,'shock_decomp')
     fnames = fieldnames(oo_.occbin.shock_decomp);

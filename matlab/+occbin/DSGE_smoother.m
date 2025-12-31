@@ -61,17 +61,22 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 
 smoother_field_list = {'SmoothedVariables', 'UpdatedVariables', 'SmoothedShocks'};
 
+if not(isempty(xparam1))
+    M_ = set_all_parameters(xparam1,estim_params_,M_);
+end
 regime_history=[];
-if  options_.occbin.smoother.linear_smoother && nargin==12
+if  options_.occbin.smoother.linear_smoother
     %% linear smoother
     options_.occbin.smoother.status=false;
     [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0] = ...
         DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
     bayestopt_.mf=mf;
-    tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,...
-        aK,P,PK,decomp,Trend,state_uncertainty);
-    for jf=1:length(smoother_field_list)
-        oo_.occbin.linear_smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
+    if nargin==12
+        tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,...
+            aK,P,PK,decomp,Trend,state_uncertainty,alphahat0,state_uncertainty0);
+        for jf=1:length(smoother_field_list)
+            oo_.occbin.linear_smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
+        end
     end
     oo_.occbin.linear_smoother.alphahat=alphahat;
     oo_.occbin.linear_smoother.etahat=etahat;
@@ -138,6 +143,7 @@ if error_indicator(1) || isempty(alphahat0)
     else
         etahat= oo_.occbin.linear_smoother.etahat;
         alphahat0= oo_.occbin.linear_smoother.alphahat0;
+        state_uncertainty0 = oo_.occbin.linear_smoother.state_uncertainty0;
     end
     base_regime = struct();
     if M_.occbin.constraint_nbr==1
@@ -180,16 +186,26 @@ opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
 opts_simul.init_regime=regime_history; % use realtime regime for guess, to avoid multiple solution issues!
 opts_simul.periods = size(opts_simul.SHOCKS,1);
 options_.occbin.simul=opts_simul;
+occbin_smoother_debug=options_.occbin.smoother.debug;
 [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
 if out.error_flag
     disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)    
     oo_.occbin.smoother.error_flag=321;
-    return;
+    if occbin_smoother_debug
+    % use regimes consistent with the last smoother run
+        out.regime_history = regime_history ;
+    else
+        return;
+    end
 elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
-    fprintf('Occbin smoother:: simulation violates first_period_binding_regime_allowed.\n')
-    print_info(out.error_flag, options_.noprint, options_)
+    disp_verbose('Occbin smoother:: simulation violates first_period_binding_regime_allowed.',~options_.noprint)
     oo_.occbin.smoother.error_flag=322;
-    return;
+    if occbin_smoother_debug
+    % use regimes consistent with the last smoother run
+        out.regime_history = regime_history ;
+    else
+        return;
+    end
 end
 regime_history = out.regime_history;
 if options_.smoother_redux
@@ -215,7 +231,6 @@ is_periodic = 0;
 is_changed_start = 0;
 maxiter = options_.occbin.smoother.max_number_of_iterations;
 occbin_smoother_fast = options_.occbin.smoother.fast;
-occbin_smoother_debug=options_.occbin.smoother.debug;
 
 sto_alphahat=alphahat;
 sto_etahat={etahat};
@@ -247,16 +262,27 @@ while is_changed && maxiter>iter && ~is_periodic
     opts_simul.SHOCKS = [etahat(:,1:end)'; zeros(1,M_.exo_nbr)];
     opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
     options_.occbin.simul=opts_simul;
+    ss0=ss;
     [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     if out.error_flag
         disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)
         oo_.occbin.smoother.error_flag=321;
-        return;
+        if occbin_smoother_debug
+        % use regimes consistent with the last smoother run
+            out.regime_history = regime_history;
+            ss=ss0;
+        else
+            return;
+        end
     elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
-        fprintf('Occbin smoother:: simulation violates first_period_binding_regime_allowed.\n')
-        print_info(out.error_flag, options_.noprint, options_)
+        disp_verbose('Occbin smoother:: simulation violates first_period_binding_regime_allowed.',~options_.noprint)
         oo_.occbin.smoother.error_flag=322;
-        return;
+        if occbin_smoother_debug
+        % use regimes consistent with the last smoother run
+            out.regime_history = regime_history ;
+        else
+            return;
+        end
     end
     regime_history = out.regime_history;
     TT = ss.T(oo_.dr.order_var,oo_.dr.order_var,:);
@@ -317,7 +343,7 @@ while is_changed && maxiter>iter && ~is_periodic
         end
     end
 
-    if occbin_smoother_debug || is_periodic
+    if occbin_smoother_debug || (is_periodic && ~options_.noprint)
         regime_ = cell(0);
         regime_new = regime_;
         start_ = regime_;
@@ -424,24 +450,26 @@ if (~is_changed || occbin_smoother_debug) && nargin==12
         TT = sto_TT;
         oo_.occbin.smoother.regime_history=regime_history0(end-1,:);
     end
-    tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,P,PKK,decomp,Trend,state_uncertainty);
-    for jf=1:length(smoother_field_list)
-        oo_.occbin.smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
+    if options_.occbin.smoother.store_results
+        tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,P,PKK,decomp,Trend,state_uncertainty,alphahat0,state_uncertainty0);
+        for jf=1:length(smoother_field_list)
+            oo_.occbin.smoother.(smoother_field_list{jf}) = tmp_smoother.(smoother_field_list{jf});
+        end
+        oo_.occbin.smoother.alphahat=alphahat;
+        oo_.occbin.smoother.etahat=etahat;
+        oo_.occbin.smoother.epsilonhat=epsilonhat;
+        oo_.occbin.smoother.ahat=ahat0;
+        oo_.occbin.smoother.SteadyState=SteadyState;
+        oo_.occbin.smoother.trend_coeff=trend_coeff;
+        oo_.occbin.smoother.aK=aKK;
+        oo_.occbin.smoother.T0=TT;
+        oo_.occbin.smoother.R0=RR;
+        oo_.occbin.smoother.C0=CC;
+        oo_.occbin.smoother.simul.piecewise = out.piecewise(1:end-1,:);
+        if ~options_.occbin.simul.piecewise_only
+            oo_.occbin.smoother.simul.linear = out.linear(1:end-1,:);
+        end        
     end
-    oo_.occbin.smoother.alphahat=alphahat;
-    oo_.occbin.smoother.etahat=etahat;
-    oo_.occbin.smoother.epsilonhat=epsilonhat;
-    oo_.occbin.smoother.ahat=ahat0;
-    oo_.occbin.smoother.SteadyState=SteadyState;
-    oo_.occbin.smoother.trend_coeff=trend_coeff;
-    oo_.occbin.smoother.aK=aKK;
-    oo_.occbin.smoother.T0=TT;
-    oo_.occbin.smoother.R0=RR;
-    oo_.occbin.smoother.C0=CC;
-    oo_.occbin.smoother.simul.piecewise = out.piecewise(1:end-1,:);
-    if ~options_.occbin.simul.piecewise_only
-        oo_.occbin.smoother.simul.linear = out.linear(1:end-1,:);
-    end        
     if options_.occbin.smoother.plot
         GraphDirectoryName = CheckPath('graphs',M_.fname);
         latexFolder = CheckPath('latex',M_.dname);

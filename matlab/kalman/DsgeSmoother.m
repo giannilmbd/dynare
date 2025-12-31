@@ -276,7 +276,7 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
     a_initial=set_Kalman_smoother_starting_values(a_initial,M_,dr,options_);
     if kalman_algo == 5
         Gamma_0 = zeros(size(Pstar)); nu_0 = zeros(size(a_initial)); Delta_0 = eye(size(a_initial,1)); % initialize at Gaussian distribution
-        [alphahat, epsilonhat, etahat, ahat, P, aK, PK, decomp, state_uncertainty, aahat, eehat, alphahat0, state_uncertainty0] = ...
+        [alphahat, epsilonhat, etahat, ahat, ~, P, aK, PK, decomp, state_uncertainty, aahat, eehat, alphahat0, state_uncertainty0] = ...
             kalman_smoother_pruned_skewed(data1, ... % data
                                           a_initial, Pstar, Gamma_0, nu_0, Delta_0, ... % initialize CSN at Gaussian distribution
                                           ST, R1, Z, ... % state space matrices
@@ -546,7 +546,25 @@ else
             tmp=zeros(M_.endo_nbr,1);
             tmp(dr.restrict_var_list,1)=ahat0(:,k-1);
             opts_simul.endo_init = tmp(dr.inv_order_var,1);
-            opts_simul.init_regime = []; %regimes_(k);
+            this_regime=[];
+            if not(isempty(regimes_)) && length(regimes_)>=gend
+                this_regime = regimes_(k-1);
+            elseif length(varargin{1}.opts_regime.regime_history)>=gend
+                this_regime = varargin{1}.opts_regime.regime_history(k-1);
+            end
+            if not(isempty(this_regime))
+                if M_.occbin.constraint_nbr ==1
+                    binding_indicator = occbin.backward_map_regime(this_regime.regime, this_regime.regimestart);
+                    [this_regime.regime, this_regime.regimestart]=occbin.map_regime(binding_indicator(2:end));
+                else
+                    binding_indicator = occbin.backward_map_regime(this_regime.regime1, this_regime.regimestart1);
+                    [this_regime.regime1, this_regime.regimestart1]=occbin.map_regime(binding_indicator(2:end));
+                    binding_indicator = occbin.backward_map_regime(this_regime.regime2, this_regime.regimestart2);
+                    [this_regime.regime2, this_regime.regimestart2]=occbin.map_regime(binding_indicator(2:end));
+                end
+            end
+            opts_simul.init_regime = this_regime; %regimes_(k);
+            opts_simul.maxit=1;
             opts_simul.waitbar=0;
             options_.occbin.simul=opts_simul;
             [~, out] = occbin.solver(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state);
@@ -559,19 +577,46 @@ else
                     aaa(jnk,dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
                 end
             elseif k>tstart
-                % the issue only matters non-stationary models, with
-                % diffuse filter, and for the first occbin smoother iteration,
-                % where tstart>1
-                %
-                % if k>tstart, the same simulation should have been done
-                % already in occbin.kalman_update, so it should never give
-                % an error
-                %
-                % if k<=tstart, the simulation may crash, since we ignore OBC in the first (diffuse) steps
-                % and it may happen that, given the linear updated states,
-                % the occbin simulation does not converge
-                error('this error should not occur, please contact the developers!')
+                this_regime=[];
+                if not(isempty(regimes_)) && length(regimes_)>=(k-1)
+                    this_regime = regimes_(k-1);
+                elseif length(varargin{1}.opts_regime.regime_history)>=(k-1)
+                    this_regime = varargin{1}.opts_regime.regime_history(k-1);
+                end
+                if not(isempty(this_regime))
+                    if M_.occbin.constraint_nbr ==1
+                        binding_indicator = occbin.backward_map_regime(this_regime.regime, this_regime.regimestart);
+                        [this_regime.regime, this_regime.regimestart]=occbin.map_regime(binding_indicator(2:end));
+                    else
+                        binding_indicator = occbin.backward_map_regime(this_regime.regime1, this_regime.regimestart1);
+                        [this_regime.regime1, this_regime.regimestart1]=occbin.map_regime(binding_indicator(2:end));
+                        binding_indicator = occbin.backward_map_regime(this_regime.regime2, this_regime.regimestart2);
+                        [this_regime.regime2, this_regime.regimestart2]=occbin.map_regime(binding_indicator(2:end));
+                    end
+                    opts_simul.init_regime = this_regime;
+                    options_.occbin.simul=opts_simul;
+                    [~, out] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+                end
+                if out.error_flag==0
+                    for jnk=1:nk
+                        aaa(jnk,oo_.dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
+                    end
+                else
+                    % the issue only matters non-stationary models, with
+                    % diffuse filter, and for the first occbin smoother iteration,
+                    % where tstart>1
+                    %
+                    % if k>tstart, the same simulation should have been done
+                    % already in occbin.kalman_update, so it should never give
+                    % an error
+                    %
+                    % if k<=tstart, the simulation may crash, since we ignore OBC in the first (diffuse) steps
+                    % and it may happen that, given the linear updated states,
+                    % the occbin simulation does not converge
+                    oo_.occbin.smoother.error_flag=327;
+                    return
 
+                end
             end
         end
         aK=aaa;
