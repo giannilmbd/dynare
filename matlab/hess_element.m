@@ -72,4 +72,102 @@ else
          -func(p11{:})...
          -func(m11{:}))/(-2*h^2);
 end
+
+return % --*-- Unit tests --*--
+
+%@test:1
+% Test polynomial function: f(x,y) = x^3 + 2*x^2*y + 3*y^2 + 4*x + 5*y + 6
+% Analytical derivatives:
+%   df/dx = 3*x^2 + 4*x*y + 4
+%   df/dy = 2*x^2 + 6*y + 5
+%   d2f/dx2 = 6*x + 4*y
+%   d2f/dy2 = 6
+%   d2f/dxdy = d2f/dydx = 4*x
+
+% Test at point (x,y) = (2, 3)
+x0 = 2;
+y0 = 3;
+
+% Analytical Hessian at (2,3):
+% H = [ 6*2 + 4*3,  4*2 ]  = [ 24,  8 ]
+%     [ 4*2,        6   ]    [  8,  6 ]
+
+try
+    h11 = hess_element('test_poly_2vars', 1, 1, {x0, y0});
+    h22 = hess_element('test_poly_2vars', 2, 2, {x0, y0});
+    h12 = hess_element('test_poly_2vars', 1, 2, {x0, y0});
+    h21 = hess_element('test_poly_2vars', 2, 1, {x0, y0});
+    t(1) = true;
+catch
+    t(1) = false;
 end
+
+if t(1)
+    t(2) = abs(h11 - 24) < 5e-2;
+    t(3) = abs(h22 - 6) < 5e-2;
+    t(4) = abs(h12 - 8) < 5e-2;
+    t(5) = abs(h21 - 8) < 5e-2;
+    t(6) = abs(h12 - h21) < 1e-10; % Verify symmetry
+end
+T = all(t);
+%@eof:1
+
+%@test:2
+% Test at origin (0,0) for simpler verification
+x0 = 0;
+y0 = 0;
+
+% Analytical Hessian at (0,0):
+% H = [ 0,  0 ]
+%     [ 0,  6 ]
+t=false(5,1);
+try
+    h11 = hess_element('test_poly_2vars', 1, 1, {x0, y0});
+    h12 = hess_element('test_poly_2vars', 1, 2, {x0, y0});
+    h21 = hess_element('test_poly_2vars', 2, 1, {x0, y0});
+    h22 = hess_element('test_poly_2vars', 2, 2, {x0, y0});
+    t(1) = true;
+catch
+    t(1) = false;
+end
+
+if t(1)
+    t(2) = abs(h11 - 0) < 1e-4;
+    t(3) = abs(h12 - 0) < 1e-3;
+    t(4) = abs(h21 - 0) < 1e-3;
+    t(5) = abs(h22 - 6) < 1e-3;
+end
+T = all(t);
+%@eof:2
+
+%@test:3
+% Test negative values
+x0 = -1;
+y0 = -2;
+
+% Analytical Hessian at (-1,-2):
+% H = [ 6*(-1) + 4*(-2),  4*(-1) ]  = [ -14, -4 ]
+%     [ 4*(-1),           6      ]    [ -4,   6 ]
+t=false(5,1);
+try
+    h11 = hess_element('test_poly_2vars', 1, 1, {x0, y0});
+    h12 = hess_element('test_poly_2vars', 1, 2, {x0, y0});
+    h21 = hess_element('test_poly_2vars', 2, 1, {x0, y0});
+    h22 = hess_element('test_poly_2vars', 2, 2, {x0, y0});
+    t(1) = true;
+catch
+    t(1) = false;
+end
+
+if t(1)
+    t(2) = abs(h11 - (-14)) < 5e-3;
+    t(3) = abs(h12 - (-4)) < 1e-3;
+    t(4) = abs(h21 - (-4)) < 1e-3;
+    t(5) = abs(h22 - 6) < 1e-3;
+end
+T = all(t);
+%@eof:3
+
+function f = test_poly_2vars(x, y)
+    % Test polynomial: f(x,y) = x^3 + 2*x^2*y + 3*y^2 + 4*x + 5*y + 6
+    f = x^3 + 2*x^2*y + 3*y^2 + 4*x + 5*y + 6;
