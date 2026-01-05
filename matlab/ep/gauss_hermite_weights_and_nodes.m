@@ -1,37 +1,15 @@
-function [nodes,weights] = gauss_hermite_weights_and_nodes(n)
+function [nodes, weights] = gauss_hermite_weights_and_nodes(n)
+
 % Computes the weights and nodes for an Hermite Gaussian quadrature rule.
+%
+% INPUTS:
+% - n       [integer]    positive scalar, number of nodes (order of approximation).
+%
+% OUTPUTS:
+% - nodes   [double]     n×1 vector of doubles, the nodes (roots of an order n Hermite polynomial).
+% - weights [double]     n×1 vector of doubles, the associated weights.
 
-%@info:
-%! @deftypefn {Function File} {@var{nodes}, @var{weights} =} gauss_hermite_weights_and_nodes (@var{n})
-%! @anchor{gauss_hermite_weights_and_nodes}
-%! @sp 1
-%! Computes the weights and nodes for an Hermite Gaussian quadrature rule. designed to approximate integrals
-%! on the infinite interval (-\infty,\infty) of an unweighted smooth function.
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item n
-%! Positive integer scalar, number of nodes (order of approximation).
-%! @end table
-%! @sp 1
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item nodes
-%! n*1 vector of doubles, the nodes (roots of an order n Hermite polynomial)
-%! @item weights
-%! n*1 vector of doubles, the associated weights.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,8 +25,6 @@ function [nodes,weights] = gauss_hermite_weights_and_nodes(n)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-
-% Original author: stephane DOT adjemian AT univ DASH lemans DOT fr
 
 b = sqrt((1:n-1)/2);
 JacobiMatrix = diag(b,1)+diag(b,-1);
