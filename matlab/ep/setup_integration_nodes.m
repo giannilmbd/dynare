@@ -1,15 +1,15 @@
-function [nodes,weights,nnodes] = setup_integration_nodes(EpOptions,pfm)
-% [nodes,weights,nnodes] = setup_integration_nodes(EpOptions,pfm)
-% Inputs:
-%   ep          [structure] EP options
-%   pfm         [structure] perfect foresight model description
-%
-% Ouputs:
-%   nodes       [double]    integration nodes
-%   weights     [double]    weights of nodes
-%   nnodes      [integer]   number of nodes
+function [nodes, weights, nnodes] = setup_integration_nodes(opt, pfm)
 
-% Copyright © 2012-2025 Dynare Team
+% INPUTS:
+% - opt         [struct]   EP options
+% - pfm         [struct]   perfect foresight model description
+%
+% OUTPUTS:
+% - nodes       [double]    vector of integration nodes
+% - weights     [double]    vector of weights
+% - nnodes      [integer]   number of nodes
+
+% Copyright Â© 2012-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -26,16 +26,20 @@ function [nodes,weights,nnodes] = setup_integration_nodes(EpOptions,pfm)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-if EpOptions.stochastic.order
+nodes=[];
+weights=[];
+nnodes=[];
+
+if opt.stochastic.order
     % Compute weights and nodes for the stochastic version of the extended path.
     % Use only shocks with positive variance (effective shocks).
     n = pfm.effective_number_of_shocks;
-    switch EpOptions.stochastic.IntegrationAlgorithm
+    switch opt.stochastic.IntegrationAlgorithm
       case 'Tensor-Gaussian-Quadrature'
         % Get the nodes and weights from a univariate Gauss-Hermite quadrature.
-        [nodes0,weights0] = gauss_hermite_weights_and_nodes(EpOptions.stochastic.quadrature.nodes);
-        % Replicate the univariate nodes for each innovation and dates, and, if needed, correlate them.
-        nodes0 = repmat(nodes0,1,n*pfm.stochastic_order)*kron(eye(pfm.stochastic_order),pfm.Omega);
+        [nodes0, weights0] = gauss_hermite_weights_and_nodes(opt.stochastic.quadrature.nodes);
+        % Replicate the univariate nodes for each innovation and, if needed, correlate them.
+        nodes0 = repmat(nodes0, 1, n)*pfm.Omega;
         % Put the nodes and weights in cells
         for i=1:n
             rr(i) = {nodes0(:,i)};
@@ -46,24 +50,34 @@ if EpOptions.stochastic.order
         weights = prod(cartesian_product_of_sets(ww{:}),2);
         nnodes = length(weights);
       case 'Stroud-Cubature-3'
-        [nodes,weights] = cubature_with_gaussian_weight(n*pfm.stochastic_order,3,'Stroud');
-        nodes = kron(eye(pfm.stochastic_order),transpose(pfm.Omega))*nodes;
+        [nodes,weights] = cubature_with_gaussian_weight(n, 3, 'Stroud');
+        nodes = transpose(pfm.Omega'*nodes);
+        weights = weights/sum(weights);
         nnodes = length(weights);
       case 'Stroud-Cubature-5'
-        [nodes,weights] = cubature_with_gaussian_weight(n*pfm.stochastic_order,5,'Stroud');
-        nodes = kron(eye(pfm.stochastic_order),transpose(pfm.Omega))*nodes;
-        nnodes = length(weights);
+        if n==1
+            info = warning('backtrace');
+            if strcmp(info.state, 'on')
+                warning('off', 'backtrace');
+            end
+            warning('Stroud-Cubature-5 is not defined for a single shock, falling back to Gaussian quadrature with 3 nodes.')
+            warning(info.state, 'backtrace');
+            [nodes, weights] = gauss_hermite_weights_and_nodes(3);
+            nodes = nodes*pfm.Omega;
+            nnodes = length(weights);
+        else
+            [nodes,weights] = cubature_with_gaussian_weight(n,5,'Stroud');
+            nodes = transpose(pfm.Omega'*nodes);
+            weights = weights/sum(weights);
+            nnodes = length(weights);
+        end
       case 'Unscented'
-        k = 3;%EpOptions.ut.k;
+        k = 3;
         C = sqrt(n + k)*pfm.Omega';
         nodes = [zeros(1,n); -C; C];
         weights = [k/(n+k); (1/(2*(n+k)))*ones(2*n,1)];
         nnodes = 2*n+1;
       otherwise
-        error('Stochastic extended path:: Unknown integration algorithm %s!',EpOptions.stochastic.IntegrationAlgorithm)
+        error('Stochastic extended path:: Unknown integration algorithm %s!',opt.stochastic.IntegrationAlgorithm)
     end
-else
-    nodes=[];
-    weights=[];
-    nnodes=[];
 end
