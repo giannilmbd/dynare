@@ -95,22 +95,27 @@ squeeze_shock_decomposition;
 
 // standard plot
 plot_shock_decomposition y_obs R_obs pie_obs dq de;
+close all
 // grouped shocks
 plot_shock_decomposition(use_shock_groups=trade) y_obs R_obs pie_obs dq de;
+close all
 
 // test datailed, custom name and yoy plots
 plot_shock_decomposition(detail_plot, fig_name = MR, type = yoy) y_obs R_obs pie_obs dq de;
+close all
 
 // testing init2shocks
 initial_condition_decomposition(detail_plot, type=aoa, steadystate, write_xls, plot_init_date=1991Q1, plot_end_date=1995Q4) R_obs;
 plot_shock_decomposition(init2shocks) y_obs R_obs pie_obs dq de;
+close all
 plot_shock_decomposition(init2shocks,use_shock_groups=trade) y_obs R_obs pie_obs dq de;
+close all
 
 // testing flip and diff
 plot_shock_decomposition(diff, use_shock_groups=trade) y_obs;
+close all
 plot_shock_decomposition(flip, use_shock_groups=trade) de;
-
-close all,
+close all
 
 
 // testing realtime decomposition
@@ -122,40 +127,45 @@ squeeze_shock_decomposition;
 
 //realtime pooled
 plot_shock_decomposition(realtime = 1) y_obs R_obs pie_obs dq de;
+close all
 
 //conditional pooled
 plot_shock_decomposition(realtime = 2) y_obs R_obs pie_obs dq de;
+close all
 
 // conditional 8-step ahead decomposition, given 1989q4
 plot_shock_decomposition(detail_plot, realtime = 2, vintage = 29) y_obs R_obs pie_obs dq de;
-
-close all,
+close all
 
 //forecast pooled
 plot_shock_decomposition(realtime = 3) y_obs R_obs pie_obs dq de;
+close all
 
 // forecast 8-step ahead decomposition, given 1989q4
 plot_shock_decomposition(detail_plot, realtime = 3, vintage = 29) y_obs R_obs pie_obs dq de;
-
-close all,
+close all
 
 // now I test annualized variables
     // this also triggers re-computing of decompositions since y was not present in squeeze set
 plot_shock_decomposition(detail_plot, type = aoa) y;
+close all
 plot_shock_decomposition(detail_plot, type = aoa) ya;
+close all
 
 plot_shock_decomposition(realtime = 1) y;
+close all
 plot_shock_decomposition(realtime = 1, vintage = 29) y;
+close all
 plot_shock_decomposition(realtime = 2, vintage = 29) y;
+close all
 plot_shock_decomposition(realtime = 3, vintage = 29) y;
-
 close all
 
 //test uimenu for groups
 plot_shock_decomposition(detail_plot, interactive, use_shock_groups = row, type = qoq, plot_init_date=2004Q1) y_obs R_obs pie_obs dq de;
+close all
 plot_shock_decomposition(detail_plot, interactive, realtime = 3, vintage = 29) y_obs R_obs pie_obs dq de;
-
-close all,
+close all
 
 
 // testing realtime decomposition with fast_realtime option
