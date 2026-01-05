@@ -50,7 +50,7 @@ function [nodes,weights] = gauss_hermite_weights_and_nodes(n)
 
 % Original author: stephane DOT adjemian AT univ DASH lemans DOT fr
 
-b = sqrt([1:n-1]/2);
+b = sqrt((1:n-1)/2);
 JacobiMatrix = diag(b,1)+diag(b,-1);
 [JacobiEigenVectors,JacobiEigenValues] = eig(JacobiMatrix);
 [nodes,idx] = sort(diag(JacobiEigenValues));
