@@ -52,20 +52,20 @@ Cov_mat = -Sigma * Gamma';
 
 % evaluate the first log-CDF
 Var_Cov1 = Delta - Gamma * Cov_mat;
-if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
+if strcmp(mvnlogcdf,"gaussian_log_mvncdf_mendell_elston")
     normalization1 = diag(1 ./ sqrt(diag(Var_Cov1)));
     eval_point1    = normalization1 * (zeros(q, 1) - nu);
     Corr_mat1      = normalization1 * Var_Cov1 * normalization1;
     Corr_mat1      = 0.5*(Corr_mat1 + Corr_mat1');
     cdf1           = gaussian_log_mvncdf_mendell_elston(eval_point1, Corr_mat1);
-elseif mvnlogcdf == "mvncdf"
+elseif strcmp(mvnlogcdf,"mvncdf")
     cdf1 = log(mvncdf(zeros(1, q), nu', Var_Cov1));
 end
 
 % prepare helper function to get quantile
 Var_Cov2 = [Sigma, Cov_mat; Cov_mat', Var_Cov1];
 
-if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
+if strcmp(mvnlogcdf,"gaussian_log_mvncdf_mendell_elston")
     % requires zero mean and correlation matrix as inputs
     normalization2 = diag(1 ./ sqrt(diag(Var_Cov2)));
     Corr_mat2      = normalization2 * Var_Cov2 * normalization2;
@@ -77,7 +77,7 @@ if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
     elseif strcmp(optim_fct,'fminsearch')
         fun = @(x) ( gaussian_log_mvncdf_mendell_elston( (normalization2 * ([x; zeros(q, 1)] - [mu; nu])), Corr_mat2 ) - cdf1 - log(alph))^2;
     end
-elseif mvnlogcdf == "mvncdf"
+elseif strcmp(mvnlogcdf,"mvncdf")
     if strcmp(optim_fct,'lsqnonlin')
         fun = @(x) log(mvncdf([x', zeros(1, q)], [mu', nu'], Var_Cov2)) - cdf1 - log(alph);
     elseif strcmp(optim_fct,'fminunc')

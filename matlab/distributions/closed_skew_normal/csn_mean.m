@@ -59,14 +59,14 @@ for jj = 1:q
         term2 = 1;
     else
         % different functions to evaluate log Gaussian cdf
-        if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
+        if strcmp(mvnlogcdf,"gaussian_log_mvncdf_mendell_elston")
             % requires zero mean and correlation matrix as inputs
             normalization2 = diag(1./sqrt(diag(condVar)));
             eval_point2 = normalization2*(nu2(1:q-1) - condMean);
             Corr_mat2 = normalization2*condVar*normalization2; 
             Corr_mat2 = 0.5*(Corr_mat2 + Corr_mat2');
             term2 = exp(gaussian_log_mvncdf_mendell_elston(eval_point2, Corr_mat2));
-        elseif mvnlogcdf == "mvncdf"
+        elseif strcmp(mvnlogcdf,"mvncdf")
             term2 = mvncdf(nu2(1:q-1)', condMean', condVar);
         end
     end
@@ -82,14 +82,14 @@ if isempty(Gamma) || isempty(nu) || isempty(Delta1)
         error("Problem with Gamma, nu, Delta being empty / not empty")
     end
 else
-    if mvnlogcdf == "gaussian_log_mvncdf_mendell_elston"
+    if strcmp(mvnlogcdf,"gaussian_log_mvncdf_mendell_elston")
         % requires zero mean and correlation matrix as inputs
         normalization3 = diag(1./sqrt(diag(Delta1)));
         eval_point3 = normalization3*(zeros(q, 1) - nu);
         Corr_mat3 = normalization3*Delta1*normalization3;
         Corr_mat3 = 0.5*(Corr_mat3 + Corr_mat3');
         term3 = exp(gaussian_log_mvncdf_mendell_elston(eval_point3, Corr_mat3));
-    elseif mvnlogcdf == "mvncdf"
+    elseif strcmp(mvnlogcdf,"mvncdf")
         term3 = mvncdf(zeros(1, q), nu', Delta1);
     end
 end

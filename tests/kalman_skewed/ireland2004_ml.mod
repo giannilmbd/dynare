@@ -46,7 +46,7 @@ estimation(datafile = 'ireland2004_post1980.csv'
           ,kalman_algo = 1  % use Gaussian Kalman filter
           );
 struct0 = cell2struct([struct2cell(oo_.mle_mode.parameters); struct2cell(oo_.mle_mode.shocks_std); oo_.posterior.optimization.log_density], ...
-                      [fieldnames(oo_.mle_mode.parameters); ["stderr_" + fieldnames(oo_.mle_mode.shocks_std); "loglik"]]);
+                      [fieldnames(oo_.mle_mode.parameters); [strcat('stderr_', fieldnames(oo_.mle_mode.shocks_std)); {'loglik'}]]);
 smoothed_shocks_0 = oo_.SmoothedShocks;
 
 % use Pruned Skewed Kalman filter as Gaussian distribution is special case of CSN distribution
@@ -59,7 +59,7 @@ estimation(datafile = 'ireland2004_post1980.csv'
           ,skewed_kalman_mvnlogcdf = 'mvncdf' % test whether the option is passed correctly, in Gaussian case there is no curse of increasing skewness dimension (as there is no need to compute Gaussian cdfs)
           );
 struct5 = cell2struct([struct2cell(oo_.mle_mode.parameters); struct2cell(oo_.mle_mode.shocks_std); oo_.posterior.optimization.log_density], ...
-                      [fieldnames(oo_.mle_mode.parameters); ["stderr_" + fieldnames(oo_.mle_mode.shocks_std); "loglik"]]);
+                      [fieldnames(oo_.mle_mode.parameters); [strcat('stderr_', fieldnames(oo_.mle_mode.shocks_std)); {'loglik'}]]);
 smoothed_shocks_5 = oo_.SmoothedShocks;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,6 +94,7 @@ end
 %         or Pruned Skewed Kalman smoother should be numerically       %
 %         equal to each other                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if ~isoctave % array2table is not available in Octave
 fprintf('\n<strong>smoothed eta_r</strong>\n');
 disp(array2table([smoothed_shocks_0.eta_r smoothed_shocks_5.eta_r (smoothed_shocks_0.eta_r-smoothed_shocks_5.eta_r)], ...
      'RowNames', "t="+string(1:options_.nobs), ...
@@ -110,6 +111,8 @@ fprintf('\n<strong>smoothed eta_a</strong>\n');
 disp(array2table([smoothed_shocks_0.eta_a smoothed_shocks_5.eta_a (smoothed_shocks_0.eta_a-smoothed_shocks_5.eta_a)], ...
      'RowNames', "t="+string(1:options_.nobs), ...
      'VariableNames', ["kalman_algo=0", "kalman_algo=5", "dev"]));
+
+end
 
 if any(abs(smoothed_shocks_0.eta_r - smoothed_shocks_5.eta_r) > 1e-3) || ...
      any(abs(smoothed_shocks_0.eta_z - smoothed_shocks_5.eta_z) > 1e-3) || ...
