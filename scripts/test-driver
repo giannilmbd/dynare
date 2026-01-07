@@ -32,8 +32,10 @@ done
 extra_files=("$@")
 
 # Create and populate the temporary directory
+# We use /var/tmp because /tmp is a tmpfs under Debian (thus in RAM), and some
+# tests use a lot of disk (and would thus consume a lot of RAM)
 
-tmpdir=$(mktemp -d)
+tmpdir=$(mktemp -d --tmpdir=/var/tmp)
 
 cleanup ()
 {
