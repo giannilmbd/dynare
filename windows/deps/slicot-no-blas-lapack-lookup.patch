@@ -1,0 +1,47 @@
+diff -urN SLICOT-Reference-5.9.1.orig/CMakeLists.txt SLICOT-Reference-5.9.1/CMakeLists.txt
+--- SLICOT-Reference-5.9.1.orig/CMakeLists.txt	2025-11-04 15:46:11.000000000 +0100
++++ SLICOT-Reference-5.9.1/CMakeLists.txt	2026-01-08 16:53:02.111563363 +0100
+@@ -110,11 +110,6 @@
+     SET(BLA_SIZEOF_INTEGER 4)
+ ENDIF()
+ 
+-FIND_PACKAGE(BLAS REQUIRED)
+-MESSAGE(STATUS "Found BLAS Library: ${BLA_VENDOR} (${BLAS_LIBRARIES})")
+-FIND_PACKAGE(LAPACK REQUIRED)
+-MESSAGE(STATUS "Found LAPACK Library: ${BLA_VENDOR} (${LAPACK_LIBRARIES})")
+-
+ # Compatability with CMAKE < 3.18
+ if(NOT TARGET BLAS::BLAS)
+     add_library(BLAS::BLAS IMPORTED INTERFACE)
+diff -urN SLICOT-Reference-5.9.1.orig/src/CMakeLists.txt SLICOT-Reference-5.9.1/src/CMakeLists.txt
+--- SLICOT-Reference-5.9.1.orig/src/CMakeLists.txt	2025-11-04 15:46:11.000000000 +0100
++++ SLICOT-Reference-5.9.1/src/CMakeLists.txt	2026-01-08 16:53:22.599865925 +0100
+@@ -96,28 +96,6 @@
+     )
+ 
+ 
+-# Check for deprecated LAPACK Symbols
+-INCLUDE(CheckFortranFunctionExists)
+-
+-MACRO(ADD_ROUTINE_IF_REQUIRED ROUTINE VAR SOURCE_FILE)
+-    SET(_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+-    SET(CMAKE_REQUIRED_LIBRARIES PRIVATE BLAS::BLAS LAPACK::LAPACK)
+-
+-    Check_Fortran_Function_Exists(${ROUTINE} ${VAR})
+-    IF (NOT ${VAR})
+-        MESSAGE(STATUS "Add ${SOURCE_FILE} to library.")
+-        SET(SOURCES ${SOURCES} ${SOURCE_FILE})
+-    ENDIF()
+-    SET(CMAKE_REQUIRED_LIBRARIES ${_CMAKE_REQUIRED_LIBRARIES})
+-ENDMACRO()
+-
+-ADD_ROUTINE_IF_REQUIRED(dgegs HAVE_DGEGS lapack_aux/dgegs.f)
+-ADD_ROUTINE_IF_REQUIRED(zgegs HAVE_ZGEGS lapack_aux/zgegs.f)
+-ADD_ROUTINE_IF_REQUIRED(dlatzm HAVE_DLAZTM lapack_aux/dlatzm.f)
+-ADD_ROUTINE_IF_REQUIRED(zlatzm HAVE_ZLAZTM lapack_aux/zlatzm.f)
+-ADD_ROUTINE_IF_REQUIRED(dgegv HAVE_DGEGV lapack_aux/dgegv.f)
+-ADD_ROUTINE_IF_REQUIRED(zgegv HAVE_ZGEGV lapack_aux/zgegv.f)
+-
+ # Setup the library.
+ 
+ ADD_LIBRARY(slicot ${SOURCES})

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright © 2019-2025 Dynare Team
+# Copyright © 2019-2026 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -67,7 +67,7 @@ GCC_VERSION=$(sed -En "/^c[[:space:]]*=/s/c[[:space:]]*=[[:space:]]*'.*gcc-([0-9
 cd "$ROOTDIR"
 
 common_meson_opts=(-Dbuild_for=matlab --buildtype=release --prefer-static \
-                   -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/', '-B', '$DEPS_DIR/panua-pardiso/lib/' ]" \
+                   -Dfortran_args="[ '-B', '$DEPS_DIR/src/slicot-matlab/build/lib', '-B', '$DEPS_DIR/panua-pardiso/lib/' ]" \
                    --native-file macOS/homebrew-native-$PKG_ARCH.ini \
                    -Dpardiso=enabled -Dsuitesparse_src_path="macOS/deps/$PKG_ARCH/src/suitesparse")
 

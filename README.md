@@ -189,7 +189,7 @@ All the prerequisites are packaged:
 - `libboost-graph-dev`
 - `libgsl-dev`
 - `libmatio-dev`
-- `libslicot-dev` and `libslicot-pic`
+- `libslicot-dev` and `libslicot64-pic` (the latter is not available in Debian ⩽ 13 and Ubuntu ⩽ 25.10; `libslicot-pic` should be used instead)
 - `libsuitesparse-dev`
 - `flex` and `libfl-dev`
 - `bison`
@@ -211,7 +211,7 @@ All the prerequisites are packaged:
 
 You can install them all at once with:
 ```sh
-apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libmatio-dev libslicot-dev libslicot-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
+apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libmatio-dev libslicot-dev libslicot-pic libslicot64-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
 ```
 If you use MATLAB, we strongly advise to also `apt install matlab-support` and confirm to rename the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by your distribution.
 
@@ -370,16 +370,18 @@ pacman -Syu
   window to complete the upgrade.
 - Install all needed dependencies:
 ```sh
-pacman -S git bison flex make tar mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gcc-fortran mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-gsl mingw-w64-ucrt-x86_64-pkgconf
+pacman -S git bison flex make cmake tar mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gcc-fortran mingw-w64-ucrt-x86_64-boost mingw-w64-ucrt-x86_64-gsl mingw-w64-ucrt-x86_64-pkgconf
 ```
 - Compile and install SLICOT
 ```sh
-wget https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v5.9.tar.gz
-tar xf v5.9.tar.gz
-cd SLICOT-Reference-5.9
-make -f makefile_Unix FORTRAN=gfortran OPTS="-O2 -fno-underscoring -fdefault-integer-8" LOADER=gfortran lib
+wget -O slicot-5.9.1.tar.gz https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v5.9.1.tar.gz
+tar xf slicot-5.9.1.tar.gz
+cd slicot-5.9.1
+sed -i 's/FIND_PACKAGE(\(.*\) REQUIRED)/FIND_PACKAGE(\1)/g' CMakeLists.txt
+FFLAGS="-fno-underscoring" cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSLICOT_TESTING=OFF -DSLICOT_INTEGER8=ON
+cmake --build build
 mkdir -p /usr/local/lib
-cp slicot.a /usr/local/lib/libslicot64_pic.a
+cp build/lib/libslicot64.a /usr/local/lib/libslicot64_pic.a
 cd ..
 ```
 - Prepare the Dynare sources, either by unpacking the source tarball, or with:
@@ -467,7 +469,7 @@ export PATH="$BREWDIR/bin:$PATH"
 
 - Install required Homebrew packages:
 ```sh
-arch -$ARCH $BREWDIR/bin/brew install meson bison flex boost gcc gsl libmatio veclibfort octave sphinx-doc docutils wget pkg-config git-lfs
+arch -$ARCH $BREWDIR/bin/brew install meson bison flex boost gcc gsl libmatio veclibfort octave sphinx-doc docutils wget pkg-config git-lfs cmake
 ```
 If you are installing `git-lfs` for the first time, you need to run `git lfs install` once after installing it.
 
@@ -499,14 +501,17 @@ export DYNAREDIR=$HOME/dynare
 ```sh
 mkdir -p $DYNAREDIR/slicot/lib
 cd $DYNAREDIR/slicot
-curl -O https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v5.9.tar.gz
-tar xf v5.9.tar.gz
-cd SLICOT-Reference-5.9
-make -f makefile_Unix -j$(sysctl -n hw.ncpu) FORTRAN=$BREWDIR/bin/gfortran OPTS="-O2" LOADER=gfortran lib
-cp slicot.a $DYNAREDIR/slicot/lib/libslicot_pic.a
-make -f makefile_Unix clean
-make -f makefile_Unix -j$(sysctl -n hw.ncpu) FORTRAN=$BREWDIR/bin/gfortran OPTS="-O2 -fdefault-integer-8" LOADER=gfortran lib
-cp slicot.a $DYNAREDIR/slicot/lib/libslicot64_pic.a
+curl -L -o slicot-5.9.1.tar.gz https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v5.9.1.tar.gz
+tar xf slicot-5.9.1.tar.gz
+cd slicot-5.9.1
+sed -i .bak 's/FIND_PACKAGE(\(.*\) REQUIRED)/FIND_PACKAGE(\1)/g' CMakeLists.txt
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSLICOT_TESTING=OFF
+cmake --build build
+cp build/lib/libslicot.a $DYNAREDIR/slicot/lib/libslicot_pic.a
+rm -rf build
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSLICOT_TESTING=OFF -DSLICOT_INTEGER8=ON
+cmake --build build
+cp build/lib/libslicot64.a $DYNAREDIR/slicot/lib/libslicot64_pic.a
 ```
 
 - Compile and install the X-13ARIMA-SEATS Seasonal Adjustment Program

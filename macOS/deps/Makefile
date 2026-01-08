@@ -1,4 +1,4 @@
-# Copyright © 2019-2025 Dynare Team
+# Copyright © 2019-2026 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -30,7 +30,7 @@ NTHREADS=$(shell sysctl -n hw.perflevel0.physicalcpu)
 
 .PHONY: all clean clean-all
 
-all: $(PKG_ARCH)/src/slicot-matlab/libslicot64_pic.a $(PKG_ARCH)/src/x13as/x13as $(PKG_ARCH)/panua-pardiso $(PKG_ARCH)/src/suitesparse
+all: $(PKG_ARCH)/src/slicot-matlab/build/lib/libslicot64_pic.a $(PKG_ARCH)/src/x13as/x13as $(PKG_ARCH)/panua-pardiso $(PKG_ARCH)/src/suitesparse
 
 # Clean everything except downloaded tarballs
 clean:
@@ -48,11 +48,14 @@ tarballs/slicot-$(SLICOT_VERSION).tar.gz:
 	mkdir -p $(dir $@)
 	wget $(WGET_OPTIONS) -O $@ https://github.com/SLICOT/SLICOT-Reference/archive/refs/tags/v$(SLICOT_VERSION).tar.gz
 
-$(PKG_ARCH)/src/slicot-matlab/libslicot64_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
-	rm -rf $(dir $@)
-	mkdir -p $(dir $@)
-	tar xf $< --directory $(dir $@) --strip-components=1
-	gmake -C $(dir $@) -f makefile_Unix lib SLICOTLIB=../$(notdir $@) OPTS="-O3 -fdefault-integer-8" FORTRAN=$(BREWDIR)/bin/gfortran LOADER=$(BREWDIR)/bin/gfortran -j$(NTHREADS)
+$(PKG_ARCH)/src/slicot-matlab/build/lib/libslicot64_pic.a: tarballs/slicot-$(SLICOT_VERSION).tar.gz
+	rm -rf $(realpath $(dir $@)/../..)
+	mkdir -p $(dir $@)/../..
+	tar xf $< --directory $(dir $@)/../.. --strip-components=1
+	patch -d $(dir $@)/../.. -p1 < ../../windows/deps/slicot-no-blas-lapack-lookup.patch
+	cmake -S $(dir $@)/../.. -B $(dir $@)/.. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSLICOT_TESTING=OFF -DSLICOT_INTEGER8=ON
+	cmake --build $(dir $@)/.. --verbose
+	mv $(dir $@)/libslicot64.a $@
 
 
 #
