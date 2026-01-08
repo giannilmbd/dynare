@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2018-2025 Dynare Team
+# Copyright © 2018-2026 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -557,7 +557,7 @@ html_static_path = ['_static']
 master_doc = 'index'
 
 project = u'Dynare'
-copyright = u'1996–2025 Dynare Team'
+copyright = u'1996–2026 Dynare Team'
 author = u'Dynare Team'
 
 add_function_parentheses = False
