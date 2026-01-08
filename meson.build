@@ -2440,9 +2440,9 @@ if get_option('build_for') == 'matlab'
   base_test_driver_args += [ matlab_exe.full_path(), matlab_version, matlab_arch, '' ]
 else
   base_test_driver_args += [ octave_exe.full_path(), octave_version, '' ]
-  xvfb_run_exe = find_program('xvfb-run', required : false) # Debian-specific utility
-  if xvfb_run_exe.found()
-    base_test_driver_args += xvfb_run_exe.full_path()
+  wlheadless_run_exe = find_program('wlheadless-run', required : false)
+  if wlheadless_run_exe.found()
+    base_test_driver_args += wlheadless_run_exe.full_path()
   else
     base_test_driver_args += ''
   endif
