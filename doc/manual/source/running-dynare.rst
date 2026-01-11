@@ -434,11 +434,18 @@ by the ``dynare`` command.
 
     .. option:: stochastic
 
-        Tells Dynare that the model to be solved is stochastic. If no
-        Dynare commands related to stochastic models (``stoch_simul``,
-        ``estimation``, ...) are present in the ``.mod`` file, Dynare
-        understands by default that the model to be solved is
-        deterministic.
+        By default, if no Dynare commands related to stochastic models
+        (``stoch_simul``, ``estimation``, ``osr``, ``discretionary_policy``,
+         ``calib_smoother``, ``identification``, ``method_of_moments``, 
+         ``sensitivity``) are present in the ``.mod`` file, 
+        Dynare treats the model to be solved as deterministic. 
+        This option instructs Dynare that the model to be solved is stochastic 
+        and that there is an implicit conditional expectation operator in the 
+        model equations. It modifies the internal handling of 
+        nonlinear forward-looking terms to account for Jensen's Inequality. 
+        This option is useful when the user wants to work with a stochastic 
+        model but does not want to use any of the stochastic Dynare 
+        commands, e.g., due to calling Matlab functions directly.
 
     .. _exclude_eqs:
 
