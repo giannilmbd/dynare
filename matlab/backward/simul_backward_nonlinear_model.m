@@ -1,6 +1,6 @@
-function [simulations, errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations)
-% function simulations = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations)
-% Simulates a stochastic non linear backward looking model with arbitrary precision (a deterministic solver is used).
+function [simulations, oo_,  errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations)
+% [simulations, oo_,  errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations)
+% Simulates a stochastic non-linear backward looking model with arbitrary precision (a deterministic solver is used).
 %
 % INPUTS
 % - initial_conditions  [dseries]     initial conditions for the endogenous variables.
@@ -12,6 +12,7 @@ function [simulations, errorflag] = simul_backward_nonlinear_model(initialcondit
 %
 % OUTPUTS
 % - simulation          [dseries]     Simulated endogenous and exogenous variables.
+% - oo_                 [struct]      Dynare's oo_ global structure.
 % - errorflag           [logical]     scalar, equal to false iff the simulation did not fail.
 %
 % REMARKS
@@ -52,8 +53,8 @@ if nargin<6
 end
 
 [initialconditions, samplesize, innovations, options_, M_, oo_, endonames, exonames, dynamic_resid, dynamic_g1] = ...
-    simul_backward_model_init(initialconditions, samplesize, options_, M_, oo_, innovations);
+    backward_model.initialize(initialconditions, samplesize, options_, M_, oo_, innovations);
 
-[ysim, xsim, errorflag] = simul_backward_nonlinear_model_(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
+[ysim, xsim, oo_, errorflag] = backward_model.simul_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, innovations, dynamic_resid, dynamic_g1);
 
 simulations = [dseries(ysim', initialconditions.init, endonames(1:M_.orig_endo_nbr)), dseries(xsim, initialconditions.init, exonames)];

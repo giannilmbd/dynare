@@ -1,5 +1,5 @@
-function [endogenousvariables, exogenousvariables] = backward_model_inversion(constraints, exogenousvariables, initialconditions, endo_names, exo_names, freeinnovations, M_, options_, oo_)
-% [endogenousvariables, exogenousvariables] = backward_model_inversion(constraints, exogenousvariables, initialconditions, endo_names, exo_names, freeinnovations, M_, options_, oo_)
+function [endogenousvariables, exogenousvariables] = inversion(constraints, exogenousvariables, initialconditions, endo_names, exo_names, freeinnovations, M_, options_, oo_)
+% [endogenousvariables, exogenousvariables] = inversion(constraints, exogenousvariables, initialconditions, endo_names, exo_names, freeinnovations, M_, options_, oo_)
 % INPUTS
 % - constraints         [dseries]        with N constrained endogenous variables from t1 to t2.
 % - exogenousvariables  [dseries]        with Q exogenous variables.

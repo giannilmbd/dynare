@@ -1,5 +1,5 @@
-function [r, J] = dynamic_backward_model_for_simulation(z, dynamic_resid, dynamic_g1, ylag, x, params, steady_state, sparse_rowval, sparse_colval, sparse_colptr)
-
+function [r, J] = dynamic_model(z, dynamic_resid, dynamic_g1, ylag, x, params, steady_state, sparse_rowval, sparse_colval, sparse_colptr)
+% [r, J] = dynamic_model(z, dynamic_resid, dynamic_g1, ylag, x, params, steady_state, sparse_rowval, sparse_colval, sparse_colptr)
 % Dynamic routine's wrapper used by dynare_solve for simulating backward models
 
 % Copyright © 2017-2023 Dynare Team

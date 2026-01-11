@@ -44,7 +44,7 @@ end
 
 if ~M_.maximum_lag
     dprintf('Model defined in %s.mod is static. Use simul_static_model instead.', M_.fname)
-    simul_static_model(samplesize, innovations);
+    [simulation, oo_]= backward_model.simul_static_model(M_,options_,oo_,samplesize, innovations);
     return
 end
 
@@ -94,7 +94,7 @@ else
 end
 
 if options_.linear
-    [simulation, errorflag] = simul_backward_linear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
+    [simulation, oo_, errorflag] = simul_backward_linear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
 else
-    [simulation, errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
+    [simulation, oo_, errorflag] = simul_backward_nonlinear_model(initialconditions, samplesize, options_, M_, oo_, Innovations);
 end
