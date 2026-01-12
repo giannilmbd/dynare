@@ -211,7 +211,7 @@ if ismember('moments(distribution)', varargin) || ismember('irfs(distribution)',
         options_.noprint = noprint;
         % First order moments
         FirstOrderMoments(:, any(isnan(FirstOrderMoments), 1)) = [];
-        SecondOrderMoments(:, :, any(isnan(SecondOrderMoments), [1 2])) = [];
+        SecondOrderMoments(:, :, squeeze(any(any(isnan(SecondOrderMoments), 1), 2))) = [];
         PriorExpectationOfFirstOrderMoments = mean(FirstOrderMoments, 2);
         PriorVarianceOfFirstOrderMoments = ...
             mean(bsxfun(@minus, FirstOrderMoments, PriorExpectationOfFirstOrderMoments).^2, 2);
