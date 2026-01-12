@@ -2432,7 +2432,39 @@ mod_and_m_tests = [
                 'reporting/dc_q.csv',
                 'reporting/ResidTablePage.m',
                 'reporting/runDynareReport.m' ] },
-  { 'test' : [ 'run_example_tests.m' ] }
+
+  # Examples
+  { 'test' : [ '../examples/agtrend.mod' ] },
+  { 'test' : [ '../examples/bkk.mod' ] },
+  { 'test' : [ '../examples/example1.mod' ] },
+  { 'test' : [ '../examples/example1_reporting.mod' ] },
+  { 'test' : [ '../examples/example2.mod' ] },
+  { 'test' : [ '../examples/example3.mod' ],
+    'extra' : [ '../examples/example3_steady_state_helper.m' ] },
+  { 'test' : [ '../examples/fs2000.mod' ],
+    'extra' : [ '../examples/fs2000_data.m' ] },
+  { 'test' : [ '../examples/fs2000_nonstationary.mod' ] },
+  { 'test' : [ '../examples/Gali_2015.mod' ],
+    'extra' : [ '../examples/Gali_2015_PC_slope.m',
+                '../examples/Gali_2015_prior_restrictions.m' ] },
+  { 'test' : [ '../examples/hank_1a.mod' ],
+    'extra' : [ '../examples/hank_1a.mat' ] },
+  { 'test' : [ '../examples/hank_2a.mod' ],
+    'extra' : [ '../examples/hank_2a.mat' ] },
+  { 'test' : [ '../examples/ks.mod' ],
+    'extra' : [ '../examples/ks.mat' ] },
+  { 'test' : [ '../examples/NK_baseline.mod' ],
+    'extra' : [ '../examples/NK_baseline_steadystate.m' ] },
+  { 'test' : [ '../examples/Occbin_example.mod' ] },
+  { 'test' : [ '../examples/pacmodel.mod' ] },
+  { 'test' : [ '../examples/perfect_foresight_expectation_errors.mod' ] },
+  { 'test' : [ '../examples/perfect_foresight_rbc.mod' ] },
+  { 'test' : [ '../examples/Ramsey_Example.mod' ] },
+  { 'test' : [ '../examples/Ramsey_steady_file.mod' ],
+    'extra' : [ '../examples/Ramsey_steady_file_steadystate.m' ] },
+  { 'test' : [ '../examples/rbc_irf_matching.mod' ],
+    'extra' : [ '../examples/rbc_irf_matching_data.csv',
+                '../examples/rbc_irf_matching_transformations.m' ] }
 ]
 
 base_test_driver_args = [ get_option('build_for') ]
