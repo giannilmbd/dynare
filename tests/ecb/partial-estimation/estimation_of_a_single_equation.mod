@@ -6,17 +6,20 @@ var ffr, unrate, cpi;
 // Declare the exogenous variables.
 varexo e_ffr, e_unrate, e_cpi;
 
+parameters p_ffr_ffr_lag_1 p_ffr_ffr_lag_2 p_ffr_ffr_lag_3 p_ffr_unrate_lag_1 p_ffr_unrate_lag_2 p_ffr_unrate_lag_4 p_ffr_unrate_lag_5 p_ffr_cpi_lag_4 p_unrate_cpi_lag_1 p_unrate_cpi_lag_2 p_unrate_cpi_lag_3 p_unrate_cpi_lag_4 p_unrate_cpi_lag_5 p_unrate_cpi_lag_6 p_cpi_ffr_lag_1 p_cpi_ffr_lag_2 p_cpi_cpi_lag_2;
+
 // Declare the model.
 model(linear);
 
 [name='ffr']
-     ffr = adl(ffr, 'p_ffr_ffr', [1:3]) + adl(unrate, 'p_ffr_unrate', 1) + adl(cpi, 'p_ffr_cpi', [4]) + e_ffr;
+     ffr = p_ffr_ffr_lag_1*ffr_lag_1 + p_ffr_ffr_lag_2*ffr_lag_2 + p_ffr_ffr_lag_3*ffr_lag_3
+           + p_ffr_unrate_lag_1*unrate_lag_1 + p_ffr_cpi_lag_4*cpi_lag_4 + e_ffr;
 
 [name='unrate']
-     unrate = adl(unrate, 'p_ffr_unrate', [4 2 5]) + adl(cpi, 'p_unrate_cpi', 6) + e_unrate;
+     unrate = unrate(-4)*p_ffr_unrate_lag_4 + unrate(-2)*p_ffr_unrate_lag_2 + unrate(-5)*p_ffr_unrate_lag_5 + cpi(-1)*p_unrate_cpi_lag_1 + cpi(-2)*p_unrate_cpi_lag_2 + cpi(-3)*p_unrate_cpi_lag_3 + cpi(-4)*p_unrate_cpi_lag_4 + cpi(-5)*p_unrate_cpi_lag_5 + cpi(-6)*p_unrate_cpi_lag_6 + e_unrate;
 
 [name='cpi']
-     cpi = adl(ffr, 'p_cpi_ffr', 2) + adl(cpi, 'p_cpi_cpi', [2]) + e_cpi;
+     cpi = ffr(-1)*p_cpi_ffr_lag_1 + ffr(-2)*p_cpi_ffr_lag_2 + cpi(-2)*p_cpi_cpi_lag_2 + e_cpi;
 
 end;
 

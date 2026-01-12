@@ -1,7 +1,7 @@
 ;;; dynare.el --- major mode for editing Dynare mod files
 
 ;; Copyright © 2010 Yannick Kalantzis
-;; Copyright © 2019-2025 Dynare Team
+;; Copyright © 2019-2026 Dynare Team
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@
 ;; “expression” and “model_expression” rules in Bison file)
 (defvar dynare-functions
   '("expectation" "var_expectation" "pac_expectation" "pac_target_nonstationary"
-    "exp" "diff" "adl" "log"
+    "exp" "diff" "log"
     "ln" "log10" "sin" "cos" "tan" "asin" "acos" "atan"
     "sinh" "cosh" "tanh" "asinh" "acosh" "atanh" "sqrt" "cbrt" "abs"
     "sign" "max" "min" "normcdf" "normpdf" "erf" "erfc" "steady_state" "sum")
