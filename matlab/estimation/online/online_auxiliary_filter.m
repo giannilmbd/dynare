@@ -163,10 +163,6 @@ for t=1:sample_size
                     end
                 end
             end
-            [tmp2]=iterate_law_of_motion(StateVectors(:,i),zeros(number_of_structural_innovations, 1),ReducedForm,M_,options_,ReducedForm.use_k_order_solver,pruning,StateVectors_(:,i));
-            if max(max(abs(tmp2-tmp)))>1e-10
-                error('')
-            end
             % end
             PredictionError = bsxfun(@minus,Y(t,:)', tmp(mf1,:));
             % Replace Gaussian density with a Student density with 3 degrees of freedom for fat tails.
@@ -246,19 +242,6 @@ for t=1:sample_size
                             end
                         end
                     end
-                    if pruning
-                        [tmp2, tmp2_]=iterate_law_of_motion(StateVectors(:,i),epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,pruning,StateVectors_(:,i));
-                        StateVectors_(:,i) = tmp_(mf0_,:);
-                        if max(max(abs(tmp2-tmp))) || max(max(abs(tmp2_-tmp_)))
-                            error('')
-                        end
-                    else
-                        [tmp2]=iterate_law_of_motion(StateVectors(:,i),epsilon,ReducedForm,M_,options_,ReducedForm.use_k_order_solver,pruning);
-                        if max(max(abs(tmp2-tmp)))>1e-10
-                            error('')
-                        end
-                    end
-
                     StateVectors(:,i) = tmp(mf0,:);
                     PredictionError = bsxfun(@minus,Y(t,:)', tmp(mf1,:));
                     wtilde(i) = w_stage1(i)*exp(-.5*(const_lik+log(det(ReducedForm.H))+sum(PredictionError.*(ReducedForm.H\PredictionError), 1)));
