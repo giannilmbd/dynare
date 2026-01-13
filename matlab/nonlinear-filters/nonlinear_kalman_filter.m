@@ -67,6 +67,7 @@ number_of_structural_innovations = length(ReducedForm.Q);
 
 % compute gaussian quadrature nodes and weights on states and shocks
 if ParticleOptions.proposal_approximation.montecarlo
+    set_dynare_seed_local_options([],false,'default');
     nodes = randn(ParticleOptions.number_of_particles,number_of_state_variables+number_of_structural_innovations);
     weights = 1/ParticleOptions.number_of_particles;
     weights_c = weights;
@@ -77,10 +78,6 @@ elseif ParticleOptions.proposal_approximation.unscented
     [nodes,weights,weights_c] = unscented_sigma_points(number_of_state_variables+number_of_structural_innovations,ParticleOptions.unscented);
 else
     error('Estimation: This approximation for the proposal is not implemented or unknown!')
-end
-
-if ParticleOptions.distribution_approximation.montecarlo % What is the purpose of this if there is no distribution approximation here?
-    set_dynare_seed_local_options([],false,'default');
 end
 
 % Get covariance matrices
