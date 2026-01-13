@@ -8928,14 +8928,17 @@ Non-linear filter options
 
            ``montecarlo``
 
-               Monte Carlo integration method.
+               Monte Carlo integration method. Not available with ``filter_algorithm=gmf``.
        
     .. option:: distribution_approximation = OPTION
 
-       Sets the method for approximating the particle
-       distribution for the ``filter_algorithm=gf``, ``gpf`` and ``nlkf`` filters. Possible values for OPTION are: ``cubature``,
+       Sets the method for approximating the particle distribution for
+       the ``filter_algorithm=gf``, ``gpf`` and ``nlkf``
+       filters. Possible values for OPTION are: ``cubature``,
        ``montecarlo`` and ``unscented``. Default value is
-       ``unscented``. For details, see    :opt:`proposal_approximation = OPTION`.
+       ``unscented``. For details, see :opt:`proposal_approximation =
+       OPTION`. Option value ``montecarlo`` is not supported for
+       ``filter_algorithm=gmf``.
 
     .. option:: cpf_weights = OPTION
 

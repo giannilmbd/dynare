@@ -1,43 +1,38 @@
-function [StateMuPrior,StateSqrtPPrior,StateWeightsPrior,StateMuPost,StateSqrtPPost,StateWeightsPost] =...
+function [StateMuPrior, StateSqrtPPrior, StateWeightsPrior, StateMuPost, StateSqrtPPost, StateWeightsPost] =...
     gaussian_mixture_filter_bank(ReducedForm, obs, StateMu, StateSqrtP, StateWeights, ...
                                  StructuralShocksMu, StructuralShocksSqrtP, StructuralShocksWeights, ...
                                  ObservationShocksWeights, H, H_lower_triangular_cholesky, normfactO, ...
                                  ParticleOptions, options_, M_)
-% [StateMuPrior,StateSqrtPPrior,StateWeightsPrior,StateMuPost,StateSqrtPPost,StateWeightsPost] =...
-%     gaussian_mixture_filter_bank(ReducedForm, obs, StateMu, StateSqrtP, StateWeights, ...
-%                                  StructuralShocksMu, StructuralShocksSqrtP, StructuralShocksWeights, ...
-%                                  ObservationShocksWeights, H, H_lower_triangular_cholesky, normfactO, ...
-%                                  ParticleOptions, options_, M_)
-%
+
 % Computes the proposal with a Gaussian approximation for importance
 % sampling. This proposal is a gaussian distribution calculated à la Kalman
 %
-% INPUTS
-% - ReducedForm             [structure]     MATLAB's structure describing the reduced form model.
-% - obs                     [double]        pp*1 vector of (detrended) data, where pp is the maximum number of observed variables
-% - StateMu                 [double]        mean of the states
-% - StateSqrtP              [double]        square root of the state covariance matrix
-% - StateWeights            [double]        weights of the state particles
-% - StructuralShocksMu      [double]        mean of the structural shocks
-% - StructuralShocksSqrtP	[double]        square root of covariance matrix of the structural shocks    
-% - StructuralShocksWeights	[double]        weights of structural shocks
-% - ObservationShocksWeights [double]       weights of measurement errors
-% - H                              [double]       Measurement error covariance
-% - H_lower_triangular_cholesky    [double]       Cholesky of measurement error covariance
-% - normfactO               [double]        normalizing constant in likelihood
-% - ParticleOptions         [structure]     filter options
-% - options_                [structure]     describing the options
-% - M_                      [structure]     describing the model
+% INPUTS:
+% - ReducedForm                    [struct]        MATLAB's structure describing the reduced form model.
+% - obs                            [double]        pp*1 vector of (detrended) data, where pp is the maximum number of observed variables
+% - StateMu                        [double]        mean of the states
+% - StateSqrtP                     [double]        square root of the state covariance matrix
+% - StateWeights                   [double]        weights of the state particles
+% - StructuralShocksMu             [double]        mean of the structural shocks
+% - StructuralShocksSqrtP	       [double]        square root of covariance matrix of the structural shocks    
+% - StructuralShocksWeights	       [double]        weights of structural shocks
+% - ObservationShocksWeights       [double]        weights of measurement errors
+% - H                              [double]        Measurement error covariance
+% - H_lower_triangular_cholesky    [double]        Cholesky of measurement error covariance
+% - normfactO                      [double]        normalizing constant in likelihood
+% - ParticleOptions                [struct]        filter options
+% - options_                       [struct]        describing the options
+% - M_                             [struct]        describing the model
 %
-% OUTPUTS
-% - StateMuPrior            [double]        prior mean of the states
-% - StateSqrtPPrior         [double]        square root of prior covariance of the states
-% - StateWeightsPrior       [double]        prior weight of the states
-% - StateMuPost             [double]        posterior mean of the states
-% - StateSqrtPPost          [double]        square root of posterior covariance of the states
-% - StateWeightsPost        [double]        posterior weight of the states
+% OUTPUTS:
+% - StateMuPrior                   [double]        prior mean of the states
+% - StateSqrtPPrior                [double]        square root of prior covariance of the states
+% - StateWeightsPrior              [double]        prior weight of the states
+% - StateMuPost                    [double]        posterior mean of the states
+% - StateSqrtPPost                 [double]        square root of posterior covariance of the states
+% - StateWeightsPost               [double]        posterior weight of the states
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -68,7 +63,11 @@ if ParticleOptions.proposal_approximation.cubature
 elseif ParticleOptions.proposal_approximation.unscented
     [nodes3, weights3, weights_c3] = unscented_sigma_points(numb, ParticleOptions.unscented);
 else
-    error('This approximation for the proposal is unknown!')
+    if ParticleOptions.proposal_approximation.montecarlo
+        error('The montecarlo approximation for the proposal is not implemented.')
+    else
+        error('This approximation for the proposal is unknown.')
+    end
 end
 
 epsilon = bsxfun(@plus, StructuralShocksSqrtP*nodes3(:,number_of_state_variables+1:number_of_state_variables+number_of_structural_innovations)', StructuralShocksMu);

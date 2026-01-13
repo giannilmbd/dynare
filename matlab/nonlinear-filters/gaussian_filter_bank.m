@@ -1,31 +1,29 @@
 function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean, StateVectorVarianceSquareRoot] = ...
     gaussian_filter_bank(ReducedForm, obs, StateVectorMean, StateVectorVarianceSquareRoot, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ...
                          ParticleOptions, options_, M_)
-% [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean, StateVectorVarianceSquareRoot] = ...
-%     gaussian_filter_bank(ReducedForm, obs, StateVectorMean, StateVectorVarianceSquareRoot, Q_lower_triangular_cholesky, H_lower_triangular_cholesky, H, ...
-%                          ParticleOptions, ThreadsOptions, options_, M_)
-%
+
 % Computes the proposal with a Gaussian approximation for importance
 % sampling. This proposal is a Gaussian distribution calculated à la Kalman
-% Inputs
-%  - ReducedForm                    [structure]    MATLAB's structure describing the reduced form model.
-%  - obs                            [double]       p×1 vector of (detrended) data, where p is the number of observed variables.
-%  - StateVectorMean                [double]       mean of the states
-%  - StateVectorVarianceSquareRoot  [double]       square root of the state covariance matrix
-%  - Q_lower_triangular_cholesky    [double]       Cholesky of shock covariance
-%  - H_lower_triangular_cholesky    [double]       Cholesky of measurement error covariance
-%  - H                              [double]       Measurement error covariance
-%  - ParticleOptions                [structure]    filter options
-%  - options_                       [structure]    describing the options
-%  - M_                             [structure]    describing the model
 %
-% Outputs
+% INPUTS:
+%  - ReducedForm                        [struct]    MATLAB's structure describing the reduced form model.
+%  - obs                                [double]       p×1 vector of (detrended) data, where p is the number of observed variables.
+%  - StateVectorMean                    [double]       mean of the states
+%  - StateVectorVarianceSquareRoot      [double]       square root of the state covariance matrix
+%  - Q_lower_triangular_cholesky        [double]       Cholesky of shock covariance
+%  - H_lower_triangular_cholesky        [double]       Cholesky of measurement error covariance
+%  - H                                  [double]       Measurement error covariance
+%  - ParticleOptions                    [struct]    filter options
+%  - options_                           [struct]    describing the options
+%  - M_                                 [struct]    describing the model
+%
+% OUTPUTS
 %  - PredictedStateMean                 [double]   one-step ahead predicted mean of the states    
 %  - PredictedStateVarianceSquareRoot   [double]   one-step ahead covariance of the states   
 %  - StateVectorMean                    [double]   updated mean of the states   
 %  - StateVectorVarianceSquareRoot      [double]   updated covariance of the states   
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

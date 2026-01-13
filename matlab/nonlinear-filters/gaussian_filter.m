@@ -1,23 +1,21 @@
 function [LIK,lik] = gaussian_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
-% [LIK,lik] = gaussian_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
+
 % Evaluates the likelihood of a non-linear model approximating the
 % predictive (prior) and filtered (posterior) densities for state variables
 % by gaussian distributions.
 %
-% INPUTS
-%    Reduced_Form     [structure] MATLAB's structure describing the reduced form model.
-%    Y                [double]    matrix of original observed variables.
-%    start            [double]    structural parameters.
-%    ParticleOptions  [structure] MATLAB's structure describing options concerning particle filtering.
-%    ThreadsOptions   [structure] MATLAB's structure.
-%    options_         [structure] describing the options
-%    M_               [structure] describing the model
+% INPUTS:
+% - Reduced_Form     [struct]    MATLAB's structure describing the reduced form model.
+% - Y                [double]    matrix of original observed variables.
+% - start            [double]    structural parameters.
+% - ParticleOptions  [struct]    MATLAB's structure describing options concerning particle filtering.
+% - ThreadsOptions   [struct]    MATLAB's structure.
+% - options_         [struct]    describing the options
+% - M_               [struct]    describing the model
 %
 % OUTPUTS
-%    LIK        [double]    scalar, likelihood
-%    lik        [double]    vector, density of observations in each period.
-%
-% REFERENCES
+% - LIK              [double]    scalar, likelihood
+% - lik              [double]    vector, density of observations in each period.
 %
 % NOTES
 % - The vector "lik" is used to evaluate the Jacobian of the likelihood.
@@ -35,7 +33,7 @@ function [LIK,lik] = gaussian_filter(ReducedForm, Y, start, ParticleOptions, Thr
 % Cons: estimations may be biased if the model is truly non-Gaussian
 %       since predictive and filtered densities are unimodal.
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

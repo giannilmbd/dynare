@@ -1,23 +1,23 @@
 function [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
-% [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOptions, ThreadsOptions, options_, M_)
+
 % Evaluates the likelihood of a non-linear model approximating the state
 % variables distributions with Gaussian mixtures.
 %
-% INPUTS
-%    ReducedForm            [structure] MATLAB's structure describing the reduced form model.
-%                                       reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
-%                                       reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
-%                                       reduced_form_model.state.dr        [structure] output of resol.m.
-%  - Y                      [double]    pp*smpl matrix of (detrended) data, where pp is the maximum number of observed variables.
-%  - start                  [integer]   scalar, likelihood evaluation starts at 'start'.
-%  - ParticleOptions        [structure] filter options
-%  - ThreadsOptions         [structure] options for threading of mex files
-%  - options_               [structure] describing the options
-%  - M_                     [structure] describing the model
+% INPUTS:
+% - ReducedForm            [struct]    MATLAB's structure describing the reduced form model.
+%                                         reduced_form_model.measurement.H   [double]   (pp x pp) variance matrix of measurement errors.
+%                                         reduced_form_model.state.Q         [double]   (qq x qq) variance matrix of state errors.
+%                                         reduced_form_model.state.dr        [structure] output of resol.m.
+% - Y                      [double]    pp×smpl matrix of (detrended) data, where pp is the maximum number of observed variables.
+% - start                  [integer]   scalar, likelihood evaluation starts at 'start'.
+% - ParticleOptions        [struct]    filter options
+% - ThreadsOptions         [struct]    options for threading of mex files
+% - options_               [struct]    describing the options
+% - M_                     [struct]    describing the model
 %
-% OUTPUTS
-%    LIK                    [double]    scalar, likelihood
-%    lik                    [double]    vector, density of observations in each period.
+% OUTPUTS:
+% - LIK                    [double]    scalar, likelihood
+% - lik                    [double]    vector, density of observations in each period.
 %
 % Remarks:
 % Gaussian Mixture allows reproducing a wide variety of generalized distributions (when multimodal for instance).
@@ -42,7 +42,7 @@ function [LIK, lik] = gaussian_mixture_filter(ReducedForm, Y, start, ParticleOpt
 % NOTES
 %   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -82,13 +82,11 @@ if ParticleOptions.distribution_approximation.cubature
 elseif ParticleOptions.distribution_approximation.unscented
     [nodes, weights] = unscented_sigma_points(number_of_state_variables, ParticleOptions.unscented);
 else
-    if ~ParticleOptions.distribution_approximation.montecarlo
-        error('This approximation for the proposal is unknown!')
+    if ParticleOptions.distribution_approximation.montecarlo
+        error('The montecarlo approximation for the distribution is not implemented.')
+    else
+        error('This approximation for the distribution is unknown.')
     end
-end
-
-if ParticleOptions.distribution_approximation.montecarlo
-    set_dynare_seed_local_options([],false,'default');
 end
 
 % Get covariance matrices
@@ -126,11 +124,11 @@ elseif ParticleOptions.mixture_structural_shocks==1
     elseif ParticleOptions.proposal_approximation.unscented
         [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions.unscented);
     else
-        if ~ParticleOptions.proposal_approximation.montecarlo
-            error('This approximation for the proposal is unknown!')
+        if ParticleOptions.proposal_approximation.montecarlo
+            error('The montecarlo approximation for the proposal is not implemented.')
+        else
+            error('This approximation for the proposal is unknown.')
         end
-        % this part for proposal_approximation=montecarlo will not work as StructuralShocksMu,
-        % StructuralShocksWeights are not set
     end
     I = size(StructuralShocksWeights, 1);
     StructuralShocksMu = Q_lower_triangular_cholesky*StructuralShocksMu';
@@ -145,8 +143,10 @@ else
     elseif ParticleOptions.proposal_approximation.unscented
         [StructuralShocksMu, StructuralShocksWeights] = unscented_sigma_points(number_of_structural_innovations, ParticleOptions.unscented);
     else
-        if ~ParticleOptions.proposal_approximation.montecarlo
-            error('This approximation for the proposal is unknown!')
+        if ParticleOptions.proposal_approximation.montecarlo
+            error('The montecarlo approximation for the proposal is not implemented.')
+        else
+            error('This approximation for the proposal is unknown.')
         end
     end
     I = size(StructuralShocksWeights, 1);
