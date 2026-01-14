@@ -1,0 +1,613 @@
+function [density, density_data, graph_info] = graphs(t, indx, ShockVectors, StateVectorsPKF, StateVectorsPPF, likxx, regimes0, regimesy, ...
+    simulated_regimes, simulated_sample, updated_regimes, updated_sample, a10, P10, a1y, P1y, alphahaty, etahaty, ...
+    di, H, QQQ, Y, ZZ, dr, M_, options_, graph_info)
+% [density, density_data, graph_info] = graphs(t, indx, ShockVectors, StateVectorsPKF, StateVectorsPPF, likxx, regimes0, regimesy, ...
+%     simulated_regimes, simulated_sample, updated_regimes, updated_sample, a10, P10, a1y, P1y, alphahaty, etahaty, ...
+%     di, H, QQQ, Y, ZZ, dr, M_, options_, graph_info)
+%
+% Generates diagnostic plots and density visualizations for the OccBin particle filter.
+%
+% INPUTS
+% - t                       [integer]   Current time period.
+% - indx                    [integer]   Index into observation subset.
+% - ShockVectors            [double]    Shock vector draws.
+% - StateVectorsPKF         [cell]      State vectors from PKF method.
+% - StateVectorsPPF         [cell]      State vectors from PPF method.
+% - likxx                   [double]    Likelihood values.
+% - regimes0                [struct]    Prior regime indicators.
+% - regimesy                [struct]    Regime indicators for observations.
+% - simulated_regimes       [struct]    Simulated regime information.
+% - simulated_sample        [struct]    Simulated particle sample.
+% - updated_regimes         [struct]    Updated regime indicators.
+% - updated_sample          [struct]    Updated particle sample.
+% - a10                     [double]    Prior state mean.
+% - P10                     [double]    Prior state covariance.
+% - a1y                     [double]    State estimate for observations.
+% - P1y                     [double]    State covariance for observations.
+% - alphahaty               [double]    Predicted observation.
+% - etahaty                 [double]    Observation error.
+% - di                      [integer]   Data index for subset selection.
+% - H                       [double]    Measurement error variance.
+% - QQQ                     [double]    State covariance matrix.
+% - Y                       [double]    Observations.
+% - ZZ                      [double]    Observation selection matrix.
+% - dr                      [struct]    Decision rule structure.
+% - M_                      [struct]    Dynare's model structure.
+% - options_                [struct]    Dynare options.
+% - graph_info              [struct]    Graphics information and handles.
+%
+% OUTPUTS
+% - density                 [struct]    Kernel density estimates.
+% - density_data            [struct]    Density data for plotting.
+% - graph_info              [struct]    Updated graphics handles and information.
+
+% Copyright © 2025-2026 Dynare Team
+%
+% This file is part of Dynare.
+%
+% Dynare is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% Dynare is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
+
+% OUTPUT
+if ~options_.occbin.filter.particle.nograph
+    % observed Y mean and covariance given 0
+    PZ0 = ZZ*P10(:,:,2)*ZZ'+H(di,di);
+    ObsVectorMean0 = ZZ*a10(:,2);
+end
+% observed Y mean and covariance
+PZ = ZZ*P1y(:,:,2)*ZZ'+H(di,di);
+ObsVectorMean = ZZ*a1y(:,2);
+
+
+success = simulated_sample.success;
+number_of_particles = options_.occbin.filter.particle.number_of_particles;
+number_of_successful_particles = length(find(success));
+number_of_simulated_regimes = length(simulated_regimes);
+number_of_updated_regimes = length(updated_regimes);
+
+epsilon = updated_sample.epsilon;
+y100 = simulated_sample.y10;
+% store observables to plot predictive density 
+z100 = ZZ*y100;
+y10 = y100(:,success);
+% store observables for kernel density
+z10 = ZZ*y10;
+nobs = size(ZZ,1);
+
+if ~options_.occbin.filter.particle.nograph
+    %
+    % QQ plot 
+    % ppf predictive covariance
+    PZ10 = cov(z10');
+    [UZ,XZ] = svd(PZ10);
+    % P= U*X*U';
+    isz = find(diag(XZ)>1.e-12);
+    nz = length(isz);
+
+    % pkf_predictive_variance
+    [U,X] = svd(0.5*(PZ+PZ'));
+    % P= U*X*U';
+    iss = find(diag(X)>1.e-12);
+
+    % test PPF updated state draws against PKF
+    ns = length(iss);
+    if ns==0
+        % should never happen?
+        disp_verbose(['pkf: time ' int2str(t) ' no predictive uncertainty!'],options_.debug);
+    else
+        UP = U(:,iss);
+        % WP = WP(:,isp);
+        S = X(iss,iss); %UP(:,isp)'*(0.5*(P+P'))*WP(:,isp);
+        iS = inv(S);
+        UPZ = UZ(:,isz);
+        SZ = XZ(isz,isz); %UP(:,isp)'*(0.5*(P+P'))*WP(:,isp);
+        iSZ = inv(SZ);
+
+        chi2=nan(number_of_successful_particles,1);
+        for k=1:number_of_successful_particles
+            vv = UP'*(z10(:,k)-ObsVectorMean);
+            chi2(k,1) = transpose(vv)*iS*vv;
+            vdiff = UP'*(z10(:,k)-Y(di,2));
+            chi2diff(k,1) = transpose(vdiff)*iS*vdiff;
+            vdiffz = UPZ'*(z10(:,k)-Y(di,2));
+            chi2diffz(k,1) = transpose(vdiffz)*iSZ*vdiffz;
+        end
+        chi2y = UP'*(Y(di,2)-ObsVectorMean);
+        chi2y = transpose(chi2y)*iS*chi2y;
+        chi2z = UPZ'*(Y(di,2)-mean(z10')');
+        chi2z = transpose(chi2z)*iSZ*chi2z;
+        [~, imin] = min(chi2diff);
+        [~, iminz] = min(chi2diffz);
+
+
+        GraphDirectoryName = CheckPath('occbin_ppf_graphs',M_.dname);
+        schi2 = sort(chi2);
+        x = zeros(size(schi2));
+        for j=1:number_of_successful_particles
+            p=0.5*1/number_of_successful_particles+(j-1)/number_of_successful_particles;
+            x(j,1) = chi2inv(p,ns);
+        end
+
+        % qqplot with chi square distribution
+        if isnan(graph_info.hfig(8))
+            hfig(8) = figure;
+            graph_info.hfig(8) = hfig(8);
+        else
+            hfig(8) = graph_info.hfig(8);
+            figure(hfig(8))
+        end
+        clf(hfig(8),'reset')
+        set(hfig(8),'name',['QQ plot PPF vs PKF predictive density, t = ' int2str(t)])
+        plot(x,x)
+        hold all, plot(x,schi2,'o' )
+        plot(chi2y,chi2z,'*g')
+        plot(chi2y,chi2(imin),'og')
+        plot(chi2y,chi2(iminz),'>g')
+        title(['QQ plot PPF vs PKF predictive density, t=' int2str(t) ])
+        dyn_saveas(hfig(8),[GraphDirectoryName, filesep, M_.fname,'_QQ_plot_predictive_density_t',int2str(t)],false,options_.graph_format);
+
+    end
+end
+
+
+% full non-parametric density
+ydist = sqrt(sum((Y(di,2)-z10).^2,1));
+[~, is] = sort(ydist);
+%bin population
+nbins = ceil(sqrt(size(z10,2)));
+
+binpop = ceil(number_of_successful_particles/nbins/2)*2;
+
+% volume of n-dimensional sphere
+isux = find(success);
+isux = isux(is); % sorted successful deviations from data
+% check for regime of Y
+is_data_regime = false(number_of_simulated_regimes,1);
+for kr=1:number_of_simulated_regimes
+    is_data_regime(kr) = any(ismember(simulated_regimes(kr).index,isux(1:binpop)));
+end
+
+% PPF density
+nrow=floor(sqrt(nobs));
+ncol=ceil(nobs/nrow);
+
+norm_datalik = sum(exp(-likxx(success)));
+is_resampled_regime = false(1,number_of_updated_regimes);
+pregime_updated0 = zeros(1,number_of_updated_regimes);
+pregime_updated = zeros(1,number_of_updated_regimes);
+datalik_regime = zeros(1,number_of_updated_regimes);
+for kr=1:number_of_updated_regimes
+    % regime specific likelihood weighted by regime probability GIVEN the
+    % observable
+    pregime_updated0(kr) = sum(exp(-likxx(updated_regimes(kr).index)))/norm_datalik;
+    is_resampled_regime(kr) = any(ismember(indx,updated_regimes(kr).index));
+    if is_resampled_regime(kr)
+        pregime_updated(kr) = sum(ismember(indx,updated_regimes(kr).index))/number_of_particles;
+        datalik_regime(kr) = sum(exp(-likxx(updated_regimes(kr).index)/2))/sum(success);
+    end
+end
+
+if ~options_.occbin.filter.particle.nograph
+    GraphDirectoryName = CheckPath('occbin_ppf_graphs',M_.dname);
+    nodisplay = false;
+    if nobs==1 && ~isoctave && user_has_matlab_license('statistics_toolbox') % ksdensity is missing
+        if isnan(graph_info.hfig(1))
+            hfig(1) = figure;
+            graph_info.hfig(1) = hfig(1);
+        else
+            hfig(1) = graph_info.hfig(1);
+            figure(hfig(1))
+        end
+        clf(hfig(1),'reset')
+        set(hfig(1),'name',['Data density, t = ' int2str(t)])
+        % subplot(nrow,ncol,kobs)
+        tlo = tiledlayout(nrow,ncol);
+        title(tlo,[' (t=' int2str(t) ')']);
+        tlo.TileSpacing = 'tight';
+    end
+    % set color order
+    all_simulated_regimes = {simulated_regimes.regime};
+    all_updated_regimes = {updated_regimes.regime};
+    all_regimes = [all_simulated_regimes all_updated_regimes(~ismember(all_updated_regimes, all_simulated_regimes))];
+    number_of_regimes = length(all_regimes);
+
+    ireg1 = find([simulated_regimes.is_pkf_regime]);
+
+    [~, ~, tmp_str]=occbin.backward_map_regime(regimes0(1));
+    if M_.occbin.constraint_nbr==1
+        tmp_str = tmp_str(2,:);
+    else
+        tmp_str = [tmp_str(2,:)  tmp_str(4,:)];
+    end
+    ireg0 = find(ismember(all_simulated_regimes,tmp_str));
+
+    func = @(x) colorspace('RGB->Lab',x);
+    my_colororder= distinguishable_colors(number_of_regimes+4,'w',func);
+    my_colororder(ismember(my_colororder,[0 0 1],'row'),:)=[]; % remove BLUE
+    previous_and_current_period_regimes_are_equal = false;
+    if isempty(ireg0)
+        % t-1 regime is not present in predictive density (should never
+        % happen, but ...)
+        my_colororder(ismember(my_colororder,[1 0 0],'row'),:)=[]; % remove RED
+    else
+        if ireg0~=ireg1
+            icolor0 = find(ismember(my_colororder,[1 0 0],'row')); % get the RED
+            my_colororder = my_colororder([1:icolor0-1,icolor0+1:number_of_simulated_regimes,icolor0,number_of_simulated_regimes+1:number_of_regimes],:);
+        else
+            ireg0 = [];
+            previous_and_current_period_regimes_are_equal = true;
+            my_colororder = my_colororder(1:number_of_regimes,:);
+        end
+    end
+
+    my_simulated_regime_order = (1:number_of_simulated_regimes);
+    imiddle = not(ismember(my_simulated_regime_order,[ireg0 ireg1]));
+    my_simulated_regime_order = [ireg1 my_simulated_regime_order(imiddle) ireg0];
+
+    all_regimes_order = [all_simulated_regimes(my_simulated_regime_order) all_updated_regimes(~ismember(all_updated_regimes, all_simulated_regimes))];
+    updated_colororder = zeros(number_of_updated_regimes,3);
+    for kr=1:number_of_updated_regimes
+        updated_colororder(kr,:) = my_colororder(ismember(all_regimes_order,all_updated_regimes(kr)),:);
+    end
+
+    % sort updated regimes like simulated for figure(1)
+    for kr = 1:number_of_regimes
+        ismember(all_regimes_order,all_updated_regimes);
+    end
+end
+
+% data density!
+density=struct();
+density_data=struct();
+
+if ~isoctave && user_has_matlab_license('statistics_toolbox')
+    for kobs = 1:size(ZZ,1)
+        obs_simul = transpose(ZZ(kobs,:)*y100); %simulated varobs
+        mc=nan(number_of_simulated_regimes,1);
+        Mc=mc;
+        for kr=1:number_of_simulated_regimes
+            mc(kr,1) = min(transpose(ZZ(kobs,:)*y100(:,simulated_regimes(kr).index)));
+            Mc(kr,1) = max(transpose(ZZ(kobs,:)*y100(:,simulated_regimes(kr).index)));
+        end
+        if nobs==1 && ~options_.occbin.filter.particle.nograph
+            ax = nexttile(kobs);
+            hold off,
+        end
+        zrange = [min(transpose(ZZ(kobs,:)*y10)) max(transpose(ZZ(kobs,:)*y10))];
+        zlin = linspace(zrange(1),zrange(2),50);
+
+
+        fobsk = ksdensity(transpose(ZZ(kobs,:)*y10),[zlin Y(kobs,2)]');
+        fobsklin = fobsk(1:end-1);
+        fobsk= fobsk(end);
+        density.(options_.varobs{di(kobs)}).kernel = [zlin' fobsklin];
+
+        m=min(transpose(ZZ(kobs,:)*y10));
+        M=max(transpose(ZZ(kobs,:)*y10));
+        bwidth = (M-m)/nbins;
+        m = min(m,Y(di(kobs),2)-bwidth/2);
+        M = max(M,Y(di(kobs),2)+bwidth/2);
+        bwidth = (M-m)/nbins;
+        EDGES = Y(di(kobs),2)-bwidth/2+bwidth*(-2*nbins:2*nbins); % we center data point in one bin
+        EDGES = EDGES(find(EDGES<m,1,'last'):find(EDGES>M,1));
+        if nobs>1 || options_.occbin.filter.particle.nograph
+            [pdf_sim,EDGES] = histcounts(transpose(ZZ(kobs,:)*y10), EDGES,'Normalization', 'pdf');
+        else
+            hh = histogram(transpose(ZZ(kobs,:)*y10),EDGES,'Normalization','pdf','EdgeColor','b');
+            pdf_sim = hh.Values;
+            hold on
+        end
+        xedges = 0.5*(EDGES(1:end-1)+EDGES(2:end));
+        density.(options_.varobs{di(kobs)}).non_parametric = [xedges' pdf_sim'];
+        % PPF density! regime specific likelihood weighted by probability
+        % WITHIN the BIN
+        pregime = zeros(length(xedges),number_of_simulated_regimes);
+        pdf_ppf = nan(1,length(xedges));
+        pdf_ppf_regime = zeros(length(xedges),number_of_simulated_regimes);
+        fobsk1 = ksdensity(transpose(ZZ(kobs,:)*y10),[xedges Y(kobs,2)]');
+        for kx=1:length(xedges)
+            ikx = obs_simul(success)>EDGES(kx) & obs_simul(success)<EDGES(kx+1);
+            nkx = length(find(ikx));
+            pdf_ppf(kx) = 0;
+            for kr=1:number_of_simulated_regimes
+                ikr = obs_simul(simulated_regimes(kr).index)>EDGES(kx) & obs_simul(simulated_regimes(kr).index)<EDGES(kx+1);
+                pregime(kx,kr) = length(find(ikr))/nkx;
+                if pregime(kx,kr)>0
+                    pdf_ppf_regime(kx,kr) = pregime(kx,kr) ...
+                        *1./sqrt(2*pi*simulated_regimes(kr).obsvar(kobs,kobs)) ...
+                        .*exp(-(xedges(kx)-simulated_regimes(kr).obsmean(kobs) ).^2./2./simulated_regimes(kr).obsvar(kobs,kobs));
+                    pdf_ppf(kx) = pdf_ppf(kx) + pdf_ppf_regime(kx,kr);
+                end
+            end
+            if length(find(pregime(kx,:)))>1
+                pdf_ppf_regime(kx,:) = pregime(kx,:).*fobsk1(kx);
+                pdf_ppf(kx) = fobsk1(kx);
+            end
+        end
+        density.(options_.varobs{di(kobs)}).ppf = [xedges' pdf_ppf'];
+        density.(options_.varobs{di(kobs)}).ppf_regime = [xedges' pdf_ppf_regime];
+        % marginal density of observable
+        likk = 1/sqrt(2*pi*PZ(kobs,kobs))*exp(-(Y(di(kobs),2)-ObsVectorMean(kobs) ).^2./2./PZ(kobs,kobs));
+        density_data.(options_.varobs{di(kobs)}).kernel = [Y(di(kobs),2) fobsk];
+        density_data.(options_.varobs{di(kobs)}).non_parametric = [Y(di(kobs),2) pdf_sim(find(EDGES(1:end-1)<Y(di(kobs),2),1,'last'))];
+        density_data.(options_.varobs{di(kobs)}).pkf = [Y(di(kobs),2) likk];
+        pdf_pkf = 1./sqrt(2*pi*PZ(kobs,kobs)).*exp(-(xedges-ObsVectorMean(kobs) ).^2./2./PZ(kobs,kobs));
+        density.(options_.varobs{di(kobs)}).pkf = [xedges' pdf_pkf'];
+
+        if nobs==1 && ~options_.occbin.filter.particle.nograph
+            pdf_pkf0 = 1/sqrt(2*pi*PZ0(kobs,kobs))*exp(-(xedges-ObsVectorMean0(kobs) ).^2./2./PZ0(kobs,kobs));
+            hold on, hd(1) = plot(xedges',pdf_ppf,'b','linewidth',2);
+            hold on, hd(2) = plot(xedges',pdf_pkf,'g','linewidth',2);
+            hold on, hd(3) = plot(xedges',pdf_pkf0,'r--.','linewidth',2);
+            if previous_and_current_period_regimes_are_equal
+                hd(3).Color = hd(2).Color;
+            end
+
+            if length(di)>1
+                [~, im] = min(abs(xedges-Y(di(kobs),2)));
+                hold on, hd(4) = fill(Y(di(kobs),2)+bwidth*[-0.5 -0.5 0.5 0.5],[0 pdf_ppf(im) pdf_ppf(im) 0],'b','edgecolor','b','linewidth',2,'facealpha',0.3);
+            else
+                hold on, hd(4) = fill(Y(di(kobs),2)+bwidth*[-0.5 -0.5 0.5 0.5],[0 datalik datalik 0],'b','edgecolor','b','linewidth',2,'facealpha',0.3);
+            end
+            cpdf_ppf_regime = cumsum(pdf_ppf_regime(:,my_simulated_regime_order),2);
+            cpdf_ppf_regime(pdf_ppf_regime(:,my_simulated_regime_order)==0)=NaN;
+            hs = stem(xedges, cpdf_ppf_regime(:,end:-1:1),':.','linewidth',1.5,'markersize',15);
+            tmp_colororder = my_colororder(number_of_simulated_regimes:-1:1,:);
+            for kr = 1:number_of_simulated_regimes
+                hs(kr).Color = tmp_colororder(kr,:);
+            end
+
+            if kobs ==size(ZZ,1)
+                mytxt = {'simulated distribution','weighted distribution density', ...
+                    'approximated distribution','approximated distribution | t-1', ...
+                    'data point ppf density'};
+                    mytxt = [mytxt all_simulated_regimes(my_simulated_regime_order(end:-1:1))];
+                lg  = legend(ax,mytxt,'Orientation','Horizontal','NumColumns',2);
+                lg.Layout.Tile = 'South'; % <-- Legend placement with tiled layout
+            end
+            title(options_.varobs{di(kobs)})
+        end
+    end
+end
+
+if ~options_.occbin.filter.particle.nograph
+    if nobs==1 && ~isoctave && user_has_matlab_license('statistics_toolbox')
+        dyn_saveas(hfig(1),[GraphDirectoryName, filesep, M_.fname,'_data_density_t',int2str(t)],nodisplay,options_.graph_format);
+    end
+    if isnan(graph_info.hfig(5))
+        hfig(5) = figure;
+        graph_info.hfig(5) = hfig(5);
+    else
+        hfig(5) = graph_info.hfig(5);
+        figure(hfig(5))
+    end
+    clf(hfig(5),'reset')
+    set(hfig(5),'name',['Predictive density scatter plot, t = ' int2str(t)])
+    ncomb = nchoosek(nobs,2);
+    nrow2=floor(sqrt(ncomb));
+    ncol2=ceil(ncomb/nrow2);
+
+    tlo2=tiledlayout(nrow2,ncol2);
+    title(tlo2,['predictive density (t=' int2str(t) ')']);
+    tlo2.TileSpacing = 'tight';
+
+    for ko=1:length(di)-1
+        for koo=ko+1:length(di)
+            axo = nexttile;
+            for kp=1:number_of_simulated_regimes
+                plot(z100(ko,simulated_regimes(my_simulated_regime_order(kp)).index),z100(koo,simulated_regimes(my_simulated_regime_order(kp)).index),'.','MarkerEdgeColor',my_colororder(kp,:))
+                hold on,
+            end
+            plot(Y(di(ko),2),Y(di(koo),2),'o','MarkerEdgeColor','k')
+            xlabel(options_.varobs{di(ko)})
+            ylabel(options_.varobs{di(koo)})
+        end
+    end
+    mytxt = [all_simulated_regimes(my_simulated_regime_order) 'data point'];
+    lgo  = legend(axo,mytxt,'Orientation','Horizontal','NumColumns',2);
+    lgo.Layout.Tile = 'South'; % <-- Legend placement with tiled layout
+    dyn_saveas(hfig(5),[GraphDirectoryName, filesep, M_.fname,'_predictive_density_t',int2str(t)],nodisplay,options_.graph_format);
+
+    if isnan(graph_info.hfig(4))
+        hfig(4) = figure;
+        graph_info.hfig(4) = hfig(4);
+    else
+        hfig(4) = graph_info.hfig(4);
+        figure(hfig(4))
+    end
+    clf(hfig(4),'reset'),
+    set(hfig(4),'name',['Data density: regimes contribution, t=' int2str(t)])
+    pp = pie(datalik_regime(is_resampled_regime)/sum(datalik_regime(is_resampled_regime)), all_updated_regimes(is_resampled_regime));
+    ip=0;
+    for kr=1:number_of_updated_regimes
+        if is_resampled_regime(kr)
+            ip=ip+1;
+            pp(ip).FaceColor=updated_colororder(kr,:);
+            ip=ip+1;
+        end
+    end
+    title(['Data density: regimes contribution, t=' int2str(t)])
+    dyn_saveas(hfig(4),[GraphDirectoryName, filesep, M_.fname,'_data_density_regimes_contribution_t',int2str(t)],nodisplay,options_.graph_format);
+
+    % START updated states t|t
+    iss = find(diag(cov(y10'))>1.e-12);
+    nstate = length(iss);
+
+    if isnan(graph_info.hfig(2))
+        hfig(2) = figure;
+        graph_info.hfig(2) = hfig(2);
+    else
+        hfig(2) = graph_info.hfig(2);
+        figure(hfig(2))
+    end
+    clf(hfig(2),'reset')
+    set(hfig(2),'name',['Updated states t|t, t = ' int2str(t)])
+    if nstate
+        tlo = tiledlayout(length(iss),length(iss));
+        title(tlo,['Updated states t|t, t = ' int2str(t)]);
+        tlo.TileSpacing = 'none';
+    end
+    for k=1:length(iss)
+        h(k) = nexttile(k+(k-1)*length(iss));
+        hold off,
+        histogram(StateVectorsPKF(iss(k),:)','Normalization','pdf' ,'BinLimits',[min(StateVectorsPKF(iss(k),:)')-0.1*abs(min(StateVectorsPKF(iss(k),:)')),max(StateVectorsPKF(iss(k),:)')+0.1*abs(max(StateVectorsPKF(iss(k),:)'))])
+        hold on, hf0=histogram(StateVectorsPPF(iss(k),:)','Normalization','pdf' ,'BinLimits',[min(StateVectorsPPF(iss(k),:)')-0.1*abs(min(StateVectorsPPF(iss(k),:)')),max(StateVectorsPPF(iss(k),:)')+0.1*abs(max(StateVectorsPPF(iss(k),:)'))]);
+        title(M_.endo_names{dr.order_var(dr.restrict_var_list(iss(k)))})
+        if nstate>3
+            set(gca,'Yticklabel',[])
+            set(gca,'Xticklabel',[])
+        end
+        for kj=k+1:length(iss)
+            for iz=1:2
+                if iz==1
+                    ax = nexttile(k+(kj-1)*length(iss));
+                    plot(y10(iss(kj),:),y10(iss(k),:),'.','MarkerEdgeColor',[0.5 0.5 0.5]),
+                    hold on,
+                else
+                    ax = nexttile(kj+(k-1)*length(iss));
+                end
+                plot(StateVectorsPKF(iss(kj),:),StateVectorsPKF(iss(k),:),'.','MarkerEdgeColor',[0.7 0.7 0.7]),
+                hold on,
+                for kr=1:number_of_updated_regimes
+                    if is_resampled_regime(kr)
+                        plot(StateVectorsPPF(iss(kj),(ismember(indx,updated_regimes(kr).index))),StateVectorsPPF(iss(k),(ismember(indx,updated_regimes(kr).index))),'.','MarkerEdgeColor',updated_colororder(kr,:))
+                    end
+                end
+                plot(alphahaty(iss(kj),2),alphahaty(iss(k),2),'ok')
+                if abs(diff(ax.XLim))<0.02*abs(alphahaty(iss(kj),2))
+                    ax.XLim = [alphahaty(iss(kj),2)-abs(alphahaty(iss(kj),2))*0.01 ...
+                        alphahaty(iss(kj),2)+abs(alphahaty(iss(kj),2))*0.01];
+                end
+                if abs(diff(ax.YLim))<0.02*abs(alphahaty(iss(k),2))
+                    ax.YLim = [alphahaty(iss(k),2)-abs(alphahaty(iss(k),2))*0.01 ...
+                        alphahaty(iss(k),2)+abs(alphahaty(iss(k),2))*0.01];
+                end
+                if nstate>3
+                    set(gca,'Yticklabel',[])
+                    set(gca,'Xticklabel',[])
+                end
+            end
+        end
+    end
+    if M_.occbin.constraint_nbr ==1
+        my_txt = mat2str(regimesy(1).regimestart);
+    else
+        my_txt = [mat2str(regimesy(1).regimestart1) '-' mat2str(regimesy(1).regimestart2)];
+    end
+
+    if nstate>1
+        lg = legend(ax,[{[my_txt ' PKF']} all_updated_regimes(is_resampled_regime) {'PKF'}],'location','westoutside');
+        lg.Position(1) = 0;
+        lg.Position(2) = 0;
+    end
+    dyn_saveas(hfig(2),[GraphDirectoryName, filesep, M_.fname,'_updated_states_t',int2str(t)],nodisplay,options_.graph_format);
+    % end plot updated states
+
+    % shocks t|t
+    iss = find(sqrt(diag(QQQ(:,:,2))));
+    nshock = length(iss);
+    if nshock
+        if isnan(graph_info.hfig(3))
+            hfig(3) = figure;
+            graph_info.hfig(3) = hfig(3);
+        else
+            hfig(3) = graph_info.hfig(3);
+            figure(hfig(3))
+        end
+        clf(hfig(3),'reset')
+        set(hfig(3),'name',['Updated (realized) shocks t|t, t = ' int2str(t)])
+        tlo = tiledlayout(nshock,nshock);
+        title(tlo,['Updated (realized) shocks t|t, t = ' int2str(t)]);
+        tlo.TileSpacing = 'none';
+        for k=1:nshock
+            nexttile(k+(k-1)*nshock);
+            hf1=histogram(epsilon(iss(k),indx),'BinLimits',[min(epsilon(iss(k),indx))-0.1*abs(min(epsilon(iss(k),indx))),max(epsilon(iss(k),indx))+0.1*abs(max(epsilon(iss(k),indx)))] );
+            hf1.FaceColor=[0.8500, 0.3250, 0.0980]	;
+            hold on
+            hf = fill(etahaty(iss(k))+mean(diff(hf1.BinEdges))*[-0.5 0.5 0.5 -0.5 ],max(hf1.Values)*[0 0 1 1] ,'r');
+            set(hf,'FaceAlpha',0.6)
+            hf.FaceColor=[0, 0.4470, 0.7410];
+            title([M_.exo_names{iss(k)}])
+            if nshock>3
+                set(gca,'Yticklabel',[])
+                set(gca,'Xticklabel',[])
+            end
+            for kj=k+1:nshock
+                for iz=1:2
+                    if iz==1
+                        ax = nexttile(k+(kj-1)*nshock);
+                        plot(ShockVectors(kj,:),ShockVectors(k,:),'.','color',[0.5 0.5 0.5])
+                        hold on
+                    else
+                        ax = nexttile(kj+(k-1)*nshock);
+                    end
+                    for kr=1:number_of_updated_regimes
+                        if is_resampled_regime(kr)
+                            plot(epsilon(iss(kj),indx(ismember(indx,updated_regimes(kr).index))),epsilon(iss(k),indx(ismember(indx,updated_regimes(kr).index))),'.','MarkerEdgeColor',updated_colororder(kr,:))
+                            hold on
+                        end
+                    end
+                    plot(etahaty(iss(kj)),etahaty(iss(k)),'ok')
+                    if nshock>3
+                        set(gca,'Yticklabel',[])
+                        set(gca,'Xticklabel',[])
+                    end
+                end
+            end
+        end
+        if nshock>1
+            lg = legend(ax,[all_updated_regimes(is_resampled_regime) {'PKF'}],'location','eastoutside');
+            lg.Position(1) = 0;
+            lg.Position(2) = 0;
+        end
+        dyn_saveas(hfig(3),[GraphDirectoryName, filesep, M_.fname,'_shocks_t',int2str(t)],nodisplay,options_.graph_format);
+    end
+
+    if isnan(graph_info.hfig(7))
+        hfig(7) = figure;
+        graph_info.hfig(7) = hfig(7);
+    else
+        hfig(7) = graph_info.hfig(7);
+        figure(hfig(7))
+    end
+    clf(hfig(7),'reset')
+    set(hfig(7),'name',['Regime-shock mapping (t=' int2str(t) ')'])
+    ncomb = nchoosek(nshock,2);
+    nrow2=floor(sqrt(ncomb));
+    ncol2=ceil(ncomb/nrow2);
+
+    tlo2=tiledlayout(nrow2,ncol2);
+    title(tlo2,['Regime-shock mapping (t=' int2str(t) ')']);
+    tlo2.TileSpacing = 'tight';
+
+    for ko=1:nshock-1
+        for koo=ko+1:nshock
+            axo = nexttile;
+            for kp=1:number_of_simulated_regimes
+                plot(ShockVectors(iss(ko),simulated_regimes(my_simulated_regime_order(kp)).index),ShockVectors(iss(koo),simulated_regimes(my_simulated_regime_order(kp)).index),'.','MarkerEdgeColor',my_colororder(kp,:))
+                hold on
+            end            
+            plot(etahaty(iss(ko)),etahaty(iss(koo)),'o','MarkerEdgeColor','k')
+            xlabel(M_.exo_names{iss(ko)})
+            ylabel(M_.exo_names{di(koo)})
+        end
+    end
+    mytxt = [all_simulated_regimes(my_simulated_regime_order) 'realised shock'];
+    lgo  = legend(axo,mytxt,'Orientation','Horizontal','NumColumns',2);
+    lgo.Layout.Tile = 'South'; % <-- Legend placement with tiled layout
+    dyn_saveas(hfig(7),[GraphDirectoryName, filesep, M_.fname,'_regime_vs_shock_predictive_mapping_t',int2str(t)],nodisplay,options_.graph_format);
+
+end
+end
+

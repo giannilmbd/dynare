@@ -115,7 +115,7 @@ end
 %------------------------------------------------------------------------------
 is_restrict_state_space = true;
 if options_.occbin.likelihood.status
-    occbin_options = set_occbin_options(options_);
+    [occbin_options, options_.occbin.filter.state_covariance] = set_occbin_options(options_);
     if occbin_options.opts_simul.restrict_state_space
         [T,R,SteadyState,info,dr, M_.params,TTx,RRx,CCx, T0, R0] = ...
             occbin.dynare_resolve(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,[],'restrict');
@@ -875,7 +875,7 @@ if analytic_derivation==0 && nargout>3
     DLIK=[-lnprior; lik(:)];
 end
 
-function occbin_options = set_occbin_options(options_)
+function[occbin_options, occbin_filter_state_covariance] = set_occbin_options(options_)
 
 % this builds the opts_simul options field needed by occbin.solver
 occbin_options.opts_simul = options_.occbin.simul;
@@ -891,3 +891,10 @@ occbin_options.opts_simul.full_output = options_.occbin.likelihood.full_output;
 occbin_options.opts_simul.piecewise_only = options_.occbin.likelihood.piecewise_only;
 occbin_options.opts_regime.init_binding_indicator = options_.occbin.likelihood.init_binding_indicator;
 occbin_options.opts_regime.init_regime_history=options_.occbin.likelihood.init_regime_history;
+
+% this checks particle filter options
+if options_.occbin.filter.init_periods_using_particles || options_.occbin.filter.particle.status
+    occbin_filter_state_covariance= true;
+else
+    occbin_filter_state_covariance= false;
+end

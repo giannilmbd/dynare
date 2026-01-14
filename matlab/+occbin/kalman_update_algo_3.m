@@ -14,8 +14,8 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % - Y:              [N_obs by 2]            observations at t-1:t
 % - H               [N_obs by 1]            vector of measurement error
 % - QQQ             [N_exo by N_exo by 3]   covariance matrix of shocks at t-1:t+1
-% - T0              [N by N]                initial state transition matrix
-% - R0              [N by N_exo]            initial shock impact transition matrix
+% - T0              [N by N]                base regime state transition matrix
+% - R0              [N by N_exo]            base regime shock impact transition matrix
 % - TT              [N by N by 2]           state transition matrix at t-1:t
 % - RR              [N by N_exo by 2]       shock impact matrix at t-1:t
 % - CC              [N by 2]                state space constant state transition matrix at t-1:t
@@ -38,17 +38,17 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % - v               [N_obs by 2]            prediction error on observables at t-1:t
 % - Fi              [N_obs by 2]            F_i matrix
 % - Ki              [N by N_obs by 2]       Kalman gain matrix
-% - TT              [N by N by 2]           state transition matrix at t-1:t
-% - RR              [N by N_exo by 2]       shock impact matrix at t-1:t
-% - CC              [N by 2]                state space constant state transition matrix at t-1:t
+% - T               [N by N by 2]           state transition matrix at t-1:t (restrict var list)
+% - R               [N by N_exo by 2]       shock impact matrix at t-1:t (restrict var list)
+% - C               [N by 2]                state space constant state transition matrix at t-1:t (restrict var list)
 % - regimes_        [structure]             regime info at t-1:t
 % - error_flag      [structure]             error flag
 % - M_              [structure]             MATLAB's structure describing the model (M_).
 % - alphahat:                               smoothed variables (a_{t|T})
 % - etahat:                                 smoothed shocks
-% - TT              [N by N by 2]           state transition matrix at t-1:t
-% - RR              [N by N_exo by 2]       shock impact matrix at t-1:t
-% - CC              [N by 2]                state space constant state transition matrix at t-1:t
+% - TT              [N by N]                state transition matrix at t-1:t (full var list) 
+% - RR              [N by N_exo]            shock impact matrix at t-1:t (full var list)
+% - CC              [N by 1]                state space constant state transition matrix at t-1:t (full var list)
 %
 % Notes: The algorithm and implementation is based on Massimo Giovannini,
 % Philipp Pfeiffer, Marco Ratto (2021), Efficient and robust inference of models with occasionally binding

@@ -4,8 +4,53 @@ function [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphah
 % [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphahat, V, Fix, Kix, TTx,RRx,CCx] = kalman_update_engine(
 %                                       a0,a1,P0,P1,t,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,regimes_,base_regime,d_index,M_,
 %                                       dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options, Fi,Ki,kalman_tol,nk)
+% INPUTS
+% - a               [N by 1]                t-1's state estimate
+% - a1              [N by 2]                state predictions made at t-1:t
+% - P               [N by N]                t-1's covariance of states
+% - P1              [N by N by 2]           one-step ahead forecast error variance at t-1:t
+% - t               [integer]               period
+% - data_index      [cell]                  1*2 cell of column vectors of indices.
+% - Z               [N_obs ny N]            Selector matrix
+% - vv              [N_obs by 2]            prediction error on observables at t-1:t
+% - Y               [N_obs by 2]            observations at t-1:t
+% - H               [N_obs by 1]            vector of measurement error
+% - Qt              [N_exo by N_exo by 3]   covariance matrix of shocks at t-1:t+1
+% - T0              [N by N]                base regime state transition matrix
+% - R0              [N by N_exo]            base regime shock impact transition matrix
+% - TT              [N by N by 2]           state transition matrix at t-1:t (restrict var list)
+% - RR              [N by N_exo by 2]       shock impact matrix at t-1:t (restrict var list)
+% - CC              [N by 2]                state space constant state transition matrix at t-1:t (restrict var list)
+% - regimes_        [struct]                regime info t:t+1 given information up to t-1
+% - base_regime     [struct]                base regime info
+% - d_index         [integer]               column vector of indices of observables in t
+%  ...
+% - Fix             [N_obs by 2]            F_i matrix (univariate algo) covariance of observables given t-1 information
+% - Kix             [N by N_obs by 2]       Kalman gain matrix (univariate algo) given t-1 information
+%
+% Outputs
+% - ax              [N by 2]                t-1:t updated state estimate
+% - a1x             [N by 2]                state predictions made at t-1:t
+% - Px              [N by N by 2]           t-1:t updated covariance of states
+% - P1x             [N by N by 2]           one-step ahead forecast error variance at t-1:t
+% - vx              [N_obs by 2]            prediction error on observables at t-1:t
+% - Tx              [N by N by 2]           state transition matrix at t-1:t (restrict var list) 
+% - Rx              [N by N_exo by 2]       shock impact matrix at t-1:t (restrict var list)
+% - Cx              [N by 2]                state space constant state transition matrix at t-1:t (restrict var list)
+% - regx            [structure]             updated regime info at t:t+2
+% - info            [integer]               error code
+% - M_              [structure]             MATLAB's structure describing the model
+% - likx            [double]                likelihood
+% - etahat:         [N_exo by 2]            smoothed shocks t-1:t|t
+% - alphahat:       [N by 2]                smoothed states t-1:t|t
+% - V:              [N by N by 2]           smoothed states covariance t-1:t|t
+% - Fix             [N_obs by 2]            F_i matrix (univariate algo): covariance of observables
+% - Kix             [N by N_obs by 2]       Kalman gain matrix (univariate algo)
+% - TTx             [N by N by 2]           state transition matrix at t-1:t (full var list)
+% - TRx             [N by N_exo by 2]       shock impact matrix at t-1:t (full var list)
+% - CCx             [N by 2]                state space constant state transition matrix at t-1:t (full var list)
 
-% Copyright © 2023-2025 Dynare Team
+% Copyright © 2023-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

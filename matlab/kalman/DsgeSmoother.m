@@ -9,7 +9,10 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %   o data_index    [cell]      1*smpl cell of column vectors of indices.
 %   o missing_value 1 if missing values, 0 otherwise
 %   o M_            [structure] describing the model
-%   o oo_           [structure] storing the results
+%   o dr            [structure] model information structure
+%   o endo_steady_state       [vector]     steady state value for endogenous variables
+%   o exo_steady_state        [vector]     steady state value for exogenous variables
+%   o exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
 %   o options_      [structure] describing the options
 %   o bayestopt_    [structure] describing the priors
 %   o estim_params_ [structure] characterizing parameters to be estimated

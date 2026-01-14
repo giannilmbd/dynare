@@ -10,7 +10,7 @@ function options_occbin_ = set_default_options(options_occbin_,M_,flag)
 % OUTPUTS
 % - options_occbin_ [structure]     MATLAB's structure describing the current options
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -42,6 +42,25 @@ if ismember(flag,{'all'})
 end
 
 if ismember(flag,{'filter','all'})
+    options_occbin_.filter.particle.draw_states_from_empirical_density = true;
+    options_occbin_.filter.particle.empirical_conditional_data_density.status = false;
+    options_occbin_.filter.particle.empirical_data_density.kernel_density = true;
+    options_occbin_.filter.particle.empirical_data_density.status = false;
+    options_occbin_.filter.particle.ensemble_kalman_filter = false;
+    options_occbin_.filter.particle.state_importance_sampling.logpost_crit_threshold = 5;
+    options_occbin_.filter.particle.state_importance_sampling.pkf_init = true;
+    options_occbin_.filter.particle.state_importance_sampling.slice_override_iteration = 100;
+    options_occbin_.filter.particle.state_importance_sampling.slice_burnin = 10;
+    options_occbin_.filter.particle.initial_state_ergodic_simul = false;
+    options_occbin_.filter.particle.likelihood_only = true;
+    options_occbin_.filter.particle.number_of_particles = 127;
+    options_occbin_.filter.particle.number_of_shocks_per_particle = 1;
+    options_occbin_.filter.particle.nograph = true;
+    options_occbin_.filter.particle.state_draws = [];
+    options_occbin_.filter.particle.status = false;
+    options_occbin_.filter.particle.tobit = false;
+    options_occbin_.filter.particle.use_pkf_updated_state_threshold = 1;
+    options_occbin_.filter.init_periods_using_particles = false;
     options_occbin_.filter.state_covariance = false;
     options_occbin_.filter.guess_regime = false;
     options_occbin_.filter.periodic_solution = true;
@@ -158,6 +177,14 @@ if ismember(flag,{'plot_simul','all'})
     options_occbin_.plot_simul.timeaxis         = [];
     options_occbin_.plot_simul.use_grid         = true;
     
+end
+
+if ismember(flag,{'posterior_importance_sampling','all'})
+    options_occbin_.posterior_importance_sampling.status = false;
+    options_occbin_.posterior_importance_sampling.filter = 'pkf'; % can be pkf or ppf
+    options_occbin_.posterior_importance_sampling.orig_dname = M_.dname;
+    options_occbin_.posterior_importance_sampling.orig_fname = M_.fname;
+    options_occbin_.posterior_importance_sampling.orig_filter = 'linear'; % can be linear or pkf    
 end
 
 if ismember(flag,{'shock_decomp','all'})
