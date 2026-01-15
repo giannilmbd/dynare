@@ -203,6 +203,7 @@ All the prerequisites are packaged:
 - `lmodern` (for macroprocessor PDF)
 - `cm-super` (for BVAR à la Sims and GSA PDFs)
 - `python3-sphinx`
+- `python3-sphinxcontrib.bibtex`
 - `tex-gyre`
 - `latexmk`
 - `libjs-mathjax`
@@ -210,7 +211,7 @@ All the prerequisites are packaged:
 
 You can install them all at once with:
 ```sh
-apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libmatio-dev libslicot-dev libslicot-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx make tex-gyre latexmk libjs-mathjax x13as
+apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libmatio-dev libslicot-dev libslicot-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
 ```
 If you use MATLAB, we strongly advise to also `apt install matlab-support` and confirm to rename the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by your distribution.
 
