@@ -152,6 +152,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
             fprintf('%s: You declared %u blocks, but the previous number of blocks was %u.\n', dispString, NumberOfBlocks, past_number_of_blocks);
             fprintf('%s: I will run the Metropolis-Hastings with %u block.\n', dispString, past_number_of_blocks);
             NumberOfBlocks = past_number_of_blocks;
+            nruns = ones(NumberOfBlocks,1)*options_.mh_replic;
             options_.mh_nblck = NumberOfBlocks;
         end
         if ~isempty(PriorFile0)
@@ -358,6 +359,7 @@ elseif options_.load_mh_file && ~options_.mh_recover
         fprintf('%s: I will run the Metropolis-Hastings with %u blocks.\n', dispString,past_number_of_blocks);
         NumberOfBlocks = past_number_of_blocks;
         options_.mh_nblck = NumberOfBlocks;
+        nruns = ones(NumberOfBlocks,1)*options_.mh_replic;
     end
     % I read the last line of the last mh-file for initialization of the new Metropolis-Hastings simulations:
     LastFileNumber = record.LastFileNumber;
