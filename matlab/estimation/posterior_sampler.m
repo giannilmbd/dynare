@@ -59,6 +59,8 @@ vv = sampler_options.invhess;
 [ ix2, ilogpo2, ModelName, MetropolisFolder, fblck, fline, npar, nblck, nruns, NewFile, MAX_nruns, d, bayestopt_] = ...
     posterior_sampler_initialization(objective_function, xparam1, vv, mh_bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_, dispString);
 
+options_.mh_nblck=nblck; %make sure that stored number of chains is consistent with the one subsequently used (may be altered by mh_recover and mh_load)
+
 InitSizeArray = min([repmat(MAX_nruns,nblck,1) fline+nruns-1],[],2);
 
 % Load last mh history file
