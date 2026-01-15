@@ -115,7 +115,7 @@ if ~isempty(d)
     record.ProposalScaleVec=bayestopt_.jscale;
 end
 
-if ~isoctave && PCTInstalled && ~isempty(gcp('nocreate'))
+if ~isoctave && ~matlab_ver_less_than('24.2') && PCTInstalled && ~isempty(gcp('nocreate'))
     % Parallel pool detected in MATLAB, MCMC can be run in parallel
     p = gcp;
 
