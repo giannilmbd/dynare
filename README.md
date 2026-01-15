@@ -185,7 +185,7 @@ All the prerequisites are packaged:
 - `gcc`
 - `g++`
 - `gfortran`
-- `octave-dev` (or `liboctave-dev` on older Debian/Ubuntu releases)
+- `octave-dev`
 - `libboost-graph-dev`
 - `libgsl-dev`
 - `libmatio-dev`
