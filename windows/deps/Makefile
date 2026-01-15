@@ -148,8 +148,8 @@ GCC_MSYS2_DEPS := \
 	tarballs/mingw-w64-ucrt-x86_64-gcc-libs-$(MSYS2_GCC_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-gmp-$(MSYS2_GMP_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-binutils-$(MSYS2_BINUTILS_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-headers-git-$(MSYS2_HEADERS_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-crt-git-$(MSYS2_CRT_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-ucrt-x86_64-headers-$(MSYS2_HEADERS_VERSION)-any.pkg.tar.zst \
+	tarballs/mingw-w64-ucrt-x86_64-crt-$(MSYS2_CRT_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-winpthreads-$(MSYS2_WINPTHREADS_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-libwinpthread-$(MSYS2_WINPTHREADS_VERSION)-any.pkg.tar.zst \
 	tarballs/mingw-w64-ucrt-x86_64-zlib-$(MSYS2_ZLIB_VERSION)-any.pkg.tar.zst \

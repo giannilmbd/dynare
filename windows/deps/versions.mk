@@ -21,7 +21,7 @@ SUITESPARSE_VERSION = 7.11.0
 
 # pacman -Ss mingw-w64-ucrt-x86_64-boost
 # (also used by the preprocessor CI, so it can be updated there also)
-MSYS2_BOOST_VERSION = 1.89.0-2
+MSYS2_BOOST_VERSION = 1.90.0-2
 
 # pacman -Ss mingw-w64-ucrt-x86_64-gsl
 MSYS2_GSL_VERSION = 2.8-1
@@ -81,7 +81,7 @@ MSYS2_NGHTTP3_VERSION = 1.13.1-1
 # pacman -Ss mingw-w64-ucrt-x86_64-ngtcp2
 MSYS2_NGTCP2_VERSION = 1.18.0-1
 
-# Dependency of libpsl and libunistring (and of the MinGW compiler)
+# Dependency of libpsl and libunistring (and of gettext-runtime for the MinGW compiler)
 # pacman -Ss mingw-w64-ucrt-x86_64-libiconv
 MSYS2_LIBICONV_VERSION = 1.18-1
 
@@ -92,7 +92,7 @@ MSYS2_LIBUNISTRING_VERSION = 1.3-1
 ## Packages for the embedded compiler
 
 # pacman -Ss mingw-w64-ucrt-x86_64-gcc$
-MSYS2_GCC_VERSION = 15.2.0-8
+MSYS2_GCC_VERSION = 15.2.0-9
 
 # Dependency of gcc, isl, mpc and mpfr
 # pacman -Ss mingw-w64-ucrt-x86_64-gmp
@@ -101,14 +101,14 @@ MSYS2_GMP_VERSION = 6.3.0-2
 # pacman -Ss mingw-w64-ucrt-x86_64-binutils
 MSYS2_BINUTILS_VERSION = 2.45.1-1
 
-# pacman -Ss mingw-w64-ucrt-x86_64-headers-git
-MSYS2_HEADERS_VERSION = 13.0.0.r338.gc1c6b0ff3-1
+# pacman -Ss mingw-w64-ucrt-x86_64-headers
+MSYS2_HEADERS_VERSION = 13.0.0.r391.g848cce552-1
 
-# pacman -Ss mingw-w64-ucrt-x86_64-crt-git
-MSYS2_CRT_VERSION = 13.0.0.r338.gc1c6b0ff3-1
+# pacman -Ss mingw-w64-ucrt-x86_64-crt
+MSYS2_CRT_VERSION = 13.0.0.r391.g848cce552-1
 
 # pacman -Ss mingw-w64-ucrt-x86_64-winpthreads
-MSYS2_WINPTHREADS_VERSION = 13.0.0.r338.gc1c6b0ff3-1
+MSYS2_WINPTHREADS_VERSION = 13.0.0.r391.g848cce552-1
 
 # pacman -Ss mingw-w64-ucrt-x86_64-isl
 MSYS2_ISL_VERSION = 0.27-1
