@@ -76,6 +76,7 @@ if ismember(flag,{'forecast','all'})
     options_occbin_.forecast.qmc=0;
     options_occbin_.forecast.replic=0;
     options_occbin_.forecast.SHOCKS0=[];
+    options_occbin_.forecast.waitbar=true;
 end
 
 if ismember(flag,{'irf','all'})    

@@ -415,7 +415,14 @@ for b=fpar:B
         end
         if horizon
             yyyy = alphahat(iendo,i_last_obs);
-            yf = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
+            if options_.occbin.smoother.status
+                M_.endo_histval=yyyy(oo_.dr.inv_order_var);
+                options_.occbin.forecast.replic=0;
+                options_.occbin.simul.waitbar=false;
+                [~, error_flag, yf] = occbin.forecast(options_,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,8);
+            else
+                yf = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
+            end
             if options_.prefilter
                 % add mean
                 yf(:,IdObs) = yf(:,IdObs)+repmat(mean_varobs, ...
@@ -432,7 +439,14 @@ for b=fpar:B
             else
                 yf = yf+repmat(SteadyState',horizon+maxlag,1);
             end
-            yf1 = simulate_posterior_forecasts(yyyy,dr,horizon,true,M_.Sigma_e,1);
+            if options_.occbin.smoother.status
+                options_.occbin.forecast.replic=1;
+                options_.occbin.forecast.qmc=0; % make sure we draw randn
+                options_.occbin.forecast.waitbar=false;
+                [~, error_flag, yf1] = occbin.forecast(options_,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,8);
+            else
+                yf1 = simulate_posterior_forecasts(yyyy,dr,horizon,true,M_.Sigma_e,1);
+            end
             if options_.prefilter == 1
                 % add mean
                 yf1(:,IdObs,:) = yf1(:,IdObs,:)+ ...

@@ -104,4 +104,4 @@ estimation(datafile='datafile',
 	sub_draws = 300,
 	//bayesian_irf,
     filter_covariance, smoothed_state_uncertainty,
-	filtered_vars, smoother, consider_all_endogenous);
+	filtered_vars, smoother, consider_all_endogenous,forecast=8);
