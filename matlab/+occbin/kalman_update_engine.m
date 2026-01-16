@@ -118,7 +118,7 @@ end
 
 
 diffstart=0;
-if info==0
+if info==0 && length(regvec)==1 % only check this if ONE solution is found
     if M_.occbin.constraint_nbr==1
         oldstart = regimes_(1).regimestart(end);
         newstart = regx(1).regimestart(end);
