@@ -11,7 +11,7 @@ function []=graph_decomp(z,shock_names,endo_names,i_var,initial_date,M_,options_
 %   M_              [structure]                     Dynare model structure
 %   options_        [structure]                     Dynare options structure
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -39,8 +39,6 @@ comp_nbr = size(z,2)-1;
 SteadyState=[];
 fig_mode='';
 fig_mode1='';
-% fig_name='';
-% screen_shocks=0;
 opts_decomp = options_.plot_shock_decomp;
 if isfield(opts_decomp,'steady_state')
     SteadyState = opts_decomp.steady_state;
@@ -194,6 +192,12 @@ for j=1:nvar
         ylabel(abs(ylabel)<eps)=0;
         set(ax,'yticklabel',num2str(ylabel,'%4.2g'))
     end
+    
+    if ~isempty(options_.plot_shock_decomp.forecast_length)
+        forecast_init_date = gend-options_.plot_shock_decomp.forecast_length+1.5;
+        hold on, plot([forecast_init_date forecast_init_date],ylim,'-r','linewidth',.5);
+    end
+    
     set(ax,'xlim',[xmin xmax]);
     hold off;
 

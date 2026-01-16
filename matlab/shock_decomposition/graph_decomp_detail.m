@@ -11,7 +11,7 @@ function []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,o
 %   M_              [structure]                     Dynare model structure
 %   options_        [structure]                     Dynare options structure
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -245,7 +245,12 @@ for j=1:nvar
             subplot(nrow,ncol,isub),
             set(gca,'ylim',a0(3:4))
         end
-
+        
+        if ~isempty(options_.plot_shock_decomp.forecast_length)
+            forecast_init_date = gend-options_.plot_shock_decomp.forecast_length+1.5;
+            hold on, plot([forecast_init_date forecast_init_date],ylim,'-r','linewidth',.5);
+        end
+        
         % make legend
         axes('Position',[0.1 0.01 0.8 0.02],'units','normalized');
         axis([0 1 0 1]);

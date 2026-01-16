@@ -1,5 +1,5 @@
 function [out, steady_state] = plot_shock_decomposition(M_,oo_,options_,varlist,get_decomp_only)
-% function plot_shock_decomposition(M_,oo_,options_,varlist)
+% [out, steady_state] = plot_shock_decomposition(M_,oo_,options_,varlist,get_decomp_only)
 % Plots the results of shock_decomposition
 %
 % INPUTS
@@ -9,10 +9,15 @@ function [out, steady_state] = plot_shock_decomposition(M_,oo_,options_,varlist,
 %    varlist:     [char]       List of variables
 %    get_decomp_only    [bool] indicator on whether to only return with
 %                               basic decomposition (required for e.g. annualized_shock_decomposition)
+%
+% OUTPUTS
+%   out
+%   steady_state
+%
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -205,11 +210,17 @@ end
 switch realtime_
     
     case 0
-        if ~expand
-            z = oo_.shock_decomposition;
+        if isempty(options_.shock_decomp.forecast_type)
+            if ~expand
+                z = oo_.shock_decomposition;
+            end
+            fig_name1=fig_name;
+        else
+            if ~expand
+                z = oo_.forecast_shock_decomposition.(options_.shock_decomp.forecast_type);
+            end
+            fig_name1=[fig_name ' ' options_.shock_decomp.forecast_type ' forecast'];
         end
-        fig_name1=fig_name;
-        
     case 1 % realtime
         if vintage_
             if ~expand

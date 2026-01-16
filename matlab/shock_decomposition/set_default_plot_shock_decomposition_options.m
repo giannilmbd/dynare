@@ -11,7 +11,7 @@ function options = set_default_plot_shock_decomposition_options(options)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2017-2019 Dynare Team
+% Copyright © 2017-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -52,4 +52,6 @@ options.plot_shock_decomp.plot_end_date = [];
 options.plot_shock_decomp.diff = false;
 options.plot_shock_decomp.flip = false;
 options.plot_shock_decomp.max_nrows = 6;
+options.shock_decomp.forecast_type=[];
+options.plot_shock_decomp.forecast_length=[];
 end

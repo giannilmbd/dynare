@@ -1,11 +1,12 @@
 function [oo_,M_] = shock_decomposition(M_,oo_,options_,varlist,bayestopt_,estim_params_)
-% function z = shock_decomposition(M_,oo_,options_,varlist)
-% Computes shocks contribution to a simulated trajectory. The field set is
-% oo_.shock_decomposition. It is a n_var by nshock+2 by nperiods array. The
-% first nshock columns store the respective shock contributions, column n+1
-% stores the role of the initial conditions, while column n+2 stores the
-% value of the smoothed variables.  Both the variables and shocks are stored
-% in the order of declaration, i.e. M_.endo_names and M_.exo_names, respectively.
+% shock_decomposition(M_,oo_,options_,varlist,bayestopt_,estim_params_)
+% Computes shocks contribution to a simulated trajectory. The field sets
+% are oo_.shock_decomposition, oo_.forecast_shock_decomposition.
+% Subfields are arrays n_var by nshock+2 by nperiods. The first nshock columns store
+% the respective shock contributions, column n+1 stores the role of the initial
+% conditions, while column n+2 stores the value of the smoothed variables.
+% Both the variables and shocks are stored in the order of declaration,
+% i.e. M_.endo_names and M_.exo_names, respectively.
 %
 % INPUTS
 %    M_:          [structure]  Definition of the model
@@ -23,7 +24,7 @@ function [oo_,M_] = shock_decomposition(M_,oo_,options_,varlist,bayestopt_,estim
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2009-2024 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -57,8 +58,8 @@ if isempty(varlist)
     varlist = M_.endo_names(1:M_.orig_endo_nbr);
 end
 
-[~, ~,index_uniques] = varlist_indices(varlist, M_.endo_names);
-varlist = varlist(index_uniques);
+[i_var,~,index_uniques] = varlist_indices(varlist,M_.endo_names);
+varlist=varlist(index_uniques);
 
 % number of variables
 endo_nbr = M_.endo_nbr;
@@ -81,6 +82,35 @@ if isempty(parameter_set)
     end
 end
 
+if ~isempty(options_.shock_decomp.forecast_type)
+    switch options_.shock_decomp.forecast_type
+        case 'unconditional'
+            if strcmp(parameter_set,'calibration')
+                if ~isfield(oo_, 'forecast')
+                    error('Can''t find unconditional forecasts in oo_.forecasts. Did you run the forecast command?');
+                else
+                    uf = oo_.forecast;
+                end
+            elseif strcmp(parameter_set,'mle_mode')
+                if ~isfield(oo_, 'forecast')
+                    error('Can''t find unconditional forecasts in oo_.forecasts. Did you run ML estimation with the forecast option?');
+                else
+                    uf = oo_.forecast;
+                end
+            else
+                if ~isfield(oo_, 'MeanForecast')
+                    error('Can''t find unconditional forecasts in oo_.MeanForecast. Did you run Bayesian estimation with the forecast option?');
+                else
+                    uf = oo_.MeanForecast;
+                end
+            end
+        case 'conditional'
+            if ~isfield(oo_, 'conditional_forecast')
+                error('Can''t find conditional forecasts');
+            end
+            cf = oo_.conditional_forecast;
+    end
+end
 
 options_.selected_variables_only = 0; %make sure all variables are stored
 options_.plot_priors=0;
@@ -101,14 +131,66 @@ B = dr.ghu;
 
 % initialization
 gend = size(oo_temp.SmoothedShocks.(M_.exo_names{1}),1);
-epsilon=NaN(nshocks,gend);
-for i=1:nshocks
-    epsilon(i,:) = oo_temp.SmoothedShocks.(M_.exo_names{i});
+
+if ~isempty(options_.shock_decomp.forecast_type)
+    smoothed_data_present = false;
+    if ~isempty(options_.dataset) || ~isempty(options_.datafile)
+        smoothed_data_present = true;
+    else
+        gend = 0;
+    end
+    
+    if strcmp(options_.shock_decomp.forecast_type, 'unconditional')
+        options_.plot_shock_decomp.forecast_length = length(uf.Mean.(M_.endo_names{i_var(1)}));
+        gend = gend + options_.plot_shock_decomp.forecast_length;
+    else
+        options_.plot_shock_decomp.forecast_length = length(cf.cond.Mean.(M_.endo_names{i_var(1)}));
+        gend = gend + options_.plot_shock_decomp.forecast_length;
+    end
+    
+    if smoothed_data_present && strcmp(options_.shock_decomp.forecast_type, 'conditional')
+        % initial condition is in the conditional forecast data
+        gend = gend - 1;
+    end
+    
+    % initialization
+    epsilon=zeros(nshocks,gend);
+    z = zeros(endo_nbr,nshocks+2,gend);
+    
+    if smoothed_data_present
+        smoothed_periods = size(Smoothed_Variables_deviation_from_mean,2);
+        for i=1:nshocks
+            epsilon(i,1:smoothed_periods) = oo_temp.SmoothedShocks.(M_.exo_names{i});
+        end
+        z(:,end,1:smoothed_periods) = Smoothed_Variables_deviation_from_mean;
+    end
+    
+    if strcmp(options_.shock_decomp.forecast_type, 'unconditional')
+        for i=1:size(i_var, 1)
+            z(i_var(i),end,smoothed_periods+1:end) = ...
+                uf.Mean.(M_.endo_names{i_var(i)})(:) - dr.ys(i_var(i));
+        end
+    else
+        for i=1:size(i_var, 1)
+            z(i_var(i),end,smoothed_periods+1:end) = ...
+                cf.cond.Mean.(M_.endo_names{i_var(i)})(2:end) - dr.ys(i_var(i));
+        end
+        
+        conditional_periods = length(cf.controlled_exo_variables.Mean.(M_.exo_names{1}));
+        for i=1:nshocks
+            epsilon(i,smoothed_periods+(1:conditional_periods)) = ...
+                cf.controlled_exo_variables.Mean.(M_.exo_names{i});
+        end
+    end
+else
+    epsilon=NaN(nshocks,gend);
+    z = zeros(endo_nbr,nshocks+2,gend);
+    
+    for i=1:nshocks
+        epsilon(i,:) = oo_temp.SmoothedShocks.(M_.exo_names{i});
+    end
+    z(:,end,:) = Smoothed_Variables_deviation_from_mean;
 end
-
-z = zeros(endo_nbr,nshocks+2,gend);
-
-z(:,end,:) = Smoothed_Variables_deviation_from_mean;
 
 maximum_lag = M_.maximum_lag;
 
@@ -136,7 +218,11 @@ if with_epilogue
     [z, oo_.shock_decomposition_info.epilogue_steady_state] = epilogue_shock_decomposition(z, M_, oo_temp);
 end
 
-oo_.shock_decomposition = z;
+if ~isempty(options_.shock_decomp.forecast_type)
+    oo_.forecast_shock_decomposition.(options_.shock_decomp.forecast_type) = z;
+else
+    oo_.shock_decomposition = z;
+end
 
 if ~options_.no_graph.shock_decomposition
     oo_ = plot_shock_decomposition(M_,oo_,options_,varlist);
