@@ -292,9 +292,7 @@ varobs yg inom pi;
     end;
     inx = strmatch('epsi',M_.exo_names);
     if any(isnan(inom))
-        M_.heteroskedastic_shocks.Qscale_orig.periods=find(isnan(inom));
-        M_.heteroskedastic_shocks.Qscale_orig.exo_id=inx;
-        M_.heteroskedastic_shocks.Qscale_orig.scale=0;
+        M_.heteroskedastic_shocks.Qscale_orig = struct('periods', find(isnan(inom)), 'exo_id', inx, 'scale', 0)
     else
         options_.heteroskedastic_filter=false;
     end
