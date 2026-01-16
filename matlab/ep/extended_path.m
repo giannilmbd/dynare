@@ -41,21 +41,15 @@ if ~isempty(M_.perfect_foresight_controlled_paths)
     error('extended_path: command is not compatible with perfect_foresight_controlled_paths block.')
 end
 
-if options_.use_dll 
-    if M_.maximum_lag==0
-        error('extended_path: use_dll option is not supported for purely forward-looking models.')
-    end
-    if M_.maximum_lead==0
-        error('extended_path: use_dll option is not supported for purely backward-looking models.')
-    end
+if M_.maximum_lag==0
+    error('(Stochastic) Extended path is not supported for purely forward-looking models.')
 end
 
-if options_.ep.stochastic.order
-    if M_.maximum_lag==0
-        error('extended_path: stochastic extended path does not yet support purely forward-looking models.')
-    end
-    if M_.maximum_lead==0
-        error('extended_path: stochastic extended path does not yet support purely backward-looking models.')
+if M_.maximum_lead==0
+    if options_.ep.stochastic.order>0
+        error('Stochastic extended path does not support purely backward-looking models.')
+    else
+        options_.ep.periods = 1;
     end
 end
 
