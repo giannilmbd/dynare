@@ -487,13 +487,8 @@ options_.occbin.smoother.periodic_solution      = true;
 options_.noprint = false;
 options_.nograph = false;
 options_.plot_priors = true;
-// make-up init-state params for future use
-M_.occbin.filter_initial_state = cell(M_.endo_nbr, 2);
-for k=1:length(M_.state_var)
-    enam = M_.endo_names{M_.state_var(k)};
-    ipar = find(strcmp([enam 'init'],M_.param_names));
-    M_.occbin.filter_initial_state(M_.state_var(k),:) = {enam, ['M_.params(' int2str(ipar) ');']};
-end
+
+
 estimation(datafile='usdata_pkf', 
 	//lik_init=2,//3, 
 	//lik_init=3, //kalman_algo=4,//kalman_algo=3,
@@ -507,7 +502,7 @@ estimation(datafile='usdata_pkf',
 	posterior_sampling_method='slice', 
 	mh_nblocks=4,
 	mh_drop=0.5, 
-	sub_draws = 100, // set to 600 to use all draws
+	sub_draws = 20, // set to 600 to use all draws
 	//bayesian_irf,
 	presample = 20,
 	nodisplay, 
@@ -522,7 +517,7 @@ estimation(datafile='usdata_pkf',
 //options_.datafile = 'usdata_pkf';
 //cli.evaluate.smoother(xparam1);
      //   identification;    
-load swpkfest_mh_mode.mat
+load swpkfest_mh_mode.mat fval xparam1;
 
 if abs(cli.evaluate.posterior_kernel(xparam1)-fval)>1.e-10
     error('Computed PKF postrior kernel at the mode is not recovered!')

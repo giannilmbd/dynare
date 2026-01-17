@@ -1,12 +1,12 @@
 // ------------------------------------------------------------------------
 //.......................... MODEL CODE ...................................
 // ------------------------------------------------------------------------
-var q r rlag rnot u;    
+var q r rlag ${r^{lag}}$ rnot ${r^{not}}$ u;    
  
-varexo  epsu
-epsr
+varexo  epsu ${\varepsilon_u}$
+epsr ${\varepsilon_r}$
 ;
-parameters betap phip rhop rhor rhou rlb shock_scale_zlb sigmap;
+parameters betap ${\beta_p}$ phip ${\phi_p}$ rhop ${\rho_p}$ rhor ${\rho_r}$ rhou ${\rho_u}$ rlb $\bar u$ shock_scale_zlb sigmap ${\sigma_p}$;
 betap   = 0.99;
 phip    = 0.2;
 rhop    = 0.5;
@@ -15,6 +15,7 @@ rhou    = 0;
 rlb     = -(1/betap-1);
 shock_scale_zlb =1;
 sigmap  = 5;
+
 model;
     [name = 'Asset price']
     q = betap*(1-rhop)*q(1)+rhop*q(-1)-sigmap*r+u;
@@ -49,6 +50,10 @@ end;
 occbin_constraints;
     name 'zlb'; bind rnot<=rlb;
 end;
+
+write_latex_dynamic_model;
+write_latex_original_model;
+write_latex_parameter_table;
 // ------------------------------------------------------------------------
 //.......................... COMPUTATIONS .................................
 // ------------------------------------------------------------------------
@@ -87,11 +92,11 @@ steady;
 check;
 // Estimation
 // -----------------------------
-
+options_.TeX=true;
 estimation(datafile='datafile', 
     order=1,
 	use_univariate_filters_if_singularity_is_detected=0,
-	mh_replic=5, 
+	mh_replic=2, 
 	load_mh_file, 
 	mode_compute=0, 
 	posterior_sampling_method='slice', 
