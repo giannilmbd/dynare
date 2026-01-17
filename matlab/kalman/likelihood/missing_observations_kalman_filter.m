@@ -73,7 +73,7 @@ if isequal(H,0)
 end
 
 P=tril(P)+transpose(tril(P,-1)); % make sure P is symmetric
-[LastSeeds.Unifor, LastSeeds.Normal] = get_dynare_random_generator_state();
+[LastSeeds.Unifor, LastSeeds.Normal] = get_dynare_random_generator_state(); % make sure that consistent seed for Particle Filter is used 
 % Set seed for randn().
 set_dynare_seed('default');
 
@@ -165,6 +165,8 @@ if occbin_.status && isfield(options_,'likelihood_base_value') && not(isempty(op
         likUB = max_data_density(likUB, t, start, last, options_, P, Q, R, T, H, data_index, Zflag, Z, kalman_tol, rescale_prediction_error_covariance, no_more_missing_observations, riccati_tol, isqvec);
     end
 end
+
+use_pkf_=false(1,last);
 
 while notsteady && t<=last
     if occbin_.status
@@ -315,7 +317,7 @@ while notsteady && t<=last
                 likx= inf;
             end
             if options_.occbin.filter.init_periods_using_particles || options_.occbin.filter.particle.status
-                [StateVector,liky, updated_regimes, updated_sample, updated_mode, use_pkf_distribution, infoy] = ...
+                [StateVector,liky, ~, ~, ~, use_pkf_distribution, infoy] = ...
                     occbin.ppf.engine(StateVector, likx, a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),a1x,Px,P1x, alphahaty, etahaty,V,t, ...
                     data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t), ...
                     info,regimes_(t:t+1),base_regime,regx,isqvec, ...
