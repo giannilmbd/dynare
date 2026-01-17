@@ -274,7 +274,7 @@ end
 
 if not(options_.nograph)
     OutputDirectoryName = CheckPath('graphs',M_.dname);
-    TeX     = false; %options_.TeX;
+    TeX = options_.TeX;
     MaxNumberOfPlotPerFigure = 9;% The square root must be an integer!
     nn = sqrt(MaxNumberOfPlotPerFigure);
 
