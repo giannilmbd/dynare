@@ -109,6 +109,7 @@ zreal = zeros(endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options
 zcond = zeros(endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs);
 
 options_.selected_variables_only = 0; %make sure all variables are stored
+options_.nograph=true;
 options_.plot_priors=0;
 init=1;
 nobs = options_.nobs;

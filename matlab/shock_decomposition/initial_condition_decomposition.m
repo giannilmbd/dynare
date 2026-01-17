@@ -98,6 +98,7 @@ if ~isfield(oo_,'initval_decomposition') || isequal(varlist,0)
     end
     with_epilogue = options_.initial_condition_decomp.with_epilogue;
     options_.selected_variables_only = 0; %make sure all variables are stored
+    options_.nograph=true;
     options_.plot_priors=0;
     [oo_local,~,~,~,Smoothed_Variables_deviation_from_mean] = evaluate_smoother(parameter_set,varlist,M_,oo_,options_,bayestopt_,estim_params_);
 

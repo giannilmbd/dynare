@@ -24,7 +24,7 @@ function [oo_,M_] = shock_decomposition(M_,oo_,options_,varlist,bayestopt_,estim
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright Â© 2009-2026 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -113,6 +113,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
 end
 
 options_.selected_variables_only = 0; %make sure all variables are stored
+options_.nograph=true;
 options_.plot_priors=0;
 [oo_temp, ~, ~, ~, Smoothed_Variables_deviation_from_mean, initial_date] = evaluate_smoother(parameter_set, varlist, M_, oo_, options_, bayestopt_, estim_params_);
 
