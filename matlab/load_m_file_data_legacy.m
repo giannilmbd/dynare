@@ -17,8 +17,11 @@ function o2WysrOISH  = load_m_file_data_legacy(datafile, U7ORsJ0vy3)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-cXDHdrXnqo5KwwVpTRuc6OprAW = datafile(1:end-2);
-[pathtocXDHdrXnqo5KwwVpTRuc6OprAW,cXDHdrXnqo5KwwVpTRuc6OprAW] = fileparts(cXDHdrXnqo5KwwVpTRuc6OprAW);
+[pathtocXDHdrXnqo5KwwVpTRuc6OprAW,cXDHdrXnqo5KwwVpTRuc6OprAW,cXDHdrXnqo5KwwVpTRuc6OprAW_ext] = fileparts(datafile);
+
+if ~strcmp(cXDHdrXnqo5KwwVpTRuc6OprAW_ext,'.m')
+    error('You did not provide a .m file as the datafile.')    
+end
 
 if ~isempty(pathtocXDHdrXnqo5KwwVpTRuc6OprAW)
     % We need to change directory, first we keep the current directory in memory...
@@ -60,9 +63,9 @@ for uAiwEPcc3Q=1:length(U7ORsJ0vy3)
     end
 end
 if ~isempty(N5L9sgRHIu)
-    N5L9sgRHIu = sprintf('%s ', N5L9sgRHIu{:});
-    N5L9sgRHIu = N5L9sgRHIu(1:end-1);
-    error('Observed variables should be provided as vectors (%s are not vectors)!')
+    N5L9sgRHIu = sprintf('%s, ', N5L9sgRHIu{:});
+    N5L9sgRHIu = N5L9sgRHIu(1:end-2);
+    error('Observed variables should be provided as vectors (%s are not vectors)!',N5L9sgRHIu)
 end
 
 % Check that all the vectors have the same number of elements.
