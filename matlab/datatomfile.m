@@ -5,9 +5,9 @@ function datatomfile (s, var_list, names)
 % or STOCH_SIMUL commands.
 %
 % INPUTS
-%  - s:              data file name
-%  - var_list:       vector of selected endogenous variables
-%  - names:          vector of strings (alternative names for the endogenous variables in the data file)
+%  - s:           [string]   data file name
+%  - var_list:    [cell]     vector of selected endogenous variables
+%  - names:       [cell]     vector of alternative names for the endogenous variables in the data file
 %
 % OUTPUTS
 % none
@@ -17,7 +17,7 @@ function datatomfile (s, var_list, names)
 % provided, all the variables as defined in M_.endo_names will be saved in
 % the generated m file.
 
-% Copyright © 2001-2020 Dynare Team
+% Copyright © 2001-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -36,18 +36,38 @@ function datatomfile (s, var_list, names)
 
 global M_ oo_
 
+if isempty(oo_.endo_simul)
+    error('datatomfile: oo_.endo_simul is empty. Check why the simulation failed.')
+end
+
+%construct .m file name, depending on whether user already provided file
+%ending
+[~,~,s_ext] = fileparts(s);
+
+if isempty(s_ext)
+    sm=[s,'.m'];
+else
+    if ~strcmp(s_ext,'.m')
+        error('You did not provide a .m file as name of the datafile.')
+    else
+        sm=s;
+    end
+end
+
 % Open the data file.
-sm=[s,'.m'];
 fid=fopen(sm,'w') ;
 
 if nargin < 2 || isempty(var_list)
     var_list = M_.endo_names(1:M_.orig_endo_nbr);
 end
 
-n = length(var_list);
-
+if ischar(var_list) %make robust against wrong input type
+    var_list=cellstr(var_list);
+end
 if nargin==3
-    names = cellstr(names);
+    if ischar(names) %make robust against wrong input type
+        names = cellstr(names);
+    end
     n = length(names);
     if ~isequal(length(var_list), n)
         error('datatomfile:: Second and third arguments must have the same number of rows (variables)!')
