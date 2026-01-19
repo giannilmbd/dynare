@@ -97,7 +97,7 @@ if ischar(parameters)
         disp('                     ''prior_mode'' or')
         disp('                     ''prior_mean''.')
         disp('                     ''calibration''.')
-        error
+        error('evaluate_smoother: unknown parameter_set option %s.',parameters)
     end
 end
 
