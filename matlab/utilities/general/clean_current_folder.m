@@ -29,7 +29,11 @@ for i = 1:length(a)
         rmdir(basename,'s');
     end
     if isfolder(['+',basename])
-        [~,~]=rmdir(['+', basename],'s');
+        try
+            [~,~]=rmdir(['+', basename],'s');
+        catch
+            warning('Unable to remove folder',['+', basename])
+        end
     end
     if isfile([basename '_steadystate.m'])
         movefile([basename '_steadystate.m'],['protect_' basename '_steadystate.m']);
