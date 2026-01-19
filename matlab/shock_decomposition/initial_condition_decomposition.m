@@ -84,6 +84,7 @@ if isempty(parameter_set)
         error(['shock_decomposition: option parameter_set is not specified ' ...
                'and posterior mode is not available'])
     end
+    options_.parameter_set=parameter_set; %store local copy to make sure subsequently called routines use same value
 end
 
 if ~isfield(oo_,'initval_decomposition') || isequal(varlist,0)
@@ -149,6 +150,7 @@ if ~isfield(oo_,'initval_decomposition') || isequal(varlist,0)
         end
     end
     oo_.initval_decomposition = z;
+    oo_.shock_decomposition_info.initval_decomposition.parameter_set=options_.parameter_set;
 end
 
 % when varlist==0, we only store results in oo_ and do not make any plot
@@ -157,6 +159,8 @@ if ~isequal(varlist,0)
     % if ~options_.no_graph.shock_decomposition
     oo_local=oo_;
     oo_local.shock_decomposition = oo_.initval_decomposition;
+    oo_local.shock_decomposition_info.initval_decomposition.parameter_set=oo_local.shock_decomposition_info.initval_decomposition.parameter_set;
+
     if ~isempty(init2shocks)
         init2shocks = M_.init2shocks.(init2shocks);
         n=size(init2shocks,1);

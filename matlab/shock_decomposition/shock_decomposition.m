@@ -80,6 +80,7 @@ if isempty(parameter_set)
         error(['shock_decomposition: option parameter_set is not specified ' ...
                'and posterior mode is not available'])
     end
+    options_.parameter_set=parameter_set; %store local copy to make sure subsequently called routines use same value
 end
 
 if ~isempty(options_.shock_decomp.forecast_type)
@@ -221,8 +222,10 @@ end
 
 if ~isempty(options_.shock_decomp.forecast_type)
     oo_.forecast_shock_decomposition.(options_.shock_decomp.forecast_type) = z;
+    oo_.shock_decomposition_info.forecast.(options_.shock_decomp.forecast_type).parameter_set=options_.parameter_set;
 else
     oo_.shock_decomposition = z;
+    oo_.shock_decomposition_info.parameter_set=options_.parameter_set;
 end
 
 if ~options_.no_graph.shock_decomposition

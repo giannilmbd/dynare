@@ -80,6 +80,7 @@ if isempty(parameter_set)
         error(['realtime_shock_decomposition: option parameter_set is not specified ' ...
                'and posterior mode is not available'])
     end
+    options_.parameter_set=parameter_set; %store local copy to make sure subsequently called routines use same value
 end
 
 presample = max(1,options_.presample-1);
@@ -309,6 +310,7 @@ for j=presample+1:nobs
         if ismember(j,save_realtime)
             oo_.realtime_forecast_shock_decomposition.(['time_' int2str(j)]) = ...
                 ootmp.realtime_forecast_shock_decomposition.(['time_' int2str(j)]);
+
         end
         if j>forecast_+presample
             %% realtime conditional shock decomp k step ahead
@@ -323,6 +325,7 @@ for j=presample+1:nobs
             if ismember(j-forecast_,save_realtime)
                 oo_.realtime_conditional_shock_decomposition.(['time_' int2str(j-forecast_)]) = ...
                     ootmp.realtime_conditional_shock_decomposition.(['time_' int2str(j-forecast_)]);
+                oo_.shock_decomposition_info.realtime_conditional_shock_decomposition.parameter_set=options_.parameter_set;
             end
             if j==nobs
                 for my_forecast_=(forecast_-1):-1:1
@@ -337,6 +340,7 @@ for j=presample+1:nobs
                     if ismember(j-my_forecast_,save_realtime)
                         oo_.realtime_conditional_shock_decomposition.(['time_' int2str(j-my_forecast_)]) = ...
                             ootmp.realtime_conditional_shock_decomposition.(['time_' int2str(j-my_forecast_)]);
+                        oo_.shock_decomposition_info.realtime_conditional_shock_decomposition.parameter_set=options_.parameter_set;
                     end
                 end
             end
@@ -355,9 +359,12 @@ for j=presample+1:nobs
     init=0;
 end
 oo_.realtime_shock_decomposition.pool = zreal;
+oo_.shock_decomposition_info.realtime_shock_decomposition.parameter_set=options_.parameter_set;
 oo_.conditional_shock_decomposition.pool = zcond;
+oo_.shock_decomposition_info.conditional_shock_decomposition.parameter_set=options_.parameter_set;
 if forecast_
     oo_.realtime_forecast_shock_decomposition.pool = zfrcst;
+    oo_.shock_decomposition_info.realtime_forecast_shock_decomposition.parameter_set=options_.parameter_set;
 end
 oo_.gui.ran_realtime_shock_decomposition = true;
 

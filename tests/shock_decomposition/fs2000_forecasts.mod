@@ -35,7 +35,7 @@ shock_decomposition(forecast_type=conditional,parameter_set=calibration) gy_obs 
 
 // Metropolis replications are too few, this is only for testing purpose
 estimation(order=1,datafile=fsdat_simul,nobs=192,mh_replic=2000,mh_nblocks=1,mh_jscale=0.8,forecast=50,silent_optimizer,plot_priors=0) gy_obs gp_obs;
-shock_decomposition(forecast_type=unconditional) gy_obs gp_obs;
+shock_decomposition(forecast_type=unconditional,parameter_set=posterior_mean) gy_obs gp_obs;
 
 conditional_forecast_paths;
 var gy_obs;
@@ -48,7 +48,7 @@ end;
 
 conditional_forecast(periods=50, parameter_set=posterior_mean, controlled_varexo=(e_a,e_m));
 plot_conditional_forecast(periods=50) gy_obs gp_obs;
-shock_decomposition(forecast_type=conditional) gy_obs gp_obs;
+shock_decomposition(forecast_type=conditional,parameter_set=posterior_mean) gy_obs gp_obs;
 collect_latex_files;
 
 [status, cmdout]=system(['pdflatex -halt-on-error -interaction=nonstopmode ' M_.fname '_TeX_binder.tex']);

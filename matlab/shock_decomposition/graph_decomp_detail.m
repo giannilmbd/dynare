@@ -1,9 +1,10 @@
-function []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,options_)
-% []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,options_)
+function []=graph_decomp_detail(z,parameter_set,shock_names,endo_names,i_var,initial_date,M_,options_)
+% []=graph_decomp_detail(z,parameter_set,shock_names,endo_names,i_var,initial_date,M_,options_)
 % Plots the results from the shock_decomposition command
 %
 % Inputs
 %   z               [n_var*(nshock+2)*nperiods]     shock decomposition array, see shock_decomposition.m for details
+%   parameter_set   [string]                        parameter set at which the decomposition was conducted
 %   shock_names     [endo_nbr*string length]        shock names from M_.exo_names
 %   endo_names      [exo_nbr*string length]         variable names from M_.endo_names
 %   i_var           [n_var*1]                       vector indices of requested variables in M_.endo_names and z
@@ -80,8 +81,10 @@ fig_name=strrep(fig_name, '.', '');
 fig_name=strrep(fig_name, '-', '');
 fig_name=strrep(fig_name, ')', '');
 fig_name=strrep(fig_name, '(', '');
+fig_name=[fig_name '_' parameter_set];
 % fig_name1 = [fig_name];
 % fig_name = [fig_name '_'];
+parameter_set_string=get_parameter_set_name(parameter_set);
 
 gend = size(z,3);
 if isempty(initial_date)
@@ -178,7 +181,7 @@ for j=1:nvar
         continue
     end
     for jf = 1:nfigs
-        fhandle = dyn_figure(options_.plot_shock_decomp.nodisplay,'Name',[preamble_txt fig_name_long strrep(fig_mode1, '_', ' ') ': ' endo_names{i_var(j)} ' (detail).'],'position',[200 100 650 850], 'PaperPositionMode', 'auto','PaperOrientation','portrait','renderermode','auto');
+        fhandle = dyn_figure(options_.plot_shock_decomp.nodisplay,'Name',[preamble_txt fig_name_long strrep(fig_mode1, '_', ' ') ' (' parameter_set_string '): ' endo_names{i_var(j)} ' (detail).'],'position',[200 100 650 850], 'PaperPositionMode', 'auto','PaperOrientation','portrait','renderermode','auto');
         a0=zeros(1,4);
         a0(3)=inf;
         a0(4)=-inf;
@@ -284,7 +287,7 @@ for j=1:nvar
                 fprintf(fidTeX,'\\centering \n');
                 fprintf(fidTeX,'\\includegraphics[width=0.8\\textwidth]{%s/graphs/%s%s}\n',M_.fname,M_.fname,[preamble_figname endo_names{i_var(j)} fig_mode1 fig_name suffix]);
                 fprintf(fidTeX,'\\label{Fig:shock_decomp_detail:%s}\n',[fig_mode endo_names{i_var(j)} fig_name suffix]);
-                fprintf(fidTeX,['\\caption{' preamble_txt fig_name_long strrep(fig_mode1, '_',  ' ') ': $ %s $ (detail).}\n'], M_.endo_names_tex{i_var(j)});
+                fprintf(fidTeX,['\\caption{' preamble_txt fig_name_long strrep(fig_mode1, '_',  ' ') ' (' parameter_set_string '): $ %s $ (detail).}\n'], M_.endo_names_tex{i_var(j)});
                 fprintf(fidTeX,'\\end{figure}\n');
                 fprintf(fidTeX,' \n');
             end
