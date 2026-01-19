@@ -38,6 +38,10 @@ if nargin<6
     field1='posterior_';
 end
 
+if ~exist('estim_params_','var') || ~isfield(estim_params_,'nvx')
+    error('get_posterior_parameters: unable to load posterior parameters. Did you run estimation before?')
+end
+
 xparam = zeros(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1);
 ip = 1; % initialize index in xparam
 
