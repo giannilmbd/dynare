@@ -25,6 +25,9 @@ for i = 1:length(a)
     if isfile([basename '.log'])
         delete([basename '.log']);
     end
+    if isfile([basename '_TeX_binder.tex'])
+        delete([basename '_TeX_binder.*']);
+    end
     if isfolder(basename)
         rmdir(basename,'s');
     end
@@ -38,7 +41,6 @@ for i = 1:length(a)
     if isfile([basename '_steadystate.m'])
         movefile([basename '_steadystate.m'],['protect_' basename '_steadystate.m']);
     end
-    delete([basename '_*'])
     if isfile(['protect_' basename '_steadystate.m'])
         movefile(['protect_' basename '_steadystate.m'],[basename '_steadystate.m']);
     end
