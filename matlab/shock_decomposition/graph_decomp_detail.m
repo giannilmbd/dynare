@@ -32,11 +32,10 @@ function []=graph_decomp_detail(z,parameter_set,shock_names,endo_names,i_var,ini
 if ~options_.plot_shock_decomp.expand
     GraphDirectoryName = CheckPath('graphs',M_.dname);
 end
-% interactive = 0;
+
 fig_mode='';
 fig_mode1='';
-% fig_name='';
-% screen_shocks=0;
+
 initval = options_.plot_shock_decomp.initval;
 use_shock_groups = options_.plot_shock_decomp.use_shock_groups;
 if use_shock_groups
@@ -67,10 +66,8 @@ if ~isempty(options_.plot_shock_decomp.use_shock_groups) || comp_nbr<=18
     screen_shocks=0;
 end
 fig_name_long = opts_decomp.fig_name;
-%         fig_name = ['_' fig_name];
 
 if screen_shocks
-    %     fig_name1 = [fig_name1 '_screen'];
     fig_name_long = [fig_name_long ' SCREEN'];
 end
 
@@ -82,8 +79,7 @@ fig_name=strrep(fig_name, '-', '');
 fig_name=strrep(fig_name, ')', '');
 fig_name=strrep(fig_name, '(', '');
 fig_name=[fig_name '_' parameter_set];
-% fig_name1 = [fig_name];
-% fig_name = [fig_name '_'];
+
 parameter_set_string=get_parameter_set_name(parameter_set);
 
 gend = size(z,3);
@@ -104,7 +100,7 @@ if floor(length(ind_yrs)/3)
 else
     xind_tick = x(ind_yrs(1)):dind_tick:x(ind_yrs(end))+(length(ind_yrs)-(dind_tick+1));
 end
-% xind_tick = floor(x(1))-floor(dind_tick/2):dind_tick:ceil(x(end))+ceil(dind_tick/2);
+
 if abs(floor(x(1))-xind_tick(1))-abs(ceil(x(end))-xind_tick(end))>1
     xind_tick = xind_tick-1;
 end
@@ -114,9 +110,6 @@ end
 if length(xind_tick)==gend
     xind_tick = x(2:end);
 end
-% xind_tick = [x(ind_yrs(1))-floor(dind_tick/2):dind_tick:x(ind_yrs(end))+floor(dind_tick/2)]+1;
-% xind_tick = x(ind_yrs(1))-1:dind_tick:x(ind_yrs(end))+1;
-% xind_tick = x(ind_yrs(1))-1:dind_tick:x(ind_yrs(end))+dind_tick;
 
 nvar = length(i_var);
 
@@ -154,7 +147,7 @@ if ~(screen_shocks && comp_nbr>18)
     screen_shocks=0;
 end
 comp_nbr0=comp_nbr;
-%%plot decomposition
+%% plot decomposition
 for j=1:nvar
     z1 = squeeze(z(i_var(j),:,:));
     if screen_shocks
@@ -264,7 +257,6 @@ for j=1:nvar
         mylabels = {'Individual contrib.','Residual contrib.'};
 
         for i=1:2
-            %     for i=1:comp_nbr
             hl = fill([x1 x1 x1+0.3*width x1+0.3*width],[0 1 1 0],i);
             hold on
             ht = text(x1+0.4*width,0.3,mylabels{i},'Interpreter','none');

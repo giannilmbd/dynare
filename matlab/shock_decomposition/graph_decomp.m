@@ -123,7 +123,7 @@ if ~(screen_shocks && comp_nbr>18)
     screen_shocks=0;
 end
 comp_nbr0=comp_nbr;
-%%plot decomposition
+%% plot decomposition
 for j=1:nvar
     z1 = squeeze(z(i_var(j),:,:));
     if screen_shocks
@@ -151,8 +151,6 @@ for j=1:nvar
     screensize = get( groot, 'Screensize' );
     set(fhandle,'OuterPosition' ,[50 50 min(1500,screensize(3)-50) min(750,screensize(4)-50)])
     ax=axes('Position',[0.1 0.1 0.6 0.8],'box','on');
-    %     plot(ax,x(2:end),z1(end,:),'k-','LineWidth',2)
-    %     axis(ax,[xmin xmax ymin ymax]);
     if strcmp('aoa',options_.plot_shock_decomp.type)
         bgap = 0.15;
     else
@@ -160,7 +158,6 @@ for j=1:nvar
     end
     hold on;
     for i=1:gend
-        i_1 = i-1;
         yp = 0;
         ym = 0;
         for k = 1:comp_nbr
@@ -182,8 +179,8 @@ for j=1:nvar
             plot(ax,[xmin xmax],SteadyState(i_var(j))*[-1 -1],'k--','linewidth',1)
             ytick=get(ax,'ytick');
             ytick1=ytick-SteadyState(i_var(j));
-            ind1=min(find(ytick1>=ymin));
-            ind2=max(find(ytick1<=ymax));
+            ind1=find(ytick1>=ymin, 1 );
+            ind2=find(ytick1<=ymax, 1, 'last' );
             dytick=ytick(2)-ytick(1);
             if ind1>1
                 ytick1  = [ytick1(ind1:end) ytick1(end)+dytick:dytick:ymax];
@@ -215,7 +212,6 @@ for j=1:nvar
     height = 1/comp_nbr;
 
     for i=comp_nbr:-1:1
-        %     for i=1:comp_nbr
         hl = fill([0 0 0.2 0.2],[y1 y1+0.7*height y1+0.7*height y1],i);
         hold on
         ht = text(0.3,y1+0.3*height,labels(i,:),'Interpreter','none');
