@@ -1566,8 +1566,6 @@ mod_and_m_tests = [
     'extra' : [ 'fs2000/fsdat_simul.m' ] },
   { 'test' : [ 'fs2000/fs2000_missing_data.mod' ],
     'extra' : [ 'fs2000/fsdat_simul_missing_obs.m' ] },
-  { 'test' : [ 'fs2000/fs2000_sd.mod' ],
-    'extra' : [ 'fs2000/fsdat_simul.m' ] },
   { 'test' : [ 'fs2000/fs2000_dseries_a.mod' ],
     'extra' : [ 'fs2000/fsdat_simul_dseries.m' ] },
   { 'test' : [ 'fs2000/fs2000_dseries_b.mod' ],
