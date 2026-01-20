@@ -1,3 +1,5 @@
+// --+ options: stochastic
+
 var y pie r;
 varexo e_y e_pie;
 
@@ -29,16 +31,31 @@ steady;
 
 // Extended path simulation
 options_.ep.order = 0;
-[ts,oo_] = extended_path([], 100, [], options_, M_, oo_);
+[ts, oo_] = extended_path([], 100, [], options_, M_, oo_);
 if ~oo_.extended_path.status
-   error('extended path algorithm failed in ./tests/ep/linearmodel1.mod')
+   error('Extended path algorithm failed in ep/linearmodel1.mod')
 end
 
-// Stochastic extended path simulation
+// Stochastic extended path simulation (should be identical to extended path because the model is linear)
 options_.ep.order = 1;
-[sts,oo_] = extended_path([], 100, [], options_, M_, oo_);
+[sts, oo_] = extended_path([], 100, [], options_, M_, oo_);
+if ~oo_.extended_path.status
+   error('Stochastic extended path simulation failed in ep/linearmodel1.mod')
+end
 
 // The generated paths should be identical (because the model is linear)
-if max(max(abs(ts.data-sts.data))) > 1e-12 || ~oo_.extended_path.status
-   error('extended path algorithm fails in ./tests/ep/linearmodel1.mod')
+if max(max(abs(ts.data-sts.data))) > 1e-12
+   error('Stochastic extended path simulation are wrong in ep/linearmodel1.mod')
+end
+
+// Stochastic extended path simulation (should be identical to extended path because the model is linear, hybrid correction )
+options_.ep.hybrid = 2;
+[sts, oo_] = extended_path([], 100, [], options_, M_, oo_);
+if ~oo_.extended_path.status
+   error('Stochastic extended path (hybrid) simulation failed in ep/linearmodel1.mod')
+end
+
+// The generated paths should be identical (because the model is linear)
+if max(max(abs(ts.data-sts.data))) > 1e-12
+   error('Stochastic extended path (hybrid) simulation are wrong in ep/linearmodel1.mod')
 end

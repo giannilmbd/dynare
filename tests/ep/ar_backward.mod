@@ -8,6 +8,7 @@ parameters rho, effstar, sigma;
 ** Calibration
 */
 
+
 rho     =  0.950;
 effstar =  1.000;
 sigma   =  0.1;
@@ -31,6 +32,10 @@ efficiency=0;
 Efficiency=effstar;
 end;
 
-steady;
+steady(nocheck);
 
-extended_path(order=1,periods=100); // Should fail because it makes no sense to integrate with respect to future shocks in a backward-looking model.
+extended_path(order=0,periods=100);
+
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in ep/ar_backward.mod')
+end
