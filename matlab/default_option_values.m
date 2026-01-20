@@ -217,7 +217,7 @@ ep.replic_nbr = 1;
 % Parallel execution of replications
 ep.parallel = false;
 % Stochastic extended path related options.
-ep.stochastic.IntegrationAlgorithm = 'Tensor-Gaussian-Quadrature'; % Other possible values are 'Stroud-Cubature-3' and 'Stroud-Cubature-5'
+ep.stochastic.IntegrationAlgorithm = 'Tensor-Gaussian-Quadrature'; % Other possible values are 'Stroud-Cubature-5' and 'Unscented'
 ep.stochastic.method = '';
 ep.stochastic.algo = 0;
 ep.stochastic.order = 0;
