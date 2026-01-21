@@ -2472,9 +2472,9 @@ if get_option('build_for') == 'matlab'
   base_test_driver_args += [ matlab_exe.full_path(), matlab_version, matlab_arch, '' ]
 else
   base_test_driver_args += [ octave_exe.full_path(), octave_version, '' ]
-  wlheadless_run_exe = find_program('wlheadless-run', required : false)
-  if wlheadless_run_exe.found()
-    base_test_driver_args += wlheadless_run_exe.full_path()
+  xwfb_run_exe = find_program('xwfb-run', required : false)
+  if xwfb_run_exe.found()
+    base_test_driver_args += xwfb_run_exe.full_path()
   else
     base_test_driver_args += ''
   endif
