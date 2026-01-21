@@ -2469,15 +2469,9 @@ mod_and_m_tests = [
 
 base_test_driver_args = [ get_option('build_for') ]
 if get_option('build_for') == 'matlab'
-  base_test_driver_args += [ matlab_exe.full_path(), matlab_version, matlab_arch, '' ]
+  base_test_driver_args += [ matlab_exe.full_path(), matlab_version, matlab_arch ]
 else
   base_test_driver_args += [ octave_exe.full_path(), octave_version, '' ]
-  xwfb_run_exe = find_program('xwfb-run', required : false)
-  if xwfb_run_exe.found()
-    base_test_driver_args += xwfb_run_exe.full_path()
-  else
-    base_test_driver_args += ''
-  endif
 endif
 base_test_driver_args += [ meson.current_source_dir(), meson.current_build_dir() ]
 

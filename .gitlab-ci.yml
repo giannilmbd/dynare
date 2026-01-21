@@ -206,7 +206,12 @@ test_octave:
   variables:
     OPENBLAS_NUM_THREADS: 1
   script:
-    - meson test -C build-octave --no-rebuild
+    # We use xwfb-run rather than wlheadless-run, because as of Octave 10, the
+    # Qt graphics backend is not available (i.e. not listed in
+    # available_graphics_toolkit) under a pure headless Wayland environment
+    # such as our CI runners. In other words, an X11 environment is still
+    # needed even for the Qt graphics backend.
+    - xwfb-run -- meson test -C build-octave --no-rebuild
   artifacts:
     paths:
       - build-octave/meson-logs/testlog.txt
