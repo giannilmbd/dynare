@@ -125,7 +125,7 @@ for i=1:npar
             pmod = oo_.posterior_mode.init_state.(name);
         end
     else % estimated structural parameters (ordered last in xparam1)
-        j = i - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx++estim_params_.nendoinit);
+        j = i - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit);
         name = M_.param_names{estim_params_.param_vals(j,1)};
         x1 = oo_.posterior_density.parameters.(name)(:,1);
         f1 = oo_.posterior_density.parameters.(name)(:,2);
