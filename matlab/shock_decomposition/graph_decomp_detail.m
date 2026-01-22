@@ -1,9 +1,10 @@
-function []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,options_)
-% []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,options_)
+function []=graph_decomp_detail(z,parameter_set,shock_names,endo_names,i_var,initial_date,M_,options_)
+% []=graph_decomp_detail(z,parameter_set,shock_names,endo_names,i_var,initial_date,M_,options_)
 % Plots the results from the shock_decomposition command
 %
 % Inputs
 %   z               [n_var*(nshock+2)*nperiods]     shock decomposition array, see shock_decomposition.m for details
+%   parameter_set   [string]                        parameter set at which the decomposition was conducted
 %   shock_names     [endo_nbr*string length]        shock names from M_.exo_names
 %   endo_names      [exo_nbr*string length]         variable names from M_.endo_names
 %   i_var           [n_var*1]                       vector indices of requested variables in M_.endo_names and z
@@ -11,7 +12,7 @@ function []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,o
 %   M_              [structure]                     Dynare model structure
 %   options_        [structure]                     Dynare options structure
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -31,11 +32,10 @@ function []=graph_decomp_detail(z,shock_names,endo_names,i_var,initial_date,M_,o
 if ~options_.plot_shock_decomp.expand
     GraphDirectoryName = CheckPath('graphs',M_.dname);
 end
-% interactive = 0;
+
 fig_mode='';
 fig_mode1='';
-% fig_name='';
-% screen_shocks=0;
+
 initval = options_.plot_shock_decomp.initval;
 use_shock_groups = options_.plot_shock_decomp.use_shock_groups;
 if use_shock_groups
@@ -66,10 +66,8 @@ if ~isempty(options_.plot_shock_decomp.use_shock_groups) || comp_nbr<=18
     screen_shocks=0;
 end
 fig_name_long = opts_decomp.fig_name;
-%         fig_name = ['_' fig_name];
 
 if screen_shocks
-    %     fig_name1 = [fig_name1 '_screen'];
     fig_name_long = [fig_name_long ' SCREEN'];
 end
 
@@ -80,8 +78,9 @@ fig_name=strrep(fig_name, '.', '');
 fig_name=strrep(fig_name, '-', '');
 fig_name=strrep(fig_name, ')', '');
 fig_name=strrep(fig_name, '(', '');
-% fig_name1 = [fig_name];
-% fig_name = [fig_name '_'];
+fig_name=[fig_name '_' parameter_set];
+
+parameter_set_string=get_parameter_set_name(parameter_set);
 
 gend = size(z,3);
 if isempty(initial_date)
@@ -101,7 +100,7 @@ if floor(length(ind_yrs)/3)
 else
     xind_tick = x(ind_yrs(1)):dind_tick:x(ind_yrs(end))+(length(ind_yrs)-(dind_tick+1));
 end
-% xind_tick = floor(x(1))-floor(dind_tick/2):dind_tick:ceil(x(end))+ceil(dind_tick/2);
+
 if abs(floor(x(1))-xind_tick(1))-abs(ceil(x(end))-xind_tick(end))>1
     xind_tick = xind_tick-1;
 end
@@ -111,9 +110,6 @@ end
 if length(xind_tick)==gend
     xind_tick = x(2:end);
 end
-% xind_tick = [x(ind_yrs(1))-floor(dind_tick/2):dind_tick:x(ind_yrs(end))+floor(dind_tick/2)]+1;
-% xind_tick = x(ind_yrs(1))-1:dind_tick:x(ind_yrs(end))+1;
-% xind_tick = x(ind_yrs(1))-1:dind_tick:x(ind_yrs(end))+dind_tick;
 
 nvar = length(i_var);
 
@@ -151,7 +147,7 @@ if ~(screen_shocks && comp_nbr>18)
     screen_shocks=0;
 end
 comp_nbr0=comp_nbr;
-%%plot decomposition
+%% plot decomposition
 for j=1:nvar
     z1 = squeeze(z(i_var(j),:,:));
     if screen_shocks
@@ -178,7 +174,7 @@ for j=1:nvar
         continue
     end
     for jf = 1:nfigs
-        fhandle = dyn_figure(options_.plot_shock_decomp.nodisplay,'Name',[preamble_txt fig_name_long strrep(fig_mode1, '_', ' ') ': ' endo_names{i_var(j)} ' (detail).'],'position',[200 100 650 850], 'PaperPositionMode', 'auto','PaperOrientation','portrait','renderermode','auto');
+        fhandle = dyn_figure(options_.plot_shock_decomp.nodisplay,'Name',[preamble_txt fig_name_long strrep(fig_mode1, '_', ' ') ' (' parameter_set_string '): ' endo_names{i_var(j)} ' (detail).'],'position',[200 100 650 850], 'PaperPositionMode', 'auto','PaperOrientation','portrait','renderermode','auto');
         a0=zeros(1,4);
         a0(3)=inf;
         a0(4)=-inf;
@@ -245,7 +241,12 @@ for j=1:nvar
             subplot(nrow,ncol,isub),
             set(gca,'ylim',a0(3:4))
         end
-
+        
+        if ~isempty(options_.plot_shock_decomp.forecast_length)
+            forecast_init_date = gend-options_.plot_shock_decomp.forecast_length+1.5;
+            hold on, plot([forecast_init_date forecast_init_date],ylim,'-r','linewidth',.5);
+        end
+        
         % make legend
         axes('Position',[0.1 0.01 0.8 0.02],'units','normalized');
         axis([0 1 0 1]);
@@ -256,7 +257,6 @@ for j=1:nvar
         mylabels = {'Individual contrib.','Residual contrib.'};
 
         for i=1:2
-            %     for i=1:comp_nbr
             hl = fill([x1 x1 x1+0.3*width x1+0.3*width],[0 1 1 0],i);
             hold on
             ht = text(x1+0.4*width,0.3,mylabels{i},'Interpreter','none');
@@ -279,7 +279,7 @@ for j=1:nvar
                 fprintf(fidTeX,'\\centering \n');
                 fprintf(fidTeX,'\\includegraphics[width=0.8\\textwidth]{%s/graphs/%s%s}\n',M_.fname,M_.fname,[preamble_figname endo_names{i_var(j)} fig_mode1 fig_name suffix]);
                 fprintf(fidTeX,'\\label{Fig:shock_decomp_detail:%s}\n',[fig_mode endo_names{i_var(j)} fig_name suffix]);
-                fprintf(fidTeX,['\\caption{' preamble_txt fig_name_long strrep(fig_mode1, '_',  ' ') ': $ %s $ (detail).}\n'], M_.endo_names_tex{i_var(j)});
+                fprintf(fidTeX,['\\caption{' preamble_txt fig_name_long strrep(fig_mode1, '_',  ' ') ' (' parameter_set_string '): $ %s $ (detail).}\n'], M_.endo_names_tex{i_var(j)});
                 fprintf(fidTeX,'\\end{figure}\n');
                 fprintf(fidTeX,' \n');
             end

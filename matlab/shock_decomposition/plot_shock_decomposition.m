@@ -1,5 +1,5 @@
 function [out, steady_state] = plot_shock_decomposition(M_,oo_,options_,varlist,get_decomp_only)
-% function plot_shock_decomposition(M_,oo_,options_,varlist)
+% [out, steady_state] = plot_shock_decomposition(M_,oo_,options_,varlist,get_decomp_only)
 % Plots the results of shock_decomposition
 %
 % INPUTS
@@ -9,10 +9,15 @@ function [out, steady_state] = plot_shock_decomposition(M_,oo_,options_,varlist,
 %    varlist:     [char]       List of variables
 %    get_decomp_only    [bool] indicator on whether to only return with
 %                               basic decomposition (required for e.g. annualized_shock_decomposition)
+%
+% OUTPUTS
+%   out
+%   steady_state
+%
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -171,12 +176,10 @@ if ~isempty(options_.plot_shock_decomp.fig_name)
     end
 end
 
-detail_plot=options_.plot_shock_decomp.detail_plot;
 realtime_= options_.plot_shock_decomp.realtime;
 vintage_ = options_.plot_shock_decomp.vintage;
 forecast_ = options_.shock_decomp.forecast;
 steadystate = options_.plot_shock_decomp.steadystate;
-write_xls = options_.plot_shock_decomp.write_xls;
 
 if vintage_
     forecast_ = min(forecast_,options_.nobs-vintage_);
@@ -204,21 +207,35 @@ end
 
 switch realtime_
     
-    case 0
-        if ~expand
-            z = oo_.shock_decomposition;
+    case 0 %standard or initval_decomposition
+        if isempty(options_.shock_decomp.forecast_type)%not forecasts
+            if ~expand
+                z = oo_.shock_decomposition;
+                if ~options_.plot_shock_decomp.init_cond_decomp
+                    options_.parameter_set=oo_.shock_decomposition_info.parameter_set;
+                else
+                    options_.parameter_set=oo_.shock_decomposition_info.initval_decomposition.parameter_set;
+                end
+            end
+            fig_name1=fig_name;
+        else
+            if ~expand
+                z = oo_.forecast_shock_decomposition.(options_.shock_decomp.forecast_type);
+                options_.parameter_set=oo_.shock_decomposition_info.forecast.(options_.shock_decomp.forecast_type).parameter_set;
+            end
+            fig_name1=[fig_name ' ' options_.shock_decomp.forecast_type ' forecast'];
         end
-        fig_name1=fig_name;
-        
     case 1 % realtime
         if vintage_
             if ~expand
                 z = oo_.realtime_shock_decomposition.(['time_' int2str(vintage_)]);
+                options_.parameter_set=oo_.shock_decomposition_info.realtime_shock_decomposition.parameter_set;
             end
             fig_name1=[fig_name ' realtime (vintage ' char(initial_date+vintage_-1) ')'];
         else
             if ~expand
                 z = oo_.realtime_shock_decomposition.pool;
+                options_.parameter_set=oo_.shock_decomposition_info.realtime_shock_decomposition.parameter_set;
             end
             fig_name1=[fig_name ' realtime (rolling)'];
         end
@@ -227,12 +244,14 @@ switch realtime_
         if vintage_
             if ~expand
                 z = oo_.realtime_conditional_shock_decomposition.(['time_' int2str(vintage_)]);
+                options_.parameter_set=oo_.shock_decomposition_info.realtime_conditional_shock_decomposition.parameter_set;
             end
             initial_date = initial_date+vintage_-1;
             fig_name1=[fig_name ' ' int2str(forecast_) '-step ahead conditional forecast (given ' char(initial_date) ')'];
         else
             if ~expand
                 z = oo_.conditional_shock_decomposition.pool;
+                options_.parameter_set=oo_.shock_decomposition_info.realtime_conditional_shock_decomposition.parameter_set;
             end
             fig_name1=[fig_name ' 1-step ahead conditional forecast (rolling)'];
         end
@@ -241,12 +260,14 @@ switch realtime_
         if vintage_
             if ~expand
                 z = oo_.realtime_forecast_shock_decomposition.(['time_' int2str(vintage_)]);
+                options_.parameter_set=oo_.shock_decomposition_info.realtime_forecast_shock_decomposition.parameter_set;
             end
             initial_date = initial_date+vintage_-1;
             fig_name1=[fig_name ' ' int2str(forecast_) '-step ahead forecast (given ' char(initial_date) ')'];
         else
             if ~expand
                 z = oo_.realtime_forecast_shock_decomposition.pool;
+                options_.parameter_set=oo_.shock_decomposition_info.realtime_forecast_shock_decomposition.parameter_set;
             end
             fig_name1=[fig_name ' 1-step ahead forecast (rolling)'];
         end
@@ -599,14 +620,14 @@ if options_.plot_shock_decomp.interactive && ~isempty(options_.plot_shock_decomp
 end
 
 if ~options_.no_graph.plot_shock_decomposition
-    if detail_plot
-        graph_decomp_detail(z, shock_names, M_.endo_names, i_var, my_initial_date, M_, options_);
+    if options_.plot_shock_decomp.detail_plot
+        graph_decomp_detail(z, options_.parameter_set, shock_names, M_.endo_names, i_var, my_initial_date, M_, options_);
     else
-        graph_decomp(z, shock_names, M_.endo_names, i_var, my_initial_date, M_, options_);
+        graph_decomp(z, options_.parameter_set, shock_names, M_.endo_names, i_var, my_initial_date, M_, options_);
     end
 end
 
-if write_xls
+if options_.plot_shock_decomp.write_xls
     WriteShockDecomp2Excel(z,shock_names,M_.endo_names,i_var,my_initial_date,M_,options_,options_.plot_shock_decomp);
 end
 
