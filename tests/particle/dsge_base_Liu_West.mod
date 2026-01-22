@@ -2,6 +2,8 @@
 
 options_.TeX=true;
 
+data(file='./mysample.m',first_obs=801Y,nobs=5);
+
 estimation(order=3,posterior_sampling_method='online',filter_algorithm=nlkf,proposal_approximation=montecarlo,posterior_sampler_options=('particles',100));
 
 collect_latex_files;
