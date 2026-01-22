@@ -184,7 +184,7 @@ else% ==> Theoretical filters.
             g_omega = [aa*tneg(ig) bb]*f_omega*[aa'*tpos(ig); bb']; % spectral density of selected variables; middle formula Uhlig (2001), p. 20; only middle block, i.e. y_t'
             f_hp = filter_gain(ig)^2*g_omega; % spectral density of selected filtered series; top formula Uhlig (2001), p. 21;
         end
-        mathp_col(ig,:) = (f_hp(:))';    % store as matrix row for ifft
+        mathp_col(ig,:) = (f_hp(:)).';    % store as matrix row for ifft (non-conjugate transpose to preserve correct orientation)
     end
     % Covariance of filtered series
     imathp_col = real(ifft(mathp_col))*(2*pi); % Inverse Fast Fourier Transformation; middle formula Uhlig (2001), p. 21;
@@ -219,7 +219,7 @@ else% ==> Theoretical filters.
                     g_omega = [aa*tneg(ig) b2]*f_omega*[aa'*tpos(ig); b2']; % spectral density of selected variables; middle formula Uhlig (2001), p. 20; only middle block, i.e. y_t'
                     f_hp = filter_gain(ig)^2*g_omega;  % spectral density of selected filtered series; top formula Uhlig (2001), p. 21;
                 end
-                mathp_col(ig,:) = (f_hp(:))';    % store as matrix row for ifft
+                mathp_col(ig,:) = (f_hp(:)).';    % store as matrix row for ifft (non-conjugate transpose)
             end
             imathp_col = real(ifft(mathp_col))*(2*pi);
             vv = diag(reshape(imathp_col(1,:),nvar,nvar));
@@ -235,7 +235,7 @@ else% ==> Theoretical filters.
                         g_omega = [aa*tneg(ig) b2]*f_omega*[aa'*tpos(ig); b2']; % spectral density of selected variables; middle formula Uhlig (2001), p. 20; only middle block, i.e. y_t'
                         f_hp = filter_gain(ig)^2*g_omega; % spectral density of selected filtered series; top formula Uhlig (2001), p. 21;
                     end
-                    mathp_col(ig,:) = (f_hp(:))';    % store as matrix row for ifft
+                    mathp_col(ig,:) = (f_hp(:)).';    % store as matrix row for ifft (non-conjugate transpose)
                 end
                 imathp_col = real(ifft(mathp_col))*(2*pi);
                 Gamma_y{nar+2}(:,i) = abs(diag(reshape(imathp_col(1,:),nvar,nvar)))./vv;

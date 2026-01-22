@@ -1419,6 +1419,8 @@ mod_and_m_tests = [
     'extra' : [ 'moments/example1_common.inc' ] },
   { 'test' : [ 'moments/example1_bp_test.mod' ],
     'extra' : [ 'moments/example1_common.inc' ] },
+  { 'test' : [ 'moments/example1_theoretical_simulated.mod' ],
+    'extra' : [ 'moments/example1_common.inc' ] },
   { 'test' : [ 'moments/test_AR1_spectral_density.mod' ] },
   { 'test' : [ 'moments/example1_one_sided_hp_test.mod' ],
     'extra' : [ 'moments/example1_common.inc' ] },
