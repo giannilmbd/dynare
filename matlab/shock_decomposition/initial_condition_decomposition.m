@@ -21,7 +21,7 @@ function oo_ = initial_condition_decomposition(M_,oo_,options_,varlist,bayestopt
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2017-2024 Dynare Team
+% Copyright © 2017-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -68,9 +68,6 @@ if ~isequal(varlist,0)
     varlist = varlist(index_uniques);
 end
 
-% number of variables
-endo_nbr = M_.endo_nbr;
-
 % parameter set
 parameter_set = options_.parameter_set;
 if isempty(parameter_set)
@@ -105,41 +102,30 @@ if ~isfield(oo_,'initval_decomposition') || isequal(varlist,0)
 
     % reduced form
     dr = oo_local.dr;
-
-    % data reordering
-    order_var = dr.order_var;
-    inv_order_var = dr.inv_order_var;
-
-
-    % coefficients
-    A = dr.ghx;
-    B = dr.ghu;
-
+   
     % initialization
     gend = length(oo_local.SmoothedShocks.(M_.exo_names{1})); %+options_.forecast;
-    z = zeros(endo_nbr,endo_nbr+2,gend);
+    z = zeros(M_.endo_nbr,M_.endo_nbr+2,gend);
     z(:,end,:) = Smoothed_Variables_deviation_from_mean;
 
-    for i=1:endo_nbr
+    for i=1:M_.endo_nbr
         z(i,i,1) = Smoothed_Variables_deviation_from_mean(i,1);
     end
 
-    maximum_lag = M_.maximum_lag;
-
-    i_state = order_var(M_.nstatic+(1:M_.nspred));
+    i_state = dr.order_var(M_.nstatic+(1:M_.nspred));
     for i=1:gend
-        if i > 1 && i <= maximum_lag+1
-            lags = min(i-1,maximum_lag):-1:1;
+        if i > 1 && i <= M_.maximum_lag+1
+            lags = min(i-1,M_.maximum_lag):-1:1;
         end
 
         if i > 1
-            tempx = permute(z(:,1:endo_nbr,lags),[1 3 2]);
-            m = min(i-1,maximum_lag);
-            tempx = [reshape(tempx,endo_nbr*m,endo_nbr); zeros(endo_nbr*(maximum_lag-i+1),endo_nbr)];
-            z(:,1:endo_nbr,i) = A(inv_order_var,:)*tempx(i_state,:);
+            tempx = permute(z(:,1:M_.endo_nbr,lags),[1 3 2]);
+            m = min(i-1,M_.maximum_lag);
+            tempx = [reshape(tempx,M_.endo_nbr*m,M_.endo_nbr); zeros(M_.endo_nbr*(M_.maximum_lag-i+1),M_.endo_nbr)];
+            z(:,1:M_.endo_nbr,i) = dr.ghx(dr.inv_order_var,:)*tempx(i_state,:);
             lags = lags+1;
         end
-        z(:,endo_nbr+1,i) = z(:,endo_nbr+2,i) - sum(z(:,1:endo_nbr,i),2);
+        z(:,M_.endo_nbr+1,i) = z(:,M_.endo_nbr+2,i) - sum(z(:,1:M_.endo_nbr,i),2);
 
     end
 

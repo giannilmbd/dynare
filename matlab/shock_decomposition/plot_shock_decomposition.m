@@ -176,12 +176,10 @@ if ~isempty(options_.plot_shock_decomp.fig_name)
     end
 end
 
-detail_plot=options_.plot_shock_decomp.detail_plot;
 realtime_= options_.plot_shock_decomp.realtime;
 vintage_ = options_.plot_shock_decomp.vintage;
 forecast_ = options_.shock_decomp.forecast;
 steadystate = options_.plot_shock_decomp.steadystate;
-write_xls = options_.plot_shock_decomp.write_xls;
 
 if vintage_
     forecast_ = min(forecast_,options_.nobs-vintage_);
@@ -622,14 +620,14 @@ if options_.plot_shock_decomp.interactive && ~isempty(options_.plot_shock_decomp
 end
 
 if ~options_.no_graph.plot_shock_decomposition
-    if detail_plot
+    if options_.plot_shock_decomp.detail_plot
         graph_decomp_detail(z, options_.parameter_set, shock_names, M_.endo_names, i_var, my_initial_date, M_, options_);
     else
         graph_decomp(z, options_.parameter_set, shock_names, M_.endo_names, i_var, my_initial_date, M_, options_);
     end
 end
 
-if write_xls
+if options_.plot_shock_decomp.write_xls
     WriteShockDecomp2Excel(z,shock_names,M_.endo_names,i_var,my_initial_date,M_,options_,options_.plot_shock_decomp);
 end
 

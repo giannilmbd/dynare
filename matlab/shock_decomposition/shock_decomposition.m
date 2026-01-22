@@ -52,7 +52,6 @@ if isfield(oo_,'shock_decomposition_info') && isfield(oo_.shock_decomposition_in
         error('shock_decomposition::squeezed shock decompositions are already stored in oo_')
     end
 end
-with_epilogue = options_.shock_decomp.with_epilogue;
 
 if isempty(varlist)
     varlist = M_.endo_names(1:M_.orig_endo_nbr);
@@ -60,9 +59,6 @@ end
 
 [i_var,~,index_uniques] = varlist_indices(varlist,M_.endo_names);
 varlist=varlist(index_uniques);
-
-% number of variables
-endo_nbr = M_.endo_nbr;
 
 % number of shocks
 nshocks = M_.exo_nbr;
@@ -122,15 +118,6 @@ options_.initial_date=initial_date;
 % reduced form
 dr = oo_temp.dr;
 
-% data reordering
-order_var = dr.order_var;
-inv_order_var = dr.inv_order_var;
-
-
-% coefficients
-A = dr.ghx;
-B = dr.ghu;
-
 % initialization
 gend = size(oo_temp.SmoothedShocks.(M_.exo_names{1}),1);
 
@@ -157,7 +144,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
     
     % initialization
     epsilon=zeros(nshocks,gend);
-    z = zeros(endo_nbr,nshocks+2,gend);
+    z = zeros(M_.endo_nbr,nshocks+2,gend);
     
     if smoothed_data_present
         smoothed_periods = size(Smoothed_Variables_deviation_from_mean,2);
@@ -186,7 +173,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
     end
 else
     epsilon=NaN(nshocks,gend);
-    z = zeros(endo_nbr,nshocks+2,gend);
+    z = zeros(M_.endo_nbr,nshocks+2,gend);
     
     for i=1:nshocks
         epsilon(i,:) = oo_temp.SmoothedShocks.(M_.exo_names{i});
@@ -194,29 +181,28 @@ else
     z(:,end,:) = Smoothed_Variables_deviation_from_mean;
 end
 
-maximum_lag = M_.maximum_lag;
 
-i_state = order_var(M_.nstatic+(1:M_.nspred));
+i_state = dr.order_var(M_.nstatic+(1:M_.nspred));
 for i=1:gend
-    if i > 1 && i <= maximum_lag+1
-        lags = min(i-1,maximum_lag):-1:1;
+    if i > 1 && i <= M_.maximum_lag+1
+        lags = min(i-1,M_.maximum_lag):-1:1;
     end
 
     if i > 1
         tempx = permute(z(:,1:nshocks,lags),[1 3 2]);
-        m = min(i-1,maximum_lag);
-        tempx = [reshape(tempx,endo_nbr*m,nshocks); zeros(endo_nbr*(maximum_lag-i+1),nshocks)];
-        z(:,1:nshocks,i) = A(inv_order_var,:)*tempx(i_state,:);
+        m = min(i-1,M_.maximum_lag);
+        tempx = [reshape(tempx,M_.endo_nbr*m,nshocks); zeros(M_.endo_nbr*(M_.maximum_lag-i+1),nshocks)];
+        z(:,1:nshocks,i) = dr.ghx(dr.inv_order_var,:)*tempx(i_state,:);
         lags = lags+1;
     end
 
     if i > options_.shock_decomp.init_state
-        z(:,1:nshocks,i) = z(:,1:nshocks,i) + B(inv_order_var,:).*repmat(epsilon(:,i)',endo_nbr,1);
+        z(:,1:nshocks,i) = z(:,1:nshocks,i) + dr.ghu(dr.inv_order_var,:).*repmat(epsilon(:,i)',M_.endo_nbr,1);
     end
     z(:,nshocks+1,i) = z(:,nshocks+2,i) - sum(z(:,1:nshocks,i),2);
 end
 
-if with_epilogue
+if options_.shock_decomp.with_epilogue
     [z, oo_.shock_decomposition_info.epilogue_steady_state] = epilogue_shock_decomposition(z, M_, oo_temp);
 end
 

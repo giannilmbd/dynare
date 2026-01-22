@@ -61,9 +61,6 @@ end
 [~, ~, index_uniques] = varlist_indices(varlist,M_.endo_names);
 varlist = varlist(index_uniques);
 
-% number of variables
-endo_nbr = M_.endo_nbr;
-
 % number of shocks
 nshocks = M_.exo_nbr;
 
@@ -88,7 +85,7 @@ if isfield(options_.shock_decomp,'presample')
     my_presample = max(1,options_.shock_decomp.presample);
     presample = min(presample,my_presample);
 end
-% forecast_=0;
+
 forecast_ = options_.shock_decomp.forecast;
 forecast_params=0;
 if forecast_ && isfield(options_.shock_decomp,'forecast_params')
@@ -99,15 +96,14 @@ if isfield(options_.shock_decomp,'fast_realtime')
     fast_realtime = options_.shock_decomp.fast_realtime;
 end
 
-% save_realtime=0;
 save_realtime = options_.shock_decomp.save_realtime;
 % array of time points in the range options_.presample+1:options_.nobs
 if isnan(options_.nobs)
     error('realtime_shock_decomposition: the nobs-option must be set.')
 end
     
-zreal = zeros(endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs+forecast_);
-zcond = zeros(endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs);
+zreal = zeros(M_.endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs+forecast_);
+zcond = zeros(M_.endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs);
 
 options_.selected_variables_only = 0; %make sure all variables are stored
 options_.nograph=true;
@@ -116,9 +112,9 @@ init=1;
 nobs = options_.nobs;
 
 if forecast_ && any(forecast_params)
-    M1=M_;
-    M1.params = forecast_params;
-    [~,~,~,~,~,dr1] = dynare_resolve(M1,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+    M_forecast=M_;
+    M_forecast.params = forecast_params;
+    [~,~,~,~,~,dr_forecast] = dynare_resolve(M_forecast,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
 end
 
 gend0=0;
@@ -174,22 +170,11 @@ for j=presample+1:nobs
     % reduced form
     dr = oo_local.dr;
 
-    % data reordering
-    order_var = dr.order_var;
-    inv_order_var = dr.inv_order_var;
-
-
-    % coefficients
-    A = dr.ghx;
-    B = dr.ghu;
-
     if forecast_
         if any(forecast_params)
-            Af = dr1.ghx;
-            Bf = dr1.ghu;
+            Af = dr_forecast.ghx;
         else
-            Af = A;
-            Bf = B;
+            Af = dr.ghx;
         end
     end
 
@@ -200,34 +185,30 @@ for j=presample+1:nobs
     end
     epsilon=[epsilon zeros(nshocks,forecast_)];
 
-    z = zeros(endo_nbr,nshocks+2,gend+forecast_);
+    z = zeros(M_.endo_nbr,nshocks+2,gend+forecast_);
 
     z(:,end,1:gend) = Smoothed_Variables_deviation_from_mean;
 
-    maximum_lag = M_.maximum_lag;
-
-    i_state = order_var(M_.nstatic+(1:M_.nspred));
+    i_state = dr.order_var(M_.nstatic+(1:M_.nspred));
     for i=1:gend+forecast_
-        if i > 1 && i <= maximum_lag+1
-            lags = min(i-1,maximum_lag):-1:1;
+        if i > 1 && i <= M_.maximum_lag+1
+            lags = min(i-1,M_.maximum_lag):-1:1;
         end
 
         if i > 1
             tempx = permute(z(:,1:nshocks,lags),[1 3 2]);
-            m = min(i-1,maximum_lag);
-            tempx = [reshape(tempx,endo_nbr*m,nshocks); zeros(endo_nbr*(maximum_lag-i+1),nshocks)];
+            m = min(i-1,M_.maximum_lag);
+            tempx = [reshape(tempx,M_.endo_nbr*m,nshocks); zeros(M_.endo_nbr*(M_.maximum_lag-i+1),nshocks)];
             if i > gend
-                z(:,nshocks+2,i) = Af(inv_order_var,:)*z(i_state,nshocks+2,lags);
-                %             z(:,nshocks+2,i) = A(inv_order_var,:)*permute(z(i_state,nshocks+2,lags),[1 3 2]);
-                z(:,1:nshocks,i) = Af(inv_order_var,:)*tempx(i_state,:);
+                z(:,nshocks+2,i) = Af(dr.inv_order_var,:)*z(i_state,nshocks+2,lags);
+                z(:,1:nshocks,i) = Af(dr.inv_order_var,:)*tempx(i_state,:);
             else
-                z(:,1:nshocks,i) = A(inv_order_var,:)*tempx(i_state,:);
+                z(:,1:nshocks,i) = dr.ghx(dr.inv_order_var,:)*tempx(i_state,:);
             end
             lags = lags+1;
-            z(:,1:nshocks,i) = z(:,1:nshocks,i) + B(inv_order_var,:).*repmat(epsilon(:,i)',endo_nbr,1);
+            z(:,1:nshocks,i) = z(:,1:nshocks,i) + dr.ghu(dr.inv_order_var,:).*repmat(epsilon(:,i)',M_.endo_nbr,1);
         end
 
-        %         z(:,1:nshocks,i) = z(:,1:nshocks,i) + B(inv_order_var,:).*repmat(epsilon(:,i)',endo_nbr,1);
         z(:,nshocks+1,i) = z(:,nshocks+2,i) - sum(z(:,1:nshocks,i),2);
     end
 
@@ -238,51 +219,46 @@ for j=presample+1:nobs
         end
     end
     %% conditional shock decomp 1 step ahead
-    z1 = zeros(endo_nbr,nshocks+2);
+    z1 = zeros(M_.endo_nbr,nshocks+2);
     z1(:,end) = Smoothed_Variables_deviation_from_mean(:,gend);
     for i=gend
-
-        z1(:,1:nshocks) = z1(:,1:nshocks) + B(inv_order_var,:).*repmat(epsilon(:,i)',endo_nbr,1);
+        z1(:,1:nshocks) = z1(:,1:nshocks) + dr.ghu(dr.inv_order_var,:).*repmat(epsilon(:,i)',M_.endo_nbr,1);
         z1(:,nshocks+1) = z1(:,nshocks+2) - sum(z1(:,1:nshocks),2);
     end
     if with_epilogue
         clear ztmp0
         ztmp0(:,1,:) = Smoothed_Variables_deviation_from_mean(:,1:gend-1);
         ztmp0(:,2,:) = Smoothed_Variables_deviation_from_mean(:,1:gend-1);
-        ztmp = cat(3,cat(2,zeros(endo_nbr,nshocks,gend-1),ztmp0),z1);
-%         ztmp = cat(3,zeros(endo_nbr,nshocks+2,40),ztmp); % pad with zeros in presample
+        ztmp = cat(3,cat(2,zeros(M_.endo_nbr,nshocks,gend-1),ztmp0),z1);
         z1  = epilogue_shock_decomposition(ztmp, M_, oo_);
         z1=squeeze(z1(:,:,end));
     end
-    %%
 
     %% conditional shock decomp k step ahead
     if forecast_ && forecast_<j
-        zn = zeros(endo_nbr,nshocks+2,forecast_+1);
+        zn = zeros(M_.endo_nbr,nshocks+2,forecast_+1);
         zn(:,end,1:forecast_+1) = Smoothed_Variables_deviation_from_mean(:,gend-forecast_:gend);
         for i=1:forecast_+1
-            if i > 1 && i <= maximum_lag+1
-                lags = min(i-1,maximum_lag):-1:1;
+            if i > 1 && i <= M_.maximum_lag+1
+                lags = min(i-1,M_.maximum_lag):-1:1;
             end
 
             if i > 1
                 tempx = permute(zn(:,1:nshocks,lags),[1 3 2]);
-                m = min(i-1,maximum_lag);
-                tempx = [reshape(tempx,endo_nbr*m,nshocks); zeros(endo_nbr*(maximum_lag-i+1-1),nshocks)];
-                zn(:,1:nshocks,i) = A(inv_order_var,:)*tempx(i_state,:);
+                m = min(i-1,M_.maximum_lag);
+                tempx = [reshape(tempx,M_.endo_nbr*m,nshocks); zeros(M_.endo_nbr*(M_.maximum_lag-i+1-1),nshocks)];
+                zn(:,1:nshocks,i) = dr.ghx(dr.inv_order_var,:)*tempx(i_state,:);
                 lags = lags+1;
-                zn(:,1:nshocks,i) = zn(:,1:nshocks,i) + B(inv_order_var,:).*repmat(epsilon(:,i+gend-forecast_-1)',endo_nbr,1);
+                zn(:,1:nshocks,i) = zn(:,1:nshocks,i) + dr.ghu(dr.inv_order_var,:).*repmat(epsilon(:,i+gend-forecast_-1)',M_.endo_nbr,1);
             end
 
-            %             zn(:,1:nshocks,i) = zn(:,1:nshocks,i) + B(inv_order_var,:).*repmat(epsilon(:,i+gend-forecast_-1)',endo_nbr,1);
             zn(:,nshocks+1,i) = zn(:,nshocks+2,i) - sum(zn(:,1:nshocks,i),2);
         end
         if with_epilogue
             clear ztmp0
             ztmp0(:,1,:) = Smoothed_Variables_deviation_from_mean(:,1:gend-forecast_-1);
             ztmp0(:,2,:) = Smoothed_Variables_deviation_from_mean(:,1:gend-forecast_-1);
-            ztmp = cat(3,cat(2,zeros(endo_nbr,nshocks,gend-forecast_-1),ztmp0),zn);
-%             ztmp = cat(3,zeros(endo_nbr,nshocks+2,40),ztmp); % pad with zeros (st state) in presample
+            ztmp = cat(3,cat(2,zeros(M_.endo_nbr,nshocks,gend-forecast_-1),ztmp0),zn);
             zn  = epilogue_shock_decomposition(ztmp, M_, oo_);
             zn=squeeze(zn(:,:,end-forecast_:end));
         end
