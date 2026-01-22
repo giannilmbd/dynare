@@ -11,11 +11,11 @@ function [a, a1, P, P1, v, T, R, C, regimes_, error_flag, M_, lik, etahat, alpha
 % - Y:              [N_obs by 2]            observations at t-1:t
 % - H               [N_obs by 1]            vector of measurement error
 % - QQQ             [N_exo by N_exo by 3]   covariance matrix of shocks at t-1:t+1
-% - T0              [N by N]                initial state transition matrix
-% - R0              [N by N_exo]            initial shock impact transition matrix
-% - TT              [N by N by 2]           state transition matrix at t-1:t
-% - RR              [N by N_exo by 2]       shock impact matrix at t-1:t
-% - CC              [N by 2]                state space constant state transition matrix at t-1:t
+% - T0              [N by N]                base regime state transition matrix
+% - R0              [N by N_exo]            base regime shock impact transition matrix
+% - TT              [N by N by 2]           state transition matrix at t-1:t (restrict var list)
+% - RR              [N by N_exo by 2]       shock impact matrix at t-1:t (restrict var list)
+% - CC              [N by 2]                state space constant state transition matrix at t-1:t (restrict var list)
 % - regimes0        [structure]             regime info at t-1:t
 % - M_              [structure]             MATLAB's structure describing the model
 % - dr                   [structure]        Reduced form model.
@@ -27,19 +27,21 @@ function [a, a1, P, P1, v, T, R, C, regimes_, error_flag, M_, lik, etahat, alpha
 % - kalman_tol      [double]                tolerance for reciprocal condition number
 % 
 % Outputs
-% - a               [N by 2]                t-1's state estimate
+% - a               [N by 2]                t-1_t updated state estimate
 % - a1              [N by 2]                state predictions made at t-1:t
-% - P               [N by N by 2]           t-1's covariance of states
+% - P               [N by N by 2]           t-1:t updated covariance of states
 % - P1              [N by N by 2]           one-step ahead forecast error variance at t-1:t
 % - v               [N_obs by 2]            prediction error on observables at t-1:t
-% - T               [N by N by 2]           state transition matrix at t-1:t
-% - R               [N by N_exo by 2]       shock impact matrix at t-1:t
-% - C               [N by 2]                state space constant state transition matrix at t-1:t
+% - T               [N by N by 2]           state transition matrix at t-1:t (restrict var list)
+% - R               [N by N_exo by 2]       shock impact matrix at t-1:t (restrict var list)
+% - C               [N by 2]                state space constant state transition matrix at t-1:t (restrict var list)
 % - regimes_        [structure]             regime info at t-1:t
 % - error_flag      [integer]               error code
 % - M_              [structure]             MATLAB's structure describing the model
 % - lik             [double]                likelihood
-% - etahat:                                 smoothed shocks
+% - etahat:                                 smoothed shocks t-1:t|t
+% - alphahat:                               smoothed states t-1:t|t
+% - V:                                      smoothed states covariance t-1:t|t
 %
 % Notes: The algorithm and implementation is based on Massimo Giovannini,
 % Philipp Pfeiffer, Marco Ratto (2021), Efficient and robust inference of models with occasionally binding

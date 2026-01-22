@@ -359,12 +359,21 @@ if options_.smoother
     end
 
     if options_.occbin.smoother.status
-        oo_=pm3(M_,options_,oo_,2,gend,ifil(5),B,'Occbin regime',...
-            [],[],{'duration','start'},...
-            {'duration','start'},'Occbin_Regime',DirectoryName,'_occbin_regime',dispString);
-        oo_=pm3(M_,options_,oo_,2,gend,ifil(5),B,'Occbin realtime regime',...
-            [],[],{'duration','start'},...
-            {'duration','start'},'Occbin_Realtime_Regime',DirectoryName,'_occbin_realtime_regime',dispString);
+        if M_.occbin.constraint_nbr==1
+            n1=2;
+            tit2 = {'',''};
+            vlist = {'duration';'start'};
+        else
+            n1=4;
+            tit2 = {'','','',''};
+            vlist = {'duration1';'start1';'duration2';'start2'};
+        end
+        oo_=pm3(M_,options_,oo_,n1,gend,ifil(5),B,'OccBin regime',...
+            tit2,[],vlist,...
+            vlist,'Occbin_Regime',DirectoryName,'_occbin_regime',dispString);
+        oo_=pm3(M_,options_,oo_,n1,gend,ifil(5),B,'OccBin realtime regime',...
+            tit2,[],vlist,...
+            vlist,'Occbin_Realtime_Regime',DirectoryName,'_occbin_realtime_regime',dispString);
     end
 
 end

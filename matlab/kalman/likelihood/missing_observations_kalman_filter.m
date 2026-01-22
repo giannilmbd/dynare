@@ -73,6 +73,9 @@ if isequal(H,0)
 end
 
 P=tril(P)+transpose(tril(P,-1)); % make sure P is symmetric
+[LastSeeds.Unifor, LastSeeds.Normal] = get_dynare_random_generator_state(); % make sure that consistent seed for Particle Filter is used 
+% Set seed for randn().
+set_dynare_seed('default');
 
 % Get sample size.
 smpl = last-start+1;
@@ -163,6 +166,8 @@ if occbin_.status && isfield(options_,'likelihood_base_value') && not(isempty(op
     end
 end
 
+use_pkf_=false(1,last);
+
 while notsteady && t<=last
     if occbin_.status
         a1(:,t) = a;
@@ -217,6 +222,7 @@ while notsteady && t<=last
         if badly_conditioned_F && (~occbin_.status || (occbin_.status && t<first_period_occbin_update))
             % if ~all(abs(F(:))<kalman_tol), then use univariate filter, otherwise this is a
             % pathological case and the draw is discarded
+            set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
             return
         else
             F_singular = false;
@@ -279,26 +285,71 @@ while notsteady && t<=last
             CC01 = zeros(size(CC,1),2);
             CC01(:,2) = CC(:,1);
             % insert here Kalman update engine
-            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx] = occbin.kalman_update_engine(a00, a10, P00, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, d_index, M_, dr, endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options);
-%            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regimes_(t:t+2), info, M_, likx] = occbin.kalman_update_algo_1(a00, a10, P00, P10, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), M_, dr, endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options);
+            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahaty, alphahaty, V] = occbin.kalman_update_engine(a00, a10, P00, P10, t, data_index0, Z, v0, Y0, H, Qt, T0, R0, TT01, RR01, CC01, regimes_(t:t+1), base_regime, d_index, M_, dr, endo_steady_state,exo_steady_state,exo_det_steady_state, options_, occbin_options);
             if t<options_.occbin.likelihood.first_period_binding_regime_allowed && not(isequal(regx(1),base_regime))
                 likx= inf;
+            end
+            if options_.occbin.filter.init_periods_using_particles || options_.occbin.filter.particle.status
+                [StateVector,liky, ~, ~, ~, use_pkf_distribution] = ...
+                    occbin.ppf.engine([], likx, a00, a10, P00, P10,a1x,Px,P1x, alphahaty, etahaty, V, t, ...
+                    data_index0,Z,v0,Y0,H,Qt,T0,R0,TT01,RR01,CC01,info,regimes_(t:t+1),base_regime,regx,isqvec, ...
+                    M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
+                likx = liky;
+                use_pkf_(t) = use_pkf_distribution;
+                if StateVector.stop_particles 
+                    options_.occbin.filter.particle.status = false;
+                end
+                if use_pkf_distribution
+                    options_.occbin.filter.init_periods_using_particles = false;
+                    if ~options_.occbin.filter.particle.status
+                        options_.occbin.filter.state_covariance=false;
+                        % this will speed-up subsequent update iterations
+                    end
+                end
             end
         else
             if isqvec
                 Qt = Qvec(:,:,t-1:t+1);
             end
             % insert here Kalman update engine
-            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx] = occbin.kalman_update_engine(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),base_regime,d_index,M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
-%            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regimes_(t:t+2), info, M_, likx] = occbin.kalman_update_algo_1(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
+            [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahaty, alphahaty, V] = occbin.kalman_update_engine(a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),t,data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t),regimes_(t:t+1),base_regime,d_index,M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
             if t<options_.occbin.likelihood.first_period_binding_regime_allowed && not(isequal(regx(1),base_regime))
                 likx= inf;
+            end
+            if options_.occbin.filter.init_periods_using_particles || options_.occbin.filter.particle.status
+                [StateVector,liky, ~, ~, ~, use_pkf_distribution, infoy] = ...
+                    occbin.ppf.engine(StateVector, likx, a0(:,t-1),a1(:,t-1:t),P0(:,:,t-1),P1(:,:,t-1:t),a1x,Px,P1x, alphahaty, etahaty,V,t, ...
+                    data_index(t-1:t),Z,vv(:,t-1:t),Y(:,t-1:t),H,Qt,T0,R0,TT(:,:,t-1:t),RR(:,:,t-1:t),CC(:,t-1:t), ...
+                    info,regimes_(t:t+1),base_regime,regx,isqvec, ...
+                    M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
+                if infoy==0
+                    likx = liky;
+                    use_pkf_(t) = use_pkf_distribution;
+                    if StateVector.stop_particles
+                        options_.occbin.filter.particle.status = false;
+                    end
+                    if use_pkf_distribution
+                        options_.occbin.filter.init_periods_using_particles = false;
+                        if ~options_.occbin.filter.particle.status
+                            options_.occbin.filter.state_covariance=false;
+                            % this will speed-up subsequent update iterations
+                        end
+                    end
+                end
             end
         end
         if info
             if options_.debug
                 fprintf('\nmissing_observations_kalman_filter:PKF failed in period %u with: %s\n', t, get_error_message(info,options_));
             end
+            set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
+            return
+        end
+        if isinf(likx) % lik is inf but info = 0 !
+            if options_.debug
+                fprintf('\nmissing_observations_kalman_filter:PKF failed in period %u with: Inf in likelihood value\n', t);
+            end
+            set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
             return
         end
         if options_.occbin.likelihood.use_updated_regime
@@ -352,6 +403,8 @@ if presample>=diffuse_periods
 else
     LIK = sum(lik);
 end
+
+set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
 
 end
 

@@ -92,9 +92,6 @@ if options_.occbin.likelihood.status || options_.occbin.smoother.status
     if options_.moments_varendo
         error('initial_estimation_checks:: OccBin is incompatible with the moments_varendo option.')                
     end
-    if options_.forecast
-        error('initial_estimation_checks:: OccBin is incompatible with the forecast option.')
-    end
 end
 
 if (options_.occbin.likelihood.status && options_.occbin.likelihood.inversion_filter) || (options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter)

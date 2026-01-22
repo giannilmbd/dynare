@@ -96,8 +96,18 @@ if estim_params_.nsx % skew among VAREXO are ordered fifth in xparam1
     end
 end
 
-% setting structural parameters
+% setting endogenous init states
 offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + estim_params_.nsx;
+if estim_params_.nendoinit % initial states are ordered sixth in xparam1
+    endo_init = estim_params_.endo_init_vals;
+    for i=1:estim_params_.nendoinit
+        k = endo_init(i,1);
+        M_.endo_initial_state.values(k) = xparam1(i+offset);
+    end
+end
+
+% setting structural parameters
+offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + estim_params_.nsx + estim_params_.nendoinit;
 if estim_params_.np % structural parameters are ordered last in xparam1
     M_.params(estim_params_.param_vals(:,1)) = xparam1(offset+1:end);
 end

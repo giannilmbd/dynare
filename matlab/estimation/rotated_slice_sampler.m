@@ -1,4 +1,5 @@
 function [theta, fxsim, neval] = rotated_slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
+% [theta, fxsim, neval] = rotated_slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
 % ----------------------------------------------------------
 % ROTATED SLICE SAMPLER - with stepping out (Neal, 2003)
 % extension of the orthogonal univarite sampler (slice_sampler.m)
@@ -24,7 +25,7 @@ function [theta, fxsim, neval] = rotated_slice_sampler(objective_function,theta,
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -47,6 +48,18 @@ neval = zeros(npar,1);
 W1=[];
 if isfield(sampler_options,'WR')
     W1 = sampler_options.WR;
+end
+rthetaprior=[];
+if isfield(sampler_options,'rthetaprior')
+    rthetaprior = sampler_options.rthetaprior;
+end
+endo_init_state = false;
+if isfield(sampler_options,'endo_init_state')
+    endo_init_state = sampler_options.endo_init_state.status;
+end
+IP = 1:length(theta);
+if endo_init_state
+    IP = sampler_options.endo_init_state.IP;
 end
 
 if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
@@ -82,13 +95,20 @@ else
 end
 npar=size(V1,2);
 
+fname = int2str(sampler_options.curr_block);
+
 for it=1:npar
     theta0 = theta;
     neval(it) = 0;
     xold  = 0;
-    tb=sort([(thetaprior(:,1)-theta)./V1(:,it) (thetaprior(:,2)-theta)./V1(:,it)],2);
+    if not(isempty(rthetaprior))
+        XLB   = rthetaprior(it,1);
+        XUB   = rthetaprior(it,2);
+    else
+        tb=sort([(thetaprior(IP,1)-theta(IP))./V1(IP,it) (thetaprior(IP,2)-theta(IP))./V1(IP,it)],2);
     XLB=max(tb(:,1));
     XUB=min(tb(:,2));
+    end
     if isempty(W1)
         W = (XUB-XLB); %*0.8;
     else
@@ -116,6 +136,10 @@ for it=1:npar
     while(L > XLB)
         xsim = L;
         theta = theta0+xsim*V1(:,it);
+        if endo_init_state
+            theta1 = theta;
+            [theta, icheck]=set_init_state(theta1,varargin{3:end});
+        end
         if fast_likelihood_evaluation_for_rejection
             fxl = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
         else
@@ -130,6 +154,10 @@ for it=1:npar
     while(R < XUB)
         xsim = R;
         theta = theta0+xsim*V1(:,it);
+        if endo_init_state
+            theta1 = theta;
+            [theta, icheck]=set_init_state(theta1,varargin{3:end});
+        end
         if fast_likelihood_evaluation_for_rejection
             fxr = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
         else
@@ -149,6 +177,10 @@ for it=1:npar
         u = rand(1,1);
         xsim = L + u*(R - L);
         theta = theta0+xsim*V1(:,it);
+        if endo_init_state
+            theta1 = theta;
+            [theta, icheck]=set_init_state(theta1,varargin{3:end});
+        end
         if fast_likelihood_evaluation_for_rejection
             fxsim = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
         else
@@ -160,6 +192,12 @@ for it=1:npar
         else
             L = xsim;
         end
+    end
+    if endo_init_state && icheck
+        [theta, fxsim] = draw_init_state_from_smoother([false 1],sampler_options,theta,fxsim,thetaprior,varargin{:});
+    end
+    if sampler_options.save_iter_info_file
+        save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'neval','it','theta','fxsim');
     end
 end
 end

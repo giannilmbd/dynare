@@ -1,6 +1,7 @@
 function [ ix2, ilogpo2, ModelName, MetropolisFolder, FirstBlock, FirstLine, npar, NumberOfBlocks, nruns, NewFile, MAX_nruns, d, bayestopt_] = ...
     posterior_sampler_initialization(objective_function, xparam1, vv, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_, dispString)
-
+% [ ix2, ilogpo2, ModelName, MetropolisFolder, FirstBlock, FirstLine, npar, NumberOfBlocks, nruns, NewFile, MAX_nruns, d, bayestopt_] = ...
+%     posterior_sampler_initialization(objective_function, xparam1, vv, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_, dispString)
 % Posterior sampler initialization.
 %
 % INPUTS
@@ -135,10 +136,6 @@ if ~options_.load_mh_file && ~options_.mh_recover
         if ~isnan(record0.MCMCConcludedSuccessfully) && ~record0.MCMCConcludedSuccessfully
             error('%s: You are trying to load an MCMC that did not finish successfully. Please use ''mh_recover''!',dispString);
         end
-%         mh_files = dir([ MetropolisFolder0 filesep ModelName0 '_mh*.mat']);
-%         if ~length(mh_files)
-%             error('%s: I cannot find any MH file to load here!',dispString)
-%         end
         fprintf('%s: Initializing from past Metropolis-Hastings simulations...\n',dispString);
         fprintf('%s: Past MH path %s\n',dispString,MetropolisFolder0);
         fprintf('%s: Past model name %s\n', dispString, ModelName0);
@@ -210,6 +207,13 @@ if ~options_.load_mh_file && ~options_.mh_recover
                     end
                 end
                 if all(candidate(:) >= mh_bounds.lb) && all(candidate(:) <= mh_bounds.ub)
+                    if strcmp(func2str(objective_function),'dsge_likelihood') && options_.init_state_endogenous_prior
+                        init = true;
+                        [candidate, ~, ~, M_] = draw_init_state_from_smoother(init,options_.posterior_sampler_options.current_options,candidate,NaN,mh_bounds, ...
+                            dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+                        %assignin('caller','endo_initial_state',M_.endo_initial_state)
+                        %evalin('caller','M_.endo_initial_state=endo_initial_state;')
+                    end
                     ix2(j,new_estimated_parameters) = candidate(new_estimated_parameters);
                     ilogpo2(j) = - feval(objective_function,ix2(j,:)',dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                     if isfinite(ilogpo2(j)) % log density is finite

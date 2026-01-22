@@ -112,6 +112,8 @@ elseif strcmpi(type,'MeasurementError')
     else
         TYPE = 'the correlation between measurement errors ';
     end
+elseif strcmpi(type,'InitialState')
+    TYPE='the initial state variable ';
 elseif strcmpi(type,'PosteriorDensity')
     TYPE='the posterior density';
 end

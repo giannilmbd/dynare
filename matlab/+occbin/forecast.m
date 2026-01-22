@@ -1,4 +1,4 @@
-function [forecast, error_flag] = forecast(options_,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,forecast_horizon)
+function [forecast, error_flag, yf] = forecast(options_,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,forecast_horizon)
 % [forecast, error_flag] = forecast(options_,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,forecast_horizon)
 % Occbin forecasts
 %
@@ -14,6 +14,7 @@ function [forecast, error_flag] = forecast(options_,M_,dr,endo_steady_state,exo_
 % OUTPUTS
 % - forecast                [structure]     forecast results
 % - error_flag              [integer]       error code
+% - yf                      [double]        matrix forecast results [horizon x nendo]
 %
 % SPECIAL REQUIREMENTS
 %   none.
@@ -80,8 +81,10 @@ end
 
 if opts.replic
     options_.noprint=true;
-    [h,length_of_old_string] = wait_bar.run(0, [], 'Please wait. OccBin forecast replic...', options_.console_mode, 0, 'OccBin forecasts.');
-
+    if options_.occbin.forecast.waitbar
+        [h,length_of_old_string] = wait_bar.run(0, [], 'Please wait. OccBin forecast replic...', options_.console_mode, 0, 'OccBin forecasts.');
+    end
+    
     ishock = find(sqrt(diag((M_.Sigma_e))));
     options_.occbin.simul.exo_pos=ishock;
     effective_exo_nbr=  length(ishock);
@@ -115,9 +118,13 @@ if opts.replic
                 save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag','out','shocks_base')
             end
         end
-        [~,length_of_old_string]=wait_bar.run(iter/opts.replic,h,['OccBin MC forecast replic ',int2str(iter),'/',int2str(opts.replic)],options_.console_mode,length_of_old_string);
+        if options_.occbin.forecast.waitbar
+            [~,length_of_old_string]=wait_bar.run(iter/opts.replic,h,['OccBin MC forecast replic ',int2str(iter),'/',int2str(opts.replic)],options_.console_mode,length_of_old_string);
+        end
     end
-    wait_bar.close(h,options_.console_mode);
+    if options_.occbin.forecast.waitbar
+        wait_bar.close(h,options_.console_mode);
+    end
     if options_.debug
          save('Occbin_forecast_debug','simul_SHOCKS','z','iter','frcst_regime_history','error_flag')
     end
@@ -172,3 +179,4 @@ else
 end
 
 forecast.regimes=frcst_regime_history;
+yf = [M_.endo_histval'; out.piecewise];

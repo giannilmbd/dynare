@@ -38,10 +38,11 @@ if isempty(estim_params_)
     estim_params_.nvn = 0;
     estim_params_.ncn = 0;
     estim_params_.nsx = 0;
+    estim_params_.nendoinit = 0;
     estim_params_.np  = 0;
 end
 
-xparam1 = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np,1);
+xparam1 = NaN(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+estim_params_.np,1);
 
 % standard deviation of exogenous shocks (stderr on varexo, ordered first in xparam1)
 if estim_params_.nvx
@@ -93,6 +94,16 @@ if estim_params_.nsx
     end
 end
 offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx;
+
+% initial state variables (ordered sixth in xparam1)
+if estim_params_.nendoinit
+    endo_init_vals = estim_params_.endo_init_vals;
+    for i = 1:estim_params_.nendoinit
+        k = endo_init_vals(i,1);
+        xparam1(i+offset) = M_.endo_initial_state.values(k);
+    end
+end
+offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit;
 
 % structural parameters (ordered last in xparam1)
 if estim_params_.np

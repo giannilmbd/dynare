@@ -35,7 +35,7 @@ function oo_ = PlotPosteriorDistributions(estim_params_, M_, options_, bayestopt
 latexDirectoryName = CheckPath('latex',M_.dname);
 graphDirectoryName = CheckPath('graphs',M_.dname);
 
-npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np; % total number of estimated parameters
+npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+estim_params_.np; % total number of estimated parameters
 MaxNumberOfPlotPerFigure = 9;% The square root must be an integer!
 nn = sqrt(MaxNumberOfPlotPerFigure);
 
@@ -113,8 +113,19 @@ for i=1:npar
         if ~issmc(options_) && ~options_.mh_posterior_mode_estimation
             pmod = oo_.posterior_mode.shocks_skew.(name);
         end
-    else % estimated structural parameters (ordered last in xparam1)
+    elseif i <= estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit % estimated init states (ordered sixth in xparam1)
         j = i - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx);
+        k = estim_params_.endo_init_vals(j,1);
+        name = sprintf('%s', M_.endo_names{k});
+        x1 = oo_.posterior_density.init_state.(name)(:,1);
+        f1 = oo_.posterior_density.init_state.(name)(:,2);
+        oo_.prior_density.init_state.(name)(:,1) = x2;
+        oo_.prior_density.init_state.(name)(:,2) = f2;
+        if ~issmc(options_) && ~options_.mh_posterior_mode_estimation
+            pmod = oo_.posterior_mode.init_state.(name);
+        end
+    else % estimated structural parameters (ordered last in xparam1)
+        j = i - (estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx++estim_params_.nendoinit);
         name = M_.param_names{estim_params_.param_vals(j,1)};
         x1 = oo_.posterior_density.parameters.(name)(:,1);
         f1 = oo_.posterior_density.parameters.(name)(:,2);

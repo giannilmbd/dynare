@@ -9,7 +9,10 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %   o data_index    [cell]      1*smpl cell of column vectors of indices.
 %   o missing_value 1 if missing values, 0 otherwise
 %   o M_            [structure] describing the model
-%   o oo_           [structure] storing the results
+%   o dr            [structure] model information structure
+%   o endo_steady_state       [vector]     steady state value for endogenous variables
+%   o exo_steady_state        [vector]     steady state value for exogenous variables
+%   o exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
 %   o options_      [structure] describing the options
 %   o bayestopt_    [structure] describing the priors
 %   o estim_params_ [structure] characterizing parameters to be estimated
@@ -273,7 +276,11 @@ end
 
 if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
     a_initial     = zeros(np,1);
-    a_initial=set_Kalman_smoother_starting_values(a_initial,M_,dr,options_);
+    if options_.smoother_redux
+        a_initial=set_Kalman_starting_values(a_initial,M_,dr,options_,bayestopt_);
+    else
+        a_initial=set_Kalman_smoother_starting_values(a_initial,M_,dr,options_);
+    end
     if kalman_algo == 5
         Gamma_0 = zeros(size(Pstar)); nu_0 = zeros(size(a_initial)); Delta_0 = eye(size(a_initial,1)); % initialize at Gaussian distribution
         [alphahat, epsilonhat, etahat, ahat, ~, P, aK, PK, decomp, state_uncertainty, aahat, eehat, alphahat0, state_uncertainty0] = ...
@@ -284,7 +291,12 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
                                           kalman_tol, options_.skewed_kalman.prune_tol, options_.skewed_kalman.mvnlogcdf, ... % skewed Kalman filter and smoother options
                                           options_.console_mode); % console mode for waitbar
     else
-        a_initial=T*a_initial; %set state prediction for first Kalman step;
+        if options_.lik_init==2 && options_.Harvey_scale_factor==0
+            a_initial=[a_initial T*a_initial]; %set state prediction for first Kalman step;
+            Pstar = cat(3,Pstar*0, R1*Q*R1');
+        else
+            a_initial=T*a_initial; %set state prediction for first Kalman step;
+        end
         [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,ST, ...
             Z,R1,Q,H,Pinf,Pstar, ...
             data1,vobs,np,smpl,data_index, ...
@@ -343,8 +355,20 @@ if kalman_algo == 2 || kalman_algo == 4
     end
     
     a_initial     = zeros(np,1);
-    a_initial=set_Kalman_smoother_starting_values(a_initial,M_,dr,options_);
+    if options_.smoother_redux
+        a_initial=set_Kalman_starting_values(a_initial,M_,dr,options_,bayestopt_);
+    else
+        a_initial=set_Kalman_smoother_starting_values(a_initial,M_,dr,options_);
+    end
+    if not(options_.occbin.smoother.status) % && options_.occbin.smoother.first_period_occbin_update==1)
+        if options_.lik_init==2 && options_.Harvey_scale_factor==0
+            a_initial=[a_initial ST*a_initial]; %set state prediction for first Kalman step;
+            Pstar = cat(3,Pstar, R1*Q*R1');
+        else
     a_initial=ST*a_initial; %set state prediction for first Kalman step;
+        end
+    end
+
     [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0, regimes_,TT,RR,CC,TTx,RRx,CCx] = missing_DiffuseKalmanSmootherH3_Z(a_initial,ST, ...
         Z,R1,Q,diag(H), ...
         Pinf,Pstar,data1,vobs,np,smpl,data_index, ...
@@ -389,6 +413,10 @@ else
     end
         
     if options_.occbin.smoother.status
+        if isempty(alphahat0)
+            % something went wrong
+            return
+        end
         % reconstruct occbin smoother
         if length_varargin>0
             % sequence of regimes is provided in input
@@ -595,11 +623,11 @@ else
                     end
                     opts_simul.init_regime = this_regime;
                     options_.occbin.simul=opts_simul;
-                    [~, out] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+                    [~, out] = occbin.solver(M_,options_,dr,steady_state,exo_steady_state,exo_det_steady_state);
                 end
                 if out.error_flag==0
                     for jnk=1:nk
-                        aaa(jnk,oo_.dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
+                        aaa(jnk,dr.inv_order_var,k+jnk-1) = out.piecewise(jnk,:) - out.ys';
                     end
                 else
                     % the issue only matters non-stationary models, with
@@ -780,7 +808,20 @@ function a=set_Kalman_smoother_starting_values(a,M_,dr,options_)
 % OUTPUTS
 %   o a             [double]    (p*1) vector of set initial states
 
-if isfield(M_,'filter_initial_state') && ~isempty(M_.filter_initial_state)
+if isfield(M_,'endo_initial_state') && ~isempty(M_.endo_initial_state) && M_.endo_initial_state.status 
+    % direct assignment
+    state_indices=dr.order_var(dr.restrict_columns);
+    if ~isempty(M_.endo_initial_state.values)
+        if options_.loglinear && ~options_.logged_steady_state
+            a(dr.restrict_columns) = log(M_.endo_initial_state.values(state_indices)) - log(dr.ys(state_indices));
+        elseif ~options_.loglinear && ~options_.logged_steady_state
+            a(dr.restrict_columns) = M_.endo_initial_state.values(state_indices) - dr.ys(state_indices);
+        else
+            error('The steady state is logged. This should not happen. Please contact the developers')
+        end
+    end
+
+elseif isfield(M_,'filter_initial_state') && ~isempty(M_.filter_initial_state)
     state_indices=dr.order_var(dr.restrict_columns);
     for ii=1:size(state_indices,1)
         if ~isempty(M_.filter_initial_state{state_indices(ii),1})

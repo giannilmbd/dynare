@@ -256,13 +256,26 @@ if strcmp(var_type,'_trend_coeff') || strcmp(var_type,'_init_state') %two dimens
     end
 elseif strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime') %two structure arrays
     for j=1:n1
+        % set the fieldnames for regime
+        if M_.occbin.constraint_nbr==1
+            regime = 'regime';
+            regimestart = 'regimestart';
+        else
+            if j<3
+                regime = 'regime1';
+                regimestart = 'regimestart1';
+            else
+                regime = 'regime2';
+                regimestart = 'regimestart2';
+            end
+        end
         for i = 1:n2
             for k=1:B
                 if j==1
-                    tmp_regime_info(1,k) = stock1(i,k).regimestart(end)-1;
+                    tmp_regime_info(1,k) = stock1(i,k).(regimestart)(end)-1;
                 else
-                    if not(isempty(find(stock1(i,k).regime==1,1)))
-                        tmp_regime_info(1,k) = stock1(i,k).regimestart(find(stock1(i,k).regime==1,1))-1; % first period kick in
+                    if not(isempty(find(stock1(i,k).(regime)==1,1)))
+                        tmp_regime_info(1,k) = stock1(i,k).(regimestart)(find(stock1(i,k).(regime)==1,1))-1; % first period kick in
                     else
                         tmp_regime_info(1,k)=0;
                     end
@@ -355,7 +368,7 @@ else
     end
 end
 
-if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean))) || strcmp(var_type,'_init_state') || strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime')
+if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean))) || strcmp(var_type,'_init_state') 
     fprintf(['%s: ' tit1 ', done!\n'],dispString);
     return %not do plots
 end
@@ -371,7 +384,10 @@ if ~options_.nograph && ~options_.no_graph.posterior
     % %%% The file .TeX! are not saved in parallel.
 
     % Store the variable mandatory for local/remote parallel computing.
-
+    if strcmp(var_type,'_occbin_regime') || strcmp(var_type,'_occbin_realtime_regime')
+        MaxNumberOfPlotsPerFigure=2;
+        nn=2;
+    end
     localVars=[];
 
     localVars.tit1=tit1;

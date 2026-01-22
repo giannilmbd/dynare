@@ -39,7 +39,7 @@ function i = name2index(M_, estim_params_, type, name1, name2, name3 )
 i = []; % initialize output
 
 if strcmpi(type,'DeepParameter')
-    i = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + estim_params_.nsx + ...
+    i = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + estim_params_.nsx + estim_params_.nendoinit + ...
         strmatch(name1, M_.param_names(estim_params_.param_vals(:,1)), 'exact');
     if nargin>4
         disp('The last input argument(s) are useless!');
@@ -125,4 +125,16 @@ if strcmpi(type,'MeasurementError')
             disp('Off diagonal terms of the covariance matrix are not estimated (measurement equation)');
         end
     end
+end
+
+if strcmpi(type,'InitialState')
+    i = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + estim_params_.nsx + ...
+        strmatch(name1, M_.endo_names(estim_params_.endo_init_vals(:,1)), 'exact');
+    if nargin>4
+        disp('The last input argument(s) are useless!');
+    end
+    if isempty(i)
+        disp([name1 ' is not an estimated deep parameter!']);
+    end
+    return
 end

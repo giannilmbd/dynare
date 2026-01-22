@@ -110,7 +110,7 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 %   * sylvester3a
 %   * get_perturbation_params_derivs_numerical_objective
 
-% Copyright © 2019-2025 Dynare Team
+% Copyright © 2019-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -230,7 +230,7 @@ if analytic_derivation_mode < 0
     %Create auxiliary estim_params_ blocks if not available for numerical derivatives, estim_params_model contains only model parameters
     estim_params_model.np = length(indpmodel);
     estim_params_model.param_vals(:,1) = indpmodel;
-    estim_params_model.nvx = 0; estim_params_model.ncx = 0; estim_params_model.nsx = 0; estim_params_model.nvn = 0; estim_params_model.ncn = 0;
+    estim_params_model.nvx = 0; estim_params_model.ncx = 0; estim_params_model.nsx = 0; estim_params_model.nvn = 0; estim_params_model.ncn = 0; estim_params_model.nendoinit = 0;
     modparam1 = get_all_parameters(estim_params_model, M_);  %get all selected model parameters
     if ~isempty(indpstderr) && isempty(estim_params_.var_exo) %if there are stderr parameters but no estimated_params_block
         %provide temporary necessary information for stderr parameters

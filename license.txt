@@ -292,8 +292,14 @@ License: CC-BY-SA-4.0
 
 Files: examples/usmodel_data.mat tests/estimation/pct/SW_2007_fmincon_parallel.m
 Copyright: 2007-2013 Frank Smets and Raf Wouters
-           2013-24 Johannes Pfeifer
+           2013-2024 Johannes Pfeifer
            2025 Dynare Team
+License: GPL-3+
+
+Files: tests/occbin/ppf/swpkfppf.mod
+Copyright: 2007-2013 Frank Smets and Raf Wouters
+           2013-2025 Johannes Pfeifer
+           2026 Dynare Team
 License: GPL-3+
 
 Files: matlab/distributions/closed_skew_normal/csn_mean.m

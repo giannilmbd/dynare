@@ -174,6 +174,9 @@ if run_smoother
     stock_smoothed_constant=NaN(endo_nbr,gend,MAX_n_smoothed_constant);
     stock_smoothed_trend=NaN(endo_nbr,gend,MAX_n_smoothed_trend);
     stock_trend_coeff = zeros(endo_nbr,MAX_n_trend_coeff);
+    if options_.occbin.smoother.status && ~options_.occbin.smoother.inversion_filter && not(options_.lik_init==2 && options_.Harvey_scale_factor==0)
+        % TBD: initialize stock_occbin_regime stock_occbin_realtime_regime
+    end
     if horizon
         stock_forcst_mean= NaN(endo_nbr,horizon,MAX_nforc1);
         stock_forcst_point = NaN(endo_nbr,horizon,MAX_nforc2);
@@ -201,6 +204,7 @@ end
 
 opts_local = options_;
 for b=fpar:B
+    is_successful_draw = true;
     if strcmpi(type,'prior')
         iter=1;
         logpo=[];
@@ -254,19 +258,80 @@ for b=fpar:B
                     trend_addition=zeros(options_.number_of_observed_variables,gend);        
                     stock_occbin_regime(:,irun(5))=regime_history;
                     stock_occbin_realtime_regime(:,irun(5))=regime_history; 
+                    stock_occbin_regime(:,irun(5))=regime_history;
+                    stock_occbin_realtime_regime(:,irun(5))=regime_history; 
                 end
                 %epsilonhat not available as no measurement error allowed
-            else
+            else % PKF
                 opts_local.verbosity=0;
-                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,~,~,a0T,state_uncertainty0] = ...
+                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
                     occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
                 if oo_.occbin.smoother.error_flag(1)
                     message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
                     fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
-                    continue
+                    is_successful_draw = false;
+                end
+                if is_successful_draw && options_.smoothed_state_uncertainty && not(opts_local.lik_init==2 && opts_local.Harvey_scale_factor==0)
+
+                    state_uncertainty1 = state_uncertainty0(oo_.dr.inv_order_var,oo_.dr.inv_order_var);
+                    alphahat0 = a0T(oo_.dr.inv_order_var);
+                    alphahat1 = alphahat0(M_.state_var);
+                    state_uncertainty1 = state_uncertainty1(M_.state_var,M_.state_var);
+                    [U,X] = svd(0.5*(state_uncertainty1+state_uncertainty1'));
+                    % P= U*X*U'; % symmetric matrix!
+                    is = find(diag(X)>options_.kalman_tol);
+                    StateVectorVarianceSquareRoot = chol(X(is,is))';
+
+                    % Get the rank of StateVectorVarianceSquareRoot
+                    state_variance_rank = size(StateVectorVarianceSquareRoot,2);
+                    U = U(:,is);
+
+                    if not(isempty(is))
+                        alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
+                    else
+                        alphahat01 = alphahat1;
+                    end
+                    error_indicator=true;
+                    M_local = M_;
+                    % set direct assignment of initial states
+                    M_local.endo_initial_state.status = true;
+                    M_local.endo_initial_state.values = zeros(M_.endo_nbr,1);
+                    opts_local1 = opts_local;
+                    opts_local1.lik_init = 2;
+                    opts_local1.Harvey_scale_factor = 0;
+                    niter=0;
+                    while error_indicator && niter<10
+                        niter=niter+1;
+                        M_local.endo_initial_state.values(M_.state_var) = alphahat01;
+                        [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                            occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                        if oo_.occbin.smoother.error_flag(1)
+                            if not(isempty(is)) && niter==1
+                                % first check if smoother mean works
+                                M_local.endo_initial_state.values(M_.state_var) = alphahat1;
+                                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                            end
+                            if oo_.occbin.smoother.error_flag(1) && (niter==1 || niter==10)
+                                % use smoother ?
+                                [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
+                                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+                            else
+                                % try another draw from smoother distribution
+                                alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
+                                oo_.occbin.smoother.error_flag(1) = 1;
+                            end
+                        end
+                        error_indicator = any(oo_.occbin.smoother.error_flag(1));
+                    end
+                end
+                if oo_.occbin.smoother.error_flag(1)
+                    message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
+                    fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
+                    is_successful_draw = false;
                 else
-                   stock_occbin_regime(:,irun(5))=oo_.occbin.smoother.regime_history;
-                   stock_occbin_realtime_regime(:,irun(5))=oo_.occbin.smoother.realtime_regime_history;
+                    stock_occbin_regime(:,irun(5))=oo_.occbin.smoother.regime_history;
+                    stock_occbin_realtime_regime(:,irun(5))=oo_.occbin.smoother.realtime_regime_history;
                 end
             end
         else
@@ -274,150 +339,167 @@ for b=fpar:B
                 DsgeSmoother(deep,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local,bayestopt_,estim_params_);
         end
 
-        stock_trend_coeff(options_.varobs_id,irun(9))=trend_coeff;
-        stock_smoothed_trend(IdObs,:,irun(11))=trend_addition;
-        if options_.loglinear %reads values from smoother results, which are in dr-order and put them into declaration order
-            constant_part=repmat(log(SteadyState(dr.order_var)),1,gend);
-            stock_smooth(dr.order_var,:,irun(1)) = alphahat(1:endo_nbr,:)+ ...
-                constant_part;
-            stock_update(dr.order_var,:,irun(1)) = alphatilde(1:endo_nbr,:)+ ...
-                constant_part;
-        else
-            constant_part=repmat(SteadyState(dr.order_var),1,gend);
-            stock_smooth(dr.order_var,:,irun(1)) = alphahat(1:endo_nbr,:)+ ...
-                constant_part;
-            stock_update(dr.order_var,:,irun(1)) = alphatilde(1:endo_nbr,:)+ ...
-                constant_part;
-        end
-        if ~(options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter)
-            stock_init_smooth(dr.order_var,irun(9)) = a0T(1:endo_nbr)+constant_part(:,1);
-        end
-        stock_smoothed_constant(dr.order_var,:,irun(10))=constant_part;
-        %% Compute constant for observables
-        if options_.prefilter == 1 %as mean is taken after log transformation, no distinction is needed here
-            constant_part=repmat(mean_varobs',1,gend);
-        elseif options_.prefilter == 0 && options_.loglinear %logged steady state must be used
-            constant_part=repmat(log(SteadyState(IdObs)),1,gend);
-        elseif options_.prefilter == 0 && ~options_.loglinear %unlogged steady state must be used
-            constant_part=repmat(SteadyState(IdObs),1,gend);
-        end
-        %add trend to observables
-        if options_.prefilter
-            %do correction for prefiltering for observed variables
-            if options_.loglinear
-                mean_correction=-repmat(log(SteadyState(IdObs)),1,gend)+constant_part;
-            else
-                mean_correction=-repmat(SteadyState(IdObs),1,gend)+constant_part;
-            end
-            stock_smoothed_constant(IdObs,:,irun(10))=stock_smoothed_constant(IdObs,:,irun(10))+mean_correction;
-            %smoothed variables are E_T(y_t) so no trend shift is required
-            stock_smooth(IdObs,:,irun(1))=stock_smooth(IdObs,:,irun(1))+trend_addition+mean_correction;
-            stock_init_smooth(IdObs,irun(9))=stock_init_smooth(IdObs,irun(9))+trend_addition(:,1)+mean_correction(:,1);
-            %updated variables are E_t(y_t) so no trend shift is required
-            stock_update(IdObs,:,irun(1))=stock_update(IdObs,:,irun(1))+trend_addition+mean_correction;
-        else
-            stock_init_smooth(IdObs,irun(9))=stock_init_smooth(IdObs,irun(9))+trend_addition(:,1);
-            stock_smooth(IdObs,:,irun(1))=stock_smooth(IdObs,:,irun(1))+trend_addition;
-            stock_update(IdObs,:,irun(1))=stock_update(IdObs,:,irun(1))+trend_addition;
-        end
-        stock_innov(:,:,irun(2))  = etahat;
-        if nvn
-            stock_error(:,:,irun(3))  = epsilonhat;
-        end
-        if naK
-            %filtered variable E_t(y_t+k) requires to shift trend by k periods
-            %write variables into declaration order
+        if is_successful_draw
+            stock_trend_coeff(options_.varobs_id,irun(9))=trend_coeff;
+            stock_smoothed_trend(IdObs,:,irun(11))=trend_addition;
             if options_.loglinear %reads values from smoother results, which are in dr-order and put them into declaration order
-                constant_part=repmat(log(SteadyState(dr.order_var))',[length(options_.filter_step_ahead),1,gend+max(options_.filter_step_ahead)]);
+                constant_part=repmat(log(SteadyState(dr.order_var)),1,gend);
+                stock_smooth(dr.order_var,:,irun(1)) = alphahat(1:endo_nbr,:)+ ...
+                    constant_part;
+                stock_update(dr.order_var,:,irun(1)) = alphatilde(1:endo_nbr,:)+ ...
+                    constant_part;
             else
-                constant_part=repmat(SteadyState(dr.order_var)',[length(options_.filter_step_ahead),1,gend+max(options_.filter_step_ahead)]);
+                constant_part=repmat(SteadyState(dr.order_var),1,gend);
+                stock_smooth(dr.order_var,:,irun(1)) = alphahat(1:endo_nbr,:)+ ...
+                    constant_part;
+                stock_update(dr.order_var,:,irun(1)) = alphatilde(1:endo_nbr,:)+ ...
+                    constant_part;
             end
-            stock_filter_step_ahead(:,dr.order_var,:,irun(4)) = aK(options_.filter_step_ahead,1:endo_nbr,:) + constant_part;
-            %now add trend to observables
-            for ii=1:length(options_.filter_step_ahead)
-                if options_.prefilter
-                    zdim = size(stock_filter_step_ahead(ii,IdObs,:,irun(4)));
-                    squeezed = reshape(stock_filter_step_ahead(ii,IdObs,:,irun(4)), [zdim(2:end) 1]);
-                    stock_filter_step_ahead(ii,IdObs,:,irun(4)) = squeezed ...
-                        +repmat(mean_correction(:,1),1,gend+max(options_.filter_step_ahead)) ... %constant correction
-                        +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*(1:max(options_.filter_step_ahead))]; %trend
-                else
-                    zdim = size(stock_filter_step_ahead(ii,IdObs,:,irun(4)));
-                    squeezed = reshape(stock_filter_step_ahead(ii,IdObs,:,irun(4)), [zdim(2:end) 1]);
-                    stock_filter_step_ahead(ii,IdObs,:,irun(4)) = squeezed ...
-                        +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*(1:max(options_.filter_step_ahead))]; %trend
-                end
+            if ~(options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter)
+                stock_init_smooth(dr.order_var,irun(9)) = a0T(1:endo_nbr)+constant_part(:,1);
             end
-        end
-        if horizon
-            yyyy = alphahat(iendo,i_last_obs);
-            yf = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
+            stock_smoothed_constant(dr.order_var,:,irun(10))=constant_part;
+            %% Compute constant for observables
+            if options_.prefilter == 1 %as mean is taken after log transformation, no distinction is needed here
+                constant_part=repmat(mean_varobs',1,gend);
+            elseif options_.prefilter == 0 && options_.loglinear %logged steady state must be used
+                constant_part=repmat(log(SteadyState(IdObs)),1,gend);
+            elseif options_.prefilter == 0 && ~options_.loglinear %unlogged steady state must be used
+                constant_part=repmat(SteadyState(IdObs),1,gend);
+            end
+            %add trend to observables
             if options_.prefilter
-                % add mean
-                yf(:,IdObs) = yf(:,IdObs)+repmat(mean_varobs, ...
-                                                 horizon+maxlag,1);
-                % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff'-...
-                    repmat(mean(trend_coeff*(options_.first_obs:options_.first_obs+gend-1),2)',length(1-maxlag:horizon),1); %center trend
-            else
-                % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff';
-            end
-            if options_.loglinear
-                yf = yf+repmat(log(SteadyState'),horizon+maxlag,1);
-            else
-                yf = yf+repmat(SteadyState',horizon+maxlag,1);
-            end
-            yf1 = simulate_posterior_forecasts(yyyy,dr,horizon,true,M_.Sigma_e,1);
-            if options_.prefilter == 1
-                % add mean
-                yf1(:,IdObs,:) = yf1(:,IdObs,:)+ ...
-                    repmat(mean_varobs,[horizon+maxlag,1,1]);
-                % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf1(:,IdObs) = yf1(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff'-...
-                    repmat(mean(trend_coeff*(options_.first_obs:options_.first_obs+gend-1),2)',length(1-maxlag:horizon),1); %center trend
-            else
-                % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
-                yf1(:,IdObs,:) = yf1(:,IdObs,:)+repmat(((options_.first_obs-1)+gend+(1-maxlag:horizon)')* ...
-                                                       trend_coeff',[1,1,1]);
-            end
-            if options_.loglinear
-                yf1 = yf1 + repmat(log(SteadyState'),[horizon+maxlag,1,1]);
-            else
-                yf1 = yf1 + repmat(SteadyState',[horizon+maxlag,1,1]);
-            end
-
-            stock_forcst_mean(:,:,irun(6)) = yf(maxlag+1:end,:)';
-            stock_forcst_point(:,:,irun(7)) = yf1(maxlag+1:end,:)';
-            if ~isequal(M_.H,0)
-                ME_shocks=zeros(length(varobs),horizon);
-                i_exo_var = setdiff(1:length(varobs),find(diag(M_.H) == 0));
-                nxs = length(i_exo_var);
-                chol_H = chol(M_.H(i_exo_var,i_exo_var));
-                if ~isempty(M_.H)
-                    ME_shocks(i_exo_var,:) = chol_H*randn(nxs,horizon);
+                %do correction for prefiltering for observed variables
+                if options_.loglinear
+                    mean_correction=-repmat(log(SteadyState(IdObs)),1,gend)+constant_part;
+                else
+                    mean_correction=-repmat(SteadyState(IdObs),1,gend)+constant_part;
                 end
-                stock_forcst_point_ME(:,:,irun(12)) = yf1(maxlag+1:end,IdObs)'+ME_shocks;
+                stock_smoothed_constant(IdObs,:,irun(10))=stock_smoothed_constant(IdObs,:,irun(10))+mean_correction;
+                %smoothed variables are E_T(y_t) so no trend shift is required
+                stock_smooth(IdObs,:,irun(1))=stock_smooth(IdObs,:,irun(1))+trend_addition+mean_correction;
+                stock_init_smooth(IdObs,irun(9))=stock_init_smooth(IdObs,irun(9))+trend_addition(:,1)+mean_correction(:,1);
+                %updated variables are E_t(y_t) so no trend shift is required
+                stock_update(IdObs,:,irun(1))=stock_update(IdObs,:,irun(1))+trend_addition+mean_correction;
+            else
+                stock_init_smooth(IdObs,irun(9))=stock_init_smooth(IdObs,irun(9))+trend_addition(:,1);
+                stock_smooth(IdObs,:,irun(1))=stock_smooth(IdObs,:,irun(1))+trend_addition;
+                stock_update(IdObs,:,irun(1))=stock_update(IdObs,:,irun(1))+trend_addition;
             end
-        end
-        if filter_covariance
-            stock_filter_covariance(dr.order_var,dr.order_var,:,irun(8)) = P;
-        end
-        if smoothed_state_uncertainty
-            stock_smoothed_uncert(dr.order_var,dr.order_var,:,irun(13)) = state_uncertainty;
-            stock_init_smoothed_uncert(dr.order_var,dr.order_var,irun(13)) = state_uncertainty0;
+            stock_innov(:,:,irun(2))  = etahat;
+            if nvn
+                stock_error(:,:,irun(3))  = epsilonhat;
+            end
+            if naK
+                %filtered variable E_t(y_t+k) requires to shift trend by k periods
+                %write variables into declaration order
+                if options_.loglinear %reads values from smoother results, which are in dr-order and put them into declaration order
+                    constant_part=repmat(log(SteadyState(dr.order_var))',[length(options_.filter_step_ahead),1,gend+max(options_.filter_step_ahead)]);
+                else
+                    constant_part=repmat(SteadyState(dr.order_var)',[length(options_.filter_step_ahead),1,gend+max(options_.filter_step_ahead)]);
+                end
+                stock_filter_step_ahead(:,dr.order_var,:,irun(4)) = aK(options_.filter_step_ahead,1:endo_nbr,:) + constant_part;
+                %now add trend to observables
+                for ii=1:length(options_.filter_step_ahead)
+                    if options_.prefilter
+                        zdim = size(stock_filter_step_ahead(ii,IdObs,:,irun(4)));
+                        squeezed = reshape(stock_filter_step_ahead(ii,IdObs,:,irun(4)), [zdim(2:end) 1]);
+                        stock_filter_step_ahead(ii,IdObs,:,irun(4)) = squeezed ...
+                            +repmat(mean_correction(:,1),1,gend+max(options_.filter_step_ahead)) ... %constant correction
+                            +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*(1:max(options_.filter_step_ahead))]; %trend
+                    else
+                        zdim = size(stock_filter_step_ahead(ii,IdObs,:,irun(4)));
+                        squeezed = reshape(stock_filter_step_ahead(ii,IdObs,:,irun(4)), [zdim(2:end) 1]);
+                        stock_filter_step_ahead(ii,IdObs,:,irun(4)) = squeezed ...
+                            +[trend_addition repmat(trend_addition(:,end),1,max(options_.filter_step_ahead))+trend_coeff*(1:max(options_.filter_step_ahead))]; %trend
+                    end
+                end
+            end
+            if horizon
+                yyyy = alphahat(iendo,i_last_obs);
+                if options_.occbin.smoother.status
+                    M_.endo_histval=yyyy(oo_.dr.inv_order_var);
+                    options_.occbin.forecast.replic=0;
+                    options_.occbin.simul.waitbar=false;
+                    [~, error_flag, yf] = occbin.forecast(options_,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,8);
+                else
+                    yf = simulate_posterior_forecasts(yyyy,dr,horizon,false,M_.Sigma_e,1);
+                end
+                if options_.prefilter
+                    % add mean
+                    yf(:,IdObs) = yf(:,IdObs)+repmat(mean_varobs, ...
+                        horizon+maxlag,1);
+                    % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
+                    yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff'-...
+                        repmat(mean(trend_coeff*(options_.first_obs:options_.first_obs+gend-1),2)',length(1-maxlag:horizon),1); %center trend
+                else
+                    % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
+                    yf(:,IdObs) = yf(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff';
+                end
+                if options_.loglinear
+                    yf = yf+repmat(log(SteadyState'),horizon+maxlag,1);
+                else
+                    yf = yf+repmat(SteadyState',horizon+maxlag,1);
+                end
+                if options_.occbin.smoother.status
+                    options_.occbin.forecast.replic=1;
+                    options_.occbin.forecast.qmc=0; % make sure we draw randn
+                    options_.occbin.forecast.waitbar=false;
+                    [~, error_flag, yf1] = occbin.forecast(options_,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,8);
+                else
+                    yf1 = simulate_posterior_forecasts(yyyy,dr,horizon,true,M_.Sigma_e,1);
+                end
+                if options_.prefilter == 1
+                    % add mean
+                    yf1(:,IdObs,:) = yf1(:,IdObs,:)+ ...
+                        repmat(mean_varobs,[horizon+maxlag,1,1]);
+                    % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
+                    yf1(:,IdObs) = yf1(:,IdObs)+((options_.first_obs-1)+gend+(1-maxlag:horizon)')*trend_coeff'-...
+                        repmat(mean(trend_coeff*(options_.first_obs:options_.first_obs+gend-1),2)',length(1-maxlag:horizon),1); %center trend
+                else
+                    % add trend, taking into account that last point of sample is still included in forecasts and only cut off later
+                    yf1(:,IdObs,:) = yf1(:,IdObs,:)+repmat(((options_.first_obs-1)+gend+(1-maxlag:horizon)')* ...
+                        trend_coeff',[1,1,1]);
+                end
+                if options_.loglinear
+                    yf1 = yf1 + repmat(log(SteadyState'),[horizon+maxlag,1,1]);
+                else
+                    yf1 = yf1 + repmat(SteadyState',[horizon+maxlag,1,1]);
+                end
+
+                stock_forcst_mean(:,:,irun(6)) = yf(maxlag+1:end,:)';
+                stock_forcst_point(:,:,irun(7)) = yf1(maxlag+1:end,:)';
+                if ~isequal(M_.H,0)
+                    ME_shocks=zeros(length(varobs),horizon);
+                    i_exo_var = setdiff(1:length(varobs),find(diag(M_.H) == 0));
+                    nxs = length(i_exo_var);
+                    chol_H = chol(M_.H(i_exo_var,i_exo_var));
+                    if ~isempty(M_.H)
+                        ME_shocks(i_exo_var,:) = chol_H*randn(nxs,horizon);
+                    end
+                    stock_forcst_point_ME(:,:,irun(12)) = yf1(maxlag+1:end,IdObs)'+ME_shocks;
+                end
+            end
+            if filter_covariance
+                stock_filter_covariance(dr.order_var,dr.order_var,:,irun(8)) = P;
+            end
+            if smoothed_state_uncertainty
+                stock_smoothed_uncert(dr.order_var,dr.order_var,:,irun(13)) = state_uncertainty;
+                stock_init_smoothed_uncert(dr.order_var,dr.order_var,irun(13)) = state_uncertainty0;
+            end
         end
     else
         [~,~,SteadyState] = dynare_resolve(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     end
-    stock_param(irun(5),:) = deep;
-    stock_logpo(irun(5),1) = logpo;
-    stock_ys(irun(5),:) = SteadyState';
+    if is_successful_draw
+        stock_param(irun(5),:) = deep;
+        stock_logpo(irun(5),1) = logpo;
+        stock_ys(irun(5),:) = SteadyState';
 
 
-    irun = irun +  ones(13,1);
-
-
+        irun = irun +  ones(13,1);
+    end
+    
     if run_smoother && (irun(1) > MAX_nsmoo || b == B)
         stock = stock_smooth(:,:,1:irun(1)-1);
         ifil(1) = ifil(1) + 1;
