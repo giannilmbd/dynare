@@ -128,6 +128,11 @@ variable `DYNARE_BUILD_DIR` to the full path of your build tree, before running
 MATLAB or Octave, if you want Dynare to be able to find the preprocessor and
 the MEX files.
 
+Optionally, you can set the `DYNARE_PROFILE_SUITE` environment variable to `true` to
+enable profiling during test runs. This will
+generate a profiling summary of the top 20 functions by total execution time,
+which can be useful for performance analysis and optimization.
+
 The `-Dsuitesparse_src_path=…` option can be used to pass the path to the
 unpacked SuiteSparse source tree, so that the ParU MEX file can be compiled.
 
