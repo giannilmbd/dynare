@@ -3725,7 +3725,10 @@ speed-up on large models.
        ``perfect_foresight_solver`` will find both the terminal steady state
        and the transitional dynamics within the same loop (which is less costly
        than first computing the terminal steady state by homotopy, then
-       computing the transitional dynamics by homotopy).
+       computing the transitional dynamics by homotopy). Note that this option
+       is implicitly enabled if the terminal condition is already a steady
+       state at the point of execution of the ``perfect_foresight_solver``
+       command.
 
     .. option:: endval_steady_nocheck
 

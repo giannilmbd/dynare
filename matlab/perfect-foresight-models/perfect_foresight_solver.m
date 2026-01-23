@@ -20,7 +20,7 @@ function [oo_, ts]=perfect_foresight_solver(M_, options_, oo_, marginal_lineariz
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 1996-2025 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -170,7 +170,7 @@ end
 % Do linearization if needed and requested, and put results and solver status information in oo_
 if completed_share == 1
     oo_.endo_simul = endo_simul;
-    if options_.simul.endval_steady
+    if recompute_final_steady_state
         oo_.steady_state = steady_state;
     end
     % NB: no need to modify oo_.exo_simul and oo_.exo_steady_state, since we simulated 100% of the shock, except if controlled paths
@@ -190,7 +190,7 @@ elseif options_.simul.homotopy_linearization_fallback && completed_share > 0
     oo_.deterministic_simulation.sim1.homotopy_completion_share = completed_share;
 
     oo_.endo_simul = endobase + (endo_simul - endobase)/completed_share;
-    if options_.simul.endval_steady
+    if recompute_final_steady_state
         % The following is needed for the STEADY_STATE() operator to work properly,
         % and thus must come before computing the maximum error.
         % This is not a true steady state, but it is the closest we can get to
@@ -269,7 +269,7 @@ elseif options_.simul.homotopy_marginal_linearization_fallback > 0 && completed_
         oo_.deterministic_simulation.sim2.homotopy_completion_share = extra_share;
 
         oo_.endo_simul = endo_simul + (endo_simul - extra_endo_simul)*(1-completed_share)/options_.simul.homotopy_marginal_linearization_fallback;
-        if options_.simul.endval_steady
+        if recompute_final_steady_state
             % The following is needed for the STEADY_STATE() operator to work properly,
             % and thus must come before computing the maximum error.
             % This is not a true steady state, but it is the closest we can get to
