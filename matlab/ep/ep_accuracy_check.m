@@ -1,7 +1,15 @@
 function e = ep_accuracy_check(M_,options_,oo_)
 % e = ep_accuracy_check(M_,options_,oo_)
+% 
+% % INPUTS
+%  o  M_               [structure] describing the model
+%  o  options_         [structure] describing the options
+%  o  oo_              [structure] describing the options
+% 
+% Outputs: 
+%  o  e                [double] matrix of Euler equation errors  
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -20,14 +28,15 @@ function e = ep_accuracy_check(M_,options_,oo_)
 
 endo_simul = oo_.endo_simul;
 n = size(endo_simul,2);
-[~, innovations, pfm, ~, ~, options_, oo_] = ...
-    extended_path_initialization([], n-1, [], options_, M_, oo_);
-
+[~, pfm, options_, oo_] = ...
+    extended_path_initialization([], options_, M_, oo_);
+ 
 options_.ep.accuracy.stochastic.order = options_.ep.stochastic.order;
 [nodes,weights] = setup_integration_nodes(options_.ep.accuracy,pfm);
 
+[~, spfm_exo_simul, oo_] = extended_path_shocks(pfm, oo_.exo_simul, options_.ep.periods, M_, options_, oo_);
+
 e = zeros(M_.endo_nbr,n);
 for i=1:n
-    e(:,i) = euler_equation_error(endo_simul(:,i),oo_.exo_simul, ...
-                                  innovations, M_, options_,oo_,pfm,nodes,weights);
+    e(:,i) = euler_equation_error(endo_simul(:,i),spfm_exo_simul, M_, options_,oo_,pfm,nodes,weights);
 end

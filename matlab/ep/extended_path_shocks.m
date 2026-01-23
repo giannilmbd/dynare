@@ -1,4 +1,19 @@
-function [shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innovations, exogenousvariables, sample_size, M_, options_, oo_)
+function [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, sample_size, M_, options_, oo_)
+% [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, sample_size, M_, options_, oo_)
+% INPUTS
+%  o pfm                 [struct]    description of pfm, containing information on innovations
+%  o exogenousvariables  [matrix]    path of exogenous variables, potentially empty
+%  o sample_size         [integer]   sample size
+%  o M_                  [structure] describing the model
+%  o options_            [structure] describing the options
+%  o oo_                 [structure] storing the results
+%
+% OUTPUTS
+%  o shocks             [matrix]    path of exogenous variables
+%  o spfm_exo_simul     [matrix]    steady state
+%  o oo_                [structure] storing the results
+%
+% Called by: extended_path.m, extended_path_mc.m
 
 % Copyright © 2016-2025 Dynare Team
 %
@@ -21,8 +36,8 @@ function [shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innov
 if isempty(exogenousvariables)
     switch options_.ep.innovation_distribution
       case 'gaussian'
-        shocks = zeros(sample_size, M_.exo_nbr);
-        shocks(:,innovations.positive_var_indx) = transpose(transpose(innovations.covariance_matrix_upper_cholesky)*randn(innovations.effective_number_of_shocks,sample_size));
+        shocks = zeros(sample_size, M_.exo_nbr); %non-zero mean steady states are filtered out in extended_path.m
+        shocks(:,pfm.positive_var_indx) = transpose(transpose(pfm.Omega)*randn(pfm.effective_number_of_shocks,sample_size)); %Omega is covariance_matrix_upper_cholesky 
       case 'calibrated'
         options = options_;
         options.periods = options.ep.periods;
@@ -33,9 +48,8 @@ if isempty(exogenousvariables)
     end
 else
     shocks = exogenousvariables;
-    innovations.positive_var_indx = find(sum(abs(shocks)>0));
 end
 
 % Copy the shocks in exo_simul
-oo_.exo_simul = shocks;
-spfm_exo_simul = repmat(oo_.exo_steady_state',options_.ep.periods+2,1);
+oo_.exo_simul = [repmat(oo_.exo_steady_state',M_.maximum_lag,1); shocks];
+spfm_exo_simul = repmat(oo_.exo_steady_state',options_.ep.periods+M_.maximum_lag+M_.maximum_lead,1);

@@ -1,4 +1,22 @@
 function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm)
+%  [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm)
+% Uses algo=0, i.e. full tree
+%
+% INPUTS
+%  o  endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
+%  o  exo_simul        [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
+%  o  options_         [structure] describing the options
+%  o  y                [vector]    initial guess
+%  o  M_               [structure] describing the model
+%  o  pfm              [struct]    perfect foresight model description
+%
+% OUTPUTS
+%  o  errorflag        [logical]   scalar, true if the nonlinear solver for the auxiliary model failed in some period.
+%  o  endo_simul       [matrix]    path of endogenous
+%  o  errorcode        [integer]   error code
+%  o  y                [vector]    solution for current period
+%  o  pfm              [struct]    perfect foresight model description
+%  o  options_         [structure] describing the options
 
 % Copyright © 2025 Dynare Team
 %
@@ -35,7 +53,6 @@ periods = pfm.periods;
 order = pfm.stochastic_order;
 
 lead_lag_incidence = pfm.lead_lag_incidence;
-lead_lag_incidence_t = transpose(lead_lag_incidence);
 ny = pfm.ny;
 nyp = pfm.nyp;
 nyf = pfm.nyf;
@@ -56,7 +73,7 @@ if update_pfm_struct
         nodes = [nodes(k,:); nodes(1:k-1,:); nodes(k+1:end,:)];
         weights = [weights(k); weights(1:k-1); weights(k+1:end)];
     else
-        error('there is no nodes equal to zero')
+        error('solve_stochastic_perfect_foresight_model_0: there is no node equal to zero')
     end
 
     pfm.nodes = nodes;
@@ -94,7 +111,7 @@ if update_pfm_struct
     for i=2:periods
         for j=1:nnodes^min(i-1,order)
             i_upd_r(i1:i2) = (n1:n2)+(j-1)*ny*periods;
-            i_upd_y(i1:i2) = (n1:n2)+ny+(j-1)*ny*(periods+2);
+            i_upd_y(i1:i2) = (n1:n2)+ny+(j-1)*ny*(periods+M_.maximum_lag+M_.maximum_lead);
             i1 = i2+1;
             i2 = i2+ny;
         end
@@ -115,7 +132,7 @@ if update_pfm_struct
 
     i_rows = 1:ny;
     i_cols = find(lead_lag_incidence');
-    pfm.i_cols_Ap = i_cols(1:nyp);;
+    pfm.i_cols_Ap = i_cols(1:nyp);
     pfm.i_cols_As = i_cols(nyp+(1:ny));
     pfm.i_cols_Af = i_cols(nyp+ny+(1:nyf)) - ny;
     pfm.i_hc = 1:ny;

@@ -2,6 +2,7 @@ function pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
 
 % Sets up the structure for the stochastic perfect foresight model solver.
 %
+%
 % INPUTS
 % - M_                     [struct]    Dynare's model structure
 % - options_               [struct]    Dynare's options structure
@@ -46,6 +47,12 @@ function pfm = setup_stochastic_perfect_foresight_model_solver(M_,options_,oo_)
 %
 % SPECIAL REQUIREMENTS
 % None.
+%
+% OUTPUTS:
+%  o  pfm              [struct]    perfect foresight model description
+%
+% Called by extended_path_initialization.m
+
 
 % Copyright © 2013-2025 Dynare Team
 %

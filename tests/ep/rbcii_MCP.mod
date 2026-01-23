@@ -52,7 +52,7 @@ end;
 set_dynare_seed(2009);
 extended_path(periods=200,order=0,lmmcp);
 
-if any(Simulated_time_series.i.data<-1e-6)
+if ~oo_.extended_path.status || any(Simulated_time_series.i.data<-1e-6)
     error('lmmcp tag did not work.')
 end
 

@@ -1,4 +1,25 @@
 function [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, algo, method, debug)
+% [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, algo, method, debug)
+% INPUTS
+%   endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
+%   exo_simul        [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
+%   M_               [structure] describing the model
+%   options_         [structure] describing the options
+%   oo_              [structure] storing the results
+%   pfm              [structure] perfect foresight model description
+%   ep               [structure] EP options
+%   order            [integer]   stochastic order
+%   algo             [integer]   0: full tree of future histories.
+%                                1: sparse tree of future histories.
+%   method           [integer]  currently hard-coded on input to 2
+%   debug            [boolean]  whether debugging mode has been requested
+%
+% OUTPUTS
+%   info_convergence [boolean]   whether convergence was achieved
+%   endo_simul       [matrix]    path of endogenous corresponding to the scenario
+%
+% Called by: extended_path_core.m
+
 
 % Copyright © 2016-2025 Dynare Team
 %
@@ -95,8 +116,6 @@ if isequal(method, 3) || (isequal(method, 2) && noconvergence)
     weights = 0:(1/1000):1;
     noconvergence = true;
     index = 1;
-    jndex = 0;
-    nweights = length(weights);
     while noconvergence
         weight = weights(index);
         oo_.endo_simul = endo_simul;
@@ -124,7 +143,6 @@ if isequal(method, 3) || (isequal(method, 2) && noconvergence)
             dprintf('%u\t %1.8f\t %u', index, weight, flag)
         end
         if flag
-            jndex = index;
             if isequal(weight, 1)
                 noconvergence = false;
                 continue

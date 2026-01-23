@@ -1,4 +1,22 @@
 function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm)
+% [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm)
+% Uses algo=1, i.e. full tree
+%
+% INPUTS
+%  o  endo_simul       [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
+%  o  exo_simul        [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
+%  o  options_         [structure] describing the options
+%  o  y                [vector]    initial guess
+%  o  M_               [structure] describing the model
+%  o  pfm              [struct]    perfect foresight model description
+%
+% OUTPUTS
+%  o  errorflag        [logical]   scalar, true if the nonlinear solver for the auxiliary model failed in some period.
+%  o  endo_simul       [matrix]    path of endogenous
+%  o  errorcode        [integer]   error code
+%  o  y                [vector]    solution for current period
+%  o  pfm              [struct]    perfect foresight model description
+%  o  options_         [structure] describing the options
 
 % Copyright © 2012-2025 Dynare Team
 %
@@ -96,15 +114,24 @@ if update_pfm_struct
         k = n1:n2;
         for j=1:(1+(nnodes-1)*min(i-1,order))
             i_upd_r(i1:i2) = k+(j-1)*ny*periods;
-            i_upd_y(i1:i2) = k+ny+(j-1)*ny*(periods+2);
+            i_upd_y(i1:i2) = k+ny+(j-1)*ny*(periods+(M_.maximum_lag+M_.maximum_lead));
             i1 = i2+1;
             i2 = i2+ny;
         end
         n1 = n2+1;
         n2 = n2+ny;
     end
-    icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ...
-           find(lead_lag_incidence(3,:))+2*world_nbr*ny]';
+
+    if rows(lead_lag_incidence)>2
+        icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ...
+            find(lead_lag_incidence(3,:))+2*world_nbr*ny]';
+    else
+        if pfm.nyf
+            icA = [find(lead_lag_incidence(2,:))+world_nbr*ny find(lead_lag_incidence(3,:))+2*world_nbr*ny ]';
+        else
+            icA = [find(lead_lag_incidence(1,:)) find(lead_lag_incidence(2,:))+world_nbr*ny ]';
+        end
+    end
 
     pfm.i_rows = 1:ny;
     pfm.i_cols = find(lead_lag_incidence');

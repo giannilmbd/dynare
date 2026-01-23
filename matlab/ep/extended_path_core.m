@@ -1,12 +1,27 @@
-function [y1, info_convergence, endogenousvariablespaths, y, pfm, options_] = extended_path_core(positive_var_indx, ...
-                                                                                             exo_simul, ...
-                                                                                             initial_conditions ,...
-                                                                                             pfm, ...
-                                                                                             M_, ...
-                                                                                             options_, ...
-                                                                                             oo_, ...
-                                                                                             initialguess, ...
-                                                                                             y)
+function [y1, info_convergence, endo_simul, y, pfm, options_] = ...
+    extended_path_core(exo_simul,initial_conditions ,...
+                        pfm,M_, options_, oo_, initialguess, y)
+% [y1, info_convergence, endo_simul, y, pfm, options_] = ...
+%     extended_path_core(exo_simul,initial_conditions ,...
+%     pfm,M_, options_, oo_, initialguess, y)
+% INPUTS
+%  o  exo_simul             [matrix]    path of exogenous, used to construct the guess values (only if oo_.deterministic_simulation.controlled_paths_by_period is not empty)
+%  o  initial_conditions    [matrix]    path of endogenous, used to construct the guess values (initial condition not used; terminal condition used as guess value iff recompute_final_steady_state=true)
+%  o  pfm                   [struct]    perfect foresight model description
+%  o  M_                    [structure] describing the model
+%  o  options_              [structure] describing the options
+%  o  oo_                   [struct]    Dynare's results structure
+%  o  y                     [vector]    initial guess
+%
+% OUTPUTS
+%  o  y                [vector]    solution for current period
+%  o  info_convergence [Boolean]   scalar if simulation was successful
+%  o  endo_simul       [matrix]    path of endogenous
+%  o  errorcode        [integer]   error code
+%  o  y                [vector]    solution for current period
+%  o  pfm              [struct]    perfect foresight model description
+%  o  options_         [structure] describing the options
+
 
 % Copyright © 2016-2025 Dynare Team
 %
@@ -27,30 +42,21 @@ function [y1, info_convergence, endogenousvariablespaths, y, pfm, options_] = ex
 
 ep = options_.ep;
 
-periods = ep.periods;
-endo_nbr = M_.endo_nbr;
-exo_nbr = M_.exo_nbr;
-init = options_.ep.use_first_order_solution_as_initial_guess;
-steady_state = oo_.steady_state;
 debug = options_.verbosity;
 order = options_.ep.stochastic.order;
 
-algo = ep.stochastic.algo;
-solve_algo = ep.solve_algo;
-stack_solve_algo = ep.stack_solve_algo;
-
-if init% Compute first order solution (Perturbation)...
+if options_.ep.use_first_order_solution_as_initial_guess% Compute first order solution (Perturbation)...
     endo_simul = simult_(M_,options_,initial_conditions,oo_.dr,exo_simul(2:end,:),1);
 else
-    if nargin>7 && ~isempty(initialguess)
+    if nargin>6 && ~isempty(initialguess)
         % Note that the first column of initialguess should be equal to initial_conditions.
         endo_simul = initialguess;
     else
-        endo_simul = [initial_conditions repmat(steady_state,1,periods+1)];
+        endo_simul = [initial_conditions repmat(oo_.steady_state,1,ep.periods+M_.maximum_lead)];
     end
 end
 
-if nargin~=9
+if nargin~=8
     y = [];
 end
 
@@ -61,49 +67,48 @@ if debug
 end
 
 if options_.bytecode && order > 0
-    error('Option order > 0 of extended_path command with order>0 is not compatible with bytecode option.')
+    error('extended path: order > 0 is not compatible with bytecode option.')
 end
 if options_.block && order > 0
-    error('Option order > 0 of extended_path command with order>0 is not compatible with block option.')
+    error('extended path: order > 0 is not compatible with block option.')
 end
 
 if order == 0
     % Extended Path
-    options_.periods = periods;
+    options_.periods = ep.periods;
     options_.block = pfm.block;
     oo_.endo_simul = endo_simul;
     oo_.exo_simul = exo_simul;
-    oo_.steady_state = steady_state;
-    options_.solve_algo = solve_algo;
-    options_.stack_solve_algo = stack_solve_algo;
-    [endogenousvariablespaths, info_convergence] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, [], M_, options_);
+    options_.solve_algo = ep.solve_algo;
+    options_.stack_solve_algo = ep.stack_solve_algo;
+    [endo_simul, info_convergence] = perfect_foresight_solver_core(oo_.endo_simul, oo_.exo_simul, oo_.steady_state, oo_.exo_steady_state, [], M_, options_);
 else
     % Stochastic Extended Path
-    switch(algo)
+    switch(ep.stochastic.algo)
       case 0
         % Full tree of future trajectories.
         if nargout>4
-            [flag, endogenousvariablespaths, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm);
+            [flag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm);
         else
-            [flag, endogenousvariablespaths, errorcode, y] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm);
+            [flag, endo_simul, errorcode, y] = solve_stochastic_perfect_foresight_model_0(endo_simul, exo_simul, y, options_, M_, pfm);
         end
       case 1
         % Sparse tree of future histories.
         if nargout>4
-            [flag, endogenousvariablespaths, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm);
+            [flag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm);
         else
-            [flag, endogenousvariablespaths, errorcode, y] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm);
+            [flag, endo_simul, errorcode, y] = solve_stochastic_perfect_foresight_model_1(endo_simul, exo_simul, y, options_, M_, pfm);
         end
     end
     info_convergence = ~flag;
 end
 
 if ~info_convergence && ~options_.no_homotopy
-    [info_convergence, endogenousvariablespaths] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, algo, 2, debug);
+    [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo_simul, M_, options_, oo_, pfm, ep, order, ep.stochastic.algo, 2, debug);
 end
 
 if info_convergence
-    y1 = endogenousvariablespaths(:,2);
+    y1 = endo_simul(:,2);
 else
-    y1 = NaN(size(endo_nbr,1));
+    y1 = NaN(size(M_.endo_nbr,1));
 end

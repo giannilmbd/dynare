@@ -1,7 +1,7 @@
 var V lL Vkp Valphaexp lzn lzd lp0 lpi MC lwreal lY lDisp lC lpiavg Int lA lDZ lG pistar Intr
 lsdf Int1 lpi1;
 // pricebond pricebondrn ytm ytmrn termprem ehpr slope;
-varexo epsA epsZ epsG epsPistar epsInt;
+varexo epsA epsG epsInt;
 
 parameters theta xi beta phi alpha eta KBar chi0 LMax chi IBar rhoinflavg taylrho DZBar taylpi tayly YBar rhoa rhoz rhog rhopistar piBar gssload consoldelta VAIMSS GBar;
 
@@ -89,10 +89,9 @@ lpiavg = rhoinflavg *lpiavg(-1) + (1-rhoinflavg) *lpi;
  + taylrho * 4*Int(-1) + epsInt; // multiply Int; infl by 4 to put at annual rate 
 // Exogenous Shocks 
 lA = rhoa * lA(-1) + epsA;
-lDZ = (1-rhoz)*log(DZBar) + rhoz * lDZ(-1) + epsZ;
+lDZ = (1-rhoz)*log(DZBar) + rhoz * lDZ(-1) + 0;
 lG = (1-rhog)*log(GBar) + rhog * lG(-1) + epsG;
-pistar = (1-rhopistar) *log(piBar) + rhopistar *pistar(-1) + gssload *(4*lpiavg-pistar)
- + epsPistar;
+pistar = (1-rhopistar) *log(piBar) + rhopistar *pistar(-1) + gssload *(4*lpiavg-pistar) + 0;
 // Term premium and other auxiliary finance equations 
 Intr = Int(-1) - lpi; // ex post real short rate 
 exp(lsdf) = beta *exp(lC(+1)-lC)^-phi *exp(lDZ(+1))^-phi
@@ -141,14 +140,67 @@ end;
 steady;
 
 shocks;
-var epsA; stderr 0.005;
-var epsZ; stderr 0.001;
+var epsA; stderr 0.001;
 var epsG; stderr 0.004;
-var epsPistar; stderr 0.0005;
 var epsInt; stderr 0.003;
 end;
 
-//stoch_simul(order=3,periods=50000,pruning);
+extended_path(periods=10, order=2, hybrid, tree=perfect, integration=unscented);
 
+if ~isequal(options_.ep.stochastic.hybrid_order, 2)
+    error('Wrong value of ep.stochastic.hybrid_order.')
+end
 
-extended_path(order=0,periods=3);
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in hybrid/rs.mod (tree=perfect, order=2, hybrid, integration=unscented).')
+end
+
+extended_path(periods=10, order=2, hybrid=0, tree=perfect, integration=unscented);
+
+if ~isequal(options_.ep.stochastic.hybrid_order, 0)
+    error('Wrong value of ep.stochastic.hybrid_order.')
+end
+
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in hybrid/rs.mod (tree=perfect, order=2, hybrid=0, integration=unscented).')
+end
+
+extended_path(periods=10, order=2, hybrid=4, tree=perfect, integration=unscented);
+
+if ~isequal(options_.ep.stochastic.hybrid_order, 4)
+    error('Wrong value of ep.stochastic.hybrid_order.')
+end
+
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in hybrid/rs.mod (tree=perfect, order=2, hybrid=4, integration=unscented).')
+end
+
+extended_path(periods=10, order=2, hybrid, tree=sparse, integration=unscented);
+
+if ~isequal(options_.ep.stochastic.hybrid_order, 2)
+    error('Wrong value of ep.stochastic.hybrid_order.')
+end
+
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in hybrid/rs.mod (tree=sparse, order=2, hybrid, integration=unscented).')
+end
+
+extended_path(periods=10, order=2, hybrid=0, tree=sparse, integration=unscented);
+
+if ~isequal(options_.ep.stochastic.hybrid_order, 0)
+    error('Wrong value of ep.stochastic.hybrid_order.')
+end
+
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in hybrid/rs.mod (tree=sparse, order=2, hybrid=0, integration=unscented).')
+end
+
+extended_path(periods=10, order=2, hybrid=4, tree=sparse, integration=unscented);
+
+if ~isequal(options_.ep.stochastic.hybrid_order, 4)
+    error('Wrong value of ep.stochastic.hybrid_order.')
+end
+
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in hybrid/rs.mod (tree=sparse, order=4, hybrid, integration=unscented).')
+end

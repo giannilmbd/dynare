@@ -30,11 +30,10 @@ stoch_simul(order=1,periods=200, irf=0, nomoments);
 
 oo = oo_;
 
-options_.simul.maxit = 100;
 options_.ep.order = 0;
 
-ts = extended_path([], 200, oo_.exo_simul, options_, M_, oo_);
+[ts, oo_] = extended_path([], 200, oo_.exo_simul, options_, M_, oo_);
 
-if max(max(abs(transpose(ts.data(2:end,:))-oo.endo_simul))) > 1e-6
-   error('extended path algorithm fails in ./tests/ep/linearmodel.mod')
+if ~oo_.extended_path.status || max(max(abs(transpose(ts.data(2:end,:))-oo.endo_simul))) > 1e-6
+   error('extended path algorithm fails in ep/linearmodel0.mod')
 end

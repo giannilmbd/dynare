@@ -21,15 +21,13 @@ rho     =  0.950;
 effstar =  1.000;
 sigma2  =  0.0001;
 
-external_function(name=mean_preserving_spread,nargs=2);
-
 model(use_dll);
 
   // Eq. n°1:
   efficiency = rho*efficiency(-1) + EfficiencyInnovation;
 
   // Eq. n°2:
-  Efficiency = effstar*exp(efficiency-mean_preserving_spread(rho,sigma2));
+  Efficiency = effstar*exp(efficiency);
 
   // Eq. n°3:
   Output = Efficiency*(alpha*(Capital(-1)^psi)+(1-alpha)*(Labour^psi))^(1/psi);
@@ -41,16 +39,16 @@ model(use_dll);
   ((1-theta)/theta)*(Consumption/(1-Labour)) - (1-alpha)*(Output/Labour)^(1-psi);
 
   // Eq. n°6:
-  (((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption - ExpectedTerm(1);
+  (Consumption^theta)*((1-Labour)^(1-theta)) - Consumption^(1/(1-tau))*ExpectedTerm(1);
 
   // Eq. n°7:
-  ExpectedTerm = beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital(-1))^(1-psi))+1-delta);
+  ExpectedTerm = (beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital(-1))^(1-psi))+1-delta))^(1/(1-tau));
 
 end;
 
 steady_state_model;
 efficiency = 0;
-Efficiency = effstar*exp(efficiency-mean_preserving_spread(rho,sigma2));
+Efficiency = effstar;
 // Compute steady state ratios.
 Output_per_unit_of_Capital=((1/beta-1+delta)/alpha)^(1/(1-psi));
 Consumption_per_unit_of_Capital=Output_per_unit_of_Capital-delta;
@@ -66,7 +64,7 @@ Labour=1/(1+Consumption_per_unit_of_Labour/((1-alpha)*theta/(1-theta)*Output_per
 Consumption = Consumption_per_unit_of_Labour*Labour;
 Capital = Labour/Labour_per_unit_of_Capital;
 Output = Output_per_unit_of_Capital*Capital;
-ExpectedTerm = beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital)^(1-psi))+1-delta);
+ExpectedTerm = (beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital)^(1-psi))+1-delta))^(1/(1-tau));
 end;
 
 
@@ -78,3 +76,27 @@ steady;
 
 extended_path(periods=10);
 
+if oo_.extended_path.status == 0
+    error('Extended path failed to find a solution in ep/rbc2.mod')
+end
+
+if size(oo_.exo_simul,1)~=size(oo_.endo_simul,2)
+    error('Variable dimensions are incorrect')
+end
+if size(oo_.exo_simul,2)~=M_.exo_nbr
+    error('Dimension of exo_simul is incorrect')
+end
+
+if options_.ep.stochastic.order ~= 0
+    error('Wrong approach order detected')
+end
+
+extended_path(periods=10, order=1);
+
+if oo_.extended_path.status == 0
+    error('Stochastic extended path failed to find a solution at order 1 in ep/rbc2.mod')
+end
+
+if options_.ep.stochastic.order ~= 1
+    error('Preprocessor interface failed to set correct approach order')
+end

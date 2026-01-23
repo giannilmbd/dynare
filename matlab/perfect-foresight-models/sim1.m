@@ -165,7 +165,7 @@ while ~(converged || iter > options_.simul.maxit)
         end
         if any(isnan(dy)) || any(isinf(dy))
             if verbose
-                display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint || ~isempty(controlled_paths_by_period));
+                display_critical_variables(reshape(dy,[ny periods])', M_.endo_names,'sim1', options_.noprint || ~isempty(controlled_paths_by_period),0,iter);
             end
         end
         y = y + dy;
@@ -204,7 +204,7 @@ if converged
             skipline()
             fprintf('Total time of simulation: %g.\n', etime(clock,h1))
             disp('Simulation terminated with NaN or Inf in the residuals or endogenous variables.')
-            display_critical_variables(reshape(dy,[ny periods])', M_, options_.noprint || ~isempty(controlled_paths_by_period));
+            display_critical_variables(reshape(y,[ny periods])', M_.endo_names,'sim1', options_.noprint || ~isempty(controlled_paths_by_period));
             disp('There is most likely something wrong with your model. Try model_diagnostics or another simulation method.')
             printline(105)
         end
@@ -314,28 +314,6 @@ flag = (relres > 1e-6); %corresponds to hard-coded relative tolerance in e.g. bi
 if flag ~= 0
     disp_verbose('    lin_solve_robust: robust_lin_solve failed to find a solution to the linear system.', options_.debug);
 end
-
-function display_critical_variables(dyy, M_, noprint)
-
-if noprint
-    return
-end
-
-if any(isnan(dyy))
-    indx = find(any(isnan(dyy)));
-    endo_names= M_.endo_names(indx);
-    disp('Last iteration provided NaN for the following variables:')
-    fprintf('%s, ', endo_names{:}),
-    fprintf('\n'),
-end
-if any(isinf(dyy))
-    indx = find(any(isinf(dyy)));
-    endo_names = M_.endo_names(indx);
-    disp('Last iteration diverged (Inf) for the following variables:')
-    fprintf('%s, ', endo_names{:}),
-    fprintf('\n'),
-end
-
 
 function check_Jacobian_for_singularity(jacob,endo_names,options_)
 n_vars_jacob=size(jacob,2);

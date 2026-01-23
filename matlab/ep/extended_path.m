@@ -1,5 +1,5 @@
-function [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
-
+function [ts,oo_] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
+% [ts,oo_] = extended_path(initialconditions, samplesize, exogenousvariables, options_, M_, oo_)
 % Stochastic simulation of a non linear DSGE model using the Extended Path method (Fair and Taylor 1983). A time
 % series of size T  is obtained by solving T perfect foresight models.
 %
@@ -13,8 +13,7 @@ function [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exoge
 %
 % OUTPUTS
 % - ts                     [dseries]   m*samplesize array, the simulations.
-% - oo_                    [struct]
-% - errorflag              [logical]   scalar, true if the nonlinear solver for the auxiliary model failed in some period.
+% - oo_                    [struct]    Dynare's results structure
 %
 % REMARKS
 % If errorflag==true, because the nonlinear solver failed in period T<samplesize, ts holds the simulations for periods 1 to T-1.
@@ -36,19 +35,48 @@ function [ts,oo_,errorflag] = extended_path(initialconditions, samplesize, exoge
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-errorflag = false;
+oo_.extended_path.status=true;
 
 if ~isempty(M_.perfect_foresight_controlled_paths)
-    error('extended_path command is not compatible with perfect_foresight_controlled_paths block')
+    error('extended_path: command is not compatible with perfect_foresight_controlled_paths block.')
 end
 
-[initialconditions, innovations, pfm, options_, oo_] = ...
-    extended_path_initialization(initialconditions, samplesize, exogenousvariables, options_, M_, oo_);
+if M_.maximum_lag==0
+    error('(Stochastic) Extended path is not supported for purely forward-looking models.')
+end
 
-[shocks, spfm_exo_simul, innovations, oo_] = extended_path_shocks(innovations, exogenousvariables, samplesize, M_, options_, oo_);
+if M_.maximum_lead==0
+    if options_.ep.stochastic.order>0
+        error('Stochastic extended path does not support purely backward-looking models.')
+    else
+        options_.ep.periods = 1;
+    end
+end
+
+[initialconditions, pfm, options_, oo_] = ...
+    extended_path_initialization(initialconditions, options_, M_, oo_);
+
+if ~isempty(exogenousvariables) && strcmp(options_.ep.innovation_distribution,'gaussian') && ~all(iszero(oo_.exo_steady_state))
+    error('extended_path: a Gaussian innovation_distribution is incompatible with non-mean 0 exogenous variables.')
+end
+
+% Set the initial period.
+if isdates(options_.initial_period)
+    if ischar(options_.initial_period)
+        initial_period = dates(options_.initial_period);
+    else
+        initial_period = options_.initial_period;
+    end
+elseif isnan(options_.initial_period)
+    initial_period = dates(1,1);
+else
+    error('extended_path: option initial_period be a date.')
+end
+
+[shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvariables, samplesize, M_, options_, oo_);
 
 % Initialize the matrix for the paths of the endogenous variables.
-endogenous_variables_paths = NaN(M_.endo_nbr, samplesize+1);
+endogenous_variables_paths = NaN(M_.endo_nbr, samplesize+M_.maximum_lag); % extended_path_initialization will error out if no lag is present
 endogenous_variables_paths(:,1) = initialconditions;
 
 % Set waitbar (graphic or text  mode)
@@ -73,30 +101,29 @@ while (t <= samplesize)
         initialguess = [];
     end
     if t>2
-        [endogenous_variables_paths(:,t), info_convergence, endogenousvariablespaths, y] = extended_path_core(innovations.positive_var_indx, ...
-                                                                                                           spfm_exo_simul, ...
-                                                                                                           endogenous_variables_paths(:,t-1), ...
-                                                                                                           pfm, ...
-                                                                                                           M_, ...
-                                                                                                           options_, ...
-                                                                                                           oo_, ...
-                                                                                                           initialguess, ...
-                                                                                                           y);
+        [endogenous_variables_paths(:,t), info_convergence, endogenousvariablespaths, y] ...
+            = extended_path_core(spfm_exo_simul, ...
+                                endogenous_variables_paths(:,t-1), ...
+                                pfm, ...
+                                M_, ...
+                                options_, ...
+                                oo_, ...
+                                initialguess, ...
+                                y);
     else
-        [endogenous_variables_paths(:,t), info_convergence, endogenousvariablespaths, y, pfm, options_] = extended_path_core(innovations.positive_var_indx, ...
-                                                                                                                          spfm_exo_simul, ...
-                                                                                                                          endogenous_variables_paths(:,t-1), ...
-                                                                                                                          pfm, ...
-                                                                                                                          M_, ...
-                                                                                                                          options_, ...
-                                                                                                                          oo_, ...
-                                                                                                                          initialguess, ...
-                                                                                                                          []);
+        [endogenous_variables_paths(:,t), info_convergence, endogenousvariablespaths, y, pfm, options_] ...
+            = extended_path_core(spfm_exo_simul, ...
+                                endogenous_variables_paths(:,t-1), ...
+                                pfm, ...
+                                M_, ...
+                                options_, ...
+                                oo_, ...
+                                initialguess, ...
+                                []);
     end
     if ~info_convergence
-        msg = sprintf('No convergence of the (stochastic) perfect foresight solver (in period %s)!', int2str(t));
-        warning(msg)
-        errorflag = true;
+        warning('extended_path: No convergence of the (stochastic) perfect foresight solver (in period %s)!', int2str(t))
+        oo_.extended_path.status = false;
         break
     end
 end % (while) loop over t
@@ -104,25 +131,11 @@ end % (while) loop over t
 % Close waitbar.
 wait_bar.close(hh_fig,options_.console_mode);
 
-% Set the initial period.
-if isdates(options_.initial_period)
-    if ischar(options_.initial_period)
-        initial_period = dates(options_.initial_period);
-    else
-        initial_period = options_.initial_period;
-    end
-elseif isnan(options_.initial_period)
-    initial_period = dates(1,1);
-else
-    error('Type of option initial_period is wrong.')
+% Return the simulated time series.
+if any(~isfinite(endogenous_variables_paths(:)))
+    display_critical_variables(endogenous_variables_paths, M_.endo_names, 'extended_path', false,1)
 end
 
-% Return the simulated time series.
-if any(isnan(endogenous_variables_paths(:)))
-    sl = find(~isnan(endogenous_variables_paths));
-    nn = size(endogenous_variables_paths, 1);
-    endogenous_variables_paths = reshape(endogenous_variables_paths(sl), nn, length(sl)/nn);
-end
 ts = dseries(transpose(endogenous_variables_paths), initial_period, M_.endo_names);
 
 oo_.endo_simul = transpose(ts.data);

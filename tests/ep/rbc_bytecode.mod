@@ -4,12 +4,11 @@ var Capital, Output, Labour, Consumption, Efficiency, efficiency, ExpectedTerm;
 
 varexo EfficiencyInnovation;
 
-parameters beta, theta, tau, alpha, psi, delta, rho, effstar, sigma;
+parameters beta, theta, tau, alpha, psi, delta, rho, effstar, sigma2;
 
 /*
 ** Calibration
 */
-
 
 beta    =  0.990;
 theta   =  0.357;
@@ -19,15 +18,15 @@ psi     =  -5.000;
 delta   =  0.020;
 rho     =  0.950;
 effstar =  1.000;
-sigma   =  0.010;
+sigma2  =  0.0001;
 
 model(bytecode);
 
   // Eq. n°1:
-  efficiency = rho*efficiency(-1) + sigma*EfficiencyInnovation;
+  efficiency = rho*efficiency(-1) + EfficiencyInnovation;
 
   // Eq. n°2:
-  Efficiency = effstar*exp(efficiency-.5*sigma*sigma/(1-rho*rho));
+  Efficiency = effstar*exp(efficiency);
 
   // Eq. n°3:
   Output = Efficiency*(alpha*(Capital(-1)^psi)+(1-alpha)*(Labour^psi))^(1/psi);
@@ -39,10 +38,10 @@ model(bytecode);
   ((1-theta)/theta)*(Consumption/(1-Labour)) - (1-alpha)*(Output/Labour)^(1-psi);
 
   // Eq. n°6:
-  (((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption - ExpectedTerm(1);
+  (Consumption^theta)*((1-Labour)^(1-theta)) - Consumption^(1/(1-tau))*ExpectedTerm(1);
 
   // Eq. n°7:
-  ExpectedTerm = beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital(-1))^(1-psi))+1-delta);
+  ExpectedTerm = (beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital(-1))^(1-psi))+1-delta))^(1/(1-tau));
 
 end;
 
@@ -64,14 +63,20 @@ Labour=1/(1+Consumption_per_unit_of_Labour/((1-alpha)*theta/(1-theta)*Output_per
 Consumption = Consumption_per_unit_of_Labour*Labour;
 Capital = Labour/Labour_per_unit_of_Capital;
 Output = Output_per_unit_of_Capital*Capital;
-ExpectedTerm = beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital)^(1-psi))+1-delta);
+ExpectedTerm = (beta*((((Consumption^theta)*((1-Labour)^(1-theta)))^(1-tau))/Consumption)*(alpha*((Output/Capital)^(1-psi))+1-delta))^(1/(1-tau));
 end;
 
 
 shocks;
-var EfficiencyInnovation = 1;
+var EfficiencyInnovation = sigma2;
 end;
 
-steady(nocheck);
+steady;
 
-extended_path(periods=10, order=0);
+options_.ep.stack_solve_algo=0; // Only necessary with bytecode, even with the new version of the model (fixing orders of magnitude issue). Not clear why...
+
+extended_path(periods=2, order=0);
+
+if ~oo_.extended_path.status
+    error('Extended path did not find solution in ep/rbc_bytecode.mod')
+end

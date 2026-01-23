@@ -1,6 +1,6 @@
 function [block_nbr,world_nbr] = get_block_world_nbr(algo,nnodes,order,periods)
 
-% Copyright © 2014 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -27,5 +27,5 @@ switch algo
     block_nbr = (order+(nnodes-1)*(order-1)*order/2+(periods-order)* ...
                  world_nbr);
   otherwise
-    error('This case is not supposed to happen')
+    error('get_block_world_nbr: This case is not supposed to happen. Please contact the developers.')
 end

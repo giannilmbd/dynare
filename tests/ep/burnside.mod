@@ -55,67 +55,67 @@ options_.ep.stochastic.algo=1; // Default is to use a sparse tree
 tic
 
 options_.ep.stochastic.order = 0;
-[ts0, o0, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts0, o0] = extended_path([], T, e_1, options_, M_, oo_);
 
-if errorflag, error('EP failed'), end
+if ~o0.extended_path.status, error('EP failed'), end
 
 options_.ep.stochastic.order = 1;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
-[ts1, o1, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts1, o1] = extended_path([], T, e_1, options_, M_, oo_);
 
-if errorflag, error('SEP(1) failed'), end
+if ~o1.extended_path.status, error('SEP(1) failed'), end
 
 options_.ep.stochastic.order = 1;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
 options_.ep.stochastic.hybrid_order = 2;
-[ts1h, o1h, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts1h, o1h] = extended_path([], T, e_1, options_, M_, oo_);
 options_.ep.stochastic.hybrid_order = 0;
 
-if errorflag, error('Hybrid SEP(1) failed'), end
+if ~o1h.extended_path.status, error('Hybrid SEP(1) failed'), end
 
 options_.ep.stochastic.order = 2;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
-[ts2, o2, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts2, o2] = extended_path([], T, e_1, options_, M_, oo_);
 
-if errorflag, error('SEP(2) failed'), end
+if ~o2.extended_path.status, error('SEP(2) failed'), end
 
 options_.ep.stochastic.order = 2;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
 options_.ep.stochastic.algo=0; // Full tree of future innovations
-[ts2__, o2full, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts2__, o2full] = extended_path([], T, e_1, options_, M_, oo_);
 options_.ep.stochastic.algo=1;
 
-if errorflag, error('SEP(2) with perfect tree failed'), end
+if ~o2full.extended_path.status,, error('SEP(2) with perfect tree failed'), end
 
 options_.ep.stochastic.order = 2;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
 options_.ep.stochastic.hybrid_order = 2;
-[ts2h, o2h, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts2h, o2h] = extended_path([], T, e_1, options_, M_, oo_);
 
-if errorflag, error('Hybrid (order 2) SEP(2) failed'), end
+if ~o2h.extended_path.status, error('Hybrid (order 2) SEP(2) failed'), end
 
 options_.ep.stochastic.order = 2;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
 options_.ep.stochastic.hybrid_order = 4;
-[ts2hh, o2hh, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts2hh, o2hh] = extended_path([], T, e_1, options_, M_, oo_);
 
-if errorflag, error('Hybrid (order 4) SEP(2) failed'), end
+if ~o2hh.extended_path.status, error('Hybrid (order 4) SEP(2) failed'), end
 
 options_.ep.stochastic.order = 2;
 options_.ep.stochastic.IntegrationAlgorithm='Tensor-Gaussian-Quadrature';
 options_.ep.stochastic.quadrature.nodes = 3;
 options_.ep.stochastic.hybrid_order = 2;
 options_.ep.stochastic.algo = 0;
-[ts2h__, o2hfull, errorflag] = extended_path([], T, e_1, options_, M_, oo_);
+[ts2h__, o2hfull] = extended_path([], T, e_1, options_, M_, oo_);
 options_.ep.stochastic.algo = 1;
 
-if errorflag, error('Hybrid (order 2) SEP(2) with perfect tree failed'), end
+if ~o2hfull.extended_path.status, error('Hybrid (order 2) SEP(2) with perfect tree failed'), end
 
 toc
 

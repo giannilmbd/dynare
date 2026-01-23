@@ -145,18 +145,28 @@ var epsG; stderr 0.004;
 var epsInt; stderr 0.003;
 end;
 
-options_.ep.stochastic.IntegrationAlgorithm = 'Unscented';
+extended_path(periods=10, order=1,integration=unscented);
 
-extended_path(periods=10, order=1);
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in zeroshocks/rstrue.mod (order=1, integration=unscented).')
+end
+
 Simulated_time_series.save('rstrue1');
 
 extended_path(periods=10, order=2);
 Simulated_time_series.save('rstrue2');
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in zeroshocks/rstrue.mod (order=2, tree=perfect, integration=unscented).')
+end
 
-options_.ep.stochastic.algo = 1;
-
-extended_path(periods=10, order=2);
+extended_path(periods=10, order=2,tree=sparse);
 Simulated_time_series.save('rstrue2s');
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in zeroshocks/rstrue.mod (order=2, tree=sparse, integration=unscented).')
+end
 
 extended_path(periods=10, order=2, hybrid);
 Simulated_time_series.save('rstrue2sh');
+if ~oo_.extended_path.status
+    error('Stochastic extended path did not find solution in zeroshocks/rstrue.mod (order=2, tree=sparse, hybrid=2, integration=unscented).')
+end

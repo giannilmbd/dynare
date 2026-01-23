@@ -1,5 +1,5 @@
 function [res, A, info] = ep_problem_0(y, x, pfm)
-
+% [res, A, info] = ep_problem_0(y, x, pfm)
 % Evaluate the residuals and stacked Jacobian of a stochastic perfect
 % foresight, considering sequences of future innovations in a perfect n-ary tree.
 %
@@ -44,7 +44,6 @@ dynamic_g1 = pfm.dynamic_g1;
 sparse_rowval = pfm.sparse_rowval;
 sparse_colval = pfm.sparse_colval;
 sparse_colptr = pfm.sparse_colptr;
-lead_lag_incidence = pfm.lead_lag_incidence;
 i_cols_1 = pfm.i_cols_1;
 i_cols_j = pfm.i_cols_j;
 i_cols_T = pfm.i_cols_T;
