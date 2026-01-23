@@ -75,13 +75,13 @@ options_.huge_number = 1e7;
 options_.add_tiny_number_to_cholesky=1e-14;
 
 % Default number of threads for parallelized mex files.
-options_.threads.kronecker.sparse_hessian_times_B_kronecker_C = num_procs;
-options_.threads.local_state_space_iteration_2 = num_procs;
-options_.threads.local_state_space_iteration_3 = num_procs;
+options_.threads.kronecker.sparse_hessian_times_B_kronecker_C = min(4, max(1,num_procs/4));
+options_.threads.local_state_space_iteration_2 = min(4, max(1,num_procs/4));
+options_.threads.local_state_space_iteration_3 = min(4, max(1,num_procs/4));
 options_.threads.local_state_space_iteration_k = 1;
-options_.threads.perfect_foresight_problem = num_procs;
-options_.threads.perfect_foresight_block_problem = num_procs;
-options_.threads.k_order_perturbation = max(1, num_procs/2);
+options_.threads.perfect_foresight_problem = min(4, max(1,num_procs/4));
+options_.threads.perfect_foresight_block_problem = min(4, max(1,num_procs/4));
+options_.threads.k_order_perturbation = min(4, max(1,num_procs/4));
 options_.threads.pardiso = num_procs;
 
 % steady state
