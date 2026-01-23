@@ -16,7 +16,7 @@ if ~isoctave % Disabled under Octave because it takes too much time
 stoch_simul(order=3,periods=200, irf=0);
 send_endogenous_variables_to_workspace;
 save('my_data.mat','q','ca');
-
+if matlab.internal.parallel.isPCTInstalled
 estimation(datafile='my_data.mat',order=2,mode_compute=0,mh_replic=0,filter_algorithm=sis,nonlinear_filter_initialization=2
     ,cova_compute=0, %tell program that no covariance matrix was computed
            posterior_sampling_method='hssmc',
@@ -26,5 +26,16 @@ estimation(datafile='my_data.mat',order=2,mode_compute=0,mh_replic=0,filter_algo
                                       'scale',.5,
                                       'target', .25)
 );
-
+else % use less particles when not in parallel context
+estimation(datafile='my_data.mat',order=2,mode_compute=0,mh_replic=0,filter_algorithm=sis,nonlinear_filter_initialization=2
+    ,cova_compute=0, %tell program that no covariance matrix was computed
+           posterior_sampling_method='hssmc',
+           posterior_sampler_options=('steps',5,
+                                      'lambda',2,
+                                      'particles', 20,
+                                      'scale',.5,
+                                      'target', .25)
+);
+    
+end
 end
