@@ -428,7 +428,26 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
     end
     clf(hfig(4),'reset'),
     set(hfig(4),'name',['Data density: regimes contribution, t=' int2str(t)])
-    pp = pie(datalik_regime(is_resampled_regime)/sum(datalik_regime(is_resampled_regime)), all_updated_regimes(is_resampled_regime));
+    tlo4=tiledlayout(1,2);
+    title(tlo4,['Regimes contribution (t=' int2str(t) ')']);
+    tlo4.TileSpacing = 'tight';
+    nexttile
+    simul_regime = nan(length(my_simulated_regime_order),1);
+    for kr = 1:length(my_simulated_regime_order)
+        simul_regime(kr) = length(simulated_regimes(my_simulated_regime_order(kr)).index)/sum(simulated_sample.success);
+    end
+    pp = pie(simul_regime);
+    ip=0;
+    for kr=1:length(simul_regime)
+        ip=ip+1;
+        pp(ip).FaceColor=my_colororder(kr,:);
+        ip=ip+1;
+    end
+    legend(all_simulated_regimes(my_simulated_regime_order),'Orientation','Horizontal','NumColumns',3,'Location','southoutside');
+    title('Predictive density t|t-1')
+
+    nexttile
+    pp = pie(datalik_regime(is_resampled_regime)/sum(datalik_regime(is_resampled_regime)));
     ip=0;
     for kr=1:number_of_updated_regimes
         if is_resampled_regime(kr)
@@ -437,8 +456,9 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
             ip=ip+1;
         end
     end
-    title(['Data density: regimes contribution, t=' int2str(t)])
-    dyn_saveas(hfig(4),[GraphDirectoryName, filesep, M_.fname,'_data_density_regimes_contribution_t',int2str(t)],nodisplay,options_.graph_format);
+    legend(all_updated_regimes(is_resampled_regime),'Orientation','Horizontal','NumColumns',3,'Location','southoutside');
+    title('Data density t|t')
+    dyn_saveas(hfig(4),[GraphDirectoryName, filesep, M_.fname,'_regimes_contribution_t',int2str(t)],nodisplay,options_.graph_format);
 
     % START updated states t|t
     iss = find(diag(cov(y10'))>1.e-12);
