@@ -99,7 +99,7 @@ if isempty(StateVector0)
     StateVector0.stop_particles = false;
 end
 
-if ~(options_.occbin.filter.particle.likelihood_only && ~options_.occbin.filter.particle.empirical_data_density.status) || options_.occbin.filter.particle.ensemble_kalman_filter
+if options_.occbin.filter.particle.diagnostics.status || options_.occbin.filter.particle.empirical_data_density.status || options_.occbin.filter.particle.ensemble_kalman_filter
     % random shocks
     [US,XS] = svd(QQQ(:,:,2));
     % P= U*X*U';
@@ -108,6 +108,10 @@ if ~(options_.occbin.filter.particle.likelihood_only && ~options_.occbin.filter.
     % Get the rank of ShockVarianceSquareRoot
     shock_variance_rank = size(ShockVarianceSquareRoot,2);
     ShockVectors = bsxfun(@plus,US(:,ishock)*ShockVarianceSquareRoot*transpose(norminv(qmc_scrambled(shock_variance_rank,number_of_particles,1))),zeros(length(US),1));
+end
+
+if  ~options_.occbin.filter.particle.diagnostics.status || (~isempty(options_.occbin.filter.particle.diagnostics.graph_periods) && ~ismember(t,options_.occbin.filter.particle.diagnostics.graph_periods))
+    options_.occbin.filter.particle.diagnostics.nograph=true;
 end
 
 if options_.occbin.filter.particle.ensemble_kalman_filter
@@ -187,7 +191,7 @@ end
 graph_info = StateVectors.graph_info;
 StateVectors.stop_particles = false;
 
-if ~(options_.occbin.filter.particle.likelihood_only && ~options_.occbin.filter.particle.empirical_data_density.status)
+if options_.occbin.filter.particle.diagnostics.status || options_.occbin.filter.particle.empirical_data_density.status
     di=data_index{2};
     ZZ = Z(di,:);
     opts_simul = occbin_options.opts_simul;
@@ -205,7 +209,7 @@ if ~(options_.occbin.filter.particle.likelihood_only && ~options_.occbin.filter.
     if  ~options_.debug && StateVector0.use_pkf_distribution && StateVectors.use_pkf_distribution
         % do not produce plots when state updates that are identical by construction
         % even if nograph==false, unless debug
-        options_.occbin.filter.particle.nograph=true;
+        options_.occbin.filter.particle.diagnostics.nograph=true;
     end
     % we enter in any case to compute density and density data
     [density, density_data, graph_info] = occbin.ppf.graphs(t, updated_sample.indx, ShockVectors, StateVectorsPKF, StateVectorsPPF, updated_sample.likxx, regimes0, regimesy, ...

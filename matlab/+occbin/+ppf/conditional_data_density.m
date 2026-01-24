@@ -122,7 +122,7 @@ if infox ==0
         end
         updated_regimes(number_of_updated_regimes).regime = tmp_str;
         all_updated_regimes = {updated_regimes.regime};
-        if ~options_.occbin.filter.particle.likelihood_only
+        if options_.occbin.filter.particle.diagnostics.status
             updated_regimes(number_of_updated_regimes).obsvar = ZZ*(Tx(:,:,1)*P0*Tx(:,:,1)'+Rx(:,:,1)*QQQ(:,:,2)*Rx(:,:,1)')*ZZ' + H(di,di);
             updated_regimes(number_of_updated_regimes).obsmean = ZZ*(Tx(:,:,1)*a0+Cx(:,1));
             updated_regimes(number_of_updated_regimes).ss.C = Cx(:,1);
@@ -158,7 +158,7 @@ if infox ==0
         updated_mode.R = Rx;
         updated_mode.C = Cx;
         updated_mode.regimes = regimesx;
-        if ~options_.occbin.filter.particle.likelihood_only
+        if options_.occbin.filter.particle.diagnostics.status
             updated_mode.lik = updated_regimes(this_updated_regime).lik;
         end
         updated_mode.etahat = etahatx;

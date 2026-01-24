@@ -52,10 +52,11 @@ if ismember(flag,{'filter','all'})
     options_occbin_.filter.particle.state_importance_sampling.slice_override_iteration = 100;
     options_occbin_.filter.particle.state_importance_sampling.slice_burnin = 10;
     options_occbin_.filter.particle.initial_state_ergodic_simul = false;
-    options_occbin_.filter.particle.likelihood_only = true;
+    options_occbin_.filter.particle.diagnostics.status = false;
+    options_occbin_.filter.particle.diagnostics.graph_periods = [];
+    options_occbin_.filter.particle.diagnostics.nograph = true;
     options_occbin_.filter.particle.number_of_particles = 127;
     options_occbin_.filter.particle.number_of_shocks_per_particle = 1;
-    options_occbin_.filter.particle.nograph = true;
     options_occbin_.filter.particle.state_draws = [];
     options_occbin_.filter.particle.status = false;
     options_occbin_.filter.particle.tobit = false;
@@ -186,6 +187,7 @@ if ismember(flag,{'posterior_importance_sampling','all'})
     options_occbin_.posterior_importance_sampling.orig_dname = M_.dname;
     options_occbin_.posterior_importance_sampling.orig_fname = M_.fname;
     options_occbin_.posterior_importance_sampling.orig_filter = 'linear'; % can be linear or pkf    
+    options_occbin_.posterior_importance_sampling.sub_draws = [];
 end
 
 if ismember(flag,{'shock_decomp','all'})

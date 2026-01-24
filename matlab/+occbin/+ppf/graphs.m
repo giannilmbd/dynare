@@ -60,7 +60,7 @@ function [density, density_data, graph_info] = graphs(t, indx, ShockVectors, Sta
 
 
 % OUTPUT
-if ~options_.occbin.filter.particle.nograph
+if ~options_.occbin.filter.particle.diagnostics.nograph
     % observed Y mean and covariance given 0
     PZ0 = ZZ*P10(:,:,2)*ZZ'+H(di,di);
     ObsVectorMean0 = ZZ*a10(:,2);
@@ -85,7 +85,7 @@ y10 = y100(:,success);
 z10 = ZZ*y10;
 nobs = size(ZZ,1);
 
-if ~options_.occbin.filter.particle.nograph
+if ~options_.occbin.filter.particle.diagnostics.nograph
     %
     % QQ plot 
     % ppf predictive covariance
@@ -198,7 +198,7 @@ for kr=1:number_of_updated_regimes
     end
 end
 
-if ~options_.occbin.filter.particle.nograph
+if ~options_.occbin.filter.particle.diagnostics.nograph
     GraphDirectoryName = CheckPath('occbin_ppf_graphs',M_.dname);
     nodisplay = false;
     if nobs==1 && ~isoctave && user_has_matlab_license('statistics_toolbox') % ksdensity is missing
@@ -280,7 +280,7 @@ if ~isoctave && user_has_matlab_license('statistics_toolbox')
             mc(kr,1) = min(transpose(ZZ(kobs,:)*y100(:,simulated_regimes(kr).index)));
             Mc(kr,1) = max(transpose(ZZ(kobs,:)*y100(:,simulated_regimes(kr).index)));
         end
-        if nobs==1 && ~options_.occbin.filter.particle.nograph
+        if nobs==1 && ~options_.occbin.filter.particle.diagnostics.nograph
             ax = nexttile(kobs);
             hold off,
         end
@@ -301,7 +301,7 @@ if ~isoctave && user_has_matlab_license('statistics_toolbox')
         bwidth = (M-m)/nbins;
         EDGES = Y(di(kobs),2)-bwidth/2+bwidth*(-2*nbins:2*nbins); % we center data point in one bin
         EDGES = EDGES(find(EDGES<m,1,'last'):find(EDGES>M,1));
-        if nobs>1 || options_.occbin.filter.particle.nograph
+        if nobs>1 || options_.occbin.filter.particle.diagnostics.nograph
             [pdf_sim,EDGES] = histcounts(transpose(ZZ(kobs,:)*y10), EDGES,'Normalization', 'pdf');
         else
             hh = histogram(transpose(ZZ(kobs,:)*y10),EDGES,'Normalization','pdf','EdgeColor','b');
@@ -345,7 +345,7 @@ if ~isoctave && user_has_matlab_license('statistics_toolbox')
         pdf_pkf = 1./sqrt(2*pi*PZ(kobs,kobs)).*exp(-(xedges-ObsVectorMean(kobs) ).^2./2./PZ(kobs,kobs));
         density.(options_.varobs{di(kobs)}).pkf = [xedges' pdf_pkf'];
 
-        if nobs==1 && ~options_.occbin.filter.particle.nograph
+        if nobs==1 && ~options_.occbin.filter.particle.diagnostics.nograph
             pdf_pkf0 = 1/sqrt(2*pi*PZ0(kobs,kobs))*exp(-(xedges-ObsVectorMean0(kobs) ).^2./2./PZ0(kobs,kobs));
             hold on, hd(1) = plot(xedges',pdf_ppf,'b','linewidth',2);
             hold on, hd(2) = plot(xedges',pdf_pkf,'g','linewidth',2);
@@ -381,7 +381,7 @@ if ~isoctave && user_has_matlab_license('statistics_toolbox')
     end
 end
 
-if ~options_.occbin.filter.particle.nograph
+if ~options_.occbin.filter.particle.diagnostics.nograph
     if nobs==1 && ~isoctave && user_has_matlab_license('statistics_toolbox')
         dyn_saveas(hfig(1),[GraphDirectoryName, filesep, M_.fname,'_data_density_t',int2str(t)],nodisplay,options_.graph_format);
     end

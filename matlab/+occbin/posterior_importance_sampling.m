@@ -43,7 +43,11 @@ TotalNumberOfMhDraws = sum(record.MhDraws(:,1));
 npar = length(bayestopt_.name);
 
 KeptNumberOfMhDraws = TotalNumberOfMhDraws-floor(options_.mh_drop*TotalNumberOfMhDraws);
- 
+
+if ~isempty(options_.occbin.posterior_importance_sampling.sub_draws)
+    % optionally override number of posterior statistics subdraws
+    options_.sub_draws = options_.occbin.posterior_importance_sampling.sub_draws;
+end
 B = options_.sub_draws;
 
 if B==KeptNumberOfMhDraws*options_.mh_nblck
@@ -73,8 +77,8 @@ else
     error('invalid filter name')
 end
 % make sure nothing is plotted during sampling
-options_.occbin.filter.particle.nograph=true; 
-options_.occbin.filter.particle.likelihood_only=true;
+options_.occbin.filter.particle.diagnostics.nograph=true; 
+options_.occbin.filter.particle.diagnostics.status=false;
 
 Label = '%s %s';
 bar_title = 'Posterior importance sampling';

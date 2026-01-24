@@ -502,7 +502,6 @@ estimation(datafile='usdata_pkf',
 	posterior_sampling_method='slice', 
 	mh_nblocks=4,
 	mh_drop=0.5, 
-	sub_draws = 20, // set to 600 to use all draws
 	//bayesian_irf,
 	presample = 20,
 	nodisplay, 
@@ -533,14 +532,16 @@ cli.evaluate.posterior_kernel(xparam1)
 
 //triggers diagnostic plots with PPF
 disp('PPF diagnostic plots')
-options_.occbin.filter.particle.nograph=false; 
-options_.occbin.filter.particle.likelihood_only=false;
+options_.occbin.filter.particle.diagnostics.graph_periods=[172 200]; 
+options_.occbin.filter.particle.diagnostics.nograph=false; 
+options_.occbin.filter.particle.diagnostics.status=true;
 cli.evaluate.posterior_kernel(xparam1)
-options_.occbin.filter.particle.nograph=true; 
-options_.occbin.filter.particle.likelihood_only=true;
+options_.occbin.filter.particle.diagnostics.nograph=true; 
+options_.occbin.filter.particle.diagnostics.status=false;
 
 // posterior importance sampling using ppf starting from pkf draws
 options_.occbin.posterior_importance_sampling.status = true;
+options_.occbin.posterior_importance_sampling.sub_draws = 10; // set to 600 to use all draws
 options_.occbin.posterior_importance_sampling.filter = 'ppf'; % can be pkf or ppf
 options_.occbin.posterior_importance_sampling.orig_dname = 'swpkfest';
 options_.occbin.posterior_importance_sampling.orig_fname = 'swpkfest';
