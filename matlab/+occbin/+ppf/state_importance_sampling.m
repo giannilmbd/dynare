@@ -454,7 +454,7 @@ StateVector.Variance_rank = ns;
 StateVector.use_modified_harmonic_mean = use_modified_harmonic_mean;
 StateVector.use_pkf_distribution = use_pkf_distribution;
 
-if not(options_.occbin.filter.particle.diagnostics.nograph) && ns && ~use_pkf_distribution
+if not(options_.occbin.filter.particle.diagnostics.nograph) && ns 
 
     GraphDirectoryName = CheckPath('occbin_ppf_graphs',M_.dname);
     schi2 = sort(chi2);
