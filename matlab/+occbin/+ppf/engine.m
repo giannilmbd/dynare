@@ -206,7 +206,7 @@ if options_.occbin.filter.particle.diagnostics.status || options_.occbin.filter.
         di, H, my_order_var, QQQ, Y, ZZ, base_regime, regimesy, ...
         M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, opts_simul);
 
-    if  ~options_.debug && StateVector0.use_pkf_distribution && StateVectors.use_pkf_distribution
+    if  ~options_.debug && isempty(options_.occbin.filter.particle.diagnostics.graph_periods) && StateVector0.use_pkf_distribution && StateVectors.use_pkf_distribution
         % do not produce plots when state updates that are identical by construction
         % even if nograph==false, unless debug
         options_.occbin.filter.particle.diagnostics.nograph=true;
