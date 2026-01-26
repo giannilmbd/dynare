@@ -5904,7 +5904,7 @@ elements are never repeated (for more details, see the description of
 ``oo_.dr.g_3`` in the third-order case).
 
 Extended path
-=======
+=============
 
 .. command:: extended_path ;
              extended_path (OPTIONS...);
@@ -6059,7 +6059,7 @@ Extended path
 
 
 Occasionally binding constraints (OccBin)
-=======
+=========================================
 
 Dynare allows simulating models with up to two occasionally-binding constraints by
 relying on a piecewise linear solution as in :cite:t:`Guerrieri:2015`.
