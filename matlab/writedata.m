@@ -10,7 +10,7 @@ function writedata(fname)
 % SPECIAL REQUIREMENT
 %   none
 
-% Copyright © 2007-2018 Dynare Team
+% Copyright © 2007-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -29,7 +29,7 @@ function writedata(fname)
 
 global M_ oo_
 
-if isoctave && ~user_has_octave_forge_package('io')
+if isoctave && ~user_has_octave_package('io')
     error('The io package is required to write XLS files from Octave')
 end
 

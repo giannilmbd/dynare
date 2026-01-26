@@ -42,7 +42,7 @@ function nls(eqname, params, data, range, optimizer, varargin)
 % is available only if the matylab optimization toolbox is installed), the
 % remaining inputs are the options (key/value) passed to the optimizers.
 
-% Copyright © 2018-2023 Dynare Team
+% Copyright © 2018-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -125,7 +125,7 @@ else
         bounds(strcmp(fieldnames(params), M_.param_names(M_.pac.(pacmodl).ec.params)),1)  = 0.0;
         bounds(strcmp(fieldnames(params), M_.param_names(M_.pac.(pacmodl).ec.params)),2)  = 1.0;
       case 'fmincon'
-        if isoctave && ~user_has_octave_forge_package('optim', '1.6')
+        if isoctave && ~user_has_octave_package('optim', '1.6')
             error('Optimization algorithm ''fmincon'' requires the optim package, version 1.6 or higher')
         elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
             error('Optimization algorithm ''fmincon'' requires the Optimization Toolbox')
@@ -135,7 +135,7 @@ else
         bounds(strcmp(fieldnames(params), M_.param_names(M_.pac.(pacmodl).ec.params)),1)  = 0.0;
         bounds(strcmp(fieldnames(params), M_.param_names(M_.pac.(pacmodl).ec.params)),2)  = 1.0;
       case 'fminunc'
-        if isoctave && ~user_has_octave_forge_package('optim')
+        if isoctave && ~user_has_octave_package('optim')
             error('Optimization algorithm ''fminunc'' requires the optim package')
         elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
             error('Optimization algorithm ''fminunc'' requires the Optimization Toolbox')
@@ -144,7 +144,7 @@ else
       case 'csminwel'
         minalgo = 4;
       case 'fminsearch'
-        if isoctave && ~user_has_octave_forge_package('optim')
+        if isoctave && ~user_has_octave_package('optim')
             error('Optimization algorithm ''fminsearch'' requires the optim package')
         elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
             error('Optimization algorithm ''fminsearch'' requires the Optimization Toolbox')

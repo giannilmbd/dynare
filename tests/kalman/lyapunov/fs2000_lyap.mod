@@ -20,7 +20,7 @@
  */
 
 /*
- * Copyright © 2004-2023 Dynare Team
+ * Copyright © 2004-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -126,7 +126,7 @@ options_.lyapunov_srs = 0;
 estimation(lyapunov=doubling,order=1,datafile='../../fs2000/fsdat_simul',silent_optimizer, nobs=192, loglinear, mh_replic=0, mh_nblocks=1, mh_jscale=0.8,nograph, mode_compute=4);
 
 
-if (isoctave && user_has_octave_forge_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
+if (isoctave && user_has_octave_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
     options_.lyapunov_fp = 0;
     options_.lyapunov_db = 0;
     options_.lyapunov_srs = 0;

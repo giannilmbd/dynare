@@ -23,7 +23,7 @@ function P=lyapunov_solver(T,R,Q,options_)
 %       Square-root solver for discrete-time Lyapunov equations (requires MATLAB System Control toolbox
 %       or Octave control package)
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -50,7 +50,7 @@ elseif options_.lyapunov_db
 elseif options_.lyapunov_srs
     % works only with MATLAB System Control toolbox or Octave control package,
     if isoctave
-        if ~user_has_octave_forge_package('control')
+        if ~user_has_octave_package('control')
             error('lyapunov=square_root_solver not available; you must install the control package from Octave Forge')
         end
     else
@@ -114,7 +114,7 @@ catch
 end
 
 % options_.lyapunov_srs == 1
-if (isoctave && user_has_octave_forge_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
+if (isoctave && user_has_octave_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
     options_.lyapunov_db = false;
     options_.lyapunov_srs = true;
     try
@@ -146,7 +146,7 @@ else
    t(5) = 1;
 end
 
-if (isoctave && user_has_octave_forge_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
+if (isoctave && user_has_octave_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
    if max(max(abs(Pstar1_small-Pstar3_small)))>1e-8
       t(6) = 0;
    else
@@ -168,7 +168,7 @@ else
    t(8) = 1;
 end
 
-if (isoctave && user_has_octave_forge_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
+if (isoctave && user_has_octave_package('control')) || (~isoctave && user_has_matlab_license('control_toolbox'))
    if max(max(abs(Pstar1_large-Pstar3_large)))>1e-8
       t(9) = 0;
    else

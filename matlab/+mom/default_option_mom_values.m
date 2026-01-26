@@ -28,10 +28,10 @@ function options_mom_ = default_option_mom_values(options_mom_, options_, dname,
 % This function calls
 %   o set_default_option
 %   o user_has_matlab_license
-%   o user_has_octave_forge_package
+%   o user_has_octave_package
 % -------------------------------------------------------------------------
 
-% Copyright © 2023-2025 Dynare Team
+% Copyright © 2023-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -169,7 +169,7 @@ end
 
 % optimization related
 if strcmp(mom_method,'GMM') || strcmp(mom_method,'SMM')
-    if (isoctave && user_has_octave_forge_package('optim')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
+    if (isoctave && user_has_octave_package('optim')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
         options_mom_ = set_default_option(options_mom_,'mode_compute',13); % specifies lsqnonlin as default optimizer for minimization
     else
         options_mom_ = set_default_option(options_mom_,'mode_compute',5); % specifies newrat as fallback default option for minimization

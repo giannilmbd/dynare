@@ -28,7 +28,7 @@ function nls(eqname, params, data, range, optimizer, varargin)
 %     equation must have NaN values in the object.
 % [4] It is assumed that the residual is additive.
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -219,7 +219,7 @@ else
       case 'lsqnonlin'
         bounds = ones(length(params0),1)*[-Inf,Inf];
       case 'fmincon'
-        if isoctave && ~user_has_octave_forge_package('optim', '1.6')
+        if isoctave && ~user_has_octave_package('optim', '1.6')
             error('Optimization algorithm ''fmincon'' requires the optim package, version 1.6 or higher')
         elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
             error('Optimization algorithm ''fmincon'' requires the Optimization Toolbox')
@@ -227,7 +227,7 @@ else
         minalgo = 1;
         bounds = ones(length(params0),1)*[-Inf,Inf];
       case 'fminunc'
-        if isoctave && ~user_has_octave_forge_package('optim')
+        if isoctave && ~user_has_octave_package('optim')
             error('Optimization algorithm ''fminunc'' requires the optim package')
         elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
             error('Optimization algorithm ''fminunc'' requires the Optimization Toolbox')
@@ -236,7 +236,7 @@ else
       case 'csminwel'
         minalgo = 4;
       case 'fminsearch'
-        if isoctave && ~user_has_octave_forge_package('optim')
+        if isoctave && ~user_has_octave_package('optim')
             error('Optimization algorithm ''fminsearch'' requires the optim package')
         elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
             error('Optimization algorithm ''fminsearch'' requires the Optimization Toolbox')

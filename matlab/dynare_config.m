@@ -16,7 +16,7 @@ function dynareroot = dynare_config(path_to_dynare)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2025 Dynare Team
+% Copyright © 2001-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -100,7 +100,7 @@ if isoctave
     % Under Octave, these functions are in the statistics Forge package.
     % Our replacement functions don't work under Octave (because of gamrnd, see
     % #1638), hence the statistics toolbox is now a hard requirement
-    if ~user_has_octave_forge_package('statistics')
+    if ~user_has_octave_package('statistics')
         error('You must install the "statistics" package from Octave Forge, either with your distribution package manager or with "pkg install -forge io statistics"')
     end
 else

@@ -24,9 +24,8 @@ function [opt_par_values,fval,exitflag,hessian_mat,Scale,new_rat_hess_info,optim
 %
 % SPECIAL REQUIREMENTS
 %   none.
-%
-%
-% Copyright © 2014-2025 Dynare Team
+
+% Copyright © 2014-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -67,7 +66,7 @@ new_rat_hess_info=[];
 switch minimizer_algorithm
 
   case 1
-    if isoctave && ~user_has_octave_forge_package('optim', '1.6')
+    if isoctave && ~user_has_octave_package('optim', '1.6')
         error('Optimization algorithm 1 is not available, you need to install the optim Forge package, version 1.6 or above')
     elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
         error('Optimization algorithm 1 requires the Optimization Toolbox')
@@ -198,7 +197,7 @@ switch minimizer_algorithm
     optimization_info.message = strrep(message, newline, ' ');
 
   case 3
-    if isoctave && ~user_has_octave_forge_package('optim')
+    if isoctave && ~user_has_octave_package('optim')
         error('Optimization algorithm 3 requires the optim package')
     elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
         error('Optimization algorithm 3 requires the Optimization Toolbox')
@@ -402,7 +401,7 @@ switch minimizer_algorithm
 
   case 7
     % MATLAB's simplex (Optimization toolbox needed).
-    if isoctave && ~user_has_octave_forge_package('optim')
+    if isoctave && ~user_has_octave_package('optim')
         error('Option mode_compute=7 requires the optim package')
     elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
         error('Option mode_compute=7 requires the Optimization Toolbox')
@@ -692,7 +691,7 @@ switch minimizer_algorithm
     if ~isfield(options_,'mom')
         error('Option mode_compute=13 is available only for method_of_moments estimation.')
     end
-    if isoctave && ~user_has_octave_forge_package('optim')
+    if isoctave && ~user_has_octave_package('optim')
         error('Option mode_compute=13 requires the optim package')
     elseif ~isoctave && ~user_has_matlab_license('optimization_toolbox')
         error('Option mode_compute=13 requires the Optimization Toolbox')

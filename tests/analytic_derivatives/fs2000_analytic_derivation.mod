@@ -78,7 +78,7 @@ varobs gp_obs gy_obs;
 options_.solve_tolf = 1e-12;
 
 estimation(order=1,mode_compute=9,silent_optimizer,analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,prior_trunc=0);
-if (isoctave && user_has_octave_forge_package('optim', '1.6')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
+if (isoctave && user_has_octave_package('optim', '1.6')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
     estimation(order=1,mode_compute=1,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0
     %,optim = ('DerivativeCheck', 'on','FiniteDifferenceType','central')
     );
@@ -113,7 +113,7 @@ stderr e_m, inv_gamma_pdf, 0.008862, inf;
 end;
 
 estimation(order=1,mode_compute=9,silent_optimizer,analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,prior_trunc=0);
-if (isoctave && user_has_octave_forge_package('optim', '1.6')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
+if (isoctave && user_has_octave_package('optim', '1.6')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
     estimation(order=1,mode_compute=1,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0
     %,optim = ('DerivativeCheck', 'on','FiniteDifferenceType','central')
     );

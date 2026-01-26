@@ -7,7 +7,7 @@ function write_regimes_to_xls(occbin_struct,M_,options_)
 % - M_              [struct]    MATLAB's structure describing the model
 % - options_        [struct]    MATLAB's structure describing the current options
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -70,7 +70,7 @@ end
 
 if isoctave
     % “writetable” and “array2table” don’t exist under Octave
-    if isoctave && ~user_has_octave_forge_package('io')
+    if isoctave && ~user_has_octave_package('io')
         error('The io package is required to write XLS files from Octave')
     end
     xlswrite(filename, vertcat(Header, xlsmat));
