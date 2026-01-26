@@ -2034,8 +2034,7 @@ in this case ``initval`` is used to specify the terminal conditions.
           endogenous and exogenous variable, the file must contain a
           column of the same name. NB: Octave only supports the
           ``.xlsx`` file extension and must have the `io`_ package
-          installed (easily done via octave by typing ‘``pkg
-          install -forge io``’). The first column may contain the date
+          installed. The first column may contain the date
 	  of each observation.
         * CSV files (extension ``.csv``): for each endogenous and
           exogenous variable, the file must contain a column of the
@@ -2310,8 +2309,7 @@ in this case ``initval`` is used to specify the terminal conditions.
           endogenous and exogenous variable, the file must contain a
           column of the same name. NB: Octave only supports the
           ``.xlsx`` file extension and must have the `io`_ package
-          installed (easily done via octave by typing ‘``pkg
-          install -forge io``’).  The first column may contain the
+          installed.  The first column may contain the
           date of each observation.
         * CSV files (extension ``.csv``): for each endogenous and
           exogenous variable, the file must contain a column of the
@@ -6970,8 +6968,7 @@ observed variables.
     .. option:: datafile = FILENAME
 
        The datafile: a ``.m`` file, a ``.mat`` file, a ``.csv`` file,
-       or a ``.xls``/``.xlsx`` file (under Octave, the `io
-       <https://octave.sourceforge.io/io/>`__ package from Octave-Forge
+       or a ``.xls``/``.xlsx`` file (under Octave, the `io`_ package
        is required for the ``.csv`` and ``.xlsx`` formats and the
        ``.xls`` file extension is not supported). Note that the base
        name (i.e. without extension) of the datafile has to be
@@ -7389,9 +7386,8 @@ observed variables.
 
                 Uses ``fmincon`` optimization routine (available under
                 MATLAB if the Optimization Toolbox is installed; available
-                under Octave if the `optim
-                <https://octave.sourceforge.io/optim/>`__ package from
-                Octave-Forge, version 1.6 or above, is installed).
+                under Octave if the `optim`_ package, version 1.6 or above,
+                is installed).
 
            ``2``
 
@@ -7402,9 +7398,8 @@ observed variables.
 
                 Uses ``fminunc`` optimization routine (available under
                 MATLAB if the Optimization Toolbox is installed;
-                available under Octave if the `optim
-                <https://octave.sourceforge.io/optim/>`__ package from
-                Octave-Forge is installed).
+                available under Octave if the `optim`_ package is
+                installed).
 
            ``4``
 
@@ -7429,7 +7424,7 @@ observed variables.
                 Uses ``fminsearch``, a simplex-based optimization
                 routine (available under MATLAB if the Optimization
                 Toolbox is installed; available under Octave if the
-                optim package from Octave-Forge is installed).
+                `optim`_ package is installed).
 
            ``8``
 
@@ -7467,9 +7462,8 @@ observed variables.
 
                 Uses the ``lsqnonlin`` non-linear least squares optimization
                 routine (available under MATLAB if the Optimization Toolbox is
-                installed; available under Octave if the `optim
-                <https://octave.sourceforge.io/optim/>`__ package from
-                Octave-Forge is installed). Only supported for ``method_of_moments``. 
+                installed; available under Octave if the `optim`_ package is
+                installed). Only supported for ``method_of_moments``.
 
            ``101``
 
@@ -8783,8 +8777,7 @@ observed variables.
                (``dlyapchol``). This method is fast for large scale
                models (available under MATLAB if the Control System
                Toolbox is installed; available under Octave if the
-               `control <https://octave.sourceforge.io/control/>`__
-               package from Octave-Forge is installed)
+               `control`_ package is installed)
 
        Default value is ``default``.
 
@@ -17344,7 +17337,9 @@ Misc commands
     and ``morefloats``.
 
 
-.. _io: https://octave.sourceforge.io/io/
+.. _control: https://gnu-octave.github.io/packages/control/
+.. _io: https://gnu-octave.github.io/packages/io/
+.. _optim: https://gnu-octave.github.io/packages/optim/
 .. _AIM website: https://www.federalreserve.gov/econres/ama-index.htm
 
 .. rubric:: Footnotes

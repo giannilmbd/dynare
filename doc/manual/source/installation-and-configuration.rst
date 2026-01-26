@@ -15,10 +15,9 @@ compilation steps are necessary in that case.
 In order to run Dynare, you need one of the following:
 
 * MATLAB, any version ranging from 9.8 (R2020a) to 25.2 (R2025b);
-* GNU Octave, any version ranging from 8.4.0 to 10.3.0, with the ``statistics`` package
-  from `Octave-Forge`_. Note however that the Dynare installer for Windows
-  requires a more specific version of Octave, as indicated on the download
-  page.
+* GNU Octave, any version ranging from 8.4.0 to 10.3.0, with the `statistics`_
+  package. Note however that the Dynare installer for Windows requires a more
+  specific version of Octave, as indicated on the download page.
 
 The following optional extensions are also useful to benefit from
 extra features, but are in no way required:
@@ -35,8 +34,7 @@ extra features, but are in no way required:
   * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``lyapunov=square_root_solver``)
   * Parallel Computing Toolbox (to speed up the ``dime`` sampler)
 
-* If under Octave, the following `Octave-Forge`_ packages: ``optim``, ``io``,
-  ``control``.
+* If under Octave, the following packages: `control`_, `io`_, `optim`_.
 
 
 Installation of Dynare
@@ -365,8 +363,11 @@ Dynare unusable.
 .. _Arch User Repository: https://wiki.archlinux.org/index.php/Arch_User_Repository
 .. _Dynare website: https://www.dynare.org/
 .. _Dynare wiki: https://git.dynare.org/Dynare/dynare/wikis
-.. _Octave-Forge: https://octave.sourceforge.io/
 .. _Homebrew: https://brew.sh
+.. _control: https://gnu-octave.github.io/packages/control/
+.. _io: https://gnu-octave.github.io/packages/io/
+.. _optim: https://gnu-octave.github.io/packages/optim/
+.. _statistics: https://gnu-octave.github.io/packages/statistics/
 
 
 .. rubric:: Footnotes

@@ -1065,8 +1065,7 @@ The dseries class
         data file specified by *FILENAME*, a string passed as
         input. Valid file types are ``.m``, ``.mat``, ``.csv`` and
         ``.xls``/``.xlsx`` (Octave only supports ``.xlsx`` files and the
-        `io <https://octave.sourceforge.io/io/>`__ package from
-        Octave-Forge must be installed). The extension of the file
+        `io`_ package must be installed). The extension of the file
         should be explicitly provided.
 
         A typical ``.m`` file will have the following form::
@@ -3654,3 +3653,6 @@ Create time series with a univariate model
     equation with an arbitrary number of lags. The ``from`` command
     must be followed by a range, which is separated from the
     (recursive) expression to be evaluated by the ``do`` command.
+
+
+.. _io: https://gnu-octave.github.io/packages/io/
