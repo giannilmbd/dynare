@@ -4151,7 +4151,7 @@ speed-up on large models.
     .. option:: lmmcp
 
        Solves the perfect foresight model with a Levenberg-Marquardt
-       mixed complementarity problem (LMMCP) solver :cite:t:`kanzow/petra:2004`, which allows to consider inequality constraints on
+       mixed complementarity problem (LMMCP) solver :cite:p:`kanzow/petra:2004`, which allows to consider inequality constraints on
        the endogenous variables (such as a zero lower bound, henceforth ZLB, on the nominal interest
        rate or a model with irreversible investment). This option is
        equivalent to ``stack_solve_algo=7`` **and**
@@ -5965,8 +5965,9 @@ Extended path
     .. option:: lmmcp
 
        Solves the perfect foresight model with a Levenberg-Marquardt
-       mixed complementarity problem (LMMCP) solver (*Kanzow and Petra
-       (2004)*), which allows to consider inequality constraints on
+       mixed complementarity problem (LMMCP) solver
+       :cite:p:`kanzow/petra:2004`,
+       which allows to consider inequality constraints on
        the endogenous variables (such as a ZLB on the nominal interest
        rate or a model with irreversible investment). For specifying the
        necessary complementarity conditions, see :opt:`lmmcp`.
