@@ -1,4 +1,4 @@
-## Copyright © 2016 Dynare Team
+## Copyright © 2016-2026 Dynare Team
 ##
 ## This file is part of Dynare.
 ##
@@ -15,7 +15,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
+pkg load control
+pkg load datatypes
 pkg load io
 pkg load optim
-pkg load control
 pkg load statistics

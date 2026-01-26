@@ -34,7 +34,7 @@ extra features, but are in no way required:
   * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``lyapunov=square_root_solver``)
   * Parallel Computing Toolbox (to speed up the ``dime`` sampler)
 
-* If under Octave, the following packages: `control`_, `io`_, `optim`_.
+* If under Octave, the following packages: `control`_, `datatypes`_, `io`_, `optim`_.
 
 
 Installation of Dynare
@@ -365,6 +365,7 @@ Dynare unusable.
 .. _Dynare wiki: https://git.dynare.org/Dynare/dynare/wikis
 .. _Homebrew: https://brew.sh
 .. _control: https://gnu-octave.github.io/packages/control/
+.. _datatypes: https://gnu-octave.github.io/packages/datatypes/
 .. _io: https://gnu-octave.github.io/packages/io/
 .. _optim: https://gnu-octave.github.io/packages/optim/
 .. _statistics: https://gnu-octave.github.io/packages/statistics/

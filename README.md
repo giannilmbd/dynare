@@ -71,7 +71,7 @@ A number of tools and libraries are needed in order to recompile everything. You
 - [GNU Octave](https://www.octave.org) with
   - the development headers (if you want to compile the MEX for Octave)
   - the development libraries corresponding to the [UMFPACK](https://people.engr.tamu.edu/davis/suitesparse.html) packaged with Octave (if you want to compile the MEX for Octave)
-  - the [statistics](https://gnu-octave.github.io/packages/statistics/) package and, optionally, the [control](https://gnu-octave.github.io/packages/control/), [io](https://gnu-octave.github.io/packages/io/) and [optim](https://gnu-octave.github.io/packages/optim/) packages
+  - the [statistics](https://gnu-octave.github.io/packages/statistics/) package and, optionally, the [control](https://gnu-octave.github.io/packages/control/), [datatypes](https://gnu-octave.github.io/packages/datatypes/), [io](https://gnu-octave.github.io/packages/io/) and [optim](https://gnu-octave.github.io/packages/optim/) packages
 - [Meson](https://mesonbuild.com), version 1.3.0 or later
 - [Pkgconf](http://pkgconf.org/), or another pkg-config implementation
 - [Bash](https://www.gnu.org/software/bash/)

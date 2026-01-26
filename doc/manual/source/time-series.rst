@@ -1125,10 +1125,11 @@ The dseries class
 
     .. construct:: dseries (TABLE)
 
-       Creates a ``dseries`` object given the MATLAB Table provided as the sole
-       argument. It is assumed that the first column of the table contains the
-       dates of the ``dseries`` and the first row contains the names. This
-       feature is not available under Octave.
+       Creates a ``dseries`` object given a MATLAB/Octave ``table`` object
+       provided as the sole argument. It is assumed that the first column of
+       the table contains the dates of the ``dseries`` and the first row
+       contains the names. Under Octave, only available if the `datatypes`_
+       packages is installed.
 
        *Example*
 
@@ -3655,4 +3656,5 @@ Create time series with a univariate model
     (recursive) expression to be evaluated by the ``do`` command.
 
 
+.. _datatypes: https://gnu-octave.github.io/packages/datatypes/
 .. _io: https://gnu-octave.github.io/packages/io/
