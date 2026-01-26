@@ -15574,7 +15574,7 @@ heterogeneity_simulate
 Semi-structural models
 ======================
 
-Dynare provides tools for semi-structural models, in the vain of the FRB/US
+Dynare provides tools for semi-structural models, in the vein of the FRB/US
 model (see :cite:t:`Brayton:1996`), where expectations are not necessarily
 model consistent but based on a VAR auxiliary model. In the following, it is
 assumed that each equation is written as ``VARIABLE = EXPRESSION`` or
