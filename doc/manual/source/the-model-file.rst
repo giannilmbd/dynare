@@ -9030,8 +9030,8 @@ Non-linear filter options
        the ``filter_algorithm=gf``, ``gpf`` and ``nlkf``
        filters. Possible values for OPTION are: ``cubature``,
        ``montecarlo`` and ``unscented``. Default value is
-       ``unscented``. For details, see :opt:`proposal_approximation =
-       OPTION`. Option value ``montecarlo`` is not supported for
+       ``unscented``. For details, see :opt:`proposal_approximation = OPTION`.
+       Option value ``montecarlo`` is not supported for
        ``filter_algorithm=gmf``.
 
     .. option:: cpf_weights = OPTION
