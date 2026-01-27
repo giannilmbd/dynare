@@ -56,11 +56,12 @@ if opt.stochastic.order
         nnodes = length(weights);
       case 'Stroud-Cubature-5'
         if n==1
-            info = warning('backtrace');
+            info = warning('query', 'backtrace');
             if strcmp(info.state, 'on')
                 warning('off', 'backtrace');
             end
             warning('Stroud-Cubature-5 is not defined for a single shock, falling back to Gaussian quadrature with 3 nodes.')
+            skipline()
             warning(info.state, 'backtrace');
             [nodes, weights] = gauss_hermite_weights_and_nodes(3);
             nodes = nodes*pfm.Omega;
