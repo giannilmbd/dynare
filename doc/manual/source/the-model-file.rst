@@ -3588,7 +3588,7 @@ Getting information about the model
     .. option:: incidence
 
        Displays the gross incidence matrix and the reordered incidence
-       matrix of the block decomposed model for the ``block_dynamic`` or ``block_static`` options.
+       matrix of the block decomposed model for the ``block_dynamic`` or ``block_static`` options. This option requires one of ``block_dynamic`` or ``block_static``.
 
 
 .. command:: print_bytecode_dynamic_model ;
