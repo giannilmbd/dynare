@@ -248,15 +248,15 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
 
     func = @(x) colorspace('RGB->Lab',x);
     my_colororder= distinguishable_colors(number_of_regimes+4,'w',func);
-    my_colororder(ismember(my_colororder,[0 0 1],'row'),:)=[]; % remove BLUE
+    my_colororder(ismember(my_colororder,[0 0 1],'rows'),:)=[]; % remove BLUE
     previous_and_current_period_regimes_are_equal = false;
     if isempty(ireg0)
         % t-1 regime is not present in predictive density (should never
         % happen, but ...)
-        my_colororder(ismember(my_colororder,[1 0 0],'row'),:)=[]; % remove RED
+        my_colororder(ismember(my_colororder,[1 0 0],'rows'),:)=[]; % remove RED
     else
         if ireg0~=ireg1
-            icolor0 = find(ismember(my_colororder,[1 0 0],'row')); % get the RED
+            icolor0 = find(ismember(my_colororder,[1 0 0],'rows')); % get the RED
             my_colororder = my_colororder([1:icolor0-1,icolor0+1:number_of_simulated_regimes,icolor0,number_of_simulated_regimes+1:number_of_regimes],:);
         else
             ireg0 = [];
@@ -285,7 +285,11 @@ end
 density=struct();
 density_data=struct();
 
-if ~isoctave && user_has_matlab_license('statistics_toolbox')
+if isoctave
+    return; %Octave does not support tiledlayout
+end
+
+if user_has_matlab_license('statistics_toolbox')
     for kobs = 1:size(ZZ,1)
         obs_simul = transpose(ZZ(kobs,:)*y100); %simulated varobs
         mc=nan(number_of_simulated_regimes,1);
@@ -400,7 +404,7 @@ if ~isoctave && user_has_matlab_license('statistics_toolbox')
 end
 
 if ~options_.occbin.filter.particle.diagnostics.nograph
-    if nobs==1 && ~isoctave && user_has_matlab_license('statistics_toolbox')
+    if nobs==1 && user_has_matlab_license('statistics_toolbox')
         dyn_saveas(hfig(1),[GraphDirectoryName, filesep, M_.fname,'_data_density_t',int2str(t)],nodisplay,options_.graph_format);
         if TeX && any(strcmp('eps', cellstr(options_.graph_format)))
             fprintf(fidTeX, '\\begin{figure}[H]\n');
