@@ -233,41 +233,43 @@ if options_.occbin.filter.particle.diagnostics.status || options_.occbin.filter.
     output.filtered.regimes.sample = simulated_sample.regime;
     output.filtered.regimes.is_constrained = simulated_sample.is_constrained;
     output.filtered.regimes.is_constrained_in_expectation = simulated_sample.is_constrained_in_expectation;
-    [aa,bb]=histcounts(simulated_sample.exit(success),'normalization','pdf','binmethod','integers');
-    output.filtered.regimes.exit(bb(1:end-1)+0.5,1) = aa';
-    isc = simulated_sample.is_constrained;
-    isce = simulated_sample.is_constrained_in_expectation;
-    rr=simulated_sample.exit;
-    output.filtered.regimes.exit_constrained_share(1,1)=0;
-    for ka=2:length(output.filtered.regimes.exit)
-        iden = length(find(isce(rr==ka)));
-        if iden
-            output.filtered.regimes.exit_constrained_share(ka,1) = length(find(isc(rr==ka)))/iden;
-        else
-            output.filtered.regimes.exit_constrained_share(ka,1) = 0;
+    if ~isoctave %histcounts in not available
+        [aa,bb]=histcounts(simulated_sample.exit(success),'normalization','pdf','binmethod','integers');
+        output.filtered.regimes.exit(bb(1:end-1)+0.5,1) = aa';
+        isc = simulated_sample.is_constrained;
+        isce = simulated_sample.is_constrained_in_expectation;
+        rr=simulated_sample.exit;
+        output.filtered.regimes.exit_constrained_share(1,1)=0;
+        for ka=2:length(output.filtered.regimes.exit)
+            iden = length(find(isce(rr==ka)));
+            if iden
+                output.filtered.regimes.exit_constrained_share(ka,1) = length(find(isc(rr==ka)))/iden;
+            else
+                output.filtered.regimes.exit_constrained_share(ka,1) = 0;
+            end
         end
-    end
 
-    [aa, bb]=histcounts(simulated_sample.is_constrained(success),'normalization','pdf','binmethod','integers');
-    if isscalar(aa)
-        if bb(1)+0.5==0
-            aa=[1 0];
-        else
-            aa=[0 1];
+        [aa, bb]=histcounts(simulated_sample.is_constrained(success),'normalization','pdf','binmethod','integers');
+        if isscalar(aa)
+            if bb(1)+0.5==0
+                aa=[1 0];
+            else
+                aa=[0 1];
+            end
         end
-    end
-    output.filtered.regimes.is_constrained = isc;
-    output.filtered.regimes.prob.is_constrained = aa(2);
-    [aa, bb]=histcounts(simulated_sample.is_constrained_in_expectation(success),'normalization','pdf','binmethod','integers');
-    if isscalar(aa)
-        if bb(1)+0.5==0
-            aa=[1 0];
-        else
-            aa=[0 1];
+        output.filtered.regimes.is_constrained = isc;
+        output.filtered.regimes.prob.is_constrained = aa(2);
+        [aa, bb]=histcounts(simulated_sample.is_constrained_in_expectation(success),'normalization','pdf','binmethod','integers');
+        if isscalar(aa)
+            if bb(1)+0.5==0
+                aa=[1 0];
+            else
+                aa=[0 1];
+            end
         end
+        output.filtered.regimes.is_constrained_in_expectation = isce;
+        output.filtered.regimes.prob.is_constrained_in_expectation = aa(2);
     end
-    output.filtered.regimes.is_constrained_in_expectation = isce;
-    output.filtered.regimes.prob.is_constrained_in_expectation = aa(2);
 
     output.data.marginal_probability_distribution = density;
     output.data.marginal_probability = density_data;
@@ -289,41 +291,43 @@ if options_.occbin.filter.particle.diagnostics.status || options_.occbin.filter.
     output.updated.variables.particles = StateVectors.Draws;
     output.updated.variables.pkf = alphahaty(:,2);
     output.updated.regimes.sample = updated_sample.regimes(updated_sample.indx);
-    [aa,bb]=histcounts(updated_sample.regime_exit(updated_sample.indx),'normalization','pdf','binmethod','integers');
-    output.updated.regimes.exit(bb(1:end-1)+0.5,1) = aa';
-    isc = updated_sample.is_constrained(updated_sample.indx);
-    isce = updated_sample.is_constrained_in_expectation(updated_sample.indx);
-    rr=updated_sample.regime_exit(updated_sample.indx);
-    output.updated.regimes.exit_constrained_share(1,1)=0;
-    for ka=2:length(output.updated.regimes.exit)
-        iden = length(find(isce(rr==ka)));
-        if iden
-            output.updated.regimes.exit_constrained_share(ka,1) = length(find(isc(rr==ka)))/iden;
-        else
-            output.updated.regimes.exit_constrained_share(ka,1) = 0;
+    if ~isoctave %histcounts in not available
+        [aa,bb]=histcounts(updated_sample.regime_exit(updated_sample.indx),'normalization','pdf','binmethod','integers');
+        output.updated.regimes.exit(bb(1:end-1)+0.5,1) = aa';
+        isc = updated_sample.is_constrained(updated_sample.indx);
+        isce = updated_sample.is_constrained_in_expectation(updated_sample.indx);
+        rr=updated_sample.regime_exit(updated_sample.indx);
+        output.updated.regimes.exit_constrained_share(1,1)=0;
+        for ka=2:length(output.updated.regimes.exit)
+            iden = length(find(isce(rr==ka)));
+            if iden
+                output.updated.regimes.exit_constrained_share(ka,1) = length(find(isc(rr==ka)))/iden;
+            else
+                output.updated.regimes.exit_constrained_share(ka,1) = 0;
+            end
         end
-    end
-    [aa, bb]=histcounts(updated_sample.is_constrained(updated_sample.indx),'normalization','pdf','binmethod','integers');
-    if isscalar(aa)
-        if bb(1)+0.5==0
-            aa=[1 0];
-        else
-            aa=[0 1];
+        [aa, bb]=histcounts(updated_sample.is_constrained(updated_sample.indx),'normalization','pdf','binmethod','integers');
+        if isscalar(aa)
+            if bb(1)+0.5==0
+                aa=[1 0];
+            else
+                aa=[0 1];
+            end
         end
-    end
-    output.updated.regimes.is_constrained = isc;
-    output.updated.regimes.prob.is_constrained = aa(2);
+        output.updated.regimes.is_constrained = isc;
+        output.updated.regimes.prob.is_constrained = aa(2);
 
-    [aa, bb]=histcounts(updated_sample.is_constrained_in_expectation(updated_sample.indx),'normalization','pdf','binmethod','integers');
-    if isscalar(aa)
-        if bb(1)+0.5==0
-            aa=[1 0];
-        else
-            aa=[0 1];
+        [aa, bb]=histcounts(updated_sample.is_constrained_in_expectation(updated_sample.indx),'normalization','pdf','binmethod','integers');
+        if isscalar(aa)
+            if bb(1)+0.5==0
+                aa=[1 0];
+            else
+                aa=[0 1];
+            end
         end
+        output.updated.regimes.is_constrained_in_expectation = isce;
+        output.updated.regimes.prob.is_constrained_in_expectation = aa(2);
     end
-    output.updated.regimes.is_constrained_in_expectation = isce;
-    output.updated.regimes.prob.is_constrained_in_expectation = aa(2);
 
 elseif ~options_.occbin.filter.particle.ensemble_kalman_filter
     if StateVectors.Variance_rank==0
