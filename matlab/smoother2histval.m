@@ -21,10 +21,8 @@ function smoother2histval(opts)
 %                 variable at the i-th position in invars, and the output
 %                 variable at the i-th position in outvars. If absent, then
 %                 taken as equal to invars.
-%
-% The function also uses the value of option_.parameter_set
 
-% Copyright © 2014-2025 Dynare Team
+% Copyright © 2014-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -60,64 +58,21 @@ end
 
 % Hack to determine if oo_.SmoothedVariables was computed after a Metropolis
 tmp = fieldnames(smoothedvars);
-if isstruct(smoothedvars.(tmp{1}))
-    post_metropolis = 1;
-    if ~ isstruct(smoothedvars.(tmp{end}))
-        % point and metropolis results are simultaneously present
-        post_metropolis = 2;
-    end
+post_metropolis = isstruct(smoothedvars.(tmp{1}));
 
-elseif isstruct(smoothedvars.(tmp{end}))
-    % point and metropolis results are simultaneously present
-    post_metropolis = 2;
-else
-    post_metropolis = 0;
-end
-
+% If post-Metropolis, use the posterior mean of variables and shocks
 if post_metropolis
-    tmp = fieldnames(smoothedvars.Mean);
-    if length(tmp)~=M_.endo_nbr
-        warning(['You are using smoother2histval although smoothed values have not '...
-            'been computed for all endogenous and auxiliary variables.'...
-            'The value of these variables will be set to their steady state.'])
-    end
-    tmpexo = fieldnames(smoothedshocks.Mean);
-else
-    tmp = fieldnames(smoothedvars);
-    tmpexo = fieldnames(smoothedshocks);
+    smoothedvars = smoothedvars.Mean;
+    smoothedshocks = smoothedshocks.Mean;
 end
 
-% If post-Metropolis, select the parameter set
-if isempty(options_.parameter_set)
-    if post_metropolis
-        smoothedvars = smoothedvars.Mean;
-        smoothedshocks = smoothedshocks.Mean;
-    end
-else
-    switch options_.parameter_set
-      case 'calibration'
-        if post_metropolis == 1
-            error('Option parameter_set=calibration is not consistent with computed smoothed values.')
-        end
-      case 'posterior_mode'
-        if post_metropolis == 1
-            error('Option parameter_set=posterior_mode is not consistent with computed smoothed values.')
-        end
-      case 'posterior_mean'
-        if ~post_metropolis
-            error('Option parameter_set=posterior_mean is not consistent with computed smoothed values.')
-        end
-        smoothedvars = smoothedvars.Mean;
-        smoothedshocks = smoothedshocks.Mean;
-      case 'posterior_median'
-        if ~post_metropolis
-            error('Option parameter_set=posterior_median is not consistent with computed smoothed values.')
-        end
-        smoothedvars = smoothedvars.Median;
-        smoothedshocks = smoothedshocks.Median;
-      otherwise
-        error([ 'Option parameter_set=' options_.parameter_set ' unsupported.' ])
-    end
+tmp = fieldnames(smoothedvars);
+tmpexo = fieldnames(smoothedshocks);
+
+if post_metropolis && length(tmp)~=M_.endo_nbr
+    warning(['You are using smoother2histval although smoothed values have not '...
+             'been computed for all endogenous and auxiliary variables.'...
+             'The value of these variables will be set to their steady state.'])
 end
 
 % Determine number of periods

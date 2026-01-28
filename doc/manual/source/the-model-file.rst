@@ -12552,16 +12552,18 @@ computed with the command ``det_cond_forecast``:
 .. command:: smoother2histval ;
              smoother2histval(OPTIONS...);
 
-    The purpose of this command is to construct initial conditions
-    (for a subsequent simulation) that are the smoothed values of a
-    previous estimation.
+    The purpose of this command is to construct initial conditions (for a
+    subsequent simulation) that are the smoothed values obtained through the
+    :comm:`estimation` command (when used with the :opt:`smoother` option), or the
+    :comm:`calib_smoother` command.
 
-    More precisely, after an estimation run with the ``smoother``
-    option, ``smoother2histval`` will extract the smoothed values
-    (from ``oo_.SmoothedVariables``, and possibly from
-    ``oo_.SmoothedShocks`` if there are lagged exogenous), and will
-    use these values to construct initial conditions (as if they had
-    been manually entered through ``histval``).
+    The ``smoother2histval`` command will extract the smoothed values from
+    :mvar:`oo_.SmoothedVariables` (and possibly from :mvar:`oo_.SmoothedShocks` if
+    there are lagged exogenous), and will use these values to construct initial
+    conditions (as if they had been manually entered through :bck:`histval`).
+
+    If the command is run after a Metropolis, then the posterior mean of
+    smoothed variables will be used.
 
     *Options*
 
