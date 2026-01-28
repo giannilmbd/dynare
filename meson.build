@@ -93,13 +93,6 @@ openmp_dep = dependency('openmp')
 # https://github.com/mesonbuild/meson/issues/12649
 gsl_dep = dependency('gsl')
 
-if get_option('build_for') == 'octave'
-  matio_dep = dependency('matio')
-else
-  # We don’t use MatIO under MATLAB
-  matio_dep = []
-endif
-
 pthread_t_sizeof = c_compiler.sizeof('pthread_t', prefix : '#include <pthread.h>')
 pthread_fortran_dep = declare_dependency(compile_args : '-DSIZEOF_PTHREAD_T=' + pthread_t_sizeof.to_string(), sources : 'mex/sources/pthread.F08')
 
@@ -540,6 +533,7 @@ ms_sbvar_src = [ 'contrib/ms-sbvar/utilities_dw/arrays/dw_array.c',
                  'contrib/ms-sbvar/switch_dw/switching/dw_metropolis_theta.c',
                  'contrib/ms-sbvar/switch_dw/state_space/sbvar/VARbase.c',
                  'contrib/ms-sbvar/switch_dw/state_space/sbvar/VARio.c',
+                 'contrib/ms-sbvar/switch_dw/state_space/sbvar/write-mat.cc',
                  'mex/sources/ms-sbvar/modify_for_mex.cc' ]
 ms_sbvar_defs = [ '-DSTRUCTURED_COLUMN_MAJOR' ]
 ms_sbvar_incdir = include_directories('contrib/ms-sbvar/utilities_dw/include', 'contrib/ms-sbvar/switch_dw/switching', 'mex/sources/ms-sbvar')
@@ -547,7 +541,7 @@ ms_sbvar_lib = static_library('ms_sbvar', ms_sbvar_src,
                               kwargs : static_library_kwargs + { 'c_args' : static_library_kwargs.get('c_args') + ms_sbvar_defs,
                                                                  'cpp_args' : static_library_kwargs.get('cpp_args') + ms_sbvar_defs,
                                                                  'include_directories' : static_library_kwargs.get('include_directories') + ms_sbvar_incdir },
-                              dependencies : [ blas_dep, lapack_dep, gsl_dep, matio_dep, ut_dep, extra_octave_dep ])
+                              dependencies : [ blas_dep, lapack_dep, gsl_dep, ut_dep, extra_octave_dep ])
 
 # NB: in the following, mex_top_level.cc is put as extra source and not in ms_sbvar_lib,
 # to ensure that mexFunction() is present in the MEX
@@ -558,7 +552,7 @@ mex_ms_sbvar_kwargs = mex_kwargs + { 'c_args' : mex_kwargs.get('c_args') + ms_sb
                                      'sources' : mex_kwargs['sources'] + [ 'mex/sources/ms-sbvar/mex_top_level.cc' ] }
 ms_sbvar_create_init_file_src = [ 'contrib/ms-sbvar/switch_dw/state_space/sbvar/create_init_file.c',
                                   'contrib/ms-sbvar/switch_dw/state_space/sbvar/VARio_matlab.c' ]
-shared_module('ms_sbvar_create_init_file', ms_sbvar_create_init_file_src, kwargs : mex_ms_sbvar_kwargs, dependencies : matio_dep)
+shared_module('ms_sbvar_create_init_file', ms_sbvar_create_init_file_src, kwargs : mex_ms_sbvar_kwargs)
 ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_opt.c',
                               'contrib/ms-sbvar/switch_dw/switching/dw_mdd_switch.c',
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/dw_sbvar_command_line.c',
@@ -570,7 +564,7 @@ ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_op
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/sbvar_variance_decomposition.c',
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/sbvar_impulse_responses.c',
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/dw_csminwel.c' ]
-shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs, dependencies : [ gsl_dep, matio_dep ])
+shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs, dependencies : gsl_dep)
 
 heterogeneity_src = [
    'mex/sources/heterogeneity/utils/gray_code.f08',

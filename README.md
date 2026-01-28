@@ -78,7 +78,6 @@ A number of tools and libraries are needed in order to recompile everything. You
 - [Boost libraries](https://www.boost.org), version 1.36 or later
 - [Bison](https://www.gnu.org/software/bison/), version 3.2 or later
 - [Flex](https://github.com/westes/flex), version 2.5.4 or later
-- [MAT File I/O library](https://sourceforge.net/projects/matio/), version 1.5 or later (only when compiling for Octave)
 - [SLICOT](http://www.slicot.org)
 - [GSL library](https://www.gnu.org/software/gsl/)
 - A decent LaTeX distribution (if you want to compile PDF documentation),
@@ -193,7 +192,6 @@ All the prerequisites are packaged:
 - `octave-dev`
 - `libboost-graph-dev`
 - `libgsl-dev`
-- `libmatio-dev`
 - `libslicot-dev` and `libslicot64-pic` (the latter is not available in Debian ⩽ 13 and Ubuntu ⩽ 25.10; `libslicot-pic` should be used instead)
 - `libsuitesparse-dev`
 - `flex` and `libfl-dev`
@@ -216,7 +214,7 @@ All the prerequisites are packaged:
 
 You can install them all at once with:
 ```sh
-apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libmatio-dev libslicot-dev libslicot-pic libslicot64-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
+apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libslicot-dev libslicot-pic libslicot64-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
 ```
 If you use MATLAB, we strongly advise to also `apt install matlab-support` and confirm to rename the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by your distribution.
 
@@ -228,7 +226,6 @@ Almost all prerequisites are packaged:
 - `gcc-gfortran`
 - `boost-devel`
 - `gsl-devel`
-- `matio-devel`
 - `suitesparse-devel`
 - `flex`
 - `bison`
@@ -244,7 +241,7 @@ Almost all prerequisites are packaged:
 You can install them all at once with:
 ```sh
 # Minimal packages
-dnf install -y gcc gcc-c++ make gcc-gfortran boost-devel gsl-devel matio-devel suitesparse-devel flex bison meson redhat-rpm-config
+dnf install -y gcc gcc-c++ make gcc-gfortran boost-devel gsl-devel suitesparse-devel flex bison meson redhat-rpm-config
 # Octave packages
 dnf install octave octave-devel octave-statistics octave-io octave-optim octave-control
 # Documentation packages (only needed if you build documentation)
@@ -329,7 +326,7 @@ Now configure dynare as above.
 The following steps show how to install Dynare on Arch Linux from source.
 - Install all needed dependencies:
 ```sh
-pacman -S git make meson boost blas gsl libmatio gcc-fortran gcc-libs
+pacman -S git make meson boost blas gsl gcc-fortran gcc-libs
 ```
 - Compile and install SLICOT:
 ```sh
@@ -474,7 +471,7 @@ export PATH="$BREWDIR/bin:$PATH"
 
 - Install required Homebrew packages:
 ```sh
-arch -$ARCH $BREWDIR/bin/brew install meson bison flex boost gcc gsl libmatio veclibfort octave sphinx-doc docutils wget pkg-config git-lfs cmake
+arch -$ARCH $BREWDIR/bin/brew install meson bison flex boost gcc gsl veclibfort octave sphinx-doc docutils wget pkg-config git-lfs cmake
 ```
 If you are installing `git-lfs` for the first time, you need to run `git lfs install` once after installing it.
 

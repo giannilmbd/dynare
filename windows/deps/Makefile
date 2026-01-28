@@ -112,23 +112,7 @@ sysroot-matlab: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz $(MATLAB_MSYS2_DEPS
 	touch $@
 
 OCTAVE_MSYS2_DEPS := \
-	tarballs/mingw-w64-ucrt-x86_64-boost-$(MSYS2_BOOST_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-matio-$(MSYS2_MATIO_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-zlib-$(MSYS2_ZLIB_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-hdf5-$(MSYS2_HDF5_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libaec-$(MSYS2_LIBAEC_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-openssl-$(MSYS2_OPENSSL_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-curl-$(MSYS2_CURL_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-zstd-$(MSYS2_ZSTD_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-brotli-$(MSYS2_BROTLI_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libidn2-$(MSYS2_LIBIDN2_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libpsl-$(MSYS2_LIBPSL_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libssh2-$(MSYS2_LIBSSH2_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-nghttp2-$(MSYS2_NGHTTP2_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-nghttp3-$(MSYS2_NGHTTP3_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-ngtcp2-$(MSYS2_NGTCP2_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libiconv-$(MSYS2_LIBICONV_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-libunistring-$(MSYS2_LIBUNISTRING_VERSION)-any.pkg.tar.zst
+	tarballs/mingw-w64-ucrt-x86_64-boost-$(MSYS2_BOOST_VERSION)-any.pkg.tar.zst
 
 sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/build/lib/libslicot.a panua-pardiso
 	rm -rf $@
@@ -138,6 +122,7 @@ sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/build/lib/libslico
 	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse octave/mingw64/include/gsl $@/ucrt64/include
 	cp -R octave/mingw64/lib/octave $@/ucrt64/lib
 	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a octave/mingw64/lib/libopenblas.dll.a $@/ucrt64/lib
+	mkdir -p $@/ucrt64/lib/pkgconfig
 	cp octave/mingw64/lib/pkgconfig/gsl.pc octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc octave/mingw64/lib/pkgconfig/openblas.pc $@/ucrt64/lib/pkgconfig
 	cp panua-pardiso/lib/libpardiso.dll $@/ucrt64/lib
 	patch -p0 < octave-pkgconfig.patch
