@@ -67,5 +67,3 @@ end
 
 dr.order_var = [stat_var(:); pred_var(:); both_var(:); fwrd_var(:)];
 dr.inv_order_var(dr.order_var) = 1:M_.endo_nbr;
-
-dr.transition_auxiliary_variables = [];
