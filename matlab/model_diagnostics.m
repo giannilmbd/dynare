@@ -237,7 +237,7 @@ for b=1:nb
             if n_rel  > 1
                 disp(['Relation ' int2str(i)])
             end
-            disp('Collinear equations')
+            disp('Collinear equations:')
             for j=1:10
                 k = find(abs(neq(:,i)) > 10^-j);
                 if max(abs(jacob(k,:)'*neq(k,i))) < 1e-6
@@ -245,9 +245,25 @@ for b=1:nb
                 end
             end
             if options_.block && ~options_.bytecode
-                disp(M_.block_structure_stat.block(b).equation(k))
+                eq_numbers = M_.block_structure_stat.block(b).equation(k);
             else
-                disp(k')
+                eq_numbers = k;
+            end
+            for eq_iter = 1:length(eq_numbers)
+                eq_nbr = eq_numbers(eq_iter);
+                % Find the 'name' tag for this equation in M_.equations_tags
+                eq_name = '';
+                if isfield(M_, 'equations_tags') && ~isempty(M_.equations_tags)
+                    name_idx = find([M_.equations_tags{:,1}]' == eq_nbr & strcmp(M_.equations_tags(:,2), 'name'));
+                    if ~isempty(name_idx)
+                        eq_name = M_.equations_tags{name_idx(1), 3};
+                    end
+                end
+                if ~isempty(eq_name)
+                    fprintf('    Equation %d: %s\n', eq_nbr, eq_name);
+                else
+                    fprintf('    Equation %d\n', eq_nbr);
+                end
             end
         end
     end
@@ -352,14 +368,29 @@ if rank_jacob_dyn < M_.endo_nbr
         if n_rel > 1
             disp(['Relation ' int2str(i)])
         end
-        disp('Collinear equations')
+        disp('Collinear equations:')
         for j = 1:10
             k = find(abs(neq(:, i)) > 10^-j);
             if max(abs(jacob_dyn(k, :)' * neq(k, i))) < 1e-6
                 break
             end
         end
-        disp(k')
+        for eq_iter = 1:length(k)
+            eq_nbr = k(eq_iter);
+            % Find the 'name' tag for this equation in M_.equations_tags
+            eq_name = '';
+            if isfield(M_, 'equations_tags') && ~isempty(M_.equations_tags)
+                name_idx = find([M_.equations_tags{:,1}]' == eq_nbr & strcmp(M_.equations_tags(:,2), 'name'));
+                if ~isempty(name_idx)
+                    eq_name = M_.equations_tags{name_idx(1), 3};
+                end
+            end
+            if ~isempty(eq_name)
+                fprintf('    Equation %d: %s\n', eq_nbr, eq_name);
+            else
+                fprintf('    Equation %d\n', eq_nbr);
+            end
+        end
     end
 end
 
