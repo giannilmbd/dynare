@@ -86,13 +86,6 @@ endif
 
 openmp_dep = dependency('openmp')
 
-# TODO: find a way to set GSL_BLAS_LIB to an empty value; otherwise there is a
-# risk of overriding OpenBLAS/MKL (though probably not in our current setup);
-# the pkgconfig_define option of dep.get_variable() is unfortunately not
-# helpful, since that latter method cannot query the “libs”. Reported as:
-# https://github.com/mesonbuild/meson/issues/12649
-gsl_dep = dependency('gsl')
-
 pthread_t_sizeof = c_compiler.sizeof('pthread_t', prefix : '#include <pthread.h>')
 pthread_fortran_dep = declare_dependency(compile_args : '-DSIZEOF_PTHREAD_T=' + pthread_t_sizeof.to_string(), sources : 'mex/sources/pthread.F08')
 
@@ -525,7 +518,7 @@ ms_sbvar_src = [ 'contrib/ms-sbvar/utilities_dw/arrays/dw_array.c',
                  'contrib/ms-sbvar/utilities_dw/matrix/dw_matrix.c',
                  'contrib/ms-sbvar/utilities_dw/matrix/bmatrix.c',
                  'contrib/ms-sbvar/utilities_dw/sort/dw_matrix_sort.c',
-                 'contrib/ms-sbvar/utilities_dw/stat/dw_rand_gsl.c',
+                 'contrib/ms-sbvar/utilities_dw/stat/dw_rand.cc',
                  'contrib/ms-sbvar/utilities_dw/stat/dw_matrix_rand.c',
                  'contrib/ms-sbvar/switch_dw/switching/dw_switch.c',
                  'contrib/ms-sbvar/switch_dw/switching/dw_switchio.c',
@@ -541,7 +534,7 @@ ms_sbvar_lib = static_library('ms_sbvar', ms_sbvar_src,
                               kwargs : static_library_kwargs + { 'c_args' : static_library_kwargs.get('c_args') + ms_sbvar_defs,
                                                                  'cpp_args' : static_library_kwargs.get('cpp_args') + ms_sbvar_defs,
                                                                  'include_directories' : static_library_kwargs.get('include_directories') + ms_sbvar_incdir },
-                              dependencies : [ blas_dep, lapack_dep, gsl_dep, ut_dep, extra_octave_dep ])
+                              dependencies : [ blas_dep, lapack_dep, boost_dep, ut_dep, extra_octave_dep ])
 
 # NB: in the following, mex_top_level.cc is put as extra source and not in ms_sbvar_lib,
 # to ensure that mexFunction() is present in the MEX
@@ -564,7 +557,7 @@ ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_op
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/sbvar_variance_decomposition.c',
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/sbvar_impulse_responses.c',
                               'contrib/ms-sbvar/switch_dw/state_space/sbvar/dw_csminwel.c' ]
-shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs, dependencies : gsl_dep)
+shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs)
 
 heterogeneity_src = [
    'mex/sources/heterogeneity/utils/gray_code.f08',

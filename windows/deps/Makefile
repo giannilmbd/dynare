@@ -98,8 +98,7 @@ tarballs/mingw-w64-ucrt-x86_64-%-any.pkg.tar.zst:
 	wget $(WGET_OPTIONS) -O $@ https://mirror.msys2.org/mingw/ucrt64/$(notdir $@)
 
 MATLAB_MSYS2_DEPS := \
-	tarballs/mingw-w64-ucrt-x86_64-boost-$(MSYS2_BOOST_VERSION)-any.pkg.tar.zst \
-	tarballs/mingw-w64-ucrt-x86_64-gsl-$(MSYS2_GSL_VERSION)-any.pkg.tar.zst
+	tarballs/mingw-w64-ucrt-x86_64-boost-$(MSYS2_BOOST_VERSION)-any.pkg.tar.zst
 
 sysroot-matlab: tarballs/matlab64-$(MATLAB64_VERSION).tar.xz $(MATLAB_MSYS2_DEPS) src/slicot-matlab/build/lib/libslicot64.a panua-pardiso
 	rm -rf $@
@@ -119,11 +118,11 @@ sysroot-octave: octave $(OCTAVE_MSYS2_DEPS) src/slicot-octave/build/lib/libslico
 	mkdir $@
 	for f in $(OCTAVE_MSYS2_DEPS); do tar xf $$f --directory $@ $(MSYS2_EXCLUDES); done
 	cp src/slicot-octave/build/lib/libslicot.a $@/ucrt64/lib/libslicot_pic.a
-	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse octave/mingw64/include/gsl $@/ucrt64/include
+	cp -R octave/mingw64/include/octave-* octave/mingw64/include/suitesparse $@/ucrt64/include
 	cp -R octave/mingw64/lib/octave $@/ucrt64/lib
-	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libgsl.dll.a octave/mingw64/lib/libgslcblas.dll.a octave/mingw64/lib/libopenblas.dll.a $@/ucrt64/lib
+	cp octave/mingw64/lib/libblas.dll.a octave/mingw64/lib/liblapack.dll.a octave/mingw64/lib/libumfpack.dll.a octave/mingw64/lib/libopenblas.dll.a $@/ucrt64/lib
 	mkdir -p $@/ucrt64/lib/pkgconfig
-	cp octave/mingw64/lib/pkgconfig/gsl.pc octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc octave/mingw64/lib/pkgconfig/openblas.pc $@/ucrt64/lib/pkgconfig
+	cp octave/mingw64/lib/pkgconfig/UMFPACK.pc octave/mingw64/lib/pkgconfig/AMD.pc octave/mingw64/lib/pkgconfig/SuiteSparse_config.pc octave/mingw64/lib/pkgconfig/openblas.pc $@/ucrt64/lib/pkgconfig
 	cp panua-pardiso/lib/libpardiso.dll $@/ucrt64/lib
 	patch -p0 < octave-pkgconfig.patch
 	touch $@

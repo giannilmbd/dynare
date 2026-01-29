@@ -23,9 +23,6 @@ SUITESPARSE_VERSION = 7.11.0
 # (also used by the preprocessor CI, so it can be updated there also)
 MSYS2_BOOST_VERSION = 1.90.0-2
 
-# pacman -Ss mingw-w64-ucrt-x86_64-gsl
-MSYS2_GSL_VERSION = 2.8-1
-
 ## Packages for the embedded compiler
 
 # pacman -Ss mingw-w64-ucrt-x86_64-gcc$
