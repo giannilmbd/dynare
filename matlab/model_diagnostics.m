@@ -319,6 +319,50 @@ if any(any(~isreal(g1)))
         display_problematic_vars_Jacobian(imagrow,imagcol,M_,dr.ys,'dynamic','MODEL_DIAGNOSTICS: ')
     end
 end
+
+%
+% singular Jacobian of dynamic model (redundant equations check)
+%
+jacob_dyn = full(g1);
+
+try
+    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
+        rank_jacob_dyn = rank(jacob_dyn);
+    else
+        rank_jacob_dyn = rank(jacob_dyn, options_.jacobian_tolerance);
+    end
+catch
+    rank_jacob_dyn = size(jacob_dyn, 1);
+end
+
+if rank_jacob_dyn < M_.endo_nbr
+    problem_dummy = 1;
+    skipline(1);
+    disp(['MODEL_DIAGNOSTICS:  The Jacobian of the dynamic model is ' ...
+          'singular'])
+    disp(['MODEL_DIAGNOSTICS:  there is ' num2str(M_.endo_nbr - rank_jacob_dyn) ...
+          ' redundant equation(s) in the model'])
+    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
+        neq = null(jacob_dyn');
+    else
+        neq = null(jacob_dyn', options_.jacobian_tolerance);
+    end
+    n_rel = size(neq, 2);
+    for i = 1:n_rel
+        if n_rel > 1
+            disp(['Relation ' int2str(i)])
+        end
+        disp('Collinear equations')
+        for j = 1:10
+            k = find(abs(neq(:, i)) > 10^-j);
+            if max(abs(jacob_dyn(k, :)' * neq(k, i))) < 1e-6
+                break
+            end
+        end
+        disp(k')
+    end
+end
+
 if exist('g2_v','var')
     if any(any(isinf(g2_v) | isnan(g2_v)))
         problem_dummy=1;
