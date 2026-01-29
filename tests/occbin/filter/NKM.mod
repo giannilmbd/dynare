@@ -5,6 +5,7 @@
 // The zero lower bound andestimation accuracy.Journal of Monetary Economics
 // original codes provided by Alexander Richter
 // adapted for dynare implementation
+// modified not to remove observables at the zlb
 // ------------------------- Settings -----------------------------------------//
 
 @#ifndef small_model
@@ -169,12 +170,12 @@ model;
     yg = g*y/(gbar*y(-1));
        
     [name = 'Notional Interest Rate (9)']
-    inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi)*exp(mp);    
+    inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi);
     
     [name = 'Nominal Interest Rate (10)', bind='zlb']
-    inom = inomlb;
+    inom = inomlb*exp(mp);
     [name = 'Nominal Interest Rate (10)', relax='zlb']
-    inom = inomnot;
+    inom = inomnot*exp(mp);
                   
     [name = 'Inverse MUC (11)']
     lam = c-h*c(-1)/g;
@@ -285,29 +286,17 @@ varobs yg inom pi;
         sigi,,,,INV_GAMMA_PDF,0.002,0.002;
     end;    
     
-    load('dataobsfile','inom')
-    // check if inom is at lb and remove data + associated shock
-    verbatim;
-    inom(inom==1)=NaN;
-    end;
-    inx = strmatch('epsi',M_.exo_names);
-    if any(isnan(inom))
-        M_.heteroskedastic_shocks.Qscale_orig = struct('periods', find(isnan(inom)), 'exo_id', inx, 'scale', 0);
-    else
-        options_.heteroskedastic_filter=false;
-    end
-            
-    copyfile dataobsfile.mat dataobsfile2.mat
-    save dataobsfile2 inom -append
+
     // -----------------Occbin ----------------------------------------------//   
     options_.occbin.smoother.debug=1;
-    occbin_setup(filter_use_relaxation,likelihood_piecewise_kalman_filter);
+    occbin_setup(likelihood_piecewise_kalman_filter);
+
     // use PKF  
     estimation(
-            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+            consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
     
     // plot regimes
     occbin.plot_regimes(oo_.occbin.smoother.regime_history,M_,options_)
@@ -345,10 +334,10 @@ varobs yg inom pi;
     oo0=oo_;
     // use smoother_redux
     estimation(
-            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother, smoother_redux,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+            consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
 
     // check consistency of smoother_redux
     for k=1:M_.endo_nbr, 
@@ -391,19 +380,19 @@ varobs yg inom pi;
     //run PKF with MCMC
     options_.smoother_redux=false;
     estimation(
-        datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+        datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
         mode_compute=0, nobs=120, first_obs=1,
         mh_replic=50, plot_priors=0, smoother,
-        consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+        consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
 
     // use inversion filter (note that IF provides smoother together with likelihood)
     occbin_setup(likelihood_inversion_filter,smoother_inversion_filter);
             
     estimation(
-            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=50, plot_priors=0, smoother,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+            consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
             
     // show initial condition effect of IF
     figure('Name','OccBin: Smoothed shocks')
@@ -425,10 +414,10 @@ varobs yg inom pi;
     occbin_write_regimes(smoother);
 
     estimation(
-            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=50, plot_priors=0, smoother,
-            consider_all_endogenous,heteroskedastic_filter,filter_step_ahead=[1:8],smoothed_state_uncertainty);
+            consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
 
 write_latex_dynamic_model;
 collect_latex_files;

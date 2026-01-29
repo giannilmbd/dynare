@@ -175,12 +175,12 @@ model;
     yg = g*y/(gbar*y(-1)) + junk1 + junk2;
        
     [name = 'Notional Interest Rate (9)']
-    inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi)*exp(mp);    
+    inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi);
     
     [name = 'Nominal Interest Rate (10)', bind='zlb']
-    inom = inomlb;
+    inom = inomlb*exp(mp);
     [name = 'Nominal Interest Rate (10)', relax='zlb']
-    inom = inomnot;
+    inom = inomnot*exp(mp);
                   
     [name = 'Inverse MUC (11)']
     lam = c-h*c(-1)/g;
@@ -294,29 +294,12 @@ varobs yg inom pi;
     end;    
     
  
-//     dataloading_jme_beta(1,'sims.txt',30);
-    load('dataobsfile','inom')
-    // check if inom is at lb and remove data + associated shock
-    verbatim;
-    inom(inom==1)=NaN;
-    end;
-    inx = strmatch('epsi',M_.exo_names);
-    if any(isnan(inom))
-        M_.heteroskedastic_shocks.Qscale_orig = struct('periods', find(isnan(inom)), 'exo_id', inx, 'scale', 0);
-    else
-        options_.heteroskedastic_filter=false;
-    end
-            
-    copyfile dataobsfile.mat dataobsfile2.mat
-    save dataobsfile2 inom -append
-    // -----------------Occbin ----------------------------------------------//   
-    options_.occbin.filter.use_relaxation=true;
-    // use PKF  
+
     estimation(
-            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
-            nodisplay,consider_all_endogenous,heteroskedastic_filter);
+            nodisplay,consider_all_endogenous);
     
     oo0=oo_;
     
@@ -325,10 +308,10 @@ varobs yg inom pi;
     options_.occbin.smoother.inversion_filter  = 1;
             
     estimation(
-            datafile=dataobsfile2, mode_file=NKM_mh_mode_saved,
+            datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
-            nodisplay, consider_all_endogenous,heteroskedastic_filter);
+            nodisplay, consider_all_endogenous);
             
     // show initial condition effect of IF
     figure,

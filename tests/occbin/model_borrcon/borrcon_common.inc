@@ -36,3 +36,5 @@ line2=100*[(oo_.occbin.endo_linear.c-oo_.occbin.endo_ss.c)/oo_.occbin.endo_ss.c,
         oo_.occbin.endo_linear.lb/100];
 
 occbin.make_chart(titlelist,legendlist,figtitle,ylabels,cat(3,line1,line2));
+occbin.plot_regimes(oo_.occbin.simul.regime_history,M_,options_)
+    
