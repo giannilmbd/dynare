@@ -63,19 +63,15 @@
  * You can receive a copy of the GNU General Public License
  * at <http://www.gnu.org/licenses/>.
  */
-// @#define observe_levels = 1
-// @#define set_options_occbin = set_options_occbin + ["likelihood.first_period_binding_regime_allowed=101"]
-// @#if dgp_estim
-// 	@#define data_file = "usdata_pkf"//usmodel_data"//usdata_pkf"
-// @#endif
+
 // -----------------Dynare ----------------------------------------------//   
 var labobs      ${lHOURS}$      (long_name='log hours worked') 
     robs        ${FEDFUNDS}$    (long_name='Federal funds rate') 
-    pinfobs     ${dlP}$         (long_name='Inflation') 
-    dy          ${dlGDP}$       (long_name='Output growth rate') 
-    dc          ${dlCONS}$      (long_name='Consumption growth rate') 
-    dinve       ${dlINV}$       (long_name='Investment growth rate') 
-    dw          ${dlWAG}$       (long_name='Wage growth rate') 
+    pinfobs     ${\pi}$         (long_name='Inflation') 
+    dy          ${\Delta GDP}$       (long_name='Output growth rate') 
+    dc          ${\Delta C}$      (long_name='Consumption growth rate') 
+    dinve       ${\Delta I}$       (long_name='Investment growth rate') 
+    dw          ${\Delta W}$       (long_name='Wage growth rate') 
     ewma        ${\eta^{w,aux}}$ (long_name='Auxiliary wage markup moving average variable')  
     epinfma     ${\eta^{p,aux}}$ (long_name='Auxiliary price markup moving average variable')
         ygap        ${ygap}$        (long_name='ygap') 
@@ -118,16 +114,12 @@ parameters curvw ${\varepsilon_w}$  (long_name='Curvature Kimball aggregator wag
     constelab   ${\bar l}$          (long_name='steady state hours')  
     constepinf  ${\bar \pi}$        (long_name='steady state inflation rate')  
     constebeta  ${100(\beta^{-1}-1)}$ (long_name='time preference rate in percent')  
-    cmaw        ${\mu_w}$           (long_name='coefficient on MA term wage markup')  
-    cmap        ${\mu_p}$           (long_name='coefficient on MA term price markup')  
     calfa       ${\alpha}$          (long_name='capital share')  
     czcap       ${\psi}$            (long_name='capacity utilization cost')  
     csadjcost   ${\varphi}$         (long_name='investment adjustment cost')  
     ctou        ${\delta}$          (long_name='depreciation rate')  
     csigma      ${\sigma_c}$        (long_name='risk aversion')  
     chabb       ${\lambda}$         (long_name='external habit degree')  
-//     ccs         ${d_4}$             (long_name='Unused parameter')  
-//     cinvs       ${d_3}$             (long_name='Unused parameter')  
     cfc         ${\phi_p}$          (long_name='fixed cost share')  
     cindw       ${\iota_w}$         (long_name='Indexation to past wages')  
     cprobw      ${\xi_w}$           (long_name='Calvo parameter wages')   
@@ -135,24 +127,17 @@ parameters curvw ${\varepsilon_w}$  (long_name='Curvature Kimball aggregator wag
     cprobp      ${\xi_p}$           (long_name='Calvo parameter prices')   
     csigl       ${\sigma_l}$        (long_name='Frisch elasticity')   
     clandaw     ${\phi_w}$          (long_name='Gross markup wages')   
-//     crdpi       ${r_{\Delta \pi}}$  (long_name='Unused parameter')  
     crpi        ${r_{\pi}}$         (long_name='Taylor rule inflation feedback') 
     crdy        ${r_{\Delta y}}$    (long_name='Taylor rule output growth feedback') 
     cry         ${r_{y}}$           (long_name='Taylor rule output level feedback') 
     crr         ${\rho}$            (long_name='interest rate persistence')  
     crhoa       ${\rho_a}$          (long_name='persistence productivity shock')  
-    crhoas      ${d_2}$             (long_name='Unused parameter')  
     crhob       ${\rho_b}$          (long_name='persistence risk premium shock')  
     crhog       ${\rho_g}$          (long_name='persistence spending shock')  
-    crhols      ${d_1}$             (long_name='Unused parameter')  
     crhoqs      ${\rho_i}$          (long_name='persistence risk premium shock')  
-    crhoms      ${\rho_r}$          (long_name='persistence monetary policy shock')  
-    crhopinf    ${\rho_p}$          (long_name='persistence price markup shock')  
-    crhow       ${\rho_w}$          (long_name='persistence wage markup shock')  
     ctrend      ${\bar \gamma}$     (long_name='net growth rate in percent')  
     cg          ${\frac{\bar g}{\bar y}}$     (long_name='steady state exogenous spending share')
     rlb         ${rlb}$             (long_name='effective lower bound')
-    zlb         ${zlb}$             (long_name='zlb dummy')
 	inomobszlb	${iobszlb}$         (long_name='switch if inom is observed at the zlb')
     
 cpie    //gross inflation rate
@@ -173,27 +158,6 @@ crkky                    // z_y=R_{*}^k*k_y
 cwhlc // W^{h}_{*}*L_{*}/C_{*} used in c_2 in equation (2)
 cwly                   // unused parameter
 conster               // steady state federal funds rate ($\bar r$)
-// state init values
-ainit      
-binit      
-ginit      
-qsinit     
-msinit     
-epinfmainit
-ewmainit   
-spinfinit  
-swinit     
-yinit      
-ygapinit      
-rlaginit   
-rnotinit   
-kpinit     
-pinfinit   
-winit      
-inveinit   
-cinit    
-// gdp level
-ybar
 ;
 // fixed parameters
 ctou=.025;
@@ -202,7 +166,7 @@ cg=0.18;
 curvp=10;
 curvw=10;
 zlb = 0;
-        inomobszlb=1;
+inomobszlb=1;
 rlb = 0.05;//1.05;
 // estimated parameters initialisation
 calfa=.24;
@@ -234,30 +198,14 @@ crhow=0;
 cmap = 0;
 cmaw  = 0;
 constelab=0;
+
 // Trends from data
 load('usdata_pkf')
 constepinf=0.7;
 constebeta=0.7420;
 //ctrend=0.3982;
 set_param_value('ctrend',mean(dy(74:end)))
-ainit = 0;      
-binit = 0;      
-ginit = 0;      
-qsinit = 0;     
-msinit = 0;     
-epinfmainit = 0;
-ewmainit = 0;   
-spinfinit = 0;  
-swinit = 0;     
-yinit = 0;      
-ygapinit = 0;      
-rlaginit = 0;   
-rnotinit = 0;   
-kpinit = 0;     
-pinfinit = 0;   
-winit = 0;      
-inveinit = 0;   
-cinit = 0;     
+
 ybar = 19;
 shocks;
 var ea;
@@ -275,37 +223,10 @@ stderr 0.1455;
 var ew;
 stderr 0.2089;
 end;
-monetary_shock_ar = 0;
-mup_muw_shock_arma = 0;
-het_shock_stddev = 1;
-//@#if observe_levels && !dgp_estim
-//model;
-//@#else
+
+
 model(linear); 
-//@#endif
-//deal with parameter dependencies; taken from usmodel_stst.mod 
-// #cpie=1+constepinf/100;         %gross inflation rate
-// #cgamma=1+ctrend/100 ;          %gross growth rate
-// #cbeta=1/(1+constebeta/100);    %discount factor
-// 
-// #clandap=cfc;                   %fixed cost share/gross price markup
-// #cbetabar=cbeta*cgamma^(-csigma);   %growth-adjusted discount factor in Euler equation
-// #cr=cpie/(cbeta*cgamma^(-csigma));  %steady state gross real interest rate
-// #crk=(cbeta^(-1))*(cgamma^csigma) - (1-ctou); %R^k_{*}: steady state rental rate
-// #cw = (calfa^calfa*(1-calfa)^(1-calfa)/(clandap*crk^calfa))^(1/(1-calfa));      %steady state real wage
-// //cw = (calfa^calfa*(1-calfa)^(1-calfa)/(clandap*((cbeta^(-1))*(cgamma^csigma) - (1-ctou))^calfa))^(1/(1-calfa));
-// #cikbar=(1-(1-ctou)/cgamma);        %(1-k_1) in equation LOM capital, equation (8)
-// #cik=(1-(1-ctou)/cgamma)*cgamma;    %i_k: investment-capital ratio
-// #clk=((1-calfa)/calfa)*(crk/cw);    %labor to capital ratio
-// #cky=cfc*(clk)^(calfa-1);           %k_y: steady state output ratio
-// #ciy=cik*cky;                       %investment-output ratio
-// #ccy=1-cg-cik*cky;                  %consumption-output ratio
-// #crkky=crk*cky;                     %z_y=R_{*}^k*k_y
-// #cwhlc=(1/clandaw)*(1-calfa)/calfa*crk*cky/ccy; %W^{h}_{*}*L_{*}/C_{*} used in c_2 in equation (2)
-// #cwly=1-crk*cky;                    %unused parameter
-// #conster=(cr-1)*100;                %steady state federal funds rate ($\bar r$)
-// flexible economy
-// sticky price - wage economy
+
 [name='FOC labor with mpl expressed as function of rk and w, SW Equation (9)']
 mc =  calfa*rk+(1-calfa)*(w) - 1*a - 0*(1-calfa)*a ;
 [name='FOC capacity utilization, SW Equation (7)']
@@ -397,9 +318,11 @@ robs =    1*(r) + conster;
 [name='Observation equation hours worked']              
 labobs = lab + constelab;
 end; 
-    occbin_constraints;
-    name 'zlb'; bind rnot+conster<=rlb; //relax rnot+conster> rlb;
-    end;   
+
+occbin_constraints;
+name 'zlb'; bind rnot+conster<=rlb; //relax rnot+conster> rlb;
+end;
+
 steady_state_model;
 dy=ctrend;
 dc=ctrend;
@@ -407,10 +330,6 @@ dinve=ctrend;
 dw=ctrend;
 pinfobs = constepinf;
 robs = (((1+constepinf/100)/((1/(1+constebeta/100))*(1+ctrend/100)^(-csigma)))-1)*100;
-//robs = ((cpie/(cbeta*cgamma^(-csigma)))-1)*100;
-//robs = (cpie/cbetabar-1)*100;
-//cr=cpie/cbetabar
-//conster=(cr-1)*100 -> conster=(cpie/cbetabar-1)*100 = robs
 labobs = constelab;
 cpie=1+constepinf/100;         %gross inflation rate
 cgamma=1+ctrend/100 ;          %gross growth rate
@@ -478,45 +397,33 @@ estimated_params;
     cgy,,0.01,2.0,NORMAL_PDF,0.5,0.25;
     calfa,,0.01,1.0,NORMAL_PDF,0.3,0.05;    
 end;
-
+options_.TeX=true;
 options_.debug = 0;  
 options_.occbin.likelihood.periodic_solution    = true;
 options_.occbin.simul.periodic_solution         = true;
 options_.occbin.smoother.periodic_solution      = true;
-    
+options_.occbin.filter.particle.number_of_particles =64;
 options_.noprint = false;
 options_.nograph = false;
 options_.plot_priors = true;
 
 
 estimation(datafile='usdata_pkf', 
-	//lik_init=2,//3, 
-	//lik_init=3, //kalman_algo=4,//kalman_algo=3,
 	nobs=210,
 	first_obs=74,
 	use_univariate_filters_if_singularity_is_detected=0,
-	//diffuse_kalman_tol=1.e-4,
 	mh_replic=0, 
 	mode_compute=0, 
     mode_file = 'swpkfest_mh_mode',
 	posterior_sampling_method='slice', 
 	mh_nblocks=4,
 	mh_drop=0.5, 
-	sub_draws = 20, // set to 600 to use all draws
-	//bayesian_irf,
 	presample = 20,
 	nodisplay, 
 	graph_format=(eps,fig), 
     filter_covariance, smoothed_state_uncertainty,
 	smoother, smoother_redux,consider_all_endogenous);
-	//options_.parameter_set = 'calibration';
-// steady;
-// check;
-// stoch_simul(order=1, nograph, nomoments);
-//load swpkf/Output/swpkf_mh_mode xparam1
-//options_.datafile = 'usdata_pkf';
-//cli.evaluate.smoother(xparam1);
-     //   identification;    
+
 load swpkfest_mh_mode.mat fval xparam1;
 
 if abs(cli.evaluate.posterior_kernel(xparam1)-fval)>1.e-10
@@ -533,16 +440,25 @@ cli.evaluate.posterior_kernel(xparam1)
 
 //triggers diagnostic plots with PPF
 disp('PPF diagnostic plots')
-options_.occbin.filter.particle.nograph=false; 
-options_.occbin.filter.particle.likelihood_only=false;
+options_.occbin.filter.particle.diagnostics.graph_periods=[172]; 
+options_.occbin.filter.particle.diagnostics.nograph=false; 
+options_.occbin.filter.particle.diagnostics.status=true;
 cli.evaluate.posterior_kernel(xparam1)
-options_.occbin.filter.particle.nograph=true; 
-options_.occbin.filter.particle.likelihood_only=true;
+options_.occbin.filter.particle.diagnostics.nograph=true; 
+options_.occbin.filter.particle.diagnostics.status=false;
 
 // posterior importance sampling using ppf starting from pkf draws
 options_.occbin.posterior_importance_sampling.status = true;
+options_.occbin.posterior_importance_sampling.sub_draws = 6; // set to 600 to use all draws
 options_.occbin.posterior_importance_sampling.filter = 'ppf'; % can be pkf or ppf
 options_.occbin.posterior_importance_sampling.orig_dname = 'swpkfest';
 options_.occbin.posterior_importance_sampling.orig_fname = 'swpkfest';
 options_.occbin.posterior_importance_sampling.orig_filter = 'pkf'; % can be linear or pkf
 oo_ = occbin.posterior_importance_sampling(M_, estim_params_, oo_, options_, bayestopt_);
+
+collect_latex_files;
+[status, cmdout]=system(['pdflatex -halt-on-error -interaction=nonstopmode ' M_.fname '_TeX_binder.tex']);
+if status
+    cmdout
+    error('TeX-File did not compile.')
+end
