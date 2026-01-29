@@ -24,10 +24,17 @@ dynamic_ = isfield(options_model_info_, 'block_dynamic') && options_model_info_.
 static_ = isfield(options_model_info_, 'block_static') && options_model_info_.block_static;
 incidence = isfield(options_model_info_, 'incidence') && options_model_info_.incidence;
 
+if dynamic_ && static_
+    error('model_info: block_dynamic and block_static cannot be used simultaneously.');
+end
+
+if incidence && ~(dynamic_ || static_)
+    error('model_info: the incidence option requires either block_dynamic or block_static to be specified.');
+end
+
 if static_
     temp_string=sprintf('\nInformation about %s (static model)\n',M_.fname);
     fprintf(temp_string);
-    block_structure_str = 'block_structure_stat';
     if ~isfield(M_,'block_structure_stat')
         fprintf('\nmodel_info: block information not present; skipping display.\n')
         return;
@@ -37,12 +44,11 @@ if static_
 else
     temp_string=sprintf('\nInformation about %s (dynamic model)\n',M_.fname);
     fprintf(temp_string);
-    block_structure_str = 'block_structure';
     if dynamic_ && isfield(M_,'block_structure')
         fprintf('\nmodel_info: block information not present; skipping display.\n')        
         return;
     elseif dynamic_
-        nb_leadlag = length([M_.(block_structure_str).incidence.lead_lag]);
+        nb_leadlag = length([M_.block_structure.incidence.lead_lag]);
     end
 end
 
