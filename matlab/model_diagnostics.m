@@ -222,9 +222,20 @@ for b=1:nb
                 end
             end
             if options_.block && ~options_.bytecode
-                fprintf('%s\n',endo_names{M_.block_structure_stat.block(b).variable(k)})
+                var_names = endo_names(M_.block_structure_stat.block(b).variable(k));
             else
-                fprintf('%s\n',endo_names{k})
+                var_names = endo_names(k);
+            end
+            if length(var_names) > 5
+                % Print 10 variables per row
+                for row_start = 1:10:length(var_names)
+                    row_end = min(row_start + 9, length(var_names));
+                    fprintf('    %s\n', strjoin(var_names(row_start:row_end), ', '));
+                end
+            else
+                for v_iter = 1:length(var_names)
+                    fprintf('    %s\n', var_names{v_iter});
+                end
             end
         end
         if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
