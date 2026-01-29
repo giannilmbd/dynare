@@ -222,9 +222,20 @@ for b=1:nb
                 end
             end
             if options_.block && ~options_.bytecode
-                fprintf('%s\n',endo_names{M_.block_structure_stat.block(b).variable(k)})
+                var_names = endo_names(M_.block_structure_stat.block(b).variable(k));
             else
-                fprintf('%s\n',endo_names{k})
+                var_names = endo_names(k);
+            end
+            if length(var_names) > 5
+                % Print 10 variables per row
+                for row_start = 1:10:length(var_names)
+                    row_end = min(row_start + 9, length(var_names));
+                    fprintf('    %s\n', strjoin(var_names(row_start:row_end), ', '));
+                end
+            else
+                for v_iter = 1:length(var_names)
+                    fprintf('    %s\n', var_names{v_iter});
+                end
             end
         end
         if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
@@ -237,7 +248,7 @@ for b=1:nb
             if n_rel  > 1
                 disp(['Relation ' int2str(i)])
             end
-            disp('Collinear equations')
+            disp('Collinear equations:')
             for j=1:10
                 k = find(abs(neq(:,i)) > 10^-j);
                 if max(abs(jacob(k,:)'*neq(k,i))) < 1e-6
@@ -245,9 +256,25 @@ for b=1:nb
                 end
             end
             if options_.block && ~options_.bytecode
-                disp(M_.block_structure_stat.block(b).equation(k))
+                eq_numbers = M_.block_structure_stat.block(b).equation(k);
             else
-                disp(k')
+                eq_numbers = k;
+            end
+            for eq_iter = 1:length(eq_numbers)
+                eq_nbr = eq_numbers(eq_iter);
+                % Find the 'name' tag for this equation in M_.equations_tags
+                eq_name = '';
+                if isfield(M_, 'equations_tags') && ~isempty(M_.equations_tags)
+                    name_idx = find([M_.equations_tags{:,1}]' == eq_nbr & strcmp(M_.equations_tags(:,2), 'name'));
+                    if ~isempty(name_idx)
+                        eq_name = M_.equations_tags{name_idx(1), 3};
+                    end
+                end
+                if ~isempty(eq_name)
+                    fprintf('    Equation %d: %s\n', eq_nbr, eq_name);
+                else
+                    fprintf('    Equation %d\n', eq_nbr);
+                end
             end
         end
     end
@@ -319,6 +346,65 @@ if any(any(~isreal(g1)))
         display_problematic_vars_Jacobian(imagrow,imagcol,M_,dr.ys,'dynamic','MODEL_DIAGNOSTICS: ')
     end
 end
+
+%
+% singular Jacobian of dynamic model (redundant equations check)
+%
+jacob_dyn = full(g1);
+
+try
+    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
+        rank_jacob_dyn = rank(jacob_dyn);
+    else
+        rank_jacob_dyn = rank(jacob_dyn, options_.jacobian_tolerance);
+    end
+catch
+    rank_jacob_dyn = size(jacob_dyn, 1);
+end
+
+if rank_jacob_dyn < M_.endo_nbr
+    problem_dummy = 1;
+    skipline(1);
+    disp(['MODEL_DIAGNOSTICS:  The Jacobian of the dynamic model is ' ...
+          'singular'])
+    disp(['MODEL_DIAGNOSTICS:  there is ' num2str(M_.endo_nbr - rank_jacob_dyn) ...
+          ' redundant equation(s) in the model'])
+    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
+        neq = null(jacob_dyn');
+    else
+        neq = null(jacob_dyn', options_.jacobian_tolerance);
+    end
+    n_rel = size(neq, 2);
+    for i = 1:n_rel
+        if n_rel > 1
+            disp(['Relation ' int2str(i)])
+        end
+        disp('Collinear equations:')
+        for j = 1:10
+            k = find(abs(neq(:, i)) > 10^-j);
+            if max(abs(jacob_dyn(k, :)' * neq(k, i))) < 1e-6
+                break
+            end
+        end
+        for eq_iter = 1:length(k)
+            eq_nbr = k(eq_iter);
+            % Find the 'name' tag for this equation in M_.equations_tags
+            eq_name = '';
+            if isfield(M_, 'equations_tags') && ~isempty(M_.equations_tags)
+                name_idx = find([M_.equations_tags{:,1}]' == eq_nbr & strcmp(M_.equations_tags(:,2), 'name'));
+                if ~isempty(name_idx)
+                    eq_name = M_.equations_tags{name_idx(1), 3};
+                end
+            end
+            if ~isempty(eq_name)
+                fprintf('    Equation %d: %s\n', eq_nbr, eq_name);
+            else
+                fprintf('    Equation %d\n', eq_nbr);
+            end
+        end
+    end
+end
+
 if exist('g2_v','var')
     if any(any(isinf(g2_v) | isnan(g2_v)))
         problem_dummy=1;
