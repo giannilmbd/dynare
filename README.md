@@ -75,7 +75,8 @@ A number of tools and libraries are needed in order to recompile everything. You
 - [Meson](https://mesonbuild.com), version 1.3.0 or later
 - [Pkgconf](http://pkgconf.org/), or another pkg-config implementation
 - [Bash](https://www.gnu.org/software/bash/)
-- [Boost libraries](https://www.boost.org), version 1.36 or later
+- [Boost libraries](https://www.boost.org), version 1.36 or later (only the
+  headers are needed, not any of the compiled libraries)
 - [Bison](https://www.gnu.org/software/bison/), version 3.2 or later
 - [Flex](https://github.com/westes/flex), version 2.5.4 or later
 - [SLICOT](http://www.slicot.org)
@@ -189,7 +190,7 @@ All the prerequisites are packaged:
 - `g++`
 - `gfortran`
 - `octave-dev`
-- `libboost-graph-dev`
+- `libboost-dev`
 - `libslicot-dev` and `libslicot64-pic` (the latter is not available in Debian ⩽ 13 and Ubuntu ⩽ 25.10; `libslicot-pic` should be used instead)
 - `libsuitesparse-dev`
 - `flex` and `libfl-dev`
@@ -212,7 +213,7 @@ All the prerequisites are packaged:
 
 You can install them all at once with:
 ```sh
-apt install gcc g++ gfortran octave-dev libboost-graph-dev libslicot-dev libslicot-pic libslicot64-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
+apt install gcc g++ gfortran octave-dev libboost-dev libslicot-dev libslicot-pic libslicot64-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
 ```
 If you use MATLAB, we strongly advise you to also `apt install matlab-support` and confirm to rename the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by your distribution.
 
