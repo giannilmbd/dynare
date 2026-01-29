@@ -1,4 +1,4 @@
-<a name="logo"/>
+﻿<a name="logo"/>
 <div align="center">
 <a href="https://www.dynare.org/" target="_blank">
 <img src="https://www.dynare.org/assets/images/logo/dlogo.svg" alt="Dynare Logo"></img>
@@ -33,12 +33,12 @@ This source can be retrieved in three forms:
 - using the stable source archive of the latest Dynare version from <https://www.dynare.org/download/>
 - using a source snapshot of the unstable version, also from <https://www.dynare.org/download/>
 
-The first section of this page gives general instructions, which apply to all platforms. Then some specific platforms are discussed.
+The first section of this page provides general instructions that apply to all platforms. Then, some specific platforms are discussed.
 
 **Note:** Here, when we refer to 32-bit or 64-bit, we refer to the type of
 MATLAB or Octave installation, not the type of operating system installation.
 For example, it is perfectly possible to run a 32-bit MATLAB on a 64-bit
-Windows: in that case, instructions for Windows 32-bit should be followed. To
+Windows: In that case, follow the instructions for Windows 32-bit. To
 determine the type of your MATLAB/Octave installation, type:
 ```matlab
 >> computer
@@ -46,7 +46,7 @@ determine the type of your MATLAB/Octave installation, type:
 at the MATLAB/Octave prompt. Under MATLAB, if it returns `PCWIN64`, `GLNX64`,
 `MACI64` or `MACA64` then it is a 64-bit MATLAB; if it returns `PCWIN`, `MACI` or `GLNX`,
 then it is a 32-bit MATLAB. Under Octave, if it returns a string that begins
-with `x86_64`, it is a 64-bit Octave; if the strings begins with `i686`, it is
+with `x86_64`, it is a 64-bit Octave; if the string begins with `i686`, it is
 a 32-bit Octave.
 
 **Contents**
@@ -97,7 +97,7 @@ A number of tools and libraries are needed in order to recompile everything. You
 
 ### Preparing the sources
 
-If you have downloaded the sources from an official source archive or the source snapshot, just unpack it.
+If you have downloaded the sources from an official source archive or the source snapshot, just unpack them.
 
 If you want to use Git, do the following from a terminal (note that you must
 have the [Git LFS](https://git-lfs.github.com/) extension installed):
@@ -105,7 +105,7 @@ have the [Git LFS](https://git-lfs.github.com/) extension installed):
 git clone --recurse-submodules https://git.dynare.org/Dynare/dynare.git
 cd dynare
 ```
-If you want a certain version (e.g. 5.x) , then add `--single-branch --branch 5.x` to the git clone command.
+If you want a certain version (e.g., 5.x), then add `--single-branch --branch 5.x` to the git clone command.
 
 ### Configuring the build directory
 
@@ -121,7 +121,7 @@ meson setup -Dbuild_for=octave --buildtype=debugoptimized build-octave
 ```
 The build directory will thus be `build-octave`.
 
-Note that if you do not chose `build-matlab` (under MATLAB) or `build-octave`
+Note that if you do not choose `build-matlab` (under MATLAB) or `build-octave`
 (under Octave) as the build directory, you will need to set the environment
 variable `DYNARE_BUILD_DIR` to the full path of your build tree, before running
 MATLAB or Octave, if you want Dynare to be able to find the preprocessor and
@@ -142,7 +142,7 @@ Conversely, `-Dpardiso=disabled` can be used to ignore it. The default,
 detected, otherwise it will ignore it.
 
 It is possible to specify various Meson options, see the Meson documentation
-for more details. Modifying options of an existing build directory can be
+for more details. Modifying the options of an existing build directory can be
 done using the `meson configure` command.
 
 ### Building
@@ -160,12 +160,12 @@ meson compile -C <builddir> doc
 
 ### Check
 
-Dynare comes with unit tests (in the MATLAB functions) and integration tests (under the `tests` subfolder). All the tests can be run with:
+Dynare includes unit tests (in the MATLAB functions) and integration tests (in the `tests` subfolder). All the tests can be run with:
 ```sh
 meson test -C <builddir>
 ```
 
-Depending on the performance of your machine, this can take several hours.
+Depending on your machine's performance, this can take several hours.
 
 Note that running the testsuite with Octave requires the additional packages `pstoedit`, `epstool`, `xfig`, and `gnuplot`.
 
@@ -174,9 +174,9 @@ Often, it does not make sense to run the complete testsuite. For instance, if yo
 meson test -C <builddir> --suite deterministic_simulations
 ```
 This will run all the integration tests in `tests/deterministic_simulations`.
-This syntax also works with a nested directory (e.g. `--suite deterministic_simulations/purely_forward`).
+This syntax also works with a nested directory (e.g., `--suite deterministic_simulations/purely_forward`).
 
-Finally if you want to run a single integration test, e.g. `deterministic_simulations/lbj/rbc.mod`:
+Finally, if you want to run a single integration test, e.g., `deterministic_simulations/lbj/rbc.mod`:
 ```sh
 meson test -C <builddir> deterministic_simulations/lbj/rbc.mod
 ```
@@ -216,7 +216,7 @@ You can install them all at once with:
 ```sh
 apt install gcc g++ gfortran octave-dev libboost-graph-dev libgsl-dev libslicot-dev libslicot-pic libslicot64-pic libsuitesparse-dev flex libfl-dev bison meson pkgconf texlive texlive-publishers texlive-latex-extra texlive-fonts-extra texlive-science lmodern cm-super python3-sphinx python3-sphinxcontrib.bibtex make tex-gyre latexmk libjs-mathjax x13as
 ```
-If you use MATLAB, we strongly advise to also `apt install matlab-support` and confirm to rename the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by your distribution.
+If you use MATLAB, we strongly advise you to also `apt install matlab-support` and confirm to rename the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by your distribution.
 
 ## Fedora, CentOS or RHEL
 
@@ -247,7 +247,7 @@ dnf install octave octave-devel octave-statistics octave-io octave-optim octave-
 # Documentation packages (only needed if you build documentation)
 dnf install texlive-scheme-minimal texlive-collection-publishers texlive-collection-latexextra texlive-collection-fontsextra texlive-collection-latexrecommended texlive-collection-science texlive-collection-plaingeneric texlive-lm python3-sphinx latexmk mathjax
 ```
-In Fedora these are available from the default repositories; whereas for CentOS and RHEL you need to enable the [Extra Packages for Enterprise Linux (EPEL)](https://fedoraproject.org/wiki/EPEL) repository and either the PowerTools repository for CentOS or the CodeReady Linux Builder repository for RHEL:
+In Fedora, these are available from the default repositories; whereas for CentOS and RHEL you need to enable the [Extra Packages for Enterprise Linux (EPEL)](https://fedoraproject.org/wiki/EPEL) repository and either the PowerTools repository for CentOS or the CodeReady Linux Builder repository for RHEL:
 ```sh
 yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 # CentOS 8
@@ -256,7 +256,7 @@ dnf config-manager --set-enabled PowerTools
 ARCH=$( /bin/arch )
 subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
 ```
-The documentation packages have slightly different names in CentOS and RHEL, but this should only impact you if you build the documentation.
+The documentation packages have slightly different names in CentOS and RHEL, but this should affect you only if you build the documentation.
 
 `Slicot` and `x13as` need to be compiled from source:
 
@@ -291,9 +291,9 @@ x13as
 # X-13ARIMA-SEATS Seasonal Adjustment Program
 # Version Number 1.1 Build 62
 ```
-Alternatively, if you don't have admin privileges you can install it into `$HOME/.local/bin` and add this folder to your PATH.
+Alternatively, if you don't have admin privileges, you can install it into `$HOME/.local/bin` and add this folder to your PATH.
 
-If you use MATLAB, we strongly advise to also rename or exclude the GCC libraries shipped with MATLAB to avoid possible conflicts with GCC libraries shipped by Fedora, see e.g. the [OpenGL Section of the ArchWiki article on MATLAB](https://wiki.archlinux.org/title/MATLAB#OpenGL_acceleration) for instructions.
+If you use MATLAB, we strongly advise renaming or excluding the GCC libraries shipped with MATLAB to avoid possible conflicts with the GCC libraries shipped by Fedora. See, e.g., the [OpenGL Section of the ArchWiki article on MATLAB](https://wiki.archlinux.org/title/MATLAB#OpenGL_acceleration) for instructions.
 
 
 Now use the following commands if using MATLAB (adapt them for Octave, see above):
@@ -319,7 +319,7 @@ make install
 export PATH=/home/$USER/dynare/bison/bin:$PATH
 bison --version # bison (GNU Bison) 3.6.4
 ```
-Now configure dynare as above.
+Now configure Dynare as above.
 
 ## Arch Linux
 
@@ -386,7 +386,7 @@ mkdir -p /usr/local/lib
 cp build/lib/libslicot64.a /usr/local/lib/libslicot64_pic.a
 cd ..
 ```
-- Prepare the Dynare sources, either by unpacking the source tarball, or with:
+- Prepare the Dynare sources, either by unpacking the source tarball or with:
 ```sh
 git clone --recurse-submodules https://git.dynare.org/Dynare/dynare.git
 cd dynare
@@ -419,7 +419,7 @@ Dynare supports both Intel and Apple Silicon chips and is compiled from source
 using a [Homebrew](https://brew.sh/) toolchain. If you have an Apple silicon processor
 (*M1/M2 PRO/MAX/ULTRA*), you can compile Dynare both for Intel's `x86_64` (using Rosetta 2)
 as well as Apple's native `arm64` platform by using the corresponding Homebrew packages.
-If you have an Intel chip you can only compile for `x86_64`.
+If you have an Intel chip, you can only compile for `x86_64`.
 
 You can check the platform of your current Homebrew installation by e.g. running
 `which brew` which should point to `/opt/homebrew/bin/brew` for `arm64` and to
@@ -442,7 +442,7 @@ softwareupdate --install-rosetta --agree-to-license
 ```
 
 - Install [Homebrew](https://brew.sh/):
-Create environment variables for which platform you want to compile for, i.e. either `arm64` or `x86_64`:
+Create environment variables for which platform you want to compile for, i.e., either `arm64` or `x86_64`:
 
 For `arm64` run the following commands:
 ```sh
@@ -460,7 +460,7 @@ Install Homebrew using the environment variables:
 ```sh
 arch -$ARCH /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-The prefix `arch -arm64` or `arch -x86_64` makes sure that you are installing the correct packages.
+The prefixes `arch -arm64` or `arch -x86_64` ensure you install the correct packages.
 Don't forget to run the displayed commands (**Next steps**) in the terminal to add Homebrew to your PATH.
 
 If you have both Homebrew installations installed, make sure that you are accessing the correct packages by temporarily (!) prepending it to the path:
@@ -490,7 +490,7 @@ If you don't have admin privileges, then you can also symlink them into `$HOME/.
 
 - Install MATLAB and additional toolboxes.
 We recommend, but don't require, the following: Optimization, Global Optimization, Statistics and Machine Learning, Econometrics, and Control System.
-For Apple Silicon: MATLAB offers a native Apple silicon version (arm64) as of version R2023b, see [the official instructions](https://de.mathworks.com/support/requirements/apple-silicon.html) how to install it.
+For Apple Silicon: MATLAB offers a native Apple Silicon version (arm64) as of version R2023b, see [the official instructions](https://de.mathworks.com/support/requirements/apple-silicon.html) on how to install it.
 You can also run the Intel version (x86_64) under Rosetta 2.
 Don't forget to run MATLAB at least once to make sure you have a valid license.
 
@@ -555,9 +555,9 @@ Similarly, if you want to compile for Octave, replace the `-Dmatlab_path` option
 ```sh
 arch -$ARCH meson compile -C $BUILDDIR
 ```
-If no errors occured, you are done. Dynare is now ready to use.
+If no errors occurred, you are done. Dynare is now ready to use.
 
-- If you additionally want to compile the documentation run:
+- If you additionally want to compile the documentation, run:
 ```sh
 arch -$ARCH meson compile -C $BUILDDIR doc
 ```
@@ -571,14 +571,14 @@ where `--num-processes` specifies the number of parallel processes to use for th
 ### Optional: pass the full PATH to MATLAB to run system commands
 If you start MATLAB from a terminal, you will get the PATH inherited from the shell.
 However, when you click on the application icon in macOS, you are not running at the terminal level:
-the program is run by launcher, which does not go through a shell login session.
-In other words, you get the system default PATH which includes `/usr/bin:/bin:/usr/sbin:/sbin`, but not `/usr/local/bin` or `$HOME/.local/bin`.
-So if you want to use system commands like `pdflatex`, `latexmk` or `x13as` you should either call them by their full path (e.g `/Library/TeX/texbin/pdflatex`)
+The program is run by a launcher, which does not go through a shell login session.
+In other words, you get the system default PATH, which includes `/usr/bin:/bin:/usr/sbin:/sbin`, but not `/usr/local/bin` or `$HOME/.local/bin`.
+So if you want to use system commands like `pdflatex`, `latexmk` or `x13as`, you should either call them by their full path (e.g `/Library/TeX/texbin/pdflatex`)
 or append the PATH by running `setenv('PATH', [getenv('PATH') ':/usr/local/bin:$HOME/.local/bin:/Library/TeX/texbin']);` in your MATLAB command line once,
-e.g. by adding this to your mod file. Alternatively, you can create a `startup.m` file or change the system default PATH in the `/etc/paths` file.
+e.g., by adding this to your mod file. Alternatively, you can create a `startup.m` file or change the system default PATH in the `/etc/paths` file.
 
 
 ## Docker
-We offer a variety of pre-configured Docker containers for Dynare, pre-configured with Octave and MATLAB including all recommended toolboxes.
+We offer a variety of pre-configured Docker containers for Dynare, pre-configured with Octave and MATLAB, including all recommended toolboxes.
 These are readily available for your convenience on [Docker Hub](https://hub.docker.com/r/dynare/dynare).
-The `scripts/docker` folder contains [information and instructions](scripts/docker/README.md) to interact, built and customize the containers.
+The `scripts/docker` folder contains [information and instructions](scripts/docker/README.md) for interacting with, building, and customizing the containers.
