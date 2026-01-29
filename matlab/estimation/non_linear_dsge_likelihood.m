@@ -204,9 +204,10 @@ end
 % 4. Likelihood evaluation
 %------------------------------------------------------------------------------
 options_.warning_for_steadystate = 0;
-[s1,s2] = get_dynare_random_generator_state();
+[s1,s2,current_stream] = get_dynare_random_generator_state();
+
 LIK = feval(options_.particle.algorithm, ReducedForm, Y, start, options_.particle, options_.threads, options_, M_);
-set_dynare_random_generator_state(s1,s2);
+set_dynare_random_generator_state(s1,s2,current_stream);
 if imag(LIK)
     fval = Inf; info(1) = 46; info(4) = 0.1; exit_flag = 0;
     return
