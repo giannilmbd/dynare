@@ -145,8 +145,8 @@ for i = 1:length(invars)
         error('smoother2histval: unknown input variable')
     end
     
-    v = s((period-M_.maximum_lag+1):period);
     if ~isfield(opts, 'outfile')
+        v = s((period-M_.maximum_lag+1):period);
         j_endo = strmatch(outvars{i}, M_.endo_names, 'exact');
         if ~isempty(j_endo) 
             M_.endo_histval(j_endo, :) = v;
@@ -159,7 +159,8 @@ for i = 1:length(invars)
             error(['smoother2histval: output variable ' outvars{i} ' does not exist.'])            
         end
     else
-        data(M_.orig_maximum_lag-M_.maximum_lag+1:end, i) = v';
+        v = s((period-M_.orig_maximum_lag+1):period);
+        data(:,i) = v';
     end
 end
 if isfield(opts, 'outfile')

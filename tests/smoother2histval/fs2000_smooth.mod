@@ -1,5 +1,5 @@
 // Test that smoother2histval works (with an outfile)
-// Note that an observation equation has been modified in order to have an aux var for lagged endo
+// Since this model has a lag of 2, it incidentally checks that lags > 1 work
 
 var m P c e W R k d n l gy_obs gp_obs y dA;
 varexo e_a e_m;
@@ -85,3 +85,8 @@ options_.solve_tolf = 1e-12;
 estimation(order=1,datafile=fsdat_simul,silent_optimizer,mh_replic=1500,mh_nblocks=1,mh_jscale=0.8,smoother,consider_all_endogenous_and_auxiliary);
 
 smoother2histval(period = 5, outfile = 'fs2000_histval.mat');
+
+
+% Check the written values
+hf = dseries('fs2000_histval.mat');
+assert(all(hf.y.data == oo_.SmoothedVariables.Mean.y(4:5)))
