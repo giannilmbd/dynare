@@ -1,18 +1,9 @@
-// Test that histval_file works
-// Note that an observation equation has been modified in order to have an aux var for lagged endo
+// Test that histval_file works with a file created by smoother2histval (after a Metropolis)
 
 var m P c e W R k d n l gy_obs gp_obs y dA;
 varexo e_a e_m;
 
 parameters alp bet gam mst rho psi del;
-
-alp = 0.33;
-bet = 0.99;
-gam = 0.003;
-mst = 1.011;
-rho = 0.7;
-psi = 0.787;
-del = 0.02;
 
 model;
 dA = exp(gam+e_a);
@@ -57,19 +48,26 @@ steady_state_model;
   gy_obs = dA;
 end;
 
-shocks;
-var e_a; stderr 0.014;
-var e_m; stderr 0.005;
-end;
-
+% Use estimated parameters (posterior mean) as calibration
 results_estimation=load(['fs2000_smooth' filesep 'Output' filesep 'fs2000_smooth_results']);
 M_.params=results_estimation.M_.params;
-steady;
 
-OO = load(['fs2000_smooth' filesep 'Output' filesep 'fs2000_smooth_results']);;
-M_.params = OO.M_.params;
+steady;
 
 histval_file(datafile = 'fs2000_histval.mat');
 
 perfect_foresight_setup(periods = 100);
 perfect_foresight_solver;
+
+
+hf = dseries('fs2000_histval.mat');
+
+% Check that y(0) is correct
+assert(oo_.endo_simul(13,1) == hf.y('2Y').data)
+
+% Check that y(-1) is correct
+% First find the corresponding auxiliary variable
+% NB: we must use cellfun and brackets become some orig_index and orig_lead_lag fields are empty
+auxid = find([M_.aux_vars.type] == 1 & cellfun(@(x) isequal(x, 13), {M_.aux_vars.orig_index}) & cellfun(@(x) isequal(x, -1), {M_.aux_vars.orig_lead_lag}));
+endoid = M_.aux_vars(auxid).endo_index;
+assert(oo_.endo_simul(endoid,1) == hf.y('1Y').data);
