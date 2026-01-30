@@ -95,26 +95,27 @@ end
 if options_.estimate_initial_states_endogenous_prior
     if not(isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice'))
         error('Init state estimation with endogenous prior is only compatible with slice sampler')
-    else
-        M_.endo_initial_state.status = true;
-        M_.endo_initial_state.values = zeros(M_.endo_nbr,1);
-        options_.Harvey_scale_factor = 0;
-        options_.lik_init = 2;
-        if ~isfield(estim_params_,'endo_init_vals') || isempty(estim_params_.endo_init_vals)
-            % add init state list
-            estim_params_.nendoinit = length(M_.state_var);
-            tmp_prior = nan(1,10);
-            tmp_prior(3) = -Inf;
-            tmp_prior(4) = Inf;
-            tmp_prior(5) = 5;
-            tmp_prior(8) = -100000000;
-            tmp_prior(9) = 100000000;
-            estim_params_.endo_init_vals=zeros(0,10);
-            for k=1:estim_params_.nendoinit
-                estim_params_.endo_init_vals(k,:) = tmp_prior;
-                estim_params_.endo_init_vals(k,1) = M_.state_var(k);
-            end
-            
+    end
+    if options_.loglinear
+        error('estimate_initial_states_endogenous_prior is not compatible with the loglinear option')
+    end
+    M_.endo_initial_state.status = true;
+    M_.endo_initial_state.values = zeros(M_.endo_nbr,1);
+    options_.Harvey_scale_factor = 0;
+    options_.lik_init = 2;
+    if ~isfield(estim_params_,'endo_init_vals') || isempty(estim_params_.endo_init_vals)
+        % add init state list
+        estim_params_.nendoinit = length(M_.state_var);
+        tmp_prior = nan(1,10);
+        tmp_prior(3) = -Inf;
+        tmp_prior(4) = Inf;
+        tmp_prior(5) = 5;
+        tmp_prior(8) = -100000000;
+        tmp_prior(9) = 100000000;
+        estim_params_.endo_init_vals=zeros(0,10);
+        for k=1:estim_params_.nendoinit
+            estim_params_.endo_init_vals(k,:) = tmp_prior;
+            estim_params_.endo_init_vals(k,1) = M_.state_var(k);
         end
     end
 elseif ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.param_vals,1))==0)
