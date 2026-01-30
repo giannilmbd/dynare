@@ -45,9 +45,9 @@ function a = get_init_state(a,xparam1,estim_params_,dr,M_,options_)
 M_ = set_all_parameters(xparam1,estim_params_,M_);
 
 if options_.loglinear && ~options_.logged_steady_state
-    a(M_.state_var) = log(M_.endo_initial_state.values(M_.state_var)) - log(dr.ys(M_.state_var));
+    a(dr.state_var) = log(M_.endo_initial_state.values(dr.state_var)) - log(dr.ys(dr.state_var));
 elseif ~options_.loglinear && ~options_.logged_steady_state
-    a(M_.state_var) = M_.endo_initial_state.values(M_.state_var) - dr.ys(M_.state_var);
+    a(dr.state_var) = M_.endo_initial_state.values(dr.state_var) - dr.ys(dr.state_var);
 else
     error('The steady state is logged. This should not happen. Please contact the developers')
 end

@@ -162,7 +162,7 @@ if error_flag==0
 
     % store current init state values
     IB = startsWith(bayestopt_.name, 'init ');
-    M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
+    M_.endo_initial_state.values(dr.state_var) = xparam1(IB);
 
     fast_likelihood_evaluation_for_rejection = false;
     if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
@@ -181,7 +181,7 @@ if error_flag==0
             alphahat01 = alphahat01(dr.inv_order_var);
 
             xproposal=xparam1;
-            xproposal(IB) = alphahat01(M_.state_var);
+            xproposal(IB) = alphahat01(dr.state_var);
             if not(all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub))
                 xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
                 xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
@@ -225,9 +225,9 @@ if error_flag==0
                 alphahat01(dr.restrict_var_list(bayestopt_.mf0))=yhat;
                 alphahat01 = alphahat01(dr.inv_order_var);
 
-                M_=update_parameters_filter_initial_state(M_,alphahat01,dr.ys,options_);
+                M_=update_parameters_filter_initial_state(M_,alphahat01,dr,options_);
                 xproposal=xparam1;
-                xproposal(IB) = M_.endo_initial_state.values(M_.state_var);
+                xproposal(IB) = M_.endo_initial_state.values(dr.state_var);
                 if all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub)
                     new_draw_out_of_bounds = false;
                 end
@@ -274,7 +274,7 @@ if error_flag==0
             if accepted
                 logpost0 = logpost1;
                 naccepted = naccepted+1;
-                M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
+                M_.endo_initial_state.values(dr.state_var) = xparam1(IB);
                 store_endo_initial_state = M_.endo_initial_state;
                 if options_.estimate_initial_states_endogenous_prior && logpostSMO<logpost0
                     % switch from independent to RW Metropolis
@@ -307,7 +307,7 @@ if not(init)
 end
 
 %% Local helper function
-function M_=update_parameters_filter_initial_state(M_,alphahat01,ys,options_)
+function M_=update_parameters_filter_initial_state(M_,alphahat01,dr,options_)
 % Updates M_.endo_initial_state.values from state deviations.
 %
 % Given a state vector `alphahat01` in declaration order (representing
@@ -317,9 +317,9 @@ function M_=update_parameters_filter_initial_state(M_,alphahat01,ys,options_)
 % otherwise a direct level addition.
 
 if options_.loglinear && ~options_.logged_steady_state
-    M_.endo_initial_state.values(M_.state_var) = exp(log(ys(M_.state_var))+alphahat01(M_.state_var));
+    M_.endo_initial_state.values(dr.state_var) = exp(log(dr.ys(dr.state_var))+alphahat01(dr.state_var));
 elseif ~options_.loglinear && ~options_.logged_steady_state
-    M_.endo_initial_state.values(M_.state_var)= ys(M_.state_var)+alphahat01(M_.state_var);
+    M_.endo_initial_state.values(dr.state_var)= dr.ys(dr.state_var)+alphahat01(dr.state_var);
 else
     error('The steady state is logged. This should not happen. Please contact the developers')
 end

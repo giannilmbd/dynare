@@ -92,7 +92,7 @@ a = get_init_state(zeros(M_.endo_nbr,1),xparam1,estim_params_,dr,M_,options_);
 mycheck =max(abs(UPN'*a(dr.restrict_var_list(bayestopt_.mf0))));
 if mycheck>options_.kalman_tol
     icheck=true;
-    nstates = length(M_.state_var);
+    nstates = length(dr.state_var);
     % check that state draws are in the null space of prior states 0|0
     in=setdiff(1:nstates,im);
     a1=a;
@@ -104,5 +104,5 @@ if mycheck>options_.kalman_tol
     % map params associated to init states
 
     IB = startsWith(bayestopt_.name, 'init ');
-    xparam1(IB) = alphahat01(M_.state_var);
+    xparam1(IB) = alphahat01(dr.state_var);
 end
