@@ -9,7 +9,7 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
 % initial state draw. If init is false, it performs a short Metropolis–
 % Hastings step to update the endogenous initial state parameters in
 % xparam1 (independent MH centered at the smoothed state when
-% options_.init_state_endogenous_prior is true; otherwise a RW-MH around
+% options_.estimate_initial_states_endogenous_prior is true; otherwise a RW-MH around
 % the current state), honoring parameter bounds. If init is true, it
 % directly sets the initial state parameters in xparam1 from the smoothed
 % draw without acceptance testing.
@@ -126,8 +126,9 @@ if options_.occbin.smoother.status
     if not(init)
         % check first that PKF with latent states provides sensible
         % likelihood
-        options_.init_state_endogenous_prior=false;
-        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);        options_.init_state_endogenous_prior=true;
+        options_.estimate_initial_states_endogenous_prior=false;
+        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);        
+        options_.estimate_initial_states_endogenous_prior=true;
         if (logpost0-logpost2)<1.e3
             [~,~,~,~,~,~,~,~,~,~,~,~,~,~,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
         else
@@ -169,7 +170,7 @@ if error_flag==0
     end
 
     if not(init)
-        if options_.init_state_endogenous_prior
+        if options_.estimate_initial_states_endogenous_prior
             % independent MH
             % check probability of smoothed in t=0 (which is the mode for
             % linear case, but how about occbin?)
@@ -197,7 +198,7 @@ if error_flag==0
             end
             logpostSMO = logpost1;
         end
-        if not(options_.init_state_endogenous_prior) || not(is_smoothed_state_optimal)
+        if not(options_.estimate_initial_states_endogenous_prior) || not(is_smoothed_state_optimal)
             % use previous draw RW MH
             alphahat0=store_endo_initial_state.values;
             alphahat0=alphahat0(dr.order_var); % decision rule order
@@ -275,12 +276,12 @@ if error_flag==0
                 naccepted = naccepted+1;
                 M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
                 store_endo_initial_state = M_.endo_initial_state;
-                if options_.init_state_endogenous_prior && logpostSMO<logpost0
+                if options_.estimate_initial_states_endogenous_prior && logpostSMO<logpost0
                     % switch from independent to RW Metropolis
                     is_smoothed_state_optimal=false;
                 end
 
-                if not(options_.init_state_endogenous_prior && is_smoothed_state_optimal) %nattempts==1)
+                if not(options_.estimate_initial_states_endogenous_prior && is_smoothed_state_optimal) %nattempts==1)
                     alphahat0=store_endo_initial_state.values;
                     alphahat0=alphahat0(dr.order_var); % decision rule order
                 end
@@ -289,7 +290,7 @@ if error_flag==0
         if init
             break
         end
-        if naccepted==0 && options_.init_state_endogenous_prior
+        if naccepted==0 && options_.estimate_initial_states_endogenous_prior
             % try reducing variance of state uncertainty in the
             % proposal and continue with MH centered on alphahat0 
             StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;

@@ -50,7 +50,7 @@ icheck=false;
 
 M_.endo_initial_state.status=false;
 options_.lik_init=1;
-options_.init_state_endogenous_prior=false;
+options_.estimate_initial_states_endogenous_prior=false;
 M_ = set_all_parameters(xparam1,estim_params_,M_);
 [Pstar, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 if info(1)

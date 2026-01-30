@@ -7122,6 +7122,22 @@ observed variables.
 
        For advanced use only.
 
+    .. option:: estimate_initial_states_endogenous_prior
+
+       Jointly estimate the initial states along with the other parameters. 
+       This contrasts to the usual approach of marginalizing with respect to
+       the states while estimating parameters, and then estimating the states
+       offline using the smoother. This option uses the unconditional
+       mean and variance of the states implied by the linear Kalman filter as an
+       endogenous prior. This means that, for a linear Kalman filter, the
+       joint posterior of parameters and states is exactly the same as
+       what would be obtained from the usual marginalized likelihood approach
+       combined with offline state estimation via the smoother.
+
+       The initial state values are treated as additional parameters to be
+       estimated. The option automatically sets ``lik_init=2`` and requires
+       ``posterior_sampling_method='slice'``.  This option is useful for nonlinear models estimated e.g. via OccBin.
+
     .. option:: lik_init = INTEGER
 
        Type of initialization of Kalman filter:

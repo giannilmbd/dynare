@@ -92,7 +92,7 @@ if options_.discretionary_policy
 end
 
 % Check init state estimation with endogenous prior
-if options_.init_state_endogenous_prior
+if options_.estimate_initial_states_endogenous_prior
     if not(isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice'))
         error('Init state estimation with endogenous prior is only compatible with slice sampler')
     else
