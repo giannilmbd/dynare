@@ -200,17 +200,17 @@ for b=1:nb
     if rank_jacob < size(jacob,1)
         problem_dummy=1;
         singularity_problem = 1;
-        disp(['MODEL_DIAGNOSTICS:  The Jacobian of the static model is ' ...
-              'singular'])
-        disp(['MODEL_DIAGNOSTICS:  there is ' num2str(n_vars_jacob-rank_jacob) ...
-              ' collinear relationships between the variables and the equations'])
+        skipline(1);
+        disp('================================================================================')
+        disp('MODEL_DIAGNOSTICS: Singularity in Static Jacobian')
+        disp('================================================================================')
+        fprintf('The Jacobian of the static model is singular.\n')
+        fprintf('There are %d collinear relationship(s) between the variables and the equations.\n', n_vars_jacob-rank_jacob)
         ncol = compute_nullspace(jacob, options_.jacobian_tolerance);
         n_rel = size(ncol,2);
         for i = 1:n_rel
-            if n_rel  > 1
-                disp(['Relation ' int2str(i)])
-            end
-            disp('Collinear variables:')
+            skipline(1);
+            fprintf('--- Static Jacobian: Collinear variables (relation %d of %d) ---\n', i, n_rel)
             for j=1:10
                 k = find(abs(ncol(:,i)) > 10^-j);
                 if max(abs(jacob(:,k)*ncol(k,i))) < 1e-6
@@ -237,10 +237,8 @@ for b=1:nb
         neq = compute_nullspace(jacob', options_.jacobian_tolerance);
         n_rel = size(neq,2);
         for i = 1:n_rel
-            if n_rel  > 1
-                disp(['Relation ' int2str(i)])
-            end
-            disp('Collinear equations:')
+            skipline(1);
+            fprintf('--- Static Jacobian: Collinear equations (relation %d of %d) ---\n', i, n_rel)
             for j=1:10
                 k = find(abs(neq(:,i)) > 10^-j);
                 if max(abs(jacob(k,:)'*neq(k,i))) < 1e-6
@@ -269,6 +267,7 @@ for b=1:nb
                 end
             end
         end
+        skipline(1);
     end
 end
 
@@ -357,17 +356,16 @@ end
 if rank_jacob_dyn < M_.endo_nbr
     problem_dummy = 1;
     skipline(1);
-    disp(['MODEL_DIAGNOSTICS:  The Jacobian of the dynamic model is ' ...
-          'singular'])
-    disp(['MODEL_DIAGNOSTICS:  there is ' num2str(M_.endo_nbr - rank_jacob_dyn) ...
-          ' redundant equation(s) in the model'])
+    disp('================================================================================')
+    disp('MODEL_DIAGNOSTICS: Singularity in Dynamic Jacobian')
+    disp('================================================================================')
+    fprintf('The Jacobian of the dynamic model is singular.\n')
+    fprintf('There are %d redundant equation(s) in the model.\n', M_.endo_nbr - rank_jacob_dyn)
     neq = compute_nullspace(jacob_dyn', options_.jacobian_tolerance);
     n_rel = size(neq, 2);
     for i = 1:n_rel
-        if n_rel > 1
-            disp(['Relation ' int2str(i)])
-        end
-        disp('Collinear equations:')
+        skipline(1);
+        fprintf('--- Dynamic Jacobian: Collinear equations (relation %d of %d) ---\n', i, n_rel)
         for j = 1:10
             k = find(abs(neq(:, i)) > 10^-j);
             if max(abs(jacob_dyn(k, :)' * neq(k, i))) < 1e-6
@@ -391,6 +389,7 @@ if rank_jacob_dyn < M_.endo_nbr
             end
         end
     end
+    skipline(1);
 end
 
 %
@@ -411,17 +410,16 @@ end
 if rank_jacob_contemp < M_.endo_nbr
     problem_dummy = 1;
     skipline(1);
-    disp(['MODEL_DIAGNOSTICS:  The contemporaneous part of the Jacobian of the dynamic model is ' ...
-          'singular'])
-    disp(['MODEL_DIAGNOSTICS:  there is ' num2str(M_.endo_nbr - rank_jacob_contemp) ...
-          ' collinear relationships between the variables and the equations'])
+    disp('================================================================================')
+    disp('MODEL_DIAGNOSTICS: Singularity in Contemporaneous Dynamic Jacobian')
+    disp('================================================================================')
+    fprintf('The contemporaneous part of the Jacobian of the dynamic model is singular.\n')
+    fprintf('There are %d collinear relationship(s) between the variables and the equations.\n', M_.endo_nbr - rank_jacob_contemp)
     ncol = compute_nullspace(jacob_contemp, options_.jacobian_tolerance);
     n_rel = size(ncol, 2);
     for i = 1:n_rel
-        if n_rel > 1
-            disp(['Relation ' int2str(i)])
-        end
-        disp('Collinear variables:')
+        skipline(1);
+        fprintf('--- Contemporaneous Dynamic Jacobian: Collinear variables (relation %d of %d) ---\n', i, n_rel)
         for j = 1:10
             k = find(abs(ncol(:, i)) > 10^-j);
             if max(abs(jacob_contemp(:, k) * ncol(k, i))) < 1e-6
@@ -444,10 +442,8 @@ if rank_jacob_contemp < M_.endo_nbr
     neq = compute_nullspace(jacob_contemp', options_.jacobian_tolerance);
     n_rel = size(neq, 2);
     for i = 1:n_rel
-        if n_rel > 1
-            disp(['Relation ' int2str(i)])
-        end
-        disp('Collinear equations:')
+        skipline(1);
+        fprintf('--- Contemporaneous Dynamic Jacobian: Collinear equations (relation %d of %d) ---\n', i, n_rel)
         for j = 1:10
             k = find(abs(neq(:, i)) > 10^-j);
             if max(abs(jacob_contemp(k, :)' * neq(k, i))) < 1e-6
@@ -471,6 +467,7 @@ if rank_jacob_contemp < M_.endo_nbr
             end
         end
     end
+    skipline(1);
 end
 
 if exist('g2_v','var')
