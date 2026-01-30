@@ -1678,6 +1678,10 @@ in this case ``initval`` is used to specify the terminal conditions.
     the exogenous variables, and the endogenous variables set to the
     associated steady state values.
 
+    It is possible to have several ``endval`` blocks, in which case their
+    contents will be concatenated. Any ``steady`` command should then follow
+    the last ``endval`` block.
+
     *Options*
 
     .. option:: all_values_required
