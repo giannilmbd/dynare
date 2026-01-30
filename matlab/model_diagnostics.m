@@ -204,11 +204,7 @@ for b=1:nb
               'singular'])
         disp(['MODEL_DIAGNOSTICS:  there is ' num2str(n_vars_jacob-rank_jacob) ...
               ' collinear relationships between the variables and the equations'])
-        if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
-            ncol = null(jacob);
-        else
-            ncol = null(jacob,options_.jacobian_tolerance); %can sometimes fail
-        end
+        ncol = compute_nullspace(jacob, options_.jacobian_tolerance);
         n_rel = size(ncol,2);
         for i = 1:n_rel
             if n_rel  > 1
@@ -238,11 +234,7 @@ for b=1:nb
                 end
             end
         end
-        if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
-            neq = null(jacob'); %can sometimes fail
-        else
-            neq = null(jacob',options_.jacobian_tolerance); %can sometimes fail
-        end
+        neq = compute_nullspace(jacob', options_.jacobian_tolerance);
         n_rel = size(neq,2);
         for i = 1:n_rel
             if n_rel  > 1
@@ -369,11 +361,7 @@ if rank_jacob_dyn < M_.endo_nbr
           'singular'])
     disp(['MODEL_DIAGNOSTICS:  there is ' num2str(M_.endo_nbr - rank_jacob_dyn) ...
           ' redundant equation(s) in the model'])
-    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
-        neq = null(jacob_dyn');
-    else
-        neq = null(jacob_dyn', options_.jacobian_tolerance);
-    end
+    neq = compute_nullspace(jacob_dyn', options_.jacobian_tolerance);
     n_rel = size(neq, 2);
     for i = 1:n_rel
         if n_rel > 1
@@ -414,4 +402,20 @@ end
 
 if problem_dummy==0
     fprintf('MODEL_DIAGNOSTICS:  No obvious problems with this mod-file were detected.\n')
+end
+
+function result = compute_nullspace(matrix, jacobian_tolerance)
+% Local helper function to compute null space with appropriate method
+% based on MATLAB/Octave version and tolerance settings
+
+if isempty(jacobian_tolerance) && isoctave
+    result = null(matrix);
+elseif ~isempty(jacobian_tolerance) && (isoctave || ~matlab_ver_less_than('9.12'))
+    result = null(matrix, jacobian_tolerance);
+else %use rational basis in MATLAB if no tolerance specified or Matlab version is too old
+    if matlab_ver_less_than('9.12')
+        result = null(matrix, 'r'); %old syntax for rational basis
+    else
+        result = null(matrix, "rational");
+    end
 end
