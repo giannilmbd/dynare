@@ -140,7 +140,7 @@ Section "Uninstall"
  Rmdir /r $INSTDIR\doc
  Rmdir /r $INSTDIR\examples
  Rmdir /r $INSTDIR\scripts
- Rmdir /r $INSTDIR\mingw64
+ Rmdir /r $INSTDIR\ucrt64
  # We don't force deletion of installation directory (with /r), to avoid deleting important files
  Rmdir $INSTDIR
 
