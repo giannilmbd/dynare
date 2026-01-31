@@ -436,8 +436,8 @@ by the ``dynare`` command.
 
         By default, if no Dynare commands related to stochastic models
         (``stoch_simul``, ``estimation``, ``osr``, ``discretionary_policy``,
-         ``calib_smoother``, ``identification``, ``method_of_moments``, 
-         ``sensitivity``) are present in the ``.mod`` file, 
+        ``calib_smoother``, ``identification``, ``method_of_moments``, 
+        ``sensitivity``) are present in the ``.mod`` file, 
         Dynare treats the model to be solved as deterministic. 
         This option instructs Dynare that the model to be solved is stochastic 
         and that there is an implicit conditional expectation operator in the 
