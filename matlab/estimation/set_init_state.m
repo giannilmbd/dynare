@@ -1,4 +1,4 @@
-function [xparam1, icheck] = set_init_state(xparam1, options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
+function [xparam1, icheck] = set_init_state(xparam1, ys0, options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % [xparam1, icheck] = set_init_state(xparam1, options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state)
 % Projects endogenous initial-state parameters to satisfy Pstar null-space constraints.
 %
@@ -11,6 +11,7 @@ function [xparam1, icheck] = set_init_state(xparam1, options_,M_,estim_params_,b
 %
 % INPUTS
 % - xparam1             [double]        parameter vector (includes 'init ' state parameters).
+% - ys0                 [double]        original steady state
 % - options_            [structure]     options; internally sets `lik_init=1` for checks.
 % - M_                  [structure]     model structure (updates `endo_initial_state`).
 % - estim_params_       [structure]     parameters to be estimated.
@@ -52,7 +53,7 @@ M_.endo_initial_state.status=false;
 options_.lik_init=1;
 options_.estimate_initial_states_endogenous_prior=false;
 M_ = set_all_parameters(xparam1,estim_params_,M_);
-[Pstar, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+[Pstar, Q, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 if info(1)
     return %JP: error code is neither returned nor handled
 end
@@ -61,7 +62,12 @@ M_.endo_initial_state.status=true;
 
 [UP,XP] = svd(0.5*(Pstar(bayestopt_.mf0,bayestopt_.mf0)+Pstar(bayestopt_.mf0,bayestopt_.mf0)'));
 % handle zero singular values
-isn = find(diag(XP)<=options_.kalman_tol);
+isp = find(diag(XP)>options_.kalman_tol);
+if length(isp)>rank(Q)
+    isp = isp(1:rank(Q));
+end
+isn = length(isp)+1:length(XP); 
+
 UPN = UP(:,isn);
 [~,im]=max(abs(UPN));
 if length(unique(im))<length(im)
@@ -88,6 +94,11 @@ if length(unique(im))<length(im)
 end
 
 a = get_init_state(zeros(M_.endo_nbr,1),xparam1,estim_params_,dr,M_,options_);
+if options_.loglinear
+    a = a + log(dr.ys(dr.order_var))-log(ys0(dr.order_var));
+else
+    a = a + dr.ys(dr.order_var)-ys0(dr.order_var);
+end
 
 mycheck =max(abs(UPN'*a(dr.restrict_var_list(bayestopt_.mf0))));
 if mycheck>options_.kalman_tol
@@ -104,5 +115,9 @@ if mycheck>options_.kalman_tol
     % map params associated to init states
 
     IB = startsWith(bayestopt_.name, 'init ');
-    xparam1(IB) = alphahat01(dr.state_var);
+    if options_.loglinear
+        xparam1(IB) = exp(alphahat01(dr.state_var)).*dr.ys(dr.state_var);
+    else
+        xparam1(IB) = alphahat01(dr.state_var)+dr.ys(dr.state_var);
+    end
 end

@@ -90,12 +90,14 @@ end
 
 % here I run unconditional smoother, so I need to undo the init state
 % estimation setup and set lik_init = 1
+M_ = set_all_parameters(xparam1,estim_params_,M_);
+ys0 = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);
 store_endo_initial_state=M_.endo_initial_state;
 M_.endo_initial_state.status = false;
 error_flag=0;
 options_.lik_init=1;
 if init
-    [Pstar, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+    [Pstar, Q, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
     if info(1)
         return
     end
@@ -115,7 +117,6 @@ options_.occbin.smoother.debug = false;
 options_.occbin.smoother.plot = false;
 options_.occbin.smoother.store_results = false;
 options_.occbin.smoother.waitbar = false;
-M_ = set_all_parameters(xparam1,estim_params_,M_);
 dr.ys = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);
 oo_.dr = dr;
 oo_.steady_state= endo_steady_state;
@@ -181,14 +182,18 @@ if error_flag==0
             alphahat01 = alphahat01(dr.inv_order_var);
 
             xproposal=xparam1;
-            xproposal(IB) = alphahat01(dr.state_var);
+            if options_.loglinear
+                xproposal(IB) = exp(alphahat01(dr.state_var)).*dr.ys(dr.state_var);
+            else
+                xproposal(IB) = alphahat01(dr.state_var)+dr.ys(dr.state_var);
+            end
             if not(all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub))
                 xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
                 xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
             end
 
             is_smoothed_state_optimal=true;
-            [xcheck, icheck]=set_init_state(xproposal,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xcheck, icheck]=set_init_state(xproposal,ys0,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if icheck
                 xproposal=xcheck;
             end
@@ -200,7 +205,11 @@ if error_flag==0
         end
         if not(options_.estimate_initial_states_endogenous_prior) || not(is_smoothed_state_optimal)
             % use previous draw RW MH
-            alphahat0=store_endo_initial_state.values;
+            if options_.loglinear
+                alphahat0=log(store_endo_initial_state.values)-log(dr.ys);
+            else
+                alphahat0=store_endo_initial_state.values-dr.ys;
+            end
             alphahat0=alphahat0(dr.order_var); % decision rule order
         end
     end
@@ -236,7 +245,7 @@ if error_flag==0
                 xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
                 xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
             end
-            [xcheck, icheck]=set_init_state(xproposal,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xcheck, icheck]=set_init_state(xproposal,ys0,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if icheck
                 % if init states have been modified to match the null space
                 % of Pstar
@@ -282,7 +291,7 @@ if error_flag==0
                 end
 
                 if not(options_.estimate_initial_states_endogenous_prior && is_smoothed_state_optimal) %nattempts==1)
-                    alphahat0=store_endo_initial_state.values;
+                    alphahat0=store_endo_initial_state.values-dr.ys;
                     alphahat0=alphahat0(dr.order_var); % decision rule order
                 end
             end

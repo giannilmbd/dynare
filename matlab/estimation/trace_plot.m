@@ -188,7 +188,7 @@ if options_.TeX
     elseif strcmpi(type,'StructuralShock')
         tex_names=M_.exo_names_tex;
         base_names=M_.exo_names;
-    elseif strcmpi(type,'MeasurementError')
+    elseif ismember(type,{'MeasurementError','InitialState'})
         tex_names=M_.endo_names_tex;
         base_names=M_.endo_names;
     end

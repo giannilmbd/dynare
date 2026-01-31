@@ -63,12 +63,6 @@ end
 if sampler_options.rotated %&& ~isempty(sampler_options.V1),
     sampler_options.endo_init_state.status = endo_init_state;
     if endo_init_state
-        % draw only params first!
-        [V1, D]=eig(sampler_options.invhess(index_deep_parameters,index_deep_parameters));
-        sampler_options.WR=sqrt(diag(D))*3;
-        sampler_options.V1(:,:)=0;
-        sampler_options.V1(:,index_init_state)=[];
-        sampler_options.V1(index_deep_parameters,index_deep_parameters)=V1;
         sampler_options.endo_init_state.IB = index_init_state;
         sampler_options.endo_init_state.IP = index_deep_parameters;
     end
@@ -189,6 +183,9 @@ while it<npar
     %    THIS DEFINES THE SLICE S={x: z < ln(f(x))}
     % -------------------------------------------------------
     fxold = -feval(objective_function,theta,varargin{:});
+    if endo_init_state
+        ys0 = get_steady_state(theta,varargin{3:end});
+    end
     if ~isfinite(fxold)
         disp(['slice_sampler:: Iteration ' int2str(it) ' started with bad parameter set (fval is inf or nan)'])
         icount=0;
@@ -222,7 +219,7 @@ while it<npar
         theta(it) = xsim;
         if endo_init_state
             theta0(it) = xsim;
-            [theta, icheck]=set_init_state(theta0,varargin{3:end});
+            [theta, icheck]=set_init_state(theta0,ys0,varargin{3:end});
         end
         if fast_likelihood_evaluation_for_rejection
             fxl = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
@@ -268,7 +265,7 @@ while it<npar
         theta(it) = xsim;
         if endo_init_state
             theta0(it) = xsim;
-            [theta, icheck]=set_init_state(theta0,varargin{3:end});
+            [theta, icheck]=set_init_state(theta0,ys0,varargin{3:end});
         end
         if fast_likelihood_evaluation_for_rejection
             fxr = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
@@ -286,7 +283,7 @@ while it<npar
             theta(it) = xsim;
             if endo_init_state
                 theta0(it) = xsim;
-                [theta, icheck]=set_init_state(theta0,varargin{3:end});
+                [theta, icheck]=set_init_state(theta0,ys0,varargin{3:end});
             end
             fxr = -feval(objective_function,theta,varargin{:});
             icount = 0;
@@ -297,7 +294,7 @@ while it<npar
                 theta(it) = xsim;
                 if endo_init_state
                     theta0(it) = xsim;
-                    [theta, icheck]=set_init_state(theta0,varargin{3:end});
+                    [theta, icheck]=set_init_state(theta0,ys0,varargin{3:end});
                 end
                 fxr = -feval(objective_function,theta,varargin{:});
             end
@@ -318,7 +315,7 @@ while it<npar
         theta(it) = xsim;
         if endo_init_state
             theta0(it) = xsim;
-            [theta, icheck]=set_init_state(theta0,varargin{3:end});
+            [theta, icheck]=set_init_state(theta0,ys0,varargin{3:end});
         end
         if fast_likelihood_evaluation_for_rejection
             fxsim = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
@@ -421,7 +418,7 @@ if endo_init_state
         sampler_options.rthetaprior=[bounds.lb(:) bounds.ub(:)];
         %         sampler_options.WR=sampler_options.initial_step_size*(bounds.ub-bounds.lb);
         [theta, fxsim, neval1] = rotated_slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin{:});
-        [~, icheck]=set_init_state(theta,varargin{3:end});
+        [~, icheck]=set_init_state(theta,ys0,varargin{3:end});
         neval(index_init_state(1:nslice)) = neval1(1:nslice);
     end
     save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'mytxt','neval','it','theta','fxsim')
@@ -430,3 +427,10 @@ end
 if sampler_options.rotated && ~isempty(sampler_options.mode) % jumping
     neval=sum(neval)+nevalR;
 end
+
+
+function ys = get_steady_state(xparam1, options_,M_,estim_params_,~,~,~, endo_steady_state, exo_steady_state, exo_det_steady_state)
+% wrapper function to get steady state 
+
+M_ = set_all_parameters(xparam1,estim_params_,M_);
+ys = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);
