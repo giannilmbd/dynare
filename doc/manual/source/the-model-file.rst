@@ -5705,13 +5705,6 @@ lag. We therefore have the following identity:
 
        M_.npred + M_.both + M_.nfwrd + M_.nstatic = M_.endo_nbr
 
-.. matvar:: M_.state_var
-
-        Vector of numerical indices identifying the state variables in the
-        vector of declared variables. ``M_.endo_names(M_.state_var)``
-        therefore yields the name of all variables that are states in
-        the model declaration, i.e. that show up with a lag.
-
 Internally, Dynare uses two orderings of the endogenous variables: the
 order of declaration (which is reflected in ``M_.endo_names``), and an
 order based on the four types described above, which we will call the
@@ -5761,10 +5754,8 @@ where :math:`y^s` is the steady state value of :math:`y` and
 
         Vector of numerical indices identifying the state variables in the
         vector of declared variables, *given the current parameter values*
-        for which the decision rules have been computed. It may differ from
-        ``M_.state_var`` in case a state variable drops from the model given
-        the current parameterization, because it only gets 0 coefficients in
-        the decision rules. See :mvar:`M_.state_var`.
+        for which the decision rules have been computed. It is in decision-rule 
+        ordering.
 
 The coefficients of the decision rules are stored as follows:
 
