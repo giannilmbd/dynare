@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2024 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -85,7 +85,7 @@ public:
   KronProdDimens(const KronProdDimens& kd, int i);
 
   KronProdDimens& operator=(const KronProdDimens& kd) = default;
-  KronProdDimens& operator=(KronProdDimens&& kd) = default;
+  KronProdDimens& operator=(KronProdDimens&& kd) noexcept = default;
   [[nodiscard]] bool
   operator==(const KronProdDimens& kd) const
   {

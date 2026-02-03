@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -68,7 +68,7 @@ public:
   /* Constructor that does not initialize the std::ofstream. To be used when an
      on-disk journal is not wanted. */
   Journal() = default;
-  Journal& operator=(Journal&&) = default;
+  Journal& operator=(Journal&&) noexcept = default;
   ~Journal() override
   {
     flush();
