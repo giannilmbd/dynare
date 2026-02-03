@@ -3457,6 +3457,7 @@ X-13 ARIMA-SEATS interface
 
 
     .. x13method:: print (A[, basefilename])
+        :noindex:
 
         Prints an ``.spc`` file with all the X-13 commands. The
         optional second argument is a row char array specifying the
