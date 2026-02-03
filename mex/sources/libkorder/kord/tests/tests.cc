@@ -117,6 +117,8 @@ SparseGenerator::fillContainer(TensorContainer<FSSparseTensor>& c, int maxdim, i
     }
 }
 
+// NOLINTBEGIN(modernize-use-std-numbers)
+
 const std::array vdata {// 3x3
                         0.1307870268, 0.1241940078, 0.1356703123, 0.1241940078, 0.1986920419,
                         0.2010160581, 0.1356703123, 0.2010160581, 0.2160336975};
@@ -259,6 +261,8 @@ const std::array<double, 300> gu_data2 {
     0.56552, 0.58556, 0.53554, 0.53507, 0.09831, 0.21229, 0.83135, 0.26375, 0.89287, 0.97069,
     0.70615, 0.42041, 0.43117, 0.21291, 0.26086, 0.26978, 0.77340, 0.43833, 0.46179, 0.54418,
     0.67878, 0.42776, 0.61454, 0.55915, 0.36363, 0.31999, 0.42442, 0.86649, 0.62513, 0.02047};
+
+// NOLINTEND(modernize-use-std-numbers)
 
 class TestRunnable
 {

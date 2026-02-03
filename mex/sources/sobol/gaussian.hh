@@ -2,7 +2,7 @@
 **
 ** Pseudo code of the algorithm is given at http://home.online.no/~pjacklam/notes/invnorm
 **
-** Copyright © 2010-2024 Dynare Team
+** Copyright © 2010-2026 Dynare Team
 **
 ** This file is part of Dynare.
 **
@@ -92,7 +92,7 @@ icdf(const T uniform)
   if (0 < uniform && uniform < 1)
     {
       T tmp, tmp_;
-      tmp = .5 * erfc(-gaussian / sqrt(2.0)) - uniform;
+      tmp = .5 * erfc(-gaussian / numbers::sqrt2) - uniform;
       tmp_ = tmp * sqrt(2 * numbers::pi) * exp(.5 * gaussian * gaussian);
       gaussian = gaussian - tmp_ / (1 + .5 * gaussian * tmp_);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2025 Dynare Team
+ * Copyright © 2007-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -24,6 +24,7 @@
 #include <chrono>
 #include <filesystem>
 #include <limits>
+#include <numbers>
 #include <numeric>
 #include <sstream>
 #include <type_traits>
@@ -2425,7 +2426,7 @@ Interpreter::compute_complete(double lambda)
 tuple<bool, double, double, double, double>
 Interpreter::mnbrak(double& ax, double& bx)
 {
-  constexpr double GOLD = 1.618034;
+  constexpr double GOLD = numbers::phi;
   constexpr double GLIMIT = 100.0;
   constexpr double TINY = 1.0e-20;
 
