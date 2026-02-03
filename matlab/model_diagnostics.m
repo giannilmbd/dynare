@@ -200,21 +200,17 @@ for b=1:nb
     if rank_jacob < size(jacob,1)
         problem_dummy=1;
         singularity_problem = 1;
-        disp(['MODEL_DIAGNOSTICS:  The Jacobian of the static model is ' ...
-              'singular'])
-        disp(['MODEL_DIAGNOSTICS:  there is ' num2str(n_vars_jacob-rank_jacob) ...
-              ' collinear relationships between the variables and the equations'])
-        if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
-            ncol = null(jacob);
-        else
-            ncol = null(jacob,options_.jacobian_tolerance); %can sometimes fail
-        end
+        skipline(1);
+        disp('================================================================================')
+        disp('MODEL_DIAGNOSTICS: Singularity in Static Jacobian')
+        disp('================================================================================')
+        fprintf('The Jacobian of the static model is singular.\n')
+        fprintf('There are %d collinear relationship(s) between the variables and the equations.\n', n_vars_jacob-rank_jacob)
+        ncol = compute_nullspace(jacob, options_.jacobian_tolerance);
         n_rel = size(ncol,2);
         for i = 1:n_rel
-            if n_rel  > 1
-                disp(['Relation ' int2str(i)])
-            end
-            disp('Collinear variables:')
+            skipline(1);
+            fprintf('--- Static Jacobian: Collinear variables (relation %d of %d) ---\n', i, n_rel)
             for j=1:10
                 k = find(abs(ncol(:,i)) > 10^-j);
                 if max(abs(jacob(:,k)*ncol(k,i))) < 1e-6
@@ -238,17 +234,11 @@ for b=1:nb
                 end
             end
         end
-        if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
-            neq = null(jacob'); %can sometimes fail
-        else
-            neq = null(jacob',options_.jacobian_tolerance); %can sometimes fail
-        end
+        neq = compute_nullspace(jacob', options_.jacobian_tolerance);
         n_rel = size(neq,2);
         for i = 1:n_rel
-            if n_rel  > 1
-                disp(['Relation ' int2str(i)])
-            end
-            disp('Collinear equations:')
+            skipline(1);
+            fprintf('--- Static Jacobian: Collinear equations (relation %d of %d) ---\n', i, n_rel)
             for j=1:10
                 k = find(abs(neq(:,i)) > 10^-j);
                 if max(abs(jacob(k,:)'*neq(k,i))) < 1e-6
@@ -277,6 +267,7 @@ for b=1:nb
                 end
             end
         end
+        skipline(1);
     end
 end
 
@@ -365,21 +356,16 @@ end
 if rank_jacob_dyn < M_.endo_nbr
     problem_dummy = 1;
     skipline(1);
-    disp(['MODEL_DIAGNOSTICS:  The Jacobian of the dynamic model is ' ...
-          'singular'])
-    disp(['MODEL_DIAGNOSTICS:  there is ' num2str(M_.endo_nbr - rank_jacob_dyn) ...
-          ' redundant equation(s) in the model'])
-    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
-        neq = null(jacob_dyn');
-    else
-        neq = null(jacob_dyn', options_.jacobian_tolerance);
-    end
+    disp('================================================================================')
+    disp('MODEL_DIAGNOSTICS: Singularity in Dynamic Jacobian')
+    disp('================================================================================')
+    fprintf('The Jacobian of the dynamic model is singular.\n')
+    fprintf('There are %d redundant equation(s) in the model.\n', M_.endo_nbr - rank_jacob_dyn)
+    neq = compute_nullspace(jacob_dyn', options_.jacobian_tolerance);
     n_rel = size(neq, 2);
     for i = 1:n_rel
-        if n_rel > 1
-            disp(['Relation ' int2str(i)])
-        end
-        disp('Collinear equations:')
+        skipline(1);
+        fprintf('--- Dynamic Jacobian: Collinear equations (relation %d of %d) ---\n', i, n_rel)
         for j = 1:10
             k = find(abs(neq(:, i)) > 10^-j);
             if max(abs(jacob_dyn(k, :)' * neq(k, i))) < 1e-6
@@ -403,6 +389,85 @@ if rank_jacob_dyn < M_.endo_nbr
             end
         end
     end
+    skipline(1);
+end
+
+%
+% singular contemporaneous Jacobian of dynamic model
+%
+jacob_contemp = jacob_dyn(:, M_.endo_nbr+1:2*M_.endo_nbr);
+
+try
+    if (~isoctave && matlab_ver_less_than('9.12')) || isempty(options_.jacobian_tolerance)
+        rank_jacob_contemp = rank(jacob_contemp);
+    else
+        rank_jacob_contemp = rank(jacob_contemp, options_.jacobian_tolerance);
+    end
+catch
+    rank_jacob_contemp = size(jacob_contemp, 1);
+end
+
+if rank_jacob_contemp < M_.endo_nbr
+    problem_dummy = 1;
+    skipline(1);
+    disp('================================================================================')
+    disp('MODEL_DIAGNOSTICS: Singularity in Contemporaneous Dynamic Jacobian')
+    disp('================================================================================')
+    fprintf('The contemporaneous part of the Jacobian of the dynamic model is singular.\n')
+    fprintf('There are %d collinear relationship(s) between the variables and the equations.\n', M_.endo_nbr - rank_jacob_contemp)
+    ncol = compute_nullspace(jacob_contemp, options_.jacobian_tolerance);
+    n_rel = size(ncol, 2);
+    for i = 1:n_rel
+        skipline(1);
+        fprintf('--- Contemporaneous Dynamic Jacobian: Collinear variables (relation %d of %d) ---\n', i, n_rel)
+        for j = 1:10
+            k = find(abs(ncol(:, i)) > 10^-j);
+            if max(abs(jacob_contemp(:, k) * ncol(k, i))) < 1e-6
+                break
+            end
+        end
+        var_names = endo_names(k);
+        if length(var_names) > 5
+            % Print 10 variables per row
+            for row_start = 1:10:length(var_names)
+                row_end = min(row_start + 9, length(var_names));
+                fprintf('    %s\n', strjoin(var_names(row_start:row_end), ', '));
+            end
+        else
+            for v_iter = 1:length(var_names)
+                fprintf('    %s\n', var_names{v_iter});
+            end
+        end
+    end
+    neq = compute_nullspace(jacob_contemp', options_.jacobian_tolerance);
+    n_rel = size(neq, 2);
+    for i = 1:n_rel
+        skipline(1);
+        fprintf('--- Contemporaneous Dynamic Jacobian: Collinear equations (relation %d of %d) ---\n', i, n_rel)
+        for j = 1:10
+            k = find(abs(neq(:, i)) > 10^-j);
+            if max(abs(jacob_contemp(k, :)' * neq(k, i))) < 1e-6
+                break
+            end
+        end
+        for eq_iter = 1:length(k)
+            eq_nbr = k(eq_iter);
+            % Find the 'name' tag for this equation in M_.equations_tags
+            eq_name = '';
+            if isfield(M_, 'equations_tags') && ~isempty(M_.equations_tags)
+                name_idx = find([M_.equations_tags{:,1}]' == eq_nbr & strcmp(M_.equations_tags(:,2), 'name'));
+                if ~isempty(name_idx)
+                    eq_name = M_.equations_tags{name_idx(1), 3};
+                end
+            end
+            if ~isempty(eq_name)
+                fprintf('    Equation %d: %s\n', eq_nbr, eq_name);
+            else
+                fprintf('    Equation %d\n', eq_nbr);
+            end
+        end
+    end
+    skipline(1);
 end
 
 if exist('g2_v','var')
@@ -414,4 +479,20 @@ end
 
 if problem_dummy==0
     fprintf('MODEL_DIAGNOSTICS:  No obvious problems with this mod-file were detected.\n')
+end
+
+function result = compute_nullspace(matrix, jacobian_tolerance)
+% Local helper function to compute null space with appropriate method
+% based on MATLAB/Octave version and tolerance settings
+
+if isempty(jacobian_tolerance) && isoctave
+    result = null(matrix);
+elseif ~isempty(jacobian_tolerance) && (isoctave || ~matlab_ver_less_than('9.12'))
+    result = null(matrix, jacobian_tolerance);
+else %use rational basis in MATLAB if no tolerance specified or Matlab version is too old
+    if matlab_ver_less_than('9.12')
+        result = null(matrix, 'r'); %old syntax for rational basis
+    else
+        result = null(matrix, "rational");
+    end
 end
