@@ -7,7 +7,7 @@ function oo_=perfect_foresight_with_expectation_errors_setup(M_, options_, oo_)
 % OUTPUTS
 %   oo_                 [structure] storing the results
 
-% Copyright © 2021-2025 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -64,9 +64,11 @@ if isfile(options_.datafile)
         oo_.pfwee.terminal_info(exo_id, period_id) = raw_csv(end, i);
     end
 else
-    %% No datafile option given, use the contents of shocks and endval blocks
-    if isempty(M_.learnt_shocks) && isempty(M_.learnt_endval) && (isempty(M_.perfect_foresight_controlled_paths) || all(cellfun(@(x) (isa(x, 'numeric') && x == 1), {M_.perfect_foresight_controlled_paths.learnt_in})))
-        warning('perfect_foresight_with_expectation_errors_setup: there is no shocks(learnt_in=...), endval(learnt_in=...), or perfect_foresight_controlled_paths(learnt_in=...) block, and you did not pass the datafile option, so there is no point in using this command')
+    %% No datafile option given, use either the contents of shocks and endval blocks, or the contents of shock_paths block
+    if isempty(M_.learnt_shocks) && isempty(M_.learnt_endval) ...
+            && (isempty(M_.shock_paths) || all(cellfun(@(x) (isa(x, 'numeric') && x == 1), {M_.shock_paths.learnt_in}))) ...
+            && (isempty(M_.perfect_foresight_controlled_paths) || all(cellfun(@(x) (isa(x, 'numeric') && x == 1), {M_.perfect_foresight_controlled_paths.learnt_in})))
+        warning('perfect_foresight_with_expectation_errors_setup: there is no shocks(learnt_in=...), endval(learnt_in=...), shock_paths(learnt_in=...) or perfect_foresight_controlled_paths(learnt_in=...) block, and you did not pass the datafile option, so there is no point in using this command')
     end
 
     %% Check that dates can be processed, if any
@@ -80,88 +82,120 @@ else
     if ~isempty(M_.learnt_endval)
         allperiods = [allperiods, {M_.learnt_endval.learnt_in }];
     end
-    if any(cellfun(@(x) isa(x, 'dates'), allperiods)) && isempty(first_simulation_period)
-        error('perfect_foresight_with_expectations_error_setup: at least one periods statement or learnt_in option is specified using a date but neither first_simulation_period nor last_simulation_period option was passed')
+    if (any(cellfun(@(x) isa(x, 'dates'), allperiods)) ...
+        || (~isempty(M_.shock_paths) && any([M_.shock_paths.contains_date]))) ...
+        && isempty(first_simulation_period)
+        error('perfect_foresight_with_expectations_error_setup: at least one periods statement, or learnt_in option, or learnt_in() namespace in shock_paths block is specified using a date but neither first_simulation_period nor last_simulation_period option was passed')
     end
 
-    %% Initialize information set at period 1 using “bare” shocks and endval blocks (or initval if there is no endval)
-    oo_.pfwee.terminal_info(:, 1) = oo_.exo_steady_state;
-    oo_.pfwee.shocks_info(:, :, 1) = repmat(oo_.exo_steady_state, 1, periods);
-    for i = 1:length(M_.det_shocks)
-        if isa(M_.det_shocks(i).periods, 'numeric')
-            prds = M_.det_shocks(i).periods;
-        else % dates
-            prds = M_.det_shocks(i).periods - first_simulation_period + 1;
-        end
-        exo_id = M_.det_shocks(i).exo_id;
-        v = M_.det_shocks(i).value;
-        if ~M_.det_shocks(i).exo_det
-            switch M_.det_shocks(i).type
-                case 'level'
+    if isempty(M_.shock_paths)
+        %% Initialize information set at period 1 using “bare” shocks and endval blocks (or initval if there is no endval)
+        oo_.pfwee.terminal_info(:, 1) = oo_.exo_steady_state;
+        oo_.pfwee.shocks_info(:, :, 1) = repmat(oo_.exo_steady_state, 1, periods);
+        for i = 1:length(M_.det_shocks)
+            if isa(M_.det_shocks(i).periods, 'numeric')
+                prds = M_.det_shocks(i).periods;
+            else % dates
+                prds = M_.det_shocks(i).periods - first_simulation_period + 1;
+            end
+            exo_id = M_.det_shocks(i).exo_id;
+            v = M_.det_shocks(i).value;
+            if ~M_.det_shocks(i).exo_det
+                switch M_.det_shocks(i).type
+                  case 'level'
                     oo_.pfwee.shocks_info(exo_id, prds, 1) = v;
-                case 'multiply_steady_state'
+                  case 'multiply_steady_state'
                     oo_.pfwee.shocks_info(exo_id, prds, 1) = oo_.exo_steady_state(exo_id) * v;
-                case 'multiply_initial_steady_state'
+                  case 'multiply_initial_steady_state'
                     if isempty(oo_.initial_exo_steady_state)
                         error('Option relative_to_initval of mshocks block cannot be used without an endval block')
                     end
                     oo_.pfwee.shocks_info(exo_id, prds, 1) = oo_.initial_exo_steady_state(exo_id) * v;
+                end
             end
         end
-    end
 
-    %% Construct information sets for subsequent informational periods
-    % Since the learnt_in=… option with a dates object is never translated to a
-    % “bare” shocks or endval block by the preprocessor (contrary to
-    % learnt_in=1), the loop starts with p=1 to also handle dates objects
-    % in learnt_in option corresponding to the first period.
-    for p = 1:periods
-        if p > 1
-            oo_.pfwee.terminal_info(:, p) = oo_.pfwee.terminal_info(:, p-1);
-            oo_.pfwee.shocks_info(:, :, p) = oo_.pfwee.shocks_info(:, :, p-1);
-        end
-        if ~isempty(M_.learnt_endval)
-            idx = find(cellfun(@(x) (isa(x, 'numeric') && x == p) || (isa(x, 'dates') && x - first_simulation_period + 1 == p), {M_.learnt_endval.learnt_in}));
-            for i = 1:length(idx)
-                j = idx(i);
-                exo_id = M_.learnt_endval(j).exo_id;
-                switch M_.learnt_endval(j).type
-                    case 'level'
+        %% Construct information sets for subsequent informational periods using shocks(learnt_in=…) and endval(learnt_in=…) blocks
+        % Since the learnt_in=… option with a dates object is never translated to a
+        % “bare” shocks or endval block by the preprocessor (contrary to
+        % learnt_in=1), the loop starts with p=1 to also handle dates objects
+        % in learnt_in option corresponding to the first period.
+        for p = 1:periods
+            if p > 1
+                oo_.pfwee.terminal_info(:, p) = oo_.pfwee.terminal_info(:, p-1);
+                oo_.pfwee.shocks_info(:, :, p) = oo_.pfwee.shocks_info(:, :, p-1);
+            end
+            if ~isempty(M_.learnt_endval)
+                idx = find(cellfun(@(x) (isa(x, 'numeric') && x == p) || (isa(x, 'dates') && x - first_simulation_period + 1 == p), {M_.learnt_endval.learnt_in}));
+                for i = 1:length(idx)
+                    j = idx(i);
+                    exo_id = M_.learnt_endval(j).exo_id;
+                    switch M_.learnt_endval(j).type
+                      case 'level'
                         oo_.pfwee.terminal_info(exo_id, p) = M_.learnt_endval(j).value;
-                    case 'add'
+                      case 'add'
                         oo_.pfwee.terminal_info(exo_id, p) = oo_.pfwee.terminal_info(exo_id, p-1) + M_.learnt_endval(j).value;
-                    case 'multiply'
+                      case 'multiply'
                         oo_.pfwee.terminal_info(exo_id, p) = oo_.pfwee.terminal_info(exo_id, p-1) * M_.learnt_endval(j).value;
-                    otherwise
+                      otherwise
                         error('Unknown type in M_.learnt_endval')
+                    end
+                    oo_.pfwee.shocks_info(exo_id, p:end, p) = oo_.pfwee.terminal_info(exo_id, p);
                 end
-                oo_.pfwee.shocks_info(exo_id, p:end, p) = oo_.pfwee.terminal_info(exo_id, p);
             end
-        end
-        if ~isempty(M_.learnt_shocks)
-            idx = find(cellfun(@(x) (isa(x, 'numeric') && x == p) || (isa(x, 'dates') && x - first_simulation_period + 1 == p), {M_.learnt_shocks.learnt_in}));
-            for i = 1:length(idx)
-                j = idx(i);
-                exo_id = M_.learnt_shocks(j).exo_id;
-                if isa(M_.learnt_shocks(j).periods, 'numeric')
-                    prds = M_.learnt_shocks(j).periods;
-                else % dates
-                    prds = M_.learnt_shocks(j).periods - first_simulation_period + 1;
-                end
-                switch M_.learnt_shocks(j).type
-                    case 'level'
+            if ~isempty(M_.learnt_shocks)
+                idx = find(cellfun(@(x) (isa(x, 'numeric') && x == p) || (isa(x, 'dates') && x - first_simulation_period + 1 == p), {M_.learnt_shocks.learnt_in}));
+                for i = 1:length(idx)
+                    j = idx(i);
+                    exo_id = M_.learnt_shocks(j).exo_id;
+                    if isa(M_.learnt_shocks(j).periods, 'numeric')
+                        prds = M_.learnt_shocks(j).periods;
+                    else % dates
+                        prds = M_.learnt_shocks(j).periods - first_simulation_period + 1;
+                    end
+                    switch M_.learnt_shocks(j).type
+                      case 'level'
                         oo_.pfwee.shocks_info(exo_id, prds, p) = M_.learnt_shocks(j).value;
-                    case 'add'
+                      case 'add'
                         oo_.pfwee.shocks_info(exo_id, prds, p) = oo_.pfwee.shocks_info(exo_id, prds, p-1) + M_.learnt_shocks(j).value;
-                    case 'multiply'
+                      case 'multiply'
                         oo_.pfwee.shocks_info(exo_id, prds, p) = oo_.pfwee.shocks_info(exo_id, prds, p-1) .* M_.learnt_shocks(j).value;
-                    case 'multiply_steady_state'
+                      case 'multiply_steady_state'
                         oo_.pfwee.shocks_info(exo_id, prds, p) = oo_.pfwee.terminal_info(exo_id, p) * M_.learnt_shocks(j).value;
-                    otherwise
+                      otherwise
                         error('Unknown type in M_.learnt_shocks')
+                    end
                 end
             end
         end
+    else
+        %% Initialize information sets using the “shock_paths” blocks
+        for i = 1:length(M_.database)
+            if ~evalin('base', sprintf("exist('%s', 'var')", M_.database{i}))
+                error('perfect_foresight_with_expectation_errors_setup: database %s does not exist in the base workspace', M_.database{i})
+            end
+        end
+
+        shock_paths = NaN(M_.exo_nbr, periods+1, periods);
+        for info_period = 1:periods
+            if info_period == 1
+                shock_paths(:,:,info_period) = repmat(oo_.exo_steady_state, 1, periods+1);
+            else
+                shock_paths(:,:,info_period) = shock_paths(:,:,info_period-1);
+            end
+
+            block_idx = find(cellfun(@(x) (isa(x, 'numeric') && x == info_period), {M_.shock_paths.learnt_in}));
+            if ~isempty(first_simulation_period)
+                block_idx = [block_idx; find(cellfun(@(x) (isa(x, 'dates') && x == first_simulation_period + info_period - 1), {M_.shock_paths.learnt_in}))];
+            end
+            for i = block_idx
+                for p = info_period:(periods + M_.shock_paths(i).contains_endval)
+                    shock_paths = feval(M_.shock_paths(i).evaluation_function, shock_paths, p, periods, first_simulation_period, M_, oo_);
+                end
+            end
+        end
+        oo_.pfwee.shocks_info = shock_paths(:,1:periods,:);
+        oo_.pfwee.terminal_info = reshape(shock_paths(:,periods+1,:), [M_.exo_nbr, periods]);
     end
 end
 

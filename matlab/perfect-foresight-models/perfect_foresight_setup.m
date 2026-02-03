@@ -72,8 +72,13 @@ if options_.simul.endval_steady && M_.maximum_lead == 0
     error('PERFECT_FORESIGHT_SETUP: Option endval_steady cannot be used on a purely backward or static model.')
 end
 
-if ~isempty(M_.learnt_shocks) || ~isempty(M_.learnt_endval)
-    error('A shocks(learnt_in=...) or endval(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
+if ~isempty(M_.learnt_shocks) || ~isempty(M_.learnt_endval) ...
+        || (~isempty(M_.shock_paths) && any([M_.shock_paths.learnt_in] ~= 1))
+    error('A shocks(learnt_in=...), endval(learnt_in=...) or shock_paths(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
+end
+
+if ~isempty(M_.shock_paths) && any([M_.shock_paths.contains_date]) && isempty(last_simulation_period)
+    error('perfect_foresight_setup: the shock_paths block contains dates but neither first_simulation_period nor last_simulation_period option was passed')
 end
 
 if isempty(M_.perfect_foresight_controlled_paths)
@@ -86,6 +91,22 @@ else
         end
     end
     oo_.deterministic_simulation.controlled_paths_by_period = controlled_paths_by_period(M_, options_);
+end
+
+% If a “shock_paths” block contains a permanent shock, recreate the additional
+% variables produced by the legacy “endval” block. If the latter is ever
+% removed, then we could think of a better design.
+if ~isempty(M_.shock_paths) && any([M_.shock_paths.contains_endval])
+    oo_.initial_steady_state = oo_.steady_state;
+    oo_.initial_exo_steady_state = oo_.exo_steady_state;
+end
+
+if ~isempty(M_.shock_paths)
+    for i = 1:length(M_.database)
+        if ~evalin('base', sprintf("exist('%s', 'var')", M_.database{i}))
+            error('perfect_foresight_setup: database %s does not exist in the base workspace', M_.database{i})
+        end
+    end
 end
 
 oo_ = make_ex_(M_,options_,oo_);

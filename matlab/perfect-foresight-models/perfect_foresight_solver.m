@@ -129,10 +129,10 @@ else
     exobase = repmat(oo_.initial_exo_steady_state', M_.maximum_lag+periods+M_.maximum_lead, 1);
 end
 
-% Determine whether to recompute the final steady state (either because
-% option “endval_steady” was passed, or because there is an “endval” block and the
-% terminal condition is a steady state)
-if options_.simul.endval_steady
+% Determine whether to recompute the final steady state (either because option
+% “endval_steady” was passed, because “shock_paths” was used, or because there
+% is an “endval” block and the terminal condition is a steady state)
+if options_.simul.endval_steady || ~isempty(M_.shock_paths)
     recompute_final_steady_state = true;
 elseif ~isempty(oo_.initial_steady_state)
     recompute_final_steady_state = true;

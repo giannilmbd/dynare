@@ -10,7 +10,7 @@ function oo_ = make_ex_(M_, options_, oo_)
 % OUTPUTS
 % - oo_          [struct]   Updated Dynare results structure
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -90,8 +90,8 @@ if M_.exo_det_nbr > 0
     end
 end
 
-% Add temporary shocks
-if isfield(M_, 'det_shocks')
+% Add temporary shocks when specified through the “shocks” block
+if ~isempty(M_.det_shocks)
     for i = 1:length(M_.det_shocks)
         if isa(M_.det_shocks(i).periods, 'numeric')
             k = M_.det_shocks(i).periods + M_.maximum_lag;
@@ -130,5 +130,22 @@ if isfield(M_, 'det_shocks')
                     error('Option relative_to_initval of mshocks block cannot be used with a deterministic exogenous variable')
             end
         end
+    end
+end
+
+% Add temporary and permanent shocks when specified through the “shock_paths” block
+if ~isempty(M_.shock_paths)
+    contains_endval = any([M_.shock_paths.contains_endval]);
+    shock_paths = oo_.exo_simul(M_.maximum_lag+(1:(periods+contains_endval)),:)';
+    for i = 1:length(M_.shock_paths)
+        assert(M_.shock_paths(i).learnt_in == 1)
+        for p = 1:(periods + M_.shock_paths(i).contains_endval)
+            shock_paths = feval(M_.shock_paths(i).evaluation_function, shock_paths, p, periods, first_simulation_period, M_, oo_);
+        end
+    end
+    oo_.exo_simul(M_.maximum_lag+(1:periods),:) = shock_paths(:,1:periods)';
+    if contains_endval
+        oo_.exo_steady_state = shock_paths(:,periods+1);
+        oo_.exo_simul(M_.maximum_lag+periods+(1:M_.maximum_lead),:) = repmat(oo_.exo_steady_state', M_.maximum_lead, 1);
     end
 end

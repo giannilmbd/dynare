@@ -81,7 +81,7 @@
     "perfect_foresight_with_expectation_errors_solver" "compilation_setup"
     "model_remove" "model_options" "var_remove"
     "heterogeneity_load_steady_state" "heterogeneity_solve" "heterogeneity_simulate"
-    "resid" "std" "corr"
+    "resid" "database" "std" "corr"
     "prior_function" "posterior_function" "end")
   "Dynare statement keywords.")
 
@@ -104,7 +104,7 @@
   (defvar dynare-blocks
     '("model" "steady_state_model" "initval" "endval" "histval"
       "filter_initial_state" "shocks" "heteroskedastic_shocks" "shock_groups"
-      "init2shocks" "mshocks" "estimated_params" "epilogue" "priors"
+      "init2shocks" "mshocks" "shock_paths" "estimated_params" "epilogue" "priors"
       "estimated_params_init" "estimated_params_bounds"
       "estimated_params_remove" "osr_params_bounds" "observation_trends"
       "deterministic_trends" "optim_weights" "homotopy_setup"
