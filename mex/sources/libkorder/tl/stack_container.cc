@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -60,7 +60,7 @@ FoldedStackContainer::multAndAdd(int dim, const FGSContainer& c, FGSTensor& out)
     if (c.check(si))
       job_group.push_back(std::make_unique<WorkerFoldMAADense>(*this, si, c, out));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 /* This is analogous to WorkerUnfoldMAADense::operator()() code. */
@@ -89,7 +89,7 @@ FoldedStackContainer::multAndAddSparse1(const FSSparseTensor& t, FGSTensor& out)
   for (Tensor::index ui = dummy.begin(); ui != dummy.end(); ++ui)
     job_group.push_back(std::make_unique<WorkerFoldMAASparse1>(*this, t, out, ui.getCoor()));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 /* This is analogous to WorkerUnfoldMAASparse1::operator()() code.
@@ -157,7 +157,7 @@ FoldedStackContainer::multAndAddSparse2(const FSSparseTensor& t, FGSTensor& out)
   for (Tensor::index fi = dummy_f.begin(); fi != dummy_f.end(); ++fi)
     job_group.push_back(std::make_unique<WorkerFoldMAASparse2>(*this, t, out, fi.getCoor()));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 /* Here we make a sparse slice first and then call multAndAddStacks()
@@ -249,7 +249,7 @@ FoldedStackContainer::multAndAddSparse4(const FSSparseTensor& t, FGSTensor& out)
   for (Tensor::index fi = dummy_f.begin(); fi != dummy_f.end(); ++fi)
     job_group.push_back(std::make_unique<WorkerFoldMAASparse4>(*this, t, out, fi.getCoor()));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 /* The WorkerFoldMAASparse4 is the same as WorkerFoldMAASparse2
@@ -387,7 +387,7 @@ UnfoldedStackContainer::multAndAdd(int dim, const UGSContainer& c, UGSTensor& ou
     if (c.check(si))
       job_group.push_back(std::make_unique<WorkerUnfoldMAADense>(*this, si, c, out));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 void
@@ -427,7 +427,7 @@ UnfoldedStackContainer::multAndAddSparse1(const FSSparseTensor& t, UGSTensor& ou
   for (Tensor::index ui = dummy.begin(); ui != dummy.end(); ++ui)
     job_group.push_back(std::make_unique<WorkerUnfoldMAASparse1>(*this, t, out, ui.getCoor()));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 /* This does a step of UnfoldedStackContainer::multAndAddSparse1() for
@@ -524,7 +524,7 @@ UnfoldedStackContainer::multAndAddSparse2(const FSSparseTensor& t, UGSTensor& ou
   for (Tensor::index fi = dummy_f.begin(); fi != dummy_f.end(); ++fi)
     job_group.push_back(std::make_unique<WorkerUnfoldMAASparse2>(*this, t, out, fi.getCoor()));
 
-  thread_pool::run(move(job_group));
+  thread_pool::run(job_group);
 }
 
 /* This does a step of UnfoldedStackContainer::multAndAddSparse2() for a given

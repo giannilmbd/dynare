@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Dynare Team
+ * Copyright © 2025-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -111,7 +111,7 @@ get_thread_number()
 }
 
 void
-run(job_group_t job_group)
+run(const job_group_t& job_group)
 {
   // Ensure that initialize() has been called
   assert(!threads.empty());

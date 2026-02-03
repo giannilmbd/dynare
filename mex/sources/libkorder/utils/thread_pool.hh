@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 Dynare Team
+ * Copyright © 2025-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -45,7 +45,7 @@ void initialize(int thread_number);
 using job_group_t = std::vector<std::unique_ptr<job>>;
 
 // Run a group of jobs, and only returns when they are all completed
-void run(job_group_t job_group);
+void run(const job_group_t& job_group);
 }
 
 #endif
