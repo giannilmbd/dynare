@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -138,9 +138,9 @@ QuasiTriangularZero::multLeftOther(GeneralMatrix& a) const
 void
 QuasiTriangularZero::print() const
 {
-  std::cout << "super=" << std::endl;
+  std::cout << "super=" << '\n';
   QuasiTriangular::print();
-  std::cout << "nz=" << nz << std::endl << "ru=" << std::endl;
+  std::cout << "nz=" << nz << '\n' << "ru=" << '\n';
   ru.print();
 }
 

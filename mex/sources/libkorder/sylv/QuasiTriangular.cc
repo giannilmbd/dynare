@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -173,7 +173,7 @@ Diagonal::getEigenValues(Vector& eig) const
     {
       std::ostringstream mes;
       mes << "Wrong length of vector for eigenvalues len=" << eig.length()
-          << ", should be=" << 2 * d_size << '.' << std::endl;
+          << ", should be=" << 2 * d_size << '.' << '\n';
       throw SYLV_MES_EXCEPTION(mes.str());
     }
   for (const auto& b : *this)
@@ -292,14 +292,14 @@ void
 Diagonal::print() const
 {
   auto ff = std::cout.flags();
-  std::cout << "Num real: " << getNumReal() << ", num complex: " << getNumComplex() << std::endl
+  std::cout << "Num real: " << getNumReal() << ", num complex: " << getNumComplex() << '\n'
             << std::fixed;
   for (const auto& it : *this)
     if (it.isReal())
-      std::cout << "real: jbar=" << it.getIndex() << ", alpha=" << *(it.getAlpha()) << std::endl;
+      std::cout << "real: jbar=" << it.getIndex() << ", alpha=" << *(it.getAlpha()) << '\n';
     else
       std::cout << "complex: jbar=" << it.getIndex() << ", alpha=" << *(it.getAlpha())
-                << ", beta1=" << it.getBeta1() << ", beta2=" << it.getBeta2() << std::endl;
+                << ", beta1=" << it.getBeta1() << ", beta2=" << it.getBeta2() << '\n';
   std::cout.flags(ff);
 }
 

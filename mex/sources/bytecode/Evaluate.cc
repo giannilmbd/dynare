@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2025 Dynare Team
+ * Copyright © 2013-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -368,7 +368,7 @@ Evaluate::error_location(it_code_type expr_begin, it_code_type faulty_op, int it
   };
 
   auto [expr_str, it_code_ret] = print_expression(expr_begin, faulty_op);
-  Error_loc << endl << add_underscore_to_fpe("      " + expr_str);
+  Error_loc << '\n' << add_underscore_to_fpe("      " + expr_str);
   return Error_loc.str();
 }
 

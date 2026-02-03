@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -514,13 +514,13 @@ void
 ConstGeneralMatrix::print() const
 {
   auto ff = std::cout.flags();
-  std::cout << "rows=" << rows << ", cols=" << cols << std::endl;
+  std::cout << "rows=" << rows << ", cols=" << cols << '\n';
   for (int i = 0; i < rows; i++)
     {
-      std::cout << "row " << i << ':' << std::endl << std::setprecision(3);
+      std::cout << "row " << i << ':' << '\n' << std::setprecision(3);
       for (int j = 0; j < cols; j++)
         std::cout << std::setw(6) << get(i, j) << ' ';
-      std::cout << std::endl;
+      std::cout << '\n';
     }
   std::cout.flags(ff);
 }

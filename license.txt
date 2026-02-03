@@ -370,7 +370,7 @@ Files: mex/sources/gensylv/gensylv.cc
        mex/sources/libkorder/kord/* mex/sources/libkorder/sylv/*
        mex/sources/libkorder/tl/* mex/sources/libkorder/utils/*
 Copyright: 2004-2011 Ondra Kamenik
-           2019-2025 Dynare Team
+           2019-2026 Dynare Team
 License: GPL-3+
 
 Files: mex/sources/sobol/sobol.f08

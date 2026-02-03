@@ -1,6 +1,6 @@
 /*
  * Copyright © 2005 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -45,7 +45,7 @@ public:
   void
   print(std::ostream& out) const
   {
-    out << file << ':' << line << ": " << mes << std::endl;
+    out << file << ':' << line << ": " << mes << '\n';
   }
 
   void

@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -309,10 +309,9 @@ BlockDiagonal::printInfo() const
       start = end;
       end = findBlockStart(start);
     }
-  std::cout << std::endl
-            << "Num blocks: " << num_blocks << std::endl
-            << "There are " << getNumZeros() << " zeros out of " << getNumOffdiagonal()
-            << std::endl;
+  std::cout << '\n'
+            << "Num blocks: " << num_blocks << '\n'
+            << "There are " << getNumZeros() << " zeros out of " << getNumOffdiagonal() << '\n';
 }
 
 int

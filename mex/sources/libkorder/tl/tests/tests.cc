@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -103,7 +103,7 @@ protected:
 bool
 TestRunnable::test() const
 {
-  std::cout << "Running test <" << name << ">" << std::endl;
+  std::cout << "Running test <" << name << ">" << '\n';
   clock_t start = clock();
   bool passed = run();
   clock_t end = clock();
@@ -1107,7 +1107,7 @@ main()
 
   int nfailed = all_tests.size() - success;
   std::cout << "There were " << nfailed << " tests that failed out of " << all_tests.size()
-            << " tests run." << std::endl;
+            << " tests run." << '\n';
 
   if (nfailed)
     return EXIT_FAILURE;

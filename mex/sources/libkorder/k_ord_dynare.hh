@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008-2025 Dynare Team
+ * Copyright © 2008-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -195,7 +195,7 @@ public:
   [[nodiscard]] std::unique_ptr<DynamicModel>
   clone() const override
   {
-    std::cerr << "KordpDynare::clone() not implemented" << std::endl;
+    std::cerr << "KordpDynare::clone() not implemented" << '\n';
     exit(EXIT_FAILURE);
   }
 

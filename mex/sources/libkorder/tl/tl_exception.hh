@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -82,7 +82,7 @@ public:
   virtual void
   print() const
   {
-    std::cout << "At " << fname << ':' << lnum << ':' << message << std::endl;
+    std::cout << "At " << fname << ':' << lnum << ':' << message << '\n';
   }
 };
 

@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004 Ondra Kamenik
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -286,7 +286,7 @@ protected:
 bool
 TestRunnable::test() const
 {
-  std::cout << "Running test <" << name << ">" << std::endl;
+  std::cout << "Running test <" << name << ">" << '\n';
   clock_t start = clock();
   auto start_real = std::chrono::steady_clock::now();
   bool passed = run();
@@ -328,14 +328,14 @@ TestRunnable::korder_unfold_fold(int maxdim, int unfold_dim, int nstat, int npre
       kord.performStep<Storage::unfold>(d);
       pertime = clock() - pertime;
       std::cout << "\ttime for unfolded step dim=" << d << ": " << std::setprecision(4)
-                << static_cast<double>(pertime) / CLOCKS_PER_SEC << std::endl;
+                << static_cast<double>(pertime) / CLOCKS_PER_SEC << '\n';
       clock_t checktime = clock();
       double err = kord.check<Storage::unfold>(d);
       checktime = clock() - checktime;
       std::cout << "\ttime for step check dim=" << d << ":    " << std::setprecision(4)
                 << static_cast<double>(checktime) / CLOCKS_PER_SEC << '\n'
                 << "\tmax error in step dim=" << d << ":      " << std::setprecision(6) << err
-                << std::endl;
+                << '\n';
       maxerror = std::max(err, maxerror);
     }
   // Perform folded steps until maxdim
@@ -345,7 +345,7 @@ TestRunnable::korder_unfold_fold(int maxdim, int unfold_dim, int nstat, int npre
       kord.switchToFolded();
       swtime = clock() - swtime;
       std::cout << "\ttime for switching dim=" << unfold_dim << ":     " << std::setprecision(4)
-                << static_cast<double>(swtime) / CLOCKS_PER_SEC << std::endl;
+                << static_cast<double>(swtime) / CLOCKS_PER_SEC << '\n';
 
       for (int d = unfold_dim + 1; d <= maxdim; d++)
         {
@@ -353,14 +353,14 @@ TestRunnable::korder_unfold_fold(int maxdim, int unfold_dim, int nstat, int npre
           kord.performStep<Storage::fold>(d);
           pertime = clock() - pertime;
           std::cout << "\ttime for folded step dim=" << d << ":   " << std::setprecision(4)
-                    << static_cast<double>(pertime) / CLOCKS_PER_SEC << std::endl;
+                    << static_cast<double>(pertime) / CLOCKS_PER_SEC << '\n';
           clock_t checktime = clock();
           double err = kord.check<Storage::fold>(d);
           checktime = clock() - checktime;
           std::cout << "\ttime for step check dim=" << d << ":    " << std::setprecision(4)
                     << static_cast<double>(checktime) / CLOCKS_PER_SEC << '\n'
                     << "\tmax error in step dim=" << d << ":      " << std::setprecision(6) << err
-                    << std::endl;
+                    << '\n';
           maxerror = std::max(err, maxerror);
         }
     }
@@ -465,19 +465,19 @@ main()
         }
       catch (const TLException& e)
         {
-          std::cout << "Caught TL exception in <" << test->name << ">:" << std::endl;
+          std::cout << "Caught TL exception in <" << test->name << ">:" << '\n';
           e.print();
         }
       catch (SylvException& e)
         {
-          std::cout << "Caught Sylv exception in <" << test->name << ">:" << std::endl;
+          std::cout << "Caught Sylv exception in <" << test->name << ">:" << '\n';
           e.printMessage();
         }
     }
 
   int nfailed = all_tests.size() - success;
   std::cout << "There were " << nfailed << " tests that failed out of " << all_tests.size()
-            << " tests run." << std::endl;
+            << " tests run." << '\n';
 
   if (nfailed)
     return EXIT_FAILURE;

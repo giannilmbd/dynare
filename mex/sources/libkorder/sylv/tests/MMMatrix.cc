@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -61,8 +61,8 @@ MMMatrixOut::write(const std::string& fname, const GeneralMatrix& m)
   if (fd.fail())
     throw MMException("Cannot open file " + fname + " for writing\n");
 
-  fd << "%%%%MatrixMarket matrix array real general" << std::endl
-     << m.nrows() << ' ' << m.ncols() << std::endl
+  fd << "%%%%MatrixMarket matrix array real general" << '\n'
+     << m.nrows() << ' ' << m.ncols() << '\n'
      << std::setprecision(35);
   for (int i = 0; i < m.ncols(); i++)
     for (int j = 0; j < m.nrows(); j++)

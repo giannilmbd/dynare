@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -133,7 +133,7 @@ InducedSymmetries::InducedSymmetries(const Equivalence& e, const Permutation& p,
 void
 InducedSymmetries::print() const
 {
-  std::cout << "Induced symmetries: " << size() << std::endl;
+  std::cout << "Induced symmetries: " << size() << '\n';
   for (unsigned int i = 0; i < size(); i++)
     operator[](i).print();
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -83,7 +83,7 @@ protected:
 bool
 TestRunnable::test() const
 {
-  std::cout << "Running test <" << name << '>' << std::endl;
+  std::cout << "Running test <" << name << '>' << '\n';
   clock_t start = clock();
   bool passed = run();
   clock_t end = clock();
@@ -93,7 +93,7 @@ TestRunnable::test() const
     std::cout << "passed";
   else
     std::cout << "FAILED";
-  std::cout << std::endl << std::endl;
+  std::cout << '\n' << '\n';
   return passed;
 }
 
@@ -132,7 +132,7 @@ TestRunnable::quasi_solve(bool trans, const std::string& mname, const std::strin
     t->solveTrans(x, v, eig_min);
   else
     t->solve(x, v, eig_min);
-  std::cout << "eig_min = " << eig_min << std::endl;
+  std::cout << "eig_min = " << eig_min << '\n';
   Vector xx(v.length());
   if (trans)
     tsave->multVecTrans(xx, ConstVector(x));
@@ -141,7 +141,7 @@ TestRunnable::quasi_solve(bool trans, const std::string& mname, const std::strin
   xx.add(-1.0, v);
   xx.add(1.0, x);
   double norm = xx.getNorm();
-  std::cout << "\terror norm = " << norm << std::endl;
+  std::cout << "\terror norm = " << norm << '\n';
   return norm < eps_norm;
 }
 
@@ -158,7 +158,7 @@ TestRunnable::mult_kron(bool trans, const std::string& mname, const std::string&
     {
       std::cout << "  Incompatible sizes for kron mult action, len=" << length
                 << ", matrow=" << mmt.row() << ", m=" << m << ", vrow=" << mmv.row()
-                << ", crow=" << mmc.row() << std::endl;
+                << ", crow=" << mmc.row() << '\n';
       return false;
     }
 
@@ -173,7 +173,7 @@ TestRunnable::mult_kron(bool trans, const std::string& mname, const std::string&
     t.multKron(v);
   c.add(-1.0, v);
   double norm = c.getNorm();
-  std::cout << "\terror norm = " << norm << std::endl;
+  std::cout << "\terror norm = " << norm << '\n';
   return norm < eps_norm;
 }
 
@@ -191,7 +191,7 @@ TestRunnable::level_kron(bool trans, const std::string& mname, const std::string
     {
       std::cout << "  Incompatible sizes for kron mult action, len=" << length
                 << ", matrow=" << mmt.row() << ", m=" << m << ", n=" << n << ", vrow=" << mmv.row()
-                << ", crow=" << mmc.row() << std::endl;
+                << ", crow=" << mmc.row() << '\n';
       return false;
     }
 
@@ -207,7 +207,7 @@ TestRunnable::level_kron(bool trans, const std::string& mname, const std::string
     KronUtils::multAtLevel(level, t, x);
   x.add(-1, c);
   double norm = x.getNorm();
-  std::cout << "\terror norm = " << norm << std::endl;
+  std::cout << "\terror norm = " << norm << '\n';
   return norm < eps_norm;
 }
 
@@ -226,7 +226,7 @@ TestRunnable::kron_power(const std::string& m1name, const std::string& m2name,
     {
       std::cout << "  Incompatible sizes for kron power mult action, len=" << length
                 << ", row1=" << mmt1.row() << ", row2=" << mmt2.row() << ", m=" << m << ", n=" << n
-                << ", vrow=" << mmv.row() << ", crow=" << mmc.row() << std::endl;
+                << ", vrow=" << mmv.row() << ", crow=" << mmc.row() << '\n';
       return false;
     }
 
@@ -240,7 +240,7 @@ TestRunnable::kron_power(const std::string& m1name, const std::string& m2name,
   KronUtils::multKron(t1, t2, x);
   x.add(-1, c);
   double norm = x.getNorm();
-  std::cout << "\terror norm = " << norm << std::endl;
+  std::cout << "\terror norm = " << norm << '\n';
   return norm < eps_norm;
 }
 
@@ -259,7 +259,7 @@ TestRunnable::lin_eval(const std::string& m1name, const std::string& m2name,
     {
       std::cout << "  Incompatible sizes for lin eval action, len=" << length
                 << ", row1=" << mmt1.row() << ", row2=" << mmt2.row() << ", m=" << m << ", n=" << n
-                << ", vrow=" << mmv.row() << ", crow=" << mmc.row() << std::endl;
+                << ", vrow=" << mmv.row() << ", crow=" << mmc.row() << '\n';
       return false;
     }
 
@@ -300,7 +300,7 @@ TestRunnable::qua_eval(const std::string& m1name, const std::string& m2name,
     {
       std::cout << "  Incompatible sizes for qua eval action, len=" << length
                 << ", row1=" << mmt1.row() << ", row2=" << mmt2.row() << ", m=" << m << ", n=" << n
-                << ", vrow=" << mmv.row() << ", crow=" << mmc.row() << std::endl;
+                << ", vrow=" << mmv.row() << ", crow=" << mmc.row() << '\n';
       return false;
     }
 
@@ -322,7 +322,7 @@ TestRunnable::qua_eval(const std::string& m1name, const std::string& m2name,
   x2.add(-1, c2);
   double norm1 = x1.getNorm();
   double norm2 = x2.getNorm();
-  std::cout << "\terror norm1 = " << norm1 << "\n\terror norm2 = " << norm2 << std::endl;
+  std::cout << "\terror norm1 = " << norm1 << "\n\terror norm2 = " << norm2 << '\n';
   return norm1 * norm1 + norm2 * norm2 < 100 * eps_norm * eps_norm; // relax norm
 }
 
@@ -339,7 +339,7 @@ TestRunnable::tri_sylv(const std::string& m1name, const std::string& m2name,
     {
       std::cout << "  Incompatible sizes for triangular sylvester action, len=" << length
                 << ", row1=" << mmt1.row() << ", row2=" << mmt2.row() << ", m=" << m << ", n=" << n
-                << ", vrow=" << mmv.row() << std::endl;
+                << ", vrow=" << mmv.row() << '\n';
       return false;
     }
 
@@ -358,10 +358,10 @@ TestRunnable::tri_sylv(const std::string& m1name, const std::string& m2name,
   dcheck.add(-1.0, v);
   double norm = dcheck.getNorm();
   double xnorm = v.getNorm();
-  std::cout << "\trel. error norm = " << norm / xnorm << std::endl;
+  std::cout << "\trel. error norm = " << norm / xnorm << '\n';
   double max = dcheck.getMax();
   double xmax = v.getMax();
-  std::cout << "\trel. error max = " << max / xmax << std::endl;
+  std::cout << "\trel. error max = " << max / xmax << '\n';
   return norm < xnorm * eps_norm;
 }
 
@@ -420,10 +420,10 @@ TestRunnable::eig_bubble(const std::string& aname, int from, int to)
   double normInf = check.getNormInf();
   double onorm1 = orig.getNorm1();
   double onormInf = orig.getNormInf();
-  std::cout << "\tabs. error1 = " << norm1 << std::endl
-            << "\tabs. error∞ = " << normInf << std::endl
-            << "\trel. error1 = " << norm1 / onorm1 << std::endl
-            << "\trel. error∞ = " << normInf / onormInf << std::endl;
+  std::cout << "\tabs. error1 = " << norm1 << '\n'
+            << "\tabs. error∞ = " << normInf << '\n'
+            << "\trel. error1 = " << norm1 / onorm1 << '\n'
+            << "\trel. error∞ = " << normInf / onormInf << '\n';
   return norm1 < eps_norm * onorm1 && normInf < eps_norm * onormInf;
 }
 
@@ -449,20 +449,20 @@ TestRunnable::block_diag(const std::string& aname, double log10norm)
   double normInf = check.getNormInf();
   double onorm1 = orig.getNorm1();
   double onormInf = orig.getNormInf();
-  std::cout << "\terror Q·B·Q⁻¹:" << std::endl
-            << "\tabs. error1 = " << norm1 << std::endl
-            << "\tabs. error∞ = " << normInf << std::endl
-            << "\trel. error1 = " << norm1 / onorm1 << std::endl
-            << "\trel. error∞ = " << normInf / onormInf << std::endl;
+  std::cout << "\terror Q·B·Q⁻¹:" << '\n'
+            << "\tabs. error1 = " << norm1 << '\n'
+            << "\tabs. error∞ = " << normInf << '\n'
+            << "\trel. error1 = " << norm1 / onorm1 << '\n'
+            << "\trel. error∞ = " << normInf / onormInf << '\n';
   SqSylvMatrix check2(dec.getQ() * dec.getInvQ());
   SqSylvMatrix in(n);
   in.setUnit();
   check2.add(-1, in);
   double nor1 = check2.getNorm1();
   double norInf = check2.getNormInf();
-  std::cout << "\terror Q·Q⁻¹:" << std::endl
-            << "\tabs. error1 = " << nor1 << std::endl
-            << "\tabs. error∞ = " << norInf << std::endl;
+  std::cout << "\terror Q·Q⁻¹:" << '\n'
+            << "\tabs. error1 = " << nor1 << '\n'
+            << "\tabs. error∞ = " << norInf << '\n';
   return norm1 < eps_norm * pow(10, log10norm) * onorm1;
 }
 
@@ -479,7 +479,7 @@ TestRunnable::iter_sylv(const std::string& m1name, const std::string& m2name,
     {
       std::cout << "  Incompatible sizes for triangular sylvester iteration, len=" << length
                 << ", row1=" << mmt1.row() << ", row2=" << mmt2.row() << ", m=" << m << ", n=" << n
-                << ", vrow=" << mmv.row() << std::endl;
+                << ", vrow=" << mmv.row() << '\n';
       return false;
     }
 
@@ -499,10 +499,10 @@ TestRunnable::iter_sylv(const std::string& m1name, const std::string& m2name,
   dcheck.add(-1.0, v);
   double cnorm = dcheck.getNorm();
   double xnorm = v.getNorm();
-  std::cout << "\trel. error norm = " << cnorm / xnorm << std::endl;
+  std::cout << "\trel. error norm = " << cnorm / xnorm << '\n';
   double max = dcheck.getMax();
   double xmax = v.getMax();
-  std::cout << "\trel. error max = " << max / xmax << std::endl;
+  std::cout << "\trel. error max = " << max / xmax << '\n';
   return cnorm < xnorm * eps_norm;
 }
 
@@ -1189,7 +1189,7 @@ main()
 
   int nfailed = all_tests.size() - success;
   std::cout << "There were " << nfailed << " tests that failed out of " << all_tests.size()
-            << " tests run." << std::endl;
+            << " tests run." << '\n';
 
   if (nfailed)
     return EXIT_FAILURE;

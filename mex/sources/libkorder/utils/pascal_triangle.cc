@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -62,10 +62,10 @@ PascalRow::prolongFirst(int n)
 void
 PascalRow::print() const
 {
-  std::cout << "k=" << k << std::endl;
+  std::cout << "k=" << k << '\n';
   for (unsigned int i = 0; i < size(); i++)
     std::cout << operator[](i) << ' ';
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 namespace PascalTriangle

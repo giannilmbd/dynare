@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -243,7 +243,7 @@ Vector::print() const
   auto ff = std::cout.flags();
   std::cout << std::setprecision(4);
   for (int i = 0; i < len; i++)
-    std::cout << i << '\t' << std::setw(8) << operator[](i) << std::endl;
+    std::cout << i << '\t' << std::setw(8) << operator[](i) << '\n';
   std::cout.flags(ff);
 }
 
@@ -346,6 +346,6 @@ ConstVector::print() const
   auto ff = std::cout.flags();
   std::cout << std::setprecision(4);
   for (int i = 0; i < len; i++)
-    std::cout << i << '\t' << std::setw(8) << operator[](i) << std::endl;
+    std::cout << i << '\t' << std::setw(8) << operator[](i) << '\n';
   std::cout.flags(ff);
 }

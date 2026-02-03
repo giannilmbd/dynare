@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -181,18 +181,14 @@ JournalRecordPair::~JournalRecordPair()
 {
   journal.decrementDepth();
   writePrefixForEnd(flash);
-  journal << prefix_end;
-  journal << mes;
-  journal << std::endl;
+  journal << prefix_end << mes << '\n';
   journal.flush();
 }
 
 JournalRecord&
 endrec(JournalRecord& rec)
 {
-  rec.journal << rec.prefix;
-  rec.journal << rec.mes;
-  rec.journal << std::endl;
+  rec.journal << rec.prefix << rec.mes << '\n';
   rec.journal.flush();
   rec.journal.incrementOrd();
   return rec;

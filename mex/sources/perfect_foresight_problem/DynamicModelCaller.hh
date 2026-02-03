@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2025 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -208,7 +208,7 @@ public:
   [[nodiscard]] double*
   T() override
   {
-    std::cerr << "This should not happen" << std::endl;
+    std::cerr << "This should not happen" << '\n';
     std::exit(EXIT_FAILURE);
   }
   void eval(double* resid) override;

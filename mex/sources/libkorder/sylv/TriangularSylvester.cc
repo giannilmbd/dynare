@@ -1,6 +1,6 @@
 /*
  * Copyright © 2004-2011 Ondra Kamenik
- * Copyright © 2019-2023 Dynare Team
+ * Copyright © 2019-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -46,9 +46,9 @@ TriangularSylvester::TriangularSylvester(const SchurDecompZero& kdecomp,
 void
 TriangularSylvester::print() const
 {
-  std::cout << "matrix K (" << matrixK->getDiagonal().getSize() << "):" << std::endl;
+  std::cout << "matrix K (" << matrixK->getDiagonal().getSize() << "):" << '\n';
   matrixK->print();
-  std::cout << "matrix F (" << matrixF->getDiagonal().getSize() << "):" << std::endl;
+  std::cout << "matrix F (" << matrixF->getDiagonal().getSize() << "):" << '\n';
   matrixF->print();
 }
 
