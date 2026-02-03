@@ -37,12 +37,10 @@
 
 #include <dynblas.h>
 
-using namespace std;
-
 constexpr double lb = .02425;
 constexpr double ub = .97575;
 
-template<floating_point T>
+template<std::floating_point T>
 T
 icdf(const T uniform)
 /*
@@ -50,19 +48,19 @@ icdf(const T uniform)
 **
 */
 {
-  const array<T, 6> A {-3.969683028665376e+01, 2.209460984245205e+02,  -2.759285104469687e+02,
-                       1.383577518672690e+02,  -3.066479806614716e+01, 2.506628277459239e+00};
-  const array<T, 5> B {-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
-                       6.680131188771972e+01, -1.328068155288572e+01};
-  const array<T, 6> C {-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
-                       -2.549732539343734e+00, 4.374664141464968e+00,  2.938163982698783e+00};
-  const array<T, 4> D {7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
-                       3.754408661907416e+00};
+  const std::array<T, 6> A {-3.969683028665376e+01, 2.209460984245205e+02,  -2.759285104469687e+02,
+                            1.383577518672690e+02,  -3.066479806614716e+01, 2.506628277459239e+00};
+  const std::array<T, 5> B {-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+                            6.680131188771972e+01, -1.328068155288572e+01};
+  const std::array<T, 6> C {-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+                            -2.549732539343734e+00, 4.374664141464968e+00,  2.938163982698783e+00};
+  const std::array<T, 4> D {7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+                            3.754408661907416e+00};
   T gaussian = static_cast<T>(0.0);
   if (0 < uniform && uniform < lb)
     {
       T tmp;
-      tmp = sqrt(-2 * log(uniform));
+      tmp = std::sqrt(-2 * std::log(uniform));
       gaussian = (((((C[0] * tmp + C[1]) * tmp + C[2]) * tmp + C[3]) * tmp + C[4]) * tmp + C[5])
                  / ((((D[0] * tmp + D[1]) * tmp + D[2]) * tmp + D[3]) * tmp + 1);
     }
@@ -82,7 +80,7 @@ icdf(const T uniform)
           if (ub < uniform && uniform < 1)
             {
               T tmp;
-              tmp = sqrt(-2 * log(1 - uniform));
+              tmp = std::sqrt(-2 * std::log(1 - uniform));
               gaussian
                   = -(((((C[0] * tmp + C[1]) * tmp + C[2]) * tmp + C[3]) * tmp + C[4]) * tmp + C[5])
                     / ((((D[0] * tmp + D[1]) * tmp + D[2]) * tmp + D[3]) * tmp + 1);
@@ -92,21 +90,21 @@ icdf(const T uniform)
   if (0 < uniform && uniform < 1)
     {
       T tmp, tmp_;
-      tmp = .5 * erfc(-gaussian / numbers::sqrt2) - uniform;
-      tmp_ = tmp * sqrt(2 * numbers::pi) * exp(.5 * gaussian * gaussian);
+      tmp = .5 * std::erfc(-gaussian / std::numbers::sqrt2) - uniform;
+      tmp_ = tmp * std::sqrt(2 * std::numbers::pi) * std::exp(.5 * gaussian * gaussian);
       gaussian = gaussian - tmp_ / (1 + .5 * gaussian * tmp_);
     }
   if (uniform == 0)
-    gaussian = -numeric_limits<T>::infinity();
+    gaussian = -std::numeric_limits<T>::infinity();
 
   if (uniform == 1)
-    gaussian = numeric_limits<T>::infinity();
+    gaussian = std::numeric_limits<T>::infinity();
 
   return gaussian;
 }
 
 void
-icdfm(int n, floating_point auto* U)
+icdfm(int n, std::floating_point auto* U)
 {
 #pragma omp parallel for
   for (int i = 0; i < n; i++)
@@ -115,20 +113,20 @@ icdfm(int n, floating_point auto* U)
 }
 
 void
-icdfmSigma(int d, int n, floating_point auto* U, const double* LowerCholSigma)
+icdfmSigma(int d, int n, std::floating_point auto* U, const double* LowerCholSigma)
 {
   double one = 1.0;
   double zero = 0.0;
   blas_int dd(d);
   blas_int nn(n);
   icdfm(n * d, U);
-  vector<double> tmp(n * d);
+  std::vector<double> tmp(n * d);
   dgemm("N", "N", &dd, &nn, &dd, &one, LowerCholSigma, &dd, U, &dd, &zero, tmp.data(), &dd);
-  ranges::copy_n(tmp.begin(), d * n, U);
+  std::ranges::copy_n(tmp.begin(), d * n, U);
 }
 
 void
-usphere(int d, int n, floating_point auto* U)
+usphere(int d, int n, std::floating_point auto* U)
 {
   icdfm(n * d, U);
 #pragma omp parallel for
@@ -146,7 +144,7 @@ usphere(int d, int n, floating_point auto* U)
 }
 
 void
-usphereRadius(int d, int n, double radius, floating_point auto* U)
+usphereRadius(int d, int n, double radius, std::floating_point auto* U)
 {
   icdfm(n * d, U);
 #pragma omp parallel for
@@ -157,7 +155,7 @@ usphereRadius(int d, int n, double radius, floating_point auto* U)
       for (int i = 0; i < d; i++) // dimension index.
         norm = norm + U[k + i] * U[k + i];
 
-      norm = sqrt(norm);
+      norm = std::sqrt(norm);
       for (int i = 0; i < d; i++) // dimension index.
         U[k + i] = radius * U[k + i] / norm;
     }

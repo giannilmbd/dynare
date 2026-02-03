@@ -1,7 +1,7 @@
 /*
 ** Computes Quasi Monte-Carlo sequence.
 **
-** Copyright © 2010-2025 Dynare Team
+** Copyright © 2010-2026 Dynare Team
 **
 ** This file is part of Dynare (can be used outside Dynare).
 **
@@ -101,7 +101,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   else if (dimension > DIM_MAX)
     mexErrMsgTxt(("qmc_sequence:: First input (dimension) has to be smaller than "
-                  + to_string(DIM_MAX) + " !")
+                  + std::to_string(DIM_MAX) + " !")
                      .c_str());
 
   /*
