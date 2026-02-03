@@ -17,7 +17,6 @@
  * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
 #include <memory>
 #include <string>
 
