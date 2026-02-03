@@ -67,6 +67,10 @@ contains
     integer :: niter ! Current iteration
     integer :: ncsucc ! Number of consecutive successful iterations
     integer :: ncslow ! Number of consecutive iterations with slow progress
+    ! Workspace arrays for dogleg (allocated once, reused across iterations)
+    real(real64), dimension(size(x), size(x)) :: r_plu
+    integer(blint), dimension(size(x)) :: ipiv
+    real(real64), dimension(size(x)) :: s_ws, t_ws
 
     ! Initialize variables associated to optional arguments
     if (present(tolx)) then
@@ -150,7 +154,7 @@ contains
          end if
 
          ! Get trust-region model (dogleg) minimizer
-         call dogleg(fjac, fvec, dg, delta, p, gn, recompute_gn)
+         call dogleg(fjac, fvec, dg, delta, p, gn, recompute_gn, r_plu, ipiv, s_ws, t_ws)
          recompute_gn = .false.
          p = -p
          pnorm = norm2(dg * p)
@@ -270,7 +274,7 @@ contains
   ! Minimize ‖r·x−b‖₂ subject to the constraint ‖d.*x‖ ≤ delta (where “.*”
   ! designates element-by-element multiplication),
   ! x is a convex combination of the Gauss-Newton and scaled gradient
-  subroutine dogleg(r, b, d, delta, x, gn, recompute_gn)
+  subroutine dogleg(r, b, d, delta, x, gn, recompute_gn, r_plu, ipiv, s, t)
     ! The arrays used in BLAS/LAPACK calls are required to be contiguous, to
     ! avoid temporary copies before calling BLAS/LAPACK.
     real(real64), dimension(:), contiguous, intent(in) :: b
@@ -280,6 +284,10 @@ contains
     real(real64), dimension(:), intent(out) :: x ! Solution of the problem
     real(real64), dimension(:), contiguous, intent(inout) :: gn ! Gauss-Newton direction
     logical, intent(in) :: recompute_gn ! Whether to re-compute Gauss-Newton direction
+    ! Workspace arrays (pre-allocated by caller to avoid repeated allocations)
+    real(real64), dimension(:,:), contiguous, intent(inout) :: r_plu
+    integer(blint), dimension(:), contiguous, intent(inout) :: ipiv
+    real(real64), dimension(:), contiguous, intent(inout) :: s, t
 
     integer(blint) :: n
 
@@ -290,8 +298,6 @@ contains
     ! Compute Gauss-Newton direction: gn = r⁻¹·b
     if (recompute_gn) then
        block
-         real(real64), dimension(size(x), size(x)) :: r_plu
-         integer(blint), dimension(size(x)) :: ipiv
          integer(blint) :: info
          gn = b
          r_plu = r
@@ -299,7 +305,7 @@ contains
          ! If r is singular, then compute a minimum-norm solution to the least squares problem
          if (info /= 0) then
             block
-              real(real64), dimension(size(x)) :: s
+              real(real64), dimension(size(x)) :: sv
               integer(blint) :: rank
               real(real64), dimension(:), allocatable :: work
               integer(blint), dimension(:), allocatable :: iwork
@@ -309,13 +315,13 @@ contains
               ! Query workspace sizes
               allocate(work(1), iwork(1))
               lwork = -1_blint
-              call dgelsd(n, n, 1_blint, r_plu, n, gn, n, s, -1._real64, rank, work, lwork, iwork, info)
+              call dgelsd(n, n, 1_blint, r_plu, n, gn, n, sv, -1._real64, rank, work, lwork, iwork, info)
               ! Do the actual computation
               lwork = int(work(1), blint)
               liwork = iwork(1)
               deallocate(work, iwork)
               allocate(work(lwork), iwork(liwork))
-              call dgelsd(n, n, 1_blint, r_plu, n, gn, n, s, -1._real64, rank, work, lwork, iwork, info)
+              call dgelsd(n, n, 1_blint, r_plu, n, gn, n, sv, -1._real64, rank, work, lwork, iwork, info)
               if (info /= 0) error stop "Failed to compute the Gauss-Newton direction"
             end block
          end if
@@ -328,7 +334,6 @@ contains
       else
          ! Gauss-Newton direction is too big, get scaled gradient
          block
-           real(real64), dimension(size(x)) :: s, t
            real(real64) :: snm, alpha
 
            ! s = rᵀ·b ./ d
