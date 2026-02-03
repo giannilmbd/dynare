@@ -1,4 +1,4 @@
-function [testFailed, testResults] = test_simulate_stochastic(M_, options_, oo_, ss, testFailed, testResults)
+function [testFailed, testResults] = test_simulate_stochastic(M_, options_, oo_, steady_state, testFailed, testResults)
 %test_simulate_stochastic Tests for heterogeneity.simulate in stochastic mode
 %
 % Tests core functionality for IRF computation and stochastic simulations
@@ -9,7 +9,7 @@ function [testFailed, testResults] = test_simulate_stochastic(M_, options_, oo_,
 %   M_           [struct]  Dynare model structure
 %   options_     [struct]  Dynare options structure
 %   oo_          [struct]  Dynare results structure
-%   ss           [struct]  Steady state structure
+%   steady_state [struct]  Steady state structure
 %   testFailed   [scalar]  Number of tests failed so far
 %   testResults  [array]   Array of test result structures
 %

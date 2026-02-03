@@ -16,24 +16,24 @@ function test_solve_with_custom_impulse_responses(M_, options_, oo_, x_hat_dash,
 %   For two-asset models: a_i, b_i, a_pi, b_pi
 
     % Set up interpolation weights based on model type
+    % mat.d.ind and mat.d.w are now [N_om × n_a] matrices where each column
+    % corresponds to a state variable (in indices.states order)
     if nargin == 11
-        % One-asset model
-        n_interp_args = 2;
+        % One-asset model: column 1 corresponds to 'a'
         interpolation_indices = varargin{1};
         interpolation_weights = varargin{2};
-        oo_.heterogeneity.mat.d.ind.a = interpolation_indices+1;
-        oo_.heterogeneity.mat.d.w.a = interpolation_weights;
+        oo_.heterogeneity.mat.d.ind(:, 1) = int32(interpolation_indices(:) + 1);
+        oo_.heterogeneity.mat.d.w(:, 1) = interpolation_weights(:);
     elseif nargin == 13
-        n_interp_args = 4;
-        % Two-asset model
+        % Two-asset model: column 1 = 'b', column 2 = 'a'
         a_i = varargin{1};
         b_i = varargin{2};
         a_pi = varargin{3};
         b_pi = varargin{4};
-        oo_.heterogeneity.mat.d.ind.a = a_i+1;
-        oo_.heterogeneity.mat.d.ind.b = b_i+1;
-        oo_.heterogeneity.mat.d.w.a = a_pi;
-        oo_.heterogeneity.mat.d.w.b = b_pi;
+        oo_.heterogeneity.mat.d.ind(:, 1) = int32(b_i(:) + 1);
+        oo_.heterogeneity.mat.d.ind(:, 2) = int32(a_i(:) + 1);
+        oo_.heterogeneity.mat.d.w(:, 1) = b_pi(:);
+        oo_.heterogeneity.mat.d.w(:, 2) = a_pi(:);
     end
 
     % Test solve function with custom impulse responses

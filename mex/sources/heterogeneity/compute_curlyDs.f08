@@ -18,17 +18,16 @@
 ! Computes distribution derivative coefficients for heterogeneous agents.
 !
 ! MATLAB SYNTAX:
-!   D = compute_curlyDs(Ind, W, inv_h, a_hat, om, mu, states, sizes)
+!   D = compute_curlyDs(Ind, W, inv_h, a_hat, om, mu, dims)
 !
 ! INPUTS:
-!   Ind     [struct]             : Structure with interpolation indices per state (N_om × 1 per field)
-!   W       [struct]             : Structure with interpolation weights per state (N_om × 1 per field)
-!   inv_h   [struct]             : Structure with inverse grid spacing per state (N_om × 1 per field)
+!   Ind     [N_om × n int32]     : Interpolation indices per state (column per state)
+!   W       [N_om × n double]    : Interpolation weights per state (column per state)
+!   inv_h   [N_om × n double]    : Inverse grid spacing per state (column per state)
 !   a_hat   [N_om × S × n double]: Policy function values for state variables
 !   om      [N_om × 1 double]    : Distribution weights
 !   mu      [N_e × N_e double]   : Transition matrix for shocks
-!   states  [cell array]         : State variable names (fastest dimension first)
-!   sizes   [struct]             : Structure with grid sizes per state
+!   dims    [n int32]            : Grid sizes per state
 !
 ! OUTPUTS:
 !   D       [N_om × S double]    : Distribution derivative coefficients
@@ -47,74 +46,45 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     type(c_ptr) :: plhs(*), prhs(*)
 
     ! MATLAB inputs as raw pointers
-    type(c_ptr) :: ind_struct_mx, w_struct_mx, inv_h_struct_mx, a_hat_mx, om_mx, mu_mx, states_mx, sizes_struct_mx
-    type(c_ptr) :: ind_field, w_field, inv_h_field, size_field
-    type(c_ptr) :: fieldname_cell
-    character(len=:), allocatable :: state
+    type(c_ptr) :: ind_mx, w_mx, inv_h_mx, a_hat_mx, om_mx, mu_mx, dims_mx
 
     ! Fortran pointers (assigned via matlab_mex wrappers)
-    real(real64), pointer, contiguous :: om(:), mu(:,:), w_col(:), inv_h_col(:)
-    integer(int32), pointer, contiguous :: ind_col(:)
+    real(real64), pointer, contiguous :: om(:), mu(:,:), w(:,:), inv_h(:,:)
+    integer(int32), pointer, contiguous :: ind(:,:), m(:)
     real(real64), pointer, contiguous :: a_hat(:,:,:)
-    real(real64), allocatable :: w(:,:), inv_h(:,:)
-    integer(int32), allocatable :: ind(:,:), m(:)
 
     ! Output
     real(real64), pointer, contiguous :: D(:,:)
 
     ! Useful size variables
-    integer(int32) :: n, N_e, N_om, S, k
+    integer(int32) :: n, N_e, N_om, S
 
-    if (nrhs /= 8) call mexErrMsgTxt("Need 8 inputs: Ind, W, inv_h, a_hat, om, mu, states, sizes")
+    if (nrhs /= 7) call mexErrMsgTxt("Need 7 inputs: Ind, W, inv_h, a_hat, om, mu, dims")
     if (nlhs < 1) call mexErrMsgTxt("Need 1 output")
 
     ! Assign inputs
-    ind_struct_mx   = prhs(1)
-    w_struct_mx     = prhs(2)
-    inv_h_struct_mx = prhs(3)
-    a_hat_mx        = prhs(4)
-    om_mx           = prhs(5)
-    mu_mx           = prhs(6)
-    states_mx       = prhs(7)
-    sizes_struct_mx = prhs(8)
+    ind_mx    = prhs(1)
+    w_mx      = prhs(2)
+    inv_h_mx  = prhs(3)
+    a_hat_mx  = prhs(4)
+    om_mx     = prhs(5)
+    mu_mx     = prhs(6)
+    dims_mx   = prhs(7)
 
     ! Get dimensions
     N_om = int(mxGetM(a_hat_mx), int32)
     N_e = int(mxGetM(mu_mx), int32)
-    n = int(mxGetNumberOfElements(states_mx), int32)
+    n = int(mxGetN(ind_mx), int32)
     S = int(mxGetN(a_hat_mx) / n, int32)
 
-    ! Convert distribution weights to Fortran array
+    ! Convert to Fortran arrays using matlab_mex wrappers
     om(1:N_om) => mxGetDoubles(om_mx)
-    a_hat(1:N_om,1:S,1:n) => mxGetDoubles(a_hat_mx)
-    mu(1:N_e,1:N_e) => mxGetDoubles(mu_mx)
-
-    ! Allocate arrays for struct data
-    allocate(w(N_om,n), inv_h(N_om,n), ind(N_om,n), m(n))
-
-    ! Loop over state fields to extract struct data
-    do k = 1, n
-        ! Get fieldname from cell array
-        fieldname_cell = mxGetCell(states_mx, int(k, mwIndex))
-        state = mxArrayToString(fieldname_cell)
-
-        ! Extract fields from structures
-        ind_field   = mxGetField(ind_struct_mx,   1_mwIndex, state)
-        w_field     = mxGetField(w_struct_mx,     1_mwIndex, state)
-        inv_h_field = mxGetField(inv_h_struct_mx, 1_mwIndex, state)
-        size_field  = mxGetField(sizes_struct_mx, 1_mwIndex, state)
-
-        ! Convert to Fortran pointers/arrays
-        ind_col(1:N_om) => mxGetInt32s(ind_field)
-        w_col(1:N_om) => mxGetDoubles(w_field)
-        inv_h_col(1:N_om) => mxGetDoubles(inv_h_field)
-
-        ! Copy to allocated arrays
-        m(k) = int(mxGetScalar(size_field), int32)
-        ind(:,k) = ind_col
-        w(:,k) = w_col
-        inv_h(:,k) = inv_h_col
-    end do
+    a_hat(1:N_om, 1:S, 1:n) => mxGetDoubles(a_hat_mx)
+    mu(1:N_e, 1:N_e) => mxGetDoubles(mu_mx)
+    ind(1:N_om, 1:n) => mxGetInt32s(ind_mx)
+    w(1:N_om, 1:n) => mxGetDoubles(w_mx)
+    inv_h(1:N_om, 1:n) => mxGetDoubles(inv_h_mx)
+    m(1:n) => mxGetInt32s(dims_mx)
 
     ! Create output array
     plhs(1) = mxCreateDoubleMatrix(int(N_om, mwSize), int(S, mwSize), mxREAL)

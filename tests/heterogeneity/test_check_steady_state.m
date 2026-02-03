@@ -1,4 +1,4 @@
-function [testFailed, testResults] = test_check_steady_state(M_, options_, ss, testFailed, testResults)
+function [testFailed, testResults] = test_check_steady_state(M_, options_, steady_state, testFailed, testResults)
 %test_check_steady_state Tests for heterogeneity.check_steady_state_input
 %
 % Comprehensive tests for the steady-state input validation function
@@ -6,7 +6,7 @@ function [testFailed, testResults] = test_check_steady_state(M_, options_, ss, t
 % INPUTS:
 %   M_           [struct]  Dynare model structure
 %   options_     [struct]  Dynare options structure
-%   ss           [struct]  Steady state structure
+%   steady_state           [struct]  Steady state structure
 %   testFailed   [scalar]  Number of tests failed so far
 %   testResults  [array]   Array of test result structures
 %
@@ -21,28 +21,28 @@ fprintf('=============================================\n');
 verbose = true;
 
 %% === OUTPUTS ===
-[testFailed, result] = run_test('sizes output validation', @() test_sizes_output(M_, options_, ss), testFailed);
+[testFailed, result] = run_test('sizes output validation', @() test_sizes_output(M_, options_, steady_state), testFailed);
 testResults = [testResults; result];
 
-[testFailed, result] = run_test('out_ss output validation', @() test_out_ss_output(M_, options_, ss), testFailed);
+[testFailed, result] = run_test('out_ss output validation', @() test_out_ss_output(M_, options_, steady_state), testFailed);
 testResults = [testResults; result];
 
-function test_sizes_output(M_, options_, ss)
-    [out_ss, sizes] = heterogeneity.check_steady_state_input(M_, options_.heterogeneity, ss);
-    assert(sizes.n_e == numel(fieldnames(ss.shocks.grids)), 'sizes.n_e incorrect');
-    assert(sizes.n_a == numel(fieldnames(ss.pol.grids)), 'sizes.n_a incorrect');
-    assert(sizes.N_e == numel(ss.shocks.grids.e), 'sizes.N_e incorrect');
+function test_sizes_output(M_, options_, steady_state)
+    [out_ss, sizes] = heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, steady_state);
+    assert(sizes.n_e == numel(fieldnames(steady_state.shocks.grids)), 'sizes.n_e incorrect');
+    assert(sizes.n_a == numel(fieldnames(steady_state.pol.grids)), 'sizes.n_a incorrect');
+    assert(sizes.N_e == numel(steady_state.shocks.grids.e), 'sizes.N_e incorrect');
     assert(sizes.n_pol == M_.heterogeneity(1).endo_nbr, 'sizes.n_pol incorrect');
-    assert(sizes.agg == numel(fieldnames(ss.agg)), 'sizes.agg incorrect');
-    assert(sizes.shocks.e == numel(ss.shocks.grids.e), 'sizes.shocks.e incorrect');
-    assert(sizes.pol.N_a == numel(ss.pol.grids.a), 'sizes.pol.N_a incorrect');
+    assert(sizes.agg == numel(fieldnames(steady_state.agg)), 'sizes.agg incorrect');
+    assert(sizes.shocks.e == numel(steady_state.shocks.grids.e), 'sizes.shocks.e incorrect');
+    assert(sizes.pol.N_a == numel(steady_state.pol.grids.a), 'sizes.pol.N_a incorrect');
     assert(sizes.pol.states.a == sizes.pol.N_a, 'sizes.pol.states.a incorrect');
     assert(sizes.d.N_a == sizes.pol.N_a, 'sizes.d.N_a incorrect');
     assert(sizes.d.states.a == sizes.pol.states.a, 'sizes.d.states.a incorrect');
 end
 
-function test_out_ss_output(M_, options_, ss)
-    [out_ss, sizes] = heterogeneity.check_steady_state_input(M_, options_.heterogeneity, ss);
+function test_out_ss_output(M_, options_, steady_state)
+    [out_ss, sizes] = heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, steady_state);
     assert(iscolumn(out_ss.shocks.grids.e), 'out_ss.shocks.grids.e not column');
     assert(iscolumn(out_ss.pol.grids.a), 'out_ss.pol.grids.a not column');
     assert(iscolumn(out_ss.d.grids.a), 'out_ss.d.grids.a not column');
@@ -54,71 +54,71 @@ end
 
 %% === NON-STRUCT FIELDS ===
 
-% ss is not a struct
+% steady_state is not a struct
 ss_test = 123;
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), 'ss is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), 'steady_state is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.shocks is not a struct
-ss_test = ss;
+% steady_state.shocks is not a struct
+ss_test = steady_state;
 ss_test.shocks = 1;
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), 'ss.shocks is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), 'steady_state.shocks is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.shocks.grids is not a struct
-ss_test = ss;
+% steady_state.shocks.grids is not a struct
+ss_test = steady_state;
 ss_test.shocks.grids = 42;
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.shocks.grids is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.shocks.grids is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.shocks.Pi is not a struct
-ss_test = ss;
+% steady_state.shocks.Pi is not a struct
+ss_test = steady_state;
 ss_test.shocks.Pi = "not_a_struct";
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.shocks.Pi is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.shocks.Pi is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.pol is not a struct
-ss_test = ss;
+% steady_state.pol is not a struct
+ss_test = steady_state;
 ss_test.pol = pi;
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.pol is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.pol is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.pol.grids is not a struct
-ss_test = ss;
+% steady_state.pol.grids is not a struct
+ss_test = steady_state;
 ss_test.pol.grids = "grid";
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.pol.grids is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.pol.grids is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.pol.values is not a struct
-ss_test = ss;
+% steady_state.pol.values is not a struct
+ss_test = steady_state;
 ss_test.pol.values = "values";
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.pol.values is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.pol.values is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.d is not a struct
-ss_test = ss;
+% steady_state.d is not a struct
+ss_test = steady_state;
 ss_test.d = 1;
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.d is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.d is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.d.grids is not a struct
-ss_test = ss;
+% steady_state.d.grids is not a struct
+ss_test = steady_state;
 ss_test.d.grids = "grid";
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.d.grids is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.d.grids is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
-% ss.agg is not a struct
-ss_test = ss;
+% steady_state.agg is not a struct
+ss_test = steady_state;
 ss_test.agg = 0;
-[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_, ss_test), ...
-    'ss.agg is not a struct', testFailed, verbose);
+[testFailed, result] = expect_error(@() heterogeneity.check_steady_state_input(M_, options_.heterogeneity.check, ss_test), ...
+    'steady_state.agg is not a struct', testFailed, verbose);
 testResults = [testResults; result];
 
 end

@@ -1,4 +1,4 @@
-function [testFailed, testResults] = test_simulate_news_shocks(M_, options_, oo_, ss, sim_result, testFailed, testResults)
+function [testFailed, testResults] = test_simulate_news_shocks(M_, options_, oo_, steady_state, sim_result, testFailed, testResults)
 %test_simulate_news_shocks Tests for heterogeneity.simulate with news shock sequences
 %
 % Tests news shock sequence mode using M_.det_shocks populated from shocks block
@@ -9,7 +9,7 @@ function [testFailed, testResults] = test_simulate_news_shocks(M_, options_, oo_
 %   M_           [struct]  Dynare model structure
 %   options_     [struct]  Dynare options structure
 %   oo_          [struct]  Dynare results structure
-%   ss           [struct]  Steady state structure
+%   steady_state [struct]  Steady state structure
 %   sim_result   [struct]  Python simulation results (can be empty)
 %   testFailed   [scalar]  Number of tests failed so far
 %   testResults  [array]   Array of test result structures
@@ -101,12 +101,12 @@ end
 
 % Build the vector of steady-state aggregate endogenous variables
 steady_state = zeros(M_.endo_nbr, 1);
-agg_vars = fieldnames(oo_.heterogeneity.ss.agg);
+agg_vars = fieldnames(oo_.heterogeneity.steady_state.agg);
 for i = 1:length(agg_vars)
     var_name = agg_vars{i};
     var_idx = find(strcmp(var_name, M_.endo_names));
     if ~isempty(var_idx)
-        steady_state(var_idx) = oo_.heterogeneity.ss.agg.(var_name);
+        steady_state(var_idx) = oo_.heterogeneity.steady_state.agg.(var_name);
     end
 end
 

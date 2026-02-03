@@ -100,7 +100,7 @@ end
 heterogeneity_load_steady_state(filename = hank_1a);
 % Check that required fields exist
 assert(isfield(oo_, 'heterogeneity'), 'oo_.heterogeneity field missing');
-assert(isfield(oo_.heterogeneity, 'ss'), 'oo_.heterogeneity.ss field missing');
+assert(isfield(oo_.heterogeneity, 'steady_state'), 'oo_.heterogeneity.ss field missing');
 assert(isfield(oo_.heterogeneity, 'sizes'), 'oo_.heterogeneity.sizes field missing');
 assert(isfield(oo_.heterogeneity, 'mat'), 'oo_.heterogeneity.mat field missing');
 assert(isfield(oo_.heterogeneity, 'indices'), 'oo_.heterogeneity.indices field missing');
