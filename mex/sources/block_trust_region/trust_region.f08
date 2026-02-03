@@ -146,7 +146,7 @@ contains
             else
                delta = 1
             end if
-            delta = delta*factor
+            delta = delta*factor_actual
          end if
 
          ! Get trust-region model (dogleg) minimizer
