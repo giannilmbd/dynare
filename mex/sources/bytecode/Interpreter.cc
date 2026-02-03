@@ -1400,14 +1400,12 @@ Interpreter::Init_UMFPACK_Sparse_One_Boundary(const mxArray* x0_m) const
   double* x0 = mxGetDoubles(x0_m);
   if (!x0)
     throw FatalException {"In Init_UMFPACK_Sparse_One_Boundary, can't retrieve x0 vector"};
-  SuiteSparse_long* Ap
-      = static_cast<SuiteSparse_long*>(mxMalloc((size + 1) * sizeof(SuiteSparse_long)));
+  auto* Ap = static_cast<SuiteSparse_long*>(mxMalloc((size + 1) * sizeof(SuiteSparse_long)));
   test_mxMalloc(Ap, __LINE__, __FILE__, __func__, (size + 1) * sizeof(SuiteSparse_long));
   if (!Ap)
     throw FatalException {"In Init_UMFPACK_Sparse_One_Boundary, can't allocate Ap index vector"};
   size_t prior_nz = IM_i.size();
-  SuiteSparse_long* Ai
-      = static_cast<SuiteSparse_long*>(mxMalloc(prior_nz * sizeof(SuiteSparse_long)));
+  auto* Ai = static_cast<SuiteSparse_long*>(mxMalloc(prior_nz * sizeof(SuiteSparse_long)));
   test_mxMalloc(Ai, __LINE__, __FILE__, __func__, prior_nz * sizeof(SuiteSparse_long));
   if (!Ai)
     throw FatalException {"In Init_UMFPACK_Sparse_One_Boundary, can't allocate Ai index vector"};
@@ -1486,14 +1484,12 @@ Interpreter::Init_UMFPACK_Sparse_Two_Boundaries(
   double* x0 = mxGetDoubles(x0_m);
   if (!x0)
     throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, can't retrieve x0 vector"};
-  SuiteSparse_long* Ap
-      = static_cast<SuiteSparse_long*>(mxMalloc((n + 1) * sizeof(SuiteSparse_long)));
+  auto* Ap = static_cast<SuiteSparse_long*>(mxMalloc((n + 1) * sizeof(SuiteSparse_long)));
   test_mxMalloc(Ap, __LINE__, __FILE__, __func__, (n + 1) * sizeof(SuiteSparse_long));
   if (!Ap)
     throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, can't allocate Ap index vector"};
   size_t prior_nz = IM_i.size() * periods;
-  SuiteSparse_long* Ai
-      = static_cast<SuiteSparse_long*>(mxMalloc(prior_nz * sizeof(SuiteSparse_long)));
+  auto* Ai = static_cast<SuiteSparse_long*>(mxMalloc(prior_nz * sizeof(SuiteSparse_long)));
   test_mxMalloc(Ai, __LINE__, __FILE__, __func__, prior_nz * sizeof(SuiteSparse_long));
   if (!Ai)
     throw FatalException {"In Init_UMFPACK_Sparse_Two_Boundaries, can't allocate Ai index vector"};
