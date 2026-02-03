@@ -14,7 +14,7 @@ function oo_=perfect_foresight_setup(M_, options_, oo_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 1996-2025 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -76,9 +76,6 @@ if ~isempty(M_.learnt_shocks) || ~isempty(M_.learnt_endval)
     error('A shocks(learnt_in=...) or endval(learnt_in=...) block is present. You want to call perfect_foresight_with_expectations_error_setup and perfect_foresight_with_expectations_error_solver.')
 end
 
-oo_ = make_ex_(M_,options_,oo_);
-oo_ = make_y_(M_,options_,oo_);
-
 if isempty(M_.perfect_foresight_controlled_paths)
     oo_.deterministic_simulation.controlled_paths_by_period = [];
 else
@@ -90,3 +87,6 @@ else
     end
     oo_.deterministic_simulation.controlled_paths_by_period = controlled_paths_by_period(M_, options_);
 end
+
+oo_ = make_ex_(M_,options_,oo_);
+oo_ = make_y_(M_,options_,oo_);
