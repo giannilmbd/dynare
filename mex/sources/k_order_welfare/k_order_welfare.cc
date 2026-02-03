@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021-2025 Dynare Team
+ * Copyright © 2021-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -343,10 +343,10 @@ extern "C"
     for (int i = static_cast<int>(W_fieldnames.size()); i <= kOrder; i++)
       W_fieldnames.emplace_back("W_" + std::to_string(i));
     // Create structure for storing derivatives in Dynare++ format
-    const char* W_fieldnames_c[kOrder + 1];
+    std::vector<const char*> W_fieldnames_c(kOrder + 1);
     for (int i = 0; i <= kOrder; i++)
       W_fieldnames_c[i] = W_fieldnames[i].c_str();
-    plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 1, W_fieldnames_c);
+    plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 1, W_fieldnames_c.data());
 
     // Fill that structure
     for (int i = 0; i <= kOrder; i++)

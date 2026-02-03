@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008-2025 Dynare Team
+ * Copyright © 2008-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -271,21 +271,18 @@ extern "C"
         for (int i = static_cast<int>(g_fieldnames.size()); i <= kOrder; i++)
           g_fieldnames.emplace_back("g_" + std::to_string(i));
         // Create structure for storing derivatives in Dynare++ format
-        const char* g_fieldnames_c[kOrder + 1];
+        std::vector<const char*> g_fieldnames_c(kOrder + 1);
         for (int i = 0; i <= kOrder; i++)
           g_fieldnames_c[i] = g_fieldnames[i].c_str();
 
         if (pruning)
           {
-            std::vector<std::string> g_fieldnames_pruning(g_fieldnames);
-            g_fieldnames_pruning.emplace_back("pruning");
-            const char* g_fieldnames_pruning_c[kOrder + 2];
-            std::ranges::copy_n(g_fieldnames_c, kOrder + 1, g_fieldnames_pruning_c);
-            g_fieldnames_pruning_c[kOrder + 1] = g_fieldnames_pruning.back().c_str();
-            plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 2, g_fieldnames_pruning_c);
+            auto g_fieldnames_pruning_c = g_fieldnames_c;
+            g_fieldnames_pruning_c.push_back("pruning");
+            plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 2, g_fieldnames_pruning_c.data());
           }
         else
-          plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 1, g_fieldnames_c);
+          plhs[0] = mxCreateStructMatrix(1, 1, kOrder + 1, g_fieldnames_c.data());
 
         // Fill that structure
         for (int i = 0; i <= kOrder; i++)
@@ -303,7 +300,7 @@ extern "C"
           {
             const UnfoldDecisionRule& udr_pruning = app.getUnfoldDecisionRulePruning();
 
-            mxArray* dr_pruning = mxCreateStructMatrix(1, 1, kOrder + 1, g_fieldnames_c);
+            mxArray* dr_pruning = mxCreateStructMatrix(1, 1, kOrder + 1, g_fieldnames_c.data());
             mxSetField(plhs[0], 0, "pruning", dr_pruning);
 
             // Fill that structure
