@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009-2025 Dynare Team.
+ * Copyright © 2009-2026 Dynare Team.
  *
  * This file is part of Dynare.
  *
@@ -131,15 +131,14 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   lapack_int LDQ = LDA;
   lapack_int LDU = std::max(static_cast<lapack_int>(1), nn);
   lapack_int LDS = std::max(static_cast<lapack_int>(1), nn + p);
-  lapack_int LIWORK = std::max(static_cast<lapack_int>(1), std::max(p, nn));
+  lapack_int LIWORK = std::max({static_cast<lapack_int>(1), p, nn});
   lapack_int LDR = std::max(static_cast<lapack_int>(1), p);
   lapack_int LDB = LDA, LDL = LDA, LDT = LDS, LDX = LDA;
   lapack_int LDWORK = std::max(
       static_cast<lapack_int>(7) * (static_cast<lapack_int>(2) * n + static_cast<lapack_int>(1))
           + static_cast<lapack_int>(16),
       static_cast<lapack_int>(16) * n);
-  LDWORK = std::max(LDWORK,
-                    std::max(static_cast<lapack_int>(2) * n + p, static_cast<lapack_int>(3) * p));
+  LDWORK = std::max({LDWORK, static_cast<lapack_int>(2) * n + p, static_cast<lapack_int>(3) * p});
   double tolerance = 1e-16;
   lapack_int INFO;
   // Outputs of subroutine sb02OD
