@@ -114,7 +114,7 @@ public:
   [[nodiscard]] Symmetry getSymmetry() const;
 
   IntSequence& operator=(const IntSequence& s);
-  IntSequence& operator=(IntSequence&& s);
+  IntSequence& operator=(IntSequence&& s) noexcept;
   virtual ~IntSequence()
   {
     if (destroy)

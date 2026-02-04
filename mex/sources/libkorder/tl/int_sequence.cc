@@ -23,6 +23,7 @@
 #include "symmetry.hh"
 #include "tl_exception.hh"
 
+#include <cassert>
 #include <iostream>
 #include <limits>
 #include <numeric>
@@ -90,9 +91,9 @@ IntSequence::operator=(const IntSequence& s)
 }
 
 IntSequence&
-IntSequence::operator=(IntSequence&& s)
+IntSequence::operator=(IntSequence&& s) noexcept
 {
-  TL_RAISE_IF(length != s.length, "Wrong length for in-place IntSequence::operator=");
+  assert(length == s.length); // Do not throw (clang-tidy/performance-noexcept-move-constructor)
   std::ranges::copy_n(s.data, length, data);
   return *this;
 }
