@@ -560,19 +560,29 @@ ms_sbvar_command_line_src = [ 'contrib/ms-sbvar/switch_dw/switching/dw_switch_op
 shared_module('ms_sbvar_command_line', ms_sbvar_command_line_src, kwargs : mex_ms_sbvar_kwargs)
 
 heterogeneity_src = [
+   'mex/sources/block_trust_region/trust_region.f08',
    'mex/sources/heterogeneity/utils/gray_code.f08',
    'mex/sources/heterogeneity/utils/interpolation.f08',
    'mex/sources/heterogeneity/utils/markov.f08',
    'mex/sources/heterogeneity/utils/expectations.f08',
-   'mex/sources/heterogeneity/utils/curlyDs.f08'
+   'mex/sources/heterogeneity/utils/curlyDs.f08',
+   'mex/sources/heterogeneity/utils/aggregate_residuals_tensor.f08',
+   'mex/sources/heterogeneity/utils/fischer_burmeister.f08',
+   'mex/sources/heterogeneity/utils/broyden_solver.f08',
+   'mex/sources/heterogeneity/utils/calibration_types.f08',
+   'mex/sources/heterogeneity/utils/calibration.f08',
+   'mex/sources/heterogeneity/utils/pack_output.f08',
+   'mex/sources/heterogeneity/utils/time_iteration_tensor.f08'
 ]
-heterogeneity_lib = static_library('heterogeneity', heterogeneity_src, kwargs : static_library_kwargs, dependencies : [ mex_fortran_dep, blas_fortran_dep ])
+heterogeneity_lib = static_library('heterogeneity', heterogeneity_src, kwargs : static_library_kwargs, dependencies : [ mex_fortran_dep, blas_fortran_dep, lapack_fortran_dep ])
 shared_module('find_bracket_linear_weight',  'mex/sources/heterogeneity/find_bracket_linear_weight.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 shared_module('rouwenhorst',  'mex/sources/heterogeneity/rouwenhorst.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 shared_module('compute_expected_dx',  'mex/sources/heterogeneity/compute_expected_dx.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 shared_module('compute_expected_y',  'mex/sources/heterogeneity/compute_expected_y.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 shared_module('compute_curlyDs',  'mex/sources/heterogeneity/compute_curlyDs.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 shared_module('compute_transition_matrices',  'mex/sources/heterogeneity/compute_transition_matrices.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('compute_steady_state_tensor',  'mex/sources/heterogeneity/compute_steady_state_tensor.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
+shared_module('compute_Phi_tilde_e',  'mex/sources/heterogeneity/compute_Phi_tilde_e.f08', kwargs : mex_kwargs, link_with : heterogeneity_lib)
 
 
 ## Optionally build PARDISO MEX files
@@ -2291,15 +2301,16 @@ mod_and_m_tests = [
   { 'test' : [ 'ecb/pooled_fgls/test_param_names.mod' ] },
 
   # Heterogeneity
-  # { 'test' : [ 'heterogeneity/ks.mod' ],
-  #   'extra': [ 'heterogeneity/ks.mat',
-  #              'heterogeneity/expect_error.m',
-  #              'heterogeneity/print_test_summary.m',
-  #              'heterogeneity/run_test.m',
-  #              'heterogeneity/test_solve_functionality.m',
-  #              'heterogeneity/test_simulate_stochastic.m',
-  #              'heterogeneity/test_check_steady_state.m',
-  #             'heterogeneity/test_field_validation.m' ] },
+  { 'test' : [ 'heterogeneity/ks.mod' ],
+    'extra': [ 'heterogeneity/ks.mat',
+               'heterogeneity/expect_error.m',
+               'heterogeneity/print_test_summary.m',
+               'heterogeneity/run_test.m',
+               'heterogeneity/test_solve_functionality.m',
+               'heterogeneity/test_simulate_stochastic.m',
+               'heterogeneity/test_check_steady_state.m',
+               'heterogeneity/test_field_validation.m',
+               'heterogeneity/test_permutation.m' ] },
   { 'test' : [ 'heterogeneity/hank_1a.mod' ],
     'extra': [ 'heterogeneity/hank_1a.mat',
                'heterogeneity/print_test_summary.m',
@@ -2315,7 +2326,8 @@ mod_and_m_tests = [
     'extra': [ 'heterogeneity/hank_2a.mat',
                'heterogeneity/print_test_summary.m',
                'heterogeneity/run_test.m',
-               'heterogeneity/test_simulate_stochastic.m' ] },
+               'heterogeneity/test_simulate_stochastic.m',
+               'heterogeneity/test_permutation.m' ] },
   { 'test' : [ 'heterogeneity/ks_commands.mod' ],
     'extra' : [ 'heterogeneity/ks.mat' ] },
   { 'test' : [ 'heterogeneity/ks_commands.mod' ],
@@ -2341,6 +2353,18 @@ mod_and_m_tests = [
     'dynare_args': [ '-DTEST_OPTION="combined"' ],
     'extra' : [ 'heterogeneity/ks.mat' ],
     'should_fail' : true },
+  { 'test' : [ 'heterogeneity/analytical_rbc.mod' ] },
+  { 'test' : [ 'heterogeneity/analytical_rbc_2capital.mod' ] },
+  { 'test' : [ 'heterogeneity/ks_two_shocks.mod' ],
+    'extra': [ 'heterogeneity/ks_two_shocks.mat' ] },
+  { 'test' : [ 'heterogeneity/ks_steady_state.mod' ],
+    'extra': [ 'heterogeneity/ks_sp.mat' ] },
+  { 'test' : [ 'heterogeneity/ks_steady_state_dense.mod' ],
+    'extra': [ 'heterogeneity/ks_sp_dense.mat' ] },
+  { 'test' : [ 'heterogeneity/hank_1a_steady_state.mod' ],
+    'extra': [ 'heterogeneity/hank_1a_sp.mat' ] },
+  { 'test' : [ 'heterogeneity/hank_2a_steady_state.mod' ],
+    'extra': [ 'heterogeneity/hank_2a_sp.mat' ] },
 
   # Heterogenous agents tests requiring large file downloads
   # They are excluded from the default test setup, see add_test_setup() call below

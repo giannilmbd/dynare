@@ -58,8 +58,8 @@ end
 verbatim;
     skipline()
     disp('*** TESTING: heterogeneity.check_steady_state_input.m ***');
-    options_.heterogeneity.nowarningredundant = false;
-    options_.heterogeneity.nowarningdgrids = false;
+    options_.heterogeneity.check.no_warning_redundant = false;
+    options_.heterogeneity.check.no_warning_d_grids = false;
     testFailed = 0;
     testResults = [];  % Array to collect all test results
 
@@ -67,7 +67,7 @@ verbatim;
     [testFailed, testResults] = test_check_steady_state(M_, options_, steady_state, testFailed, testResults);
 end;
 
-%% === SHOCKS TESTS ===
+%% === FIELD VALIDATION TESTS ===
 verbatim;
     % Field validation tests
     verbose = true;
@@ -80,7 +80,7 @@ end;
 % Test 1: Load with explicit .mat extension + validate residuals
 heterogeneity_load_steady_state(filename = 'ks.mat');
 assert(isfield(oo_, 'heterogeneity'), 'oo_.heterogeneity field missing');
-assert(isfield(oo_.heterogeneity, 'ss'), 'oo_.heterogeneity.ss field missing');
+assert(isfield(oo_.heterogeneity, 'steady_state'), 'oo_.heterogeneity.ss field missing');
 assert(isfield(oo_.heterogeneity, 'sizes'), 'oo_.heterogeneity.sizes field missing');
 assert(isfield(oo_.heterogeneity, 'mat'), 'oo_.heterogeneity.mat field missing');
 assert(isfield(oo_.heterogeneity, 'indices'), 'oo_.heterogeneity.indices field missing');
@@ -112,7 +112,7 @@ end;
 % Test 2: Load without extension (auto-detect)
 heterogeneity_load_steady_state(filename = ks);
 assert(isfield(oo_, 'heterogeneity'), 'oo_.heterogeneity field missing');
-assert(isfield(oo_.heterogeneity, 'ss'), 'oo_.heterogeneity.ss field missing');
+assert(isfield(oo_.heterogeneity, 'steady_state'), 'oo_.heterogeneity.ss field missing');
 assert(isfield(oo_.heterogeneity, 'sizes'), 'oo_.heterogeneity.sizes field missing');
 assert(isfield(oo_.heterogeneity, 'mat'), 'oo_.heterogeneity.mat field missing');
 assert(isfield(oo_.heterogeneity, 'indices'), 'oo_.heterogeneity.indices field missing')
@@ -124,7 +124,7 @@ end;
 % Test 3: Load with relative path to current directory
 heterogeneity_load_steady_state(filename = './ks.mat');
 assert(isfield(oo_, 'heterogeneity'), 'oo_.heterogeneity field missing');
-assert(isfield(oo_.heterogeneity, 'ss'), 'oo_.heterogeneity.ss field missing');
+assert(isfield(oo_.heterogeneity, 'steady_state'), 'oo_.heterogeneity.ss field missing');
 assert(isfield(oo_.heterogeneity, 'sizes'), 'oo_.heterogeneity.sizes field missing');
 assert(isfield(oo_.heterogeneity, 'mat'), 'oo_.heterogeneity.mat field missing');
 assert(isfield(oo_.heterogeneity, 'indices'), 'oo_.heterogeneity.indices field missing')
@@ -148,7 +148,7 @@ end;
 heterogeneity_load_steady_state;
 
 verbatim;
-    assert(isfield(oo_.heterogeneity, 'ss'), 'Failed to load custom variable');
+    assert(isfield(oo_.heterogeneity, 'steady_state'), 'Failed to load custom variable');
     delete(temp_file);  % Clean up
 
     fprintf('✔ Test 4: Custom variable name works\n');
@@ -233,6 +233,9 @@ verbatim;
 
     % Test heterogeneity.simulate function (reuse initialized and solved model)
     [testFailed, testResults] = test_simulate_stochastic(M_, options_, oo_, steady_state, testFailed, testResults);
+
+    % Test permutation handling
+    [testFailed, testResults] = test_permutation(M_, options_, oo_, steady_state, testFailed, testResults);
 
     % Print test summary
     print_test_summary(testResults);

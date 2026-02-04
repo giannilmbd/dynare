@@ -14,6 +14,8 @@
 ! see <https://www.gnu.org/licenses/>.
 !
 ! Original author: Normann Rion <normann@dynare.org>
+!
+! Expected value and derivative computation for policy functions
 
 module expectations
     use iso_fortran_env, only: real64, int32
@@ -76,14 +78,11 @@ contains
 
         ! Useful variables
         real(real64) :: beta
-        real(real64), pointer, contiguous :: x_bar_dash(:,:,:), x_bar_dash_mat(:,:)
-        real(real64), allocatable :: Y(:,:), beta_0(:), beta_k(:)
-        real(real64), allocatable :: r_up(:,:), r_down(:,:)
-        integer(int32) :: N_x, N_sp, N_a, N_e, n, Kcorn, t, i, j_a, j_e, j, k, l_a, m, kf, z
-        integer(int32), allocatable :: flip_idx(:), a(:)
-        integer(int32), allocatable :: stride(:)
-        logical, allocatable, target :: is_hard(:,:)
-        logical, allocatable :: sk(:)
+        real(real64), pointer, contiguous :: x_bar_dash(:,:,:)
+        real(real64), allocatable :: Y(:,:), beta_0(:), beta_k(:), r_up(:,:), r_down(:,:), x_bar_dash_mat(:,:)
+        integer(int32) :: N_x, N_sp, N_a, N_e, n, Kcorn, t, i, j_a, j_e, j, k, l_a, kf, z
+        integer(int32), allocatable :: flip_idx(:), a(:), stride(:)
+        logical, allocatable :: is_hard_one(:,:), is_hard_zero(:,:), sk(:)
 
         N_x = size(x,1,int32)
         N_sp = size(x,2,int32)
@@ -102,17 +101,16 @@ contains
         call compute_strides(dims, stride)
 
         ! Low-corner linear indices in 1, ..., N_a
+        allocate(a(N_sp))
         call compute_linear_indices(ind, stride, a)
+
+        ! Coefficient updates and hard dimensions
+        allocate(r_up(N_sp, n), r_down(N_sp, n), is_hard_one(N_sp, n), is_hard_zero(N_sp, n))
+        call compute_coefficient_updates(w, r_up, r_down, is_hard_one, is_hard_zero)
 
         ! Low corner initial weight
         allocate(beta_0(N_sp))
-        beta_0 = 1.0_real64
-        do m=1,n
-            beta_0 = beta_0*w(:,m)
-        end do
-
-        ! Coefficient updates and hard dimensions
-        call compute_coefficient_updates(w, r_up, r_down, is_hard)
+        beta_0 = product(w, dim=2, mask=(.not. is_hard_zero))
 
         ! Weighting with the transition matrix
         allocate(Y(N_x*N_a,N_e), x_bar_dash_mat(N_x*N_a,N_e))
@@ -124,7 +122,8 @@ contains
         ! ---- Expectations ----
         allocate(sk(n), beta_k(N_sp))
         do k=1, n
-            beta_k = beta_0 / w(:,k)
+            beta_k = beta_0
+            where (.not. is_hard_zero(:,k)) beta_k = beta_k / w(:,k)
             do j_a=1,N_a
                 do j_e=1,N_e
                     ! do concurrent (j_a=1:N_a, j_e=1:N_e)
@@ -134,9 +133,13 @@ contains
                     ! Initialization
                     beta = -inv_h(j,k)*beta_k(j)
                     sk = .false.
-                    z = 0
+                    z = count(is_hard_zero(j,:))
                     l_a = a(j)
-                    E(:,k,j) = beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
+                    if (z == 0_int32) then
+                        E(:,k,j) = beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
+                    else
+                        E(:,k,j) = 0.0_real64
+                    end if
                     
                     ! Remaining corners
                     do t=1, Kcorn-1
@@ -152,47 +155,43 @@ contains
                                 l_a = l_a - stride(kf)
                                 sk(kf) = .false.
                             end if
-                            if (z==0) then
-                                E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
-                            end if
                         else 
                             if (.not. sk(kf)) then
                                 ! lower -> upper on dim kf
                                 l_a = l_a + stride(kf)
                                 sk(kf) = .true.
-                                if (is_hard(j,kf)) then
+                                if (is_hard_one(j,kf)) then
                                     ! No contribution. The number of
-                                    ! hard dims flipped to upper increases
-                                    z = z+1
+                                    ! hard-one dims flipped to upper increases
+                                    z = z+1_int32
+                                else if (is_hard_zero(j,kf)) then
+                                    ! No contribution. The number of
+                                    ! hard-zero dims flipped to lower decreases
+                                    z = z-1_int32
                                 else
                                     ! Both sides are higher than 0, but
                                     ! there is a contribution if and only
                                     ! if no hard dims is flipped to upper
                                     beta = beta*r_up(j,kf)
-                                    if (z==0) then
-                                        E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
-                                    end if
                                 end if
                             else
                                 ! upper -> lower on dim kf
                                 l_a = l_a - stride(kf)
                                 sk(kf) = .false.
-                                if (is_hard(j,kf)) then
-                                    z = z-1
-                                    ! The number of hard dims flipped to upper decreases
-                                    if (z==0) then
-                                        E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
-                                    end if
+                                if (is_hard_one(j,kf)) then
+                                    z = z-1_int32
+                                else if (is_hard_zero(j,kf)) then
+                                    z = z+1_int32
                                 else
                                     ! Both sides are higher than 0, but
                                     ! there is a contribution if and only
                                     ! if no hard dims is flipped to upper
                                     beta = beta*r_down(j,kf)
-                                    if (z==0) then
-                                        E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
-                                    end if
                                 end if
                             end if
+                        end if
+                        if (z==0_int32) then
+                            E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
                         end if
                     end do
                 end do
@@ -209,12 +208,12 @@ contains
         integer(int32), contiguous, intent(in) :: dims(:)
 
         ! Local variables
-        real(real64), pointer, contiguous :: y_ptr(:,:)
+        real(real64), pointer, contiguous :: y_ptr(:,:) => null()
         real(real64), allocatable, target :: y_mat(:,:)
         real(real64), allocatable :: beta(:), r_up(:,:), r_down(:,:)
-        integer(int32) :: n, N_e, N_a, N_om, S, Kcorn, t, k, kf, i, j, m
-        integer(int32), allocatable :: flip_idx(:), a(:), z(:), stride(:)
-        logical, allocatable :: sk(:), is_hard(:,:), is_soft(:,:), contributes(:)
+        integer(int32) :: n, N_e, N_a, N_om, S, Kcorn, t, kf, i, j, m
+        integer(int32), allocatable :: flip_idx(:), z(:), stride(:), a(:)
+        logical, allocatable :: sk(:), is_hard_one(:,:), is_hard_zero(:,:)
 
         ! Size variables
         n = size(dims, 1, int32)
@@ -231,6 +230,7 @@ contains
         call compute_strides(dims, stride)
 
         ! Low-corner linear indices in 1, ..., N_a
+        allocate(a(N_om))
         call compute_linear_indices(ind, stride, a)
         
         ! Fetch it into 1, ..., N_om
@@ -238,19 +238,13 @@ contains
             a((j-1_int32)*N_e+i) = (a((j-1_int32)*N_e+i)-1)*N_e+i
         end do
 
+        ! Coefficient updates and hard dimensions
+        allocate(r_up(N_om, n), r_down(N_om, n), is_hard_one(N_om, n), is_hard_zero(N_om, n))
+        call compute_coefficient_updates(w, r_up, r_down, is_hard_one, is_hard_zero)
+
         ! Low corner initial weight
         allocate(beta(N_om))
-        beta = 1.0_real64
-        do concurrent (k=1:n)
-            beta = beta*w(:,k)
-        end do
-
-        ! Coefficient updates and hard dimensions
-        call compute_coefficient_updates(w, r_up, r_down, is_hard)
-
-        ! Soft dimensions
-        allocate(is_soft(N_om,n))
-        is_soft = .not. (is_hard)
+        beta = product(w, dim=2, mask=(.not. is_hard_zero))
 
         ! Weighting with the Mu matrix
         y_ptr(1:N_e,1:(N_a*S))=>y
@@ -261,14 +255,17 @@ contains
         ! Computes ℰ(i, j, s) = sum_{i'} sum_{j'} [ ∏_ℓ (B^ℓ)_{j'_ℓ, i, j} ] *
         ! y_{i', j', s} * μ_{i,i'}. Note that the i and j dimensions are merged
         ! in the following calculation
-        allocate(sk(n),z(N_om),contributes(N_om))
+        allocate(sk(n),z(N_om))
 
         ! Initialization at the low corner
         sk = .false.
-        contributes = .true.
-        z = 0_int32
-        do concurrent (m=1:S)
-            E(:,m) = beta*y_ptr(a,m)
+        z = count(is_hard_zero, dim=2)
+        do concurrent (j=1:N_om, m=1:S)
+            if (z(j) == 0_int32) then
+                E(j,m) = beta(j)*y_ptr(a(j),m)
+            else
+                E(j,m) = 0.0_real64
+            end if
         end do
         stride = stride * N_e
 
@@ -279,41 +276,48 @@ contains
                 ! lower -> upper on dim kf
                 a = a + stride(kf)
                 sk(kf) = .true.
-                ! For nodes with a hard kf dim, the number of hard dims flipped
-                ! to upper increases
-                where (is_hard(:,kf)) z = z+1_int32 
-                ! For nodes with a soft kf dim, there is a contribution iff no
-                ! hard dimension is flipped to upper. We also update the beta
-                ! coefficient
-                where (is_soft(:,kf)) beta = beta*r_up(:,kf)
-                contributes = is_soft(:,kf) .and. (z == 0_int32)
-                do concurrent (m=1:S)
-                    where (contributes) E(:,m) = E(:,m)+beta*y_ptr(a,m)
+                do concurrent (j=1:N_om)
+                    if (is_hard_one(j,kf)) then
+                        ! For nodes with a hard-one kf dim, the number of hard dims flipped
+                        ! to upper increases
+                        z(j) = z(j)+1_int32
+                    else if (is_hard_zero(j,kf)) then
+                        ! For nodes with a hard-zero kf dim, the number of hard dims flipped
+                        ! to lower decreases
+                        z(j) = z(j)-1_int32
+                    else
+                        ! For nodes with a soft kf dim, we update the beta
+                        ! coefficient
+                        beta(j) = beta(j)*r_up(j,kf)
+                    end if
                 end do
             else
                 ! upper -> lower on dim kf
                 a = a - stride(kf)
                 sk(kf) = .false.
-                ! For nodes with a hard kf dim, the number of hard dims flipped
-                ! to upper decreases.
-                where (is_hard(:,kf)) z = z-1_int32
-                ! If the number of hard dims flipped to upper is zero, there is
-                ! a contribution
-                contributes = is_hard(:,kf) .and. (z == 0_int32)
-                do concurrent (m=1:S)
-                    where (contributes) E(:,m) = E(:,m) + beta*y_ptr(a,m)
+                do concurrent (j=1:N_om)
+                    if (is_hard_one(j,kf)) then
+                        ! For nodes with a hard-one kf dim, the number of hard dims flipped
+                        ! to upper decreases
+                        z(j) = z(j)-1_int32
+                    else if (is_hard_zero(j,kf)) then
+                        ! For nodes with a hard-zero kf dim, the number of hard dims flipped
+                        ! to lower increases
+                        z(j) = z(j)+1_int32
+                    else
+                        ! For nodes with a soft kf dim, we update the beta
+                        ! coefficient
+                        beta(j) = beta(j)*r_down(j,kf)
+                    end if
                 end do
-                ! For nodes with a soft kf dim, there is a contribution iff no
-                ! hard dimension is flipped to upper. We also update the beta
-                ! coefficient
-                where (is_soft(:,kf)) beta = beta*r_down(:,kf)                 
-                contributes = is_soft(:,kf) .and. (z==0_int32)
-                do concurrent (m=1:S)
-                    where (contributes) 
-                        E(:,m) = E(:,m)+beta*y_ptr(a,m)
-                    end where
-                end do
-           end if
+            end if
+            do concurrent (j=1:N_om)
+                if (z(j) == 0_int32) then
+                    do m=1,S
+                        E(j,m) = E(j,m) + beta(j) * y_ptr(a(j),m)
+                    end do
+                end if
+            end do
         end do
 
     end subroutine compute_expected_y

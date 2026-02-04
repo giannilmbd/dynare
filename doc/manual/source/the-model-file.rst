@@ -15416,7 +15416,7 @@ heterogeneity_load_steady_state
     **steady_state.d** (structure)
         The stationary distribution:
 
-        - ``d.grids``: structure with distribution state grids (optional; defaults to ``pol.grids``). Allows using different grids for the distribution than for policy functions.
+        - ``d.grids``: structure with distribution state grids (optional; defaults to ``pol.grids``). Allows using different grids for the distribution than for policy functions. When specified, each grid must have the same bounds as its counterpart in ``pol.grids``.
 
         - ``d.hist``: multidimensional array containing the histogram of the stationary distribution. Must sum to 1.0. Dimensions are ordered according to ``d.order``.
 

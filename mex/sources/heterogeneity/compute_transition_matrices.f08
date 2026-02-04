@@ -22,8 +22,8 @@
 !
 ! INPUTS:
 !   curlyYs       [T × N_Y × N_Ix double]      : Aggregate impact coefficients
-!   expectations  [N_e × N_a × N_Ix × (T-1)]   : Expectation matrices
-!   curlyDs       [N_e × N_a × T × N_Y]        : Distribution derivative coefficients
+!   expectations  [N_om × N_Ix × (T-1) double] : Expectation matrices (N_om = N_e × N_a)
+!   curlyDs       [N_om × T × N_Y double]      : Distribution derivative coefficients
 !
 ! OUTPUTS:
 !   transition_matrices [T × T × N_Y × N_Ix]   : Transition matrices F

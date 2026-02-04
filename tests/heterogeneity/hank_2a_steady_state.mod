@@ -121,9 +121,6 @@ model;
    // Aggregate investment
    K - (1 - delta) * K(-1) + K(-1) * (K / K(-1) - 1) ^ 2 / (2 * delta * epsI) - I;
 
-   // Resource constraint
-   Y - w * N - I - psip - div;
-
    // Taylor rule
    rstar + r_ss + phi * pi - i;
 
@@ -146,13 +143,19 @@ model;
    muw / (1 - muw) / 2 / kappaw * log(1 + piw) ^ 2 * N - psiw;
 
    // Wage NKPC
+   [name='wage_nkpc']
    kappaw * (vphi * N ^ (1 + 1 / frisch) - (1 - tax) * w * N * SUM(u) / muw) + (beta_ss+beta) * log(1 + piw(+1)) + markup_w - log(1 + piw);
 
    // Total asset market clearing
-   p + Bg - SUM(b) - SUM(a);
+   [name='illiquid_asset_market_clearing']
+   p - SUM(a);
+
+   // Liquid asset clearing 
+   [name='liquid_asset_market_clearing']
+   Bg - SUM(b); 
 end;
 
-load 'hank_2a.mat';
+load 'hank_2a_sp.mat';
 
 param_names = fieldnames(steady_state.params);
 for i=1:numel(param_names)
@@ -160,31 +163,15 @@ for i=1:numel(param_names)
    set_param_value(param, steady_state.params.(param));
 end
 
-% Initialize steady state once for all tests
-heterogeneity_load_steady_state(filename = hank_2a);
-assert(isfield(oo_, 'heterogeneity'), 'oo_.heterogeneity field missing');
-assert(isfield(oo_.heterogeneity, 'steady_state'), 'oo_.heterogeneity.ss field missing');
-assert(isfield(oo_.heterogeneity, 'sizes'), 'oo_.heterogeneity.sizes field missing');
-assert(isfield(oo_.heterogeneity, 'mat'), 'oo_.heterogeneity.mat field missing');
-assert(isfield(oo_.heterogeneity, 'indices'), 'oo_.heterogeneity.indices field missing');
+heterogeneity_compute_steady_state(filename=hank_2a_sp, calibration_target_equations=['wage_nkpc', 'liquid_asset_market_clearing', 'illiquid_asset_market_clearing'], time_iteration_tol=1e-10, time_iteration_learning_rate=0.8, time_iteration_solver_tolf=1e-12, time_iteration_solver_tolx=1e-14);
 
-% Solve once for all tests
 heterogeneity_solve;
 
-testFailed = 0;
-testResults = [];  % Array to collect all test results
+if max(abs(oo_.heterogeneity.mat.G(:))) > 1e-4
+    error('Aggregate-block residuals are too big!');
+end
+if max(abs(oo_.heterogeneity.mat.F(:))) > 1e-6
+    error('Heterogeneous-block residuals are too big');
+end
 
-verbatim;
-    % Test heterogeneity.simulate function (reuse initialized and solved model)
-    [testFailed, testResults] = test_simulate_stochastic(M_, options_, oo_, steady_state, testFailed, testResults);
-
-    % Test permutation handling
-    [testFailed, testResults] = test_permutation(M_, options_, oo_, steady_state, testFailed, testResults);
-
-    % Print test summary
-    print_test_summary(testResults);
-
-    if testFailed > 0
-        error('Some unit tests failed!');
-    end
-end;
+heterogeneity_simulate;

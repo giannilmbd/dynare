@@ -34,6 +34,8 @@ function oo_ = simulate_stochastic_shocks(M_, options_, oo_, var_list, shock_lis
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+%
+% Original author: Normann Rion <normann@dynare.org>
 
 % Check simulation horizon vs drop (following stoch_simul.m pattern)
 % Commented out as it is not useful yet.
@@ -71,11 +73,8 @@ end
 % Following stoch_simul.m: no initial steady state column
 oo_.endo_simul = zeros(M_.endo_nbr, options_.periods);
 
-% Compute the aggregate steady state
-oo_het = oo_.heterogeneity;
-steady_state = heterogeneity.internal.compute_agg_steady_state(M_, oo_het.ss.agg, oo_het.mat.pol.x_bar_dash, oo_het.mat.d.Phi, oo_het.mat.d.hist, oo_het.indices.Ix.in_x);
-
 % For each variable, compute path as linear combination of shock responses
+oo_het = oo_.heterogeneity;
 for i_var = 1:M_.endo_nbr
     var_name = M_.endo_names{i_var};
     path = zeros(options_.periods, 1);
@@ -107,7 +106,7 @@ for i_var = 1:M_.endo_nbr
     end
 
     % oo_.endo_simul contains levels (not deviations), consistent with stoch_simul
-    oo_.endo_simul(i_var, :) = steady_state(i_var) + path';
+    oo_.endo_simul(i_var, :) = oo_het.mat.y(i_var) + path';
 end
 
 % Plot if requested

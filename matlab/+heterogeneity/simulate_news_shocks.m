@@ -54,6 +54,8 @@ function oo_ = simulate_news_shocks(M_, options_, oo_, var_list, shock_list)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+%
+% Original author: Normann Rion <normann@dynare.org>
 
 % Call make_ex_ to parse shocks block and populate oo_.exo_simul
 oo_ = make_ex_(M_, options_, oo_);
@@ -105,11 +107,8 @@ eps_seq = oo_.exo_simul(start_idx:end_idx, :)';  % [n_exo × periods]
 % Following stoch_simul pattern: periods 1 to periods, no initial column
 oo_.endo_simul = zeros(M_.endo_nbr, periods);
 
-% Compute the aggregate steady state
-oo_het = oo_.heterogeneity;
-steady_state = heterogeneity.internal.compute_agg_steady_state(M_, oo_het.ss.agg, oo_het.mat.pol.x_bar_dash, oo_het.mat.d.Phi, oo_het.mat.d.hist, oo_het.indices.Ix.in_x);
-
 % Compute linear responses using impulse response Jacobians from heterogeneity_solve
+oo_het = oo_.heterogeneity;
 for i_var = 1:M_.endo_nbr
     var_name = M_.endo_names{i_var};
     deviation = zeros(periods, 1);  % Deviation from steady state
@@ -120,22 +119,22 @@ for i_var = 1:M_.endo_nbr
         shock_idx = find(strcmp(shock_name, M_.exo_names));
 
         % Error if no Jacobian available for this variable-shock pair
-        if ~isfield(oo_.heterogeneity.dr.G, var_name) || ...
-           ~isfield(oo_.heterogeneity.dr.G.(var_name), shock_name)
+        if ~isfield(oo_het.dr.G, var_name) || ...
+           ~isfield(oo_het.dr.G.(var_name), shock_name)
             error('heterogeneity:simulate_news_shocks:NoJacobian', ...
                   'No Jacobian found for variable "%s" and shock "%s". Run heterogeneity_solve first.', ...
                   var_name, shock_name);
         end
 
         % Get impulse response Jacobian: G(t,s) = response at t to unit shock at s
-        G = oo_.heterogeneity.dr.G.(var_name).(shock_name);  % [truncation_horizon × truncation_horizon]
+        G = oo_het.dr.G.(var_name).(shock_name);  % [truncation_horizon × truncation_horizon]
 
         % Convolve with shock sequence: response(t) = sum_s G(t,s) * shock(s)
         deviation = deviation + G(1:periods,1:periods)*eps_seq(shock_idx, :)';
     end
 
     % Store as levels (steady state + deviation), consistent with stoch_simul
-    oo_.endo_simul(i_var, :) = steady_state(i_var) + deviation';
+    oo_.endo_simul(i_var, :) = oo_het.mat.y(i_var) + deviation';
 end
 
 % Note: oo_.exo_simul already populated by make_ex_, no modification needed

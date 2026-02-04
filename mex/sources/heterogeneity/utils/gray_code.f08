@@ -14,6 +14,8 @@
 ! see <https://www.gnu.org/licenses/>.
 !
 ! Original author: Normann Rion <normann@dynare.org>
+!
+! Gray code utilities for efficient hypercube corner traversal
 
 module gray_code
     use iso_fortran_env, only: real64, int32
@@ -74,29 +76,26 @@ contains
 
     ! Compute low-corner linear indices from multi-dimensional indices
     subroutine compute_linear_indices(ind, stride, a)
-        integer(int32), intent(in) :: ind(:,:), stride(:)
-        integer(int32), allocatable, intent(out) :: a(:)
+        integer(int32), contiguous, intent(in) :: ind(:,:), stride(:)
+        integer(int32), contiguous, intent(inout) :: a(:)
 
         ! Local variables
-        integer(int32) :: n, N_sp, k
+        integer(int32) :: n, k
 
-        N_sp = size(ind, 1, int32)
         n = size(stride, 1, int32)
-        allocate(a(N_sp))
-
         a = 1_int32
         do concurrent (k=1:n)
             a = a + stride(k)*(ind(:, k)-1_int32)
         end do
-
     end subroutine compute_linear_indices
 
     ! Compute coefficient updates r_up, r_down and identify hard dimensions
-    ! Hard dimensions are those where interpolation weight w = 1.0
-    subroutine compute_coefficient_updates(w, r_up, r_down, is_hard)
-        real(real64), intent(in) :: w(:,:)
-        real(real64), allocatable, intent(out) :: r_up(:,:), r_down(:,:)
-        logical, allocatable, intent(out) :: is_hard(:,:)
+    ! Hard dimensions are those where interpolation weight w = 1.0 (is_hard_one)
+    ! or w = 0.0 (is_hard_zero), requiring special handling to avoid division by zero
+    subroutine compute_coefficient_updates(w, r_up, r_down, is_hard_one, is_hard_zero)
+        real(real64), contiguous, intent(in) :: w(:,:)
+        real(real64), contiguous, intent(inout) :: r_up(:,:), r_down(:,:)
+        logical, contiguous, intent(inout) :: is_hard_one(:,:), is_hard_zero(:,:)
 
         ! Local variables
         integer(int32) :: n, N_om, k, j
@@ -104,18 +103,25 @@ contains
         N_om = size(w, 1, int32)
         n = size(w, 2, int32)
 
-        allocate(r_up(N_om,n), r_down(N_om,n), is_hard(N_om,n))
-
-        ! Hard dimensions (weight = 1, no interpolation needed)
-        is_hard = (w == 1.0_real64)
+        ! Identify hard dimensions
+        is_hard_one = (w == 1.0_real64)   ! Lower boundary: use x(ilow) only
+        is_hard_zero = (w == 0.0_real64)  ! Upper boundary: use x(ilow+1) only
 
         ! Coefficient updates for moving between hypercube corners
-        r_up = (1-w)/w
+        ! Safe computation avoiding division by zero
         do concurrent(k=1:n, j=1:N_om)
-            if (is_hard(j,k)) then
-                r_down(j,k) = 1.0_real64
+            if (is_hard_one(j,k)) then
+                ! w=1: only lower corner contributes, never flip to upper
+                r_up(j,k) = 0.0_real64    ! Not used, but safe default
+                r_down(j,k) = 1.0_real64  ! Not used, but safe default
+            else if (is_hard_zero(j,k)) then
+                ! w=0: only upper corner contributes, start flipped
+                r_up(j,k) = 1.0_real64    ! Not used, but safe default
+                r_down(j,k) = 0.0_real64  ! Not used, but safe default
             else
-                r_down(j,k) = w(j,k)/(1-w(j,k))
+                ! Normal interpolation: 0 < w < 1
+                r_up(j,k) = (1.0_real64-w(j,k))/w(j,k)
+                r_down(j,k) = w(j,k)/(1.0_real64-w(j,k))
             end if
         end do
 

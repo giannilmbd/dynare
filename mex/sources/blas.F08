@@ -47,6 +47,15 @@ module blas
        real(real64), intent(in) :: alpha, beta
        real(real64), dimension(*), intent(inout) :: y
      end subroutine dgemv
+
+     subroutine dger(m, n, alpha, x, incx, y, incy, a, lda)
+       import :: blint, real64
+       implicit none
+       integer(blint), intent(in) :: m, n, lda, incx, incy
+       real(real64), intent(in) :: alpha
+       real(real64), dimension(*), intent(in) :: x, y
+       real(real64), dimension(*), intent(inout) :: a
+     end subroutine dger
   end interface
 
 contains
@@ -110,5 +119,19 @@ contains
     call dgemv(op, int(size(A, 1), blint), int(size(A, 2), blint), alpha, A, &
          int(size(A, 1), blint), x, 1_blint, beta, y, 1_blint)
   end subroutine matvecmul_add
+
+  ! Rank-1 update using BLAS DGER
+  ! A <- alpha * x * y^T + A
+  subroutine rank_one_update(m, n, alpha, x, y, A)
+    integer, intent(in) :: m, n
+    real(real64), intent(in) :: alpha
+    ! The arrays used in BLAS/LAPACK calls are required to be contiguous, to
+    ! avoid temporary copies before calling BLAS/LAPACK.
+    real(real64), contiguous, intent(in) :: x(:), y(:)
+    real(real64), contiguous, intent(inout) :: A(:,:)
+
+    call dger(int(m, blint), int(n, blint), alpha, x, 1_blint, y, 1_blint, &
+              A, int(size(A, 1), blint))
+  end subroutine rank_one_update
 
 end module blas

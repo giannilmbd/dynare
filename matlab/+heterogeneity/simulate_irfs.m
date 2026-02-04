@@ -34,6 +34,8 @@ function oo_irfs = simulate_irfs(M_, options_, oo_, var_list, shock_list)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+%
+% Original author: Normann Rion <normann@dynare.org>
 
 % Initialization
 oo_irfs = struct();

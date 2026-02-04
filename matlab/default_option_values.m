@@ -382,6 +382,30 @@ options_.heterogeneity.solve.truncation_horizon = 300;
 options_.heterogeneity.rouwenhorst.grid_size = 7;
 options_.heterogeneity.rouwenhorst.max_iter = 1000;
 
+% - Forward iteration on the distribution
+options_.heterogeneity.forward.max_iter = 1e4;
+options_.heterogeneity.forward.tol = 1e-10;
+options_.heterogeneity.forward.check_every = 100;
+options_.heterogeneity.forward.verbosity = 1;
+
+% - Time iteration
+options_.heterogeneity.time_iteration.max_iter = 1e3;
+options_.heterogeneity.time_iteration.tol = 1e-8;
+options_.heterogeneity.time_iteration.learning_rate = 1;
+options_.heterogeneity.time_iteration.early_stopping = 3;
+options_.heterogeneity.time_iteration.verbosity = 2;
+options_.heterogeneity.time_iteration.solver_tolf = 1e-10;
+options_.heterogeneity.time_iteration.solver_tolx = 1e-10;
+options_.heterogeneity.time_iteration.solver_factor = 100;
+options_.heterogeneity.time_iteration.solver_max_iter = 1e3;
+options_.heterogeneity.time_iteration.solver_stop_on_error = false;
+
+% - Calibration
+options_.heterogeneity.calibration.ftol = 1e-4;
+options_.heterogeneity.calibration.max_iter = 50;
+options_.heterogeneity.calibration.verbosity = 2;
+options_.heterogeneity.calibration.target_equations = {};
+
 % Ramsey policy
 options_.ramsey_policy = false;
 options_.instruments = {};

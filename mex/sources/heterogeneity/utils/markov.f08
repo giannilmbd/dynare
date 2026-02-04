@@ -14,13 +14,30 @@
 ! see <https://www.gnu.org/licenses/>.
 !
 ! Original author: Normann Rion <normann@dynare.org>
+!
+! Markov chain utilities (Rouwenhorst discretization, stationary distribution)
 
 module markov
     use iso_fortran_env, only: real64, int32
     implicit none (type, external)
 contains
 
-    ! Function to compute the Markov transition matrix using Rouwenhorst method
+    !---------------------------------------------------------------------------
+    ! Discretize AR(1) process using Rouwenhorst method
+    !
+    ! Computes transition matrix P_mat, stationary distribution p_vec, and
+    ! productivity grid y = exp(s) normalized so that E[y] = 1.
+    !
+    ! Arguments:
+    !   rho      [in]     : AR(1) persistence parameter
+    !   sigma    [in]     : AR(1) innovation standard deviation
+    !   N        [in]     : Number of grid points
+    !   tol      [in]     : Tolerance for stationary distribution
+    !   maxiter  [in]     : Maximum iterations for stationary distribution
+    !   y        [inout]  : Productivity grid [N]
+    !   p_vec    [inout]  : Stationary distribution [N]
+    !   P_mat    [inout]  : Transition matrix [N × N]
+    !---------------------------------------------------------------------------
     subroutine markov_rouwenhorst(rho, sigma, N, tol, maxiter, y, p_vec, P_mat)
         integer(int32), intent(in) :: N, maxiter
         real(real64), intent(in) :: rho, sigma, tol
@@ -31,6 +48,7 @@ contains
         real(real64) :: p, scale_factor
         real(real64), allocatable :: P1(:, :), P2(:, :), P3(:, :), P4(:, :)
         real(real64), allocatable :: s(:)
+        logical :: flag
 
         ! Step 1: Initialize transition matrix for N=2
         p = (1.0_real64 + rho) / 2.0_real64
@@ -65,7 +83,7 @@ contains
         deallocate(P1, P2, P3, P4)
 
         ! Step 3: Compute stationary distribution p_vec
-        call compute_stationary(P_mat, N, p_vec, tol, maxiter)
+        call compute_stationary(P_mat, N, p_vec, tol, maxiter, flag)
 
         ! Step 4: Construct the grid (Equivalent of `np.linspace(-1, 1, N)`)
         allocate(s(N))
@@ -88,25 +106,42 @@ contains
         deallocate(s)
     end subroutine markov_rouwenhorst
 
-    ! Function to compute stationary distribution of a transition matrix
-    subroutine compute_stationary(P_mat, N, p_vec, tol, maxiter)
+    !---------------------------------------------------------------------------
+    ! Compute stationary distribution via power iteration: p = p·P
+    !
+    ! Arguments:
+    !   P_mat     [in]  : Transition matrix [N × N]
+    !   N         [in]  : Number of grid points
+    !   p_vec     [out] : Stationary distribution [N]
+    !   tol       [in]  : Convergence tolerance
+    !   maxiter   [in]  : Maximum iterations
+    !   converged [out] : True if converged within tolerance
+    !---------------------------------------------------------------------------
+    subroutine compute_stationary(P_mat, N, p_vec, tol, maxiter, converged)
         integer(int32), intent(in) :: N, maxiter
         real(real64), intent(in) :: P_mat(N, N), tol
         real(real64), intent(out) :: p_vec(N)
+        logical, intent(out) :: converged
         integer(int32) :: iter
         real(real64) :: diff, temp(N)
 
         p_vec = 1.0_real64 / real(N, real64)  ! Start with a uniform guess
+        converged = .false.
 
         do iter = 1, maxiter
             temp = matmul(p_vec, P_mat)
             diff = maxval(abs(temp - p_vec))
             p_vec = temp
-            if (diff < tol) exit
+            if (diff < tol) then
+                converged = .true.
+                exit
+            end if
         end do
     end subroutine compute_stationary
 
-    ! Function to compute variance using a probability distribution
+    !---------------------------------------------------------------------------
+    ! Compute variance of discrete distribution: Var(s) = E[(s - E[s])²]
+    !---------------------------------------------------------------------------
     function compute_variance(s, p_vec, N) result(var)
         integer(int32), intent(in) :: N
         real(real64), intent(in) :: s(N), p_vec(N)

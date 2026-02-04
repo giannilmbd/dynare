@@ -264,6 +264,11 @@ module matlab_mat
      end function mxGetData
 
      ! Character
+     type(c_ptr) function mxCreateString(str) bind(c, name="mxCreateString"//API_VER)
+       use iso_c_binding
+       character(kind=c_char), intent(in) :: str(*)
+     end function mxCreateString
+
      pure logical(c_bool) function mxIsChar(pm) bind(c, name="mxIsChar"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
@@ -279,6 +284,11 @@ module matlab_mat
        use iso_c_binding
        type(c_ptr), intent(in), value :: array_ptr
      end function mxIsLogicalScalar
+
+     pure logical(c_bool) function mxIsLogicalScalarTrue(array_ptr) bind(c, name="mxIsLogicalScalarTrue"//API_VER)
+       use iso_c_binding
+       type(c_ptr), intent(in), value :: array_ptr
+     end function mxIsLogicalScalarTrue
 
      type(c_ptr) function mxCreateLogicalScalar(value) bind(c, name="mxCreateLogicalScalar"//API_VER_INTERLEAVED)
        use iso_c_binding
@@ -336,6 +346,12 @@ module matlab_mat
      end function mxGetNumberOfFields
 
      ! Cell
+     type(c_ptr) function mxCreateCellMatrix(m, n) bind(c, name="mxCreateCellMatrix"//API_VER)
+       use iso_c_binding
+       import :: mwSize
+       integer(mwSize), intent(in), value :: m, n
+     end function mxCreateCellMatrix
+
      pure logical(c_bool) function mxIsCell(pm) bind(c, name="mxIsCell"//API_VER)
        use iso_c_binding
        type(c_ptr), intent(in), value :: pm
@@ -347,6 +363,13 @@ module matlab_mat
        type(c_ptr), intent(in), value :: pm
        integer(mwIndex), intent(in), value :: index
      end function mxGetCell_internal
+
+     subroutine mxSetCell_internal(array_ptr, index, value) bind(c, name="mxSetCell"//API_VER)
+       use iso_c_binding
+       import :: mwIndex
+       type(c_ptr), intent(in), value :: array_ptr, value
+       integer(mwIndex), intent(in), value :: index
+     end subroutine mxSetCell_internal
 
      !! Delete and Duplicate mxArray
      subroutine mxDestroyArray(pm) bind(c, name="mxDestroyArray"//API_VER)
@@ -466,6 +489,12 @@ contains
     integer(mwIndex), intent(in) :: index
     mxGetCell = mxGetCell_internal(pm, index-1)
   end function mxGetCell
+
+  subroutine mxSetCell(array_ptr, index, value)
+    type(c_ptr), intent(in) :: array_ptr, value
+    integer(mwIndex), intent(in) :: index
+    call mxSetCell_internal(array_ptr, index-1, value)
+  end subroutine mxSetCell
 
   function mxArrayToString(pm)
     type(c_ptr), intent(in) :: pm
