@@ -10,7 +10,7 @@ function expand_group(use_shock_groups,var_list_, ic, no_graph)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2016-2018 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -61,7 +61,7 @@ M_.exo_names = mydata.exo_names;
 
 options_.plot_shock_decomp.interactive=0;
 options_.plot_shock_decomp.expand=1;
-options_.plot_shock_decomp.nodisplay=0;
+options_.plot_shock_decomp.nodisplay = options_.console_mode;
 if no_graph
     options_.no_graph.plot_shock_decomposition=1;
     options_.plot_shock_decomp.write_xls=1;

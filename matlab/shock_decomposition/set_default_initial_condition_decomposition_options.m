@@ -29,7 +29,7 @@ function options_ = set_default_initial_condition_decomposition_options(options_
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 options_.initial_condition_decomp.colormap = '';
-options_.initial_condition_decomp.nodisplay = false;
+options_.initial_condition_decomp.nodisplay = options_.console_mode;
 options_.initial_condition_decomp.graph_format = 'eps';
 options_.initial_condition_decomp.fig_name = '';
 options_.initial_condition_decomp.detail_plot = false;

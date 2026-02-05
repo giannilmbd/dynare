@@ -30,7 +30,7 @@ function options_ = set_default_plot_shock_decomposition_options(options_)
 
 options_.plot_shock_decomp.use_shock_groups = '';
 options_.plot_shock_decomp.colormap = '';
-options_.plot_shock_decomp.nodisplay = false;
+options_.plot_shock_decomp.nodisplay = options_.console_mode;
 options_.plot_shock_decomp.graph_format = 'eps';
 options_.plot_shock_decomp.detail_plot = false;
 options_.plot_shock_decomp.init2shocks = [];
