@@ -8,7 +8,7 @@ function [endogenousvariables, success, err, iter, exogenousvariables] = sim1(en
 %   - endogenousvariables [double] N*(T+M_.maximum_lag+M_.maximum_lead) array, paths for the endogenous variables (initial condition + initial guess + terminal condition).
 %   - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables.
 %   - steadystate         [double] N*1 array, steady state for the endogenous variables.
-%   - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths block
+%   - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths or shock_paths+exogenize block
 %   - M_                  [struct] contains a description of the model.
 %   - options_            [struct] contains various options.
 % OUTPUTS
@@ -17,9 +17,10 @@ function [endogenousvariables, success, err, iter, exogenousvariables] = sim1(en
 %   - err                 [double] ∞-norm of the residual
 %   - iter                [integer] Number of iterations
 %   - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables
-%                                  (may be modified if perfect_foresight_controlled_paths present)
+%                                  (may be modified if perfect_foresight_controlled_paths or
+%                                   shock_paths+exogenize is present)
 
-% Copyright © 1996-2025 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -60,10 +61,10 @@ if ~isempty(controlled_paths_by_period)
     end
 
     if options_.debug
-        error('Debugging not available with perfect_foresight_controlled_paths')
+        error('Debugging not available with perfect_foresight_controlled_paths or shock_paths+exogenize')
     end
     if options_.endogenous_terminal_period
-        error('The endogenous_terminal_period option not available with perfect_foresight_controlled_paths')
+        error('The endogenous_terminal_period option not available with perfect_foresight_controlled_paths or shock_paths+exogenize')
     end
 end
 

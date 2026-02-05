@@ -6,7 +6,7 @@ function [endogenousvariables, success, maxerror, exogenousvariables] = solve_st
 % - endogenousvariables [double] N*(T+M_.maximum_lag+M_.maximum_lead) array, paths for the endogenous variables (initial guess).
 % - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables.
 % - steadystate         [double] N*1 array, steady state for the endogenous variables.
-%   - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths block
+%   - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths or shock_paths+exogenize block
 % - M_                   [struct] contains a description of the model.
 % - options_             [struct] contains various options.
 %
@@ -15,9 +15,10 @@ function [endogenousvariables, success, maxerror, exogenousvariables] = solve_st
 % - success             [logical] Whether a solution was found
 % - maxerror            [double] 1-norm of the residual
 % - exogenousvariables  [double] (T+M_.maximum_lag+M_.maximum_lead)*M array, paths for the exogenous variables
-%                                (may be modified if perfect_foresight_controlled_paths present)
+%                                (may be modified if perfect_foresight_controlled_paths or
+%                                 shock_paths+exogenize is present)
 
-% Copyright © 2015-2025 Dynare Team
+% Copyright © 2015-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

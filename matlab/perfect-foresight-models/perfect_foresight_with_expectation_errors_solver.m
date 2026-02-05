@@ -7,7 +7,7 @@ function [oo_, ts] = perfect_foresight_with_expectation_errors_solver(M_, option
 % OUTPUTS
 %   oo_                 [structure] storing the results
 
-% Copyright © 2021-2025 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -29,7 +29,7 @@ if options_.pfwee.constant_simulation_length && ~isempty(options_.simul.last_sim
 end
 
 if options_.pfwee.constant_simulation_length && ~all(cellfun(@(x) isempty(x), {oo_.pfwee.controlled_paths_by_period.endogenize_id}))
-    error('Options constant_simulation_length is incompatible with perfect_foresight_controlled_paths block')
+    error('Options constant_simulation_length is incompatible with perfect_foresight_controlled_paths or shock_paths+exogenize block')
 end
 
 [periods, first_simulation_period] = get_simulation_periods(options_);

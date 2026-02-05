@@ -3,7 +3,7 @@ function controlled_paths_by_period = controlled_paths_by_period(M_, options_, i
 % “info_period” should only be set in a perfect foresight with expectation errors context,
 % in which case only the information available at that period is extracted.
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,7 +37,7 @@ for i=1:length(M_.perfect_foresight_controlled_paths)
         prange = transpose(prange - first_simulation_period + 1);
     end
     if nargin >= 3 && any(prange < learnt_in)
-        error('perfect_foresight_controlled_paths(learnt_in=%d): the periods are inconsistent with the learnt_in value', learnt_in)
+        error('perfect_foresight_controlled_paths(learnt_in=%d)/shock_paths(learnt_in=%d)+exogenize: the periods are inconsistent with the learnt_in value', learnt_in, learnt_in)
     end
     for p = prange
         % Determine whether this is an change in expectations, and if yes overwrite the previous expected value
@@ -64,14 +64,14 @@ for p = 1:periods
     [~, idx] = unique(exogenize_id, 'stable');
     duplicate_idx = setdiff(1:numel(exogenize_id), idx);
     if ~isempty(duplicate_idx)
-        error('perfect_foresight_controlled_paths: variable %s is exogenized two times in period %d', M_.endo_names{exogenize_id(duplicate_idx(1))}, p);
+        error('perfect_foresight_controlled_paths/shock_paths+exogenize: variable %s is exogenized two times in period %d', M_.endo_names{exogenize_id(duplicate_idx(1))}, p);
     end
 
     endogenize_id = controlled_paths_by_period(p).endogenize_id;
     [~, idx] = unique(endogenize_id, 'stable');
     duplicate_idx = setdiff(1:numel(endogenize_id), idx);
     if ~isempty(duplicate_idx)
-        error('perfect_foresight_controlled_paths: variable %s is endogenized two times in period %d', M_.exo_names{endogenize_id(duplicate_idx(1))}, p);
+        error('perfect_foresight_controlled_paths/shock_paths+exogenize: variable %s is endogenized two times in period %d', M_.exo_names{endogenize_id(duplicate_idx(1))}, p);
     end
 end
 

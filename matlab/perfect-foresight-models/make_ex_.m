@@ -136,16 +136,16 @@ end
 % Add temporary and permanent shocks when specified through the “shock_paths” block
 if ~isempty(M_.shock_paths)
     contains_endval = any([M_.shock_paths.contains_endval]);
-    shock_paths = oo_.exo_simul(M_.maximum_lag+(1:(periods+contains_endval)),:)';
+    exo_paths = oo_.exo_simul(M_.maximum_lag+(1:(periods+contains_endval)),:)';
     for i = 1:length(M_.shock_paths)
         assert(M_.shock_paths(i).learnt_in == 1)
         for p = 1:(periods + M_.shock_paths(i).contains_endval)
-            shock_paths = feval(M_.shock_paths(i).evaluation_function, shock_paths, p, periods, first_simulation_period, M_, oo_);
+            exo_paths = feval(M_.shock_paths(i).evaluation_function, exo_paths, p, periods, first_simulation_period, M_, oo_);
         end
     end
-    oo_.exo_simul(M_.maximum_lag+(1:periods),:) = shock_paths(:,1:periods)';
+    oo_.exo_simul(M_.maximum_lag+(1:periods),:) = exo_paths(:,1:periods)';
     if contains_endval
-        oo_.exo_steady_state = shock_paths(:,periods+1);
+        oo_.exo_steady_state = exo_paths(:,periods+1);
         oo_.exo_simul(M_.maximum_lag+periods+(1:M_.maximum_lead),:) = repmat(oo_.exo_steady_state', M_.maximum_lead, 1);
     end
 end

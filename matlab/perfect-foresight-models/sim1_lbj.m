@@ -11,7 +11,8 @@ function [endogenousvariables, success, err_f, iter, exogenousvariables] = sim1_
 %   err_f               [double]        ∞-norm of the residual
 %   iter                [integer]       Number of iterations
 %   exogenousvariables  [matrix]        All exogenous variables of the model
-%                                       (may be modified if perfect_foresight_controlled_paths present)
+%                                       (may be modified if perfect_foresight_controlled_paths
+%                                        or shock_paths+exogenize is present)
 %
 % ALGORITHM
 %   Laffargue, Boucekkine, Juillard (LBJ)
@@ -22,7 +23,7 @@ function [endogenousvariables, success, err_f, iter, exogenousvariables] = sim1_
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 1996-2025 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

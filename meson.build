@@ -1966,6 +1966,7 @@ mod_and_m_tests = [
   { 'test' : [ 'deterministic_simulations/pfwee_marginal_linearization.mod' ] },
   { 'test' : [ 'deterministic_simulations/ramst_shock_paths.mod' ] },
   { 'test' : [ 'deterministic_simulations/ramst_shock_paths_pfwee.mod' ] },
+  { 'test' : [ 'deterministic_simulations/ramst_shock_paths_controlled.mod' ] },
   { 'test' : [ 'deterministic_simulations/lbj/rbc.mod' ] },
   { 'test' : [ 'lmmcp/rbc.mod' ] },
   { 'test' : [ 'lmmcp/sw_lmmcp.mod',

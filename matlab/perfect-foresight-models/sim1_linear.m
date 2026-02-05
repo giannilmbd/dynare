@@ -7,7 +7,7 @@ function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(e
 % - exogenousvariables  [double] T*M array, paths for the exogenous variables.
 % - steadystate_y       [double] N*1 array, steady state for the endogenous variables.
 % - steadystate_x       [double] M*1 array, steady state for the exogenous variables.
-% - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths block
+% - controlled_paths_by_period [struct] data from perfect_foresight_controlled_paths or shock_paths+exogenize block
 % - M_                  [struct] contains a description of the model.
 % - options_            [struct] contains various options.
 %
@@ -16,7 +16,8 @@ function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(e
 % - success             [logical] Whether a solution was found
 % - ERR                 [double] ∞-norm of the residual
 % - exogenousvariables  [double] T*M array, paths for the exogenous variables
-%                                (may be modified if perfect_foresight_controlled_paths present)
+%                                (may be modified if perfect_foresight_controlled_paths or
+%                                 shock_paths+exogenize is present)
 %
 % NOTATIONS
 % - N is the number of endogenous variables.
@@ -42,7 +43,7 @@ function [endogenousvariables, success, ERR, exogenousvariables] = sim1_linear(e
 % to center the variables around the deterministic steady state to solve the
 % perfect foresight model.
 
-% Copyright © 2015-2025 Dynare Team
+% Copyright © 2015-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -78,7 +79,7 @@ if ~isempty(controlled_paths_by_period)
     end
 
     if options_.debug
-        error('Debugging not available with perfect_foresight_controlled_paths')
+        error('Debugging not available with perfect_foresight_controlled_paths or shock_paths+exogenize')
     end
 end
 
