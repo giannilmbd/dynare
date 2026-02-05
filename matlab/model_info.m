@@ -44,7 +44,7 @@ if static_
 else
     temp_string=sprintf('\nInformation about %s (dynamic model)\n',M_.fname);
     fprintf(temp_string);
-    if dynamic_ && isfield(M_,'block_structure')
+    if dynamic_ && ~isfield(M_,'block_structure')
         fprintf('\nmodel_info: block information not present; skipping display.\n')        
         return;
     elseif dynamic_
@@ -124,7 +124,6 @@ if dynamic_ || static_ || incidence %block information requested
         end
     end
     if incidence
-
         %printing the gross incidence matrix
         IM_star = char([kron(ones(M_.endo_nbr, M_.endo_nbr-1), double(blanks(3))) double(blanks(M_.endo_nbr)')]);
         for i = 1:nb_leadlag
