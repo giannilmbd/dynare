@@ -1,11 +1,9 @@
 function smoother2histval(opts)
 % This function takes values from oo_.SmoothedVariables (and possibly
-% oo_.SmoothedShocks) and copies them into M_.histval.
+% oo_.SmoothedShocks) and copies them into M_.endo_histval or in a file to be
+% read by the “histval_file” command.
 %
 % Optional fields in 'opts' structure:
-%    infile:      An optional *_results MAT file created by Dynare.
-%                 If present, oo_.Smoothed{Variables,Shocks} are read from
-%                 there. Otherwise, they are read from the global workspace.
 %    invars:      An optional char or cell array listing variables to read in
 %                 oo_.SmoothedVariables. If absent, all the endogenous
 %                 variables present in oo_.SmoothedVariables are used.
@@ -41,20 +39,11 @@ function smoother2histval(opts)
 
 global M_ options_ oo_
 
-if ~isfield(opts, 'infile')
-    if ~isfield(oo_, 'SmoothedVariables')
-        error('Could not find smoothed variables; did you set the "smoother" option?')
-    end
-    smoothedvars = oo_.SmoothedVariables;
-    smoothedshocks = oo_.SmoothedShocks;
-else
-    S = load(opts.infile);
-    if ~isfield(S, 'oo_') || ~isfield(S.oo_, 'SmoothedVariables')
-        error('Could not find smoothed variables in file; is this a Dynare results file, and did you set the "smoother" option when producing it?')
-    end
-    smoothedvars = S.oo_.SmoothedVariables;
-    smoothedshocks = S.oo_.SmoothedShocks;
+if ~isfield(oo_, 'SmoothedVariables')
+    error('Could not find smoothed variables, did you compute them? (either by the "smoother" option of the "estimation" command, or the "calib_smoother" command')
 end
+smoothedvars = oo_.SmoothedVariables;
+smoothedshocks = oo_.SmoothedShocks;
 
 % Hack to determine if oo_.SmoothedVariables was computed after a Metropolis
 tmp = fieldnames(smoothedvars);

@@ -12569,12 +12569,6 @@ computed with the command ``det_cond_forecast``:
         observations that were used to produce the smoothed
         values. Default: the last observation.
 
-    .. option:: infile = FILENAME
-
-        Load the smoothed values from a ``_results.mat`` file created
-        by a previous Dynare run. Default: use the smoothed values
-        currently in the global workspace.
-
     .. option:: invars = ( VARIABLE_NAME [VARIABLE_NAME ...] )
 
         A list of variables to read from the smoothed values. It can
@@ -12598,21 +12592,15 @@ computed with the command ``det_cond_forecast``:
 
     *Use cases*
 
-    There are three possible ways of using this command:
+    There are two possible ways of using this command:
 
         * Everything in a single file: run an estimation with a
           smoother, then run ``smoother2histval`` (without the
-          ``infile`` and ``outfile`` options), then run a stochastic
-          simulation.
+          ``outfile`` option), then run a stochastic simulation.
         * In two files: in the first file, run the smoother and then
           run ``smoother2histval`` with the ``outfile`` option; in the
           second file, run ``histval_file`` to load the initial
           conditions, and run a (deterministic or stochastic)
-          simulation.
-        * In two files: in the first file, run the smoother; in the
-          second file, run ``smoother2histval`` with the ``infile``
-          option equal to the ``_results.mat`` file created by the
-          first file, and then run a (deterministic or stochastic)
           simulation.
 
 
