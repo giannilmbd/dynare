@@ -1,5 +1,5 @@
-function options = set_default_initial_condition_decomposition_options(options)
-%function options = set_default_initial_condition_decomposition_options(options)
+function options_ = set_default_initial_condition_decomposition_options(options_)
+%function options_ = set_default_initial_condition_decomposition_options(options_)
 % sets the default options for prior_shock_decomposition
 %
 % INPUTS
@@ -11,7 +11,7 @@ function options = set_default_initial_condition_decomposition_options(options)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2017-2019 Dynare Team
+% Copyright © 2017-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -28,19 +28,19 @@ function options = set_default_initial_condition_decomposition_options(options)
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
-options.initial_condition_decomp.colormap = '';
-options.initial_condition_decomp.nodisplay = false;
-options.initial_condition_decomp.graph_format = 'eps';
-options.initial_condition_decomp.fig_name = '';
-options.initial_condition_decomp.detail_plot = false;
-options.initial_condition_decomp.init2shocks = [];
-options.initial_condition_decomp.steadystate = false;
-options.initial_condition_decomp.with_epilogue = options.shock_decomp.with_epilogue;
-options.initial_condition_decomp.write_xls = false;
-options.initial_condition_decomp.type = '';
-options.initial_condition_decomp.plot_init_date = [];
-options.initial_condition_decomp.plot_end_date = [];
-options.initial_condition_decomp.diff = false;
-options.initial_condition_decomp.flip = false;
-options.initial_condition_decomp.max_nrows = 6;
+options_.initial_condition_decomp.colormap = '';
+options_.initial_condition_decomp.nodisplay = false;
+options_.initial_condition_decomp.graph_format = 'eps';
+options_.initial_condition_decomp.fig_name = '';
+options_.initial_condition_decomp.detail_plot = false;
+options_.initial_condition_decomp.init2shocks = [];
+options_.initial_condition_decomp.steadystate = false;
+options_.initial_condition_decomp.with_epilogue = options_.shock_decomp.with_epilogue;
+options_.initial_condition_decomp.write_xls = false;
+options_.initial_condition_decomp.type = '';
+options_.initial_condition_decomp.plot_init_date = [];
+options_.initial_condition_decomp.plot_end_date = [];
+options_.initial_condition_decomp.diff = false;
+options_.initial_condition_decomp.flip = false;
+options_.initial_condition_decomp.max_nrows = 6;
 end
