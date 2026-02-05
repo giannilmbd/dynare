@@ -32,6 +32,22 @@ if ((cpp_compiler.get_id() == 'gcc'
   error('GCC is too old. Version ' + gcc_minimal_version.to_string() + ' or higher is required.')
 endif
 
+# Put trampolines on the heap, for Fortran MEX files, on platforms where this is supported
+# (as of GCC 14 and 15: x86_64 Darwin, x86_64 and aarch64 Linux)
+# Seems only needed under Linux (likely the default under Darwin; not needed under Windows)
+# Seems also only needed under Octave (MATLAB likely requests an executable stack to the OS)
+# For more context, see https://git.dynare.org/Dynare/dynare/-/merge_requests/2428#note_25854
+# Requires GCC ⩾ 14, which is why it is only conditionally enabled here after compiler checks
+if (fortran_compiler.get_id() == 'gcc' and fortran_compiler.version().version_compare('>=14')
+    and ((host_machine.system() == 'linux' and (host_machine.cpu_family() == 'x86_64' or
+                                                host_machine.cpu_family() == 'aarch64'))
+         or (host_machine.system() == 'darwin' and host_machine.cpu_family() == 'x86_64')))
+  add_global_arguments('-ftrampoline-impl=heap', language : 'fortran')
+elif get_option('build_for') == 'octave' and host_machine.system() == 'linux'
+  warning('Your Fortran compiler does not support the -ftrampoline-impl=heap flag. As a consequence, you may need to set the environment variable GLIBC_TUNABLES=glibc.rtld.execstack=2 before running Octave, otherwise some MEX files may not load.')
+endif
+
+
 ### Preprocessor
 
 subdir('preprocessor/src')
