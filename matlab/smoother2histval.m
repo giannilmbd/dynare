@@ -167,44 +167,6 @@ if isfield(opts, 'outfile')
     o = dseries(data, '1Y', invars);
 end
 
-% $$$ % Handle auxiliary variables for lags (both on endogenous and exogenous)
-% $$$ for i = 1:length(M_.aux_vars)
-% $$$     if ~ ismember(M_.endo_names{M_.aux_vars(i).endo_index},invars)
-% $$$         if M_.aux_vars(i).type ~= 1 && M_.aux_vars(i).type ~= 3
-% $$$             continue
-% $$$         end
-% $$$         if M_.aux_vars(i).type == 1
-% $$$             % Endogenous
-% $$$             orig_var = M_.endo_names{M_.aux_vars(i).orig_index};
-% $$$         else
-% $$$             % Exogenous
-% $$$             orig_var = M_.exo_names{M_.aux_vars(i).orig_index};
-% $$$         end
-% $$$         [m, k] = ismember(orig_var, outvars);
-% $$$         if m
-% $$$             if ~isempty(strmatch(invars{k}, M_.endo_names))
-% $$$                 s = smoothedvars.(invars{k});
-% $$$             else
-% $$$                 s = smoothedshocks.(invars{k});
-% $$$             end
-% $$$             l = M_.aux_vars(i).orig_lead_lag;
-% $$$             if period-M_.maximum_endo_lag+1+l < 1
-% $$$                 error('The period that you indicated is too small to construct initial conditions')
-% $$$             end
-% $$$             j = M_.aux_vars(i).endo_index;
-% $$$             v = s((period-M_.maximum_endo_lag+1+l):(period+l)); %+steady_state(j);
-% $$$             if ~isfield(opts, 'outfile')
-% $$$                 M_.endo_histval(j, :) = v;
-% $$$             else
-% $$$                 % When saving to a file, x(-2) is in the variable called "x_l2"
-% $$$                 lead_lag = num2str(l);
-% $$$                 lead_lag = regexprep(lead_lag, '-', 'l');
-% $$$                 o.([ orig_var '_' lead_lag ]) = v;
-% $$$             end
-% $$$         end
-% $$$     end
-% $$$ end
-
 % Finalize output
 if isfield(opts, 'outfile')
     [dir, fname, ext] = fileparts(opts.outfile);
