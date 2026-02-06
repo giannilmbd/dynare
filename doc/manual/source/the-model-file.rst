@@ -6954,9 +6954,10 @@ observed variables.
     convergence diagnostic.
 
     The inefficiency factors are computed as in :cite:t:`Giordani:2011` based on Parzen windows as in e.g. :cite:t:`Andrews:1991`.
+    
 
-
-    *Options*
+Data treatment options
+----------------------
 
     .. _dataf:
 
@@ -7070,6 +7071,9 @@ observed variables.
        otherwise the :math:`log` transformation will be applied twice
        (this may result in complex data).
 
+Graph output options
+--------------------
+
     .. option:: plot_priors = INTEGER
 
        Control the plotting of priors.
@@ -7112,266 +7116,12 @@ observed variables.
 
        See :opt:`graph_format <graph_format = ( FORMAT, FORMAT... )>`.
 
-    .. option:: no_init_estimation_check_first_obs
+    .. option:: tex
 
-       Do not check for stochastic singularity in first period. If used, `ESTIMATION CHECKS`
-       does not return an error if the check fails only in first observation.
-       This should only be used when observing stock variables (e.g. capital) in first period, on top of their associated flow (e.g. investment).
-       Using this option may lead to a crash or provide undesired/wrong results for badly specified problems
-       (e.g. the additional variable observed in first period is not predetermined).
+       See :opt:`tex`.
 
-       For advanced use only.
-
-    .. option:: estimate_initial_states_endogenous_prior
-
-       Jointly estimate the initial states along with the other parameters. 
-       This contrasts to the usual approach of marginalizing with respect to
-       the states while estimating parameters, and then estimating the states
-       offline using the smoother. This option uses the unconditional
-       mean and variance of the states implied by the linear Kalman filter as an
-       endogenous prior. This means that, for a linear Kalman filter, the
-       joint posterior of parameters and states is exactly the same as
-       what would be obtained from the usual marginalized likelihood approach
-       combined with offline state estimation via the smoother.
-
-       The initial state values are treated as additional parameters to be
-       estimated. The option automatically sets ``lik_init=2`` and requires
-       ``posterior_sampling_method='slice'``.  This option is useful for nonlinear models estimated e.g. via OccBin.
-
-    .. option:: lik_init = INTEGER
-
-       Type of initialization of Kalman filter:
-
-           ``1``
-
-               For stationary models, the initial matrix of variance
-               of the error of forecast is set equal to the
-               unconditional variance of the state variables.
-
-           ``2``
-
-               For nonstationary models: a wide prior is used with an
-               initial matrix of variance of the error of forecast
-               diagonal with 10 on the diagonal (follows the
-               suggestion of :cite:t:`Harvey:1979`).
-
-           ``3``
-
-               For nonstationary models: use a diffuse filter (use
-               rather the ``diffuse_filter`` option).
-
-           ``4``
-
-               The filter is initialized with the fixed point of the
-               Riccati equation.
-
-           ``5``
-
-               Use i) option 2 for the non-stationary elements by
-               setting their initial variance in the forecast error
-               matrix to 10 on the diagonal and all covariances to 0
-               and ii) option 1 for the stationary elements.
-
-       |br| Default value is 1. For advanced use only.
-
-    .. option:: conditional_likelihood
-
-       Do not use the kalman filter to evaluate the likelihood, but instead
-       evaluate the conditional likelihood, based on the first order reduced
-       form of the model, by assuming that the initial state vector is at its 
-       steady state. This approach requires that:
-
-       1. The number of structural innovations be equal to the number of observed variables.
-
-       2. The absence of measurement errors (as introduced by the Dynare
-          interface, see documentation about the :bck:`estimated_params` block).
-
-       3. The absence of missing observations.
-
-       The evaluation of the conditional likelihood is faster and more stable
-       than the evaluation of the likelihood with the Kalman filter. Also this
-       approach does not require special treatment for models with unit roots.
-       Note however that the conditional likelihood is sensitive to the choice
-       for the initial condition, which can be an issue if the data are
-       initially far from the steady state. This option is not compatible with
-       ``analytic_derivation``.
-
-    .. option:: conf_sig = DOUBLE
-
-       Level of significance of the confidence interval used for classical forecasting after
-       estimation. Default: 0.9.
-
-    .. option:: mh_conf_sig = DOUBLE
-
-       Confidence/HPD interval used for the computation of prior and
-       posterior statistics like: parameter distributions,
-       prior/posterior moments, conditional variance decomposition,
-       impulse response functions, Bayesian forecasting. Default:
-       ``0.9``.
-
-    .. option:: mh_replic = INTEGER
-
-       Number of replications for each chain of the Metropolis-Hastings algorithm.
-       The number of draws should be sufficient to achieve convergence of the MCMC and
-       to meaningfully compute posterior objects. Default: ``20000``.
-
-    .. option:: sub_draws = INTEGER
-
-       Number of draws from the MCMC that are used to compute
-       posterior distribution of various objects (smoothed variable,
-       smoothed shocks, forecast, moments, IRF). The draws used to
-       compute these posterior moments are sampled uniformly in the
-       estimated empirical posterior distribution (i.e. draws of the
-       MCMC). ``sub_draws`` should be smaller than the total number of
-       MCMC draws available. Default:
-       ``min(posterior_max_subsample_draws, (Total number of
-       draws)*(number of chains) )``.
-
-    .. option:: posterior_max_subsample_draws = INTEGER
-
-       Maximum number of draws from the MCMC used to compute posterior
-       distribution of various objects (smoothed variable, smoothed
-       shocks, forecast, moments, IRF), if not overriden by option
-       ``sub_draws``. Default: ``1200``.
-
-    .. option:: mh_nblocks = INTEGER
-
-       Number of parallel chains for Metropolis-Hastings
-       algorithm. Default: ``2``.
-
-    .. option:: mh_drop = DOUBLE
-
-       The fraction of initially generated parameter vectors to be
-       dropped as a burn-in before using posterior
-       simulations. Default: ``0.5``.
-
-    .. option:: mh_jscale = DOUBLE
-
-       The scale parameter of the jumping distribution's covariance
-       matrix (Metropolis-Hastings or TaRB-algorithm). This option must be tuned to
-       obtain, ideally, an acceptance ratio of 25%-33%. Basically, the
-       idea is to increase the variance of the jumping distribution if
-       the acceptance ratio is too high, and decrease the same
-       variance if the acceptance ratio is too low. In some situations
-       it may help to consider parameter-specific values for this
-       scale parameter. This can be done in the
-       :bck:`estimated_params` block.
-
-       Note that ``mode_compute=6`` will tune the scale parameter to
-       achieve an acceptance rate of
-       :ref:`AcceptanceRateTarget<art>`. The resulting scale parameter
-       will be saved into a file named
-       ``MODEL_FILENAME_mh_scale.mat`` in the ``FILENAME/Output`` folder.
-       This file can be loaded in
-       subsequent runs via the ``posterior_sampler_options`` option
-       :ref:`scale_file <scale-file>`. Both ``mode_compute=6`` and
-       ``scale_file`` will overwrite any value specified in
-       ``estimated_params`` with the tuned value. Default: ``2.38/sqrt(n)``.
-
-       Note also that for the Random Walk Metropolis Hastings
-       algorithm, it is possible to use option :opt:`mh_tune_jscale
-       <mh_tune_jscale [= DOUBLE]>`, to automatically tune the value
-       of ``mh_jscale``. In this case, the ``mh_jscale`` option must
-       not be used.
-
-    .. option:: mh_init_scale = DOUBLE (deprecated)
-
-       The scale to be used for drawing the initial value of the
-       Metropolis-Hastings chain. Generally, the starting points
-       should be overdispersed for the :cite:t:`Brooks:1998`
-       convergence diagnostics to be meaningful. Default:
-       ``2*mh_jscale.``
-
-       It is important to keep in mind that ``mh_init_scale`` is set
-       at the beginning of Dynare execution, i.e. the default will not
-       take into account potential changes in ``mh_jscale`` introduced
-       by either ``mode_compute=6`` or the
-       ``posterior_sampler_options`` option :ref:`scale_file<scale-file>`. 
-       If ``mh_init_scale`` is too wide during
-       initalization of the posterior sampler so that 100 tested draws
-       are inadmissible (e.g. Blanchard-Kahn conditions are always
-       violated), Dynare will request user input of a new
-       ``mh_init_scale`` value with which the next 100 draws will be
-       drawn and tested. If the :opt:`nointeractive` option has been
-       invoked, the program will instead automatically decrease
-       ``mh_init_scale`` by 10 percent after 100 futile draws and try
-       another 100 draws. This iterative procedure will take place at
-       most 10 times, at which point Dynare will abort with an error
-       message.
-
-    .. option:: mh_init_scale_factor = DOUBLE
-
-       The multiple of ``mh_jscale`` used for drawing the initial value of the
-       Metropolis-Hastings chain. Generally, the starting points
-       should be overdispersed for the :cite:t:`Brooks:1998`
-       convergence diagnostics to be meaningful. Default:
-       ``2``
-
-       If ``mh_init_scale_factor`` is too wide during
-       initalization of the posterior sampler so that 100 tested draws
-       are inadmissible (e.g. Blanchard-Kahn conditions are always
-       violated), Dynare will request user input of a new
-       ``mh_init_scale_factor`` value with which the next 100 draws will be
-       drawn and tested. If the :opt:`nointeractive` option has been
-       invoked, the program will instead automatically decrease
-       ``mh_init_scale_factor`` by 10 percent after 100 futile draws and try
-       another 100 draws. This iterative procedure will take place at
-       most 10 times, at which point Dynare will abort with an error
-       message.
-
-    .. option:: mh_tune_jscale [= DOUBLE]
-
-       Automatically tunes the scale parameter of the jumping
-       distribution's covariance matrix (Metropolis-Hastings), so that
-       the overall acceptance ratio is close to the desired
-       level. Default value is ``0.33``. It is not possible to
-       match exactly the desired acceptance ratio because of the
-       stochastic nature of the algorithm (the proposals and the
-       initial conditions of the markov chains if
-       ``mh_nblocks>1``). This option is only available for the
-       Random Walk Metropolis Hastings algorithm. Must not be used in conjunction with
-       :opt:`mh_jscale = DOUBLE`.
-
-    .. option:: mh_tune_guess = DOUBLE
-
-       Specifies the initial value for the :opt:`mh_tune_jscale
-       <mh_tune_jscale [= DOUBLE]>` option. Default: ``2.38/sqrt(n)``. Must not
-       be set if :opt:`mh_tune_jscale <mh_tune_jscale [= DOUBLE]>` is
-       not used.
-
-    .. option:: mh_recover
-
-       Attempts to recover a Metropolis-Hastings simulation that
-       crashed prematurely, starting with the last available saved
-       ``mh``-file. Shouldn’t be used together with ``load_mh_file``
-       or a different ``mh_replic`` than in the crashed run. Since
-       Dynare 4.5 the proposal density from the previous run will
-       automatically be loaded. In older versions, to assure a neat
-       continuation of the chain with the same proposal density, you
-       should provide the ``mode_file`` used in the previous run or
-       the same user-defined ``mcmc_jumping_covariance`` when using
-       this option. Note that under Octave, a neat continuation of the
-       crashed chain with the respective last random number generator
-       state is currently not supported.
-
-    .. option:: mh_posterior_mode_estimation
-
-       Skip optimizer-based mode-finding and instead compute the mode based 
-       on a run of a MCMC. The MCMC will start at the prior mode and use the prior
-       variances to compute the inverse Hessian.
-
-    .. option:: mode_file = FILENAME
-
-       Name of the file containing previous value for the mode. When
-       computing the mode, Dynare stores the mode (``xparam1``) and
-       the hessian (``hh``, only if ``cova_compute=1``) in a file
-       called ``MODEL_FILENAME_mode.mat`` in the ``FILENAME/Output`` folder.
-       After a successful run of
-       the estimation command, the ``mode_file`` will be disabled to
-       prevent other function calls from implicitly using an updated
-       mode file. Thus, if the ``.mod`` file contains subsequent
-       ``estimation`` commands, the ``mode_file`` option, if desired,
-       needs to be specified again.
+Mode computing options
+----------------------
 
     .. option:: mode_compute = INTEGER | FUNCTION_NAME
 
@@ -7463,6 +7213,7 @@ observed variables.
                 ``posterior_sampling_method='online'``.
                 
 
+
            ``12``
 
                 Uses the ``particleswarm`` optimization routine
@@ -7496,158 +7247,25 @@ observed variables.
 
        |br| Default value is ``5``.
 
+    .. option:: mode_file = FILENAME
+
+       Name of the file containing previous value for the mode. When
+       computing the mode, Dynare stores the mode (``xparam1``) and
+       the hessian (``hh``, only if ``cova_compute=1``) in a file
+       called ``MODEL_FILENAME_mode.mat`` in the ``FILENAME/Output`` folder.
+       After a successful run of
+       the estimation command, the ``mode_file`` will be disabled to
+       prevent other function calls from implicitly using an updated
+       mode file. Thus, if the ``.mod`` file contains subsequent
+       ``estimation`` commands, the ``mode_file`` option, if desired,
+       needs to be specified again.
+
     .. option:: additional_optimizer_steps = [INTEGER]
                 additional_optimizer_steps = [INTEGER1:INTEGER2]
                 additional_optimizer_steps = [INTEGER1 INTEGER2 ...]
 
         Vector of additional minimization algorithms run after
         ``mode_compute``. Default: no additional optimization iterations.
-
-    .. option:: silent_optimizer
-
-       Instructs Dynare to run mode computing/optimization silently
-       without displaying results or saving files in between. Useful
-       when running loops.
-
-    .. option:: mcmc_jumping_covariance = OPTION
-
-       Tells Dynare which covariance to use for the proposal density
-       of the MCMC sampler. OPTION can be one of the following:
-
-           ``hessian``
-
-               Uses the Hessian matrix computed at the mode.
-
-           ``prior_variance``
-
-               Uses the prior variances. No infinite prior variances
-               are allowed in this case.
-
-           ``identity_matrix``
-
-               Uses an identity matrix.
-
-           ``FILENAME``
-
-               Loads an arbitrary user-specified covariance matrix
-               from ``FILENAME.mat``. The covariance matrix must be
-               saved in a variable named ``jumping_covariance``, must
-               be square, positive definite, and have the same
-               dimension as the number of estimated parameters.
-
-       Note that the covariance matrices are still scaled with
-       :opt:`mh_jscale <mh_jscale = DOUBLE>`. Default value is
-       ``hessian``.
-
-    .. option:: mode_check
-
-       Tells Dynare to plot the posterior density for values around
-       the computed mode for each estimated parameter in turn. This is
-       helpful to diagnose problems with the optimizer. Note that for
-       ``order>1`` the likelihood function resulting from the particle
-       filter is not differentiable anymore due to the resampling
-       step. For this reason, the ``mode_check`` plot may look wiggly.
-
-    .. option:: mode_check_neighbourhood_size = DOUBLE
-
-       Used in conjunction with option ``mode_check``, gives the width
-       of the window around the posterior mode to be displayed on the
-       diagnostic plots. This width is expressed in percentage
-       deviation. The ``Inf`` value is allowed, and will trigger a
-       plot over the entire domain (see also
-       ``mode_check_symmetric_plots``). Default:``0.5``.
-
-    .. option:: mode_check_symmetric_plots = INTEGER
-
-       Used in conjunction with option ``mode_check``, if set to
-       ``1``, tells Dynare to ensure that the check plots are
-       symmetric around the posterior mode. A value of ``0`` allows to
-       have asymmetric plots, which can be useful if the posterior
-       mode is close to a domain boundary, or in conjunction with
-       ``mode_check_neighbourhood_size = Inf`` when the domain in not
-       the entire real line. Default: ``1``.
-
-    .. option:: mode_check_number_of_points = INTEGER
-
-       Number of points around the posterior mode where the posterior
-       kernel is evaluated (for each parameter). Default is ``20``.
-
-    .. option:: prior_trunc = DOUBLE
-
-       Probability of extreme values of the prior density in each tail that is
-       ignored when computing bounds for the parameters. Default:
-       ``1e-10`` for ``posterior_sampling_method=slice`` and ``0`` otherwise .
-
-    .. option:: huge_number = DOUBLE
-
-       Value for replacing infinite values in the definition of
-       (prior) bounds when finite values are required for
-       computational reasons. Default: ``1e7``.
-
-    .. option:: load_mh_file
-
-       Tells Dynare to add to previous Metropolis-Hastings simulations
-       instead of starting from scratch. Since Dynare 4.5 the proposal
-       density from the previous run will automatically be loaded. In
-       older versions, to assure a neat continuation of the chain with
-       the same proposal density, you should provide the ``mode_file``
-       used in the previous run or the same user-defined
-       ``mcmc_jumping_covariance`` when using this option. Shouldn’t
-       be used together with ``mh_recover``. Note that under Octave, a
-       neat continuation of the chain with the last random number
-       generator state of the already present draws is currently not
-       supported.
-
-    .. option:: load_results_after_load_mh
-
-       This option is available when loading a previous MCMC run
-       without adding additional draws, i.e. when ``load_mh_file`` is
-       specified with ``mh_replic=0``. It tells Dynare to load the
-       previously computed convergence diagnostics, marginal data
-       density, and posterior statistics from an existing ``_results``
-       file instead of recomputing them.
-
-    .. option:: mh_initialize_from_previous_mcmc
-
-       This option allows to pick initial values for new MCMC from a previous one,
-       where the model specification, the number of estimated parameters,
-       (some) prior might have changed (so a situation where ``load_mh_file`` would not work).
-       If an additional parameter is estimated, it is automatically initialized from prior_draw.
-       Note that, if this option is used to skip the optimization step, you should use a sampling method which does not require
-       a proposal density, like slice. Otherwise, optimization should always be done beforehand or a mode file with
-       an appropriate posterior covariance matrix should be used.
-
-    .. option:: mh_initialize_from_previous_mcmc_directory = FILENAME
-
-       If ``mh_initialize_from_previous_mcmc`` is set, users must provide here
-       the path to the standard FNAME folder from where to load prior definitions and
-       last MCMC values to be used to initialize the new MCMC.
-
-       Example: if previous project directory is ``/my_previous_dir`` and FNAME is ``mymodel``,
-       users should set the option as
-
-       ``mh_initialize_from_previous_mcmc_directory = '/my_previous_dir/mymodel'``
-
-       Dynare will then look for the last record file into
-
-       ``/my_previous_dir/mymodel/metropolis/mymodel_mh_history_<LAST>.mat``
-
-       and for the prior definition file into
-
-       ``/my_previous_dir/mymodel/prior/definition.mat``
-
-    .. option:: mh_initialize_from_previous_mcmc_record = FILENAME
-
-       If ``mh_initialize_from_previous_mcmc`` is set, and whenever the standard file or directory tree
-       is not applicable to load initial values, users may directly provide here
-       the path to the record file from which to load
-       values to be used to initialize the new MCMC.
-
-    .. option:: mh_initialize_from_previous_mcmc_prior = FILENAME
-
-       If ``mh_initialize_from_previous_mcmc`` is set, and whenever the standard file or directory tree
-       is not applicable to load initial values, users may directly provide here
-       the path to the prior definition file, to get info in the priors used in previous MCMC.
 
     .. option:: optim = (NAME, VALUE, ...)
 
@@ -8031,11 +7649,513 @@ observed variables.
                estimation(..., mode_compute=4,optim=('NumgradAlgorithm',3,'TolFun',1e-5),...);
 
 
-    .. option:: nodiagnostic
+    .. option:: silent_optimizer
 
-       Does not compute the convergence diagnostics for
-       Metropolis-Hastings. Default: diagnostics are computed and
-       displayed.
+       Instructs Dynare to run mode computing/optimization silently
+       without displaying results or saving files in between. Useful
+       when running loops.
+
+Hessian/derivative options
+--------------------------
+
+    .. option:: cova_compute = INTEGER
+
+       When ``0``, the covariance matrix of estimated parameters is
+       not computed after the computation of posterior mode (or
+       maximum likelihood). This increases speed of computation in
+       large models during development, when this information is not
+       always necessary. Of course, it will break all successive
+       computations that would require this covariance
+       matrix. Otherwise, if this option is equal to ``1``, the
+       covariance matrix is computed and stored in variable ``hh`` of
+       ``MODEL_FILENAME_mode.mat``. Default is ``1``.
+
+    .. option:: use_penalized_objective_for_hessian
+
+       Use the penalized objective instead of the objective function
+       to compute numerically the hessian matrix at the mode. The
+       penalties decrease the value of the posterior density (or
+       likelihood) when, for some perturbations, Dynare is not able to
+       solve the model (issues with steady state existence, Blanchard
+       and Kahn conditions, ...). In practice, the penalized and
+       original objectives will only differ if the posterior mode is
+       found to be near a region where the model is ill-behaved. By
+       default, the original objective function is used.
+
+    .. option:: analytic_derivation
+
+       Triggers estimation with analytic gradient at ``order=1``.
+       The final hessian at the mode is also computed analytically.
+       Only works for stationary models without missing observations,
+       i.e. for ``kalman_algo<3``. Incompatible with :bck:`heteroskedastic_shocks`. Optimizers that rely on analytic gradients are ``mode_compute=1,3,4,5,101``.
+
+Mode-check diagnostics
+----------------------
+
+    .. option:: mode_check
+
+       Tells Dynare to plot the posterior density for values around
+       the computed mode for each estimated parameter in turn. This is
+       helpful to diagnose problems with the optimizer. Note that for
+       ``order>1`` the likelihood function resulting from the particle
+       filter is not differentiable anymore due to the resampling
+       step. For this reason, the ``mode_check`` plot may look wiggly.
+
+    .. option:: mode_check_neighbourhood_size = DOUBLE
+
+       Used in conjunction with option ``mode_check``, gives the width
+       of the window around the posterior mode to be displayed on the
+       diagnostic plots. This width is expressed in percentage
+       deviation. The ``Inf`` value is allowed, and will trigger a
+       plot over the entire domain (see also
+       ``mode_check_symmetric_plots``). Default:``0.5``.
+
+    .. option:: mode_check_symmetric_plots = INTEGER
+
+       Used in conjunction with option ``mode_check``, if set to
+       ``1``, tells Dynare to ensure that the check plots are
+       symmetric around the posterior mode. A value of ``0`` allows to
+       have asymmetric plots, which can be useful if the posterior
+       mode is close to a domain boundary, or in conjunction with
+       ``mode_check_neighbourhood_size = Inf`` when the domain in not
+       the entire real line. Default: ``1``.
+
+    .. option:: mode_check_number_of_points = INTEGER
+
+       Number of points around the posterior mode where the posterior
+       kernel is evaluated (for each parameter). Default is ``20``.
+
+Kalman filtering and likelihood options
+---------------------------------------
+
+    .. option:: no_init_estimation_check_first_obs
+
+       Do not check for stochastic singularity in first period. If used, `ESTIMATION CHECKS`
+       does not return an error if the check fails only in first observation.
+       This should only be used when observing stock variables (e.g. capital) in first period, on top of their associated flow (e.g. investment).
+       Using this option may lead to a crash or provide undesired/wrong results for badly specified problems
+       (e.g. the additional variable observed in first period is not predetermined).
+
+       For advanced use only.
+
+    .. option:: lik_init = INTEGER
+
+       Type of initialization of Kalman filter:
+
+           ``1``
+
+               For stationary models, the initial matrix of variance
+               of the error of forecast is set equal to the
+               unconditional variance of the state variables.
+
+           ``2``
+
+               For nonstationary models: a wide prior is used with an
+               initial matrix of variance of the error of forecast
+               diagonal with 10 on the diagonal (follows the
+               suggestion of :cite:t:`Harvey:1979`).
+
+           ``3``
+
+               For nonstationary models: use a diffuse filter (use
+               rather the ``diffuse_filter`` option).
+
+           ``4``
+
+               The filter is initialized with the fixed point of the
+               Riccati equation.
+
+           ``5``
+
+               Use i) option 2 for the non-stationary elements by
+               setting their initial variance in the forecast error
+               matrix to 10 on the diagonal and all covariances to 0
+               and ii) option 1 for the stationary elements.
+
+       |br| Default value is 1. For advanced use only.
+
+    .. option:: conditional_likelihood
+
+       Do not use the Kalman filter to evaluate the likelihood, but instead
+       evaluate the conditional likelihood, based on the first order reduced
+       form of the model, by assuming that the initial state vector is at its 
+       steady state. This approach requires that:
+
+       1. The number of structural innovations is equal to the number of observed variables.
+
+       2. The absence of measurement errors (as introduced by the Dynare
+          interface, see documentation about the :bck:`estimated_params` block).
+
+       3. The absence of missing observations.
+
+       The evaluation of the conditional likelihood is faster and more stable
+       than the evaluation of the likelihood with the Kalman filter. Also, this
+       approach does not require special treatment for models with unit roots.
+       Note however that the conditional likelihood is sensitive to the choice
+       for the initial condition, which can be an issue if the data are
+       initially far from the steady state. This option is not compatible with
+       ``analytic_derivation``.
+
+    .. option:: kalman_algo = INTEGER
+
+           ``0``
+
+               Automatically use the Multivariate Kalman Filter for
+               stationary models and the Multivariate Diffuse Kalman
+               Filter for non-stationary models.
+
+           ``1``
+
+               Use the Multivariate Kalman Filter.
+
+           ``2``
+
+               Use the Univariate Kalman Filter.
+
+           ``3``
+
+               Use the Multivariate Diffuse Kalman Filter.
+
+           ``4``
+
+               Use the Univariate Diffuse Kalman Filter.
+
+           ``5``
+
+               Use the Pruned Skewed Kalman Filter.
+
+       Default value is ``0``. In case of missing observations of
+       single or all series, Dynare treats those missing values as
+       unobserved states and uses the Kalman filter to infer their
+       value (see e.g. :cite:t:`Durbin:2012`, Ch. 4.10) This
+       procedure has the advantage of being capable of dealing with
+       observations where the forecast error variance matrix becomes
+       singular for some variable(s). If this happens, the respective
+       observation enters with a weight of zero in the log-likelihood,
+       i.e. this observation for the respective variable(s) is dropped
+       from the likelihood computations (for details see :cite:t:`Durbin:2012`, Ch. 6.4 and 7.2.5 and :cite:t:`Koopman:2000`). If the use of a multivariate Kalman filter is
+       specified and a singularity is encountered, Dynare by default
+       automatically switches to the univariate Kalman filter for this
+       parameter draw. This behavior can be changed via the
+       :opt:`use_univariate_filters_if_singularity_is_detected
+       <use_univariate_filters_if_singularity_is_detected = INTEGER>`
+       option.
+       In case of skew normally distributed shocks, the Pruned Skewed
+       Kalman filter of :cite:t:`Guljanov:2025` can
+       be used by setting ``kalman_algo=5``. This filter is currently
+       not compatible with missing observations and does not switch to
+       a univariate filter in case of singularity.
+
+    .. option:: fast_kalman_filter
+
+       Select the fast Kalman filter using Chandrasekhar recursions as
+       described by :cite:t:`Herbst:2015`. This setting is only used with
+       ``kalman_algo=1`` or ``kalman_algo=3``. In case of using the
+       diffuse Kalman filter (``kalman_algo=3/lik_init=3``), the
+       observables must be stationary. This option is neither
+       compatible with :opt:`analytic_derivation` nor :bck:`heteroskedastic_shocks`.
+
+    .. option:: kalman_tol = DOUBLE
+
+       Numerical tolerance for determining the singularity of the
+       covariance matrix of the prediction errors during the Kalman
+       filter (minimum allowed reciprocal of the matrix condition
+       number). Default value is ``1e-10``.
+
+    .. option:: diffuse_kalman_tol = DOUBLE
+
+       Numerical tolerance for determining the singularity of the
+       covariance matrix of the prediction errors (:math:`F_{\infty}`)
+       and the rank of the covariance matrix of the non-stationary
+       state variables (:math:`P_{\infty}`) during the Diffuse Kalman
+       filter. Default value is ``1e-6``.
+
+    .. option:: filter_covariance
+
+       Saves the series of one step ahead error of forecast covariance
+       matrices. With Metropolis, they are saved in
+       :mvar:`oo_.FilterCovariance`, otherwise in
+       :mvar:`oo_.Smoother.Variance`. Saves also k-step ahead error of
+       forecast covariance matrices if ``filter_step_ahead`` is set.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
+
+    .. option:: filter_step_ahead = [INTEGER1:INTEGER2]
+                filter_step_ahead = [INTEGER1 INTEGER2 ...]
+
+       Triggers the computation k-step ahead filtered values,
+       i.e. :math:`E_{t}{y_{t+k}}`. Stores results in
+       ``oo_.FilteredVariablesKStepAhead``. Also stores 1-step ahead
+       values in
+       ``oo_.FilteredVariables``. ``oo_.FilteredVariablesKStepAheadVariances``
+       is stored if ``filter_covariance``.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
+
+    .. option:: filter_decomposition
+
+       Triggers the computation of the shock decomposition of the
+       above k-step ahead filtered values. Stores results in
+       ``oo_.FilteredVariablesShockDecomposition``.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
+
+    .. option:: diffuse_filter
+
+       Uses the diffuse Kalman filter (as described in :cite:t:`Durbin:2012` and :cite:t:`Koopman:2003` for the
+       multivariate and :cite:t:`Koopman:2000` for the univariate
+       filter) to estimate models with non-stationary observed
+       variables. This option will also reset the ``qz_criterium`` to 
+       count unit root variables towards the stable variables. Trying to estimate 
+       a model with unit roots will otherwise result in a Blanchard-Kahn error.
+
+       When ``diffuse_filter`` is used the ``lik_init`` option of
+       ``estimation`` has no effect.
+
+       When there are nonstationary exogenous variables in a model,
+       there is no unique deterministic steady state. For instance, if
+       productivity is a pure random walk:
+
+           .. math::
+
+              a_t = a_{t-1} + e_t
+
+       any value of :math:`\bar a` of :math:`a` is a deterministic
+       steady state for productivity. Consequently, the model admits
+       an infinity of steady states. In this situation, the user must
+       help Dynare in selecting one steady state, except if zero is a
+       trivial model’s steady state, which happens when the ``linear``
+       option is used in the model declaration. The user can either
+       provide the steady state to Dynare using a
+       ``steady_state_model`` block (or writing a steady state file)
+       if a closed form solution is available, see
+       :bck:`steady_state_model`, or specify some constraints on the
+       steady state, see
+       :ref:`equation_tag_for_conditional_steady_state <eq-tag-ss>`
+       so that Dynare computes the steady state conditionally on some
+       predefined levels for the non-stationary variables. In both
+       cases, the idea is to use dummy values for the steady state
+       level of the exogenous non-stationary variables.
+
+       Note that the nonstationary variables in the model must be
+       integrated processes (their first difference or k-difference
+       must be stationary).
+
+    .. option:: heteroskedastic_filter
+
+       Runs filter, likelihood, and smoother using heteroskedastic definitions provided in
+       a :bck:`heteroskedastic_shocks` block.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
+
+    .. option:: use_univariate_filters_if_singularity_is_detected = INTEGER
+
+       Decide whether Dynare should automatically switch to univariate
+       filter if a singularity is encountered in the likelihood
+       computation (this is the behaviour if the option is equal to
+       ``1``). Alternatively, if the option is equal to ``0``, Dynare
+       will not automatically change the filter, but rather use a
+       penalty value for the likelihood when such a singularity is
+       encountered. Default: ``1``.
+
+    .. option:: rescale_prediction_error_covariance
+
+       Rescales the prediction error covariance in the Kalman filter
+       to avoid badly scaled matrix and reduce the probability of a
+       switch to univariate Kalman filters (which are slower). By
+       default, no rescaling is done.
+
+    .. option:: lyapunov = OPTION
+
+       Determines the algorithm used to solve the Lyapunov equation used to
+       initialize the variance-covariance matrix of the Kalman filter. Possible
+       values for OPTION are:
+
+           ``default``
+
+               Uses the default solver for Lyapunov equations based on
+               Bartels-Stewart algorithm.
+
+           ``fixed_point``
+
+               Uses a fixed point algorithm to solve the Lyapunov
+               equation. This method is faster than the ``default``
+               one for large scale models, but it could require a
+               large amount of iterations.
+
+           ``doubling``
+
+               Uses a doubling algorithm to solve the Lyapunov
+               equation (``disclyap_fast``). This method is faster
+               than the two previous one for large scale models.
+
+           ``square_root_solver``
+
+               Uses a square-root solver for Lyapunov equations
+               (``dlyapchol``). This method is fast for large scale
+               models (available under MATLAB if the Control System
+               Toolbox is installed; available under Octave if the
+               `control`_ package is installed)
+
+       Default value is ``default``.
+
+    .. option:: lyapunov_fixed_point_tol = DOUBLE
+
+       This is the convergence criterion used in the fixed point
+       Lyapunov solver. Its default value is ``1e-10``.
+
+    .. option:: lyapunov_doubling_tol = DOUBLE
+
+       This is the convergence criterion used in the doubling
+       algorithm to solve the Lyapunov equation. Its default value is
+       ``1e-16``.
+
+Skewed Kalman filter options
+----------------------------
+
+    .. option:: skewed_kalman_prune_tol = DOUBLE
+
+       Tolerance for pruning redundant skewness dimensions in closed skew normal distribution
+       during the skewed Kalman filter and smoother. Default is ``0.01``.
+       Only relevant for ``kalman_algo=5``.
+
+    .. option:: skewed_kalman_rank_deficiency_transform
+
+       In case of singular transition matrix, compute CSN parameters
+       for joint distribution of states and shocks from state transition
+       equation. Does either rank deficient or full rank linear transformation
+       which might speed up or robustify the pruned skewed Kalman filter.
+       Only relevant for ``kalman_algo=5``.
+
+    .. option:: skewed_kalman_mvnlogcdf = QUOTED_STRING
+
+       Name of function to compute log Gaussian cdf, possible values:
+       ``'gaussian_log_mvncdf_mendell_elston'`` (default) or ``'mvncdf'``.
+       Only relevant for ``kalman_algo=5``.
+
+    .. option:: skewed_kalman_smoother_skip
+
+       Skip the computation of the classical smoother after an estimation
+       with the pruned skewed Kalman filter. Might be useful to skip this,
+       because computing the mean of CSN distributed states and shocks takes some time.
+       Only relevant for ``kalman_algo=5``.
+
+Posterior objects
+-----------------
+
+    .. option:: moments_varendo
+
+       Triggers the computation of the posterior distribution of the
+       theoretical moments of the endogenous variables. Results are
+       stored in ``oo_.PosteriorTheoreticalMoments`` (see
+       :mvar:`oo_.PosteriorTheoreticalMoments`). The number of lags in
+       the autocorrelation function is controlled by the ``ar``
+       option. Not compatible with OccBin.
+
+    .. option:: ar = INTEGER
+
+       See :opt:`ar <ar = INTEGER>`. Only useful in conjunction with
+       option ``moments_varendo``.
+
+    .. option:: contemporaneous_correlation
+
+       See :opt:`contemporaneous_correlation`. Results are stored in
+       ``oo_.PosteriorTheoreticalMoments``. Note that the ``nocorr``
+       option has no effect.
+
+    .. option:: no_posterior_kernel_density
+
+       Shuts off the computation of the kernel density estimator for
+       the posterior objects (see :ref:`density <dens>` field).
+
+    .. option:: conditional_variance_decomposition = INTEGER
+                conditional_variance_decomposition = [INTEGER1:INTEGER2]
+                conditional_variance_decomposition = [INTEGER1 INTEGER2 ...]
+
+       Computes the posterior distribution of the conditional variance
+       decomposition for the specified period(s). The periods must be
+       strictly positive. Conditional variances are given by
+       :math:`var(y_{t+k}\vert t)`. For period 1, the conditional
+       variance decomposition provides the decomposition of the
+       effects of shocks upon impact. The results are stored in
+       ``oo_.PosteriorTheoreticalMoments.dsge.ConditionalVarianceDecomposition``. Note
+       that this option requires the option :opt:`moments_varendo` to be
+       specified. In the presence of measurement error, the field will
+       contain the variance contribution after measurement error has
+       been taken out, *i.e.* the decomposition will be conducted of the
+       actual as opposed to the measured variables. The variance
+       decomposition of the measured variables will be stored in
+       ``oo_.PosteriorTheoreticalMoments.dsge.ConditionalVarianceDecompositionME``.
+
+
+    .. option:: filtered_vars
+
+       Triggers the computation of the posterior distribution of
+       filtered endogenous variables/one-step ahead forecasts,
+       i.e. :math:`E_{t}{y_{t+1}}`. Results are stored in
+       ``oo_.FilteredVariables`` (see below for a description of this
+       variable)
+
+    .. option:: smoother
+
+       Triggers the computation of the posterior distribution of
+       smoothed endogenous variables and shocks, i.e. the expected
+       value of variables and shocks given the information available
+       in all observations up to the final date
+       (:math:`E_{T}{y_t}`). Results are stored in
+       ``oo_.SmoothedVariables``, ``oo_.SmoothedShocks`` and
+       ``oo_.SmoothedMeasurementErrors``. Also triggers the
+       computation of ``oo_.UpdatedVariables``, which contains the
+       estimation of the expected value of variables given the
+       information available at the current date
+       (:math:`E_{t}{y_t}`). See below for a description of all these
+       variables.
+
+    .. option:: smoother_redux
+
+       Triggers a faster computation of the smoothed endogenous variables and shocks for large models.
+       It runs the smoother only for the state variables (i.e. with the same representation used for
+       likelihood computations) and computes the remaining variables ex-post.
+       Static unobserved objects (filtered, smoothed, updated, k-step ahead) are recovered, but there are
+       exceptions to a full recovery, depending on how static unobserved variables depend on the restricted
+       state space adopted. For example, lagged shocks which are ONLY used to recover NON-observed static
+       variables will not be recovered).
+       For such exceptions, only the following output is provided:
+
+           ``FilteredVariablesKStepAhead``: will be fully recovered
+
+           ``SmoothedVariables``, ``FilteredVariables``, ``UpdatedVariables``: recovered for all periods beyond period ``d+1``,
+            where ``d`` denotes the number of diffuse filtering steps.
+
+           ``FilteredVariablesKStepAheadVariances``, ``Variance``, and ``State_uncertainty`` cannot be recovered, and ZERO is provided as output.
+
+       If you need variances for those variables, either do not set the option, or declare the variable as observed, using ``NaN`` as data points.
+       Currently not compatible with the pruned skewed Kalman filter (``kalman_algo=5``).
+
+    .. option:: smoothed_state_uncertainty
+
+       Triggers the computation of the variance of smoothed estimates,
+       i.e. :math:`var_T(y_t)`. Stores results in
+       ``oo_.Smoother.State_uncertainty``.
+       This option is not yet compatible with the pruned skewed Kalman
+       filter (``kalman_algo=5``).
+
+    .. option:: forecast = INTEGER
+
+       Computes the posterior distribution of a forecast on INTEGER
+       periods after the end of the sample used in estimation. If no
+       Metropolis-Hastings is computed, the result is stored in
+       variable ``oo_.forecast`` and corresponds to the forecast at
+       the posterior mode. If a Metropolis-Hastings is computed, the
+       distribution of forecasts is stored in variables
+       ``oo_.PointForecast`` and ``oo_.MeanForecast``. See
+       :ref:`fore`, for a description of these variables. Not compatible with OccBin,
+       and currently not compatible with the pruned skewed Kalman filter (``kalman_algo=5``).
+
+    .. option:: conf_sig = DOUBLE
+
+       Level of significance of the confidence interval used for classical forecasting after
+       estimation. Default: 0.9.
 
     .. option:: bayesian_irf
 
@@ -8048,39 +8168,106 @@ observed variables.
 
         See :opt:`relative_irf`.
 
-    .. option:: dsge_var = DOUBLE
+    .. option:: irf = INTEGER
 
-       Triggers the estimation of a DSGE-VAR model, where the weight
-       of the DSGE prior of the VAR model is calibrated to the value
-       passed (see :cite:t:`DelNegro:2004`). It represents
-       the ratio of dummy over actual observations. To assure that the
-       prior is proper, the value must be bigger than :math:`(k+n)/T`,
-       where :math:`k` is the number of estimated parameters,
-       :math:`n` is the number of observables, and :math:`T` is the
-       number of observations.
+       See :opt:`irf <irf = INTEGER>`. Only used if
+       :opt:`bayesian_irf` is passed.
 
-        NB: The previous method of declaring ``dsge_prior_weight`` as
-        a parameter and then calibrating it is now deprecated and will
-        be removed in a future release of Dynare. Some of objects
-        arising during estimation are stored with their values at the
-        mode in ``oo_.dsge_var.posterior_mode``.
+    .. option:: irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )
 
-    .. option:: dsge_var
+        See :opt:`irf_shocks
+        <irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )>`.
+        Only used if :opt:`bayesian_irf` is passed.
 
-       Triggers the estimation of a DSGE-VAR model, where the weight
-       of the DSGE prior of the VAR model will be estimated (as in
-       :cite:t:`Adjemian:2008`). The prior on the weight of the DSGE
-       prior, ``dsge_prior_weight``, must be defined in the
-       ``estimated_params`` section.
+    .. option:: irf_plot_threshold = DOUBLE
 
-       NB: The previous method of declaring ``dsge_prior_weight`` as
-       a parameter and then placing it in ``estimated_params`` is now
-       deprecated and will be removed in a future release of Dynare.
+       See :opt:`irf_plot_threshold
+       <irf_plot_threshold = DOUBLE>`.
+       Only used if :opt:`bayesian_irf` is passed.
 
-    .. option:: dsge_varlag = INTEGER
+.. _estim-variable-selection:
 
-       The number of lags used to estimate a DSGE-VAR model. Default:
-       ``4``.
+Variable selection for posterior objects
+----------------------------------------
+
+    .. option:: consider_all_endogenous
+
+       Compute the posterior moments, smoothed variables, k-step ahead
+       filtered variables and forecasts (when requested) on all the
+       endogenous variables. This is equivalent to manually listing
+       all the endogenous variables after the ``estimation`` command.
+
+    .. option:: consider_all_endogenous_and_auxiliary
+
+       Compute the posterior moments, smoothed variables, k-step ahead
+       filtered variables and forecasts (when requested) on all the
+       endogenous variables and the auxiliary variables introduced by the
+       preprocessor. This option is useful when e.g. running ``smoother2histval``
+       on the results of the Kalman smoother.
+
+    .. option:: consider_only_observed
+
+       Compute the posterior moments, smoothed variables, k-step ahead
+       filtered variables and forecasts (when requested) on all the
+       observed variables. This is equivalent to manually listing all
+       the observed variables after the ``estimation`` command.
+
+    .. option:: selected_variables_only
+
+       Only run the classical smoother on the variables listed just
+       after the ``estimation`` command. This option is incompatible
+       with requesting classical frequentist forecasts and will be
+       overridden in this case. When using Bayesian estimation, the
+       smoother is by default only run on the declared endogenous
+       variables. Default: run the smoother on all the declared
+       endogenous variables.
+
+Model solution options
+----------------------
+
+    .. option:: solve_algo = INTEGER
+
+       See :ref:`solve_algo <solvalg>`.
+
+    .. option:: order = INTEGER
+
+       Order of approximation around the deterministic steady
+       state. When greater than 1, the likelihood is evaluated with a
+       particle or nonlinear filter :cite:p:`{see}FernandezVillaverde:2005`. Default is ``1``, i.e. the likelihood
+       of the linearized model is evaluated using a standard Kalman
+       filter.
+
+    .. option:: dr = OPTION
+
+        See :opt:`dr <dr = OPTION>`. Default: ``default``, i.e. generalized
+        Schur decomposition.
+
+    .. option:: dr_cycle_reduction_tol = DOUBLE
+
+        See :opt:`dr_cycle_reduction_tol <dr_cycle_reduction_tol = DOUBLE>`.
+        Default: ``1e-7``.
+
+    .. option:: dr_cycle_reduction_maxiter = INTEGER
+
+        See :opt:`dr_cycle_reduction_maxiter <dr_cycle_reduction_maxiter = INTEGER>`.
+        Default: ``100``.
+
+    .. option:: dr_logarithmic_reduction_tol = DOUBLE
+
+        See :opt:`dr_logarithmic_reduction_tol <dr_logarithmic_reduction_tol = DOUBLE>`.
+        Default: ``1e-12``.
+
+    .. option:: dr_logarithmic_reduction_maxiter = INTEGER
+
+        See :opt:`dr_logarithmic_reduction_maxiter <dr_logarithmic_reduction_maxiter = INTEGER>`.
+        Default: ``100``.
+
+    .. option:: qz_zero_threshold = DOUBLE
+
+       See :opt:`qz_zero_threshold <qz_zero_threshold = DOUBLE>`.
+
+Posterior sampling options
+--------------------------
 
     .. option:: posterior_sampling_method = NAME
 
@@ -8394,438 +8581,36 @@ observed variables.
 
                   Scale parameter in the mutation step (on the proposal covariance matrix of the MH iteration). Default value is: .5.                  
                   
-    .. option:: moments_varendo
-
-       Triggers the computation of the posterior distribution of the
-       theoretical moments of the endogenous variables. Results are
-       stored in ``oo_.PosteriorTheoreticalMoments`` (see
-       :mvar:`oo_.PosteriorTheoreticalMoments`). The number of lags in
-       the autocorrelation function is controlled by the ``ar``
-       option. Not compatible with OccBin.
-
-    .. option:: contemporaneous_correlation
-
-       See :opt:`contemporaneous_correlation`. Results are stored in
-       ``oo_.PosteriorTheoreticalMoments``. Note that the ``nocorr``
-       option has no effect.
-
-    .. option:: no_posterior_kernel_density
-
-       Shuts off the computation of the kernel density estimator for
-       the posterior objects (see :ref:`density <dens>` field).
-
-    .. option:: conditional_variance_decomposition = INTEGER
-                conditional_variance_decomposition = [INTEGER1:INTEGER2]
-                conditional_variance_decomposition = [INTEGER1 INTEGER2 ...]
-
-       Computes the posterior distribution of the conditional variance
-       decomposition for the specified period(s). The periods must be
-       strictly positive. Conditional variances are given by
-       :math:`var(y_{t+k}\vert t)`. For period 1, the conditional
-       variance decomposition provides the decomposition of the
-       effects of shocks upon impact. The results are stored in
-       ``oo_.PosteriorTheoreticalMoments.dsge.ConditionalVarianceDecomposition``.. Note
-       that this option requires the option ``moments_varendo`` to be
-       specified. In the presence of measurement error, the field will
-       contain the variance contribution after measurement error has
-       been taken out, *i.e.* the decomposition will be conducted of the
-       actual as opposed to the measured variables. The variance
-       decomposition of the measured variables will be stored in
-       ``oo_.PosteriorTheoreticalMoments.dsge.ConditionalVarianceDecompositionME``.
-
-
-    .. option:: filtered_vars
-
-       Triggers the computation of the posterior distribution of
-       filtered endogenous variables/one-step ahead forecasts,
-       i.e. :math:`E_{t}{y_{t+1}}`. Results are stored in
-       ``oo_.FilteredVariables`` (see below for a description of this
-       variable)
-
-    .. option:: smoother
-
-       Triggers the computation of the posterior distribution of
-       smoothed endogenous variables and shocks, i.e. the expected
-       value of variables and shocks given the information available
-       in all observations up to the final date
-       (:math:`E_{T}{y_t}`). Results are stored in
-       ``oo_.SmoothedVariables``, ``oo_.SmoothedShocks`` and
-       ``oo_.SmoothedMeasurementErrors``. Also triggers the
-       computation of ``oo_.UpdatedVariables``, which contains the
-       estimation of the expected value of variables given the
-       information available at the current date
-       (:math:`E_{t}{y_t}`). See below for a description of all these
-       variables.
-
-    .. option:: smoother_redux
-
-       Triggers a faster computation of the smoothed endogenous variables and shocks for large models.
-       It runs the smoother only for the state variables (i.e. with the same representation used for
-       likelihood computations) and computes the remaining variables ex-post.
-       Static unobserved objects (filtered, smoothed, updated, k-step ahead) are recovered, but there are
-       exceptions to a full recovery, depending on how static unobserved variables depend on the restricted
-       state space adopted. For example, lagged shocks which are ONLY used to recover NON-observed static
-       variables will not be recovered).
-       For such exceptions, only the following output is provided:
-
-           ``FilteredVariablesKStepAhead``: will be fully recovered
-
-           ``SmoothedVariables``, ``FilteredVariables``, ``UpdatedVariables``: recovered for all periods beyond period ``d+1``,
-            where ``d`` denotes the number of diffuse filtering steps.
-
-           ``FilteredVariablesKStepAheadVariances``, ``Variance``, and ``State_uncertainty`` cannot be recovered, and ZERO is provided as output.
-
-       If you need variances for those variables, either do not set the option, or declare the variable as observed, using NaNs as data points.
-       Currently not compatible with the pruned skewed Kalman filter (``kalman_algo=5``).
-
-    .. option:: forecast = INTEGER
-
-       Computes the posterior distribution of a forecast on INTEGER
-       periods after the end of the sample used in estimation. If no
-       Metropolis-Hastings is computed, the result is stored in
-       variable ``oo_.forecast`` and corresponds to the forecast at
-       the posterior mode. If a Metropolis-Hastings is computed, the
-       distribution of forecasts is stored in variables
-       ``oo_.PointForecast`` and ``oo_.MeanForecast``. See
-       :ref:`fore`, for a description of these variables. Not compatible with OccBin,
-       and currently not compatible with the pruned skewed Kalman filter (``kalman_algo=5``).
-
-    .. option:: tex
-
-       See :opt:`tex`.
-
-    .. option:: kalman_algo = INTEGER
-
-           ``0``
-
-               Automatically use the Multivariate Kalman Filter for
-               stationary models and the Multivariate Diffuse Kalman
-               Filter for non-stationary models.
-
-           ``1``
-
-               Use the Multivariate Kalman Filter.
-
-           ``2``
-
-               Use the Univariate Kalman Filter.
-
-           ``3``
-
-               Use the Multivariate Diffuse Kalman Filter.
-
-           ``4``
-
-               Use the Univariate Diffuse Kalman Filter.
-
-           ``5``
-
-               Use the Pruned Skewed Kalman Filter.
-
-       Default value is ``0``. In case of missing observations of
-       single or all series, Dynare treats those missing values as
-       unobserved states and uses the Kalman filter to infer their
-       value (see e.g. :cite:t:`Durbin:2012`, Ch. 4.10) This
-       procedure has the advantage of being capable of dealing with
-       observations where the forecast error variance matrix becomes
-       singular for some variable(s). If this happens, the respective
-       observation enters with a weight of zero in the log-likelihood,
-       i.e. this observation for the respective variable(s) is dropped
-       from the likelihood computations (for details see :cite:t:`Durbin:2012`, Ch. 6.4 and 7.2.5 and :cite:t:`Koopman:2000`). If the use of a multivariate Kalman filter is
-       specified and a singularity is encountered, Dynare by default
-       automatically switches to the univariate Kalman filter for this
-       parameter draw. This behavior can be changed via the
-       :opt:`use_univariate_filters_if_singularity_is_detected
-       <use_univariate_filters_if_singularity_is_detected = INTEGER>`
-       option.
-       In case of skew normally distributed shocks, the Pruned Skewed
-       Kalman filter of :cite:t:`Guljanov:2025` can
-       be used by setting ``kalman_algo=5``. This filter is currently
-       not compatible with missing observations and does not switch to
-       a univariate filter in case of singularity.
-
-    .. option:: fast_kalman_filter
-
-       Select the fast Kalman filter using Chandrasekhar recursions as
-       described by :cite:t:`Herbst:2015`. This setting is only used with
-       ``kalman_algo=1`` or ``kalman_algo=3``. In case of using the
-       diffuse Kalman filter (``kalman_algo=3/lik_init=3``), the
-       observables must be stationary. This option is neither
-       compatible with :opt:`analytic_derivation` nor ``heteroskedastic_shocks``.
-
-    .. option:: kalman_tol = DOUBLE
-
-       Numerical tolerance for determining the singularity of the
-       covariance matrix of the prediction errors during the Kalman
-       filter (minimum allowed reciprocal of the matrix condition
-       number). Default value is ``1e-10``.
-
-    .. option:: diffuse_kalman_tol = DOUBLE
-
-       Numerical tolerance for determining the singularity of the
-       covariance matrix of the prediction errors (:math:`F_{\infty}`)
-       and the rank of the covariance matrix of the non-stationary
-       state variables (:math:`P_{\infty}`) during the Diffuse Kalman
-       filter. Default value is ``1e-6``.
-
-    .. option:: filter_covariance
-
-       Saves the series of one step ahead error of forecast covariance
-       matrices. With Metropolis, they are saved in
-       :mvar:`oo_.FilterCovariance`, otherwise in
-       :mvar:`oo_.Smoother.Variance`. Saves also k-step ahead error of
-       forecast covariance matrices if ``filter_step_ahead`` is set.
-       This option is not yet compatible with the pruned skewed Kalman
-       filter (``kalman_algo=5``).
-
-    .. option:: filter_step_ahead = [INTEGER1:INTEGER2]
-                filter_step_ahead = [INTEGER1 INTEGER2 ...]
-
-       Triggers the computation k-step ahead filtered values,
-       i.e. :math:`E_{t}{y_{t+k}}`. Stores results in
-       ``oo_.FilteredVariablesKStepAhead``. Also stores 1-step ahead
-       values in
-       ``oo_.FilteredVariables``. ``oo_.FilteredVariablesKStepAheadVariances``
-       is stored if ``filter_covariance``.
-       This option is not yet compatible with the pruned skewed Kalman
-       filter (``kalman_algo=5``).
-
-    .. option:: filter_decomposition
-
-       Triggers the computation of the shock decomposition of the
-       above k-step ahead filtered values. Stores results in
-       ``oo_.FilteredVariablesShockDecomposition``.
-       This option is not yet compatible with the pruned skewed Kalman
-       filter (``kalman_algo=5``).
-
-    .. option:: smoothed_state_uncertainty
-
-       Triggers the computation of the variance of smoothed estimates,
-       i.e. :math:`var_T(y_t)`. Stores results in
-       ``oo_.Smoother.State_uncertainty``.
-       This option is not yet compatible with the pruned skewed Kalman
-       filter (``kalman_algo=5``).
-
-    .. option:: diffuse_filter
-
-       Uses the diffuse Kalman filter (as described in :cite:t:`Durbin:2012` and :cite:t:`Koopman:2003` for the
-       multivariate and :cite:t:`Koopman:2000` for the univariate
-       filter) to estimate models with non-stationary observed
-       variables. This option will also reset the ``qz_criterium`` to 
-       count unit root variables towards the stable variables. Trying to estimate 
-       a model with unit roots will otherwise result in a Blanchard-Kahn error.
-
-       When ``diffuse_filter`` is used the ``lik_init`` option of
-       ``estimation`` has no effect.
-
-       When there are nonstationary exogenous variables in a model,
-       there is no unique deterministic steady state. For instance, if
-       productivity is a pure random walk:
-
-           .. math::
-
-              a_t = a_{t-1} + e_t
-
-       any value of :math:`\bar a` of :math:`a` is a deterministic
-       steady state for productivity. Consequently, the model admits
-       an infinity of steady states. In this situation, the user must
-       help Dynare in selecting one steady state, except if zero is a
-       trivial model’s steady state, which happens when the ``linear``
-       option is used in the model declaration. The user can either
-       provide the steady state to Dynare using a
-       ``steady_state_model`` block (or writing a steady state file)
-       if a closed form solution is available, see
-       :bck:`steady_state_model`, or specify some constraints on the
-       steady state, see
-       :ref:`equation_tag_for_conditional_steady_state <eq-tag-ss>`,
-       so that Dynare computes the steady state conditionally on some
-       predefined levels for the non stationary variables. In both
-       cases, the idea is to use dummy values for the steady state
-       level of the exogenous non stationary variables.
-
-       Note that the nonstationary variables in the model must be
-       integrated processes (their first difference or k-difference
-       must be stationary).
-
-    .. option:: heteroskedastic_filter
-
-       Runs filter, likelihood, and smoother using heteroskedastic definitions provided in
-       a ``heteroskedastic_shocks`` block.
-       This option is not yet compatible with the pruned skewed Kalman
-       filter (``kalman_algo=5``).
-
-    .. option:: skewed_kalman_prune_tol = DOUBLE
-
-       Tolerance for pruning redundant skewness dimensions in closed skew normal distribution
-       during the skewed Kalman filter and smoother. Default is ``0.01``.
-       Only relevant for ``kalman_algo=5``.
-
-    .. option:: skewed_kalman_rank_deficiency_transform
-
-       In case of singular transition matrix, compute CSN parameters
-       for joint distribution of states and shocks from state transition
-       equation. Does either rank deficient or full rank linear transformation
-       which might speed up or robustify the pruned skewed Kalman filter.
-       Only relevant for ``kalman_algo=5``.
-
-    .. option:: skewed_kalman_mvnlogcdf = QUOTED_STRING
-
-       Name of function to compute log Gaussian cdf, possible values:
-       ``'gaussian_log_mvncdf_mendell_elston'`` (default) or ``'mvncdf'``.
-       Only relevant for ``kalman_algo=5``.
-
-    .. option:: skewed_kalman_smoother_skip
-
-       Skip the computation of the classical smoother after an estimation
-       with the pruned skewed Kalman filter. Might be useful to skip this,
-       because computing the mean of CSN distributed states and shocks takes some time.
-       Only relevant for ``kalman_algo=5``.
-
-    .. option:: selected_variables_only
-
-       Only run the classical smoother on the variables listed just
-       after the ``estimation`` command. This option is incompatible
-       with requesting classical frequentist forecasts and will be
-       overridden in this case. When using Bayesian estimation, the
-       smoother is by default only run on the declared endogenous
-       variables. Default: run the smoother on all the declared
-       endogenous variables.
-
-    .. option:: cova_compute = INTEGER
-
-       When ``0``, the covariance matrix of estimated parameters is
-       not computed after the computation of posterior mode (or
-       maximum likelihood). This increases speed of computation in
-       large models during development, when this information is not
-       always necessary. Of course, it will break all successive
-       computations that would require this covariance
-       matrix. Otherwise, if this option is equal to ``1``, the
-       covariance matrix is computed and stored in variable ``hh`` of
-       ``MODEL_FILENAME_mode.mat``. Default is ``1``.
-
-    .. option:: solve_algo = INTEGER
-
-       See :ref:`solve_algo <solvalg>`.
-
-    .. option:: order = INTEGER
-
-       Order of approximation around the deterministic steady
-       state. When greater than 1, the likelihood is evaluated with a
-       particle or nonlinear filter :cite:p:`{see}FernandezVillaverde:2005`. Default is ``1``, i.e. the likelihood
-       of the linearized model is evaluated using a standard Kalman
-       filter.
-
-    .. option:: irf = INTEGER
-
-       See :opt:`irf <irf = INTEGER>`. Only used if
-       :opt:`bayesian_irf` is passed.
-
-    .. option:: irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )
-
-        See :opt:`irf_shocks
-        <irf_shocks = ( VARIABLE_NAME [[,] VARIABLE_NAME ...] )>`.
-        Only used if :opt:`bayesian_irf` is passed.
-
-    .. option:: irf_plot_threshold = DOUBLE
-
-       See :opt:`irf_plot_threshold
-       <irf_plot_threshold = DOUBLE>`.
-       Only used if :opt:`bayesian_irf` is passed.
-
-    .. option:: dr = OPTION
-
-        See :opt:`dr <dr = OPTION>`. Default: ``default``, i.e. generalized
-        Schur decomposition.
-
-    .. option:: dr_cycle_reduction_tol = DOUBLE
-
-        See :opt:`dr_cycle_reduction_tol <dr_cycle_reduction_tol = DOUBLE>`.
-        Default: ``1e-7``.
-
-    .. option:: dr_cycle_reduction_maxiter = INTEGER
-
-        See :opt:`dr_cycle_reduction_maxiter <dr_cycle_reduction_maxiter = INTEGER>`.
-        Default: ``100``.
-
-    .. option:: dr_logarithmic_reduction_tol = DOUBLE
-
-        See :opt:`dr_logarithmic_reduction_tol <dr_logarithmic_reduction_tol = DOUBLE>`.
-        Default: ``1e-12``.
-
-    .. option:: dr_logarithmic_reduction_maxiter = INTEGER
-
-        See :opt:`dr_logarithmic_reduction_maxiter <dr_logarithmic_reduction_maxiter = INTEGER>`.
-        Default: ``100``.
-
-    .. option:: lyapunov = OPTION
-
-       Determines the algorithm used to solve the Lyapunov equation to
-       initialized the variance-covariance matrix of the Kalman filter
-       using the steady-state value of state variables. Possible
-       values for OPTION are:
-
-           ``default``
-
-               Uses the default solver for Lyapunov equations based on
-               Bartels-Stewart algorithm.
-
-           ``fixed_point``
-
-               Uses a fixed point algorithm to solve the Lyapunov
-               equation. This method is faster than the ``default``
-               one for large scale models, but it could require a
-               large amount of iterations.
-
-           ``doubling``
-
-               Uses a doubling algorithm to solve the Lyapunov
-               equation (``disclyap_fast``). This method is faster
-               than the two previous one for large scale models.
-
-           ``square_root_solver``
-
-               Uses a square-root solver for Lyapunov equations
-               (``dlyapchol``). This method is fast for large scale
-               models (available under MATLAB if the Control System
-               Toolbox is installed; available under Octave if the
-               `control`_ package is installed)
-
-       Default value is ``default``.
-
-    .. option:: lyapunov_fixed_point_tol = DOUBLE
-
-       This is the convergence criterion used in the fixed point
-       Lyapunov solver. Its default value is ``1e-10``.
-
-    .. option:: lyapunov_doubling_tol = DOUBLE
-
-       This is the convergence criterion used in the doubling
-       algorithm to solve the Lyapunov equation. Its default value is
-       ``1e-16``.
-
-    .. option:: use_penalized_objective_for_hessian
-
-       Use the penalized objective instead of the objective function
-       to compute numerically the hessian matrix at the mode. The
-       penalties decrease the value of the posterior density (or
-       likelihood) when, for some perturbations, Dynare is not able to
-       solve the model (issues with steady state existence, Blanchard
-       and Kahn conditions, ...). In pratice, the penalized and
-       original objectives will only differ if the posterior mode is
-       found to be near a region where the model is ill-behaved. By
-       default the original objective function is used.
-
-    .. option:: analytic_derivation
-
-       Triggers estimation with analytic gradient at ``order=1``.
-       The final hessian at the mode is also computed analytically.
-       Only works for stationary models without missing observations,
-       i.e. for ``kalman_algo<3``. Incompatible with ``heteroskedastic_shocks``. Optimizers that rely on analytic gradients are ``mode_compute=1,3,4,5,101``.
-
-    .. option:: ar = INTEGER
-
-       See :opt:`ar <ar = INTEGER>`. Only useful in conjunction with
-       option ``moments_varendo``.
+    .. option:: sub_draws = INTEGER
+
+       Number of draws from the MCMC that are used to compute
+       posterior distribution of various objects (smoothed variable,
+       smoothed shocks, forecast, moments, IRF). The draws used to
+       compute these posterior moments are sampled uniformly in the
+       estimated empirical posterior distribution (i.e. draws of the
+       MCMC). ``sub_draws`` should be smaller than the total number of
+       MCMC draws available. Default:
+       ``min(posterior_max_subsample_draws, (Total number of
+       draws)*(number of chains) )``.
+
+    .. option:: posterior_max_subsample_draws = INTEGER
+
+       Maximum number of draws from the MCMC used to compute posterior
+       distribution of various objects (smoothed variable, smoothed
+       shocks, forecast, moments, IRF), if not overridden by option
+       ``sub_draws``. Default: ``1200``.
+
+    .. option:: prior_trunc = DOUBLE
+
+       Probability of extreme values of the prior density in each tail that is
+       ignored when computing bounds for the parameters. Default:
+       ``1e-10`` for ``posterior_sampling_method=slice`` and ``0`` otherwise.
+
+    .. option:: huge_number = DOUBLE
+
+       Value for replacing infinite values in the definition of
+       (prior) bounds when finite values are required for
+       computational reasons. Default: ``1e7``.
 
     .. option:: endogenous_prior
 
@@ -8844,26 +8629,270 @@ observed variables.
        not explicitly targeted, but often of particular interest to
        researchers).
 
-    .. option:: use_univariate_filters_if_singularity_is_detected = INTEGER
+    .. option:: estimate_initial_states_endogenous_prior
+       Jointly estimate the initial states along with the other parameters. 
+       This contrasts to the usual approach of marginalizing with respect to
+       the states while estimating parameters, and then estimating the states
+       offline using the smoother. This option uses the unconditional
+       mean and variance of the states implied by the linear Kalman filter as an
+       endogenous prior. This means that, for a linear Kalman filter, the
+       joint posterior of parameters and states is exactly the same as
+       what would be obtained from the usual marginalized likelihood approach
+       combined with offline state estimation via the smoother.
+       The initial state values are treated as additional parameters to be
+       estimated. The option automatically sets ``lik_init=2`` and requires
+       ``posterior_sampling_method='slice'``.  This option is useful for 
+       nonlinear models estimated e.g. via OccBin.
 
-       Decide whether Dynare should automatically switch to univariate
-       filter if a singularity is encountered in the likelihood
-       computation (this is the behaviour if the option is equal to
-       ``1``). Alternatively, if the option is equal to ``0``, Dynare
-       will not automatically change the filter, but rather use a
-       penalty value for the likelihood when such a singularity is
-       encountered. Default: ``1``.
 
-    .. option:: rescale_prediction_error_covariance
+MCMC options
+------------
 
-       Rescales the prediction error covariance in the Kalman filter
-       to avoid badly scaled matrix and reduce the probability of a
-       switch to univariate Kalman filters (which are slower). By
-       default no rescaling is done.
+    .. option:: mh_conf_sig = DOUBLE
 
-    .. option:: qz_zero_threshold = DOUBLE
+       Confidence/HPD interval used for the computation of prior and
+       posterior statistics like: parameter distributions,
+       prior/posterior moments, conditional variance decomposition,
+       impulse response functions, Bayesian forecasting. Default:
+       ``0.9``.
 
-       See :opt:`qz_zero_threshold <qz_zero_threshold = DOUBLE>`.
+    .. option:: mh_replic = INTEGER
+
+       Number of replications for each chain of the Metropolis-Hastings algorithm.
+       The number of draws should be sufficient to achieve convergence of the MCMC and
+       to meaningfully compute posterior objects. Default: ``20000``.
+
+    .. option:: mh_nblocks = INTEGER
+
+       Number of parallel chains for Metropolis-Hastings
+       algorithm. Default: ``2``.
+
+    .. option:: mh_drop = DOUBLE
+
+       The fraction of initially generated parameter vectors to be
+       dropped as a burn-in before using posterior
+       simulations. Default: ``0.5``.
+
+    .. option:: mh_jscale = DOUBLE
+
+       The scale parameter of the jumping distribution's covariance
+       matrix (Metropolis-Hastings or TaRB-algorithm). This option must be tuned to
+       obtain, ideally, an acceptance ratio of 25%-33%. Basically, the
+       idea is to increase the variance of the jumping distribution if
+       the acceptance ratio is too high, and decrease the same
+       variance if the acceptance ratio is too low. In some situations
+       it may help to consider parameter-specific values for this
+       scale parameter. This can be done in the
+       :bck:`estimated_params` block.
+
+       Note that ``mode_compute=6`` will tune the scale parameter to
+       achieve an acceptance rate of
+       :ref:`AcceptanceRateTarget<art>`. The resulting scale parameter
+       will be saved into a file named
+       ``MODEL_FILENAME_mh_scale.mat`` in the ``FILENAME/Output`` folder.
+       This file can be loaded in
+       subsequent runs via the ``posterior_sampler_options`` option
+       :ref:`scale_file <scale-file>`. Both ``mode_compute=6`` and
+       ``scale_file`` will overwrite any value specified in
+       ``estimated_params`` with the tuned value. Default: ``2.38/sqrt(n)``.
+
+       Note also that for the Random Walk Metropolis Hastings
+       algorithm, it is possible to use option :opt:`mh_tune_jscale
+       <mh_tune_jscale [= DOUBLE]>`, to automatically tune the value
+       of ``mh_jscale``. In this case, the ``mh_jscale`` option must
+       not be used.
+
+    .. option:: mh_init_scale = DOUBLE (deprecated)
+
+       The scale to be used for drawing the initial value of the
+       Metropolis-Hastings chain. Generally, the starting points
+       should be overdispersed for the :cite:t:`Brooks:1998`
+       convergence diagnostics to be meaningful. Default:
+       ``2*mh_jscale.``
+
+       It is important to keep in mind that ``mh_init_scale`` is set
+       at the beginning of Dynare execution, i.e. the default will not
+       take into account potential changes in ``mh_jscale`` introduced
+       by either ``mode_compute=6`` or the
+       ``posterior_sampler_options`` option :ref:`scale_file<scale-file>`. 
+       If ``mh_init_scale`` is too wide during
+       initalization of the posterior sampler so that 100 tested draws
+       are inadmissible (e.g. Blanchard-Kahn conditions are always
+       violated), Dynare will request user input of a new
+       ``mh_init_scale`` value with which the next 100 draws will be
+       drawn and tested. If the :opt:`nointeractive` option has been
+       invoked, the program will instead automatically decrease
+       ``mh_init_scale`` by 10 percent after 100 futile draws and try
+       another 100 draws. This iterative procedure will take place at
+       most 10 times, at which point Dynare will abort with an error
+       message.
+
+    .. option:: mh_init_scale_factor = DOUBLE
+
+       The multiple of ``mh_jscale`` used for drawing the initial value of the
+       Metropolis-Hastings chain. Generally, the starting points
+       should be overdispersed for the :cite:t:`Brooks:1998`
+       convergence diagnostics to be meaningful. Default:
+       ``2``
+
+       If ``mh_init_scale_factor`` is too wide during
+       initialization of the posterior sampler so that 100 tested draws
+       are inadmissible (e.g. Blanchard-Kahn conditions are always
+       violated), Dynare will request user input of a new
+       ``mh_init_scale_factor`` value with which the next 100 draws will be
+       drawn and tested. If the :opt:`nointeractive` option has been
+       invoked, the program will instead automatically decrease
+       ``mh_init_scale_factor`` by 10 percent after 100 futile draws and try
+       another 100 draws. This iterative procedure will take place at
+       most 10 times, at which point Dynare will abort with an error
+       message.
+
+    .. option:: mh_tune_jscale [= DOUBLE]
+
+       Automatically tunes the scale parameter of the jumping
+       distribution's covariance matrix (Metropolis-Hastings), so that
+       the overall acceptance ratio is close to the desired
+       level. Default value is ``0.33``. It is not possible to
+       match exactly the desired acceptance ratio because of the
+       stochastic nature of the algorithm (the proposals and the
+       initial conditions of the Markov chains if
+       ``mh_nblocks>1``). This option is only available for the
+       Random Walk Metropolis Hastings algorithm. Must not be used in conjunction with
+       :opt:`mh_jscale = DOUBLE`.
+
+    .. option:: mh_tune_guess = DOUBLE
+
+       Specifies the initial value for the :opt:`mh_tune_jscale
+       <mh_tune_jscale [= DOUBLE]>` option. Default: ``2.38/sqrt(n)``. Must not
+       be set if :opt:`mh_tune_jscale <mh_tune_jscale [= DOUBLE]>` is
+       not used.
+
+    .. option:: mh_recover
+
+       Attempts to recover a Metropolis-Hastings simulation that
+       crashed prematurely, starting with the last available saved
+       ``mh``-file. Shouldn’t be used together with :opt:`load_mh_file`
+       or a different ``mh_replic`` than in the crashed run. Since
+       Dynare 4.5 the proposal density from the previous run will
+       automatically be loaded. In older versions, to assure a neat
+       continuation of the chain with the same proposal density, you
+       should provide the ``mode_file`` used in the previous run or
+       the same user-defined ``mcmc_jumping_covariance`` when using
+       this option. Note that under Octave, a neat continuation of the
+       crashed chain with the respective last random number generator
+       state is currently not supported.
+
+    .. option:: mh_posterior_mode_estimation
+
+       Skip optimizer-based mode-finding and instead compute the mode based 
+       on a run of a MCMC. The MCMC will start at the prior mode and use the prior
+       variances to compute the inverse Hessian.
+
+    .. option:: load_mh_file
+
+       Tells Dynare to add to previous Metropolis-Hastings simulations
+       instead of starting from scratch. Since Dynare 4.5 the proposal
+       density from the previous run will automatically be loaded. In
+       older versions, to assure a neat continuation of the chain with
+       the same proposal density, you should provide the ``mode_file``
+       used in the previous run or the same user-defined
+       ``mcmc_jumping_covariance`` when using this option. Shouldn’t
+       be used together with ``mh_recover``. Note that under Octave, a
+       neat continuation of the chain with the last random number
+       generator state of the already present draws is currently not
+       supported.
+
+    .. option:: load_results_after_load_mh
+
+       This option is available when loading a previous MCMC run
+       without adding additional draws, i.e. when :opt:`load_mh_file` is
+       specified with ``mh_replic=0``. It tells Dynare to load the
+       previously computed convergence diagnostics, marginal data
+       density, and posterior statistics from an existing ``_results``
+       file instead of recomputing them.
+
+    .. option:: mh_initialize_from_previous_mcmc
+
+       This option allows picking initial values for new MCMC from a previous one,
+       where the model specification, the number of estimated parameters,
+       (some) prior might have changed (so a situation where :opt:`load_mh_file` would not work).
+       If an additional parameter is estimated, it is automatically initialized from prior_draw.
+       Note that, if this option is used to skip the optimization step, you should use a sampling method which does not require
+       a proposal density, like slice. Otherwise, optimization should always be done beforehand or a mode file with
+       an appropriate posterior covariance matrix should be used.
+
+    .. option:: mh_initialize_from_previous_mcmc_directory = FILENAME
+
+       If ``mh_initialize_from_previous_mcmc`` is set, users must provide here
+       the path to the standard FNAME folder from where to load prior definitions and
+       last MCMC values to be used to initialize the new MCMC.
+
+       Example: if previous project directory is ``/my_previous_dir`` and FNAME is ``mymodel``,
+       users should set the option as
+
+       ``mh_initialize_from_previous_mcmc_directory = '/my_previous_dir/mymodel'``
+
+       Dynare will then look for the last record file into
+
+       ``/my_previous_dir/mymodel/metropolis/mymodel_mh_history_<LAST>.mat``
+
+       and for the prior definition file into
+
+       ``/my_previous_dir/mymodel/prior/definition.mat``
+
+    .. option:: mh_initialize_from_previous_mcmc_record = FILENAME
+
+       If ``mh_initialize_from_previous_mcmc`` is set, and whenever the standard file or directory tree
+       is not applicable to load initial values, users may directly provide here
+       the path to the record file from which to load
+       values to be used to initialize the new MCMC.
+
+    .. option:: mh_initialize_from_previous_mcmc_prior = FILENAME
+
+       If ``mh_initialize_from_previous_mcmc`` is set, and whenever the standard file or directory tree
+       is not applicable to load initial values, users may directly provide here
+       the path to the prior definition file, to get info in the priors used in previous MCMC.
+
+    .. option:: mcmc_jumping_covariance = OPTION
+
+       Tells Dynare which covariance to use for the proposal density
+       of the MCMC sampler. OPTION can be one of the following:
+
+           ``hessian``
+
+               Uses the Hessian matrix computed at the mode.
+
+           ``prior_variance``
+
+               Uses the prior variances. No infinite prior variances
+               are allowed in this case.
+
+           ``identity_matrix``
+
+               Uses an identity matrix.
+
+           ``FILENAME``
+
+               Loads an arbitrary user-specified covariance matrix
+               from ``FILENAME.mat``. The covariance matrix must be
+               saved in a variable named ``jumping_covariance``, must
+               be square, positive definite, and have the same
+               dimension as the number of estimated parameters.
+
+       Note that the covariance matrices are still scaled with
+       :opt:`mh_jscale <mh_jscale = DOUBLE>`. Default value is
+       ``hessian``.
+
+.. _estim-convergence-diagnostics:
+
+Convergence diagnostics
+-----------------------
+
+    .. option:: nodiagnostic
+
+       Does not compute the convergence diagnostics for
+       Metropolis-Hastings. Default: diagnostics are computed and
+       displayed.
 
     .. option:: taper_steps = [INTEGER1 INTEGER2 ...]
 
@@ -8911,27 +8940,43 @@ observed variables.
        convergence diagnostics. Default: ``[0.025 0.005
        0.95]``.
 
-    .. option:: consider_all_endogenous
+DSGE-VAR
+--------
 
-       Compute the posterior moments, smoothed variables, k-step ahead
-       filtered variables and forecasts (when requested) on all the
-       endogenous variables. This is equivalent to manually listing
-       all the endogenous variables after the ``estimation`` command.
+    .. option:: dsge_var = DOUBLE
 
-    .. option:: consider_all_endogenous_and_auxiliary
+       Triggers the estimation of a DSGE-VAR model, where the weight
+       of the DSGE prior of the VAR model is calibrated to the value
+       passed (see :cite:t:`DelNegro:2004`). It represents
+       the ratio of dummy over actual observations. To assure that the
+       prior is proper, the value must be bigger than :math:`(k+n)/T`,
+       where :math:`k` is the number of estimated parameters,
+       :math:`n` is the number of observables, and :math:`T` is the
+       number of observations.
 
-       Compute the posterior moments, smoothed variables, k-step ahead
-       filtered variables and forecasts (when requested) on all the
-       endogenous variables and the auxiliary variables introduced by the
-       preprocessor. This option is useful when e.g. running ``smoother2histval``
-       on the results of the Kalman smoother.
+        NB: The previous method of declaring ``dsge_prior_weight`` as
+        a parameter and then calibrating it is now deprecated and will
+        be removed in a future release of Dynare. Some of the objects
+        arising during estimation are stored with their values at the
+        mode in ``oo_.dsge_var.posterior_mode``.
 
-    .. option:: consider_only_observed
+    .. option:: dsge_var
 
-       Compute the posterior moments, smoothed variables, k-step ahead
-       filtered variables and forecasts (when requested) on all the
-       observed variables. This is equivalent to manually listing all
-       the observed variables after the ``estimation`` command.
+       Triggers the estimation of a DSGE-VAR model, where the weight
+       of the DSGE prior of the VAR model will be estimated (as in
+       :cite:t:`Adjemian:2008`). The prior on the weight of the DSGE
+       prior, ``dsge_prior_weight``, must be defined in the
+       ``estimated_params`` section.
+
+       NB: The previous method of declaring ``dsge_prior_weight`` as
+       a parameter and then placing it in ``estimated_params`` is now
+       deprecated and will be removed in a future release of Dynare.
+
+    .. option:: dsge_varlag = INTEGER
+
+       The number of lags used to estimate a DSGE-VAR model. Default:
+       ``4``.
+
 
 Non-linear filter options
 -------------------------
