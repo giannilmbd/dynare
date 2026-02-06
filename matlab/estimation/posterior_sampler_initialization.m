@@ -207,7 +207,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
                     end
                 end
                 if all(candidate(:) >= mh_bounds.lb) && all(candidate(:) <= mh_bounds.ub)
-                    if strcmp(func2str(objective_function),'dsge_likelihood') && options_.init_state_endogenous_prior
+                    if strcmp(func2str(objective_function),'dsge_likelihood') && options_.estimate_initial_states_endogenous_prior
                         init = true;
                         [candidate, ~, ~, M_] = draw_init_state_from_smoother(init,options_.posterior_sampler_options.current_options,candidate,NaN,mh_bounds, ...
                             dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
@@ -263,6 +263,11 @@ if ~options_.load_mh_file && ~options_.mh_recover
     else% Case 2: one chain (we start from the posterior mode)
         fprintf(fidlog,'  Initial values of the parameters:\n');
         candidate = transpose(xparam1(:));%
+        if strcmp(func2str(objective_function),'dsge_likelihood') && options_.estimate_initial_states_endogenous_prior
+            init = true;
+            [candidate, ~, ~, M_] = draw_init_state_from_smoother(init,options_.posterior_sampler_options.current_options,candidate,NaN,mh_bounds, ...
+                dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+        end
         if all(candidate(:) >= mh_bounds.lb) && all(candidate(:) <= mh_bounds.ub)
             ix2 = candidate;
             ilogpo2 = - feval(objective_function,ix2',dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);

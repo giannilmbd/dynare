@@ -853,7 +853,7 @@ if options_.endogenous_prior==1
         [lnpriormom]  = endogenous_prior(Y,dataset_info,Pstar,bayestopt_,H);
         fval    = (likelihood-lnprior-lnpriormom);
     end
-elseif options_.init_state_endogenous_prior    
+elseif options_.estimate_initial_states_endogenous_prior
     if not(options_.lik_init==2 && options_.Harvey_scale_factor==0)
         error('Init state endogenous prior not supported without conditional likelihood')
     else

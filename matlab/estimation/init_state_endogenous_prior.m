@@ -53,14 +53,23 @@ Pstar=lyapunov_solver(T,R,Q,options_);
 
 [UP,XP] = svd(0.5*(Pstar(bayestopt_.mf0,bayestopt_.mf0)+Pstar(bayestopt_.mf0,bayestopt_.mf0)'));
 isp = find(diag(XP)>options_.kalman_tol);
+if length(isp)>rank(Q)
+    isp = isp(1:rank(Q));
+end
 ns = size(XP,1);
+isn=length(isp)+1:ns;
+UPN = UP(:,isn);
+mycheck =max(abs(UPN'*a_0_given_tm0(bayestopt_.mf0)));
 UP = UP(:,isp);
 S = XP(isp,isp);
 log_dS = log(det(S));
 
 vv = UP'*(a_0_given_tm0(bayestopt_.mf0));
 lnpriorendoinitstate = -(log_dS + transpose(vv)/S*vv + ns*log(2*pi))/2;
-
+if mycheck>options_.kalman_tol
+    do_nothing=true;
+    % lnpriorendoinitstate=-inf;
+end
 if nargout>1
     % now I remove original state prior declared
     IB = startsWith(bayestopt_.name, 'init ');

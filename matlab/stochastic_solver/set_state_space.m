@@ -1,41 +1,24 @@
-function dr=set_state_space(dr,M_)
-% dr=set_state_space(dr,M_)
-% This function computes the DR ordering and inverse ordering.
-% It used to compute stuff related to the state-space representation of the reduced form, hence
-%  its name.
+function [dr, state_var]=set_state_space(dr,M_)
+% [dr, state_var]=set_state_space(dr,M_)
+% Computes the DR ordering and inverse ordering.
+%
+% INPUTS
+% - dr            [struct]    MATLAB's structure describing decision and transition rules.
+% - M_            [struct]    MATLAB's structure describing the model.
+%
+% OUTPUTS
+% - dr            [struct]    MATLAB's structure describing decision and transition rules.
+% - state_var     [vector]    (optional) Indices of state variables (variables with lags) in
+%                             declaration order. See also dyn_first_order_solver.m where state_var
+%                             is computed as [no_both_lag_id, both_id].
+%
+% CALLED BY
+%   check, cli/prior, discretionary_policy/discretionary_policy_1, ep/extended_path_initialization,
+%   estimation/dynare_estimation_init, estimation/optimize_prior, estimation/prior_sampler,
+%   perfect-foresight-models/det_cond_forecast, stochastic_solver/stochastic_solvers,
+%   stochastic_solver/stoch_simul, +osr/run, preprocessor-generated driver.m files
 
-%@info:
-%! @deftypefn {Function File} {[@var{dr} =} set_state_space (@var{dr},@var{M_})
-%! @anchor{set_state_space}
-%! @sp 1
-%! Write the state space representation of the reduced form solution.
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item dr
-%! MATLAB's structure describing decision and transition rules.
-%! @item M_
-%! MATLAB's structure describing the model
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item dr
-%! MATLAB's structure describing decision and transition rules.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{check}, @ref{discretionary_policy_1}, @ref{dynare_estimation_init}, @ref{dyn_risky_steady_state_solver}, @ref{osr1}, @ref{partial_information/dr1_PI}, @ref{pea/pea_initialization}, @ref{stochastic_solvers}, @ref{stoch_simul}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 2
-%! @end deftypefn
-%@eod:
-
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -58,12 +41,18 @@ if M_.maximum_endo_lag > 0
     both_var = intersect(pred_var,fwrd_var);
     pred_var = setdiff(pred_var,both_var);
     fwrd_var = setdiff(fwrd_var,both_var);
-    stat_var = setdiff([1:M_.endo_nbr]',union(union(pred_var,both_var),fwrd_var));  % static variables
+    static_var = setdiff([1:M_.endo_nbr]',union(union(pred_var,both_var),fwrd_var));  % static variables
 else
     pred_var = [];
     both_var = [];
-    stat_var = setdiff([1:M_.endo_nbr]',fwrd_var);
+    static_var = setdiff([1:M_.endo_nbr]',fwrd_var);
 end
 
-dr.order_var = [stat_var(:); pred_var(:); both_var(:); fwrd_var(:)];
+dr.order_var = [static_var(:); pred_var(:); both_var(:); fwrd_var(:)];
 dr.inv_order_var(dr.order_var) = 1:M_.endo_nbr;
+
+if nargout > 1
+    % State variables: variables that appear at t-1 (predetermined)
+    % See also: dyn_first_order_solver.m where state_var is computed as [no_both_lag_id, both_id]
+    state_var = [pred_var(:); both_var(:)]';
+end

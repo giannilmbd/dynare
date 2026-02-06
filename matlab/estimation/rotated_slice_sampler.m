@@ -2,11 +2,11 @@ function [theta, fxsim, neval] = rotated_slice_sampler(objective_function,theta,
 % [theta, fxsim, neval] = rotated_slice_sampler(objective_function,theta,thetaprior,sampler_options,varargin)
 % ----------------------------------------------------------
 % ROTATED SLICE SAMPLER - with stepping out (Neal, 2003)
-% extension of the orthogonal univarite sampler (slice_sampler.m)
+% extension of the orthogonal univariate sampler (slice_sampler.m)
 % copyright M. Ratto (European Commission)
 %
 % objective_function(theta,varargin): -log of any unnormalized pdf
-% with varargin (optional) a vector of auxiliaty parameters
+% with varargin (optional) a vector of auxiliary parameters
 % to be passed to f( ).
 % ----------------------------------------------------------
 %
@@ -106,8 +106,8 @@ for it=1:npar
         XUB   = rthetaprior(it,2);
     else
         tb=sort([(thetaprior(IP,1)-theta(IP))./V1(IP,it) (thetaprior(IP,2)-theta(IP))./V1(IP,it)],2);
-    XLB=max(tb(:,1));
-    XUB=min(tb(:,2));
+        XLB=max(tb(:,1));
+        XUB=min(tb(:,2));
     end
     if isempty(W1)
         W = (XUB-XLB); %*0.8;
@@ -121,6 +121,9 @@ for it=1:npar
     % -------------------------------------------------------
 
     fxold = -feval(objective_function,theta,varargin{:});
+    if endo_init_state
+        ys0 = get_steady_state(theta,varargin{3:end});
+    end
     %I have to be sure that the rotation is for L,R or for Fxold, theta(it)
     neval(it) = neval(it) + 1;
     Z = fxold + log(rand(1,1));
@@ -137,8 +140,9 @@ for it=1:npar
         xsim = L;
         theta = theta0+xsim*V1(:,it);
         if endo_init_state
-            theta1 = theta;
-            [theta, icheck]=set_init_state(theta1,varargin{3:end});
+            theta1 = theta0;
+            theta1(IP) = theta(IP);
+            [theta, icheck]=set_init_state(theta1,ys0,varargin{3:end});
         end
         if fast_likelihood_evaluation_for_rejection
             fxl = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
@@ -155,8 +159,9 @@ for it=1:npar
         xsim = R;
         theta = theta0+xsim*V1(:,it);
         if endo_init_state
-            theta1 = theta;
-            [theta, icheck]=set_init_state(theta1,varargin{3:end});
+            theta1 = theta0;
+            theta1(IP) = theta(IP);
+            [theta, icheck]=set_init_state(theta1,ys0,varargin{3:end});
         end
         if fast_likelihood_evaluation_for_rejection
             fxr = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
@@ -178,8 +183,9 @@ for it=1:npar
         xsim = L + u*(R - L);
         theta = theta0+xsim*V1(:,it);
         if endo_init_state
-            theta1 = theta;
-            [theta, icheck]=set_init_state(theta1,varargin{3:end});
+            theta1 = theta0;
+            theta1(IP) = theta(IP);
+            [theta, icheck]=set_init_state(theta1,ys0,varargin{3:end});
         end
         if fast_likelihood_evaluation_for_rejection
             fxsim = -rejection_objective_function(objective_function,theta,Z-rejection_penalty,varargin{:});
@@ -200,4 +206,9 @@ for it=1:npar
         save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'neval','it','theta','fxsim');
     end
 end
-end
+
+function ys = get_steady_state(xparam1, options_,M_,estim_params_,~,~,~, endo_steady_state, exo_steady_state, exo_det_steady_state)
+% wrapper function to get steady state 
+
+M_ = set_all_parameters(xparam1,estim_params_,M_);
+ys = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);

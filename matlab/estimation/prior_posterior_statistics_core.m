@@ -275,8 +275,8 @@ for b=fpar:B
 
                     state_uncertainty1 = state_uncertainty0(oo_.dr.inv_order_var,oo_.dr.inv_order_var);
                     alphahat0 = a0T(oo_.dr.inv_order_var);
-                    alphahat1 = alphahat0(M_.state_var);
-                    state_uncertainty1 = state_uncertainty1(M_.state_var,M_.state_var);
+                    alphahat1 = alphahat0(oo_.dr.state_var);
+                    state_uncertainty1 = state_uncertainty1(oo_.dr.state_var,oo_.dr.state_var);
                     [U,X] = svd(0.5*(state_uncertainty1+state_uncertainty1'));
                     % P= U*X*U'; % symmetric matrix!
                     is = find(diag(X)>options_.kalman_tol);
@@ -302,13 +302,13 @@ for b=fpar:B
                     niter=0;
                     while error_indicator && niter<10
                         niter=niter+1;
-                        M_local.endo_initial_state.values(M_.state_var) = alphahat01;
+                        M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat01;
                         [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
                             occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
                         if oo_.occbin.smoother.error_flag(1)
                             if not(isempty(is)) && niter==1
                                 % first check if smoother mean works
-                                M_local.endo_initial_state.values(M_.state_var) = alphahat1;
+                                M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat1;
                                 [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
                                     occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
                             end

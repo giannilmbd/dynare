@@ -72,13 +72,13 @@ options_.occbin.smoother.periodic_solution=true;
 options_.occbin.likelihood.periodic_solution=true;
 // end occbin options
 
-options_.init_state_endogenous_prior = true;
 steady;
 check;
 // Estimation
 // -----------------------------
 
-estimation(datafile='datafile', 
+estimation(estimate_initial_states_endogenous_prior,
+    datafile='datafile', 
     order=1,
 	use_univariate_filters_if_singularity_is_detected=0,
 	mh_replic=20, 

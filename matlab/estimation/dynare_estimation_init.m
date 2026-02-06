@@ -92,7 +92,7 @@ if options_.discretionary_policy
 end
 
 % Check init state estimation with endogenous prior
-if options_.init_state_endogenous_prior
+if options_.estimate_initial_states_endogenous_prior
     if not(isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice'))
         error('Init state estimation with endogenous prior is only compatible with slice sampler')
     else
@@ -101,8 +101,8 @@ if options_.init_state_endogenous_prior
         options_.Harvey_scale_factor = 0;
         options_.lik_init = 2;
         if ~isfield(estim_params_,'endo_init_vals') || isempty(estim_params_.endo_init_vals)
-            % add init state list
-            estim_params_.nendoinit = length(M_.state_var);
+	        [~,oo_.dr.state_var]=set_state_space(oo_.dr,M_); %later replace by fixed reference 
+            estim_params_.nendoinit = length(oo_.dr.state_var);
             tmp_prior = nan(1,10);
             tmp_prior(3) = -Inf;
             tmp_prior(4) = Inf;
@@ -112,7 +112,8 @@ if options_.init_state_endogenous_prior
             estim_params_.endo_init_vals=zeros(0,10);
             for k=1:estim_params_.nendoinit
                 estim_params_.endo_init_vals(k,:) = tmp_prior;
-                estim_params_.endo_init_vals(k,1) = M_.state_var(k);
+                estim_params_.endo_init_vals(k,1) = oo_.dr.state_var(k);
+                estim_params_.endo_init_vals(k,2) = oo_.steady_state( oo_.dr.state_var(k));
             end
             
         end

@@ -44,13 +44,16 @@ function [UP, XP] = get_init_state_prior(xparam1, options_,M_,estim_params_,baye
 
 M_.endo_initial_state.status=false;
 options_.lik_init=1;
-options_.init_state_endogenous_prior=false;
-[Pstar, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+options_.estimate_initial_states_endogenous_prior=false;
+[Pstar, Q, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 if info(1)
     return
 end
 
 [UP,XP] = svd(0.5*(Pstar(bayestopt_.mf0,bayestopt_.mf0)+Pstar(bayestopt_.mf0,bayestopt_.mf0)'));
 isp = find(diag(XP)>options_.kalman_tol);
+if length(isp)>rank(Q)
+    isp = isp(1:rank(Q));
+end
 UP = UP(:,isp);
 XP = XP(isp,isp);

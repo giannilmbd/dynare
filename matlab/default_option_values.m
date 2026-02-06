@@ -827,7 +827,7 @@ options_.endogenous_prior = false;
 options_.endogenous_prior_restrictions.irf={};
 options_.endogenous_prior_restrictions.moment={};
 
-options_.init_state_endogenous_prior = false;
+options_.estimate_initial_states_endogenous_prior = false;
 
 % OSR Optimal Simple Rules
 options_.osr.opt_algo=4;

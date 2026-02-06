@@ -9,7 +9,7 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
 % initial state draw. If init is false, it performs a short Metropolis–
 % Hastings step to update the endogenous initial state parameters in
 % xparam1 (independent MH centered at the smoothed state when
-% options_.init_state_endogenous_prior is true; otherwise a RW-MH around
+% options_.estimate_initial_states_endogenous_prior is true; otherwise a RW-MH around
 % the current state), honoring parameter bounds. If init is true, it
 % directly sets the initial state parameters in xparam1 from the smoothed
 % draw without acceptance testing.
@@ -90,12 +90,14 @@ end
 
 % here I run unconditional smoother, so I need to undo the init state
 % estimation setup and set lik_init = 1
+M_ = set_all_parameters(xparam1,estim_params_,M_);
+ys0 = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);
 store_endo_initial_state=M_.endo_initial_state;
 M_.endo_initial_state.status = false;
 error_flag=0;
 options_.lik_init=1;
 if init
-    [Pstar, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+    [Pstar, Q, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
     if info(1)
         return
     end
@@ -115,7 +117,6 @@ options_.occbin.smoother.debug = false;
 options_.occbin.smoother.plot = false;
 options_.occbin.smoother.store_results = false;
 options_.occbin.smoother.waitbar = false;
-M_ = set_all_parameters(xparam1,estim_params_,M_);
 dr.ys = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);
 oo_.dr = dr;
 oo_.steady_state= endo_steady_state;
@@ -126,8 +127,9 @@ if options_.occbin.smoother.status
     if not(init)
         % check first that PKF with latent states provides sensible
         % likelihood
-        options_.init_state_endogenous_prior=false;
-        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);        options_.init_state_endogenous_prior=true;
+        options_.estimate_initial_states_endogenous_prior=false;
+        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);        
+        options_.estimate_initial_states_endogenous_prior=true;
         if (logpost0-logpost2)<1.e3
             [~,~,~,~,~,~,~,~,~,~,~,~,~,~,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
         else
@@ -138,11 +140,11 @@ if options_.occbin.smoother.status
     if init || (oo_.occbin.smoother.error_flag && isempty(alphahat0))
         % use linear smoother to initialize or if error
         options_.occbin.smoother.status=false;
-        [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+        [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
         options_.occbin.smoother.status=true;
     end
 else
-    [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_);
+    [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
 end
 % end unconditional smoother to get mean (alphahat0) and covariance (state_uncertainty0) of the proposal for init state 
 % now I reset init state estimation stuff
@@ -161,7 +163,7 @@ if error_flag==0
 
     % store current init state values
     IB = startsWith(bayestopt_.name, 'init ');
-    M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
+    M_.endo_initial_state.values(dr.state_var) = xparam1(IB);
 
     fast_likelihood_evaluation_for_rejection = false;
     if isfield(sampler_options,'fast_likelihood_evaluation_for_rejection') && sampler_options.fast_likelihood_evaluation_for_rejection
@@ -169,7 +171,7 @@ if error_flag==0
     end
 
     if not(init)
-        if options_.init_state_endogenous_prior
+        if options_.estimate_initial_states_endogenous_prior
             % independent MH
             % check probability of smoothed in t=0 (which is the mode for
             % linear case, but how about occbin?)
@@ -180,14 +182,18 @@ if error_flag==0
             alphahat01 = alphahat01(dr.inv_order_var);
 
             xproposal=xparam1;
-            xproposal(IB) = alphahat01(M_.state_var);
+            if options_.loglinear
+                xproposal(IB) = exp(alphahat01(dr.state_var)).*dr.ys(dr.state_var);
+            else
+                xproposal(IB) = alphahat01(dr.state_var)+dr.ys(dr.state_var);
+            end
             if not(all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub))
                 xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
                 xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
             end
 
             is_smoothed_state_optimal=true;
-            [xcheck, icheck]=set_init_state(xproposal,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xcheck, icheck]=set_init_state(xproposal,ys0,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if icheck
                 xproposal=xcheck;
             end
@@ -197,9 +203,13 @@ if error_flag==0
             end
             logpostSMO = logpost1;
         end
-        if not(options_.init_state_endogenous_prior) || not(is_smoothed_state_optimal)
+        if not(options_.estimate_initial_states_endogenous_prior) || not(is_smoothed_state_optimal)
             % use previous draw RW MH
-            alphahat0=store_endo_initial_state.values;
+            if options_.loglinear
+                alphahat0=log(store_endo_initial_state.values)-log(dr.ys);
+            else
+                alphahat0=store_endo_initial_state.values-dr.ys;
+            end
             alphahat0=alphahat0(dr.order_var); % decision rule order
         end
     end
@@ -224,9 +234,9 @@ if error_flag==0
                 alphahat01(dr.restrict_var_list(bayestopt_.mf0))=yhat;
                 alphahat01 = alphahat01(dr.inv_order_var);
 
-                M_=update_parameters_filter_initial_state(M_,alphahat01,dr.ys,options_);
+                M_=update_parameters_filter_initial_state(M_,alphahat01,dr,options_);
                 xproposal=xparam1;
-                xproposal(IB) = M_.endo_initial_state.values(M_.state_var);
+                xproposal(IB) = M_.endo_initial_state.values(dr.state_var);
                 if all(xproposal(:)>=sampler_options.bounds.lb) && all(xproposal(:)<=sampler_options.bounds.ub)
                     new_draw_out_of_bounds = false;
                 end
@@ -235,7 +245,7 @@ if error_flag==0
                 xproposal(xproposal(:)<sampler_options.bounds.lb)=sampler_options.bounds.lb(xproposal(:)<sampler_options.bounds.lb)+sqrt(eps);
                 xproposal(xproposal(:)>sampler_options.bounds.ub)=sampler_options.bounds.ub(xproposal(:)>sampler_options.bounds.ub)-sqrt(eps);
             end
-            [xcheck, icheck]=set_init_state(xproposal,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+            [xcheck, icheck]=set_init_state(xproposal,ys0,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             if icheck
                 % if init states have been modified to match the null space
                 % of Pstar
@@ -273,15 +283,15 @@ if error_flag==0
             if accepted
                 logpost0 = logpost1;
                 naccepted = naccepted+1;
-                M_.endo_initial_state.values(M_.state_var) = xparam1(IB);
+                M_.endo_initial_state.values(dr.state_var) = xparam1(IB);
                 store_endo_initial_state = M_.endo_initial_state;
-                if options_.init_state_endogenous_prior && logpostSMO<logpost0
+                if options_.estimate_initial_states_endogenous_prior && logpostSMO<logpost0
                     % switch from independent to RW Metropolis
                     is_smoothed_state_optimal=false;
                 end
 
-                if not(options_.init_state_endogenous_prior && is_smoothed_state_optimal) %nattempts==1)
-                    alphahat0=store_endo_initial_state.values;
+                if not(options_.estimate_initial_states_endogenous_prior && is_smoothed_state_optimal) %nattempts==1)
+                    alphahat0=store_endo_initial_state.values-dr.ys;
                     alphahat0=alphahat0(dr.order_var); % decision rule order
                 end
             end
@@ -289,7 +299,7 @@ if error_flag==0
         if init
             break
         end
-        if naccepted==0 && options_.init_state_endogenous_prior
+        if naccepted==0 && options_.estimate_initial_states_endogenous_prior
             % try reducing variance of state uncertainty in the
             % proposal and continue with MH centered on alphahat0 
             StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;
@@ -306,7 +316,7 @@ if not(init)
 end
 
 %% Local helper function
-function M_=update_parameters_filter_initial_state(M_,alphahat01,ys,options_)
+function M_=update_parameters_filter_initial_state(M_,alphahat01,dr,options_)
 % Updates M_.endo_initial_state.values from state deviations.
 %
 % Given a state vector `alphahat01` in declaration order (representing
@@ -316,9 +326,9 @@ function M_=update_parameters_filter_initial_state(M_,alphahat01,ys,options_)
 % otherwise a direct level addition.
 
 if options_.loglinear && ~options_.logged_steady_state
-    M_.endo_initial_state.values(M_.state_var) = exp(log(ys(M_.state_var))+alphahat01(M_.state_var));
+    M_.endo_initial_state.values(dr.state_var) = exp(log(dr.ys(dr.state_var))+alphahat01(dr.state_var));
 elseif ~options_.loglinear && ~options_.logged_steady_state
-    M_.endo_initial_state.values(M_.state_var)= ys(M_.state_var)+alphahat01(M_.state_var);
+    M_.endo_initial_state.values(dr.state_var)= dr.ys(dr.state_var)+alphahat01(dr.state_var);
 else
     error('The steady state is logged. This should not happen. Please contact the developers')
 end
