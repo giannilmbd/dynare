@@ -49,13 +49,13 @@ if matlab_random_streams% Use new MATLAB interface.
         if ischar(a) && strcmpi(a,'default')
             DynareRandomStreams.algo = 'mt19937ar';
             DynareRandomStreams.seed = 0;
-            s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
-            reset(RandStream.setGlobalStream(s));
+            DynareRandomStreams.global_stream = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
+            reset(RandStream.setGlobalStream(DynareRandomStreams.global_stream));
             return
         end
         if ischar(a) && strcmpi(a,'reset')
-            s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
-            reset(RandStream.setGlobalStream(s));
+            DynareRandomStreams.global_stream = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
+            reset(RandStream.setGlobalStream(DynareRandomStreams.global_stream));
             return
         end
         if ~ischar(a) || (ischar(a) && strcmpi(a, 'clock'))
@@ -65,8 +65,8 @@ if matlab_random_streams% Use new MATLAB interface.
             else
                 DynareRandomStreams.seed = a;
             end
-            s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
-            reset(RandStream.setGlobalStream(s));
+            DynareRandomStreams.global_stream = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
+            reset(RandStream.setGlobalStream(DynareRandomStreams.global_stream));
             return
         end
         error('set_dynare_seed:: something is wrong in the calling sequence!')
@@ -89,10 +89,11 @@ if matlab_random_streams% Use new MATLAB interface.
         end
         DynareRandomStreams.algo = a;
         DynareRandomStreams.seed = b;
-        s = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
-        reset(RandStream.setGlobalStream(s));
+        DynareRandomStreams.global_stream = RandStream(DynareRandomStreams.algo,'Seed',DynareRandomStreams.seed);
+        reset(RandStream.setGlobalStream(DynareRandomStreams.global_stream));
     end
 else% Use old MATLAB interface.
+    DynareRandomStreams.global_stream=[];
     if nargin==3
         if ischar(a) && strcmpi(a,'default')
             if isoctave

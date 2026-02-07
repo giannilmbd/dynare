@@ -210,7 +210,14 @@ if ~isoctave && ~matlab_ver_less_than('24.2') && PCTInstalled && ~isempty(gcp('n
         record.FunctionEvalPerIteration(curr_block) = feval_this_chain/(draw_iter-1);
         record.LastSeeds(curr_block).Unifor = LastSeeds.Unifor;
         record.LastSeeds(curr_block).Normal = LastSeeds.Normal;
-
+        if isfield(LastSeeds,'algo')
+            record.LastSeeds(curr_block).algo=LastSeeds.algo;
+        else
+            record.LastSeeds(curr_block).algo=options_.DynareRandomStreams.algo;
+        end
+        if isfield(LastSeeds,'global_stream')
+            record.LastSeeds(curr_block).global_stream =LastSeeds.global_stream;
+        end
         NewFile(curr_block) = NewFile;
         OutputFileName(block_iter,:) = OutputFileName;
 
@@ -289,6 +296,14 @@ else % Run in serial as usual
         record.FunctionEvalPerIteration(curr_block) = feval_this_chain/(draw_iter-1);
         record.LastSeeds(curr_block).Unifor = LastSeeds.Unifor;
         record.LastSeeds(curr_block).Normal = LastSeeds.Normal;
+        if isfield(LastSeeds,'algo')
+            record.LastSeeds(curr_block).algo=LastSeeds.algo;
+        else
+            record.LastSeeds(curr_block).algo=options_.DynareRandomStreams.algo;
+        end
+        if isfield(LastSeeds,'global_stream')
+            record.LastSeeds(curr_block).global_stream =LastSeeds.global_stream;
+        end
 
         NewFile(curr_block) = NewFile_cb;
         OutputFileName(block_iter,:) = OutputFileName_cb; %#ok<AGROW>
@@ -341,7 +356,6 @@ try
     % Set the random number generator type (the seed is useless but needed by the function)
     if ~isoctave
         options_.DynareRandomStreams=set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.algo, options_.DynareRandomStreams.seed);
-
     else
         options_.DynareRandomStreams=set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.seed+curr_block);
     end
@@ -421,12 +435,12 @@ while draw_iter <= nruns_cb
         end
 
         if save_tmp_file
-            [LastSeeds.(['file' int2str(NewFile_cb)]).Unifor, LastSeeds.(['file' int2str(NewFile_cb)]).Normal] = get_dynare_random_generator_state();
+            [LastSeeds.(['file' int2str(NewFile_cb)]).Unifor, LastSeeds.(['file' int2str(NewFile_cb)]).Normal, LastSeeds.(['file' int2str(NewFile_cb)]).global_stream] = get_dynare_random_generator_state();
             save([BaseName '_mh_tmp_blck' curr_block_str '.mat'],'x2','logpo2','LastSeeds','neval_this_chain','accepted_draws_this_chain','accepted_draws_this_file','feval_this_chain','feval_this_file');
         end
     end
     if (draw_index_current_file == InitSizeArray_cb) || (draw_iter == nruns_cb) % Now I save the simulations, either because the current file is full or the chain is done
-        [LastSeeds.(['file' int2str(NewFile_cb)]).Unifor, LastSeeds.(['file' int2str(NewFile_cb)]).Normal] = get_dynare_random_generator_state();
+        [LastSeeds.(['file' int2str(NewFile_cb)]).Unifor, LastSeeds.(['file' int2str(NewFile_cb)]).Normal, LastSeeds.(['file' int2str(NewFile_cb)]).global_stream] = get_dynare_random_generator_state();
         if save_tmp_file
             delete([BaseName '_mh_tmp_blck' curr_block_str '.mat']);
         end
@@ -476,7 +490,7 @@ while draw_iter <= nruns_cb
 end % End of the simulations for one mh-block.
 
 if nruns_cb
-    [LastSeeds_cb.Unifor, LastSeeds_cb.Normal] = get_dynare_random_generator_state();
+    [LastSeeds_cb.Unifor, LastSeeds_cb.Normal, LastSeeds_cb.global_stream] = get_dynare_random_generator_state();
 end
 OutputFileName = {[MetropolisFolder,filesep], [ModelName '_mh*_blck' curr_block_str '.mat']};
 

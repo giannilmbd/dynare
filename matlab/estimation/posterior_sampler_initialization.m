@@ -306,12 +306,20 @@ if ~options_.load_mh_file && ~options_.mh_recover
     record.FunctionEvalPerIteration = NaN(1,NumberOfBlocks);
     if options_.mh_initialize_from_previous_mcmc.status
         record.InitialSeeds = record0.LastSeeds;
+        if isfield(record0.InitialSeeds,'algo')
+            record.InitialSeeds.algo = record0.InitialSeeds.algo;
+        end
+        if isfield(record0.InitialSeeds,'global_stream')
+            record.InitialSeeds.global_stream = record0.InitialSeeds.global_stream;
+        end
     else
         for j=1:NumberOfBlocks
             % we set a different seed for the random generator for each block then we record the corresponding random generator state (vector)
             options_.DynareRandomStreams=set_dynare_seed_local_options([],options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.seed+j);
             % record.Seeds keeps a vector of the random generator state and not the scalar seed despite its name
-            [record.InitialSeeds(j).Unifor,record.InitialSeeds(j).Normal] = get_dynare_random_generator_state();
+            [record.InitialSeeds(j).Unifor,record.InitialSeeds(j).Normal, record.InitialSeeds(j).global_stream] = get_dynare_random_generator_state();
+            record.InitialSeeds(j).algo=options_.DynareRandomStreams.algo; %save algorithm information
+            record.InitialSeeds(j).global_stream=options_.DynareRandomStreams.global_stream; %save global_stream information
         end
     end
     record.InitialParameters = ix2;
@@ -558,6 +566,12 @@ elseif options_.mh_recover
                 if isfield(loaded_results,'LastSeeds')
                     record.InitialSeeds(FirstBlock).Unifor=loaded_results.LastSeeds.(['file' int2str(NumberOfSavedMhFilesInTheCrashedBlck)]).Unifor;
                     record.InitialSeeds(FirstBlock).Normal=loaded_results.LastSeeds.(['file' int2str(NumberOfSavedMhFilesInTheCrashedBlck)]).Normal;
+                    if isfield(loaded_results.LastSeeds.(['file' int2str(NumberOfSavedMhFilesInTheCrashedBlck)]),'algo')
+                        record.InitialSeeds(FirstBlock).algo = loaded_results.LastSeeds.(['file' int2str(NumberOfSavedMhFilesInTheCrashedBlck)]).algo;
+                    end
+                    if isfield(loaded_results.LastSeeds.(['file' int2str(NumberOfSavedMhFilesInTheCrashedBlck)]),'global_stream')
+                        record.InitialSeeds(FirstBlock).global_stream=options_.DynareRandomStreams.global_stream; %save global_stream information
+                    end
                 else
                     fprintf('%s: You are trying to recover a chain generated with an older Dynare version.\n',dispString);
                     fprintf('%s: I am using the default seeds to continue the chain.\n',dispString);
@@ -578,6 +592,12 @@ elseif options_.mh_recover
             if isfield(loaded_results,'LastSeeds')
                 record.LastSeeds(FirstBlock).Unifor=loaded_results.LastSeeds.(['file' int2str(ExpectedNumberOfMhFilesPerBlock)]).Unifor;
                 record.LastSeeds(FirstBlock).Normal=loaded_results.LastSeeds.(['file' int2str(ExpectedNumberOfMhFilesPerBlock)]).Normal;
+                if isfield(loaded_results.LastSeeds.(['file' int2str(ExpectedNumberOfMhFilesPerBlock)]),'algo')
+                    record.LastSeeds(FirstBlock).algo = loaded_results.LastSeeds.(['file' int2str(ExpectedNumberOfMhFilesPerBlock)]).algo;
+                end
+                if isfield(loaded_results.LastSeeds.(['file' int2str(ExpectedNumberOfMhFilesPerBlock)]),'global_stream')
+                    record.LastSeeds(FirstBlock).global_stream = loaded_results.LastSeeds.(['file' int2str(ExpectedNumberOfMhFilesPerBlock)]).global_stream;
+                end
             else
                 fprintf('%s: You are trying to recover a chain generated with an older Dynare version.\n',dispString);
                 fprintf('%s: I am using the default seeds to continue the chain.\n',dispString);
