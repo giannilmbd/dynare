@@ -174,7 +174,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
                 new_estimated_parameters = logical(new_estimated_parameters + (ix2(j,:)' > mh_bounds.ub));
             end
         end
-    else
+    else %not initialized from old MCMC
         new_estimated_parameters = true(1,npar);
     end
     % Find initial values for the NumberOfBlocks chains...
@@ -211,8 +211,6 @@ if ~options_.load_mh_file && ~options_.mh_recover
                         init = true;
                         [candidate, ~, ~, M_] = draw_init_state_from_smoother(init,options_.posterior_sampler_options.current_options,candidate,NaN,mh_bounds, ...
                             dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
-                        %assignin('caller','endo_initial_state',M_.endo_initial_state)
-                        %evalin('caller','M_.endo_initial_state=endo_initial_state;')
                     end
                     ix2(j,new_estimated_parameters) = candidate(new_estimated_parameters);
                     ilogpo2(j) = - feval(objective_function,ix2(j,:)',dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
@@ -251,13 +249,13 @@ if ~options_.load_mh_file && ~options_.mh_recover
                     end
                     trial = trial+1;
                 end
-            end
+            end %inner loop initializing chains with starting values
             if ~validate && trial>10
                 fprintf('%s: I''m unable to find a starting value for block %u.', dispString, j);
                 fclose(fidlog);
                 return
             end
-        end
+        end %outer loop over chains
         fprintf(fidlog,' \n');
         fprintf('%s: Initial values found!\n\n',dispString);
     else% Case 2: one chain (we start from the posterior mode)
@@ -284,7 +282,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
             return
         end
         fprintf(fidlog,' \n');
-    end
+    end %loop initializing all chains
     fprintf(fidlog,' \n');
     FirstBlock = 1;
     FirstLine = ones(NumberOfBlocks,1);
@@ -405,10 +403,10 @@ elseif options_.load_mh_file && ~options_.mh_recover
     end
     fclose(fidlog);
 elseif options_.mh_recover
-    % The previous metropolis-hastings crashed before the end! I try to recover the saved draws...
+    % The previous Metropolis-Hastings crashed before the end! I try to recover the saved draws...
     fprintf('%s: Recover mode!\n',dispString);
     record=load_last_mh_history_file(MetropolisFolder, ModelName);
-    NumberOfBlocks = record.Nblck;% Number of "parallel" mcmc chains.
+    NumberOfBlocks = record.Nblck;% Number of "parallel" MCMC chains.
     options_.mh_nblck = NumberOfBlocks;
 
     %% check consistency of options
@@ -475,7 +473,7 @@ elseif options_.mh_recover
     % How many mh files do we actually have ?
     AllMhFiles = dir([BaseName '_mh*_blck*.mat']);
     TotalNumberOfMhFiles = length(AllMhFiles)-length(dir([BaseName '_mh_tmp*_blck*.mat']));
-    % Quit if no crashed mcmc chain can be found as there are as many files as expected
+    % Quit if no crashed MCMC chain can be found as there are as many files as expected
     if (ExpectedNumberOfMhFilesPerBlock>LastFileNumberInThePreviousMh) && (TotalNumberOfMhFiles==ExpectedNumberOfMhFiles)
         if isnumeric(options_.parallel)
             fprintf('%s: It appears that you don''t need to use the mh_recover option!\n',dispString);
@@ -540,13 +538,6 @@ elseif options_.mh_recover
                     NewFile(FirstBlock)=NewFile(FirstBlock)+1; %set first file to be created to next one
                 end
             end
-            %     % Correct the number of saved mh files if the crashed Metropolis was not the first session (so
-            %     % that NumberOfSavedMhFilesInTheCrashedBlck is the number of saved mh files in the crashed chain
-            %     % of the current session).
-            %     if OldMhExists
-            %         NumberOfSavedMhFilesInTheCrashedBlck = NumberOfSavedMhFilesInTheCrashedBlck - LastFileNumberInThePreviousMh;
-            %     end
-            %     NumberOfSavedMhFiles = NumberOfSavedMhFilesInTheCrashedBlck+LastFileNumberInThePreviousMh;
 
             % Correct initial conditions.
             if NumberOfSavedMhFilesInTheCrashedBlck>0 && NumberOfSavedMhFilesInTheCrashedBlck<ExpectedNumberOfMhFilesPerBlock

@@ -148,7 +148,6 @@ else
         NamFileInput(length(NamFileInput)+1,:)={[M_.dname '/metropolis/'],[ModelName '_mh' int2str(NewFile(1)) '_blck*.mat']};
     end
     % from where to get back results
-    %     NamFileOutput(1,:) = {[M_.dname,'/metropolis/'],'*.*'};
     if options_.mh_recover && isempty(fblck)
         % here we just need to retrieve the output of the completed remote jobs
         fblck=1;
