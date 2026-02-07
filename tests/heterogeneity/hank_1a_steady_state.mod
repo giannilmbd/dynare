@@ -77,7 +77,7 @@ for i=1:numel(param_names)
     set_param_value(param, steady_state.params.(param));
 end
 
-heterogeneity_compute_steady_state(filename=hank_1a_sp, calibration_target_equations=['capital_market_clearing'], time_iteration_solver_stop_on_error);
+heterogeneity_compute_steady_state(filename=hank_1a_sp, calibration_target_equations=['capital_market_clearing'], time_iteration_solver_stop_on_error,time_iteration_verbosity=0,forward_verbosity=0);
 
 heterogeneity_solve;
 
