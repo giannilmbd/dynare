@@ -124,12 +124,13 @@ if dynamic_ || static_ || incidence %block information requested
         end
     end
     if incidence
+        [~, state_var]=set_state_space([],M_);
         %printing the gross incidence matrix
         IM_star = char([kron(ones(M_.endo_nbr, M_.endo_nbr-1), double(blanks(3))) double(blanks(M_.endo_nbr)')]);
         for i = 1:nb_leadlag
             n = size(block_structure.incidence(i).sparse_IM,1);
             for j = 1:n
-                if ismember(block_structure.incidence(i).sparse_IM(j,2), M_.state_var)
+                if ismember(block_structure.incidence(i).sparse_IM(j,2), state_var)
                     IM_star(block_structure.incidence(i).sparse_IM(j,1), 3 * (block_structure.incidence(i).sparse_IM(j,2) - 1) + 1) = 'X';
                 else
                     IM_star(block_structure.incidence(i).sparse_IM(j,1), 3 * (block_structure.incidence(i).sparse_IM(j,2) - 1) + 1) = '1';
@@ -175,14 +176,14 @@ if dynamic_ || static_ || incidence %block information requested
             end
         end
         topp = [char(kron(double(blanks(ceil(log10(M_.endo_nbr)))),ones(cellofchararraymaxlength(M_.endo_names),1))) var_names' ];
-        n_state_var = length(M_.state_var);
+        n_state_var = length(state_var);
         IM_state_var = zeros(n_state_var, n_state_var);
         inv_variable_reordered(block_structure.variable_reordered) = 1:M_.endo_nbr;
-        state_equation = block_structure.equation_reordered(inv_variable_reordered(M_.state_var));
+        state_equation = block_structure.equation_reordered(inv_variable_reordered(state_var));
         for i = 1:nb_leadlag
             n = size(block_structure.incidence(i).sparse_IM,1);
             for j = 1:n
-                [tf, loc] = ismember(block_structure.incidence(i).sparse_IM(j,2), M_.state_var);
+                [tf, loc] = ismember(block_structure.incidence(i).sparse_IM(j,2), state_var);
                 if tf
                     IM_star_reordered(eq(block_structure.incidence(i).sparse_IM(j,1)), 3 * (va(block_structure.incidence(i).sparse_IM(j,2)) - 1) + 1) = 'X';
                     [tfi, loci] = ismember(block_structure.incidence(i).sparse_IM(j,1), state_equation);
@@ -196,18 +197,25 @@ if dynamic_ || static_ || incidence %block information requested
         end
         fprintf('\n1: non-null element, X: non-null element related to a state variable\n');
         
-        cur_block = 1;
         i_last = 0;
         block = {};
+        % Map each state variable to its block so order does not matter.
+        state_block = zeros(1, n_state_var);
         for i = 1:n_state_var
-            past_block = cur_block;
-            while ismember(M_.state_var(i), block_structure.block(cur_block).variable) == 0
+            cur_block = 1;
+            while ~ismember(state_var(i), block_structure.block(cur_block).variable)
                 cur_block = cur_block + 1;
             end
-            if (past_block ~= cur_block) || (past_block == cur_block && i == n_state_var)
-                block(past_block).IM_state_var(1:(i - 1 - i_last), 1:i - 1) = IM_state_var(i_last+1:i - 1, 1:i - 1);
-                i_last = i - 1;
+            state_block(i) = cur_block;
+        end
+        for b = 1:nb_blocks
+            idx = find(state_block == b);
+            if isempty(idx)
+                continue;
             end
+            last_i = max(idx);
+            block(b).IM_state_var(1:(last_i - i_last), 1:last_i) = IM_state_var(i_last+1:last_i, 1:last_i);
+            i_last = last_i;
         end
         cur_block = 1;
         for i = 1:M_.endo_nbr

@@ -1489,6 +1489,7 @@ mod_and_m_tests = [
   { 'test' : [ 'estimation/univariate/nls/dynamicmodel2.mod' ] },
   { 'test' : [ 'model_info/NKM_3_back.mod' ] },
   { 'test' : [ 'model_info/NKM_3_forward.mod' ] },
+  { 'test' : [ 'model_info/bkk.mod' ] },
   { 'test' : [ 'moments/example1_var_decomp.mod' ],
     'extra' : [ 'moments/example1_common.inc' ] },
   { 'test' : [ 'moments/example1_bp_test.mod' ],
