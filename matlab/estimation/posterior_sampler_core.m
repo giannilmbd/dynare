@@ -103,10 +103,6 @@ elseif strcmpi(ProposalFun,'rand_multivariate_student')
     sampler_options.ProposalDensity = 'multivariate_student_pdf';
 end
 
-%
-% Now I run the (nblck-fblck+1) MCMC chains
-%
-
 sampler_options.xparam1 = xparam1;
 if ~isempty(d)
     sampler_options.proposal_covariance_Cholesky_decomposition = d*diag(bayestopt_.jscale);
@@ -115,7 +111,15 @@ if ~isempty(d)
     record.ProposalScaleVec=bayestopt_.jscale;
 end
 
-if ~isoctave && ~matlab_ver_less_than('24.2') && PCTInstalled && ~isempty(gcp('nocreate'))
+% Setup parallel execution using the shared utility function
+% This handles: PCT availability check, user preferences, pool management, and cleanup
+% restore_pool holds an onCleanup object that restores the pool state when this function ends:
+%   - If a pool was created here, it will be closed on exit
+%   - If a pool was closed for serial execution, it will be reopened on exit
+% We need to keep it in the scope of this function and so ignore the warning about unused variable
+[run_with_pct, restore_pool] = setup_parallel_execution(options_.parallel_info.use_pct.estimation.sampler, 'posterior_sampler_core'); %#ok<ASGLU>
+
+if run_with_pct
     % Parallel pool detected in MATLAB, MCMC can be run in parallel
     p = gcp;
 
@@ -515,8 +519,4 @@ if ~isempty(F.QueuedFutures)
 end
 cancel(F.RunningFutures);
 
-end
-
-function OK = PCTInstalled
-OK = matlab.internal.parallel.isPCTInstalled;
 end
