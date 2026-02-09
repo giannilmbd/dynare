@@ -125,6 +125,64 @@ processing. Currently, there is only one option available.
 Parallel Configuration
 ======================
 
+Dynare offers two approaches for parallelizing computations:
+
+1. **Parallel Computing Toolbox (PCT)**: A simple, built-in approach
+   that uses MATLAB's Parallel Computing Toolbox to distribute work
+   across cores on a single machine. No configuration file is needed.
+   See :ref:`pct-parallel` below.
+
+2. **Cluster-based parallelization**: A more flexible approach that
+   spawns separate MATLAB/Octave processes on local or remote machines,
+   communicating via SMB (Windows) or SSH (Unix). This requires a
+   configuration file and the ``parallel`` command-line option. See
+   :ref:`cluster-parallel` below.
+
+.. _pct-parallel:
+
+Parallel Computing Toolbox (PCT)
+--------------------------------
+
+Starting with Dynare 7, certain estimation tasks can be parallelized
+using MATLAB's Parallel Computing Toolbox (PCT). This is the
+recommended approach for users running Dynare on a single multi-core
+machine, as it requires no configuration file, no SSH setup, and no
+PsTools installation.
+
+**Requirements:**
+
+    * MATLAB R2024b or later
+    * Parallel Computing Toolbox installed and licensed
+
+**Currently supported tasks:**
+
+    * The MCMC posterior sampler (each chain is dispatched to a separate
+      worker via ``parfeval``)
+
+**Usage:**
+
+Parallelization via PCT is controlled by the :opt:`use_pct` option of the
+``estimation`` command. By default, ``use_pct`` is ``true``, meaning that
+if PCT is available, the MCMC sampler will automatically run chains in
+parallel using the current parallel pool. If no pool is open, one will
+be created for the duration of the computation and closed afterwards.
+
+**Tips for tuning the parallel pool:**
+
+    * You can control the pool configuration before calling
+      ``estimation``::
+
+          c = parcluster('local');
+          c.NumThreads = 2;
+          parpool(c, 4);
+
+    * Thread pools are not supported; use a process pool.
+
+.. _cluster-parallel:
+
+Cluster-based Parallel Configuration
+-------------------------------------
+
 This section explains how to configure Dynare for parallelizing some
 tasks which require very little inter-process communication.
 
