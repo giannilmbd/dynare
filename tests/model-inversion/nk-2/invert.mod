@@ -16,7 +16,7 @@ c1 = 0.9;
 c2 = 1.5;
 c3 = 0.5;
 
-model(bytecode);
+model;
   y  = a1*y(-1) + a2*y(1) - a3*(i-pi(1)) + e_y ;
   pi = b1*pi(-1) + b2*pi(1) + b3*y + e_pi ;
   i  = c1*i(-1) + c2*pi(1) + c3*y + e_i ;
