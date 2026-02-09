@@ -67,8 +67,8 @@ A number of tools and libraries are needed in order to recompile everything. You
 
 - The [GNU Compiler Collection](https://gcc.gnu.org/), version 13 or later, with
   gcc, g++ and gfortran
-- [MATLAB](https://mathworks.com) (if you want to compile the MEX for MATLAB)
-- [GNU Octave](https://www.octave.org) with
+- [MATLAB](https://mathworks.com), version R2020a or later (if you want to compile the MEX for MATLAB)
+- [GNU Octave](https://www.octave.org), version 8.4.0 or later, with
   - the development headers (if you want to compile the MEX for Octave)
   - the development libraries corresponding to the [UMFPACK](https://people.engr.tamu.edu/davis/suitesparse.html) packaged with Octave (if you want to compile the MEX for Octave)
   - the [statistics](https://gnu-octave.github.io/packages/statistics/) package and, optionally, the [control](https://gnu-octave.github.io/packages/control/), [datatypes](https://gnu-octave.github.io/packages/datatypes/), [io](https://gnu-octave.github.io/packages/io/) and [optim](https://gnu-octave.github.io/packages/optim/) packages

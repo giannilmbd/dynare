@@ -16,7 +16,7 @@ function DynareInfo = dynare(fname, varargin)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2025 Dynare Team
+% Copyright © 2001-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -79,13 +79,13 @@ if isoctave
                  'Octave from www.octave.org, otherwise precompiled MEX files may fail to load, '
                  'leading to an important loss of functionality.'], supported_octave_version())
         skipline()
-    elseif octave_ver_less_than('8.4.0') % Should match the test in meson.build, and also the one in matlab/dseries/src/initialize_dseries_class.m
+    elseif octave_ver_less_than('8.4.0') % Should match the version in README.md, the test in meson.build, and also the one in matlab/dseries/src/initialize_dseries_class.m
         skipline()
         warning('This version of Dynare has only been tested on Octave 8.4.0 and above. Dynare may fail to run or give unexpected result. Consider upgrading your version of Octave.')
         skipline()
     end
 else
-    if matlab_ver_less_than('9.8') % Should match the test in meson.build
+    if matlab_ver_less_than('9.8') % Should match the version in README.md and the test in meson.build
         skipline()
         warning('This version of Dynare has only been tested on MATLAB 9.8 (R2020a) and above. Since your MATLAB version is older than that, Dynare may fail to run, or give unexpected results. Consider upgrading your MATLAB installation, or switch to Octave.');
         skipline()
