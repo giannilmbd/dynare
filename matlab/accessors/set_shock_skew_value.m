@@ -1,17 +1,18 @@
 function set_shock_skew_value(varargin)
 % set_shock_skew_value(varargin)
 % -------------------------------------------------------------------------
-% Update entries of the coskewness tensor M_.Skew_e for shocks identified
-% by their names. Supports either the univariate-diagonal case or the full
-% trivariate entry with automatic filling of all index permutations.
+% Update entries of the sparse coskewness matrix M_.Skew_e for shocks
+% identified by their names. M_.Skew_e is an N x 4 matrix where each row
+% is [i, j, k, value]. Supports either the univariate-diagonal case or the
+% full trivariate entry with automatic filling of all index permutations.
 %
 % USAGE
 % - set_shock_skew_value(exoname, value)
-%     Sets M_.Skew_e(i,i,i) = value for the shock named exoname.
+%     Sets the skewness for the shock named exoname (diagonal entry [i,i,i]).
 %
 % - set_shock_skew_value(exoname1, exoname2, exoname3, value)
-%     Sets M_.Skew_e(i1,i2,i3) = value and all permutations of (i1,i2,i3), where
-%     i1, i2, i3 correspond to exoname1, exoname2, exoname3.
+%     Sets the coskewness for (i1,i2,i3) stored in sorted index order,
+%     where i1, i2, i3 correspond to exoname1, exoname2, exoname3.
 %
 % INPUTS
 % - exoname, exoname1, exoname2, exoname3  [char]  shock names as in M_.exo_names
@@ -50,7 +51,13 @@ if nargin == 2
         error(['Shock name ' exoname ' doesn''t exist'])
     end
 
-    M_.Skew_e(i,i,i) = value;
+    % Remove existing entry for (i,i,i) in sparse Skew_e
+    idx = M_.Skew_e(:,1)==i & M_.Skew_e(:,2)==i & M_.Skew_e(:,3)==i;
+    M_.Skew_e(idx,:) = [];
+    % Append new entry if non-zero
+    if value ~= 0
+        M_.Skew_e = [M_.Skew_e; i, i, i, value];
+    end
 else
     exoname1 = varargin{1};
     exoname2 = varargin{2};
@@ -71,11 +78,13 @@ else
         error(['Shock name ' exoname3 ' doesn''t exist'])
     end
 
-    % Assign value to all permutations of (i1, i2, i3)
-    M_.Skew_e(i1, i2, i3) = value;
-    M_.Skew_e(i1, i3, i2) = value;
-    M_.Skew_e(i2, i1, i3) = value;
-    M_.Skew_e(i2, i3, i1) = value;
-    M_.Skew_e(i3, i1, i2) = value;
-    M_.Skew_e(i3, i2, i1) = value;
+    % Sort indices to canonical increasing order (like model derivative matrices)
+    sorted_idx = sort([i1 i2 i3]);
+    % Remove existing entry for sorted triple in sparse Skew_e
+    idx = M_.Skew_e(:,1)==sorted_idx(1) & M_.Skew_e(:,2)==sorted_idx(2) & M_.Skew_e(:,3)==sorted_idx(3);
+    M_.Skew_e(idx,:) = [];
+    % Append new entry if non-zero
+    if value ~= 0
+        M_.Skew_e = [M_.Skew_e; sorted_idx, value];
+    end
 end

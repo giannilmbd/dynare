@@ -49,7 +49,9 @@ end
 if ~isequal(M_.Sigma_e,diag([2.5232^2; 0.021228^2; 0.79002^2; 0.28384^2]))
     error('set_shock_stderr_value did not set values correctly')
 end
-if ~isequal(M_.Skew_e(1,1,1),-0.1948) || ~isequal(M_.Skew_e(2,2,2),-0.21401) || ~isequal(M_.Skew_e(3,3,3),-0.99527) || ~isequal(M_.Skew_e(4,4,4),0.81275)
+% Helper to look up skewness value from sparse Skew_e (sorts indices, returns 0 if not found)
+skew_lookup = @(S,i,j,k) sum(S(S(:,1)==min([i j k]) & S(:,2)==median([i j k]) & S(:,3)==max([i j k]), 4));
+if ~isequal(skew_lookup(M_.Skew_e,1,1,1),-0.1948) || ~isequal(skew_lookup(M_.Skew_e,2,2,2),-0.21401) || ~isequal(skew_lookup(M_.Skew_e,3,3,3),-0.99527) || ~isequal(skew_lookup(M_.Skew_e,4,4,4),0.81275)
     error('set_shock_skew_value did not set values correctly')
 end
 
@@ -172,6 +174,7 @@ end
 if any(abs(skewness(exo_N)) > 1e-2)
     error('Skewness coefficient of normal shocks should be close to 0!')
 end
-if any(abs(skewness(exo_SN)-transpose(nonzeros(M_.Skew_e(:)))) > 1e-2)
+sorted_Skew = sortrows(M_.Skew_e, 1);
+if any(abs(skewness(exo_SN)-transpose(sorted_Skew(:,4))) > 1e-2)
     error('Skewness coefficient of skew normal shocks should be close to theoretical values in M_.Skew_e!')
 end

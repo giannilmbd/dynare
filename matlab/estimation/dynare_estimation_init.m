@@ -181,12 +181,12 @@ if isequal(options_.kalman_algo, 5)
         error('dynare_estimation_init: pruned skewed Kalman filter is not yet compatible with the heteroskedastic_filter option.')
     end
 else
-    if nnz(M_.Skew_e) > 0
+    if size(M_.Skew_e, 1) > 0
         error('dynare_estimation_init: Skewed shocks have been declared (M_.Skew_e ≠ 0), but estimation with skewed shocks is only supported with the pruned skewed Kalman filter. You need to set kalman_algo=5.')
     end
     if isfield(estim_params_,'skew_exo') && ~isempty(estim_params_.skew_exo)
         error('dynare_estimation_init: Skewness parameters have been declared in the estimated_params block, but estimation of skewness parameters is only supported with the pruned skewed Kalman filter. You need to set kalman_algo=5.')
-    end 
+    end
 end
 
 if strcmp('slice',options_.posterior_sampler_options.posterior_sampling_method)

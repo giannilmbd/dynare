@@ -141,29 +141,40 @@ if ~options_.noprint
             lh = cellofchararraymaxlength(labels)+2;
             dyn_latex_table(M_, options_, my_title, 'covar_ex_shocks', headers, labels, M_.Sigma_e, lh, 10, 6);
         end
-        if ~all(M_.Skew_e(:)==0)
-            my_title='MATRIX OF COSKEWNESS OF EXOGENOUS SHOCKS';
-            labels = {}; idx = 1;
-            for j1 = 1:M_.exo_nbr
-                for j2 = 1:M_.exo_nbr
-                    labels{idx,1} = sprintf('%s * %s', M_.exo_names{j1}, M_.exo_names{j2});
-                    idx = idx + 1;
-                end
-            end
-            headers = vertcat('Variables', M_.exo_names);
-            lh = cellofchararraymaxlength(labels)+2;
-            dyntable(options_, my_title, headers, labels, reshape(M_.Skew_e(:), M_.exo_nbr, M_.exo_nbr^2)', lh, 10, 4);
+        if size(M_.Skew_e, 1) > 0
+            my_title='COSKEWNESS OF EXOGENOUS SHOCKS';
+            % Indices are stored in sorted (increasing) order, one row per unique entry
+            unique_entries = M_.Skew_e;
+            labels = cell(size(unique_entries, 1), 1);
+            values = zeros(size(unique_entries, 1), 1);
             if options_.TeX
-                labels = {}; idx = 1;
-                for j1 = 1:M_.exo_nbr
-                    for j2 = 1:M_.exo_nbr
-                        labels{idx,1} = sprintf('%s \\cdot %s', M_.exo_names_tex{j1}, M_.exo_names_tex{j2});
-                        idx = idx + 1;
+                labels_tex = cell(size(unique_entries, 1), 1);
+            end
+            for j = 1:size(unique_entries, 1)
+                i1 = unique_entries(j, 1);
+                i2 = unique_entries(j, 2);
+                i3 = unique_entries(j, 3);
+                if i1 == i2 && i2 == i3
+                    labels{j} = sprintf('Skew(%s)', M_.exo_names{i1});
+                else
+                    labels{j} = sprintf('Skew(%s, %s, %s)', M_.exo_names{i1}, M_.exo_names{i2}, M_.exo_names{i3});
+                end
+                if options_.TeX
+                    if i1 == i2 && i2 == i3
+                        labels_tex{j} = sprintf('Skew(%s)', M_.exo_names_tex{i1});
+                    else
+                        labels_tex{j} = sprintf('Skew(%s, %s, %s)', M_.exo_names_tex{i1}, M_.exo_names_tex{i2}, M_.exo_names_tex{i3});
                     end
                 end
-                headers = vertcat('Variables', M_.exo_names_tex);
-                lh = cellofchararraymaxlength(labels)+2;
-                dyn_latex_table(M_, options_, my_title, 'coskew_ex_shocks', headers, labels, reshape(M_.Skew_e(:), M_.exo_nbr, M_.exo_nbr^2)', lh, 10, 6);
+                values(j) = unique_entries(j, 4);
+            end
+            headers = {'Entry'; 'Value'};
+            lh = cellofchararraymaxlength(labels)+2;
+            dyntable(options_, my_title, headers, labels, values, lh, 10, 4);
+            if options_.TeX
+                headers_tex = {'Entry'; 'Value'};
+                lh = cellofchararraymaxlength(labels_tex)+2;
+                dyn_latex_table(M_, options_, my_title, 'coskew_ex_shocks', headers_tex, labels_tex, values, lh, 10, 6);
             end
         end
         if ~all(diag(M_.H)==0)

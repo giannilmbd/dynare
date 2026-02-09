@@ -54,8 +54,9 @@ function csn = csn_update_specification(Var, Skew)
 % -------------------------------------------------------------------------
 % INPUTS
 % - Var      [double]   unconditional variance matrix (exo_nbr × exo_nbr)
-% - Skew     [double]   theoretical skewness tensor (exo_nbr × exo_nbr × exo_nbr)
-%                       with exo_nbr*(exo_nbr+1)*(exo_nbr+2)/6 unique entries
+% - Skew     [double]   sparse skewness representation (N × 4 matrix)
+%                       each row is [i, j, k, value] storing a non-zero element
+%                       of the coskewness tensor with all index permutations
 %   Note: Currently only supports diagonal Var and Skew tensors (no covariance/coskewness)
 %         This can be generalized but requires careful design and numerical implementation
 % -------------------------------------------------------------------------
@@ -104,21 +105,26 @@ csn.Sigma_e = Var;
 csn.Gamma_e = zeros(exo_nbr,exo_nbr);
 csn.nu_e = zeros(exo_nbr,1);
 csn.Delta_e = eye(exo_nbr);
-if nnz(Skew) > 0
+if size(Skew, 1) > 0
     if ~isdiag(Var)
         error('csn_update_specification: Skewness is currently only supported for independent skew normally distributed shocks, i.e. they cannot be correlated. Remove the corr parameters.')
     end
+    % Check for co-skewness (off-diagonal entries where not all 3 indices are equal)
+    if any(Skew(:,1) ~= Skew(:,2) | Skew(:,2) ~= Skew(:,3))
+        error('csn_update_specification: Skewness is currently only supported for independent skew normally distributed shocks, i.e. there cannot be co-skewness between shocks.')
+    end
     sqrtTwoPi = sqrt(2/pi);
     for jexo = 1:exo_nbr
-        if ~isdiag(Skew(:,:,jexo))
-            error('csn_update_specification: Skewness is currently only supported for independent skew normally distributed shocks, i.e. there cannot be co-skewness between shocks.')
-        end
-        if abs(Skew(jexo,jexo,jexo)) > eps % univariate skew normal distribution, 0 would be Gaussian
-            [omega_e, alpha_e] = sn_var_skew_to_scale_shape_univariate(Var(jexo,jexo), Skew(jexo,jexo,jexo));
-            csn.Sigma_e(jexo,jexo) = omega_e^2;
-            csn.Gamma_e(jexo,jexo) = alpha_e/omega_e;
-            % set location parameter such that E[shocks]=0
-            csn.mu_e(jexo) = -omega_e*alpha_e/sqrt(1+alpha_e^2)*sqrtTwoPi;
+        idx = Skew(:,1)==jexo & Skew(:,2)==jexo & Skew(:,3)==jexo; % lookup (jexo,jexo,jexo) in sparse Skew using element-wise comparison
+        if any(idx)
+            skew_val = Skew(idx,4);
+            if abs(skew_val) > eps % univariate skew normal distribution, 0 would be Gaussian
+                [omega_e, alpha_e] = sn_var_skew_to_scale_shape_univariate(Var(jexo,jexo), skew_val);
+                csn.Sigma_e(jexo,jexo) = omega_e^2;
+                csn.Gamma_e(jexo,jexo) = alpha_e/omega_e;
+                % set location parameter such that E[shocks]=0
+                csn.mu_e(jexo) = -omega_e*alpha_e/sqrt(1+alpha_e^2)*sqrtTwoPi;
+            end
         end
     end
 end

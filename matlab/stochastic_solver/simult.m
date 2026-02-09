@@ -80,7 +80,7 @@ chol_S = chol(M_.Sigma_e(i_exo_var,i_exo_var));
 for i=1:replic
     if ~isempty(M_.Sigma_e)
         % we fill the shocks row wise to have the same values independently of the length of the simulation
-        if nnz(M_.Skew_e) > 0 % draw from skew normal distribution (special case of closed skew normal, see csn_update_specification.m for details)
+        if size(M_.Skew_e, 1) > 0 % draw from skew normal distribution (special case of closed skew normal, see csn_update_specification.m for details)
             exo_simul(:,i_exo_var) = transpose(rand_multivariate_csn(options_.periods, M_.csn.mu_e(i_exo_var,1), M_.csn.Sigma_e(i_exo_var,i_exo_var), M_.csn.Gamma_e(i_exo_var,i_exo_var), M_.csn.nu_e(i_exo_var,1), M_.csn.Delta_e(i_exo_var,i_exo_var)));
         else % draw from Gaussian distribution
             exo_simul(:,i_exo_var) = transpose(randn(nxs,options_.periods))*chol_S;
