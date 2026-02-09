@@ -39,7 +39,7 @@ function [ ix2, ilogpo2, ModelName, MetropolisFolder, FirstBlock, FirstLine, npa
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2025 Dynare Team
+% Copyright © 2006-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -179,7 +179,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
     end
     % Find initial values for the NumberOfBlocks chains...
     if NumberOfBlocks > 1 || options_.mh_initialize_from_previous_mcmc.status% Case 1: multiple chains
-        options_.DynareRandomStreams=set_dynare_seed_local_options([],options_.parallel_info.isHybridMatlabOctave,'default');
+        options_.DynareRandomStreams=set_dynare_seed_local_options([],options_.parallel_info.isHybridMatlabOctave,options_.DynareRandomStreams.seed); % initialize with the same seed currently set in the mod file
         fprintf(fidlog,'  Initial values of the parameters:\n');
         fprintf('%s: Searching for initial values...\n', dispString);
         if ~options_.mh_initialize_from_previous_mcmc.status
