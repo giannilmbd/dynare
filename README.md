@@ -86,7 +86,7 @@ A number of tools and libraries are needed in order to recompile everything. You
   - [Sphinx](https://www.sphinx-doc.org/), with the [extension for BibTeX style
     citations](https://github.com/mcmtroffaes/sphinxcontrib-bibtex)
   - [MathJax](https://www.mathjax.org/)
-- [X-13ARIMA-SEATS Seasonal Adjustment Program](https://www.census.gov/data/software/x13as.html)
+- Optionally, the [X-13ARIMA-SEATS Seasonal Adjustment Program](https://www.census.gov/data/software/x13as.html)
 - Optionally, the unpacked source tree of
   [SuiteSparse](https://www.suitesparse.com), for compiling the ParU MEX file
   (needed for `stack_solve_algo=8`); see the `-Dsuitesparse_src_path` option
