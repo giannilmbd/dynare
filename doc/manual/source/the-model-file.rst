@@ -9194,13 +9194,15 @@ Non-linear filter options
 
     *Output*
 
-    After running estimation, the parameters ``M_.params`` and the
-    variance matrix ``M_.Sigma_e`` of the shocks are set to the mode
-    for maximum likelihood estimation or posterior mode computation
-    without Metropolis iterations. After estimation with Metropolis
-    iterations (option ``mh_replic > 0`` or option :opt:`load_mh_file`
-    set) the parameters ``M_.params`` and the variance matrix
-    ``M_.Sigma_e`` of the shocks are set to the posterior mean.
+    After running estimation, the following are updated:
+    the structural parameters ``M_.params``, the shock variance
+    matrix ``M_.Sigma_e``, the shock skewness coefficients
+    ``M_.Skew_e``, and the measurement error variance matrix
+    ``M_.H``. For maximum likelihood estimation or posterior mode
+    computation without Metropolis iterations, these are set to the
+    mode. After estimation with Metropolis iterations (option
+    ``mh_replic > 0`` or option :opt:`load_mh_file`), they are
+    set to the posterior mean.
 
     Depending on the options, ``estimation`` stores results in various
     fields of the ``oo_`` structure, described below. In the following
@@ -9282,6 +9284,10 @@ Non-linear filter options
             ``shocks_std``
 
                 Standard deviation of structural shocks.
+
+            ``shocks_skew``
+
+                Skewness coefficient of structural shocks.
 
 
     .. matvar:: oo_.MarginalDensity.LaplaceApproximation
