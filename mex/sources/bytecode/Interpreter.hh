@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2025 Dynare Team
+ * Copyright © 2007-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -43,23 +43,6 @@ struct t_save_op_s
   short int lag, operat;
   int first, second;
 };
-
-struct s_plan
-{
-  string var, exo;
-  int var_num, exo_num;
-  vector<pair<int, double>> per_value;
-  vector<double> value;
-};
-
-struct table_conditional_local_type
-{
-  bool is_cond;
-  int var_exo, var_endo;
-  double constrained_value;
-};
-using vector_table_conditional_local_type = vector<table_conditional_local_type>;
-using table_conditional_global_type = map<int, vector_table_conditional_local_type>;
 
 constexpr int IFLD = 0, IFDIV = 1, IFLESS = 2, IFSUB = 3, IFLDZ = 4, IFMUL = 5, IFSTP = 6,
               IFADD = 7;
@@ -175,15 +158,8 @@ private:
   void solve_simple_over_periods(bool forward);
   void compute_complete_2b();
   void evaluate_a_block(bool initialization, bool single_block, const string& bin_base_name);
-  int simulate_a_block(const vector_table_conditional_local_type& vector_table_conditional_local,
-                       bool single_block, const string& bin_base_name);
-  static string elastic(string str, unsigned int len, bool left);
-  pair<bool, vector<int>>
-  MainLoop(const string& bin_basename, bool evaluate, int block, bool constrained,
-           const vector<s_plan>& sconstrained_extended_path,
-           const vector_table_conditional_local_type& vector_table_conditional_local);
-  void Simulate_Newton_Two_Boundaries(
-      bool cvg, const vector_table_conditional_local_type& vector_table_conditional_local);
+  int simulate_a_block(const string& bin_base_name);
+  void Simulate_Newton_Two_Boundaries(bool cvg);
   void Simulate_Newton_One_Boundary(bool forward);
   void fixe_u();
   void Read_SparseMatrix(const string& file_name, bool two_boundaries);
@@ -192,9 +168,8 @@ private:
   void Init_Gaussian_Elimination();
   void Init_Matlab_Sparse_Two_Boundaries(const mxArray* A_m, const mxArray* b_m,
                                          const mxArray* x0_m) const;
-  tuple<SuiteSparse_long*, SuiteSparse_long*, double*, double*> Init_UMFPACK_Sparse_Two_Boundaries(
-      const mxArray* x0_m,
-      const vector_table_conditional_local_type& vector_table_conditional_local) const;
+  tuple<SuiteSparse_long*, SuiteSparse_long*, double*, double*>
+  Init_UMFPACK_Sparse_Two_Boundaries(const mxArray* x0_m) const;
   bool Init_Matlab_Sparse_One_Boundary(const mxArray* A_m, const mxArray* b_m,
                                        const mxArray* x0_m) const;
   tuple<bool, SuiteSparse_long*, SuiteSparse_long*, double*, double*>
@@ -205,9 +180,8 @@ private:
   pair<bool, double> golden(double ax, double bx, double cx, double tol);
   void Solve_ByteCode_Symbolic_Sparse_GaussianElimination(bool symbolic);
   bool Solve_ByteCode_Sparse_GaussianElimination();
-  void Solve_LU_UMFPack_Two_Boundaries(
-      SuiteSparse_long* Ap, SuiteSparse_long* Ai, double* Ax, double* b,
-      const vector_table_conditional_local_type& vector_table_conditional_local);
+  void Solve_LU_UMFPack_Two_Boundaries(SuiteSparse_long* Ap, SuiteSparse_long* Ai, double* Ax,
+                                       double* b);
   void Solve_LU_UMFPack_One_Boundary(SuiteSparse_long* Ap, SuiteSparse_long* Ai, double* Ax,
                                      double* b);
 
@@ -249,11 +223,6 @@ public:
               bool block_decomposed_arg, int col_x_arg, int col_y_arg,
               const BasicSymbolTable& symbol_table_arg, int verbosity_arg,
               iter_solver_opts_t iter_solver_opts_arg);
-  pair<bool, vector<int>>
-  extended_path(const string& file_name, bool evaluate, int block, int nb_periods,
-                const vector<s_plan>& sextended_path,
-                const vector<s_plan>& sconstrained_extended_path, const vector<string>& dates,
-                const table_conditional_global_type& table_conditional_global);
   pair<bool, vector<int>> compute_blocks(const string& file_name, bool evaluate, int block);
   void Close_SaveCode();
 

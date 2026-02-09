@@ -1721,7 +1721,6 @@ mod_and_m_tests = [
     'extra' : [ 'conditional_forecasts/2/fsdat_simul.m' ] },
   { 'test' : [ 'conditional_forecasts/3/fs2000_conditional_forecast_initval.mod' ] },
   { 'test' : [ 'conditional_forecasts/4/fs2000_conditional_forecast_histval.mod' ] },
-  { 'test' : [ 'conditional_forecasts/5/fs2000_cal.mod' ] },
   { 'test' : [ 'conditional_forecasts/6/fs2000_cal.mod' ] },
   { 'test' : [ 'recursive/ls2003.mod' ],
     'extra' : [ 'recursive/data_ca1.m' ] },

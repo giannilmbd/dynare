@@ -15,7 +15,7 @@ function [dr, state_var]=set_state_space(dr,M_)
 % CALLED BY
 %   check, cli/prior, discretionary_policy/discretionary_policy_1, ep/extended_path_initialization,
 %   estimation/dynare_estimation_init, estimation/optimize_prior, estimation/prior_sampler,
-%   perfect-foresight-models/det_cond_forecast, stochastic_solver/stochastic_solvers,
+%   perfect-foresight-models, stochastic_solver/stochastic_solvers,
 %   stochastic_solver/stoch_simul, +osr/run, preprocessor-generated driver.m files
 
 % Copyright © 1996-2026 Dynare Team

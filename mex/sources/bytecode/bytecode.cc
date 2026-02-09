@@ -1,5 +1,5 @@
 /*
- * Copyright © 2007-2025 Dynare Team
+ * Copyright © 2007-2026 Dynare Team
  *
  * This file is part of Dynare.
  *
@@ -57,12 +57,10 @@ Get_Arguments_and_global_variables(int nrhs, const mxArray* prhs[], double* yd[]
                                    size_t& steady_col_y, int& periods, mxArray** block_structur,
                                    bool& steady_state, bool& block_decomposed, bool& evaluate,
                                    int& block, const mxArray** M_, const mxArray** options_,
-                                   bool& print, const mxArray** GlobalTemporaryTerms,
-                                   bool* extended_path, mxArray** ep_struct)
+                                   bool& print, const mxArray** GlobalTemporaryTerms)
 // NOLINTEND(modernize-avoid-c-arrays)
 {
   int count_array_argument {0};
-  *extended_path = false;
   for (int i = 0; i < nrhs; i++)
     {
 #ifdef DEBUG
@@ -122,33 +120,19 @@ Get_Arguments_and_global_variables(int nrhs, const mxArray* prhs[], double* yd[]
         evaluate = true;
       else if (Get_Argument(prhs[i]) == "print")
         print = true;
-      else
+      else if (Get_Argument(prhs[i]).substr(0, 6) == "block=")
         {
-          if (Get_Argument(prhs[i]).substr(0, 6) == "block=")
+          try
             {
-              try
-                {
-                  block = stoi(Get_Argument(prhs[i]).substr(6)) - 1;
-                }
-              catch (...)
-                {
-                  throw FatalException {"ERROR: incorrect syntax for the 'block=' option"};
-                }
+              block = stoi(Get_Argument(prhs[i]).substr(6)) - 1;
             }
-          else if (Get_Argument(prhs[i]).substr(0, 13) == "extended_path")
+          catch (...)
             {
-              *extended_path = true;
-              if ((i + 1) >= nrhs)
-                *ep_struct = nullptr;
-              else
-                {
-                  *ep_struct = mxDuplicateArray(prhs[i + 1]);
-                  i++;
-                }
+              throw FatalException {"ERROR: incorrect syntax for the 'block=' option"};
             }
-          else
-            throw FatalException {"In main, unknown argument : " + Get_Argument(prhs[i])};
         }
+      else
+        throw FatalException {"In main, unknown argument : " + Get_Argument(prhs[i])};
     }
   if (steady_state)
     {
@@ -187,15 +171,6 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
   bool print = false; // Whether the “print” command is requested
   int verbosity {1};  // Corresponds to options_.verbosity
   double* steady_yd = nullptr;
-  bool extended_path;
-  mxArray* extended_path_struct;
-
-  table_conditional_local_type conditional_local;
-  vector<s_plan> sextended_path, sconditional_extended_path;
-  vector_table_conditional_local_type vector_conditional_local;
-  table_conditional_global_type table_conditional_global;
-
-  int max_periods = 0;
 
 #ifdef DEBUG
   mexPrintf("**************************************\n");
@@ -204,10 +179,10 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   try
     {
-      Get_Arguments_and_global_variables(
-          nrhs, prhs, &yd, row_y, col_y, &xd, row_x, col_x, &params, &steady_yd, steady_row_y,
-          steady_col_y, periods, &block_structur, steady_state, block_decomposed, evaluate, block,
-          &M_, &options_, print, &GlobalTemporaryTerms, &extended_path, &extended_path_struct);
+      Get_Arguments_and_global_variables(nrhs, prhs, &yd, row_y, col_y, &xd, row_x, col_x, &params,
+                                         &steady_yd, steady_row_y, steady_col_y, periods,
+                                         &block_structur, steady_state, block_decomposed, evaluate,
+                                         block, &M_, &options_, print, &GlobalTemporaryTerms);
     }
   catch (GeneralException& feh)
     {
@@ -218,184 +193,6 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 #endif
 
   BasicSymbolTable symbol_table {M_};
-  vector<string> dates;
-
-  if (extended_path)
-    {
-      if (!extended_path_struct)
-        mexErrMsgTxt("The 'extended_path' option must be followed by the extended_path descriptor");
-      mxArray* date_str = mxGetField(extended_path_struct, 0, "date_str");
-      if (!date_str)
-        mexErrMsgTxt(
-            "The extended_path description structure does not contain the member: date_str");
-      int nb_periods = mxGetM(date_str) * mxGetN(date_str);
-
-      mxArray* constrained_vars_ = mxGetField(extended_path_struct, 0, "constrained_vars_");
-      if (!constrained_vars_)
-        mexErrMsgTxt("The extended_path description structure does not contain the member: "
-                     "constrained_vars_");
-      mxArray* constrained_paths_ = mxGetField(extended_path_struct, 0, "constrained_paths_");
-      if (!constrained_paths_)
-        mexErrMsgTxt("The extended_path description structure does not contain the member: "
-                     "constrained_paths_");
-      mxArray* constrained_int_date_ = mxGetField(extended_path_struct, 0, "constrained_int_date_");
-      if (!constrained_int_date_)
-        mexErrMsgTxt("The extended_path description structure does not contain the member: "
-                     "constrained_int_date_");
-      mxArray* constrained_perfect_foresight_
-          = mxGetField(extended_path_struct, 0, "constrained_perfect_foresight_");
-      if (!constrained_perfect_foresight_)
-        mexErrMsgTxt("The extended_path description structure does not contain the member: "
-                     "constrained_perfect_foresight_");
-      mxArray* shock_var_ = mxGetField(extended_path_struct, 0, "shock_vars_");
-      if (!shock_var_)
-        mexErrMsgTxt(
-            "The extended_path description structure does not contain the member: shock_vars_");
-      mxArray* shock_paths_ = mxGetField(extended_path_struct, 0, "shock_paths_");
-      if (!shock_paths_)
-        mexErrMsgTxt(
-            "The extended_path description structure does not contain the member: shock_paths_");
-      mxArray* shock_int_date_ = mxGetField(extended_path_struct, 0, "shock_int_date_");
-      if (!shock_int_date_)
-        mexErrMsgTxt(
-            "The extended_path description structure does not contain the member: shock_int_date_");
-      mxArray* shock_str_date_ = mxGetField(extended_path_struct, 0, "shock_str_date_");
-      if (!shock_str_date_)
-        mexErrMsgTxt(
-            "The extended_path description structure does not contain the member: shock_str_date_");
-      mxArray* shock_perfect_foresight_
-          = mxGetField(extended_path_struct, 0, "shock_perfect_foresight_");
-      if (!shock_perfect_foresight_)
-        mexErrMsgTxt("The extended_path description structure does not contain the member: "
-                     "shock_perfect_foresight_");
-
-      // Check that there is no 'perfect_foresight' shocks, which are not implemented
-      double* constrained_pf = mxGetDoubles(constrained_perfect_foresight_);
-      double* shock_pf = mxGetDoubles(shock_perfect_foresight_);
-      if (auto is_pf = [](double v) { return v != 0; };
-          ranges::any_of(constrained_pf,
-                         constrained_pf + mxGetNumberOfElements(constrained_perfect_foresight_),
-                         is_pf)
-          || ranges::any_of(shock_pf, shock_pf + mxGetNumberOfElements(shock_perfect_foresight_),
-                            is_pf))
-        mexErrMsgTxt(
-            "Shocks of type 'perfect_foresight' are not supported with the bytecode option.");
-
-      int nb_constrained = mxGetM(constrained_vars_) * mxGetN(constrained_vars_);
-      int nb_controlled = 0;
-      mxArray* options_cond_fcst_ = mxGetField(extended_path_struct, 0, "options_cond_fcst_");
-      mxArray* controlled_varexo = nullptr;
-      if (options_cond_fcst_)
-        {
-          controlled_varexo = mxGetField(options_cond_fcst_, 0, "controlled_varexo");
-          nb_controlled = mxGetM(controlled_varexo) * mxGetN(controlled_varexo);
-          if (nb_controlled != nb_constrained)
-            mexErrMsgTxt("The number of exogenized variables and the number of exogenous "
-                         "controlled variables should be equal.");
-        }
-      double* controlled_varexo_value = nullptr;
-      if (controlled_varexo)
-        controlled_varexo_value = mxGetDoubles(controlled_varexo);
-      double* constrained_var_value = mxGetDoubles(constrained_vars_);
-      sconditional_extended_path.resize(nb_constrained);
-      max_periods = 0;
-      if (nb_constrained)
-        {
-          conditional_local.is_cond = false;
-          conditional_local.var_exo = 0;
-          conditional_local.var_endo = 0;
-          conditional_local.constrained_value = 0;
-          for (int i = 0; i < nb_periods; i++)
-            {
-              vector_conditional_local.clear();
-              for (unsigned int j = 0; j < row_y; j++)
-                {
-                  conditional_local.var_endo = j;
-                  vector_conditional_local.push_back(conditional_local);
-                }
-              table_conditional_global[i] = vector_conditional_local;
-            }
-        }
-
-      vector_table_conditional_local_type vv3 = table_conditional_global[0];
-      for (int i = 0; i < nb_constrained; i++)
-        {
-          sconditional_extended_path[i].exo_num = ceil(constrained_var_value[i]) - 1;
-          sconditional_extended_path[i].var_num = ceil(controlled_varexo_value[i]) - 1;
-          mxArray* Array_constrained_paths_ = mxGetCell(constrained_paths_, i);
-          double* specific_constrained_paths_ = mxGetDoubles(Array_constrained_paths_);
-          double* specific_constrained_int_date_
-              = mxGetDoubles(mxGetCell(constrained_int_date_, i));
-          int nb_local_periods
-              = mxGetM(Array_constrained_paths_) * mxGetN(Array_constrained_paths_);
-          int* constrained_int_date = static_cast<int*>(mxMalloc(nb_local_periods * sizeof(int)));
-          test_mxMalloc(constrained_int_date, __LINE__, __FILE__, __func__,
-                        nb_local_periods * sizeof(int));
-          if (nb_periods < nb_local_periods)
-            mexErrMsgTxt(("The total number of simulation periods (" + to_string(nb_periods)
-                          + ") is lesser than the number of periods in the shock definitions ("
-                          + to_string(nb_local_periods))
-                             .c_str());
-
-          sconditional_extended_path[i].per_value.resize(nb_local_periods);
-          sconditional_extended_path[i].value.resize(nb_periods, 0);
-          for (int j = 0; j < nb_local_periods; j++)
-            {
-              constrained_int_date[j] = static_cast<int>(specific_constrained_int_date_[j]) - 1;
-              conditional_local.is_cond = true;
-              conditional_local.var_exo = sconditional_extended_path[i].var_num;
-              conditional_local.var_endo = sconditional_extended_path[i].exo_num;
-              conditional_local.constrained_value = specific_constrained_paths_[j];
-              table_conditional_global[constrained_int_date[j]]
-                                      [sconditional_extended_path[i].exo_num]
-                  = conditional_local;
-              sconditional_extended_path[i].per_value[j]
-                  = {constrained_int_date[j], specific_constrained_paths_[j]};
-              sconditional_extended_path[i].value[constrained_int_date[j]]
-                  = specific_constrained_paths_[j];
-              max_periods = max(max_periods, constrained_int_date[j] + 1);
-            }
-          mxFree(constrained_int_date);
-        }
-      vector_table_conditional_local_type vv = table_conditional_global[0];
-      double* shock_var_value = mxGetDoubles(shock_var_);
-      int nb_shocks = mxGetM(shock_var_) * mxGetN(shock_var_);
-      sextended_path.resize(nb_shocks);
-      for (int i = 0; i < nb_shocks; i++)
-        {
-          sextended_path[i].exo_num = ceil(shock_var_value[i]);
-          mxArray* Array_shock_paths_ = mxGetCell(shock_paths_, i);
-          double* specific_shock_paths_ = mxGetDoubles(Array_shock_paths_);
-          double* specific_shock_int_date_ = mxGetDoubles(mxGetCell(shock_int_date_, i));
-          int nb_local_periods = mxGetM(Array_shock_paths_) * mxGetN(Array_shock_paths_);
-          if (nb_periods < nb_local_periods)
-            mexErrMsgTxt(("The total number of simulation periods (" + to_string(nb_periods)
-                          + ") is lesser than the number of periods in the shock definitions ("
-                          + to_string(nb_local_periods))
-                             .c_str());
-          sextended_path[i].per_value.resize(nb_local_periods);
-          sextended_path[i].value.resize(nb_periods, 0);
-          for (int j = 0; j < nb_local_periods; j++)
-            {
-              sextended_path[i].per_value[j]
-                  = {static_cast<int>(specific_shock_int_date_[j]), specific_shock_paths_[j]};
-              sextended_path[i].value[static_cast<int>(specific_shock_int_date_[j] - 1)]
-                  = specific_shock_paths_[j];
-              max_periods = max(max_periods, static_cast<int>(specific_shock_int_date_[j]));
-            }
-        }
-      for (int i = 0; i < nb_periods; i++)
-        {
-          int buflen = mxGetNumberOfElements(mxGetCell(date_str, i)) + 1;
-          char* buf = static_cast<char*>(mxCalloc(buflen, sizeof(char)));
-          int info = mxGetString(mxGetCell(date_str, i), buf, buflen);
-          if (info)
-            mexErrMsgTxt(
-                "Can not allocated memory to store the date_str in the extended path descriptor");
-          dates.emplace_back(buf); // string(Dates[i]);
-          mxFree(buf);
-        }
-    }
 
   if (!steady_state)
     {
@@ -588,12 +385,7 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
   try
     {
-      if (extended_path)
-        tie(r, blocks)
-            = interprete.extended_path(file_name, evaluate, block, max_periods, sextended_path,
-                                       sconditional_extended_path, dates, table_conditional_global);
-      else
-        tie(r, blocks) = interprete.compute_blocks(file_name, evaluate, block);
+      tie(r, blocks) = interprete.compute_blocks(file_name, evaluate, block);
     }
   catch (GeneralException& feh)
     {
@@ -612,9 +404,8 @@ mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         }
       else
         {
-          int out_periods = extended_path ? max_periods + y_kmin : col_y;
-          plhs[0] = mxCreateDoubleMatrix(row_y, out_periods, mxREAL);
-          std::ranges::copy_n(y, row_y * out_periods, mxGetDoubles(plhs[0]));
+          plhs[0] = mxCreateDoubleMatrix(row_y, col_y, mxREAL);
+          std::ranges::copy_n(y, row_y * col_y, mxGetDoubles(plhs[0]));
         }
       if (nlhs > 1)
         {
