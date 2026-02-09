@@ -228,7 +228,12 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
         set(hfig(1),'name',['Data density, t = ' int2str(t)])
         tlo = tiledlayout(nrow,ncol);
         title(tlo,[' (t=' int2str(t) ')']);
-        tlo.TileSpacing = 'tight';
+        if matlab_ver_less_than('9.10')
+            % R2020b and earlier: use 'none' as the old equivalent syntax for tight spacing
+            tlo.TileSpacing = 'none';
+        else
+            tlo.TileSpacing = 'tight';
+        end
     end
     % set color order
     all_simulated_regimes = {simulated_regimes.regime};
@@ -392,7 +397,10 @@ if user_has_matlab_license('statistics_toolbox')
                     'data point ppf density'};
                     mytxt = [mytxt all_simulated_regimes(my_simulated_regime_order(end:-1:1))];
                 lg  = legend(ax,mytxt,'Orientation','Horizontal','NumColumns',2);
-                lg.Layout.Tile = 'South'; % <-- Legend placement with tiled layout
+                if ~matlab_ver_less_than('9.10')
+                    % Legend placement with tiled layout (R2021a and later)
+                    lg.Layout.Tile = 'South';
+                end
             end
             if TeX
                 title(['$' M_.endo_names_tex(options_.varobs_id(di(kobs))) '$'],'Interpreter','latex')
@@ -432,7 +440,12 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
 
     tlo2=tiledlayout(nrow2,ncol2);
     title(tlo2,['predictive density (t=' int2str(t) ')']);
-    tlo2.TileSpacing = 'tight';
+    if matlab_ver_less_than('9.10')
+        % R2020b and earlier: use 'none' as the old equivalent syntax for tight spacing
+        tlo2.TileSpacing = 'none';
+    else
+        tlo2.TileSpacing = 'tight';
+    end
 
     for ko=1:length(di)-1
         for koo=ko+1:length(di)
@@ -453,7 +466,10 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
     end
     mytxt = [all_simulated_regimes(my_simulated_regime_order) 'data point'];
     lgo  = legend(axo,mytxt,'Orientation','Horizontal','NumColumns',2);
-    lgo.Layout.Tile = 'South'; % <-- Legend placement with tiled layout
+    if ~matlab_ver_less_than('9.10')
+        % Legend placement with tiled layout (R2021a and later)
+        lgo.Layout.Tile = 'South';
+    end
     dyn_saveas(hfig(5),[GraphDirectoryName, filesep, M_.fname,'_predictive_density_t',int2str(t)],nodisplay,options_.graph_format);
     if TeX && any(strcmp('eps', cellstr(options_.graph_format)))
         fprintf(fidTeX, '\\begin{figure}[H]\n');
@@ -477,7 +493,12 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
     set(hfig(4),'name',['Data density: regimes contribution, t=' int2str(t)])
     tlo4=tiledlayout(1,2);
     title(tlo4,['Regimes contribution (t=' int2str(t) ')']);
-    tlo4.TileSpacing = 'tight';
+    if matlab_ver_less_than('9.10')
+        % R2020b and earlier: use 'none' as the old equivalent syntax for tight spacing
+        tlo4.TileSpacing = 'none';
+    else
+        tlo4.TileSpacing = 'tight';
+    end
     nexttile
     simul_regime = nan(length(my_simulated_regime_order),1);
     for kr = 1:length(my_simulated_regime_order)
@@ -699,7 +720,12 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
 
     tlo2=tiledlayout(nrow2,ncol2);
     title(tlo2,['Regime-shock mapping (t=' int2str(t) ')']);
-    tlo2.TileSpacing = 'tight';
+    if matlab_ver_less_than('9.10')
+        % R2020b and earlier: use 'none' as the old equivalent syntax for tight spacing
+        tlo2.TileSpacing = 'none';
+    else
+        tlo2.TileSpacing = 'tight';
+    end
 
     for ko=1:nshock-1
         for koo=ko+1:nshock
@@ -720,7 +746,10 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
     end
     mytxt = [all_simulated_regimes(my_simulated_regime_order) 'realised shock'];
     lgo  = legend(axo,mytxt,'Orientation','Horizontal','NumColumns',2);
-    lgo.Layout.Tile = 'South'; % <-- Legend placement with tiled layout
+    if ~matlab_ver_less_than('9.10')
+        % Legend placement with tiled layout (R2021a and later)
+        lgo.Layout.Tile = 'South';
+    end
     dyn_saveas(hfig(7),[GraphDirectoryName, filesep, M_.fname,'_regime_vs_shock_predictive_mapping_t',int2str(t)],nodisplay,options_.graph_format);
     if TeX && any(strcmp('eps', cellstr(options_.graph_format)))
         fprintf(fidTeX, '\\begin{figure}[H]\n');
