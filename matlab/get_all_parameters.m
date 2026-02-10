@@ -90,7 +90,12 @@ if estim_params_.nsx
     skew_exo = estim_params_.skew_exo;
     for i = 1:estim_params_.nsx
         k = skew_exo(i,1);
-        xparam1(i+offset) = M_.Skew_e(k,k,k);
+        idx = M_.Skew_e(:,1)==k & M_.Skew_e(:,2)==k & M_.Skew_e(:,3)==k; % lookup (k,k,k) in sparse Skew_e using element-wise comparison
+        if any(idx)
+            xparam1(i+offset) = M_.Skew_e(idx,4);
+        else
+            xparam1(i+offset) = 0;
+        end
     end
 end
 offset = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx;

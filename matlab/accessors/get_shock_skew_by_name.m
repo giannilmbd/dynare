@@ -42,7 +42,12 @@ if nargin == 1
     if isempty(i)
         error(['Can''t find shock ', exoname])
     end
-    x = M_.Skew_e(i,i,i);
+    idx = M_.Skew_e(:,1)==i & M_.Skew_e(:,2)==i & M_.Skew_e(:,3)==i; % lookup (i,i,i) in sparse Skew_e using element-wise comparison
+    if any(idx)
+        x = M_.Skew_e(idx,4);
+    else
+        x = 0;
+    end
 else
     exoname1 = varargin{1};
     exoname2 = varargin{2};
@@ -62,5 +67,11 @@ else
         error(['Can''t find shock ', exoname3])
     end
 
-    x = M_.Skew_e(i1,i2,i3);
+    sorted_idx = sort([i1 i2 i3]); % indices are stored in sorted order
+    idx = M_.Skew_e(:,1)==sorted_idx(1) & M_.Skew_e(:,2)==sorted_idx(2) & M_.Skew_e(:,3)==sorted_idx(3);
+    if any(idx)
+        x = M_.Skew_e(idx,4);
+    else
+        x = 0;
+    end
 end

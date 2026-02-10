@@ -38,6 +38,6 @@ if ~isequal(M_.H,0)
     end
 end
 
-if any(abs(nonzeros(M_.Skew_e)) > abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)))
+if size(M_.Skew_e, 1) > 0 && any(abs(M_.Skew_e(:,4)) > abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)))
     error('Skewness parameters are larger than theoretical bound of skew normal distribution of ±%f.', abs((sqrt(2)*(pi-4))/(pi-2)^(3/2)));
 end

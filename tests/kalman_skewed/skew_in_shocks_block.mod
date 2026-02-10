@@ -64,95 +64,95 @@ skew eta_r, eta_r, eta_a = 37;
 % skew eta_r, eta_r, eta_e = 38
 end;
 
-fprintf('\n======= M_.Skew_e =======\n');
+% Helper to look up skewness value from sparse Skew_e (sorts indices, returns 0 if not found)
+skew_lookup = @(S,i,j,k) sum(S(S(:,1)==min([i j k]) & S(:,2)==median([i j k]) & S(:,3)==max([i j k]), 4));
+
+fprintf('\n======= M_.Skew_e (sparse 4-column format, sorted indices) =======\n');
 disp(M_.Skew_e);
 fprintf('\n=========================\n');
 
-fprintf('\n=== Testing Co-Skewness Matrix Permutations ===\n\n');
-fprintf('Matrix dimensions: %d x %d x %d\n\n', size(M_.Skew_e));
+fprintf('\n=== Testing Co-Skewness Sparse Matrix ===\n\n');
+fprintf('Number of stored entries: %d\n\n', size(M_.Skew_e, 1));
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TEST 1: Check symmetry across all permutations %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf('Test 1: Checking permutation symmetry...\n');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TEST 1: Check that indices are stored in increasing order %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf('Test 1: Checking sorted index order...\n');
+errors = 0;
+
+for row = 1:size(M_.Skew_e, 1)
+    i = M_.Skew_e(row, 1);
+    j = M_.Skew_e(row, 2);
+    k = M_.Skew_e(row, 3);
+
+    if ~(i <= j && j <= k)
+        errors = errors + 1;
+        fprintf('  ERROR: Row %d has unsorted indices (%d, %d, %d)\n', row, i, j, k);
+    end
+end
+
+if errors == 0
+    fprintf('  PASSED: All %d entries have sorted indices (i <= j <= k)!\n\n', size(M_.Skew_e, 1));
+else
+    error('  FAILED: Found %d rows with unsorted indices\n\n', errors);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TEST 2: Check that any permutation lookup returns correct %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fprintf('Test 2: Checking that any-permutation lookup works...\n');
 errors = 0;
 total_checks = 0;
-    
-for i = 1:size(M_.Skew_e, 1)
-    for j = 1:size(M_.Skew_e, 1)
-        for k = 1:size(M_.Skew_e, 1)
-            % Get all 6 permutations
-            val_ijk = M_.Skew_e(i,j,k);
-            val_ikj = M_.Skew_e(i,k,j);
-            val_jik = M_.Skew_e(j,i,k);
-            val_jki = M_.Skew_e(j,k,i);
-            val_kij = M_.Skew_e(k,i,j);
-            val_kji = M_.Skew_e(k,j,i);
-            
-            % Collect all permutations
-            perms = [val_ijk, val_ikj, val_jik, val_jki, val_kij, val_kji];
-            
-            % Check if all are equal (within numerical tolerance)
-            if ~iszero(perms - perms(1))
-                errors = errors + 1;
-                fprintf('  ERROR: Permutations not equal for (%s, %s, %s)\n', ...
-                    M_.exo_names{i}, M_.exo_names{j}, M_.exo_names{k});
-                fprintf('    (%d,%d,%d) = %.6f\n', i, j, k, val_ijk);
-                fprintf('    (%d,%d,%d) = %.6f\n', i, k, j, val_ikj);
-                fprintf('    (%d,%d,%d) = %.6f\n', j, i, k, val_jik);
-                fprintf('    (%d,%d,%d) = %.6f\n', j, k, i, val_jki);
-                fprintf('    (%d,%d,%d) = %.6f\n', k, i, j, val_kij);
-                fprintf('    (%d,%d,%d) = %.6f\n', k, j, i, val_kji);
-            end
-            total_checks = total_checks + 1;
-        end
+
+for row = 1:size(M_.Skew_e, 1)
+    i = M_.Skew_e(row, 1);
+    j = M_.Skew_e(row, 2);
+    k = M_.Skew_e(row, 3);
+    v = M_.Skew_e(row, 4);
+
+    % Look up all 6 permutations via skew_lookup (which sorts internally)
+    perm_vals = [skew_lookup(M_.Skew_e,i,j,k), skew_lookup(M_.Skew_e,i,k,j), ...
+                 skew_lookup(M_.Skew_e,j,i,k), skew_lookup(M_.Skew_e,j,k,i), ...
+                 skew_lookup(M_.Skew_e,k,i,j), skew_lookup(M_.Skew_e,k,j,i)];
+
+    if ~iszero(perm_vals - v)
+        errors = errors + 1;
+        fprintf('  ERROR: Lookup mismatch for (%s, %s, %s)\n', ...
+            M_.exo_names{i}, M_.exo_names{j}, M_.exo_names{k});
     end
+    total_checks = total_checks + 1;
 end
-    
+
 if errors == 0
-    fprintf('  ✓ PASSED: All %d permutations are consistent!\n\n', total_checks);
+    fprintf('  PASSED: All %d entries return consistent values for any permutation!\n\n', total_checks);
 else
-    error('  ✗ FAILED: Found %d inconsistencies out of %d checks\n\n', errors, total_checks);
+    error('  FAILED: Found %d inconsistencies out of %d checks\n\n', errors, total_checks);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TEST 2: Display non-zero unique elements %
+% TEST 3: Display non-zero unique elements %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf('Test 2: Summary of non-zero skewness values...\n');
-reported = zeros(size(M_.Skew_e, 1), size(M_.Skew_e, 1), size(M_.Skew_e, 1));
-count = 0;
+fprintf('Test 3: Summary of non-zero skewness values...\n');
 
-for i = 1:size(M_.Skew_e, 1)
-    for j = 1:size(M_.Skew_e, 1)
-        for k = 1:size(M_.Skew_e, 1)
-            if abs(M_.Skew_e(i,j,k)) > 0 && reported(i,j,k) == 0
-                count = count + 1;
-                % Mark all permutations as reported
-                reported(i,j,k) = 1;
-                reported(i,k,j) = 1;
-                reported(j,i,k) = 1;
-                reported(j,k,i) = 1;
-                reported(k,i,j) = 1;
-                reported(k,j,i) = 1;
-                
-                fprintf('  [%d] Skew(%s, %s, %s) = %.6f\n', ...
-                    count, M_.exo_names{i}, M_.exo_names{j}, M_.exo_names{k}, M_.Skew_e(i,j,k));
-            end
-        end
-    end
+for count = 1:size(M_.Skew_e, 1)
+    i = M_.Skew_e(count, 1);
+    j = M_.Skew_e(count, 2);
+    k = M_.Skew_e(count, 3);
+    fprintf('  [%d] Skew(%s, %s, %s) = %.6f\n', ...
+        count, M_.exo_names{i}, M_.exo_names{j}, M_.exo_names{k}, M_.Skew_e(count, 4));
 end
 
-if count == 0
+if size(M_.Skew_e, 1) == 0
     fprintf('  No non-zero elements found.\n');
 end
 fprintf('\n');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Test 3: Check diagonal elements (own-shock skewness) %
+% Test 4: Check diagonal elements (own-shock skewness) %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fprintf('Test 3: Own-shock skewness (diagonal elements)...\n');
-for i = 1:size(M_.Skew_e, 1)
-    val = M_.Skew_e(i,i,i);
+fprintf('Test 4: Own-shock skewness (diagonal elements)...\n');
+for i = 1:M_.exo_nbr
+    val = skew_lookup(M_.Skew_e, i, i, i);
     if abs(val) > 0
         fprintf('  Skew(%s, %s, %s) = %.6f\n', ...
             M_.exo_names{i}, M_.exo_names{i}, M_.exo_names{i}, val);

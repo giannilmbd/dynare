@@ -92,7 +92,13 @@ if estim_params_.nsx % skew among VAREXO are ordered fifth in xparam1
     skew_exo = estim_params_.skew_exo;
     for i=1:estim_params_.nsx
         k = skew_exo(i,1);
-        M_.Skew_e(k,k,k) = xparam1(i+offset);
+        % Remove existing entry for (k,k,k) in sparse Skew_e
+        idx = M_.Skew_e(:,1)==k & M_.Skew_e(:,2)==k & M_.Skew_e(:,3)==k;
+        M_.Skew_e(idx,:) = [];
+        % Append new entry if non-zero
+        if xparam1(i+offset) ~= 0
+            M_.Skew_e = [M_.Skew_e; k, k, k, xparam1(i+offset)];
+        end
     end
 end
 
