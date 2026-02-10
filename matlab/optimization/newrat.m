@@ -49,7 +49,7 @@ function [xparam1, hh, gg, fval, igg, hess_info, jit, fcount, exitflag, message]
 % - exitflag                exit flag
 % - message                 message upon termination
 
-% Copyright © 2004-2025 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -72,6 +72,7 @@ fcount = 0;
 icount=0;
 nx=length(x);
 xparam1=x;
+jit=[];
 %ftol0=1.e-6;
 htol_base = max(1.e-7, hess_info.htol);
 flagit=0;  % mode of computation of Hessian in each iteration; hard-coded outer-product of gradients as it performed best in tests
