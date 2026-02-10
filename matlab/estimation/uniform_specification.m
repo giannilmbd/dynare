@@ -12,7 +12,10 @@ function [m,s,p6,p7,error_indicator] = uniform_specification(m,s,p3,p4)
 %    s:      standard deviation
 %    p6:     lower bound
 %    p7:     upper bound
-%    error_indicator:   whether inconsistent prior specification was used
+%    error_indicator:   error code for inconsistent prior specification
+%                       0: no error
+%                       1: both bounds and mean/std specified
+%                       2: mean or std not finite
 %
 % SPECIAL REQUIREMENTS
 %    none
@@ -43,6 +46,9 @@ if ~(isnan(p3) || isnan(p4))
     m  = (p3+p4)/2;
     s  = (p4-p3)/(sqrt(12));
 else
+    if ~isfinite(m) || ~isfinite(s)
+        error_indicator=2;
+    end
     p6 = m-s*sqrt(3);
     p7 = m+s*sqrt(3);
 
