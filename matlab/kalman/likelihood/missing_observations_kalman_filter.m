@@ -73,9 +73,6 @@ if isequal(H,0)
 end
 
 P=tril(P)+transpose(tril(P,-1)); % make sure P is symmetric
-[LastSeeds.Unifor, LastSeeds.Normal] = get_dynare_random_generator_state(); % make sure that consistent seed for Particle Filter is used 
-% Set seed for randn().
-set_dynare_seed('default');
 
 % Get sample size.
 smpl = last-start+1;
@@ -106,6 +103,10 @@ if occbin_.status
     vv = zeros(pp,last);
 
     options_=occbin_.info{1};
+    [LastSeeds.Unifor, LastSeeds.Normal,LastSeeds.current_stream] = get_dynare_random_generator_state(); % make sure that consistent seed for Particle Filter is used
+    % Set seed for randn().
+    set_dynare_seed_local_options([],false,'default');
+
     dr=occbin_.info{2};
     endo_steady_state=occbin_.info{3};
     exo_steady_state=occbin_.info{4};
@@ -222,7 +223,9 @@ while notsteady && t<=last
         if badly_conditioned_F && (~occbin_.status || (occbin_.status && t<first_period_occbin_update))
             % if ~all(abs(F(:))<kalman_tol), then use univariate filter, otherwise this is a
             % pathological case and the draw is discarded
-            set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
+            if occbin_.status
+                set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal,LastSeeds.current_stream);
+            end
             return
         else
             F_singular = false;
@@ -342,14 +345,18 @@ while notsteady && t<=last
             if options_.debug
                 fprintf('\nmissing_observations_kalman_filter:PKF failed in period %u with: %s\n', t, get_error_message(info,options_));
             end
-            set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
+            if occbin_.status
+                set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal,LastSeeds.current_stream);
+            end
             return
         end
         if isinf(likx) % lik is inf but info = 0 !
             if options_.debug
                 fprintf('\nmissing_observations_kalman_filter:PKF failed in period %u with: Inf in likelihood value\n', t);
             end
-            set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
+            if occbin_.status
+                set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal,LastSeeds.current_stream);
+            end
             return
         end
         if options_.occbin.likelihood.use_updated_regime
@@ -404,7 +411,9 @@ else
     LIK = sum(lik);
 end
 
-set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
+if occbin_.status
+    set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal,LastSeeds.current_stream);
+end
 
 end
 
