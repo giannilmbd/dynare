@@ -1,41 +1,40 @@
-function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, kalman_tol, diffuse_kalman_tol, riccati_tol, presample, T, R, Q, H, Z, mm, pp, rr)
+function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, kalman_tol, diffuse_kalman_tol, presample, T, R, Q, H, Z, pp)
+% [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, kalman_tol, diffuse_kalman_tol, presample, T, R, Q, H, Z, pp)
 % Computes the diffuse likelihood of a state space model.
 %
 % INPUTS
-%    Y           [double]      pp*smpl matrix of (detrended) data, where pp is the number of observed variables.
-%    start       [integer]     scalar, first observation.
-%    last        [integer]     scalar, last observation.
-%    a           [double]      mm*1 vector, levels of the predicted initial state variables (E_{0}(alpha_1)).
-%    Pinf        [double]      mm*mm matrix used to initialize the covariance matrix of the state vector.
-%    Pstar       [double]      mm*mm matrix used to initialize the covariance matrix of the state vector.
-%    kalman_tol  [double]      scalar, tolerance parameter (rcond) of F_star.
-%    diffuse_kalman_tol [double]      scalar, tolerance parameter (rcond) of Pinf to signify end of diffuse filtering and Finf.
-%    riccati_tol [double]      scalar, tolerance parameter (riccati iteration);
-%                              not used in this filter as usually diffuse phase will be left before convergence of filter to steady state.
-%    presample   [integer]     scalar, presampling if strictly positive.
-%    T           [double]      mm*mm matrix, transition matrix in  the state equations.
-%    R           [double]      mm*rr matrix relating the structural innovations to the state vector.
-%    Q           [double]      rr*rr covariance matrix of the structural innovations.
-%    H           [double]      pp*pp covariance matrix of the measurement errors (if H is equal to zero (scalar) there is no measurement error).
-%    Z           [double]      pp*mm matrix, selection matrix or pp linear independent combinations of the state vector.
-%    mm          [integer]     scalar, number of state variables.
-%    pp          [integer]     scalar, number of observed variables.
-%    rr          [integer]     scalar, number of structural innovations.
+% - Y                       [matrix]    pp*smpl matrix of (detrended) data
+% - start                   [integer]   first observation
+% - last                    [integer]   last observation
+% - a                       [vector]    initial state vector (E_0(alpha_1))
+% - Pinf                    [matrix]    matrix used to initialize the covariance matrix of the state vector
+% - Pstar                   [matrix]    matrix used to initialize the covariance matrix of the state vector
+% - kalman_tol              [double]    tolerance parameter (rcond) of F_star
+% - diffuse_kalman_tol      [double]    tolerance parameter (rcond) of Pinf
+% - presample               [integer]   number of initial iterations to be discarded when evaluating the likelihood
+% - T                       [matrix]    transition matrix in the state equations
+% - R                       [matrix]    matrix relating the structural innovations to the state vector
+% - Q                       [matrix]    covariance matrix of the structural innovations
+% - H                       [matrix]    covariance matrix of the measurement errors
+% - Z                       [matrix]    matrix relating states to the observed variables
+% - pp                      [integer]   number of observed variables
 %
 % OUTPUTS
-%    LIK         [double]      scalar, minus loglikelihood
-%    lik         [double]      smpl*1 vector, log density of each vector of observations.
-%    a           [double]      mm*1 vector, current estimate of the state vector tomorrow 
-%                                                               (E_{T}(alpha_{T+1})).
-%    Pstar       [double]      mm*mm matrix, covariance matrix of the state vector.
+% - dLIK                    [double]    minus loglikelihood
+% - dlik                    [vector]    smpl*1 vector of log densities of observations
+% - a                       [vector]    estimate of the state vector (E_T(alpha_{T+1}))
+% - Pstar                   [matrix]    covariance matrix of the state vector
 %
-% REFERENCES
-%   See "Filtering and Smoothing of State Vector for Diffuse State Space
-%   Models", S.J. Koopman and J. Durbin (2003), in Journal of Time Series
-%   Analysis, vol. 24(1), pp. 85-98.
-%   and
-%   Durbin/Koopman (2012): "Time Series Analysis by State Space Methods", Oxford University Press,
-%   Second Edition, Ch. 5 and 7.2
+% This function is called by: dsge_likelihood
+% This function calls: none
+%
+% References:
+%   Koopman, S.J. and Durbin, J. (2003), "Filtering and Smoothing of State
+%   Vector for Diffuse State Space Models", Journal of Time Series Analysis,
+%   vol. 24(1), pp. 85-98.
+%   
+%   Durbin, J. and Koopman, S.J. (2012), "Time Series Analysis by State Space
+%   Methods", Oxford University Press, Second Edition, Ch. 5 and 7.2
 
 % Copyright © 2004-2021 Dynare Team
 %
