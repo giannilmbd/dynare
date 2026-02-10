@@ -2044,6 +2044,8 @@ mod_and_m_tests = [
     'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
   { 'test' : [ 'smoother2histval/fs2000_smooth_ML.mod' ],
     'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
+  { 'test' : [ 'smoother2histval/fs2000_calib_smoother.mod' ],
+    'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
   { 'test' : [ 'epilogue/example1.mod' ] },
   { 'test' : [ 'differentiate_forward_vars/RBC_differentiate_forward.mod' ] },
   { 'test' : [ 'partitioning/partitions.mod' ] },
