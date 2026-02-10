@@ -305,12 +305,14 @@ if ~isnumeric(options_.parallel)
     end
 end
 
-% to check for possible non converged smoothers
-[~, B1]=pm3(M_,options_,oo_,length(bayestopt_.name),1,ifil(5),B,'Params',...
-            [],[],bayestopt_.name,...
-            bayestopt_.name,'Params',DirectoryName,'_param',dispString);
-if B1<B
-    B=B1;
+if options_.occbin.smoother.status
+    % to check for possible non converged smoothers
+    [~, B1]=pm3(M_,options_,oo_,length(bayestopt_.name),1,ifil(5),B,'Params',...
+        [],[],bayestopt_.name,...
+        bayestopt_.name,'Params',DirectoryName,'_param',dispString);
+    if B1<B
+        B=B1;
+    end
 end
 
 if options_.smoother

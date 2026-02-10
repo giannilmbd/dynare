@@ -78,7 +78,12 @@ HPD = zeros(2,n2,nvar);
 if options_.estimation.moments_posterior_density.indicator
     Density = zeros(options_.estimation.moments_posterior_density.gridpoints,2,n2,nvar);
 end
-fprintf(['%s: ' tit1 '\n'],dispString);
+
+if strcmp(var_type,'_param')
+    fprintf(['%s: OccBin Initialization \n'],dispString);
+else
+    fprintf(['%s: ' tit1 '\n'],dispString);
+end
 k = 0;
 filter_step_ahead_indicator=0;
 filter_covar_indicator=0;
@@ -88,12 +93,8 @@ state_uncert_indicator=0;
 for file = 1:ifil
     loaded_file=load([DirectoryName '/' M_.fname var_type int2str(file)]);
     stock=loaded_file.stock;
-    if strcmp(var_type,'_param')
-        if file==1 %on first run, initialize variable for storing filter_step_ahead
-            stock1 = zeros(n1,B);
-        end
-        k = k(end)+(1:size(stock,1));
-        stock1(:,k) = stock';
+    if strcmp(var_type,'_param') % Counting successful OccBin smoother draws
+        k(file) = size(stock,1);
     elseif strcmp(var_type,'_filter_step_ahead')
         if file==1 %on first run, initialize variable for storing filter_step_ahead
             stock1_filter_step_ahead=NaN(n1,n2,B,length(options_.filter_step_ahead));
@@ -158,7 +159,7 @@ for file = 1:ifil
     end
 end
 if nargout==2
-    B1=max(k);
+    B1=sum(k);
     return
 end
 clear stock
