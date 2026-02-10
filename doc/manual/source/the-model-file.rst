@@ -8629,6 +8629,7 @@ Posterior sampling options
        researchers).
 
     .. option:: estimate_initial_states_endogenous_prior
+
        Jointly estimate the initial states along with the other parameters. 
        This contrasts to the usual approach of marginalizing with respect to
        the states while estimating parameters, and then estimating the states
