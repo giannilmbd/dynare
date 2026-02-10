@@ -3165,7 +3165,7 @@ Finding the steady state with Dynare nonlinear solver
 
     .. option:: noprint
 
-       See :opt:`noprint`.
+       Don’t print anything. Useful for loops.
 
     .. _steady_markowitz:
 
@@ -3786,7 +3786,7 @@ speed-up on large models.
 
     .. option:: noprint
 
-       Don’t print anything. Useful for loops.
+       See :opt:`noprint`.
 
     .. option:: print
 
