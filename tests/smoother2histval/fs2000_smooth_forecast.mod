@@ -1,4 +1,5 @@
-// Test that smoother2histval works (with an outfile)
+/* Test that the forecast command after smoother2histval gives the same result as the forecast
+   from the estimation command, and a forecast manually computed from the smoother output */
 // Note that an observation equation has been modified in order to have an aux var for lagged endo
 
 var m P c e W R k d n l gy_obs gp_obs y dA;
@@ -85,12 +86,14 @@ options_.solve_tolf = 1e-12;
 estimation(order=1,datafile=fsdat_simul,silent_optimizer,mh_replic=0,mh_nblocks=1,mh_jscale=0.8,smoother,consider_all_endogenous,forecast=5);
 
 forecast_estimation=oo_.forecast;
+
 smoother2histval;
 
 forecast;
+
 forecast_smoother2histval=oo_.forecast;
 
-[forecast_smoother] = forecasts.run(var_list_,M_,options_,oo_,'smoother');
+forecast_smoother = forecasts.run(var_list_,M_,options_,oo_,'smoother');
 
 if max(abs(struct2array(forecast_estimation.Mean)-struct2array(forecast_smoother2histval.Mean)))>1e-6
     error('Forecasts do not match')

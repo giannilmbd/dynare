@@ -2042,7 +2042,7 @@ mod_and_m_tests = [
     'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
   { 'test' : [ 'smoother2histval/fs2000_smooth_stoch_simul.mod' ],
     'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
-  { 'test' : [ 'smoother2histval/fs2000_smooth_ML.mod' ],
+  { 'test' : [ 'smoother2histval/fs2000_smooth_forecast.mod' ],
     'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
   { 'test' : [ 'smoother2histval/fs2000_calib_smoother.mod' ],
     'extra' : [ 'smoother2histval/fsdat_simul.m' ] },
