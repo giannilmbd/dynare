@@ -200,7 +200,8 @@ for it=1:npar
         end
     end
     if endo_init_state && icheck
-        [theta, fxsim] = draw_init_state_from_smoother([false 1],sampler_options,theta,fxsim,thetaprior,varargin{:});
+        [theta, fxsim, ~, ~, neval_init] = draw_init_state_from_smoother([false 1],sampler_options,theta,fxsim,thetaprior,varargin{:});
+        neval(it) = neval(it) + neval_init;
     end
     if sampler_options.save_iter_info_file
         save([varargin{4}.dname filesep 'metropolis/slice_iter_info_' fname],'neval','it','theta','fxsim');

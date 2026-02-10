@@ -1,6 +1,6 @@
-function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
+function [xparam1, logpost0, mh_bounds, M_, neval] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
-% [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
+% [xparam1, logpost0, mh_bounds, M_, neval] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
 %     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
 % Draws the Kalman filter initial state from the DSGE smoother.
 %
@@ -46,6 +46,7 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
 % - logpost0            [double]        updated log-posterior at returned xparam1.
 % - mh_bounds           [structure]     possibly tightened bounds for initial state parameters.
 % - M_                  [structure]     updated model with endo_initial_state values.
+% - neval               [double]        number of objective function evaluations.
 %
 % SEE ALSO
 %   get_init_state_prior - computes Pstar-based constraints for initial-state consistency.
@@ -73,6 +74,8 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
 % dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info
 
 options_.noprint = ~options_.debug;
+
+neval = 0;
 
 if options_.occbin.likelihood.status
     options_.occbin.smoother.status = true;
@@ -128,7 +131,8 @@ if options_.occbin.smoother.status
         % check first that PKF with latent states provides sensible
         % likelihood
         options_.estimate_initial_states_endogenous_prior=false;
-        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);        
+        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+        neval = neval + 1;
         options_.estimate_initial_states_endogenous_prior=true;
         if (logpost0-logpost2)<1.e3
             [~,~,~,~,~,~,~,~,~,~,~,~,~,~,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
@@ -198,6 +202,7 @@ if error_flag==0
                 xproposal=xcheck;
             end
             logpost1 = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+            neval = neval + 1;
             if logpost1<logpost0
                 is_smoothed_state_optimal=false;
             end
@@ -264,12 +269,15 @@ if error_flag==0
             if fast_likelihood_evaluation_for_rejection
                 fval=lnrand+logpost0-10;
                 logpost1  = -rejection_objective_function(@dsge_likelihood,xproposal,fval,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                neval = neval + 1;
                 if (logpost1 >= fval)
                     logcheck = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                    neval = neval + 1;
                     logpost1 = logcheck;
                 end
             else
                 logpost1 = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                neval = neval + 1;
             end
             if logpost1<logpost0
                 r = logpost1-logpost0;
