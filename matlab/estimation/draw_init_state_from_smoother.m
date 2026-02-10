@@ -215,11 +215,16 @@ if error_flag==0
     end
     naccepted=0;
     nattempts=0;
+    disp_verbose('draw_init_state_from_smoother: Starting MH sampling for initial states', options_.debug);
     while naccepted<target_accepted && nattempts<10
         niter = 0;
         nattempts = nattempts+1;
+        disp_verbose(sprintf('draw_init_state_from_smoother: Outer loop (variance scaling attempt) - attempt %d/10 (%.1f%%), accepted %d/%d (%.1f%%)', nattempts, 100*nattempts/10, naccepted, target_accepted, 100*naccepted/target_accepted), options_.debug);
         while naccepted<target_accepted && niter<20
             niter = niter+1;
+            if mod(niter, 10) == 0
+                disp_verbose(sprintf('draw_init_state_from_smoother:   MH iteration - iteration %d/20 (%.1f%%)', niter, 100*niter/20), options_.debug);
+            end
             new_draw_out_of_bounds= true;
             icount = 0;
             while new_draw_out_of_bounds && icount<10
@@ -283,6 +288,7 @@ if error_flag==0
             if accepted
                 logpost0 = logpost1;
                 naccepted = naccepted+1;
+                disp_verbose(sprintf('draw_init_state_from_smoother:     ACCEPTED - accepted %d/%d (%.1f%%)', naccepted, target_accepted, 100*naccepted/target_accepted), options_.debug);
                 M_.endo_initial_state.values(dr.state_var) = xparam1(IB);
                 store_endo_initial_state = M_.endo_initial_state;
                 if options_.estimate_initial_states_endogenous_prior && logpostSMO<logpost0
@@ -305,6 +311,9 @@ if error_flag==0
             StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;
         end
     end
+    if naccepted < target_accepted
+        disp_verbose(sprintf('draw_init_state_from_smoother: WARNING - MH sampling terminated without reaching acceptance criterion - accepted %d/%d (%.1f%%), attempts %d/10\n', naccepted, target_accepted, 100*naccepted/target_accepted, nattempts), options_.debug);
+    end
 end
 if not(init)
     if isstruct(mh_bounds)
@@ -312,7 +321,7 @@ if not(init)
         mh_bounds.lb(IB)= xparam1(IB);
         mh_bounds.ub(IB)= xparam1(IB);
     end
-    disp_verbose(['naccepted=' int2str(naccepted) '| niter=' int2str(niter) '| nattempts=' int2str(nattempts)],options_.debug)
+    disp_verbose(['draw_init_state_from_smoother: Final - accepted=' int2str(naccepted) ' | iterations=' int2str(niter) ' | attempts=' int2str(nattempts)],options_.debug)
 end
 
 %% Local helper function
