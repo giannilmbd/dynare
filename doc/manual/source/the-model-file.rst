@@ -6528,6 +6528,61 @@ Note that in order to avoid stochastic singularity, you must have at
 least as many shocks or measurement errors in your model as you have
 observed variables.
 
+Specifying the dataset, observables, and trends
+-----------------------------------------------
+
+.. command:: data (OPTIONS...);
+
+    |br| This command allows specifying the dataset used for estimation using ``dseries`` objects.
+    It obviates the need for a :opt:`datafile = FILENAME` option to the ``estimation`` command.
+
+    *Options*
+
+    .. option:: file = FILENAME
+
+        The name of the file containing the data: See :opt:`datafile = FILENAME` for syntax 
+        and supported file types. Mandatory input if :opt:`series = DSERIES` is not specified.
+
+    .. option:: series = DSERIES
+
+        The name of a ``dseries`` object available in memory containing the data series to be used.
+        Mandatory input if :opt:`file = FILENAME` is not specified.
+
+    .. option:: xls_sheet = QUOTED_STRING
+
+        See :opt:`xls_sheet = QUOTED_STRING`
+
+    .. option:: xls_range = RANGE
+
+        See :opt:`xls_range = RANGE`
+    
+    .. option:: nobs = INTEGER
+
+        See :opt:`nobs = INTEGER`
+
+    .. option:: nobs = [INTEGER1:INTEGER2]
+
+        See :opt:`nobs = [INTEGER1:INTEGER2]`
+
+    .. option:: first_obs = DATE
+
+        The date (see :ref:`dates-members`) of the first observation to be 
+        used in the file.
+
+    .. option:: first_obs = INTEGER
+
+        See :opt:`first_obs = INTEGER`
+
+    .. option:: first_obs = [INTEGER1:INTEGER2]
+
+        See :opt:`first_obs = [INTEGER1:INTEGER2]`
+
+    .. option:: last_obs = DATE
+
+        The date (see :ref:`dates-members`) of the last observation to be 
+        used in the file.
+
+
 .. _varobs:
 
 .. command:: varobs VARIABLE_NAME...;
@@ -6588,6 +6643,9 @@ observed variables.
             Y (eta);
             P (mu/eta);
             end;
+
+Specifying the estimated parameters and priors
+----------------------------------------------
 
 .. block:: estimated_params ;
            estimated_params (overwrite) ;
@@ -6718,7 +6776,14 @@ observed variables.
 
         A parameter specific scale parameter for the jumping
         distribution’s covariance matrix of the Metropolis-Hasting
-        algorithm.
+        algorithm. If no ``SCALE_PARAMETER`` parameter is specified,
+        :opt:`mh_jscale <mh_jscale = DOUBLE>` is used for all parameters. If 
+        :opt:`mh_jscale <mh_jscale = DOUBLE>` isn’t set, the default value of 
+        ``0.2`` applies for all parameters. If ``mode_compute=6`` is
+        used or the ``posterior_sampler_option`` called ``scale_file`` is
+        specified, the values set in ``estimated_params`` will be
+        overwritten.
+
 
     Note that INITIAL_VALUE, LOWER_BOUND, UPPER_BOUND, PRIOR_MEAN,
     PRIOR_STANDARD_ERROR, PRIOR_3RD_PARAMETER, PRIOR_4TH_PARAMETER and
@@ -6851,7 +6916,27 @@ observed variables.
 
         stderr VARIABLE_NAME | corr VARIABLE_NAME_1, VARIABLE_NAME_2 | skew VARIABLE_NAME | PARAMETER_NAME;
 
+
+   *“Endogenous” prior restrictions*
+
+    It is also possible to impose implicit “endogenous” priors about
+    IRFs and moments on the model during estimation. For example, one
+    can specify that all valid parameter draws for the model must
+    generate fiscal multipliers that are bigger than 1 by specifying
+    how the IRF to a government spending shock must look like. The
+    prior restrictions can be imposed via ``irf_calibration`` and
+    ``moment_calibration`` blocks (see :ref:`irf-momcal`). The way it
+    works internally is that any parameter draw that is inconsistent
+    with the “calibration” provided in these blocks is discarded,
+    i.e. assigned a prior density of 0. When specifying these blocks,
+    it is important to keep in mind that one won’t be able to easily
+    do :comm:`model_comparison` in this case, because the prior density
+    will not integrate to 1.
+
 .. _estim-comm:
+
+The estimation command
+----------------------
 
 .. command:: estimation [VARIABLE_NAME...];
              estimation (OPTIONS...) [VARIABLE_NAME...];
@@ -6957,7 +7042,7 @@ observed variables.
     
 
 Data treatment options
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
     .. _dataf:
 
@@ -7072,7 +7157,7 @@ Data treatment options
        (this may result in complex data).
 
 Graph output options
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
     .. option:: plot_priors = INTEGER
 
@@ -7121,7 +7206,7 @@ Graph output options
        See :opt:`tex`.
 
 Mode computing options
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: mode_compute = INTEGER | FUNCTION_NAME
 
@@ -7655,7 +7740,7 @@ Mode computing options
        when running loops.
 
 Hessian/derivative options
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: cova_compute = INTEGER
 
@@ -7689,7 +7774,7 @@ Hessian/derivative options
        i.e. for ``kalman_algo<3``. Incompatible with :bck:`heteroskedastic_shocks`. Optimizers that rely on analytic gradients are ``mode_compute=1,3,4,5,101``.
 
 Mode-check diagnostics
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: mode_check
 
@@ -7725,7 +7810,7 @@ Mode-check diagnostics
        kernel is evaluated (for each parameter). Default is ``20``.
 
 Kalman filtering and likelihood options
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: no_init_estimation_check_first_obs
 
@@ -8010,7 +8095,7 @@ Kalman filtering and likelihood options
        ``1e-16``.
 
 Skewed Kalman filter options
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: skewed_kalman_prune_tol = DOUBLE
 
@@ -8040,7 +8125,7 @@ Skewed Kalman filter options
        Only relevant for ``kalman_algo=5``.
 
 Posterior objects
------------------
+^^^^^^^^^^^^^^^^^
 
     .. option:: moments_varendo
 
@@ -8187,7 +8272,7 @@ Posterior objects
 .. _estim-variable-selection:
 
 Variable selection for posterior objects
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: consider_all_endogenous
 
@@ -8222,7 +8307,7 @@ Variable selection for posterior objects
        endogenous variables.
 
 Model solution options
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: solve_algo = INTEGER
 
@@ -8266,7 +8351,7 @@ Model solution options
        See :opt:`qz_zero_threshold <qz_zero_threshold = DOUBLE>`.
 
 Posterior sampling options
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: posterior_sampling_method = NAME
 
@@ -8645,7 +8730,7 @@ Posterior sampling options
 
 
 MCMC options
-------------
+^^^^^^^^^^^^
 
     .. option:: mh_conf_sig = DOUBLE
 
@@ -8885,7 +8970,7 @@ MCMC options
 .. _estim-convergence-diagnostics:
 
 Convergence diagnostics
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: nodiagnostic
 
@@ -8940,7 +9025,7 @@ Convergence diagnostics
        0.95]``.
 
 DSGE-VAR
---------
+^^^^^^^^
 
     .. option:: dsge_var = DOUBLE
 
@@ -8978,7 +9063,7 @@ DSGE-VAR
 
 
 Non-linear filter options
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
     .. option:: pruning
 
@@ -9166,33 +9251,9 @@ Non-linear filter options
 
                Number of mixture components in the Gaussian-mixture filter (``gmf``) for the measurement errors. Default: ``1``.
 
-    *Note*
 
-    If no ``mh_jscale`` parameter is used for a parameter in
-    ``estimated_params``, the procedure uses ``mh_jscale`` for all
-    parameters. If ``mh_jscale`` option isn’t set, the procedure uses
-    ``0.2`` for all parameters. Note that if ``mode_compute=6`` is
-    used or the ``posterior_sampler_option`` called ``scale_file`` is
-    specified, the values set in ``estimated_params`` will be
-    overwritten.
-
-    *“Endogenous” prior restrictions*
-
-    It is also possible to impose implicit “endogenous” priors about
-    IRFs and moments on the model during estimation. For example, one
-    can specify that all valid parameter draws for the model must
-    generate fiscal multipliers that are bigger than 1 by specifying
-    how the IRF to a government spending shock must look like. The
-    prior restrictions can be imposed via ``irf_calibration`` and
-    ``moment_calibration`` blocks (see :ref:`irf-momcal`). The way it
-    works internally is that any parameter draw that is inconsistent
-    with the “calibration” provided in these blocks is discarded,
-    i.e. assigned a prior density of 0. When specifying these blocks,
-    it is important to keep in mind that one won’t be able to easily
-    do :comm:`model_comparison` in this case, because the prior density
-    will not integrate to 1.
-
-    *Output*
+Estimation output variables
+---------------------------
 
     After running estimation, the following are updated:
     the structural parameters ``M_.params``, the shock variance
@@ -9905,64 +9966,9 @@ Non-linear filter options
         for each MCMC chain. Contains the results of the test in individual fields.
 
 
-.. command:: data (OPTIONS...);
 
-    |br| This command allows specifying the dataset used for estimation using ``dseries`` objects.
-    It obviates the need for a :opt:`datafile = FILENAME` option to the ``estimation`` command.
-
-    *Options*
-
-    .. option:: file = FILENAME
-
-        The name of the file containing the data: See :opt:`datafile = FILENAME` for syntax 
-        and supported file types. Mandatory input if :opt:`series = DSERIES` is not specified.
-
-    .. option:: series = DSERIES
-
-        The name of a ``dseries`` object available in memory containing the data series to be used.
-        Mandatory input if :opt:`file = FILENAME` is not specified.
-
-    .. option:: xls_sheet = QUOTED_STRING
-
-        See :opt:`xls_sheet = QUOTED_STRING`
-
-    .. option:: xls_range = RANGE
-
-        See :opt:`xls_range = RANGE`
-    
-    .. option:: nobs = INTEGER
-
-        See :opt:`nobs = INTEGER`
-
-    .. option:: nobs = [INTEGER1:INTEGER2]
-
-        See :opt:`nobs = [INTEGER1:INTEGER2]`
-
-    .. option:: first_obs = DATE
-
-        The date (see :ref:`dates-members`) of the first observation to be 
-        used in the file.
-
-    .. option:: first_obs = INTEGER
-
-        See :opt:`first_obs = INTEGER`
-
-    .. option:: first_obs = [INTEGER1:INTEGER2]
-
-        See :opt:`first_obs = [INTEGER1:INTEGER2]`
-
-    .. option:: last_obs = DATE
-
-        The date (see :ref:`dates-members`) of the last observation to be 
-        used in the file.
-
-.. command:: unit_root_vars VARIABLE_NAME...;
-
-    |br| This command is deprecated. Use ``estimation`` option
-    :opt:`diffuse_filter` instead for estimating a model with
-    non-stationary observed variables or ``steady`` option :opt:`nocheck`
-    to prevent ``steady`` to check the steady state returned by your
-    steady state file.
+Bayesian VAR estimation
+-----------------------
 
 Dynare also has the ability to estimate Bayesian VARs:
 
