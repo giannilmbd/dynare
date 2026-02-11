@@ -835,6 +835,6 @@ end
 epsilonhat = Y - Z*alphahat;
 
 if (d==smpl)
-    warning('missing_DiffuseKalmanSmootherH3_Z:: There isn''t enough information to estimate the initial conditions of the nonstationary variables');
+    warning('missing_DiffuseKalmanSmootherH3_Z:: The diffuse filter never exited the diffuse state. There isn''t enough information to estimate the initial conditions of the nonstationary variables');
     return
 end
