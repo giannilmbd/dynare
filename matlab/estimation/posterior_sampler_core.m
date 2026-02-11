@@ -91,7 +91,7 @@ exo_det_steady_state=myinputs.exo_det_steady_state;
 
 MetropolisFolder = CheckPath('metropolis',M_.dname);
 ModelName = M_.fname;
-BaseName = [MetropolisFolder filesep ModelName];
+BaseName = [MetropolisFolder '/' ModelName]; %do not use filesep for consistent display as MetropolisFolder cannot use filesep due to LaTeX constraints
 save_tmp_file = sampler_options.save_tmp_file;
 
 OpenOldFile = ones(nblck,1);
