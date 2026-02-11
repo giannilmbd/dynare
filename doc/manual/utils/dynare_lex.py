@@ -1,4 +1,4 @@
-# Copyright © 2018-2021 Dynare Team
+# Copyright © 2018-2026 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -40,7 +40,7 @@ class DynareLexer(RegexLexer):
         "periods","values","scales","corr","stderr","steady","check","model_diagnostics","model_info",
         "print_bytecode_dynamic_model"," print_bytecode_static_model",
         "perfect_foresight_setup","perfect_foresight_solver","simul","stoch_simul",
-        "extended_path","varobs","estimation","unit_root_vars","bvar_density",
+        "extended_path","varobs","estimation","bvar_density",
         "model_comparison","shock_decomposition","realtime_shock_decomposition",
         "plot_shock_decomposition","calib_smoother","forecast",
         "conditional_forecast","plot_conditional_forecast","bvar_forecast",
