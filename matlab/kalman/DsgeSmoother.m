@@ -179,6 +179,7 @@ mf    = bayestopt_.mf;
 %  Here, Pinf and Pstar are determined. If the model is stationary, determine
 %  Pstar as the solution of the Lyapunov equation and set Pinf=[] (Notation follows
 %  Koopman/Durbin (2003), Journal of Time Series Analysis 24(1))
+%  Note: Pinf and Pstar are in decision-rule order, like P, T, and R.
 %
 Q = M_.Sigma_e;
 H = M_.H;
@@ -187,6 +188,8 @@ if isequal(H,0)
     H = zeros(vobs,vobs);
 end
 
+% Construct observation matrix Z: maps state vector (decision-rule order) to observed variables
+% Z(i,mf(i)) = 1 means the i-th observed variable equals the mf(i)-th state variable
 Z = zeros(vobs,size(T,2));
 for i=1:vobs
     Z(i,mf(i)) = 1;
@@ -297,18 +300,27 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
         else
             a_initial=T*a_initial; %set state prediction for first Kalman step;
         end
-        [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,ST, ...
+        [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0, filter_error_flag] = missing_DiffuseKalmanSmootherH1_Z(a_initial,ST, ...
             Z,R1,Q,H,Pinf,Pstar, ...
             data1,vobs,np,smpl,data_index, ...
-            options_.nk,kalman_tol,diffuse_kalman_tol,options_.filter_decomposition,options_.smoothed_state_uncertainty,options_.filter_covariance,options_.smoother_redux);
+            options_.nk,kalman_tol,diffuse_kalman_tol,options_.filter_decomposition,options_.smoothed_state_uncertainty,options_.filter_covariance,options_.smoother_redux,options_.varobs,options_.debug);
     end
     if isinf(alphahat)
+        % Store Kalman filter error code before switching algorithms
+        % error_flag from filter: 0=success, 420=Finf rank-deficient, 421=Fstar rank-deficient, 422=F singular
+        if filter_error_flag > 0
+            info = [filter_error_flag, 0, 0, 0];
+            if filter_error_flag==422 %stochastic singularity in F
+                print_info(info,options_.noprint, options_);
+            end
+        end
         if kalman_algo == 1
-            fprintf('\nDsgeSmoother: Switching to univariate filter. This may be a sign of stochastic singularity.\n')
+            disp_verbose('DsgeSmoother: Switching to univariate filter. This may be a sign of stochastic singularity.',options_.verbosity)
             kalman_algo = 2;
         elseif kalman_algo == 3
-            fprintf('\nDsgeSmoother: Switching to univariate filter. This is usually due to co-integration in diffuse filter,\n')
-            fprintf('otherwise it may be a sign of stochastic singularity.\n')
+            disp_verbose('DsgeSmoother: Switching to univariate filter. This is usually due to co-integration and/or having',options_.verbosity)
+            disp_verbose('DsgeSmoother: fewer stochastic trends than observables. This is unproblematic.',options_.verbosity)
+            disp_verbose('DsgeSmoother: However, occassionally, there is a problem of stochastic singularity.',options_.verbosity)
             kalman_algo = 4;
         elseif kalman_algo == 5
             fprintf('\nDsgeSmoother: Switching to univariate filter. This may be a sign of stochastic singularity.\n');
