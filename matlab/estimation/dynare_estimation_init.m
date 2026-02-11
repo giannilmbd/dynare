@@ -30,7 +30,7 @@ function [dataset_, dataset_info, xparam1, hh, M_, options_, oo_, estim_params_,
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2003-2025 Dynare Team
+% Copyright © 2003-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -581,15 +581,15 @@ if options_.heteroskedastic_filter
 
     for k=1:length(M_.heteroskedastic_shocks.Qvalue_orig)
         v = M_.heteroskedastic_shocks.Qvalue_orig(k);
-        temp_periods=v.periods(v.periods<options_.nobs+options_.first_obs+1);
-        temp_periods=temp_periods(temp_periods>=options_.first_obs);
-        M_.heteroskedastic_shocks.Qvalue(v.exo_id, temp_periods-(options_.first_obs-1)) = v.value^2;
+        mask_periods = v.periods >= options_.first_obs & v.periods <= options_.nobs+options_.first_obs;
+        obs_idx = v.periods(mask_periods) - options_.first_obs + 1;
+        M_.heteroskedastic_shocks.Qvalue(v.exo_id,obs_idx) = v.value^2;
     end
     for k=1:length(M_.heteroskedastic_shocks.Qscale_orig)
         v = M_.heteroskedastic_shocks.Qscale_orig(k);
-        temp_periods=v.periods(v.periods<options_.nobs+options_.first_obs+1);
-        temp_periods=temp_periods(temp_periods>=options_.first_obs);
-        M_.heteroskedastic_shocks.Qscale(v.exo_id, temp_periods-(options_.first_obs-1)) = v.scale^2;
+        mask_periods = v.periods >= options_.first_obs & v.periods <= options_.nobs+options_.first_obs;
+        obs_idx = v.periods(mask_periods) - options_.first_obs + 1;
+        M_.heteroskedastic_shocks.Qscale(v.exo_id,obs_idx) = v.scale^2;
     end
 
     if any(any(~isnan(M_.heteroskedastic_shocks.Qvalue) & ~isnan(M_.heteroskedastic_shocks.Qscale)))
