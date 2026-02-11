@@ -2854,16 +2854,23 @@ blocks.
       periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
       values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
-    OR (for setting scale factors)::
+    or (for setting scale factors)::
 
       var VARIABLE_NAME;
       periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
       scales DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
-    NOTE: ``scales`` and ``values`` cannot be simultaneously set for the same shock in the same period, but it is 
-    possible to set ``values`` for some periods and ``scales`` for other periods for the same shock. There can be
-    only one ``scales`` and ``values`` directive each for a given shock, so all affected periods must be set in one
-    statement. This option is not compatible with :opt:`analytic_derivation`.
+    *Notes*
+
+    * Integer period indices refer to the original dataset (*e.g.* if
+      ``first_obs=10``, then a period index of 11 will refer to the second
+      observation used for estimation).
+    * ``scales`` and ``values`` cannot be simultaneously set for the same shock
+      in the same period, but it is possible to set ``values`` for some periods
+      and ``scales`` for other periods for the same shock.
+    * There can be only one ``scales`` and ``values`` directive each for a
+      given shock, so all affected periods must be set in one statement.
+    * This block is not compatible with :opt:`analytic_derivation`.
 
     *Example*
 
