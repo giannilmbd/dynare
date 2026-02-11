@@ -581,14 +581,38 @@ if options_.heteroskedastic_filter
 
     for k=1:length(M_.heteroskedastic_shocks.Qvalue_orig)
         v = M_.heteroskedastic_shocks.Qvalue_orig(k);
-        mask_periods = v.periods >= options_.first_obs & v.periods <= options_.nobs+options_.first_obs;
-        obs_idx = v.periods(mask_periods) - options_.first_obs + 1;
+        if isa(v.periods, 'dates')
+            if isempty(options_.dataset.series)
+                error('heteroskedastic_shocks: dates in "periods" requires the dataset to be specified with the "data(series=...)" command')
+            end
+            mask_periods = v.periods >= dataset_.dates(1) & v.periods <= dataset_.dates(end);
+            if any(mask_periods)
+                obs_idx = v.periods(mask_periods) - dataset_.dates(1) + 1;
+            else % arithmetic on empty dates is not supported
+                obs_idx = [];
+            end
+        else
+            mask_periods = v.periods >= options_.first_obs & v.periods <= options_.nobs+options_.first_obs;
+            obs_idx = v.periods(mask_periods) - options_.first_obs + 1;
+        end
         M_.heteroskedastic_shocks.Qvalue(v.exo_id,obs_idx) = v.value^2;
     end
     for k=1:length(M_.heteroskedastic_shocks.Qscale_orig)
         v = M_.heteroskedastic_shocks.Qscale_orig(k);
-        mask_periods = v.periods >= options_.first_obs & v.periods <= options_.nobs+options_.first_obs;
-        obs_idx = v.periods(mask_periods) - options_.first_obs + 1;
+        if isa(v.periods, 'dates')
+            if isempty(options_.dataset.series)
+                error('heteroskedastic_shocks: dates in "periods" requires the dataset to be specified with the "data(series=...)" command')
+            end
+            mask_periods = v.periods >= dataset_.dates(1) & v.periods <= dataset_.dates(end);
+            if any(mask_periods)
+                obs_idx = v.periods(mask_periods) - dataset_.dates(1) + 1;
+            else % arithmetic on empty dates is not supported
+                obs_idx = [];
+            end
+        else
+            mask_periods = v.periods >= options_.first_obs & v.periods <= options_.nobs+options_.first_obs;
+            obs_idx = v.periods(mask_periods) - options_.first_obs + 1;
+        end
         M_.heteroskedastic_shocks.Qscale(v.exo_id,obs_idx) = v.scale^2;
     end
 

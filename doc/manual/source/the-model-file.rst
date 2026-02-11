@@ -2851,13 +2851,13 @@ blocks.
     group of three lines (for setting values)::
 
       var VARIABLE_NAME;
-      periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
       values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
     or (for setting scale factors)::
 
       var VARIABLE_NAME;
-      periods INTEGER[:INTEGER] [[,] INTEGER[:INTEGER]]...;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
       scales DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
     *Notes*
@@ -2865,6 +2865,8 @@ blocks.
     * Integer period indices refer to the original dataset (*e.g.* if
       ``first_obs=10``, then a period index of 11 will refer to the second
       observation used for estimation).
+    * Period indices can only be specified as dates if the dataset has been
+      specified with the ``series`` option of the :comm:`data` command.
     * ``scales`` and ``values`` cannot be simultaneously set for the same shock
       in the same period, but it is possible to set ``values`` for some periods
       and ``scales`` for other periods for the same shock.
