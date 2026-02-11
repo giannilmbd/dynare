@@ -486,19 +486,3 @@ end
 if problem_dummy==0
     fprintf('MODEL_DIAGNOSTICS:  No obvious problems with this mod-file were detected.\n')
 end
-
-function result = compute_nullspace(matrix, jacobian_tolerance)
-% Local helper function to compute null space with appropriate method
-% based on MATLAB/Octave version and tolerance settings
-
-if isempty(jacobian_tolerance) && isoctave
-    result = null(matrix);
-elseif ~isempty(jacobian_tolerance) && (isoctave || ~matlab_ver_less_than('9.12'))
-    result = null(matrix, jacobian_tolerance);
-else %use rational basis in MATLAB if no tolerance specified or Matlab version is too old
-    if matlab_ver_less_than('9.12')
-        result = null(matrix, 'r'); %old syntax for rational basis
-    else
-        result = null(matrix, "rational");
-    end
-end
