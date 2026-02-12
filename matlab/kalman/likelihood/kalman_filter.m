@@ -1,78 +1,44 @@
 function [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
 % [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
-% Computes the likelihood of a stationary state space model.
+% Computes the log-likelihood of a stationary state space model.
 
-%@info:
-%! @deftypefn {Function File} {[@var{LIK},@var{likk},@var{a},@var{P} ] =} DsgeLikelihood (@var{Y}, @var{start}, @var{last}, @var{a}, @var{P}, @var{kalman_tol}, @var{riccati_tol},@var{presample},@var{T},@var{Q},@var{R},@var{H},@var{Z},@var{mm},@var{pp},@var{rr},@var{Zflag},@var{diffuse_periods})
-%! @anchor{kalman_filter}
-%! @sp 1
-%! Computes the likelihood of a stationary state space model, given initial condition for the states (mean and variance).
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item Y
-%! Matrix (@var{pp}*T) of doubles, data.
-%! @item start
-%! Integer scalar, first period.
-%! @item last
-%! Integer scalar, last period (@var{last}-@var{first} has to be inferior to T).
-%! @item a
-%! Vector (@var{mm}*1) of doubles, initial mean of the state vector.
-%! @item P
-%! Matrix (@var{mm}*@var{mm}) of doubles, initial covariance matrix of the state vector.
-%! @item kalman_tol
-%! Double scalar, tolerance parameter (rcond, inversibility of the covariance matrix of the prediction errors).
-%! @item riccati_tol
-%! Double scalar, tolerance parameter (iteration over the Riccati equation).
-%! @item presample
-%! Integer scalar, presampling if strictly positive (number of initial iterations to be discarded when evaluating the likelihood).
-%! @item T
-%! Matrix (@var{mm}*@var{mm}) of doubles, transition matrix of the state equation.
-%! @item Q
-%! Matrix (@var{rr}*@var{rr}) of doubles, covariance matrix of the structural innovations (noise in the state equation).
-%! @item R
-%! Matrix (@var{mm}*@var{rr}) of doubles, second matrix of the state equation relating the structural innovations to the state variables.
-%! @item H
-%! Matrix (@var{pp}*@var{pp}) of doubles, covariance matrix of the measurement errors (if no measurement errors set H as a zero scalar).
-%! @item Z
-%! Matrix (@var{pp}*@var{mm}) of doubles or vector of integers, matrix relating the states to the observed variables or vector of indices (depending on the value of @var{Zflag}).
-%! @item mm
-%! Integer scalar, number of state variables.
-%! @item pp
-%! Integer scalar, number of observed variables.
-%! @item rr
-%! Integer scalar, number of structural innovations.
-%! @item Zflag
-%! Integer scalar, equal to 0 if Z is a vector of indices targeting the obseved variables in the state vector, equal to 1 if Z is a @var{pp}*@var{mm} matrix.
-%! @item diffuse_periods
-%! Integer scalar, number of diffuse filter periods in the initialization step.
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item LIK
-%! Double scalar, value of (minus) the likelihood.
-%! @item LIKK
-%! Column vector of doubles, values of the density of each observation.
-%! @item a
-%! Vector (@var{mm}*1) of doubles, mean of the state vector at the end of the (sub)sample.
-%! @item P
-%! Matrix (@var{mm}*@var{mm}) of doubles, covariance of the state vector at the end of the (sub)sample.
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{DsgeLikelihood}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 1
-%! @ref{kalman_filter_ss}
-%! @end deftypefn
-%@eod:
+%
+% INPUTS
+% - Y                       [matrix]      [pp x T] matrix of observed data
+% - start                   [integer]     index of the first period processed in Y
+% - last                    [integer]     index of the last period processed in Y
+% - a                       [vector]      [mm x 1] initial mean of the state vector, E_0(alpha_1)
+% - P                       [matrix]      [mm x mm] initial covariance matrix of the state vector, Var_0(alpha_1)
+% - kalman_tol              [double]      tolerance parameter for inversion/conditioning of prediction-error covariance matrices
+% - riccati_tol             [double]      tolerance parameter for Riccati fixed-point convergence
+% - rescale_prediction_error_covariance
+%                           [logical]     if true, rescales covariance matrix before inversion to improve numerical stability
+% - presample               [integer]     number of initial iterations discarded when evaluating the likelihood
+% - T                       [matrix]      [mm x mm] transition matrix of the state equation
+% - Q                       [matrix]      [rr x rr] covariance matrix of structural innovations, or 3D array for time-varying Q
+% - R                       [matrix]      [mm x rr] mapping from structural innovations to state innovations
+% - H                       [matrix]      [pp x pp] covariance matrix of measurement errors
+% - Z                       [matrix]      [pp x mm] measurement matrix, or index vector when Zflag=0
+% - mm                      [integer]     number of state variables
+% - pp                      [integer]     number of observed variables
+% - rr                      [integer]     number of structural innovations
+% - Zflag                   [integer]     0 if Z is an index vector; 1 if Z is a [pp x mm] matrix
+% - diffuse_periods         [integer]     number of diffuse-filter periods already consumed during initialization
+% - analytic_derivation     [integer]     derivative mode: 0 (none), 1 (score), 2 (score and Hessian), or asymptotic-Hessian mode
+% - DT, DYss, DOm, DH, DP   [array]       first-derivative objects used when analytic_derivation > 0
+% - D2T, D2Yss, D2Om, D2H, D2P
+%                           [array]       second-derivative objects used when analytic_derivation == 2
+%
+% OUTPUTS
+% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation>0, returns cell array {LIK,DLIK[,Hess]}
+% - LIKK                    [vector|cell] [smpl x 1] period-wise log-likelihood contributions; if analytic_derivation>0, returns {LIKK,dlik}
+% - a                       [vector]      [mm x 1] filtered state mean at the end of the processed sample
+% - P                       [matrix]      [mm x mm] filtered state covariance at the end of the processed sample
+%
+% This function is called by: dsge_likelihood
+% This function calls: kalman_filter_ss
 
-% Copyright © 2004-2021 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

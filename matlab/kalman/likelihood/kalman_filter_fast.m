@@ -1,7 +1,10 @@
 function [LIK, LIKK, a, P] = kalman_filter_fast(Y,start,last,a,P,kalman_tol,presample,T,H,Z,pp,Zflag,diffuse_periods)
 % [LIK, LIKK, a, P] = kalman_filter_fast(Y,start,last,a,P,kalman_tol,presample,T,H,Z,pp,Zflag,diffuse_periods)
-% computes the likelihood of a stationnary state space model using Ed
-% Herbst fast implementation of the Kalman filter.
+% computes the likelihood of a stationary state space model using the fast
+% implementation of the Kalman filter of Edward Herbst, (2015). Using the 'Chandrasekhar Recursions' 
+% for likelihood evaluation of DSGE models. Computational Economics, 45(4):693–705
+% Useful for models where the number of states is much greater than the
+% number of observables.
 %
 % Inputs:
 % - Y           [double]        pp*T matrix of data
@@ -15,7 +18,7 @@ function [LIK, LIKK, a, P] = kalman_filter_fast(Y,start,last,a,P,kalman_tol,pres
 % - H           [double]        pp*pp covariance matrix of the measurement errors (if no measurement errors set H as a zero scalar).
 % - Z           [double]        pp*mm matrix matrix relating states to  observed variables or vector of indices (depending on the value of Zflag).
 % - pp          [integer]       number of observed variables
-% - Zflag       [boolean]       equal to 0 if Z is a vector of indices targeting the obseved variables in the state vector,
+% - Zflag       [boolean]       equal to 0 if Z is a vector of indices targeting the observed variables in the state vector,
 %                               equal to 1 if Z is a pp*mm} matrix
 % - diffuse_periods [integer]       number of diffuse filter periods in the initialization step
 %
@@ -27,7 +30,7 @@ function [LIK, LIKK, a, P] = kalman_filter_fast(Y,start,last,a,P,kalman_tol,pres
 %
 % This function is called by: dsge_likelihood
 
-% Copyright © 2004-2025 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

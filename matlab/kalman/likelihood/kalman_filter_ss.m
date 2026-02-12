@@ -1,60 +1,32 @@
 function [LIK, likk, a] = kalman_filter_ss(Y,start,last,a,T,K,iF,log_dF,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,D2a,D2T,D2Yss)
-% Computes the likelihood of a stationary state space model (steady state Kalman filter).
+% Computes the log-likelihood of a stationary state space model (steady-state Kalman filter).
 
-%@info:
-%! @deftypefn {Function File} {[@var{LIK},@var{likk},@var{a},@var{P} ] =} kalman_filter_ss (@var{Y}, @var{start}, @var{last}, @var{a}, @var{P}, @var{kalman_tol}, @var{riccati_tol},@var{presample},@var{T},@var{Q},@var{R},@var{H},@var{Z},@var{mm},@var{pp},@var{rr},@var{Zflag},@var{diffuse_periods})
-%! @anchor{kalman_filter}
-%! @sp 1
-%! Computes the likelihood of a stationary state space model, given initial condition for the states (mean), the steady state Kalman gain and the steady state inveverted covariance matrix of the prediction errors.
-%! @sp 2
-%! @strong{Inputs}
-%! @sp 1
-%! @table @ @var
-%! @item Y
-%! Matrix (@var{pp}*T) of doubles, data.
-%! @item start
-%! Integer scalar, first period.
-%! @item last
-%! Integer scalar, last period (@var{last}-@var{first} has to be inferior to T).
-%! @item a
-%! Vector (mm*1) of doubles, levels of the predicted initial state variables (E_{0}(alpha_1)).
-%! @item T
-%! Matrix (mm*mm) of doubles, transition matrix of the state equation.
-%! @item K
-%! Matrix (mm*@var{pp}) of doubles, steady state Kalman gain.
-%! @item iF
-%! Matrix (@var{pp}*@var{pp}) of doubles, inverse of the steady state covariance matrix of the prediction errors.
-%! @item dF
-%! Double scalar, determinant of the steady state covariance matrix of the prediction errors.
-%! @item Z
-%! Matrix (@var{pp}*mm) of doubles or vector of integers, matrix relating the states to the observed variables or vector of indices (depending on the value of @var{Zflag}).
-%! @item pp
-%! Integer scalar, number of observed variables.
-%! @item Zflag
-%! Integer scalar, equal to 0 if Z is a vector of indices targeting the obseved variables in the state vector, equal to 1 if Z is a @var{pp}*@var{mm} matrix.
-%! @end table
-%! @sp 2
-%! @strong{Outputs}
-%! @sp 1
-%! @table @ @var
-%! @item LIK
-%! Double scalar, value of (minus) the likelihood.
-%! @item likk
-%! Column vector of doubles, values of the density of each observation.
-%! @item a
-%! Vector (mm*1) of doubles, current estimate of the state vector tomorrow (E_{T}(alpha_{T+1})).
-%! @end table
-%! @sp 2
-%! @strong{This function is called by:}
-%! @sp 1
-%! @ref{kalman_filter}
-%! @sp 2
-%! @strong{This function calls:}
-%! @sp 1
-%! @end deftypefn
-%@eod:
+%
+% INPUTS
+% - Y                       [matrix]      [pp x T] matrix of observed data
+% - start                   [integer]     index of the first period processed in Y
+% - last                    [integer]     index of the last period processed in Y
+% - a                       [vector]      [mm x 1] predicted initial state vector, E_0(alpha_1)
+% - T                       [matrix]      [mm x mm] transition matrix of the state equation
+% - K                       [matrix]      [mm x pp] steady-state Kalman gain
+% - iF                      [matrix]      [pp x pp] inverse of steady-state covariance matrix of prediction errors
+% - log_dF                  [double]      log determinant of steady-state covariance matrix of prediction errors
+% - Z                       [matrix]      [pp x mm] measurement matrix, or index vector when Zflag=0
+% - pp                      [integer]     number of observed variables
+% - Zflag                   [integer]     0 if Z is an index vector; 1 if Z is a [pp x mm] matrix
+% - analytic_derivation     [integer]     derivative mode: 0 (none), 1 (score), 2 (score and Hessian), or asymptotic-Hessian mode
+% - Da, DT, DYss            [array]       first-derivative objects used when analytic_derivation > 0
+% - D2a, D2T, D2Yss         [array]       second-derivative objects used when analytic_derivation == 2
+%
+% OUTPUTS
+% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation>0, returns cell array {LIK,DLIK[,Hess]}
+% - likk                    [vector|cell] [smpl x 1] period-wise log-likelihood contributions; if analytic_derivation>0, returns {likk,dlikk}
+% - a                       [vector]      [mm x 1] filtered state estimate for next period, E_T(alpha_{T+1})
+%
+% This function is called by: kalman_filter
+% This function calls: none
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
