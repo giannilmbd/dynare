@@ -39,7 +39,7 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr] = dsge_li
 % This function calls: dynare_resolve, lyapunov_symm, lyapunov_solver, compute_Pinf_Pstar, kalman_filter_d, missing_observations_kalman_filter_d,
 % univariate_kalman_filter_d, kalman_steady_state, get_perturbation_params_deriv, kalman_filter, missing_observations_kalman_filter, univariate_kalman_filter, priordens
 
-% Copyright © 2004-2025 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -541,8 +541,8 @@ if analytic_derivation
             tmp(j,:,:) = blkdiag(zeros(offset,offset), squeeze(D2Yss(j,:,:)));
         end
         D2Yss = tmp;
-        D2H=sparse(size(D2Om,1),size(D2Om,2)); %zeros([size(H),length(xparam1),length(xparam1)]);
-        D2P=sparse(size(D2Om,1),size(D2Om,2)); %zeros([size(T),length(xparam1),length(xparam1)]);
+        D2H=sparse(size(D2Om,1),size(D2Om,2));
+        D2P=sparse(size(D2Om,1),size(D2Om,2));
         jcount=0;
     end
     if options_.lik_init==1
@@ -550,17 +550,12 @@ if analytic_derivation
             k =estim_params_.var_exo(i,1);
             DQ(k,k,i) = 2*sqrt(Q(k,k));
             dum =  lyapunov_symm(T,DOm(:,:,i),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-            %         kk = find(abs(dum) < 1e-12);
-            %         dum(kk) = 0;
             DP(:,:,i)=dum;
             if full_Hess
                 for j=1:i
                     jcount=jcount+1;
                     dum =  lyapunov_symm(T,dyn_unvech(D2Om(:,jcount)),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-                    %             kk = (abs(dum) < 1e-12);
-                    %             dum(kk) = 0;
                     D2P(:,jcount)=dyn_vech(dum);
-                    %             D2P(:,:,j,i)=dum;
                 end
             end
         end
@@ -577,8 +572,6 @@ if analytic_derivation
     if options_.lik_init==1
         for j=1:estim_params_.np
             dum =  lyapunov_symm(T,DT(:,:,j+offset)*Pstar*T'+T*Pstar*DT(:,:,j+offset)'+DOm(:,:,j+offset),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-            %         kk = find(abs(dum) < 1e-12);
-            %         dum(kk) = 0;
             DP(:,:,j+offset)=dum;
             if full_Hess
                 DTj = DT(:,:,j+offset);
