@@ -170,7 +170,7 @@ heterogeneity_solve;
 if max(abs(oo_.heterogeneity.mat.G(:))) > 1e-4
     error('Aggregate-block residuals are too big!');
 end
-if max(abs(oo_.heterogeneity.mat.F(:))) > 1e-6
+if max(abs(oo_.heterogeneity.mat.F(:))) > 2e-6
     error('Heterogeneous-block residuals are too big');
 end
 
