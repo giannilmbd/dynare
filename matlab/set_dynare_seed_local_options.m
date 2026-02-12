@@ -106,7 +106,7 @@ else% Use old MATLAB interface.
             randn('state',DynareRandomStreams.seed);
             return
         end
-        if isempty(DynareRandomStreams) || isfield(DynareRandomStreams,'algo')
+        if isempty(DynareRandomStreams) || ~isfield(DynareRandomStreams,'algo')
         %make sure algorithm is set
             if isoctave
                 DynareRandomStreams.algo = 'state';
