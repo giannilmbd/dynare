@@ -275,11 +275,11 @@ function solve_time_iteration_tensor( &
         ! Workspace (outputs written here)
         type(grid_point_workspace), intent(inout) :: gp_ws
 
-        ! MATLAB handles
-        type(matlab_mex_handles), intent(in) :: input_mex
+        ! MATLAB handles (inout because step_mx may be lazily created)
+        type(matlab_mex_handles), intent(inout) :: input_mex
 
         ! Local variables
-        integer(int32) :: l, k, t, kf, z, a(1)
+        integer(int32) :: l, k, t, kf, z, a(1), lv_idx
         integer(int32), allocatable :: dz(:)
         real(real64) :: beta
         real(real64), allocatable :: dbeta(:)
@@ -296,7 +296,12 @@ function solve_time_iteration_tensor( &
         gp_ws%yh(dims%n_het_endo+1:dims%n_het_endo+dims%n_orig) = policy
         ! Call dynamic_het1_set_auxiliary_variables to compute auxiliary variables
         ! This sets yh(0) auxiliaries from the originally declared variables
-        if (mcp%set_auxiliary_variables) call call_matlab_set_auxiliary_variables(gp_ws%yh, input_mex)
+        ! Currently, the only level that's used is the level 0
+        ! As we don't need the MCP multipliers value, we don't need the level 1
+        if (mcp%set_auxiliary_variables) then
+            lv_idx = 0
+            call call_matlab_set_auxiliary_variables(gp_ws%yh, input_mex, l)
+        end if
         if (dims%n_mult > 0) then
             ! Set MCP multipliers to zero for the FB function to work correctly
             gp_ws%yh(dims%n_het_endo+mcp%mult_in_het) = 0.0_real64
@@ -608,9 +613,12 @@ function solve_time_iteration_tensor( &
                 ! Store solution for originally declared variables
                 ! We use yh as temporary storage
                 gp_ws%yh(dims%n_het_endo+1:dims%n_het_endo+dims%n_orig) = gp_ws%x_orig
-                ! Set the auxiliary variables
-                if (mcp%set_auxiliary_variables) &
-                     call call_matlab_set_auxiliary_variables(gp_ws%yh, mex)
+                ! Set the auxiliary variables (loop over topological levels)
+                if (mcp%set_auxiliary_variables) then
+                    do i = 0, dims%n_aux_levels - 1
+                        call call_matlab_set_auxiliary_variables(gp_ws%yh, mex, i)
+                    end do
+                end if
                 ! Copy back into new_pol
                 new_pol(:, j) = gp_ws%yh(dims%n_het_endo+1:2*dims%n_het_endo)
                 ! Set MCP multipliers to zero for the FB function to work correctly
@@ -814,20 +822,24 @@ function solve_time_iteration_tensor( &
     ! Computes auxiliary variables from originally declared variables
     ! Signature: yh = set_aux_fn(y, x, params, ss, yh, xh, paramsh)
     !---------------------------------------------------------------------------
-    subroutine call_matlab_set_auxiliary_variables(yh, input_mex)
-        real(real64), dimension(:), intent(inout) :: yh 
-        type(matlab_mex_handles), intent(in) :: input_mex
+    subroutine call_matlab_set_auxiliary_variables(yh, input_mex, step)
+        real(real64), dimension(:), intent(inout) :: yh
+        type(matlab_mex_handles), intent(inout) :: input_mex
+        integer(int32), intent(in) :: step
 
         ! MATLAB interface variables
-        type(c_ptr), dimension(7) :: prhs
+        type(c_ptr), dimension(8) :: prhs
         type(c_ptr), dimension(1) :: plhs
         integer(C_INT) :: retval
 
         ! Pointer to the results
         real(real64), pointer, contiguous :: yh_ptr(:)
 
-        ! Build input array for mexCallMATLAB (7 inputs)
-        ! Signature: (y, x, params, ss, yh, xh, paramsh)
+        ! Create mxArray for step parameter
+        input_mex%step_mx = mxCreateDoubleScalar(real(step, c_double))
+
+        ! Build input array for mexCallMATLAB (8 inputs)
+        ! Signature: (y, x, params, ss, yh, xh, paramsh, step)
         prhs(1) = input_mex%y_mx
         prhs(2) = input_mex%x_mx
         prhs(3) = input_mex%params_mx
@@ -835,9 +847,10 @@ function solve_time_iteration_tensor( &
         prhs(5) = input_mex%yh_mx
         prhs(6) = input_mex%xh_mx
         prhs(7) = input_mex%params_mx    ! paramsh (same as params)
+        prhs(8) = input_mex%step_mx
 
         ! Call MATLAB MEX function: yh = model_name.dynamic_het1_set_auxiliary_variables(...)
-        retval = mexCallMATLAB(1_C_INT, plhs, 7_C_INT, prhs, input_mex%het_aux)
+        retval = mexCallMATLAB(1_C_INT, plhs, 8_C_INT, prhs, input_mex%het_aux)
         if (retval /= 0) &
              call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_aux)
 

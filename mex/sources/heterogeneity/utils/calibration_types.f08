@@ -185,6 +185,11 @@ module calibration_types
         ! Solver-related counts
         integer(int32) :: n_orig = 0     ! Originally declared het endo vars (solver optimizes over these)
         integer(int32) :: n_mult = 0     ! Number of multiplier variables
+        integer(int32) :: n_aux_levels = 0 ! Number of topological levels for aux variable computation
+
+        ! Level structure for aux variables (for time-shifting)
+        integer(int32), allocatable :: het_aux_level_sizes(:)  ! Size of each level
+        integer(int32), allocatable :: het_aux_level_vars(:)   ! Concatenated level vars (1-based indices)
     end type model_dimensions
 
     ! Broyden workspace for calibration solver
@@ -254,6 +259,9 @@ module calibration_types
         type(c_ptr) :: yh_mx = c_null_ptr
         type(c_ptr) :: xh_mx = c_null_ptr
         type(c_ptr) :: paramsh_mx = c_null_ptr
+
+        ! Auxiliary variable computation
+        type(c_ptr) :: step_mx = c_null_ptr
 
         ! Sparse Jacobian structure
         type(c_ptr) :: rowval_mx = c_null_ptr

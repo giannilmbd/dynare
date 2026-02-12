@@ -63,7 +63,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
     ! MATLAB input pointers
     type(c_ptr) :: M_fname_mx, equation_names_mx, M_params_mx, &
-                   H_orig_endo_nbr, H_set_auxiliary_variables, H_dynamic_mcp_equations_ordering, &
+                   H_orig_endo_nbr, H_set_auxiliary_variables, H_het_aux_levels_mx, &
+                   H_dynamic_mcp_equations_ordering, &
                    H_state_var_mx, H_dynamic_g1_sparse_rowval_mx, H_dynamic_g1_sparse_colval_mx, &
                    H_dynamic_g1_sparse_colptr_mx, options_het_mx, mat_mx, &
                    indices_mx
@@ -96,13 +97,13 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     type(aggregation_output), target :: agg_output
 
     ! Size variables
-    integer(int32) :: i, status, n_states, N_sp, N_om, N_a_om, N_e, n_het_endo, n_agg_endo, &
+    integer(int32) :: i, j, status, n_states, N_sp, N_om, N_a_om, N_e, n_het_endo, n_agg_endo, &
                       total_cols, ntmp, n_params, n_yh, n_xh, n_unknowns, n_Ix, &
                       n_target_eqs, n_y, n_orig
     logical :: flag
 
     ! Check arguments
-    if (nrhs /= 13) call mexErrMsgTxt("Need 13 inputs")
+    if (nrhs /= 14) call mexErrMsgTxt("Need 14 inputs")
     if (nlhs < 1) call mexErrMsgTxt("Need 1 output")
 
     ! Assign input pointers
@@ -111,14 +112,15 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     M_params_mx = prhs(3)
     H_orig_endo_nbr = prhs(4)
     H_set_auxiliary_variables = prhs(5)
-    H_dynamic_mcp_equations_ordering = prhs(6)
-    H_state_var_mx = prhs(7)
-    H_dynamic_g1_sparse_rowval_mx = prhs(8)
-    H_dynamic_g1_sparse_colval_mx = prhs(9)
-    H_dynamic_g1_sparse_colptr_mx = prhs(10)
-    options_het_mx = prhs(11)
-    mat_mx = prhs(12)
-    indices_mx = prhs(13)
+    H_het_aux_levels_mx = prhs(6)
+    H_dynamic_mcp_equations_ordering = prhs(7)
+    H_state_var_mx = prhs(8)
+    H_dynamic_g1_sparse_rowval_mx = prhs(9)
+    H_dynamic_g1_sparse_colval_mx = prhs(10)
+    H_dynamic_g1_sparse_colptr_mx = prhs(11)
+    options_het_mx = prhs(12)
+    mat_mx = prhs(13)
+    indices_mx = prhs(14)
 
     ! ==================================================================
     ! PART 0: Put the direct MATLAB input under Fortran variables
@@ -151,6 +153,33 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     ! Heterogeneous auxiliary variables flag
     if (.not. c_associated(H_set_auxiliary_variables)) call mexErrMsgTxt("H_.set_auxiliary_variables not found")
     tg_config%mcp%set_auxiliary_variables = logical(mxIsLogicalScalarTrue(H_set_auxiliary_variables))
+
+    ! Number of topological levels for auxiliary variable computation (from cell array size)
+    if (.not. c_associated(H_het_aux_levels_mx)) call mexErrMsgTxt("H_.het_aux_levels not found")
+    input%dims%n_aux_levels = int(mxGetNumberOfElements(H_het_aux_levels_mx), int32)
+
+    ! Read het_aux_levels structure for time-shifting
+    if (input%dims%n_aux_levels > 0) then
+        allocate(input%dims%het_aux_level_sizes(input%dims%n_aux_levels))
+        ntmp = 0  ! Total count of aux vars
+        do i = 1, input%dims%n_aux_levels
+            field = mxGetCell(H_het_aux_levels_mx, int(i, mwIndex))
+            if (.not. c_associated(field)) call mexErrMsgTxt("H_.het_aux_levels cell is null")
+            input%dims%het_aux_level_sizes(i) = int(mxGetNumberOfElements(field), int32)
+            ntmp = ntmp + input%dims%het_aux_level_sizes(i)
+        end do
+        allocate(input%dims%het_aux_level_vars(ntmp))
+        ntmp = 0
+        do i = 1, input%dims%n_aux_levels
+            field = mxGetCell(H_het_aux_levels_mx, int(i, mwIndex))
+            ! Read doubles and convert to integers (MATLAB stores as double)
+            temp_real(1:input%dims%het_aux_level_sizes(i)) => mxGetDoubles(field)
+            do j = 1, input%dims%het_aux_level_sizes(i)
+                ntmp = ntmp + 1
+                input%dims%het_aux_level_vars(ntmp) = nint(temp_real(j), int32)
+            end do
+        end do
+    end if
 
     ! Heterogeneous equations MCP reordering
     if (.not. c_associated(H_dynamic_mcp_equations_ordering)) call mexErrMsgTxt("H_.dynamic_mcp_equations_ordering not found")
