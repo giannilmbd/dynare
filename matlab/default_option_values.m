@@ -12,7 +12,7 @@ function options_ = default_option_values(M_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2018-2025 Dynare Team
+% Copyright © 2018-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -585,6 +585,7 @@ options_.mh_autocorrelation_function_size = 30;
 options_.plot_priors = 1;
 options_.cova_compute = 1;
 options_.parallel = 0;
+options_.parallel_info.use_pct.estimation.sampler = true;
 options_.parallel_info.isHybridMatlabOctave = false;
 options_.parallel_info.leaveSlaveOpen = 0;
 options_.parallel_info.RemoteTmpFolder = '';
