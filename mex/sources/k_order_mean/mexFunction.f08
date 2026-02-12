@@ -1,4 +1,4 @@
-! Copyright © 2021-2025 Dynare Team
+! Copyright © 2021-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -74,47 +74,32 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       call mexErrMsgTxt("Must have 1 or 2 outputs")
 
    ! Checking the consistence and validity of input arguments
-   if (nrhs /= 12) then
-      call mexErrMsgTxt("Must have exactly 12 inputs")
-   end if
-   if (.not. (mxIsScalar(order_mx) .and. mxIsNumeric(order_mx))) then
-      call mexErrMsgTxt("1st argument (order) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nstatic_mx) .and. mxIsNumeric(nstatic_mx))) then
-      call mexErrMsgTxt("2nd argument (nstat) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(npred_mx) .and. mxIsNumeric(npred_mx))) then
-      call mexErrMsgTxt("3rd argument (npred) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nboth_mx) .and. mxIsNumeric(nboth_mx))) then
-      call mexErrMsgTxt("4th argument (nboth) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nfwrd_mx) .and. mxIsNumeric(nfwrd_mx))) then
-      call mexErrMsgTxt("5th argument (nforw) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nexog_mx) .and. mxIsNumeric(nexog_mx))) then
-      call mexErrMsgTxt("6th argument (nexog) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(order_moment_mx) .and. mxIsNumeric(order_moment_mx))) then
-      call mexErrMsgTxt("7th argument (order_moment) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nburn_mx) .and. mxIsNumeric(nburn_mx))) then
-      call mexErrMsgTxt("8th argument (nburn) should be a numeric scalar")
-   end if
+   if (nrhs /= 12) call mexErrMsgTxt("Must have exactly 12 inputs")
+   if (.not. (mxIsScalar(order_mx) .and. mxIsNumeric(order_mx))) &
+        call mexErrMsgTxt("1st argument (order) should be a numeric scalar")
+   if (.not. (mxIsScalar(nstatic_mx) .and. mxIsNumeric(nstatic_mx))) &
+        call mexErrMsgTxt("2nd argument (nstat) should be a numeric scalar")
+   if (.not. (mxIsScalar(npred_mx) .and. mxIsNumeric(npred_mx))) &
+        call mexErrMsgTxt("3rd argument (npred) should be a numeric scalar")
+   if (.not. (mxIsScalar(nboth_mx) .and. mxIsNumeric(nboth_mx))) &
+        call mexErrMsgTxt("4th argument (nboth) should be a numeric scalar")
+   if (.not. (mxIsScalar(nfwrd_mx) .and. mxIsNumeric(nfwrd_mx))) &
+        call mexErrMsgTxt("5th argument (nforw) should be a numeric scalar")
+   if (.not. (mxIsScalar(nexog_mx) .and. mxIsNumeric(nexog_mx))) &
+        call mexErrMsgTxt("6th argument (nexog) should be a numeric scalar")
+   if (.not. (mxIsScalar(order_moment_mx) .and. mxIsNumeric(order_moment_mx))) &
+        call mexErrMsgTxt("7th argument (order_moment) should be a numeric scalar")
+   if (.not. (mxIsScalar(nburn_mx) .and. mxIsNumeric(nburn_mx))) &
+        call mexErrMsgTxt("8th argument (nburn) should be a numeric scalar")
    if (.not. (mxIsDouble(yhat_start_mx) .and. (mxGetM(yhat_start_mx) == 1 .or. mxGetN(yhat_start_mx) == 1)) &
-        .or. mxIsComplex(yhat_start_mx) .or. mxIsSparse(yhat_start_mx)) then
-      call mexErrMsgTxt("9th argument (yhat_start) should be a real dense vector")
-   end if
-   if (.not. (mxIsDouble(shocks_mx)) .or. mxIsComplex(shocks_mx) .or. mxIsSparse(shocks_mx)) then
-      call mexErrMsgTxt("10th argument (shocks) should be a real dense matrix")
-   end if
+        .or. mxIsComplex(yhat_start_mx) .or. mxIsSparse(yhat_start_mx)) &
+        call mexErrMsgTxt("9th argument (yhat_start) should be a real dense vector")
+   if (.not. mxIsDouble(shocks_mx) .or. mxIsComplex(shocks_mx) .or. mxIsSparse(shocks_mx)) &
+        call mexErrMsgTxt("10th argument (shocks) should be a real dense matrix")
    if (.not. (mxIsDouble(ysteady_mx) .and. (mxGetM(ysteady_mx) == 1 .or. mxGetN(ysteady_mx) == 1)) &
-        .or. mxIsComplex(ysteady_mx) .or. mxIsSparse(ysteady_mx)) then
-      call mexErrMsgTxt("11th argument (ysteady) should be a real vector")
-   end if
-   if (.not. mxIsStruct(dr_mx)) then
-      call mexErrMsgTxt("12th argument (dr) should be a struct")
-   end if
+        .or. mxIsComplex(ysteady_mx) .or. mxIsSparse(ysteady_mx)) &
+        call mexErrMsgTxt("11th argument (ysteady) should be a real vector")
+   if (.not. mxIsStruct(dr_mx)) call mexErrMsgTxt("12th argument (dr) should be a struct")
 
    ! Converting inputs in Fortran format
    order = int(mxGetScalar(order_mx))
@@ -129,30 +114,25 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    nburn = int(mxGetScalar(nburn_mx))
    order_moment = int(mxGetScalar(order_moment_mx))
 
-   if (endo_nbr /= int(mxGetM(yhat_start_mx))) then
-      call mexErrMsgTxt("yhat_start should have nstat+npred+nboth+nforw rows")
-   end if
+   if (endo_nbr /= int(mxGetM(yhat_start_mx))) &
+        call mexErrMsgTxt("yhat_start should have nstat+npred+nboth+nforw rows")
    yhat_start => mxGetDoubles(yhat_start_mx)
 
-   if (exo_nbr /= int(mxGetM(shocks_mx))) then
-      call mexErrMsgTxt("shocks should have nexog rows")
-   end if
+   if (exo_nbr /= int(mxGetM(shocks_mx))) call mexErrMsgTxt("shocks should have nexog rows")
    nper = int(mxGetN(shocks_mx))
    allocate(shocks(exo_nbr,nper))
    shocks = reshape(mxGetDoubles(shocks_mx),[exo_nbr,nper])
 
-   if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) then
-      call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
-   end if
+   if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) &
+        call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
    ysteady => mxGetDoubles(ysteady_mx)
 
    allocate(h(0:order), fdr(0:order), udr(0:order)) 
    do i = 0, order
       write (fieldname, '(a2, i1)') "g_", i
       tmp = mxGetField(dr_mx, 1_mwIndex, trim(fieldname))
-      if (.not. (c_associated(tmp) .and. mxIsDouble(tmp))) then
-         call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
-      end if
+      if (.not. (c_associated(tmp) .and. mxIsDouble(tmp))) &
+           call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
       m = int(mxGetM(tmp))
       n = int(mxGetN(tmp))
       allocate(fdr(i)%m(m,n), udr(i)%m(endo_nbr, nvar**i), h(i)%m(endo_nbr, nvar**i))
@@ -190,9 +170,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       dyu(nys+1:) = shocks(:,t)
       call eval(h, dyu, udr, endo_nbr, nvar, order)
       sim(:,t) = h(0)%m(:,1) + ysteady
-      if (t > nburn) then
-         mean = mean + sim(:,t)**order_moment
-      end if
+      if (t > nburn) mean = mean + sim(:,t)**order_moment
    end do
    ! scaling the mean with the number of non-burn-in periods
    mean = mean/(nper-nburn)

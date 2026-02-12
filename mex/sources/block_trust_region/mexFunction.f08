@@ -1,4 +1,4 @@
-! Copyright © 2019-2025 Dynare Team
+! Copyright © 2019-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -38,42 +38,33 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   logical :: debug, block_decompose
   character(len=80) :: debug_msg
 
-  if (nrhs < 8 .or. nlhs /= 3) then
-     call mexErrMsgTxt("Must have at least 8 inputs and exactly 3 outputs")
-  end if
+  if (nrhs < 8 .or. nlhs /= 3) &
+       call mexErrMsgTxt("Must have at least 8 inputs and exactly 3 outputs")
 
-  if (.not. ((mxIsChar(prhs(1)) .and. mxGetM(prhs(1)) == 1) .or. mxIsClass(prhs(1), "function_handle"))) then
-     call mexErrMsgTxt("First argument (function) should be a string or a function handle")
-  end if
+  if (.not. ((mxIsChar(prhs(1)) .and. mxGetM(prhs(1)) == 1) .or. mxIsClass(prhs(1), "function_handle"))) &
+       call mexErrMsgTxt("First argument (function) should be a string or a function handle")
 
   if (.not. (mxIsDouble(prhs(2)) .and. (mxGetM(prhs(2)) == 1 .or. mxGetN(prhs(2)) == 1)) &
-       .or. mxIsComplex(prhs(2)) .or. mxIsSparse(prhs(2))) then
-     call mexErrMsgTxt("Second argument (initial guess) should be a real dense vector")
-  end if
+       .or. mxIsComplex(prhs(2)) .or. mxIsSparse(prhs(2))) &
+       call mexErrMsgTxt("Second argument (initial guess) should be a real dense vector")
 
-  if (.not. (mxIsScalar(prhs(3)) .and. mxIsNumeric(prhs(3)))) then
-     call mexErrMsgTxt("Third argument (tolf) should be a numeric scalar")
-  end if
+  if (.not. (mxIsScalar(prhs(3)) .and. mxIsNumeric(prhs(3)))) &
+       call mexErrMsgTxt("Third argument (tolf) should be a numeric scalar")
 
-  if (.not. (mxIsScalar(prhs(4)) .and. mxIsNumeric(prhs(4)))) then
-     call mexErrMsgTxt("Fourth argument (tolx) should be a numeric scalar")
-  end if
+  if (.not. (mxIsScalar(prhs(4)) .and. mxIsNumeric(prhs(4)))) &
+       call mexErrMsgTxt("Fourth argument (tolx) should be a numeric scalar")
 
-  if (.not. (mxIsScalar(prhs(5)) .and. mxIsNumeric(prhs(5)))) then
-     call mexErrMsgTxt("Fifth argument (maxiter) should be a numeric scalar")
-  end if
+  if (.not. (mxIsScalar(prhs(5)) .and. mxIsNumeric(prhs(5)))) &
+       call mexErrMsgTxt("Fifth argument (maxiter) should be a numeric scalar")
 
-  if (.not. (mxIsScalar(prhs(6)) .and. mxIsNumeric(prhs(6)))) then
-     call mexErrMsgTxt("Sixth argument (factor) should be a numeric scalar")
-  end if
+  if (.not. (mxIsScalar(prhs(6)) .and. mxIsNumeric(prhs(6)))) &
+       call mexErrMsgTxt("Sixth argument (factor) should be a numeric scalar")
 
-  if (.not. (mxIsLogicalScalar(prhs(7)))) then
-     call mexErrMsgTxt("Seventh argument (block_decompose) should be a logical scalar")
-  end if
+  if (.not. mxIsLogicalScalar(prhs(7))) &
+       call mexErrMsgTxt("Seventh argument (block_decompose) should be a logical scalar")
 
-  if (.not. (mxIsLogicalScalar(prhs(8)))) then
-     call mexErrMsgTxt("Eigth argument (debug) should be a logical scalar")
-  end if
+  if (.not. mxIsLogicalScalar(prhs(8))) &
+       call mexErrMsgTxt("Eigth argument (debug) should be a logical scalar")
 
   func => prhs(1)
   tolf = mxGetScalar(prhs(3))
@@ -150,10 +141,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
              & still too large, solving for the whole model")
         call trust_region_solve(x, matlab_fcn, info, tolx, tolf, maxiter, factor)
      else
-        if (size(blocks) > 1) then
-           ! Note that the value of info may be different across blocks
-           info = 1
-        end if
+        if (size(blocks) > 1) info = 1 ! Note that the value of info may be different across blocks
      end if
   else ! No block decomposition
      nullify(x_indices, f_indices, x_all)

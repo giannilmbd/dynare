@@ -1,4 +1,4 @@
-! Copyright © 2021-2023 Dynare Team
+! Copyright © 2021-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -28,9 +28,8 @@ module struct
          character(*), intent(in) :: field
          type(c_ptr) :: tmp
          tmp = mxGetField(struct, 1_mwIndex, field)
-         if (.not. (c_associated(tmp) .and. mxIsScalar(tmp) .and. mxIsNumeric(tmp))) then
-            call mexErrMsgTxt("Field "//field//" should be a numeric scalar")
-         end if
+         if (.not. (c_associated(tmp) .and. mxIsScalar(tmp) .and. mxIsNumeric(tmp))) &
+              call mexErrMsgTxt("Field "//field//" should be a numeric scalar")
          get_int_field = int(mxGetScalar(tmp))
       end function get_int_field
 

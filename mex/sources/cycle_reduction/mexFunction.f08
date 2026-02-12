@@ -1,4 +1,4 @@
-! Copyright © 2022-2025 Dynare Team
+! Copyright © 2022-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -67,9 +67,7 @@ loop: do
          crit = norm(A02(:,1:n),"1")
          ! Checking for stopping conditions
          if (crit < cvg_tol) then
-            if (norm(A02(:,n+1:dn), "1") < cvg_tol) then
-               exit loop
-            end if
+            if (norm(A02(:,n+1:dn), "1") < cvg_tol) exit loop
          elseif (it == max_it) then
             info(1) = 401._c_double
             info(2) = real(log(norm(A1i,"1")), c_double)
@@ -126,15 +124,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    logical :: check
 
    ! 0. Checking the consistency and validity of input arguments
-   if (nrhs < 4) then
-      call mexErrMsgTxt("Must have at least 4 inputs")
-   end if
-   if (nrhs > 5) then
-      call mexErrMsgTxt("Too many input arguments")
-   end if
-   if (nlhs > 2) then
-      call mexErrMsgTxt("Too many output arguments")
-   end if
+   if (nrhs < 4) call mexErrMsgTxt("Must have at least 4 inputs")
+   if (nrhs > 5) call mexErrMsgTxt("Too many input arguments")
+   if (nlhs > 2) call mexErrMsgTxt("Too many output arguments")
    
    do i=1,3
       if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. & 
@@ -144,30 +136,25 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       end if
    end do
    if (.not. (c_associated(prhs(4)) .and. mxIsScalar(prhs(4)) .and. &
-       mxIsNumeric(prhs(4)))) then
-      call mexErrMsgTxt("Argument 4 should be a numeric scalar")
-   end if
+       mxIsNumeric(prhs(4)))) &
+       call mexErrMsgTxt("Argument 4 should be a numeric scalar")
 
    check = .false.
    if (nrhs == 5) then
       if (.not. (c_associated(prhs(5)))) then
          call mexErrMsgTxt("Argument 5 should be a Matlab object")
       else
-         if (.not. (mxIsEmpty(prhs(5)))) then
-            check = .true.
-         end if
+         if (.not. mxIsEmpty(prhs(5))) check = .true.
       end if
    end if
 
    n = int(mxGetM(prhs(1)))            ! Order of the considered matrices
-   if ((n /= mxGetN(prhs(1))) &        ! Number of columns of A0
-      &.or. (n /= mxGetM(prhs(2))) &   ! Number of lines of A1
-      &.or. (n /= mxGetN(prhs(2))) &   ! Number of columns of A1
-      &.or. (n /= mxGetM(prhs(3))) &   ! Number of lines of A2
-      &.or. (n /= mxGetN(prhs(3))) &   ! Number of columns of A2
-      ) then  
-      call mexErrMsgTxt("Input dimension mismatch")
-   end if
+   if (n /= mxGetN(prhs(1))        &   ! Number of columns of A0
+        .or. n /= mxGetM(prhs(2))  &   ! Number of lines of A1
+        .or. n /= mxGetN(prhs(2))  &   ! Number of columns of A1
+        .or. n /= mxGetM(prhs(3))  &   ! Number of lines of A2
+        .or. n /= mxGetN(prhs(3))) &   ! Number of columns of A2
+        call mexErrMsgTxt("Input dimension mismatch")
    
    ! 1. Storing the relevant information in Fortran format
    A0(1:n,1:n) => mxGetDoubles(prhs(1))

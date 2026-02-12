@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -64,9 +64,8 @@ contains
         call compute_aggregate_residuals(input, output)
 
         ! Only print "Calibration iteration complete" when there's actual calibration
-        if (input%dims%n_unknowns > 0 .and. input%cal_verbosity == 2) then
-            call mexPrintf('  Calibration iteration complete'//NEW_LINE('A'))
-        end if
+        if (input%dims%n_unknowns > 0 .and. input%cal_verbosity == 2) &
+             call mexPrintf('  Calibration iteration complete'//NEW_LINE('A'))
 
     end function agg_resid_tensor
 
@@ -115,9 +114,8 @@ contains
         input%d_next = dist_output%distribution
         d_mat_next(1:N_e, 1:N_a) => input%d_next
 
-        if (input%forward_verbosity == 2) then
-            call mexPrintf('  === Forward Iteration ==='//NEW_LINE('A'))
-        end if
+        if (input%forward_verbosity == 2) &
+             call mexPrintf('  === Forward Iteration ==='//NEW_LINE('A'))
 
         ! Perform forward iterations
         do iter = 1, input%d_options%max_iter
@@ -229,9 +227,8 @@ contains
 
         integer(int32) :: k, N_Ix
 
-        if (input%cal_verbosity == 2) then
-            call mexPrintf('  === Aggregate variables and residuals ==='//NEW_LINE('A'))
-        end if
+        if (input%cal_verbosity == 2) &
+             call mexPrintf('  === Aggregate variables and residuals ==='//NEW_LINE('A'))
 
         ! Compute the aggregated heterogeneous policy functions
         ! Ix_j = sum_i D_i * policy_j(state_i)
@@ -254,10 +251,9 @@ contains
         character(len=256) :: msg
         integer :: i
 
-        if (input%dims%n_agg_endo > 0_int32) then
-            ! Use MATLAB MEX function
-            call call_matlab_resid_tensor(output%agg_output%residuals, input%mex)
-        end if
+        if (input%dims%n_agg_endo > 0_int32) &
+             ! Use MATLAB MEX function
+             call call_matlab_resid_tensor(output%agg_output%residuals, input%mex)
 
         ! Print all aggregate residuals if verbosity == 2
         if (input%cal_verbosity == 2) then
@@ -305,9 +301,8 @@ contains
         ! Call MATLAB function: resid = model_name.dynamic_resid(y, x, params, ss, yagg)
         retval = mexCallMATLAB(1_C_INT, plhs, 5_C_INT, prhs, input_mex%agg_resid)
 
-        if (retval /= 0) then
-            call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%agg_resid)
-        end if
+        if (retval /= 0) &
+             call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%agg_resid)
 
         ! Extract residual from MATLAB output
         resid(1:size(residuals)) => mxGetDoubles(plhs(1))

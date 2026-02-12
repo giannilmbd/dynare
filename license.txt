@@ -375,7 +375,7 @@ License: GPL-3+
 
 Files: mex/sources/sobol/sobol.f08
 Copyright: 2004-2009 John Burkardt
-           2023 Dynare Team
+           2023-2026 Dynare Team
 License: LGPL-3+
 
 Files: preprocessor/doc/macroprocessor/*

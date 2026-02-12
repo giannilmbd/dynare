@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -67,15 +67,13 @@ contains
             output%iterations = 1
             ! residual_norm computed from ALL aggregate residuals
             output%residual_norm = maxval(abs(output%agg_output%residuals))
-            if (input%cal_verbosity == 2) then
-                call mexPrintf('No calibration parameters - computing residuals only'//NEW_LINE('A'))
-            end if
+            if (input%cal_verbosity == 2) &
+                 call mexPrintf('No calibration parameters - computing residuals only'//NEW_LINE('A'))
             return
         end if
 
-        if (input%cal_verbosity == 2) then
-            call mexPrintf('=== Parameter Calibration (Broyden) ==='//NEW_LINE('A'))
-        end if
+        if (input%cal_verbosity == 2) &
+             call mexPrintf('=== Parameter Calibration (Broyden) ==='//NEW_LINE('A'))
 
         ! Allocate local solution and residual vectors
         allocate(x(input%dims%n_unknowns), fvec(input%dims%n_unknowns))
@@ -107,9 +105,8 @@ contains
         ! Check convergence
         if (info == BROYDEN_SUCCESS) then
             output%converged = .true.
-            if (input%cal_verbosity == 2) then
-                call mexPrintf('Calibration converged successfully!'//NEW_LINE('A'))
-            end if
+            if (input%cal_verbosity == 2) &
+                 call mexPrintf('Calibration converged successfully!'//NEW_LINE('A'))
         else
             output%converged = .false.
             if (input%cal_verbosity == 2) then
@@ -136,23 +133,17 @@ contains
         end if
 
         ! Extract market clearing residuals
-        if (.not. allocated(output%residuals)) then
-            allocate(output%residuals(input%dims%n_unknowns))
-        end if
+        if (.not. allocated(output%residuals)) allocate(output%residuals(input%dims%n_unknowns))
         output%residuals = fvec
         output%residual_norm = maxval(abs(output%residuals))
 
         ! Store iteration count
         output%iterations = nfev
 
-        if (input%cal_verbosity == 2) then
-            call mexPrintf('Calibration complete'//NEW_LINE('A'))
-        end if
+        if (input%cal_verbosity == 2) call mexPrintf('Calibration complete'//NEW_LINE('A'))
 
         ! Set status based on convergence
-        if (.not. output%converged) then
-            status = 10
-        end if
+        if (.not. output%converged) status = 10
 
     contains
         ! Residual wrapper (nested procedure to access input/output)
@@ -184,10 +175,9 @@ contains
             end do
 
             ! Print iteration info if verbosity == 2 (use parameter values from params)
-            if (input%cal_verbosity == 2) then
-                call print_calibration_iteration(nvar, input%params, input%unknowns_ind, &
-                                                 input%unknowns_names)
-            end if
+            if (input%cal_verbosity == 2) &
+                 call print_calibration_iteration(nvar, input%params, input%unknowns_ind, &
+                                                  input%unknowns_names)
 
         end subroutine residual_wrapper
 

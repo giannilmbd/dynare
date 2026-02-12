@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -83,9 +83,7 @@ function solve_time_iteration_tensor( &
 
         status = 0
 
-        if (ti_verbosity == 2) then
-            call mexPrintf('  === Time Iteration ==='//NEW_LINE('A'))
-        end if
+        if (ti_verbosity == 2) call mexPrintf('  === Time Iteration ==='//NEW_LINE('A'))
 
         ! Initialize early stopping tracking
         prev_diff_norm = huge(1.0_real64)
@@ -113,9 +111,8 @@ function solve_time_iteration_tensor( &
                 mex, &
                 status)
 
-            if (status /= 0) then
-                call mexErrMsgTxt('Time iteration failed: Household solver did not converge')
-            end if
+            if (status /= 0) &
+                 call mexErrMsgTxt('Time iteration failed: Household solver did not converge')
 
             ! Step 2: Check convergence
             diff_norm = maxval(abs(new_pol - old_pol))
@@ -169,9 +166,8 @@ function solve_time_iteration_tensor( &
         end do
 
         if (.not. ti_output%converged) then
-            if (ti_verbosity == 2) then
-                call mexPrintf('    Warning: Time iteration did not converge'//NEW_LINE('A'))
-            end if
+            if (ti_verbosity == 2) &
+                 call mexPrintf('    Warning: Time iteration did not converge'//NEW_LINE('A'))
             ! If we exited the loop without convergence and without early stopping,
             ! we still need to store the last computed policy (not the dampened one)
             if (ti_output%iterations == 0) then
@@ -300,9 +296,7 @@ function solve_time_iteration_tensor( &
         gp_ws%yh(dims%n_het_endo+1:dims%n_het_endo+dims%n_orig) = policy
         ! Call dynamic_het1_set_auxiliary_variables to compute auxiliary variables
         ! This sets yh(0) auxiliaries from the originally declared variables
-        if (mcp%set_auxiliary_variables) then
-            call call_matlab_set_auxiliary_variables(gp_ws%yh, input_mex)
-        end if
+        if (mcp%set_auxiliary_variables) call call_matlab_set_auxiliary_variables(gp_ws%yh, input_mex)
         if (dims%n_mult > 0) then
             ! Set MCP multipliers to zero for the FB function to work correctly
             gp_ws%yh(dims%n_het_endo+mcp%mult_in_het) = 0.0_real64
@@ -356,9 +350,7 @@ function solve_time_iteration_tensor( &
         z = count(gc_cache_next%is_hard_zero(1,:))
         pol_next(1:dims%n_het_endo) => gp_ws%yh(2*dims%n_het_endo+1:3*dims%n_het_endo)
         pol_next = 0.0_real64
-        if (z==0_int32) then
-            pol_next = pol_next + beta * weighted_old_pol(l,:)
-        end if
+        if (z==0_int32) pol_next = pol_next + beta * weighted_old_pol(l,:)
         gp_ws%dpol_next = 0.0_real64
         do k=1, dims%n_states
             dz(k) = count(gc_cache_next%is_hard_zero(1,:))
@@ -437,9 +429,7 @@ function solve_time_iteration_tensor( &
             end if
             ! If the number of hard dims flipped to upper is zero, there is
             ! a contribution
-            if (z == 0_int32) then
-                pol_next = pol_next + beta * weighted_old_pol(l,:)
-            end if
+            if (z == 0_int32) pol_next = pol_next + beta * weighted_old_pol(l,:)
             do k=1, dims%n_states
                 if (dz(k) == 0_int32) gp_ws%dpol_next(:,k) = gp_ws%dpol_next(:,k) + dbeta(k)*weighted_old_pol(l,:)
             end do
@@ -619,16 +609,12 @@ function solve_time_iteration_tensor( &
                 ! We use yh as temporary storage
                 gp_ws%yh(dims%n_het_endo+1:dims%n_het_endo+dims%n_orig) = gp_ws%x_orig
                 ! Set the auxiliary variables
-                if (mcp%set_auxiliary_variables) then
-                    call call_matlab_set_auxiliary_variables(gp_ws%yh, mex)
-                end if
+                if (mcp%set_auxiliary_variables) &
+                     call call_matlab_set_auxiliary_variables(gp_ws%yh, mex)
                 ! Copy back into new_pol
                 new_pol(:, j) = gp_ws%yh(dims%n_het_endo+1:2*dims%n_het_endo)
                 ! Set MCP multipliers to zero for the FB function to work correctly
-                if (dims%n_mult > 0) then
-                    new_pol(mcp%mult_in_het, j) = 0.0_real64
-                end if
-
+                if (dims%n_mult > 0) new_pol(mcp%mult_in_het, j) = 0.0_real64
             end do
         end do
 
@@ -732,9 +718,8 @@ function solve_time_iteration_tensor( &
 
         ! Call MATLAB MEX function: resid = model_name.dynamic_het1_resid(y, x, params, ss, yh, xh, paramsh)
         retval = mexCallMATLAB(1_C_INT, plhs, 7_C_INT, prhs, input_mex%het_resid)
-        if (retval /= 0) then
-            call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_resid)
-        end if
+        if (retval /= 0) &
+             call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_resid)
 
         ! Extract residual from MATLAB output
         resid_ptr(1:size(resid)) => mxGetDoubles(plhs(1))
@@ -780,15 +765,13 @@ function solve_time_iteration_tensor( &
 
         ! Call MATLAB MEX function: g1 = model_name.dynamic_het1_g1(...)
         retval = mexCallMATLAB(1_C_INT, plhs, 10_C_INT, prhs, input_mex%het_jac)
-        if (retval /= 0) then
-            call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_jac)
-        end if
+        if (retval /= 0) &
+             call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_jac)
         g1_mx = plhs(1)
 
         ! Check that output is sparse
-        if (.not. mxIsSparse(g1_mx)) then
-            call mexErrMsgTxt("MATLAB fallback: " // input_mex%het_jac // " must return sparse matrix")
-        end if
+        if (.not. mxIsSparse(g1_mx)) &
+             call mexErrMsgTxt("MATLAB fallback: " // input_mex%het_jac // " must return sparse matrix")
 
         ! Extract sparse matrix data
         colptr(1:input_mex%dynamic_g1_ncols) => mxGetJc(g1_mx)
@@ -855,9 +838,8 @@ function solve_time_iteration_tensor( &
 
         ! Call MATLAB MEX function: yh = model_name.dynamic_het1_set_auxiliary_variables(...)
         retval = mexCallMATLAB(1_C_INT, plhs, 7_C_INT, prhs, input_mex%het_aux)
-        if (retval /= 0) then
-            call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_aux)
-        end if
+        if (retval /= 0) &
+             call mexErrMsgTxt("MATLAB fallback: Failed to call " // input_mex%het_aux)
 
         ! Extract updated yh from MATLAB output (auxiliary variables have been set)
         yh_ptr(1:size(yh)) => mxGetDoubles(plhs(1))

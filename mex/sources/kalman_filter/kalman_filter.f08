@@ -1,4 +1,4 @@
-! Copyright © 2023-2025 Dynare Team
+! Copyright © 2023-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -91,14 +91,11 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    Zflag_mx = c_null_ptr
 
    ! Check the number of output arguments
-   if (nlhs /= 2) then
-      call mexErrMsgTxt("Must have 2 outputs")
-   end if
+   if (nlhs /= 2) call mexErrMsgTxt("Must have 2 outputs")
 
    ! Check the consistency and validity of input arguments
-   if ((nrhs < 9) .or. (nrhs > 13)) then
-      call mexErrMsgTxt("Must have at least 9 inputs and at most 13 inputs")
-   end if
+   if (nrhs < 9 .or. nrhs > 13) &
+        call mexErrMsgTxt("Must have at least 9 inputs and at most 13 inputs")
 
    Y_mx = prhs(1)
    a_mx = prhs(2)
@@ -110,31 +107,23 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    R_mx = prhs(8)
    Z_mx = prhs(9)
 
-   if (.not. mxIsDouble(Y_mx) .or. mxIsComplex(Y_mx) .or. mxIsSparse(Y_mx)) then
-      call mexErrMsgTxt("1st argument (Y) should be a real dense matrix")
-   end if
-   if (.not. (mxIsDouble(a_mx) .and. ((mxGetM(a_mx) == 1) .or. &
-      &(mxGetN(a_mx) == 1))) .or. mxIsComplex(a_mx) .or. mxIsSparse(a_mx)) then
-      call mexErrMsgTxt("2nd argument (a) should be a real dense vector")
-   end if
-   if (.not. mxIsDouble(P_mx) .or. mxIsComplex(P_mx) .or. mxIsSparse(P_mx)) then
-      call mexErrMsgTxt("3rd argument (P) should be a real dense matrix")
-   end if
-   if (.not. (mxIsScalar(kalman_tol_mx) .and. mxIsNumeric(kalman_tol_mx))) then
-      call mexErrMsgTxt("4th argument (kalman_tol) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(riccati_tol_mx) .and. mxIsNumeric(riccati_tol_mx))) then
-      call mexErrMsgTxt("5th argument (riccati_tol) should be a numeric scalar")
-   end if
-   if (.not. mxIsDouble(T_mx) .or. mxIsComplex(T_mx) .or. mxIsSparse(T_mx)) then
-      call mexErrMsgTxt("6th argument (T) should be a real dense matrix")
-   end if
-   if (.not. mxIsDouble(Q_mx) .or. mxIsComplex(Q_mx) .or. mxIsSparse(Q_mx)) then
-      call mexErrMsgTxt("7th argument (Q) should be a real dense matrix")
-   end if
-   if (.not. mxIsDouble(R_mx) .or. mxIsComplex(R_mx) .or. mxIsSparse(R_mx)) then
-      call mexErrMsgTxt("8th argument (R) should be a real dense matrix")
-   end if
+   if (.not. mxIsDouble(Y_mx) .or. mxIsComplex(Y_mx) .or. mxIsSparse(Y_mx)) &
+        call mexErrMsgTxt("1st argument (Y) should be a real dense matrix")
+   if (.not. (mxIsDouble(a_mx) .and. (mxGetM(a_mx) == 1 .or. &
+        mxGetN(a_mx) == 1)) .or. mxIsComplex(a_mx) .or. mxIsSparse(a_mx)) &
+        call mexErrMsgTxt("2nd argument (a) should be a real dense vector")
+   if (.not. mxIsDouble(P_mx) .or. mxIsComplex(P_mx) .or. mxIsSparse(P_mx)) &
+        call mexErrMsgTxt("3rd argument (P) should be a real dense matrix")
+   if (.not. (mxIsScalar(kalman_tol_mx) .and. mxIsNumeric(kalman_tol_mx))) &
+        call mexErrMsgTxt("4th argument (kalman_tol) should be a numeric scalar")
+   if (.not. (mxIsScalar(riccati_tol_mx) .and. mxIsNumeric(riccati_tol_mx))) &
+        call mexErrMsgTxt("5th argument (riccati_tol) should be a numeric scalar")
+   if (.not. mxIsDouble(T_mx) .or. mxIsComplex(T_mx) .or. mxIsSparse(T_mx)) &
+        call mexErrMsgTxt("6th argument (T) should be a real dense matrix")
+   if (.not. mxIsDouble(Q_mx) .or. mxIsComplex(Q_mx) .or. mxIsSparse(Q_mx)) &
+        call mexErrMsgTxt("7th argument (Q) should be a real dense matrix")
+   if (.not. mxIsDouble(R_mx) .or. mxIsComplex(R_mx) .or. mxIsSparse(R_mx)) &
+        call mexErrMsgTxt("8th argument (R) should be a real dense matrix")
 
    ! Import variables
    a => mxGetDoubles(a_mx)
@@ -151,44 +140,38 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    riccati_tol = mxGetScalar(riccati_tol_mx)
 
    ! Check the order consistency of input matrices
-   if ((mxGetM(P_mx) /= m) .or. (mxGetN(P_mx) /= m) .or.& ! P
-      &(mxGetM(T_mx) /= m) .or. (mxGetN(T_mx) /= m) .or.& ! T
-      &(mxGetN(Q_mx) /= r) .or.                         & ! Q
-      &(mxGetM(R_mx) /= m) .or. (mxGetN(R_mx) /= r)) then ! R
-      call mexErrMsgTxt("Input dimension mismatch in (a, Y, P, T, Q, R)")
-   end if
+   if (mxGetM(P_mx) /= m .or. mxGetN(P_mx) /= m .or.  & ! P
+        mxGetM(T_mx) /= m .or. mxGetN(T_mx) /= m .or. & ! T
+        mxGetN(Q_mx) /= r .or.                        & ! Q
+        mxGetM(R_mx) /= m .or. mxGetN(R_mx) /= r)     & ! R
+        call mexErrMsgTxt("Input dimension mismatch in (a, Y, P, T, Q, R)")
 
    ! Optional inputs
    ! Zflag
    if (nrhs > 9) then
       Zflag_mx = prhs(10)
-      if (.not. (mxIsScalar(Zflag_mx) .and. mxIsNumeric(Zflag_mx))) then
-         call mexErrMsgTxt("10th argument (Zflag) should be a numeric scalar")
-      end if
+      if (.not. (mxIsScalar(Zflag_mx) .and. mxIsNumeric(Zflag_mx))) &
+           call mexErrMsgTxt("10th argument (Zflag) should be a numeric scalar")
       Zflag = (mxGetScalar(Zflag_mx) == 1._c_double)
    else
       Zflag = .false.
    end if
    if (Zflag) then
-      if (.not. mxIsDouble(Z_mx) .or. mxIsComplex(Z_mx) .or. mxIsSparse(Z_mx)) then
-         call mexErrMsgTxt("9th argument (Z) should be a real dense matrix")
-      end if
-      if ((mxGetM(Z_mx) /= p) .or. (mxGetN(Z_mx) /= m)) then
-         call mexErrMsgTxt("Input dimension mismatch in Z")
-      end if
+      if (.not. mxIsDouble(Z_mx) .or. mxIsComplex(Z_mx) .or. mxIsSparse(Z_mx)) &
+           call mexErrMsgTxt("9th argument (Z) should be a real dense matrix")
+      if (mxGetM(Z_mx) /= p .or. mxGetN(Z_mx) /= m) &
+           call mexErrMsgTxt("Input dimension mismatch in Z")
       Z(1:p,1:m) => mxGetDoubles(Z_mx)
       ! Initialization to avoid compilation warnings 
       ! (-Wmaybe-uninitialized flag)
       allocate (indZ(0))
    else
-      if (.not. (mxIsDouble(Z_mx) .and. ((mxGetM(Z_mx) == 1) .or. &  
-         &(mxGetN(Z_mx) == 1))) .or. mxIsComplex(Z_mx) .or.       &
-         &mxIsSparse(Z_mx)) then
-         call mexErrMsgTxt("9th argument (Z) should be a real dense vector")
-      end if
-      if ((mxGetM(Z_mx) /= p) .and. (mxGetN(Z_mx) /= p)) then
-         call mexErrMsgTxt("Input dimension mismatch in Z")
-      end if
+      if (.not. (mxIsDouble(Z_mx) .and. (mxGetM(Z_mx) == 1 .or. &
+           mxGetN(Z_mx) == 1)) .or. mxIsComplex(Z_mx) .or.      &
+           mxIsSparse(Z_mx)) &
+           call mexErrMsgTxt("9th argument (Z) should be a real dense vector")
+      if (mxGetM(Z_mx) /= p .and. mxGetN(Z_mx) /= p) &
+           call mexErrMsgTxt("Input dimension mismatch in Z")
       Z(1:p,1:1) => mxGetDoubles(Z_mx)
       indZ = int(Z(1:p,1))
    end if
@@ -197,13 +180,12 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    Hflag = .false.
    if (nrhs > 10) then
       H_mx = prhs(11)
-      if ((mxIsScalar(H_mx) .and. mxIsNumeric(H_mx))) then
+      if (mxIsScalar(H_mx) .and. mxIsNumeric(H_mx)) then
          Hflag = .false.
       elseif (mxIsDouble(H_mx) .and. .not. (mxIsComplex(H_mx) .or. mxIsSparse(H_mx))) then
          Hflag = .true.
-         if ((mxGetM(H_mx) /= p) .or. (mxGetN(H_mx) /= p)) then
-            call mexErrMsgTxt("Input dimension mismatch in H")
-         end if
+         if (mxGetM(H_mx) /= p .or. mxGetN(H_mx) /= p) &
+              call mexErrMsgTxt("Input dimension mismatch in H")
          H(1:p,1:p) => mxGetDoubles(H_mx)
       else
          call mexErrMsgTxt("11th argument (H) should be a real dense matrix or a zero scalar if no measurement error is set")
@@ -213,9 +195,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    ! diffuse_periods
    if (nrhs > 11) then
       diffuse_periods_mx = prhs(12)
-      if (.not. (mxIsScalar(diffuse_periods_mx) .and. mxIsNumeric(diffuse_periods_mx))) then
-         call mexErrMsgTxt("12th argument (diffuse_periods) should be a numeric scalar")
-      end if
+      if (.not. (mxIsScalar(diffuse_periods_mx) .and. mxIsNumeric(diffuse_periods_mx))) &
+           call mexErrMsgTxt("12th argument (diffuse_periods) should be a numeric scalar")
       diffuse_periods = int(mxGetScalar(diffuse_periods_mx))
    else
       diffuse_periods = 0
@@ -224,9 +205,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    ! presample
    if (nrhs > 12) then
       presample_mx = prhs(13)
-      if (.not. (mxIsScalar(presample_mx) .and. mxIsNumeric(presample_mx))) then
-         call mexErrMsgTxt("13th argument (presample) should be a numeric scalar")
-      end if
+      if (.not. (mxIsScalar(presample_mx) .and. mxIsNumeric(presample_mx))) &
+           call mexErrMsgTxt("13th argument (presample) should be a numeric scalar")
       presample = int(mxGetScalar(presample_mx))
    else
       presample = 0
@@ -290,14 +270,10 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       ! (i) LU decomposition of F
       lu = F
       call dgetrf(p, p, lu, p, ipiv, info)
-      if (info < 0) then
-         call mexErrMsgTxt("Ill-conditioned F!")
-      end if
+      if (info < 0) call mexErrMsgTxt("Ill-conditioned F!")
       ! (ii) Reciprocal condition number of F
       call dgecon("1", p, lu, p, norm(F, "1"), rcond, work_rcond, iwork, info)
-      if (rcond < kalman_tol) then
-         call mexErrMsgTxt("Ill-conditioned F!")
-      end if
+      if (rcond < kalman_tol) call mexErrMsgTxt("Ill-conditioned F!")
 
       ! Compute log(det(F))
       log_dF = 0._real64
@@ -404,9 +380,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
          call_rhs(11) = mxCreateDoubleScalar(0._c_double)
       end if
       retval = mexCallMATLAB(2_c_int, call_lhs, 11_c_int, call_rhs, "kalman_filter_ss")
-      if (retval /= 0_c_int) then
-         call mexErrMsgTxt("Error calling kalman_filter_ss!")
-      end if
+      if (retval /= 0_c_int) call mexErrMsgTxt("Error calling kalman_filter_ss!")
       likk_m(s+1:smpl) => mxGetDoubles(call_lhs(2))
       likk(s+1:smpl) = likk_m(s+1:smpl)
    end if

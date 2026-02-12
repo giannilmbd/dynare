@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -190,9 +190,7 @@ contains
                                 end if
                             end if
                         end if
-                        if (z==0_int32) then
-                            E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
-                        end if
+                        if (z==0_int32) E(:,k,j) = E(:,k,j)+beta*Y((l_a-1)*N_x+1:l_a*N_x,j_e)
                     end do
                 end do
             end do

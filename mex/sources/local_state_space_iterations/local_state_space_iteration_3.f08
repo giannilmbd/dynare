@@ -1,4 +1,4 @@
-! Copyright © 2022-2025 Dynare Team
+! Copyright © 2022-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -50,9 +50,7 @@ contains
       integer :: is, im, j, k, start, end, q, r
 
       ! Checking that the thread number got passed as argument
-      if (.not. c_associated(arg)) then
-         call mexErrMsgTxt("No argument was passed to thread_eval_3")
-      end if
+      if (.not. c_associated(arg)) call mexErrMsgTxt("No argument was passed to thread_eval_3")
       call c_f_pointer(arg, ithread)
 
       ! Specifying bounds for the curent thread
@@ -168,9 +166,7 @@ contains
       integer, pointer :: ithread
       integer :: is, im, j, k, start, end, q, r, j1, j2
       ! Checking that the thread number got passed as argument
-      if (.not. c_associated(arg)) then
-         call mexErrMsgTxt("No argument was passed to thread_eval")
-      end if
+      if (.not. c_associated(arg)) call mexErrMsgTxt("No argument was passed to thread_eval")
       call c_f_pointer(arg, ithread)
 
       ! Specifying bounds for the curent thread
@@ -383,9 +379,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    logical :: pruning
 
    ! 0. Checking the consistency and validity of input arguments
-   if (nrhs /= 17) then
-      call mexErrMsgTxt("Must have exactly 17 inputs")
-   end if
+   if (nrhs /= 17) call mexErrMsgTxt("Must have exactly 17 inputs")
 
    do i=1,15
       if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. &
@@ -396,18 +390,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    end do
 
    if (.not. (c_associated(prhs(16)) .and. mxIsScalar(prhs(16)) .and. &
-       mxIsNumeric(prhs(16)))) then
-      call mexErrMsgTxt("Argument 16 should be a numeric scalar")
-   end if
+       mxIsNumeric(prhs(16)))) &
+       call mexErrMsgTxt("Argument 16 should be a numeric scalar")
    numthreads = int(mxGetScalar(prhs(16)))
-   if (numthreads <= 0) then
-      call mexErrMsgTxt("Argument 16 should be a positive integer")
-   end if
+   if (numthreads <= 0) call mexErrMsgTxt("Argument 16 should be a positive integer")
    td3%numthreads = numthreads
 
-   if (.not. (c_associated(prhs(17)) .and. mxIsLogicalScalar(prhs(17)))) then
-      call mexErrMsgTxt("Argument 17 should be a logical scalar")
-   end if
+   if (.not. (c_associated(prhs(17)) .and. mxIsLogicalScalar(prhs(17)))) &
+        call mexErrMsgTxt("Argument 17 should be a logical scalar")
    pruning = mxGetScalar(prhs(17)) == 1._c_double
 
    if (pruning) then
@@ -429,33 +419,31 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    td3%q = q
    td3%m = m
 
-   if ((s /= mxGetN(prhs(2)))            &  ! Number of columns for epsilon
-      &.or. (n /= mxGetN(prhs(3)))       &  ! Number of columns for ghx
-      &.or. (m /= mxGetM(prhs(4)))       &  ! Number of rows for ghu
-      &.or. (q /= mxGetN(prhs(4)))       &  ! Number of columns for ghu
-      &.or. (m /= mxGetM(prhs(5)))       &  ! Number of rows for ghxx
-      &.or. (n*n /= mxGetN(prhs(5)))     &  ! Number of columns for ghxx
-      &.or. (m /= mxGetM(prhs(6)))       &  ! Number of rows for ghuu
-      &.or. (q*q /= mxGetN(prhs(6)))     &  ! Number of columns for ghuu
-      &.or. (m /= mxGetM(prhs(7)))       &  ! Number of rows for ghxu
-      &.or. (n*q /= mxGetN(prhs(7)))     &  ! Number of columns for ghxu
-      &.or. (m /= mxGetM(prhs(8)))       &  ! Number of rows for ghs2
-      &.or. (m /= mxGetM(prhs(9)))       &  ! Number of rows for ghxxx
-      &.or. (n*n*n /= mxGetN(prhs(9)))   &  ! Number of columns for ghxxx
-      &.or. (m /= mxGetM(prhs(10)))      &  ! Number of rows for ghuuu
-      &.or. (q*q*q /= mxGetN(prhs(10)))  &  ! Number of columns for ghuuu
-      &.or. (m /= mxGetM(prhs(11)))      &  ! Number of rows for ghxxu
-      &.or. (n*n*q /= mxGetN(prhs(11)))  &  ! Number of columns for ghxxu
-      &.or. (m /= mxGetM(prhs(12)))      &  ! Number of rows for ghxuu
-      &.or. (n*q*q /= mxGetN(prhs(12)))  &  ! Number of columns for ghxuu
-      &.or. (m /= mxGetM(prhs(13)))      &  ! Number of rows for ghxss
-      &.or. (n /= mxGetN(prhs(13)))      &  ! Number of columns for ghxss
-      &.or. (m /= mxGetM(prhs(14)))      &  ! Number of rows for ghuss
-      &.or. (q /= mxGetN(prhs(14)))      &  ! Number of columns for ghuss
-      &.or. (m /= mxGetM(prhs(15)))      &  ! Number of rows for ss
-      &) then
-      call mexErrMsgTxt("Input dimension mismatch")
-   end if
+   if (s /= mxGetN(prhs(2))            &  ! Number of columns for epsilon
+        .or. n /= mxGetN(prhs(3))      &  ! Number of columns for ghx
+        .or. m /= mxGetM(prhs(4))      &  ! Number of rows for ghu
+        .or. q /= mxGetN(prhs(4))      &  ! Number of columns for ghu
+        .or. m /= mxGetM(prhs(5))      &  ! Number of rows for ghxx
+        .or. n*n /= mxGetN(prhs(5))    &  ! Number of columns for ghxx
+        .or. m /= mxGetM(prhs(6))      &  ! Number of rows for ghuu
+        .or. q*q /= mxGetN(prhs(6))    &  ! Number of columns for ghuu
+        .or. m /= mxGetM(prhs(7))      &  ! Number of rows for ghxu
+        .or. n*q /= mxGetN(prhs(7))    &  ! Number of columns for ghxu
+        .or. m /= mxGetM(prhs(8))      &  ! Number of rows for ghs2
+        .or. m /= mxGetM(prhs(9))      &  ! Number of rows for ghxxx
+        .or. n*n*n /= mxGetN(prhs(9))  &  ! Number of columns for ghxxx
+        .or. m /= mxGetM(prhs(10))     &  ! Number of rows for ghuuu
+        .or. q*q*q /= mxGetN(prhs(10)) &  ! Number of columns for ghuuu
+        .or. m /= mxGetM(prhs(11))     &  ! Number of rows for ghxxu
+        .or. n*n*q /= mxGetN(prhs(11)) &  ! Number of columns for ghxxu
+        .or. m /= mxGetM(prhs(12))     &  ! Number of rows for ghxuu
+        .or. n*q*q /= mxGetN(prhs(12)) &  ! Number of columns for ghxuu
+        .or. m /= mxGetM(prhs(13))     &  ! Number of rows for ghxss
+        .or. n /= mxGetN(prhs(13))     &  ! Number of columns for ghxss
+        .or. m /= mxGetM(prhs(14))     &  ! Number of rows for ghuss
+        .or. q /= mxGetN(prhs(14))     &  ! Number of columns for ghuss
+        .or. m /= mxGetM(prhs(15)))    &  ! Number of rows for ss
+        call mexErrMsgTxt("Input dimension mismatch")
 
    ! 1. Getting relevant information to take advantage of symmetries
    ! There are symmetries in the ghxx, ghuu, ghxxx, ghuuu, ghxxu and ghxuu terms

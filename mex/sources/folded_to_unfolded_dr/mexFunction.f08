@@ -1,4 +1,4 @@
-! Copyright © 2021-2025 Dynare Team
+! Copyright © 2021-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -40,18 +40,10 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    options_mx = prhs(3)
 
    ! Checking the consistence and validity of input arguments
-   if (nrhs /= 3 .or. nlhs /= 1) then
-      call mexErrMsgTxt("Must have exactly 3 inputs and 1 output")
-   end if
-   if (.not. mxIsStruct(dr_mx)) then
-      call mexErrMsgTxt("1st argument (dr) should be a struct")
-   end if
-   if (.not. mxIsStruct(M_mx)) then
-      call mexErrMsgTxt("2nd argument (M) should be a struct")
-   end if
-   if (.not. mxIsStruct(options_mx)) then
-      call mexErrMsgTxt("3rd argument (options) should be a struct")
-   end if
+   if (nrhs /= 3 .or. nlhs /= 1) call mexErrMsgTxt("Must have exactly 3 inputs and 1 output")
+   if (.not. mxIsStruct(dr_mx)) call mexErrMsgTxt("1st argument (dr) should be a struct")
+   if (.not. mxIsStruct(M_mx)) call mexErrMsgTxt("2nd argument (M) should be a struct")
+   if (.not. mxIsStruct(options_mx)) call mexErrMsgTxt("3rd argument (options) should be a struct")
 
    nstatic = get_int_field(M_mx, "nstatic")
    npred = get_int_field(M_mx, "npred")
@@ -67,9 +59,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    do d = 0, order
       write (fieldnames(d), '(a2, i1)') "g_", d
       tmp = mxGetField(dr_mx, 1_mwIndex, trim(fieldnames(d)))
-      if (.not. (c_associated(tmp) .and. mxIsDouble(tmp))) then
-         call mexErrMsgTxt(trim(fieldnames(d))//" is not allocated in dr")
-      end if
+      if (.not. (c_associated(tmp) .and. mxIsDouble(tmp))) &
+           call mexErrMsgTxt(trim(fieldnames(d))//" is not allocated in dr")
       m = int(mxGetM(tmp))
       n = int(mxGetN(tmp))
       allocate(fdr(d)%m(m,n))

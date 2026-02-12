@@ -18,7 +18,7 @@
 !   eigval       [complex] (n×1) vector of generalized eigenvalues
 !   info         [integer] scalar, error code of dgges (or 30 if eigenvalue close to 0÷0)
 
-! Copyright © 2006-2025 Dynare Team
+! Copyright © 2006-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -72,22 +72,19 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   real(real64), dimension(:), pointer, contiguous :: s, t, z, info, sdim, vsl
   complex(real64), dimension(:), pointer :: gev
 
-  if (nrhs < 2 .or. nrhs > 4 .or. nlhs /= 6) then
-     call mexErrMsgTxt("MJDGGES: takes 2, 3 or 4 input arguments and exactly 6 output arguments.")
-  end if
+  if (nrhs < 2 .or. nrhs > 4 .or. nlhs /= 6) &
+       call mexErrMsgTxt("MJDGGES: takes 2, 3 or 4 input arguments and exactly 6 output arguments.")
 
   n = mxGetM(prhs(1))
   if (.not. mxIsDouble(prhs(1)) .or. mxIsComplex(prhs(1)) .or. mxIsSparse(prhs(1)) &
       .or. .not. mxIsDouble(prhs(2)) .or. mxIsComplex(prhs(2)) .or. mxIsSparse(prhs(2)) &
-      .or. mxGetN(prhs(1)) /= n .or. mxGetM(prhs(2)) /= n .or. mxGetN(prhs(2)) /= n) then
-     call mexErrMsgTxt("MJDGGES: first two arguments should be real dense matrices of the same dimension")
-  end if
+      .or. mxGetN(prhs(1)) /= n .or. mxGetM(prhs(2)) /= n .or. mxGetN(prhs(2)) /= n) &
+      call mexErrMsgTxt("MJDGGES: first two arguments should be real dense matrices of the same dimension")
 
   ! Set criterium for stable eigenvalues
   if (nrhs >= 3 .and. mxGetM(prhs(3)) > 0) then
-     if (.not. (mxIsScalar(prhs(3)) .and. mxIsNumeric(prhs(3)))) then
-        call mexErrMsgTxt("MJDGGES: third argument (qz_criterium) should be a numeric scalar")
-     end if
+     if (.not. (mxIsScalar(prhs(3)) .and. mxIsNumeric(prhs(3)))) &
+          call mexErrMsgTxt("MJDGGES: third argument (qz_criterium) should be a numeric scalar")
      criterium = mxGetScalar(prhs(3))
   else
      criterium = 1_real64 + 1e-6_real64
@@ -95,9 +92,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
   ! set criterium for 0/0 generalized eigenvalues */
   if (nrhs == 4 .and. mxGetM(prhs(4)) > 0) then
-     if (.not. (mxIsScalar(prhs(4)) .and. mxIsNumeric(prhs(4)))) then
-        call mexErrMsgTxt("MJDGGES: fourth argument (zhreshold) should be a numeric scalar")
-     end if
+     if (.not. (mxIsScalar(prhs(4)) .and. mxIsNumeric(prhs(4)))) &
+          call mexErrMsgTxt("MJDGGES: fourth argument (zhreshold) should be a numeric scalar")
      zhreshold = mxGetScalar(prhs(4))
   else
      zhreshold = 1e-6_real64

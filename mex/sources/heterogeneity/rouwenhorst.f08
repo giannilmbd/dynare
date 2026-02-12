@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -55,9 +55,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     real(real64), pointer, contiguous :: y(:), p_vec(:), P_mat(:, :)
 
     ! Validate number of inputs/outputs
-    if (nrhs /= 5_c_int .or. nlhs /= 3_c_int) then
-        call mexErrMsgTxt("Rouwenhorst routine: incorrect number of inputs and/or outputs")
-    end if
+    if (nrhs /= 5_c_int .or. nlhs /= 3_c_int) &
+         call mexErrMsgTxt("Rouwenhorst routine: incorrect number of inputs and/or outputs")
 
     ! Get input pointers
     rho_mx = prhs(1)
@@ -67,21 +66,16 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     maxiter_mx = prhs(5)
 
     ! Validate input types
-    if (.not. (mxIsScalar(rho_mx) .and. mxIsDouble(rho_mx))) then
-        call mexErrMsgTxt("1st argument (rho) must be a double scalar")
-    end if
-    if (.not. (mxIsScalar(sigma_mx) .and. mxIsDouble(sigma_mx))) then
-        call mexErrMsgTxt("2nd argument (sigma) must be a double scalar")
-    end if
-    if (.not. (mxIsScalar(N_mx) .and. mxIsNumeric(N_mx))) then
-        call mexErrMsgTxt("3rd argument (N) must be an integer scalar")
-    end if
-    if (.not. (mxIsScalar(tol_mx) .and. mxIsDouble(tol_mx))) then
-        call mexErrMsgTxt("4th argument (tol) must be a double scalar")
-    end if
-    if (.not. (mxIsScalar(maxiter_mx) .and. mxIsNumeric(maxiter_mx))) then
-        call mexErrMsgTxt("5th argument (maxiter) must be an integer scalar")
-    end if
+    if (.not. (mxIsScalar(rho_mx) .and. mxIsDouble(rho_mx))) &
+         call mexErrMsgTxt("1st argument (rho) must be a double scalar")
+    if (.not. (mxIsScalar(sigma_mx) .and. mxIsDouble(sigma_mx))) &
+         call mexErrMsgTxt("2nd argument (sigma) must be a double scalar")
+    if (.not. (mxIsScalar(N_mx) .and. mxIsNumeric(N_mx))) &
+         call mexErrMsgTxt("3rd argument (N) must be an integer scalar")
+    if (.not. (mxIsScalar(tol_mx) .and. mxIsDouble(tol_mx))) &
+         call mexErrMsgTxt("4th argument (tol) must be a double scalar")
+    if (.not. (mxIsScalar(maxiter_mx) .and. mxIsNumeric(maxiter_mx))) &
+         call mexErrMsgTxt("5th argument (maxiter) must be an integer scalar")
 
     ! Convert MATLAB inputs to Fortran variables
     rho = mxGetScalar(rho_mx)

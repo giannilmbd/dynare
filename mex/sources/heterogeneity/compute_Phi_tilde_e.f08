@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -108,18 +108,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     Mu_mx = prhs(4)
 
     ! Validate input types
-    if (.not. mxIsInt32(pol_ind_mx) .or. mxIsSparse(pol_ind_mx)) then
-        call mexErrMsgTxt("1st argument (pol_ind) must be a dense int32 matrix")
-    end if
-    if (.not. mxIsDouble(pol_w_mx) .or. mxIsSparse(pol_w_mx)) then
-        call mexErrMsgTxt("2nd argument (pol_w) must be a dense double matrix")
-    end if
-    if (.not. mxIsInt32(pol_dims_mx)) then
-        call mexErrMsgTxt("3rd argument (pol_dims) must be an int32 vector")
-    end if
-    if (.not. mxIsDouble(Mu_mx) .or. mxIsSparse(Mu_mx)) then
-        call mexErrMsgTxt("4th argument (Mu) must be a dense double matrix")
-    end if
+    if (.not. mxIsInt32(pol_ind_mx) .or. mxIsSparse(pol_ind_mx)) &
+         call mexErrMsgTxt("1st argument (pol_ind) must be a dense int32 matrix")
+    if (.not. mxIsDouble(pol_w_mx) .or. mxIsSparse(pol_w_mx)) &
+         call mexErrMsgTxt("2nd argument (pol_w) must be a dense double matrix")
+    if (.not. mxIsInt32(pol_dims_mx)) &
+         call mexErrMsgTxt("3rd argument (pol_dims) must be an int32 vector")
+    if (.not. mxIsDouble(Mu_mx) .or. mxIsSparse(Mu_mx)) &
+         call mexErrMsgTxt("4th argument (Mu) must be a dense double matrix")
 
     ! Extract dimensions and create Fortran pointers
     N_sp = int(mxGetM(pol_ind_mx), int32)
@@ -127,15 +123,12 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     N_e = int(mxGetM(Mu_mx), int32)
 
     ! Verify consistency
-    if (int(mxGetM(pol_w_mx), int32) /= N_sp .or. int(mxGetN(pol_w_mx), int32) /= n) then
-        call mexErrMsgTxt("pol_w must have same dimensions as pol_ind")
-    end if
-    if (int(mxGetNumberOfElements(pol_dims_mx), int32) /= n) then
-        call mexErrMsgTxt("pol_dims length must match number of columns in pol_ind")
-    end if
-    if (int(mxGetN(Mu_mx), int32) /= N_e) then
-        call mexErrMsgTxt("Mu must be square")
-    end if
+    if (int(mxGetM(pol_w_mx), int32) /= N_sp .or. int(mxGetN(pol_w_mx), int32) /= n) &
+         call mexErrMsgTxt("pol_w must have same dimensions as pol_ind")
+    if (int(mxGetNumberOfElements(pol_dims_mx), int32) /= n) &
+         call mexErrMsgTxt("pol_dims length must match number of columns in pol_ind")
+    if (int(mxGetN(Mu_mx), int32) /= N_e) &
+         call mexErrMsgTxt("Mu must be square")
 
     ! Create Fortran pointers to MATLAB data
     pol_ind(1:N_sp, 1:n) => mxGetInt32s(pol_ind_mx)
@@ -149,9 +142,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     TOT = Kcorn * N_e * N_sp
 
     ! Verify N_sp = N_e × N_a
-    if (N_sp /= N_e * N_a) then
-        call mexErrMsgTxt("N_sp must equal N_e × product(pol_dims)")
-    end if
+    if (N_sp /= N_e * N_a) call mexErrMsgTxt("N_sp must equal N_e × product(pol_dims)")
 
     ! Allocate output arrays
     plhs(1) = mxCreateNumericMatrix(int(TOT, mwSize), 1_mwSize, mxINT32_CLASS, mxREAL)

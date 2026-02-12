@@ -1,4 +1,4 @@
-! Copyright © 2021-2025 Dynare Team
+! Copyright © 2021-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -41,9 +41,7 @@ contains
       real(real64), dimension(:), allocatable :: dyu
 
       ! Checking that the thread number got passed as argument
-      if (.not. c_associated(arg)) then
-         call mexErrMsgTxt("No argument was passed to thread_eval")
-      end if
+      if (.not. c_associated(arg)) call mexErrMsgTxt("No argument was passed to thread_eval")
       call c_f_pointer(arg, im)
 
       ! Allocating local arrays
@@ -117,29 +115,17 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    udr_mx = prhs(6)
 
    ! Checking the consistence and validity of input arguments
-   if (nrhs /= 6 .or. nlhs /= 1) then
-      call mexErrMsgTxt("Must have exactly 5 inputs and 1 output")
-   end if
+   if (nrhs /= 6 .or. nlhs /= 1) call mexErrMsgTxt("Must have exactly 5 inputs and 1 output")
    if (.not. (mxIsDouble(yhat_mx) .and. mxGetM(yhat_mx) >= 1 .and. mxGetN(yhat_mx) >= 1) &
-        .or. mxIsComplex(yhat_mx) .or. mxIsSparse(yhat_mx)) then
-      call mexErrMsgTxt("1st argument (yhat) should be a real dense vector")
-   end if
+        .or. mxIsComplex(yhat_mx) .or. mxIsSparse(yhat_mx)) &
+        call mexErrMsgTxt("1st argument (yhat) should be a real dense vector")
    if (.not. (mxIsDouble(epsilon_mx) .and. mxGetM(epsilon_mx) >= 1 .or. mxGetN(epsilon_mx) == 1) &
-        .or. mxIsComplex(epsilon_mx) .or. mxIsSparse(epsilon_mx)) then
-      call mexErrMsgTxt("2nd argument (epsilon) should be a real dense vector")
-   end if
-   if (.not. mxIsStruct(dr_mx)) then
-      call mexErrMsgTxt("3rd argument (dr) should be a struct")
-   end if
-   if (.not. mxIsStruct(M_mx)) then
-      call mexErrMsgTxt("4th argument (M) should be a struct")
-   end if
-   if (.not. mxIsStruct(options_mx)) then
-      call mexErrMsgTxt("5th argument (options) should be a struct")
-   end if
-   if (.not. mxIsStruct(udr_mx)) then
-      call mexErrMsgTxt("6th argument (udr) should be a struct")
-   end if
+        .or. mxIsComplex(epsilon_mx) .or. mxIsSparse(epsilon_mx)) &
+        call mexErrMsgTxt("2nd argument (epsilon) should be a real dense vector")
+   if (.not. mxIsStruct(dr_mx)) call mexErrMsgTxt("3rd argument (dr) should be a struct")
+   if (.not. mxIsStruct(M_mx)) call mexErrMsgTxt("4th argument (M) should be a struct")
+   if (.not. mxIsStruct(options_mx)) call mexErrMsgTxt("5th argument (options) should be a struct")
+   if (.not. mxIsStruct(udr_mx)) call mexErrMsgTxt("6th argument (udr) should be a struct")
 
    nstatic = get_int_field(M_mx, "nstatic")
    npred = get_int_field(M_mx, "npred")
@@ -153,17 +139,15 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    associate (order_var_mx => mxGetField(dr_mx, 1_mwIndex, "order_var"))
      if (.not. (mxIsDouble(order_var_mx) .and. int(mxGetNumberOfElements(order_var_mx)) == endo_nbr) &
-          .or. mxIsComplex(order_var_mx) .or. mxIsSparse(order_var_mx)) then
-         call mexErrMsgTxt("Field dr.order_var should be a real dense vector with endo_nbr elements")
-      end if
+          .or. mxIsComplex(order_var_mx) .or. mxIsSparse(order_var_mx)) &
+          call mexErrMsgTxt("Field dr.order_var should be a real dense vector with endo_nbr elements")
       order_var => mxGetDoubles(order_var_mx)
    end associate
 
    associate (ys_mx => mxGetField(dr_mx, 1_mwIndex, "ys"))
       if (.not. (mxIsDouble(ys_mx) .and. int(mxGetNumberOfElements(ys_mx)) == endo_nbr) &
-          .or. mxIsComplex(ys_mx) .or. mxIsSparse(ys_mx)) then
-         call mexErrMsgTxt("Field dr.ys should be a real dense vector with endo_nbr elements")
-      end if
+          .or. mxIsComplex(ys_mx) .or. mxIsSparse(ys_mx)) &
+          call mexErrMsgTxt("Field dr.ys should be a real dense vector with endo_nbr elements")
       ys => mxGetDoubles(ys_mx)
       ! Construct the reordered steady state
       allocate(ys_reordered(endo_nbr))
@@ -173,30 +157,24 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    end associate
 
    associate (restrict_var_list_mx => mxGetField(dr_mx, 1_mwIndex, "restrict_var_list"))
-      if (.not. mxIsDouble(restrict_var_list_mx) .or. mxIsComplex(restrict_var_list_mx) .or. mxIsSparse(restrict_var_list_mx)) then
-         call mexErrMsgTxt("Field dr.restrict_var_list should be a real dense vector")
-      end if
+      if (.not. mxIsDouble(restrict_var_list_mx) .or. mxIsComplex(restrict_var_list_mx) .or. mxIsSparse(restrict_var_list_mx)) &
+           call mexErrMsgTxt("Field dr.restrict_var_list should be a real dense vector")
       nrestricted = size(mxGetDoubles(restrict_var_list_mx))
       restrict_var_list => mxGetDoubles(restrict_var_list_mx)
    end associate
 
    associate (thread_mx => mxGetField(options_mx, 1_mwIndex, "threads"))
-      if (.not. c_associated(thread_mx)) then
-         call mexErrMsgTxt("Cannot find `threads' in options_")
-      end if
+      if (.not. c_associated(thread_mx)) call mexErrMsgTxt("Cannot find `threads' in options_")
       nm = get_int_field(thread_mx, "local_state_space_iteration_k")
    end associate
 
    nparticles = int(mxGetN(yhat_mx));
-   if (int(mxGetN(epsilon_mx)) /= nparticles) then
-      call mexErrMsgTxt("epsilon and yhat don't have the same number of columns")
-   end if
-   if (.not. (mxIsDouble(yhat_mx) .and. int(mxGetM(yhat_mx)) == npred + nboth)) then
-      call mexErrMsgTxt("yhat should be a double precision matrix with npred+nboth rows")
-   end if
-   if (.not. (mxIsDouble(epsilon_mx) .and. int(mxGetM(epsilon_mx)) == exo_nbr)) then
-      call mexErrMsgTxt("epsilon should be a double precision matrix with exo_nbr rows")
-   end if
+   if (int(mxGetN(epsilon_mx)) /= nparticles) &
+        call mexErrMsgTxt("epsilon and yhat don't have the same number of columns")
+   if (.not. (mxIsDouble(yhat_mx) .and. int(mxGetM(yhat_mx)) == npred + nboth)) &
+        call mexErrMsgTxt("yhat should be a double precision matrix with npred+nboth rows")
+   if (.not. (mxIsDouble(epsilon_mx) .and. int(mxGetM(epsilon_mx)) == exo_nbr)) &
+        call mexErrMsgTxt("epsilon should be a double precision matrix with exo_nbr rows")
 
    allocate(yhat(nys, nparticles), e(exo_nbr, nparticles), ynext(nrestricted, nparticles))
    yhat = reshape(mxGetDoubles(yhat_mx), [nys, nparticles])
@@ -207,9 +185,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    do i = 0, order
       write (fieldname, '(a2, i1)') "g_", i
       tmp = mxGetField(udr_mx, 1_mwIndex, trim(fieldname))
-      if (.not. (c_associated(tmp) .and. mxIsDouble(tmp))) then
-         call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
-      end if
+      if (.not. (c_associated(tmp) .and. mxIsDouble(tmp))) &
+           call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
       m = int(mxGetM(tmp))
       n = int(mxGetN(tmp))
       allocate(udr(i)%m(m,n))

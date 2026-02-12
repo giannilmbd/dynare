@@ -7,7 +7,7 @@
 ! – various Fortran 2018 modernizations were applied.
 
 ! Copyright © 2004-2009 John Burkardt
-! Copyright © 2023 Dynare Team
+! Copyright © 2023-2026 Dynare Team
 !
 ! This program is free software: you can redistribute it and/or modify
 ! it under the terms of the GNU Lesser General Public License as published by
@@ -94,9 +94,7 @@ function i8_bit_hi1 ( n )
 
   do
 
-     if ( i <= 0 ) then
-        exit
-     end if
+     if (i <= 0) exit
 
      bit = bit + 1
      i = i / 2
@@ -181,9 +179,7 @@ function i8_bit_lo0 ( n )
      bit = bit + 1
      i2 = i / 2
 
-     if ( i == 2 * i2 ) then
-        exit
-     end if
+     if (i == 2 * i2) exit
 
      i = i2
 
@@ -1238,9 +1234,7 @@ subroutine i8_sobol ( dim_num, seed, quasi )
 
            j = j / 2
 
-           if ( j <= 0 ) then
-              exit
-           end if
+           if (j <= 0) exit
 
            m = m + 1
 
@@ -1263,9 +1257,7 @@ subroutine i8_sobol ( dim_num, seed, quasi )
            l = 1
            do k = 1, m
               l = 2 * l
-              if ( includ(k) ) then
-                 newv = ieor ( newv, l * v(i,j-k) )
-              end if
+              if (includ(k)) newv = ieor ( newv, l * v(i,j-k) )
            end do
            v(i,j) = newv
         end do
@@ -1286,9 +1278,7 @@ subroutine i8_sobol ( dim_num, seed, quasi )
 
   end if
 
-  if ( seed < 0 ) then
-     seed = 0
-  end if
+  if (seed < 0) seed = 0
 
   if ( seed == 0 ) then
 

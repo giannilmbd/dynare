@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -136,9 +136,8 @@ contains
             ! Step 2: Compute Jacobian (first iteration only)
             if (iter == 1) then
                 if (present(verbosity)) then
-                    if (verbosity == 2) then
-                        call mexPrintf('  Computing initial Jacobian via finite differences...'//NEW_LINE('A'))
-                    end if
+                    if (verbosity == 2) &
+                         call mexPrintf('  Computing initial Jacobian via finite differences...'//NEW_LINE('A'))
                 end if
                 call compute_fd_jacobian(ws, x, fvec, fcn, h, nfev, iflag, verbosity)
                 if (iflag < 0) then
@@ -298,10 +297,8 @@ contains
         ! Compute ||dx||^2
         dx_norm_sq = dot_product(ws%dx, ws%dx)
 
-        if (dx_norm_sq < 1.0e-30_real64) then
-            ! Skip update if dx is too small to avoid division by zero
-            return
-        end if
+        ! Skip update if dx is too small to avoid division by zero
+        if (dx_norm_sq < 1.0e-30_real64) return
 
         ! Compute correction = J * dx using BLAS (store in fvec_new as temp)
         ws%fvec_new = 0.0_real64

@@ -1,7 +1,7 @@
 ! This MEX file computes A·(B⊗C) or A·(B⊗B) without explicitly building B⊗C or
 ! B⊗B, so that one can consider large matrices B and/or C.
 
-! Copyright © 2007-2025 Dynare Team
+! Copyright © 2007-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -32,14 +32,12 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   integer(c_size_t) :: mA, nA, mB, nB, mC, nC
   real(real64), dimension(:, :), pointer, contiguous :: A, B, C, D
 
-  if (nrhs > 3 .or. nrhs < 2 .or. nlhs /= 1) then
-     call mexErrMsgTxt("A_times_B_kronecker_C takes 2 or 3 input arguments and provides 1 output argument")
-  end if
+  if (nrhs > 3 .or. nrhs < 2 .or. nlhs /= 1) &
+       call mexErrMsgTxt("A_times_B_kronecker_C takes 2 or 3 input arguments and provides 1 output argument")
 
   if (.not. mxIsDouble(prhs(1)) .or. mxIsComplex(prhs(1)) .or. mxIsSparse(prhs(1)) &
-       .or. .not. mxIsDouble(prhs(2)) .or. mxIsComplex(prhs(2)) .or. mxIsSparse(prhs(2))) then
-     call mexErrMsgTxt("A_times_B_kronecker_C: first two arguments should be real dense matrices")
-  end if
+       .or. .not. mxIsDouble(prhs(2)) .or. mxIsComplex(prhs(2)) .or. mxIsSparse(prhs(2))) &
+       call mexErrMsgTxt("A_times_B_kronecker_C: first two arguments should be real dense matrices")
   mA = mxGetM(prhs(1))
   nA = mxGetN(prhs(1))
   mB = mxGetM(prhs(2))
@@ -49,14 +47,11 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
   if (nrhs == 3) then
      ! A·(B⊗C) is to be computed.
-     if (.not. mxIsDouble(prhs(3)) .or. mxIsComplex(prhs(3)) .or. mxIsSparse(prhs(3))) then
-        call mexErrMsgTxt("A_times_B_kronecker_C: third argument should be a real dense matrix")
-     end if
+     if (.not. mxIsDouble(prhs(3)) .or. mxIsComplex(prhs(3)) .or. mxIsSparse(prhs(3))) &
+          call mexErrMsgTxt("A_times_B_kronecker_C: third argument should be a real dense matrix")
      mC = mxGetM(prhs(3))
      nC = mxGetN(prhs(3))
-     if (mB*mC /= nA) then
-        call mexErrMsgTxt("Input dimension error!")
-     end if
+     if (mB*mC /= nA) call mexErrMsgTxt("Input dimension error!")
 
      C(1:mC,1:nC) => mxGetDoubles(prhs(3))
 
@@ -66,9 +61,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
      call full_A_times_kronecker_B_C
   else
      ! A·(B⊗B) is to be computed.
-     if (mB*mB /= nA) then
-        call mexErrMsgTxt("Input dimension error!")
-     end if
+     if (mB*mB /= nA) call mexErrMsgTxt("Input dimension error!")
 
      plhs(1) = mxCreateDoubleMatrix(mA, nB*nB, mxREAL)
      D(1:mA,1:nB*nB) => mxGetDoubles(plhs(1))

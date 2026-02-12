@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -201,9 +201,7 @@ contains
                                 end if
                             end if
                         end if
-                        if (z==0_int32) then
-                            acc(:,m) = acc(:,m)+inc
-                        end if
+                        if (z==0_int32) acc(:,m) = acc(:,m)+inc
                     end do
                 end do
             end do

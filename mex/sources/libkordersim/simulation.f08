@@ -2,7 +2,7 @@
 !
 ! A first step is to get the associated 
 
-! Copyright © 2021-2025 Dynare Team
+! Copyright © 2021-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -133,9 +133,8 @@ contains
       do while (q <= order)
          write (fieldname, '(a2, i1)') "g_", q
          g_q = mxGetField(dr_mx, 1_mwIndex, trim(fieldname))
-         if (.not. (c_associated(g_q) .and. mxIsDouble(g_q) .and. .not. mxIsComplex(g_q) .and. .not. mxIsSparse(g_q))) then
-            call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr.pruning")
-         end if
+         if (.not. (c_associated(g_q) .and. mxIsDouble(g_q) .and. .not. mxIsComplex(g_q) .and. .not. mxIsSparse(g_q))) &
+              call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr.pruning")
          g(q)%m(1:mxGetM(g_q),1:mxGetN(g_q)) => mxGetDoubles(g_q)
          q = q+1
       end do
@@ -181,9 +180,8 @@ contains
                               &part_set%partition(r)%coor(c))
                               c = c+1
                            end if
-                           if ((g(l)%ind(j)%coor(m) > nys) .and. (g(l)%ind(j)%coor(m) <= nvar)) then
-                              prod = prod*u(g(l)%ind(j)%coor(m)-nys)
-                           end if
+                           if ((g(l)%ind(j)%coor(m) > nys) .and. (g(l)%ind(j)%coor(m) <= nvar)) &
+                                prod = prod*u(g(l)%ind(j)%coor(m)-nys)
                         end do
                         sum_part = sum_part+prod
                      end do
@@ -198,9 +196,8 @@ contains
                   ! exists when q=l.
                   prod = 1._real64
                   do m=1,l
-                     if ((g(l)%ind(j)%coor(m) > nys) .and. (g(l)%ind(j)%coor(m) <= nvar)) then
-                        prod = prod*u(g(l)%ind(j)%coor(m)-nys)
-                     end if
+                     if ((g(l)%ind(j)%coor(m) > nys) .and. (g(l)%ind(j)%coor(m) <= nvar)) &
+                          prod = prod*u(g(l)%ind(j)%coor(m)-nys)
                   end do
                   psim(l)%m(:,1) = psim(l)%m(:,1)+g(l)%m(:,j)*prod
                end if
@@ -236,9 +233,8 @@ contains
       do while (d <= order)
          write (fieldname, '(a2, i1)') "g_", d
          g_d = mxGetField(dr_mx, 1_mwIndex, trim(fieldname))
-         if (.not. (c_associated(g_d) .and. mxIsDouble(g_d) .and. .not. mxIsComplex(g_d) .and. .not. mxIsSparse(g_d))) then
-            call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
-         end if
+         if (.not. (c_associated(g_d) .and. mxIsDouble(g_d) .and. .not. mxIsComplex(g_d) .and. .not. mxIsSparse(g_d))) &
+              call mexErrMsgTxt(trim(fieldname)//" is not allocated in dr")
          fg(d)%m(1:mxGetM(g_d),1:mxGetN(g_d)) => mxGetDoubles(g_d)
          d = d+1
       end do

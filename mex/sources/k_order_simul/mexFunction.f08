@@ -1,4 +1,4 @@
-! Copyright © 2021-2025 Dynare Team
+! Copyright © 2021-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -60,44 +60,32 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    pruning_mx = prhs(11)
 
    ! Checking the consistence and validity of input arguments
-   if (nrhs /= 11 .or. nlhs /= 1) then
-      call mexErrMsgTxt("Must have exactly 11 inputs and 1 output")
-   end if
-   if (.not. (mxIsScalar(order_mx)) .and. mxIsNumeric(order_mx)) then
-      call mexErrMsgTxt("1st argument (order) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nstatic_mx)) .and. mxIsNumeric(nstatic_mx)) then
-      call mexErrMsgTxt("2nd argument (nstat) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(npred_mx)) .and. mxIsNumeric(npred_mx)) then
-      call mexErrMsgTxt("3rd argument (npred) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nboth_mx)) .and. mxIsNumeric(nboth_mx)) then
-      call mexErrMsgTxt("4th argument (nboth) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nfwrd_mx)) .and. mxIsNumeric(nfwrd_mx)) then
-      call mexErrMsgTxt("5th argument (nforw) should be a numeric scalar")
-   end if
-   if (.not. (mxIsScalar(nexog_mx)) .and. mxIsNumeric(nexog_mx)) then
-      call mexErrMsgTxt("6th argument (nexog) should be a numeric scalar")
-   end if
+   if (nrhs /= 11 .or. nlhs /= 1) &
+        call mexErrMsgTxt("Must have exactly 11 inputs and 1 output")
+   if (.not. mxIsScalar(order_mx) .and. mxIsNumeric(order_mx)) &
+        call mexErrMsgTxt("1st argument (order) should be a numeric scalar")
+   if (.not. mxIsScalar(nstatic_mx) .and. mxIsNumeric(nstatic_mx)) &
+        call mexErrMsgTxt("2nd argument (nstat) should be a numeric scalar")
+   if (.not. mxIsScalar(npred_mx) .and. mxIsNumeric(npred_mx)) &
+        call mexErrMsgTxt("3rd argument (npred) should be a numeric scalar")
+   if (.not. mxIsScalar(nboth_mx) .and. mxIsNumeric(nboth_mx)) &
+        call mexErrMsgTxt("4th argument (nboth) should be a numeric scalar")
+   if (.not. mxIsScalar(nfwrd_mx) .and. mxIsNumeric(nfwrd_mx)) &
+        call mexErrMsgTxt("5th argument (nforw) should be a numeric scalar")
+   if (.not. mxIsScalar(nexog_mx) .and. mxIsNumeric(nexog_mx)) &
+        call mexErrMsgTxt("6th argument (nexog) should be a numeric scalar")
    if (.not. (mxIsDouble(ystart_mx) .and. (mxGetM(ystart_mx) == 1 .or. mxGetN(ystart_mx) == 1)) &
-        .or. mxIsComplex(ystart_mx) .or. mxIsSparse(ystart_mx)) then
-      call mexErrMsgTxt("7th argument (ystart) should be a real dense vector")
-   end if
-   if (.not. mxIsDouble(shocks_mx) .or. mxIsComplex(shocks_mx) .or. mxIsSparse(shocks_mx)) then
-      call mexErrMsgTxt("8th argument (shocks) should be a real dense matrix")
-   end if
+        .or. mxIsComplex(ystart_mx) .or. mxIsSparse(ystart_mx)) &
+        call mexErrMsgTxt("7th argument (ystart) should be a real dense vector")
+   if (.not. mxIsDouble(shocks_mx) .or. mxIsComplex(shocks_mx) .or. mxIsSparse(shocks_mx)) &
+        call mexErrMsgTxt("8th argument (shocks) should be a real dense matrix")
    if (.not. (mxIsDouble(ysteady_mx) .and. (mxGetM(ysteady_mx) == 1 .or. mxGetN(ysteady_mx) == 1)) &
-        .or. mxIsComplex(ysteady_mx) .or. mxIsSparse(ysteady_mx)) then
-      call mexErrMsgTxt("9th argument (ysteady) should be a real dense vector")
-   end if
-   if (.not. mxIsStruct(dr_mx)) then
-      call mexErrMsgTxt("10th argument (dr) should be a struct")
-   end if
-   if (.not. (mxIsLogicalScalar(pruning_mx))) then
-      call mexErrMsgTxt("11th argument (pruning) should be a logical scalar")
-   end if
+        .or. mxIsComplex(ysteady_mx) .or. mxIsSparse(ysteady_mx)) &
+        call mexErrMsgTxt("9th argument (ysteady) should be a real dense vector")
+   if (.not. mxIsStruct(dr_mx)) &
+        call mexErrMsgTxt("10th argument (dr) should be a struct")
+   if (.not. mxIsLogicalScalar(pruning_mx)) &
+        call mexErrMsgTxt("11th argument (pruning) should be a logical scalar")
 
    ! Converting inputs in Fortran format
    order = int(mxGetScalar(order_mx))
@@ -111,20 +99,16 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    pruning = mxGetScalar(pruning_mx) == 1._c_double
    nvar = nys+exo_nbr
 
-   if (endo_nbr /= int(mxGetM(ystart_mx))) then
-      call mexErrMsgTxt("ystart should have nstat+npred+nboth+nforw rows")
-   end if
+   if (endo_nbr /= int(mxGetM(ystart_mx))) &
+        call mexErrMsgTxt("ystart should have nstat+npred+nboth+nforw rows")
    ystart => mxGetDoubles(ystart_mx)
 
-   if (exo_nbr /= int(mxGetM(shocks_mx))) then
-      call mexErrMsgTxt("shocks should have nexog rows")
-   end if
+   if (exo_nbr /= int(mxGetM(shocks_mx))) call mexErrMsgTxt("shocks should have nexog rows")
    nper = int(mxGetN(shocks_mx))
    shocks(1:exo_nbr,1:nper) => mxGetDoubles(shocks_mx)
 
-   if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) then
-      call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
-   end if
+   if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) &
+        call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
    ysteady => mxGetDoubles(ysteady_mx)
    ! Initial value for between the states' starting value and the states' 
    ! steady-state value
@@ -132,9 +116,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    if (pruning) then
       dr_mx = mxGetField(dr_mx, 1_mwIndex, "pruning")
-      if (.not. mxIsStruct(dr_mx)) then
-         call mexErrMsgTxt("dr.pruning should be a struct")
-      end if
+      if (.not. mxIsStruct(dr_mx)) call mexErrMsgTxt("dr.pruning should be a struct")
    end if
 
    ! Generating output

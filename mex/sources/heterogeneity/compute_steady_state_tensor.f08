@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -489,9 +489,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
         field = mxGetField(struct, 1_mwIndex, 'in_het')
         if (c_associated(field)) then
             input%dims%n_mult = int(mxGetNumberOfElements(field), int32)
-            if (input%dims%n_mult > 0) then
-                tg_config%mcp%mult_in_het(1:input%dims%n_mult) => mxGetInt32s(field)
-            end if
+            if (input%dims%n_mult > 0) &
+                 tg_config%mcp%mult_in_het(1:input%dims%n_mult) => mxGetInt32s(field)
         end if
     end if
 

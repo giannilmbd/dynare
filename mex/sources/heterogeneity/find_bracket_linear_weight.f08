@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -54,9 +54,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    integer(int32), pointer, contiguous :: xqi(:)
 
    ! Validate number of inputs/outputs
-   if (nrhs /= 2_c_int .or. nlhs /= 2_c_int) then
-      call mexErrMsgTxt("Rouwenhorst routine: incorrect number of inputs and/or outputs")
-   end if
+   if (nrhs /= 2_c_int .or. nlhs /= 2_c_int) &
+        call mexErrMsgTxt("Rouwenhorst routine: incorrect number of inputs and/or outputs")
 
    ! Get input pointers
    x_mx = prhs(1)
@@ -64,13 +63,11 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    ! Validate input types
    if (.not. (mxIsDouble(x_mx) .and. (mxGetM(x_mx) == 1 .or. mxGetN(x_mx) == 1)) &
-        .or. mxIsComplex(x_mx) .or. mxIsSparse(x_mx)) then
-      call mexErrMsgTxt("1st argument (x) should be a real dense vector")
-   end if
+        .or. mxIsComplex(x_mx) .or. mxIsSparse(x_mx)) &
+        call mexErrMsgTxt("1st argument (x) should be a real dense vector")
    if (.not. (mxIsDouble(xq_mx) .and. (mxGetM(xq_mx) == 1 .or. mxGetN(xq_mx) == 1)) &
-        .or. mxIsComplex(xq_mx) .or. mxIsSparse(xq_mx)) then
-      call mexErrMsgTxt("2nd argument (xq) should be a real dense vector")
-   end if
+        .or. mxIsComplex(xq_mx) .or. mxIsSparse(xq_mx)) &
+        call mexErrMsgTxt("2nd argument (xq) should be a real dense vector")
 
    ! Convert MATLAB inputs to Fortran variables
    x => mxGetDoubles(x_mx)

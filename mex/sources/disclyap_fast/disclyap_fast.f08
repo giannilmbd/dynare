@@ -20,7 +20,7 @@
 ! This is a Fortran translation of a code originally written by Joe Pearlman
 ! and Alejandro Justiniano.
 
-! Copyright © 2020-2025 Dynare Team
+! Copyright © 2020-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -59,35 +59,30 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
   real(real64), dimension(:, :), pointer :: X
 
-  if (nlhs < 1 .or. nlhs > 2 .or. nrhs < 3 .or. nrhs > 5) then
-     call mexErrMsgTxt("disclyap_fast: requires between 3 and 5 input arguments, and 1 or 2 output arguments")
-  end if
+  if (nlhs < 1 .or. nlhs > 2 .or. nrhs < 3 .or. nrhs > 5) &
+       call mexErrMsgTxt("disclyap_fast: requires between 3 and 5 input arguments, and 1 or 2 output arguments")
 
   n = mxGetM(prhs(1))
   if (.not. mxIsDouble(prhs(1)) .or. mxIsComplex(prhs(1)) .or. mxIsSparse(prhs(1)) &
       .or. .not. mxIsDouble(prhs(2)) .or. mxIsComplex(prhs(2)) .or. mxIsSparse(prhs(2)) &
-      .or. mxGetN(prhs(1)) /= n .or. mxGetM(prhs(2)) /= n .or. mxGetN(prhs(2)) /= n) then
-     call mexErrMsgTxt("disclyap_fast: first two arguments should be real dense matrices of the same dimension")
-  end if
+      .or. mxGetN(prhs(1)) /= n .or. mxGetM(prhs(2)) /= n .or. mxGetN(prhs(2)) /= n) &
+      call mexErrMsgTxt("disclyap_fast: first two arguments should be real dense matrices of the same dimension")
 
-  if (.not. (mxIsScalar(prhs(3)) .and. mxIsNumeric(prhs(3)))) then
-     call mexErrMsgTxt("disclyap_fast: third argument (tol) should be a numeric scalar")
-  end if
+  if (.not. (mxIsScalar(prhs(3)) .and. mxIsNumeric(prhs(3)))) &
+       call mexErrMsgTxt("disclyap_fast: third argument (tol) should be a numeric scalar")
   tol = mxGetScalar(prhs(3))
 
   if (nrhs >= 4) then
-     if (.not. (mxIsLogicalScalar(prhs(4)))) then
-        call mexErrMsgTxt("disclyap_fast: fourth argument (check_flag) should be a logical scalar")
-     end if
+     if (.not. mxIsLogicalScalar(prhs(4))) &
+          call mexErrMsgTxt("disclyap_fast: fourth argument (check_flag) should be a logical scalar")
      check_flag = mxGetScalar(prhs(4)) == 1_c_double
   else
      check_flag = .false.
   end if
 
   if (nrhs >= 5) then
-     if (.not. (mxIsScalar(prhs(5)) .and. mxIsNumeric(prhs(5)))) then
-        call mexErrMsgTxt("disclyap_fast: fifth argument (max_iter) should be a numeric scalar")
-     end if
+     if (.not. (mxIsScalar(prhs(5)) .and. mxIsNumeric(prhs(5)))) &
+          call mexErrMsgTxt("disclyap_fast: fifth argument (max_iter) should be a numeric scalar")
      max_iter = int(mxGetScalar(prhs(5)))
   else
      max_iter = 2000

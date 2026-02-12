@@ -1,4 +1,4 @@
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -67,9 +67,7 @@ contains
 
         ! Create main output struct using the wrapper (it handles the conversion)
         output_mx = mxCreateStructMatrix(1_mwSize, 1_mwSize, field_names)
-        if (.not. c_associated(output_mx)) then
-            call mexErrMsgTxt("Failed to create output struct")
-        end if
+        if (.not. c_associated(output_mx)) call mexErrMsgTxt("Failed to create output struct")
 
         ! ================================================================
         ! PART 1: Top-level convergence fields
@@ -121,9 +119,7 @@ contains
         ! ================================================================
 
         ti_struct = mxCreateStructMatrix(1_mwSize, 1_mwSize, ti_fields)
-        if (.not. c_associated(ti_struct)) then
-            call mexErrMsgTxt("Failed to create time_iteration struct")
-        end if
+        if (.not. c_associated(ti_struct)) call mexErrMsgTxt("Failed to create time_iteration struct")
 
         if (associated(output%ti_output)) then
             ! converged
@@ -167,9 +163,7 @@ contains
         ! ================================================================
 
         dist_struct = mxCreateStructMatrix(1_mwSize, 1_mwSize, dist_fields)
-        if (.not. c_associated(dist_struct)) then
-            call mexErrMsgTxt("Failed to create distribution struct")
-        end if
+        if (.not. c_associated(dist_struct)) call mexErrMsgTxt("Failed to create distribution struct")
 
         if (associated(output%dist_output)) then
             ! converged
@@ -212,9 +206,7 @@ contains
         ! ================================================================
 
         agg_struct = mxCreateStructMatrix(1_mwSize, 1_mwSize, agg_fields)
-        if (.not. c_associated(agg_struct)) then
-            call mexErrMsgTxt("Failed to create aggregates struct")
-        end if
+        if (.not. c_associated(agg_struct)) call mexErrMsgTxt("Failed to create aggregates struct")
 
         if (associated(output%agg_output)) then
             ! Ix [n_het_endo × 1]
