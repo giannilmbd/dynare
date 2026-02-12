@@ -202,18 +202,8 @@ while newRank && t<smpl
                 % The univariate diffuse Kalman filter should be used.
                 % Display debugging information about singular combination
                 if debug
-                    Finf(abs(Finf)<1e-10)=0; %remove spurious small values
-                    null_space = compute_nullspace(Finf, []);
-                    fprintf('\nSingularity detected in Finf at t=%d (diffuse period).\n', t);
-                    fprintf('Rank-deficient linear combination(s) of observables:\n');
-                    for j = 1:size(null_space, 2)
-                        fprintf('  Combination %d: ', j);
-                        for i = 1:length(di)
-                            if abs(null_space(i,j)) > 1e-8
-                                fprintf('%s (%.4f)  ', varobs{di(i)}, null_space(i,j));
-                            end
-                        end
-                        fprintf('\n');
+                    if debug
+                        check_stochastic_singularity(Finf, di, varobs, t,'forecast-error variance matrix Finf of nonstationary variables');
                     end
                 end
                 alphahat = Inf;
@@ -227,20 +217,7 @@ while newRank && t<smpl
                         % The univariate diffuse Kalman filter should be used.
                         % Display debugging information about singular combination
                         if debug
-                            null_space = compute_nullspace(Fstar(di,di,t), []);
-                            fprintf('\nSingularity detected in Fstar at t=%d (diffuse period, Finf=0).\n', t);
-                            fprintf('\nThis is expected in case of co-integration and/or\n');
-                            fprintf('fewer stochastic trends than observables.\n');
-                            fprintf('Rank-deficient linear combination(s) of observables:\n');
-                            for j = 1:size(null_space, 2)
-                                fprintf('  Combination %d: ', j);
-                                for i = 1:length(di)
-                                    if abs(null_space(i,j)) > 1e-8
-                                        fprintf('%s (%.4f)  ', varobs{di(i)}, null_space(i,j));
-                                    end
-                                end
-                                fprintf('\n');
-                            end
+                            check_stochastic_singularity(Fstar(di,di,t), di, varobs, t,'forecast-error variance matrix Fstar of stationary variables');
                         end
                         alphahat = Inf;
                         error_flag = 421;
@@ -314,18 +291,7 @@ while t<smpl
         if any(diag(F)<kalman_tol) || rcond(F./(sig*sig')) < kalman_tol
             % Display debugging information about singular combination
             if debug
-                null_space = compute_nullspace(F, []);
-                fprintf('\nSingularity detected in F at t=%d (stationary period).\n', t);
-                fprintf('Rank-deficient linear combination(s) of observables:\n');
-                for j = 1:size(null_space, 2)
-                    fprintf('  Combination %d: ', j);
-                    for i = 1:length(di)
-                        if abs(null_space(i,j)) > 1e-8
-                            fprintf('%s (%.4f)  ', varobs{di(i)}, null_space(i,j));
-                        end
-                    end
-                    fprintf('\n');
-                end
+                check_stochastic_singularity(F, di, varobs, t);
             end
             alphahat = Inf;
             error_flag = 422;
