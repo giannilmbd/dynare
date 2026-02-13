@@ -16,7 +16,7 @@ function model_diagnostics(M_,options_,oo_)
 %   none.
 %
 
-% Copyright © 1996-2025 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -151,6 +151,12 @@ end
 
 exo = [oo_.exo_steady_state; oo_.exo_det_steady_state];
 for b=1:nb
+    if options_.block && (M_.block_structure_stat.block(b).Simulation_Type == 1 ...
+                          || M_.block_structure_stat.block(b).Simulation_Type == 2)
+        % Skip blocks that are evaluated, the preprocessor does not produce a Jacobian for them
+        continue
+    end
+
     if options_.bytecode
         if nb == 1
             [~, jacob] = bytecode(M_, options_, dr.ys, exo, M_.params, dr.ys, 1, exo, ...
