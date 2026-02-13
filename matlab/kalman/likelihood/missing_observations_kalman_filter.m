@@ -1,10 +1,9 @@
-function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,number_of_observations,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,occbin_)
-% [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,number_of_observations,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,occbin_)
+function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,Zflag,diffuse_periods,occbin_)
+% [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,Zflag,diffuse_periods,occbin_)
 % Computes the likelihood of a state space model in the case with missing observations.
 %
 % INPUTS
 %    data_index                   [cell]      1*smpl cell of column vectors of indices.
-%    number_of_observations       [integer]   scalar.
 %    no_more_missing_observations [integer]   scalar.
 %    Y                            [double]    pp*smpl matrix of data.
 %    start                        [integer]   scalar, index of the first observation.
@@ -21,7 +20,9 @@ function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,numbe
 %    Z                            [integer]   pp*1 vector of indices for the observed variables.
 %    mm                           [integer]   scalar, dimension of the state vector.
 %    pp                           [integer]   scalar, number of observed variables.
-%    rr                           [integer]   scalar, number of structural innovations.
+%    Zflag                        [integer]   scalar, 0 if Z is an index vector, 1 if Z is a pp*mm matrix.
+%    diffuse_periods              [integer]   scalar, number of diffuse-filter periods already consumed during initialization.
+%    occbin_                      [struct]    occbin options/context structure; if occbin_.status is true, runs the occbin-specific likelihood branch.
 %
 % OUTPUTS
 %    LIK        [double]    scalar, MINUS log-likelihood
@@ -33,7 +34,7 @@ function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,numbe
 % NOTES
 %   The vector "lik" is used to evaluate the Jacobian of the likelihood.
 
-% Copyright © 2004-2023 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -51,12 +52,12 @@ function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,numbe
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % Set defaults
-if nargin<20
+if nargin<19
     Zflag = 0;
     diffuse_periods = 0;
 end
 
-if nargin<21
+if nargin<20
     diffuse_periods = 0;
 end
 

@@ -1,14 +1,48 @@
 function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, kalman_tol, diffuse_kalman_tol, presample, T, R, Q, H, Z, pp)
 % [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, kalman_tol, diffuse_kalman_tol, presample, T, R, Q, H, Z, pp)
-% Computes the diffuse likelihood of a state space model.
+% Computes the diffuse log-likelihood of a state space model.
+%
+% The function implements the exact diffuse Kalman filter for the initialization
+% of the state vector when some or all initial conditions are unknown (diffuse).
+% It iterates until the diffuse part of the state covariance matrix has
+% converged to zero (i.e., Pinf becomes numerically zero), at which point
+% the standard Kalman filter can take over.
+%
+% The state space model is given by:
+%   y_t = Z * alpha_t + epsilon_t,   epsilon_t ~ N(0, H)
+%   alpha_{t+1} = T * alpha_t + R * eta_t,   eta_t ~ N(0, Q)
+%
+% with the diffuse initialization:
+%   alpha_1 ~ N(a, Pinf * kappa + Pstar)  as kappa -> infinity
+%
+% This implies a decomposition of the forecast error variance:
+%   F_t = F_{inf,t} * kappa + F_{*,t}    as kappa -> infinity
+% where:
+%   F_{inf,t} = Z * P_{inf,t} * Z'       diffuse forecast error variance
+%   F_{*,t}   = Z * P_{*,t} * Z' + H     stationary forecast error variance
+%
+% The filter distinguishes two cases at each period t:
+%   (i)  F_{inf,t} full rank: the observation resolves diffuse uncertainty.
+%        The likelihood contribution is log|F_{inf,t}| (no quadratic term,
+%        as the forecast error variance diverges with kappa).
+%   (ii) F_{inf,t} = 0: diffuse uncertainty does not affect this observable.
+%        The standard likelihood contribution applies:
+%        log|F_{*,t}| + v_t' * F_{*,t}^{-1} * v_t
+%        where v_t = y_t - Z * a_t is the prediction error.
+%
+% The diffuse phase ends once P_{inf,t} (and hence F_{inf,t}) has
+% converged to zero for all observables, after which the standard
+% Kalman filter takes over.
 %
 % INPUTS
-% - Y                       [matrix]    pp*smpl matrix of (detrended) data
-% - start                   [integer]   first observation
-% - last                    [integer]   last observation
+% - Y                       [matrix]    [pp x smpl] matrix of (detrended) data
+% - start                   [integer]   index of the first observation to process in Y
+% - last                    [integer]   index of the last observation to process in Y
 % - a                       [vector]    initial state vector (E_0(alpha_1))
-% - Pinf                    [matrix]    matrix used to initialize the covariance matrix of the state vector
-% - Pstar                   [matrix]    matrix used to initialize the covariance matrix of the state vector
+%   Pinf                    [double]    (m x m) diffuse part of the initial state covariance matrix;
+%                                       reflects prior uncertainty about nonstationary components
+%   Pstar                   [double]    (m x m) stationary part of the initial state covariance matrix;
+%                                       reflects prior uncertainty about stationary components
 % - kalman_tol              [double]    tolerance parameter (rcond) of F_star
 % - diffuse_kalman_tol      [double]    tolerance parameter (rcond) of Pinf
 % - presample               [integer]   number of initial iterations to be discarded when evaluating the likelihood
@@ -21,9 +55,15 @@ function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, k
 %
 % OUTPUTS
 % - dLIK                    [double]    minus loglikelihood
-% - dlik                    [vector]    smpl*1 vector of log densities of observations
-% - a                       [vector]    estimate of the state vector (E_T(alpha_{T+1}))
-% - Pstar                   [matrix]    covariance matrix of the state vector
+% - dlik                    [vector]    contributions to the log-likelihood at each period of the diffuse phase, where s is the number of
+%                                       diffuse iterations; each element equals 0.5*(w_t + pp*log(2*pi)) 
+%                                       with w_t as defined in Durbin and Koopman (2012, p. 172)
+% - a                       [vector]    estimated state vector at the end of the diffuse phase,
+%                                       E_{t_d}(alpha_{t_d+1}), to be used as initial condition for
+%                                       the standard Kalman filter
+% - Pstar                   [matrix]    state covariance matrix at the end of the diffuse phase,
+%                                       Var_{t_d}(alpha_{t_d+1}), to be used as initial condition for
+%                                       the standard Kalman filter
 %
 % This function is called by: dsge_likelihood
 % This function calls: none
@@ -36,7 +76,7 @@ function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, k
 %   Durbin, J. and Koopman, S.J. (2012), "Time Series Analysis by State Space
 %   Methods", Oxford University Press, Second Edition, Ch. 5 and 7.2
 
-% Copyright © 2004-2021 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -57,7 +97,6 @@ function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, k
 smpl = last-start+1;
 
 % Initialize some variables.
-dF   = 1;
 isqvec = false;
 if ndims(Q)>2
     Qvec = Q;
@@ -68,7 +107,6 @@ QQ   = R*Q*transpose(R);   % Variance of R times the vector of structural innova
 t    = start;              % Initialization of the time index.
 dlik = zeros(smpl,1);      % Initialization of the vector gathering the densities.
 dLIK = Inf;                % Default value of the log likelihood.
-oldK = Inf;
 s    = 0;
 
 while rank(Z*Pinf*Z',diffuse_kalman_tol) && (t<=last)
