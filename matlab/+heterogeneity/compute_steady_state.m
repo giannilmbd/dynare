@@ -257,7 +257,7 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
       M_.dynamic_tmp_nbr = [];
    end
    % Tensor product grid - call compute_steady_state_tensor
-   output = compute_steady_state_tensor(M_.fname, equation_names, M_.params, H_.orig_endo_nbr, H_.set_auxiliary_variables, int32(H_.dynamic_mcp_equations_reordering), int32(H_.state_var), H_.dynamic_g1_sparse_rowval, H_.dynamic_g1_sparse_colval, H_.dynamic_g1_sparse_colptr, options_het, mat, indices);
+   output = compute_steady_state_tensor(M_.fname, equation_names, M_.params, H_.orig_endo_nbr, H_.set_auxiliary_variables, H_.het_aux_levels, int32(H_.dynamic_mcp_equations_reordering), int32(H_.state_var), H_.dynamic_g1_sparse_rowval, H_.dynamic_g1_sparse_colval, H_.dynamic_g1_sparse_colptr, options_het, mat, indices);
 
    %% Process MEX output and update steady_state structure
     % 1. Check convergence

@@ -170,41 +170,43 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
       xh = mat.pol.sm(1:sizes.n_e, :);
    end
    % Compute auxiliary policy values using the preprocessor-generated function
+   % Level-by-level computation with Phi_e between levels ensures correct
+   % expectations for chain auxiliaries (e.g., AUX2(t) = AUX1(t+1))
    if H_.set_auxiliary_variables
       n_aux = H_.endo_nbr - H_.orig_endo_nbr;
       aux_range = H_.orig_endo_nbr+1:H_.endo_nbr;
       set_aux_fn = str2func([M_.fname '.dynamic_het1_set_auxiliary_variables']);
       pol_shape = size(steady_state.pol.values.(H_.endo_names{1}));
+      n_levels = numel(H_.het_aux_levels);
 
-      % --- Pass 1: compute auxiliary t-values (t+1 aux slots still NaN) ---
-      for j = 1:sizes.N_sp
-         yh(:, j) = set_aux_fn(mat.y, mat.x, M_.params, [], yh(:, j), xh(:, j), []);
+      % Process each topological level
+      for lv = 0:n_levels-1
+         level_vars = H_.het_aux_levels{lv+1};  % 1-based MATLAB indexing
+
+         % 1. Compute this level's aux at t (pointwise over all grid points)
+         for j = 1:sizes.N_sp
+            yh(:, j) = set_aux_fn(mat.y, mat.x, M_.params, [], yh(:, j), xh(:, j), [], lv);
+         end
+
+         % 2. Build policy for this level's computed variables
+         for i = 1:length(level_vars)
+            idx = level_vars(i);
+            aux_name = H_.endo_names{idx};
+            steady_state.pol.values.(aux_name) = reshape(yh(H_.endo_nbr + idx, :), pol_shape);
+         end
+
+         % 3. Apply Phi_e to get E[aux(t+1)] for this level's computed variables
+         [lv_x_bar, lv_x_bar_dash] = compute_pol_matrices(...
+            steady_state.pol.values, length(level_vars), sizes.N_sp, ...
+            mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(level_vars));
+         yh(H_.endo_nbr + level_vars, :) = lv_x_bar;
+         yh(2*H_.endo_nbr + level_vars, :) = lv_x_bar_dash * mat.pol.Phi_e;
       end
 
-      % --- Intermediate: build t+1 auxiliary values from pass-1 t-values ---
-      for i = 1:n_aux
-         aux_idx = H_.orig_endo_nbr + i;
-         aux_name = H_.endo_names{aux_idx};
-         steady_state.pol.values.(aux_name) = reshape(yh(H_.endo_nbr + aux_idx, :), pol_shape);
-      end
-      [aux_x_bar, aux_x_bar_dash] = compute_pol_matrices(steady_state.pol.values, n_aux, sizes.N_sp, mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(aux_range));
-      yh(H_.endo_nbr + aux_range, :) = aux_x_bar;
-      yh(2*H_.endo_nbr + aux_range, :) = aux_x_bar_dash * mat.pol.Phi_e;
-
-      % --- Pass 2: recompute with t+1 aux slots now populated ---
-      for j = 1:sizes.N_sp
-         yh(:, j) = set_aux_fn(mat.y, mat.x, M_.params, [], yh(:, j), xh(:, j), []);
-      end
-
-      % --- Final extraction and matrix update ---
-      for i = 1:n_aux
-         aux_idx = H_.orig_endo_nbr + i;
-         aux_name = H_.endo_names{aux_idx};
-         steady_state.pol.values.(aux_name) = reshape(yh(H_.endo_nbr + aux_idx, :), pol_shape);
-      end
-      [aux_x_bar, aux_x_bar_dash] = compute_pol_matrices(steady_state.pol.values, n_aux, sizes.N_sp, mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(aux_range));
-      yh(H_.endo_nbr + aux_range, :) = aux_x_bar;
-      yh(2*H_.endo_nbr + aux_range, :) = aux_x_bar_dash * mat.pol.Phi_e;
+      % Build final aux_x_bar and aux_x_bar_dash for all aux variables
+      [aux_x_bar, aux_x_bar_dash] = compute_pol_matrices(...
+         steady_state.pol.values, n_aux, sizes.N_sp, ...
+         mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(aux_range));
 
       % Concatenate x_bar and x_bar_dash
       x_bar = [x_bar ; aux_x_bar];
