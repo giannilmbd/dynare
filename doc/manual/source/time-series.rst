@@ -1093,7 +1093,7 @@ The dseries class
         typically useful if ``INIT__`` is not provided in the data
         file.
 
-        If an ``.xlsx`` file is used, the first row should be a header
+        If a ``.csv``, ``.xls`` or ``.xlsx`` file is used, the first row should be a header
         containing the variable names. The first column may contain date
         information that must correspond to a valid date format recognized
         by Dynare. If such date information is specified in the first column,
