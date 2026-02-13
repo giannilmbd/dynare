@@ -80,7 +80,8 @@
     "perfect_foresight_with_expectation_errors_setup"
     "perfect_foresight_with_expectation_errors_solver" "compilation_setup"
     "model_remove" "model_options" "var_remove"
-    "heterogeneity_load_steady_state" "heterogeneity_solve" "heterogeneity_simulate"
+    "heterogeneity_load_steady_state" "heterogeneity_compute_steady_state"
+    "heterogeneity_solve" "heterogeneity_simulate"
     "resid" "database" "std" "corr"
     "prior_function" "posterior_function" "end")
   "Dynare statement keywords.")
