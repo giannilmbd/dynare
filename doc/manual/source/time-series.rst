@@ -1117,7 +1117,7 @@ The dseries class
         \times 1` cell of strings composed of the LaTeX names
         associated with the variables. The default LaTeX name
         associated with column ``i`` of *DATA_MATRIX* is
-        ``Variable\_i``. If the optional second input argument is a
+        ``Variable_i``. If the optional second input argument is a
         range of dates, ``dates`` object *RANGE_OF_DATES*, the number
         of rows in the first argument must match the number of
         elements *RANGE_OF_DATES* or be equal to one (in which case
