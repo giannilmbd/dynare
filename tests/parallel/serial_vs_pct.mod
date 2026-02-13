@@ -29,7 +29,7 @@
 
 @#define TESTS = ["start", "123", "default", "noseed"]
 
-if matlab.internal.parallel.isPCTInstalled
+if ~isoctave && matlab.internal.parallel.isPCTInstalled
 
 fprintf('\nTESTS BETWEEN SERIAL AND PCT ESTIMATIONS DONE IN OTHER MOD FILES:\n');
 
