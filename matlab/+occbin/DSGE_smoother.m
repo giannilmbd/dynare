@@ -42,7 +42,7 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 % - alphahat0     [double]  (m*1) array, smoothed endogenous variables in period 0 (a_{0|T})  (decision-rule order)
 % - state_uncertainty0 [double] (K,K,1) array, storing the uncertainty in period 0
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -130,10 +130,14 @@ occbin_options.opts_regime.regime_history=options_.occbin.smoother.init_regime_h
 
 options_.noprint = true;
 
-[alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0,~,error_indicator,oo_.occbin.smoother.regime_history] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+is_realtime_smoother_successful = true;
+
+[alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0,~,error_indicator,oo_.occbin.smoother.regime_history] = ...
+    DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
 bayestopt_.mf=mf;
 
 if error_indicator(1) || isempty(alphahat0)
+    is_realtime_smoother_successful = false;
     if ~options_.occbin.smoother.linear_smoother || nargin~=12 %make sure linear smoother results are set before using them
         options_.occbin.smoother.status=false;
         [~,etahat,~,~,~,~,~,~,~,~,~,~,~,~,~,~,alphahat0] = ...
@@ -173,8 +177,6 @@ aKK=aK;
 PKK=PK;
 clear aK PK;
 
-occbin_options.first_period_occbin_update = inf;
-
 opts_regime.binding_indicator=[];
 regime_history0 = regime_history;
 
@@ -187,24 +189,19 @@ opts_simul.periods = size(opts_simul.SHOCKS,1);
 options_.occbin.simul=opts_simul;
 occbin_smoother_debug=options_.occbin.smoother.debug;
 [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+oo_.occbin.smoother.error_flag=0;
+is_last_simulation_converged = true;
 if out.error_flag
+    is_last_simulation_converged = false;
     disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)    
     oo_.occbin.smoother.error_flag=321;
-    if occbin_smoother_debug
-    % use regimes consistent with the last smoother run
-        out.regime_history = regime_history ;
-    else
-        return;
-    end
+    % store regimes consistent with the last smoother run
+    out.regime_history = regime_history ;
 elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
     disp_verbose('Occbin smoother:: simulation violates first_period_binding_regime_allowed.',~options_.noprint)
     oo_.occbin.smoother.error_flag=322;
-    if occbin_smoother_debug
-    % use regimes consistent with the last smoother run
-        out.regime_history = regime_history ;
-    else
-        return;
-    end
+    % store regimes consistent with the last smoother run
+    out.regime_history = regime_history ;
 end
 regime_history = out.regime_history;
 if options_.smoother_redux
@@ -241,8 +238,115 @@ for k=1:size(TT,3)
     sto_eee(:,k) = eig(TT(:,:,k));
 end
 
+is_conditional_smoother_converged = false;
+is_realtime_smoother_converged = true;
 
-while is_changed && maxiter>iter && ~is_periodic
+if (is_changed || oo_.occbin.smoother.error_flag)
+    is_realtime_smoother_converged = false;
+end
+if is_realtime_smoother_successful
+    sto_realtime.alphahat=alphahat;
+    sto_realtime.etahat=etahat;
+    sto_realtime.epsilonhat=epsilonhat;
+    sto_realtime.SteadyState=SteadyState;
+    sto_realtime.trend_coeff=trend_coeff;
+    sto_realtime.T0=T0;
+    sto_realtime.R0=R0;
+    sto_realtime.P=P;
+    sto_realtime.decomp=decomp;
+    sto_realtime.Trend=Trend;
+    sto_realtime.state_uncertainty=state_uncertainty;
+    sto_realtime.dr=oo_.dr;
+    sto_realtime.alphahat0=alphahat0;
+    sto_realtime.state_uncertainty0=state_uncertainty0;
+    sto_realtime.opts_simul=opts_simul;
+    sto_realtime.regime_history=regime_history;
+end
+
+if ~is_realtime_smoother_converged && not(options_.lik_init==2 && options_.Harvey_scale_factor==0)
+    % try conditional smoother, where state uncertainty is smaller [unless too many shocks in excess]
+    disp_verbose(sprintf('OccBin: try conditional smoother iteration.'),options_.verbosity)
+    occbin_options.opts_regime.regime_history=regime_history;
+    %%%% resort to conditional smoother
+    alphahat1 = alphahat0(oo_.dr.inv_order_var)+SteadyState;
+    alphahat1 = alphahat1(oo_.dr.state_var);
+    M_local = M_;
+    % set direct assignment of initial states
+    M_local.endo_initial_state.status = true;
+    M_local.endo_initial_state.values = zeros(M_.endo_nbr,1);
+    opts_local1 = options_;
+    opts_local1.lik_init = 2;
+    opts_local1.Harvey_scale_factor = 0;
+    M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat1;
+    occbin_options.first_period_occbin_update = 1;
+    [c.alphahat,c.etahat,c.epsilonhat,~,~,~,~,c.T0,c.R0,c.P,~,~,~,~,~,~,c.alphahat0,~,~,c.error_indicator,c.regime_history] = ...
+        DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_local,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local1,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+    if c.error_indicator(1)
+        disp_verbose('OccBin smoother:: there was an error in running conditional smoother.',options_.verbosity)
+        oo_.occbin.smoother.error_flag=322;
+    else
+        %%%% compute state uncertainty consistent with conditional smoother
+        %%%% regime sequence
+        regime_history = c.regime_history;
+        opts_simul.SHOCKS = [c.etahat(:,1:end)'; zeros(1,M_.exo_nbr)];
+        opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
+        options_.occbin.simul=opts_simul;
+        out0 = out;
+        ss0=ss;
+        [~, out, ss] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+        oo_.occbin.smoother.error_flag=0;
+        if out.error_flag
+            disp_verbose('OccBin smoother:: simulation within conditional smoother did not converge.',options_.verbosity)
+            oo_.occbin.smoother.error_flag=321;
+            % use regimes consistent with the last smoother run
+            out = out0;
+            out.regime_history = regime_history;
+            ss=ss0;
+        elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
+            disp_verbose('Occbin smoother:: simulation violates first_period_binding_regime_allowed.',~options_.noprint)
+            oo_.occbin.smoother.error_flag=322;
+            % use regimes consistent with the last smoother run
+            out.regime_history = regime_history ;
+        end
+        c.TT = ss.T(oo_.dr.order_var,oo_.dr.order_var,:);
+        c.RR = ss.R(oo_.dr.order_var,:,:);
+        c.CC = ss.C(oo_.dr.order_var,:);
+
+        opts_regime.regime_history = out.regime_history;
+        [c.TT, c.RR, c.CC, regime_history] = occbin.check_regimes(c.TT, c.RR, c.CC, opts_regime, M_, options_ , oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
+        is_changed = ~isequal(c.regime_history,regime_history);
+        if not(is_changed || oo_.occbin.smoother.error_flag)
+            is_conditional_smoother_converged = true;
+            occbin_options.opts_regime.regime_history=c.regime_history;
+            occbin_options.first_period_occbin_update = inf;
+            % compute uncertainty consistent with sequence of regimes of conditional smoother
+            CC = c.CC;
+            TT = c.TT;
+            RR = c.RR;
+            [~,~,~,~,~,~,~,~,~,P,~,decomp,~,state_uncertainty,~,~,~,state_uncertainty0]...
+                = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
+            alphahat = c.alphahat;
+            etahat = c.etahat;
+            epsilonhat = c.epsilonhat;
+            T0 = c.T0;
+            R0 = c.R0;
+            alphahat0 = c.alphahat0;
+            oo_.occbin.smoother.regime_history = c.regime_history;
+        else
+            disp_verbose(sprintf('OccBin: conditional smoother did not converge.'),options_.verbosity)
+        end
+    end
+end
+
+
+occbin_options.first_period_occbin_update = inf;
+
+% try consistent estimation of shocks and regime sequence
+while is_changed && maxiter>iter && ~is_periodic && is_last_simulation_converged
+    if iter==1
+        regime_history = sto_realtime.regime_history;
+        oo_.occbin.smoother.error_flag=0;
+    end
     iter=iter+1;
     disp_verbose(sprintf('OccBin smoother iteration %u.', iter),options_.verbosity)
     occbin_options.opts_regime.regime_history=regime_history;
@@ -266,22 +370,15 @@ while is_changed && maxiter>iter && ~is_periodic
     if out.error_flag
         disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)
         oo_.occbin.smoother.error_flag=321;
-        if occbin_smoother_debug
         % use regimes consistent with the last smoother run
-            out.regime_history = regime_history;
-            ss=ss0;
-        else
-            return;
-        end
+        out.regime_history = regime_history;
+        break
     elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1),regime_history(1:options_.occbin.likelihood.first_period_binding_regime_allowed-1)))
         disp_verbose('Occbin smoother:: simulation violates first_period_binding_regime_allowed.',~options_.noprint)
         oo_.occbin.smoother.error_flag=322;
-        if occbin_smoother_debug
         % use regimes consistent with the last smoother run
-            out.regime_history = regime_history ;
-        else
-            return;
-        end
+        out.regime_history = regime_history ;
+        break
     end
     regime_history = out.regime_history;
     TT = ss.T(oo_.dr.order_var,oo_.dr.order_var,:);
@@ -423,27 +520,71 @@ if occbin_smoother_debug
     save('Occbin_smoother_debug_regime_history','regime_history0')
 end
 
-if (maxiter==iter && is_changed) || is_periodic
+is_smoother_converged=false;
+oo_.occbin.smoother.warning_flag = 0;
+
+if ( (maxiter==iter || ~is_last_simulation_converged) && is_changed) || is_periodic || oo_.occbin.smoother.error_flag
     disp_verbose('occbin.DSGE_smoother: smoother did not converge.',options_.verbosity)
     disp_verbose('occbin.DSGE_smoother: The algorithm did not reach a fixed point for the smoothed regimes.',options_.verbosity)
     if is_periodic
+        is_smoother_converged=true;
         oo_.occbin.smoother.error_flag=0;
+        oo_.occbin.smoother.warning_flag = 321;
         disp_verbose('occbin.DSGE_smoother: For the periods indicated above, regimes loops between the "regime_" and the "regime_new_" pattern displayed above.',options_.verbosity)
         disp_verbose('occbin.DSGE_smoother: We provide smoothed shocks consistent with "regime_" in oo_.',options_.verbosity)
-    else
+    elseif ~is_realtime_smoother_successful
+        disp_verbose('occbin.DSGE_smoother: The realtime smoother was not successful either.',options_.verbosity)
         disp_verbose('occbin.DSGE_smoother: The respective fields in oo_ will be left empty.',options_.verbosity)
         oo_.occbin.smoother=[];
         oo_.occbin.smoother.error_flag=322;
     end
 else
     disp_verbose('occbin.DSGE_smoother: smoother converged.',options_.verbosity)
+    is_smoother_converged=true;
     oo_.occbin.smoother.error_flag=0;
-    if occbin_smoother_fast && is_changed_start
+    if ~is_conditional_smoother_converged && ~is_realtime_smoother_converged
+        oo_.occbin.smoother.warning_flag = 320;
+        disp_verbose('occbin.DSGE_smoother: WARNING: algorithm converged to a different regime wrt realtime regime',options_.verbosity)
+        disp_verbose('occbin.DSGE_smoother: WARNING: this usually indicates that for some period there is no unique regime dominance.',options_.verbosity)
+    elseif occbin_smoother_fast && is_changed_start
+        oo_.occbin.smoother.warning_flag = 323;
         disp_verbose('occbin.DSGE_smoother: WARNING: fast algo is used, regime duration was not forced to converge',options_.verbosity)
+        disp_verbose('occbin.DSGE_smoother: WARNING: this usually indicates that for some period there is no unique regime dominance.',options_.verbosity)
     end
 end
-if (~is_changed || occbin_smoother_debug) && nargin==12
+
+if is_realtime_smoother_successful && ~is_conditional_smoother_converged && ~is_realtime_smoother_converged && ~is_smoother_converged
+    % fallback solution
+    disp_verbose('occbin.DSGE_smoother: We provide results consistent with realtime regime',options_.verbosity)
+    disp_verbose('occbin.DSGE_smoother: WARNING: this usually indicates that for some period there is no unique regime dominance.',options_.verbosity)
+    oo_.occbin.smoother.warning_flag = 322;
+    oo_.occbin.smoother.error_flag = 0;
+    options_.occbin.simul=sto_realtime.opts_simul;
+    options_.occbin.simul.maxit=1;
+    [~, out] = occbin.solver(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
+    oo_.occbin.smoother.regime_history = oo_.occbin.smoother.realtime_regime_history;
+    is_changed=false;
+    alphahat=sto_realtime.alphahat;
+    etahat=sto_realtime.etahat;
+    epsilonhat=sto_realtime.epsilonhat;
+    SteadyState=sto_realtime.SteadyState;
+    trend_coeff=sto_realtime.trend_coeff;
+    T0=sto_realtime.T0;
+    R0=sto_realtime.R0;
+    P=sto_realtime.P;
+    decomp=sto_realtime.decomp;
+    Trend=sto_realtime.Trend;
+    state_uncertainty=sto_realtime.state_uncertainty;
+    oo_.dr=sto_realtime.dr;
+    alphahat0=sto_realtime.alphahat0;
+    state_uncertainty0=sto_realtime.state_uncertainty0;
+end
+
+
+if (~is_changed || (occbin_smoother_debug && iter>1)) && nargin==12
     if is_changed
+        % this can happen when realtime smoother did not work and
+        % iterations done starting from linear smoother did not converge
         CC = sto_CC;
         RR = sto_RR;
         TT = sto_TT;
@@ -464,8 +605,10 @@ if (~is_changed || occbin_smoother_debug) && nargin==12
         oo_.occbin.smoother.T0=TT;
         oo_.occbin.smoother.R0=RR;
         oo_.occbin.smoother.C0=CC;
-        oo_.occbin.smoother.simul.piecewise = out.piecewise(1:end-1,:);
-        if ~options_.occbin.simul.piecewise_only
+        if isfield(out,'piecewise')
+            oo_.occbin.smoother.simul.piecewise = out.piecewise(1:end-1,:);
+        end
+        if ~options_.occbin.simul.piecewise_only &&  isfield(out,'linear')
             oo_.occbin.smoother.simul.linear = out.linear(1:end-1,:);
         end        
     end
