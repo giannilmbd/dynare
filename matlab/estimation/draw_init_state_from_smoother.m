@@ -100,7 +100,7 @@ M_.endo_initial_state.status = false;
 error_flag=0;
 options_.lik_init=1;
 if init
-    [Pstar, Q, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+    [Pstar, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
     if info(1)
         return
     end

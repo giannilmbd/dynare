@@ -25,7 +25,7 @@ function [UP, XP] = get_init_state_prior(xparam1, options_,M_,estim_params_,baye
 % - UP                  [double]     eigenvectors (columns) of the restricted `Pstar` subspace retained.
 % - XP                  [double]     diagonal matrix of retained singular values/eigenvalues.
 
-% Copyright © 2024-2025 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -45,15 +45,14 @@ function [UP, XP] = get_init_state_prior(xparam1, options_,M_,estim_params_,baye
 M_.endo_initial_state.status=false;
 options_.lik_init=1;
 options_.estimate_initial_states_endogenous_prior=false;
-[Pstar, Q, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+[Pstar, info] = get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
 if info(1)
     return
 end
 
 [UP,XP] = svd(0.5*(Pstar(bayestopt_.mf0,bayestopt_.mf0)+Pstar(bayestopt_.mf0,bayestopt_.mf0)'));
 isp = find(diag(XP)>options_.kalman_tol);
-if length(isp)>rank(Q)
-    isp = isp(1:rank(Q));
-end
+dd=diag(XP(isp,isp));
+isp = isp(1:sum((dd./dd(1))>eps));
 UP = UP(:,isp);
 XP = XP(isp,isp);
