@@ -429,14 +429,6 @@ while is_changed && maxiter>iter && ~is_periodic && is_last_simulation_converged
         for k=1:size(TT,3)
             eee(:,k) = eig(TT(:,:,k));
         end
-        if options_.debug
-            err_eig(iter-1) = max(max(abs(sort(eee)-sort(sto_eee))));
-            err_alphahat(iter-1) = max(max(max(abs(alphahat-sto_alphahat))));
-            err_etahat(iter-1) = max(max(max(abs(etahat-sto_etahat{iter-1}))));
-            err_CC(iter-1) = max(max(max(abs(CC-sto_CC))));
-            err_RR(iter-1) = max(max(max(abs(RR-sto_RR))));
-            err_TT(iter-1) = max(max(max(abs(TT-sto_TT))));
-        end
     end
 
     if occbin_smoother_debug || (is_periodic && ~options_.noprint)
