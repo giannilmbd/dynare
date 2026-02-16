@@ -9,7 +9,7 @@ estimation(order=1,datafile='../fsdat_simul',silent_optimizer,nobs=192,loglinear
 posterior_sampling_method='slice',
 posterior_sampler_options=('rotated',1,'use_mh_covariance_matrix',1)
 );
-// continue with optiomizer within slice
+// continue with optimizer within slice
 options_.gradient_epsilon = 1e-5;
 estimation(order=1,datafile='../fsdat_simul',silent_optimizer,nobs=192,loglinear,mh_replic=1,mh_nblocks=2,mh_drop=0.5,load_mh_file,//mode_compute=0,
 posterior_sampling_method='slice',
