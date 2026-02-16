@@ -269,7 +269,11 @@ if ~options_.load_mh_file && ~options_.mh_recover
         if all(candidate(:) >= mh_bounds.lb) && all(candidate(:) <= mh_bounds.ub)
             ix2 = candidate;
             ilogpo2 = - feval(objective_function,ix2',dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,mh_bounds,oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
-            fprintf('%s: Initialization at the posterior mode.\n\n',dispString);
+            if strcmp(options_.posterior_sampler_options.posterior_sampling_method,'slice')
+                fprintf('%s: Initialization at the prior mode.\n\n',dispString);
+            else
+                fprintf('%s: Initialization at the posterior mode.\n\n',dispString);
+            end
             fprintf(fidlog,['    Blck ' int2str(1) 'params:\n']);
             for i=1:length(ix2(1,:))
                 fprintf(fidlog,['      ' int2str(i)  ':' num2str(ix2(1,i)) '\n']);
@@ -277,7 +281,11 @@ if ~options_.load_mh_file && ~options_.mh_recover
             fprintf(fidlog,['    Blck ' int2str(1) 'logpo2:' num2str(ilogpo2) '\n']);
         else
             fprintf('%s: Initialization failed...\n',dispString);
-            fprintf('%s: The posterior mode lies outside the prior bounds.\n',dispString);
+            if strcmp(options_.posterior_sampler_options.posterior_sampling_method,'slice')
+                fprintf('%s: The prior mode lies outside the prior bounds.\n',dispString);
+            else
+                fprintf('%s: The posterior mode lies outside the prior bounds.\n',dispString);
+            end
             fclose(fidlog);
             return
         end
