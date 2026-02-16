@@ -12,14 +12,4 @@ estimation(order=1,datafile='../fsdat_simul',nobs=192,loglinear,
     smoother, filtered_vars, consider_all_endogenous
 );
 
-
-estimation(order=1,datafile='../fsdat_simul',nobs=192,loglinear,
-    mh_replic=100,mh_nblocks=2,mh_drop=0.2,
-    mode_compute=0,
-    posterior_sampling_method='slice',
-    estimate_initial_states_endogenous_prior,
-    smoother, filtered_vars, consider_all_endogenous,load_mh_file,
-    posterior_sampler_options=('rotated',1,'use_mh_covariance_matrix',1)
-);
-
 generate_trace_plots(1:2);

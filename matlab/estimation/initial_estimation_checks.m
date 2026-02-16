@@ -171,6 +171,17 @@ if options_.mh_drop<0 || options_.mh_drop>=1
     error('initial_estimation_checks:: mh_drop must be in [0,1).')    
 end
 
+if options_.estimate_initial_states_endogenous_prior && ...
+        isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice') && ...
+        ~isempty(options_.posterior_sampler_options.sampling_opt)
+    options_list = read_key_value_string(options_.posterior_sampler_options.sampling_opt);
+    for i=1:rows(options_list)
+        if strcmp(options_list{i,1},'rotated') && options_list{i,2}
+            warning('initial_estimation_checks:: rotated slice with estimate_initial_states_endogenous_prior tends to be very inefficient. Consider using normal slice.')
+        end
+    end
+end
+                
 % check and display warnings if steady-state solves static model (except if diffuse_filter == 1) and if steady-state changes estimated parameters
 [oo_.steady_state] = check_steady_state_changes_parameters(M_,estim_params_,oo_,options_, [options_.diffuse_filter==0 options_.diffuse_filter==0] );
 
