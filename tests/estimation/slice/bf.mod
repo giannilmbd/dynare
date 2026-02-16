@@ -77,6 +77,8 @@ check;
 // Estimation
 // -----------------------------
 
+if ~isoctave % test leads to timeout under Octave, see https://git.dynare.org/Dynare/dynare/-/issues/2018
+options_.debug=true;
 estimation(estimate_initial_states_endogenous_prior,
     datafile='datafile', 
     order=1,
@@ -95,4 +97,5 @@ estimation(estimate_initial_states_endogenous_prior,
     filter_covariance, smoothed_state_uncertainty,
 	filtered_vars, smoother,consider_all_endogenous);
 
+end
       

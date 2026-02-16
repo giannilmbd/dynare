@@ -27,7 +27,7 @@
 @#define MH_NBLOCKS = 1
 @#define DIRNAME    = "pct_mhblocks_" + ((string) MH_NBLOCKS)
 
-if matlab.internal.parallel.isPCTInstalled
+if ~isoctave && matlab.internal.parallel.isPCTInstalled
 delete(gcp('nocreate')); % make sure no parallel pool is open
 parpool('local'); % open pool
 @#include "_estimation_commands_with_different_seeds.inc"

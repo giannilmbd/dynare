@@ -27,7 +27,7 @@
 @#define MH_NBLOCKS = 2
 @#define DIRNAME    = "serial_mhblocks_" + ((string) MH_NBLOCKS)
 
-if matlab.internal.parallel.isPCTInstalled
+if ~isoctave && matlab.internal.parallel.isPCTInstalled
 options_.parallel_info.use_pct.estimation = false;
 delete(gcp('nocreate')); % make sure no parallel pool is open
 parpool('local', 2); % open pool to check whether desire of user to not use PCT is honored and pool is restored correctly on cleanup
