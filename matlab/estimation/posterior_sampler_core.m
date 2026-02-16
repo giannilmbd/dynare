@@ -111,17 +111,17 @@ if ~isempty(d)
     record.ProposalScaleVec=bayestopt_.jscale;
 end
 
-% Setup parallel execution using the shared utility function
-% This handles: PCT availability check, user preferences, pool management, and cleanup
-% restore_pool holds an onCleanup object that restores the pool state when this function ends:
-%   - If a pool was created here, it will be closed on exit
-%   - If a pool was closed for serial execution, it will be reopened on exit
-% We need to keep it in the scope of this function and so ignore the warning about unused variable
+% Setup parallel execution using the shared utility function setup_parallel_execution
+% which handles PCT availability check, user preferences, pool management, and cleanup.
 % Note: parallel as command line option has precedence over PCT
-if isnumeric(options_.parallel) && options_.parallel == 0
+run_with_pct = false;
+if options_.mh_nblck > 1 && isnumeric(options_.parallel) && options_.parallel == 0
     [run_with_pct, restore_pool] = setup_parallel_execution(options_.parallel_info.use_pct.estimation.sampler, 'posterior_sampler_core'); %#ok<ASGLU>
-else
-    run_with_pct = false;
+    % restore_pool holds an onCleanup object that restores the pool state when this function ends or crashes:
+    %   - If a pool was created here, it will be closed on exit
+    %   - If a pool was closed for serial execution, it will be reopened on exit
+    %   - If the function ends or crashes, the pool will be restored to its original state
+    % We need to keep it in the scope of this function and so ignore the warning about unused variable
 end
 
 if run_with_pct
