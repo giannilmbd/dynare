@@ -90,6 +90,9 @@ if not(islogical(init))
     target_accepted = init(2);
     init=logical(init(1));
 end
+if init
+    target_accepted = 1;
+end
 
 % here I run unconditional smoother, so I need to undo the init state
 % estimation setup and set lik_init = 1
@@ -262,7 +265,9 @@ if error_flag==0
                 xproposal=xcheck;
             end
             if init
+                naccepted = 1;
                 xparam1=xproposal;
+                disp_verbose(sprintf('draw_init_state_from_smoother initialization:     ACCEPTED - accepted %d/%d (%.1f%%)', naccepted, target_accepted, 100*naccepted/target_accepted), options_.debug);
                 break
             end
             lnrand = log(rand);
