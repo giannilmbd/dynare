@@ -5,6 +5,7 @@
 // The zero lower bound andestimation accuracy.Journal of Monetary Economics
 // original codes provided by Alexander Richter
 // adapted for dynare implementation
+// adapted to avoid stochastic singularity at the ZLB 
 // ------------------------- Settings -----------------------------------------//
 
 @#ifndef small_model
@@ -171,12 +172,12 @@ model;
 yg = g*y/(gbar*y(-1));
 
 [name = 'Notional Interest Rate (9)']
-inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi)*exp(mp);
+inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi);
 
 [name = 'Nominal Interest Rate (10)', bind='zlb']
-inom = inomlb;
+inom = inomlb*exp(mp);
 [name = 'Nominal Interest Rate (10)', relax='zlb']
-inom = inomnot;
+inom = inomnot*exp(mp);
 
 [name = 'Inverse MUC (11)']
 lam = c-h*c(-1)/g;
@@ -274,31 +275,16 @@ check;
 // ---------------- Estimation -----------------------------------------//
 
 varobs yg inom pi;
-load('dataobsfile','inom')
-// check if inom is at lb and remove data + associated shock
-verbatim;
-    inom(inom==1)=NaN;
-end;
-inx = strmatch('epsi',M_.exo_names);
-if any(isnan(inom))
-    M_.heteroskedastic_shocks.Qscale_orig = struct('periods', find(isnan(inom)), 'exo_id', inx, 'scale', 0);
-else
-    options_.heteroskedastic_filter=false;
-end
-
-copyfile dataobsfile.mat dataobsfile2.mat
-save dataobsfile2 inom -append
 
 // -----------------Occbin ----------------------------------------------//
 options_.occbin.smoother.debug=1;
-occbin_setup(filter_use_relaxation,likelihood_piecewise_kalman_filter);
-options_.heteroskedastic_filter=1;
+occbin_setup(likelihood_piecewise_kalman_filter);
 options_.nobs=110;
-calib_smoother(datafile=dataobsfile2,first_obs=1,smoothed_state_uncertainty,smoother_redux);
+calib_smoother(datafile=dataobsfile,first_obs=1,smoothed_state_uncertainty,smoother_redux);
 oo_PKF=oo_;
 
 occbin_setup(likelihood_inversion_filter,smoother_inversion_filter);
-calib_smoother(datafile=dataobsfile2,first_obs=1,smoothed_state_uncertainty,smoother_redux);
+calib_smoother(datafile=dataobsfile,first_obs=1,smoothed_state_uncertainty,smoother_redux);
 
 figure
 subplot(3,1,1)
@@ -323,7 +309,7 @@ if max(abs(oo_.SmoothedVariables.inom(burnin+1:end)-oo_PKF.SmoothedVariables.ino
     error('Smoothed observables differ too much')
 end
 
-temp_data=load('dataobsfile2.mat');
+temp_data=load('dataobsfile.mat');
 if max(abs(temp_data.inom(options_.first_obs+burnin:options_.first_obs+options_.nobs-1)-oo_PKF.SmoothedVariables.inom(burnin+1:end)))>0.0001 || ...
     max(abs(temp_data.yg(options_.first_obs+burnin:options_.first_obs+options_.nobs-1)-oo_PKF.SmoothedVariables.yg(burnin+1:end)))>0.0001 || ...
     max(abs(temp_data.pi(options_.first_obs+burnin:options_.first_obs+options_.nobs-1)-oo_PKF.SmoothedVariables.pi(burnin+1:end)))>0.0001

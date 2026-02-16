@@ -61,6 +61,7 @@ end
 occbin_setup(smoother_debug);
 occbin_solver(simul_debug,simul_periodic_solution,simul_periods=200,simul_maxit=300,simul_curb_retrench,simul_check_ahead_periods=300);
 occbin_write_regimes(filename='test',periods=[1:40]);
+occbin.plot_regimes(oo_.occbin.simul.regime_history,M_,options_)
 
 %% Modify to plot IRFs
 titlelist = char('c','lambdak','k','i','a');
@@ -89,9 +90,6 @@ occbin_graph(noconstant) c erra lambdak k i a k;
     occbin_solver(simul_periods=200,simul_maxit=200,simul_curb_retrench,simul_check_ahead_periods=200);
     occbin_setup(smoother_periods=200,smoother_maxit=200,smoother_curb_retrench,smoother_check_ahead_periods=200);
     calib_smoother(datafile=datasim);
-    oo0=oo_;
-    occbin_setup(filter_use_relaxation);
-    calib_smoother(datafile=datasim);
     oo_= occbin.unpack_simulations(M_,oo_,options_);
 
     titlelist = char('c','lambdak','k','i','a','erra');
@@ -113,6 +111,6 @@ occbin_graph(noconstant) c erra lambdak k i a k;
     line2=100*[oo_.occbin.linear_smoother.SmoothedVariables.c-oo_.occbin.endo_ss.c,oo_.occbin.linear_smoother.SmoothedVariables.lambdak/100,oo_.occbin.linear_smoother.SmoothedVariables.k-oo_.occbin.endo_ss.k,oo_.occbin.linear_smoother.SmoothedVariables.i-oo_.occbin.endo_ss.i,oo_.occbin.linear_smoother.SmoothedVariables.a-oo_.occbin.endo_ss.a, oo_.occbin.linear_smoother.SmoothedShocks.erra/100];
     occbin.make_chart(titlelist,legendlist,figtitle,ylabels,cat(3,line1,line2));
 
-    occbin.plot_regimes(oo_.occbin.smoother.regime_history,M_,options_)
+    occbin.plot_regimes(oo_.occbin.smoother.regime_history(1:169),M_,options_)
 @#endif
 @#endfor
