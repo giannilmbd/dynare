@@ -1,4 +1,4 @@
-function [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
+function [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,varobs,debug, analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
 % [LIK, LIKK, a, P] = kalman_filter(Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
 % Computes the log-likelihood of a stationary state space model.
 
@@ -64,7 +64,7 @@ if nargin<18
     diffuse_periods = 0;
 end
 
-if nargin<19
+if nargin<21
     analytic_derivation = 0;
 end
 
@@ -155,6 +155,9 @@ while notsteady && t<=last
         % if ~all(abs(F(:))<kalman_tol), then use univariate filter (will remove
         % observations with zero variance prediction error), otherwise this is a
         % pathological case and the draw is discarded
+        if debug
+            check_stochastic_singularity(F, 1:pp, varobs, t);
+        end
         return
     else
         F_singular = false;

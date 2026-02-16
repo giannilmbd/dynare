@@ -1,4 +1,4 @@
-function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,Zflag,diffuse_periods,occbin_)
+function  [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,varobs,debug,Zflag,diffuse_periods,occbin_)
 % [LIK, lik, a, P] = missing_observations_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,rescale_prediction_error_covariance,presample,T,Q,R,H,Z,mm,pp,Zflag,diffuse_periods,occbin_)
 % Computes the likelihood of a state space model in the case with missing observations.
 %
@@ -226,6 +226,9 @@ while notsteady && t<=last
             % pathological case and the draw is discarded
             if occbin_.status
                 set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal,LastSeeds.current_stream);
+            end
+            if debug
+                check_stochastic_singularity(F, d_index, varobs, t);
             end
             return
         else

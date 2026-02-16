@@ -1,6 +1,6 @@
-function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
+function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0,error_flag] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux,varobs,debug)
 
-% [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux)
+% [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d,alphahat0,aalphahat0,V0,error_flag] = missing_DiffuseKalmanSmootherH1_Z(a_initial,T,Z,R,Q,H,Pinf1,Pstar1,Y,pp,mm,smpl,data_index,nk,kalman_tol,diffuse_kalman_tol,decomp_flag,state_uncertainty_flag,filter_covariance_flag,smoother_redux,varobs,debug)
 % Computes the diffuse Kalman smoother without measurement error, in the case of a non-singular var-cov matrix.
 %
 % INPUTS
@@ -27,6 +27,8 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 %    filter_covariance_flag:    if true, compute filter covariance
 %    smoother_redux:            if true, compute smoother on restricted
 %                               state space, recover static variables from this
+%    varobs:                    [cell]      names of observed variables for debugging
+%    debug:                     [boolean]   if true, display debugging information for singularities
 %
 % OUTPUTS
 %    alphahat:      smoothed variables (a_{t|T})
@@ -49,6 +51,9 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 %                   smoother_redux option
 %    V0             (K,K,1) array, storing the uncertainty
 %                     about the smoothed state in t=0 (decision-rule order)
+%    error_flag     [integer]   error code: 0=success, 420=Finf rank-deficient (diffuse period),
+%                               421=Fstar rank-deficient when Finf=0 (diffuse period),
+%                               422=F singular (stationary period)
 %
 % Notes:
 %   Outputs are stored in decision-rule order, i.e. to get variables in order of declaration
@@ -80,6 +85,7 @@ function [alphahat,epsilonhat,etahat,atilde,P,aK,PK,decomp,V,aalphahat,eetahat,d
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 d = 0;
+error_flag = 0;
 decomp = [];
 spinf           = size(Pinf1);
 spstar          = size(Pstar1(:,:,1));
@@ -194,7 +200,14 @@ while newRank && t<smpl
         if rcond(Finf) < diffuse_kalman_tol                                 %F_{\infty,t} = 0
             if ~all(abs(Finf(:)) < diffuse_kalman_tol)                      %rank-deficient but not rank 0
                 % The univariate diffuse Kalman filter should be used.
+                % Display debugging information about singular combination
+                if debug
+                    if debug
+                        check_stochastic_singularity(Finf, di, varobs, t,'forecast-error variance matrix Finf of nonstationary variables');
+                    end
+                end
                 alphahat = Inf;
+                error_flag = 420;
                 return
             else                                                            %rank of F_{\infty,t} is 0
                 Finf_singular(1,t) = 1;
@@ -202,7 +215,12 @@ while newRank && t<smpl
                 if rcond(Fstar(di,di,t)) < kalman_tol                         %F_{*} is singular
                     if ~all(all(abs(Fstar(di,di,t))<kalman_tol))
                         % The univariate diffuse Kalman filter should be used.
+                        % Display debugging information about singular combination
+                        if debug
+                            check_stochastic_singularity(Fstar(di,di,t), di, varobs, t,'forecast-error variance matrix Fstar of stationary variables');
+                        end
                         alphahat = Inf;
+                        error_flag = 421;
                         return
                     else %rank 0
                         a(:,t+1) = T*a(:,t);
@@ -271,7 +289,12 @@ while t<smpl
         sig=sqrt(diag(F));
 
         if any(diag(F)<kalman_tol) || rcond(F./(sig*sig')) < kalman_tol
+            % Display debugging information about singular combination
+            if debug
+                check_stochastic_singularity(F, di, varobs, t);
+            end
             alphahat = Inf;
+            error_flag = 422;
             return
         end
         iF(di,di,t)   = inv(F./(sig*sig'))./(sig*sig');

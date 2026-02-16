@@ -10,7 +10,7 @@ function message = get_error_message(info, options_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2005-2024 Dynare Team
+% Copyright © 2005-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -249,6 +249,12 @@ switch info(1)
         message = 'Logarithmic reduction terminated with NaN/Inf.';
     case 413
         message = 'Logarithmic reduction converged to a solution that does not solve the matrix equation.';
+    case 420
+        message = 'Kalman filter: Finf is rank-deficient in diffuse period. This may indicate co-integration or fewer stochastic trends than observables.';
+    case 421
+        message = 'Kalman filter: Fstar is rank-deficient when Finf=0 in diffuse period.';
+    case 422
+        message = 'Kalman filter: F is singular in stationary period. Stochastic singularity detected.';
     otherwise
         message = 'This case shouldn''t happen. Contact the authors of Dynare';
 end
