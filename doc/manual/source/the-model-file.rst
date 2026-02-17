@@ -3689,7 +3689,8 @@ speed-up on large models.
              perfect_foresight_setup (OPTIONS...);
 
     |br| Prepares a perfect foresight simulation, by extracting the
-    information in the ``initval``, ``endval`` and ``shocks`` blocks
+    information in the :bck:`initval`, :bck:`endval`, :bck:`shocks`,
+    :bck:`mshocks` and :bck:`perfect_foresight_controlled_paths` blocks
     and converting them into simulation paths for exogenous and
     endogenous variables.
 
@@ -4642,8 +4643,9 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
              perfect_foresight_with_expectation_errors_setup (OPTIONS...);
 
     |br| Prepares a perfect foresight simulation with expectation errors, by
-    extracting the contents of the ``initval``, ``endval`` and ``shocks``
-    blocks (the latter two types of blocks typically used with the
+    extracting the contents of the :bck:`initval`, :bck:`endval`,
+    :bck:`shocks`, :bck:`mshocks` and :bck:`perfect_foresight_controlled_paths`
+    blocks (the latter four types of blocks typically used with the
     ``learnt_in`` option); alternatively, the information about future shocks
     can be given in a CSV file using the ``datafile`` option.
 
