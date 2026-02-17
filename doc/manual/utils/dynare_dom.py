@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2018-2024 Dynare Team
+# Copyright © 2018-2026 Dynare Team
 #
 # This file is part of Dynare.
 #
@@ -257,8 +257,6 @@ class DynSimpleObject(ObjectDescription):
             return _('%s (constructor)') % name
         elif self.objtype == 'matvar':
             return _('%s (MATLAB variable)') % name
-        elif self.objtype == 'specvar':
-            return _('%s (special variable)') % name
         elif self.objtype == 'operator':
             endsig = name.find(' ')
             name = name[0:endsig]
@@ -269,9 +267,6 @@ class DynSimpleObject(ObjectDescription):
 class MatlabVar(DynSimpleObject):
     display_prefix = 'MATLAB/Octave variable: '
     allow_nesting = False
-
-class SpecialVar(MatlabVar):
-    display_prefix = 'Special variable: '
 
 class Operator(MatlabVar):
     display_prefix = 'Operator: '
@@ -308,7 +303,6 @@ class DynareDomain(Domain):
     'macrodir':          ObjType(_('macro directive'),  'mdir'),
     'construct':         ObjType(_('constructor'),      'cstr'),
     'matvar':            ObjType(_('matlab variable'),  'mvar'),
-    'specvar':           ObjType(_('special variable'), 'svar'),
     'operator':          ObjType(_('operator'),         'op'),
     'constant':          ObjType(_('constant'),         'const'),
     'option':            ObjType(_('option'),           'opt'),
@@ -327,7 +321,6 @@ class DynareDomain(Domain):
     'macrodir':          DynMacroDir,
     'construct':         Constructor,
     'matvar':            MatlabVar,
-    'specvar':           SpecialVar,
     'operator':          Operator,
     'constant':          Constant,
     'option':            Option,
@@ -346,7 +339,6 @@ class DynareDomain(Domain):
     'mdir':     DynareXRefRole(),
     'cstr':     DynareXRefRole(),
     'mvar':     DynareXRefRole(),
-    'svar':     DynareXRefRole(),
     'op':       DynareXRefRole(),
     'const':    DynareXRefRole(),
     'opt':      DynareXRefRole(),
