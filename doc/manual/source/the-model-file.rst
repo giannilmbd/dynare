@@ -7063,7 +7063,7 @@ Data treatment options
        ``.xls`` file extension is not supported). Note that the base
        name (i.e. without extension) of the datafile has to be
        different from the base name of the model file. If there are
-       several files named FILENAME, but with different file endings,
+       several files named ``FILENAME``, but with different file endings,
        the file name must be included in quoted strings and provide
        the file ending like::
 
