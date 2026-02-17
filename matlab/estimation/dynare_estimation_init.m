@@ -582,8 +582,8 @@ if options_.heteroskedastic_filter
     for k=1:length(M_.heteroskedastic_shocks.Qvalue_orig)
         v = M_.heteroskedastic_shocks.Qvalue_orig(k);
         if isa(v.periods, 'dates')
-            if isempty(options_.dataset.series)
-                error('heteroskedastic_shocks: dates in "periods" requires the dataset to be specified with the "data(series=...)" command')
+            if v.periods.freq ~= dataset_.dates.freq
+                error('heteroskedastic_shocks: dates in "periods" do not have the same frequency as those in the dataset')
             end
             mask_periods = v.periods >= dataset_.dates(1) & v.periods <= dataset_.dates(end);
             if any(mask_periods)
@@ -600,8 +600,8 @@ if options_.heteroskedastic_filter
     for k=1:length(M_.heteroskedastic_shocks.Qscale_orig)
         v = M_.heteroskedastic_shocks.Qscale_orig(k);
         if isa(v.periods, 'dates')
-            if isempty(options_.dataset.series)
-                error('heteroskedastic_shocks: dates in "periods" requires the dataset to be specified with the "data(series=...)" command')
+            if v.periods.freq ~= dataset_.dates.freq
+                error('heteroskedastic_shocks: dates in "periods" do not have the same frequency as those in the dataset')
             end
             mask_periods = v.periods >= dataset_.dates(1) & v.periods <= dataset_.dates(end);
             if any(mask_periods)

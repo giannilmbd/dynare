@@ -2865,8 +2865,9 @@ blocks.
     * Integer period indices refer to the original dataset (*e.g.* if
       ``first_obs=10``, then a period index of 11 will refer to the second
       observation used for estimation).
-    * Period indices can only be specified as dates if the dataset has been
-      specified with the ``series`` option of the :comm:`data` command.
+    * Period indices can only be specified as dates if the dataset has either been
+      specified as a ``.csv`` file with dates in the ``datafile`` option of
+      :comm:`estimation`, or with the ``series`` option of the :comm:`data` command.
     * ``scales`` and ``values`` cannot be simultaneously set for the same shock
       in the same period, but it is possible to set ``values`` for some periods
       and ``scales`` for other periods for the same shock.
