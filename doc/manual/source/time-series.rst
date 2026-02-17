@@ -1962,7 +1962,7 @@ The dseries class
        |br| Computes bi-annual growth rates.
 
 
-   .. dseriesmethod:: D = horzcat (A, B[, ...])
+    .. dseriesmethod:: D = horzcat (A, B[, ...])
 
         |br| Overloads the ``horzcat`` MATLAB/Octave’s method for
         ``dseries`` objects. Returns a ``dseries`` object ``D``
