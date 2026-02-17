@@ -93,6 +93,10 @@ end
 
 % Check init state estimation with endogenous prior
 if options_.estimate_initial_states_endogenous_prior
+    if options_.analytic_derivation
+        error(['estimation option conflict: estimate_initial_states_endogenous_prior isn''t available ' ...
+            'for analytic_derivation'])
+    end
     if not(isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice'))
         error('Init state estimation with endogenous prior is only compatible with slice sampler')
     else
