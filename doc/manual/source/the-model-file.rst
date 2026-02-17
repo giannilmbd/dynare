@@ -7059,7 +7059,7 @@ Data treatment options
 
        The datafile: a ``.m`` file, a ``.mat`` file, a ``.csv`` file,
        or a ``.xls``/``.xlsx`` file (under Octave, the `io`_ package
-       is required for the ``.csv`` and ``.xlsx`` formats and the
+       is required for the ``.xlsx`` format, and the
        ``.xls`` file extension is not supported). Note that the base
        name (i.e. without extension) of the datafile has to be
        different from the base name of the model file. If there are
