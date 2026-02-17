@@ -77,8 +77,7 @@ check;
 // Estimation
 // -----------------------------
 
-if ~isoctave % test leads to timeout under Octave, see https://git.dynare.org/Dynare/dynare/-/issues/2018
-options_.debug=true;
+if ~isoctave % test takes too much time under Octave, 
 estimation(estimate_initial_states_endogenous_prior,
     datafile='datafile', 
     order=1,

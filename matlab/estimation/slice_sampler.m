@@ -70,7 +70,12 @@ if sampler_options.rotated %&& ~isempty(sampler_options.V1),
     if endo_init_state
         % draw initial states
         if draw_endo_init_state_from_smoother
-            [theta, fxsim] = draw_init_state_from_smoother([false 5],sampler_options,theta,fxsim,thetaprior,varargin{:});
+            [theta, fxsim, ~, ~, neval_init] = draw_init_state_from_smoother([false 5],sampler_options,theta,fxsim,thetaprior,varargin{:});
+            if ~isempty(index_init_state)
+                neval(index_init_state(1)) = neval(index_init_state(1)) + neval_init;
+            else
+                neval(1) = neval(1) + neval_init;
+            end
         elseif draw_endo_init_state_with_rotated_slice
             [V, D]=get_init_state_prior(theta,varargin{3:end});
             % take eigenvectors of state priors and set zero wieghts for other
@@ -349,7 +354,12 @@ while it<npar
         disp('SLICE: posterior density is infinite. Reset values at initial ones.')
     end
     if endo_init_state && icheck %(icheck || islow)
-        [theta, fxsim] = draw_init_state_from_smoother([false 1],sampler_options,theta,fxsim,thetaprior,varargin{:});
+        [theta, fxsim, ~, ~, neval_init] = draw_init_state_from_smoother([false 1],sampler_options,theta,fxsim,thetaprior,varargin{:});
+        if ~isempty(index_init_state)
+            neval(index_init_state(1)) = neval(index_init_state(1)) + neval_init;
+        else
+            neval(1) = neval(1) + neval_init;
+        end
     end
     if isinf(fxsim) || isnan(fxsim)
         theta(it) = xold;
@@ -399,7 +409,12 @@ end
 if endo_init_state
     % draw initial states
     if draw_endo_init_state_from_smoother
-        [theta, fxsim] = draw_init_state_from_smoother([false 5],sampler_options,theta,fxsim,thetaprior,varargin{:});
+        [theta, fxsim, ~, ~, neval_init] = draw_init_state_from_smoother([false 5],sampler_options,theta,fxsim,thetaprior,varargin{:});
+        if ~isempty(index_init_state)
+            neval(index_init_state(1)) = neval(index_init_state(1)) + neval_init;
+        else
+            neval(1) = neval(1) + neval_init;
+        end
     elseif draw_endo_init_state_with_rotated_slice
         [V, D]=get_init_state_prior(theta,varargin{3:end});
         % take eigenvectors of state priors and set zero wieghts for other

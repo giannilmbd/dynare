@@ -602,6 +602,19 @@ end
 %------------------------------------------------------------------------------
 % 4. Likelihood evaluation
 %------------------------------------------------------------------------------
+if isfield(options_,'likelihood_base_value') && not(isempty(options_.likelihood_base_value)) && options_.estimate_initial_states_endogenous_prior
+    if not(options_.lik_init==2 && options_.Harvey_scale_factor==0)
+        error('Init state endogenous prior not supported without conditional likelihood')
+    else
+        [lnpriorendoinitstate, lnpriorinitstate]  = init_state_endogenous_prior(a_0_given_tm0,T,R,Q,xparam1,bayestopt_,options_);
+    end
+    % note lnprior has been already removed!
+    options_.likelihood_base_value    = options_.likelihood_base_value-lnpriorendoinitstate +lnpriorinitstate;
+    if occbin_.status
+        occbin_.info{1} = options_;
+    end
+end
+
 if options_.heteroskedastic_filter
     Q=Qvec;
 end

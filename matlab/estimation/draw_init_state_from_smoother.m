@@ -1,6 +1,6 @@
-function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
+function [xparam1, logpost0, mh_bounds, M_, neval] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
-% [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
+% [xparam1, logpost0, mh_bounds, M_, neval] = draw_init_state_from_smoother(init,sampler_options,xparam1,logpost0,mh_bounds, ...
 %     dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
 % Draws the Kalman filter initial state from the DSGE smoother.
 %
@@ -46,6 +46,7 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
 % - logpost0            [double]        updated log-posterior at returned xparam1.
 % - mh_bounds           [structure]     possibly tightened bounds for initial state parameters.
 % - M_                  [structure]     updated model with endo_initial_state values.
+% - neval               [double]        number of objective function evaluations.
 %
 % SEE ALSO
 %   get_init_state_prior - computes Pstar-based constraints for initial-state consistency.
@@ -74,6 +75,8 @@ function [xparam1, logpost0, mh_bounds, M_] = draw_init_state_from_smoother(init
 
 options_.noprint = ~options_.debug;
 
+neval = 0;
+
 if options_.occbin.likelihood.status
     options_.occbin.smoother.status = true;
 end
@@ -87,6 +90,9 @@ if not(islogical(init))
     target_accepted = init(2);
     init=logical(init(1));
 end
+if init
+    target_accepted = 1;
+end
 
 % here I run unconditional smoother, so I need to undo the init state
 % estimation setup and set lik_init = 1
@@ -97,7 +103,7 @@ M_.endo_initial_state.status = false;
 error_flag=0;
 options_.lik_init=1;
 if init
-    [Pstar, Q, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
+    [Pstar, info]=get_pstar(xparam1,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
     if info(1)
         return
     end
@@ -128,7 +134,8 @@ if options_.occbin.smoother.status
         % check first that PKF with latent states provides sensible
         % likelihood
         options_.estimate_initial_states_endogenous_prior=false;
-        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);        
+        logpost2  = -rejection_objective_function(@dsge_likelihood,xparam1,logpost0-10,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+        neval = neval + 1;
         options_.estimate_initial_states_endogenous_prior=true;
         if (logpost0-logpost2)<1.e3
             [~,~,~,~,~,~,~,~,~,~,~,~,~,~,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
@@ -198,6 +205,7 @@ if error_flag==0
                 xproposal=xcheck;
             end
             logpost1 = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+            neval = neval + 1;
             if logpost1<logpost0
                 is_smoothed_state_optimal=false;
             end
@@ -215,11 +223,16 @@ if error_flag==0
     end
     naccepted=0;
     nattempts=0;
+    disp_verbose('draw_init_state_from_smoother: Starting MH sampling for initial states', options_.debug);
     while naccepted<target_accepted && nattempts<10
         niter = 0;
         nattempts = nattempts+1;
+        disp_verbose(sprintf('draw_init_state_from_smoother: Outer loop (variance scaling attempt) - attempt %d/10 (%.1f%%), accepted %d/%d (%.1f%%)', nattempts, 100*nattempts/10, naccepted, target_accepted, 100*naccepted/target_accepted), options_.debug);
         while naccepted<target_accepted && niter<20
             niter = niter+1;
+            if mod(niter, 10) == 0
+                disp_verbose(sprintf('draw_init_state_from_smoother:   MH iteration - iteration %d/20 (%.1f%%)', niter, 100*niter/20), options_.debug);
+            end
             new_draw_out_of_bounds= true;
             icount = 0;
             while new_draw_out_of_bounds && icount<10
@@ -252,19 +265,24 @@ if error_flag==0
                 xproposal=xcheck;
             end
             if init
+                naccepted = 1;
                 xparam1=xproposal;
+                disp_verbose(sprintf('draw_init_state_from_smoother initialization:     ACCEPTED - accepted %d/%d (%.1f%%)', naccepted, target_accepted, 100*naccepted/target_accepted), options_.debug);
                 break
             end
             lnrand = log(rand);
             if fast_likelihood_evaluation_for_rejection
                 fval=lnrand+logpost0-10;
                 logpost1  = -rejection_objective_function(@dsge_likelihood,xproposal,fval,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                neval = neval + 1;
                 if (logpost1 >= fval)
                     logcheck = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                    neval = neval + 1;
                     logpost1 = logcheck;
                 end
             else
                 logpost1 = -dsge_likelihood(xproposal,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info);
+                neval = neval + 1;
             end
             if logpost1<logpost0
                 r = logpost1-logpost0;
@@ -283,6 +301,7 @@ if error_flag==0
             if accepted
                 logpost0 = logpost1;
                 naccepted = naccepted+1;
+                disp_verbose(sprintf('draw_init_state_from_smoother:     ACCEPTED - accepted %d/%d (%.1f%%)', naccepted, target_accepted, 100*naccepted/target_accepted), options_.debug);
                 M_.endo_initial_state.values(dr.state_var) = xparam1(IB);
                 store_endo_initial_state = M_.endo_initial_state;
                 if options_.estimate_initial_states_endogenous_prior && logpostSMO<logpost0
@@ -305,6 +324,9 @@ if error_flag==0
             StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;
         end
     end
+    if naccepted < target_accepted
+        disp_verbose(sprintf('draw_init_state_from_smoother: WARNING - MH sampling terminated without reaching acceptance criterion - accepted %d/%d (%.1f%%), attempts %d/10\n', naccepted, target_accepted, 100*naccepted/target_accepted, nattempts), options_.debug);
+    end
 end
 if not(init)
     if isstruct(mh_bounds)
@@ -312,7 +334,7 @@ if not(init)
         mh_bounds.lb(IB)= xparam1(IB);
         mh_bounds.ub(IB)= xparam1(IB);
     end
-    disp_verbose(['naccepted=' int2str(naccepted) '| niter=' int2str(niter) '| nattempts=' int2str(nattempts)],options_.debug)
+    disp_verbose(['draw_init_state_from_smoother: Final - accepted=' int2str(naccepted) ' | iterations=' int2str(niter) ' | attempts=' int2str(nattempts)],options_.debug)
 end
 
 %% Local helper function

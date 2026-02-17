@@ -32,7 +32,7 @@ function [lnpriorendoinitstate, lnpriorinitstate] = init_state_endogenous_prior(
 % SEE ALSO
 %   get_init_state_prior - derives the Pstar subspace (UP, XP) used similarly.
 
-% Copyright Â© 2024-2026 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -53,9 +53,8 @@ Pstar=lyapunov_solver(T,R,Q,options_);
 
 [UP,XP] = svd(0.5*(Pstar(bayestopt_.mf0,bayestopt_.mf0)+Pstar(bayestopt_.mf0,bayestopt_.mf0)'));
 isp = find(diag(XP)>options_.kalman_tol);
-if length(isp)>rank(Q)
-    isp = isp(1:rank(Q));
-end
+dd=diag(XP(isp,isp));
+isp = isp(1:sum((dd./dd(1))>eps));
 ns = size(XP,1);
 isn=length(isp)+1:ns;
 UPN = UP(:,isn);
