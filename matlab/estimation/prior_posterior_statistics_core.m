@@ -302,7 +302,7 @@ for b=fpar:B
                     niter=0;
                     while error_indicator && niter<10
                         niter=niter+1;
-                        M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat01;
+                        M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat01 + SteadyState(oo_.dr.state_var);
                         [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
                             occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
                         if oo_.occbin.smoother.error_flag(1)

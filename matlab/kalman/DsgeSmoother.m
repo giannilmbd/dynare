@@ -296,7 +296,7 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
     else
         if options_.lik_init==2 && options_.Harvey_scale_factor==0
             a_initial=[a_initial T*a_initial]; %set state prediction for first Kalman step;
-            Pstar = cat(3,Pstar*0, R1*Q*R1');
+            Pstar = cat(3,Pstar*0, R1*Q(:,:,1)*R1');
         else
             a_initial=T*a_initial; %set state prediction for first Kalman step;
         end
@@ -375,7 +375,7 @@ if kalman_algo == 2 || kalman_algo == 4
     if not(options_.occbin.smoother.status) % && options_.occbin.smoother.first_period_occbin_update==1)
         if options_.lik_init==2 && options_.Harvey_scale_factor==0
             a_initial=[a_initial ST*a_initial]; %set state prediction for first Kalman step;
-            Pstar = cat(3,Pstar, R1*Q*R1');
+            Pstar = cat(3,Pstar, R1*Q(:,:,1)*R1');
         else
     a_initial=ST*a_initial; %set state prediction for first Kalman step;
         end
