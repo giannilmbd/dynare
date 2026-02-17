@@ -2605,7 +2605,7 @@ blocks.
     The block should contain one or more occurrences of the following
     group of three lines::
 
-      var VARIABLE_NAME;
+      var EXOGENOUS_NAME;
       periods INTEGER[:INTEGER] | DATE[:DATE] [[,] INTEGER[:INTEGER] | DATE[:DATE]]...;
       values DOUBLE | (EXPRESSION)  [[,] DOUBLE | (EXPRESSION) ]...;
 
