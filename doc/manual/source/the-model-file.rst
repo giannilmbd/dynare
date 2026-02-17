@@ -87,6 +87,8 @@ observed:
 * VARIABLE_NAME (sometimes VAR_NAME) indicates a variable name
   starting with an alphabetical character and can’t contain:
   ``()+-\*/^=!;:@#.`` or accentuated characters;
+* ENDOGENOUS_NAME indicates an endogenous variable name
+* EXOGENOUS_NAME indicates an exogenous variable name
 * PARAMETER_NAME (sometimes PARAM_NAME) indicates a parameter name
   starting with an alphabetical character and can’t contain:
   ``()+-\*/^=!;:@#.`` or accentuated characters;
