@@ -1097,7 +1097,11 @@ The dseries class
         containing the variable names. The first column may contain date
         information that must correspond to a valid date format recognized
         by Dynare. If such date information is specified in the first column,
-        its header name must be left empty.
+        its header name must be left empty. Also note that dates should all be
+        of the same frequency (years, months…) and form a consecutive sequence
+        without holes (*e.g.* if the second row of the file corresponds to
+        ``2025Q1``, then the third row has to be ``2025Q2``, the fourth
+        ``2025Q3``, and so on).
 
     .. construct:: dseries (DATA_MATRIX[,INITIAL_DATE[,LIST_OF_NAMES[,TEX_NAMES]]])
                    dseries (DATA_MATRIX[,RANGE_OF_DATES[,LIST_OF_NAMES[,TEX_NAMES]]])
