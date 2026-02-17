@@ -7069,6 +7069,10 @@ Data treatment options
 
             estimation(datafile='../fsdat_simul.mat',...);
 
+       When using the ``.csv``, ``.xls`` or ``.xls`` format, it is possible to
+       specify dates in the first column of the file (as described in the
+       :class:`dseries` constructor that takes a filename).
+
        The ``datafile`` option is mandatory unless a :comm:`data`
        command is present.
 
