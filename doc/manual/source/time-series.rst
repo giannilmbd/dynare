@@ -174,7 +174,7 @@ The dates class
 
     :arg freq: equal to 1, 2, 4, 12 or 365 (resp. for annual, bi-annual, quarterly,
                monthly, or daily dates).
-    :arg time: a ``n*1`` array of integers, the number of periods since year 0 ().
+    :arg time: a ``n*1`` array of integers, the number of periods since year 0.
 
     Each member is private, one can display the content of a member
     but cannot change its value directly. Note also that it is not
