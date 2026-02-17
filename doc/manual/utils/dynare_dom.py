@@ -266,15 +266,14 @@ class DynSimpleObject(ObjectDescription):
 
 class MatlabVar(DynSimpleObject):
     display_prefix = 'MATLAB/Octave variable: '
-    allow_nesting = False
 
-class Operator(MatlabVar):
+class Operator(DynSimpleObject):
     display_prefix = 'Operator: '
 
-class Constant(MatlabVar):
+class Constant(DynSimpleObject):
     display_prefix = 'Constant: '
 
-class Option(MatlabVar):
+class Option(DynSimpleObject):
     display_prefix = None
 
 ############## Cross-referencing ####################
