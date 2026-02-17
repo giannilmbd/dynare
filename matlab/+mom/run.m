@@ -298,7 +298,7 @@ if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_meth
     end
 end
 % check for calibrated covariances before updating parameters
-estim_params_ = check_for_calibrated_covariances(estim_params_,M_);
+estim_params_ = check_for_calibrated_covariances(estim_params_,M_,options_mom_.varobs_id);
 
 % checks on parameter calibration and initialization
 xparam_calib = get_all_parameters(estim_params_,M_); % get calibrated parameters
