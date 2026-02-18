@@ -178,7 +178,7 @@ while notsteady && t<=last %loop over t
             lik(s,i) = log(Fi) + (prediction_error*prediction_error)/Fi + l2pi; %Top equation p. 175 in DK (2012)
             if analytic_derivation
                 if analytic_derivation==2
-                    [Da,DP,DLIKt,D2a,D2P, Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,D2a,D2Yss,D2P);
+                    [Da,DP,DLIKt,D2a,D2P, Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,D2a,D2Yss,squeeze(D2H(d_index(i),:,:)),D2P);
                 else
                     [Da,DP,DLIKt,Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady);
                 end
@@ -239,7 +239,7 @@ if t <= last
     if analytic_derivation
         if analytic_derivation==2
             [tmp, tmp2] = univariate_kalman_filter_ss(Y,t,last,a,P,kalman_tol,T,H,Z,pp,Zflag, ...
-                                                      analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2P);
+                                                      analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2H,D2P);
         else
             [tmp, tmp2] = univariate_kalman_filter_ss(Y,t,last,a,P,kalman_tol,T,H,Z,pp,Zflag, ...
                                                       analytic_derivation,Da,DT,DYss,DP,DH,asy_hess);

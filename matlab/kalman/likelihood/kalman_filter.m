@@ -180,7 +180,7 @@ while notsteady && t<=last
         tmp = (a+K*v);
         if analytic_derivation
             if analytic_derivation==2
-                [Da,DP,DLIKt,D2a,D2P, Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady,D2a,D2Yss,D2T,D2Om,D2P);
+                [Da,DP,DLIKt,D2a,D2P, Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady,D2a,D2Yss,D2T,D2Om,D2H,D2P);
             else
                 [Da,DP,DLIKt,Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady);
             end

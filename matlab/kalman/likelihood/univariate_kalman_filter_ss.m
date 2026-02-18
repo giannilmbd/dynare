@@ -1,4 +1,4 @@
-function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2P)
+function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2H,D2P)
 % Computes the log-likelihood of a stationary state space model (steady-state univariate Kalman filter).
 
 %
@@ -16,7 +16,7 @@ function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,
 % - Zflag                   [integer]     0 if Z is an index vector; 1 if Z is a [pp x mm] matrix
 % - analytic_derivation     [integer]     derivative mode: 0 (none), 1 (score), 2 (score and Hessian), or asymptotic-Hessian mode
 % - Da, DT, DYss, DP, DH    [array]       first-derivative objects used when analytic_derivation > 0
-% - D2a, D2T, D2Yss, D2P    [array]       second-derivative objects used when analytic_derivation == 2
+% - D2a, D2T, D2Yss, D2H, D2P    [array]       second-derivative objects used when analytic_derivation == 2
 %
 % OUTPUTS
 % - LIK                     [double|cell] minus log-likelihood; if analytic_derivation>0, returns cell array {LIK,DLIK[,Hess]}
@@ -107,7 +107,7 @@ while t<=last
             likk(s,i) = log(Fi) + prediction_error*prediction_error/Fi + l2pi;
             if analytic_derivation
                 if analytic_derivation==2
-                    [Da,DPP,DLIKt,D2a,D2PP, Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,D2a,D2Yss,D2PP);
+                    [Da,DPP,DLIKt,D2a,D2PP, Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,D2a,D2Yss,squeeze(D2H(i,:,:)),D2PP);
                 else
                     [Da,DPP,DLIKt,Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0);
                 end

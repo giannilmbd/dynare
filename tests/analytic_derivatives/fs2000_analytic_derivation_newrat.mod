@@ -59,18 +59,33 @@ end;
 shocks;
 var e_a; stderr 0.014;
 var e_m; stderr 0.005;
+var gy_obs= 0.005^2;
+var gp_obs= 0.005^2;
+corr gp_obs, gy_obs= 0.05;
 end;
 
-stoch_simul(order=1,periods=200, irf=0,nomoments,noprint);
+stoch_simul(order=1,periods=1000, irf=0,nomoments,noprint);
+
 send_endogenous_variables_to_workspace;
+% stoch_simul does not add measurement error; draw it from M_.H
+% varobs order: gp_obs (1), gy_obs (2)
+verbatim;
+T = length(gy_obs);
+me = chol(M_.H, 'lower') * randn(size(M_.H, 1), T);
+gp_obs = gp_obs + me(1,:)';
+gy_obs = gy_obs + me(2,:)';
+end;
 save('my_data.mat','gp_obs','gy_obs');
 
+
 estimated_params;
-alp, 0.356;
-rho, 0.129;
-psi, 0.65;
-stderr e_a, 0.035449, 0, inf;
-stderr e_m, 0.008862, 0, inf;
+alp, 0.33;
+stderr e_a, 0.02, 0, inf;
+stderr e_m, 0.02, 0, inf;
+corr e_a, e_m, 0 ,-1, 1;
+stderr gy_obs, 0.005, 0, inf;
+stderr gp_obs, 0.005, 0, inf;
+corr gp_obs, gy_obs, 0.05, -1, 1;
 end;
 
 varobs gp_obs gy_obs;
