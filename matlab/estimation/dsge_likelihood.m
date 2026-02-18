@@ -494,11 +494,6 @@ if analytic_derivation
         else
             indpcorr=[];
         end
-        old_order = options_.order;
-        if options_.order > 1%not sure whether this check is necessary
-            options_.order = 1; fprintf('Reset order to 1 for analytical parameter derivatives.\n');
-        end
-        old_analytic_derivation_mode = options_.analytic_derivation_mode;
         options_.analytic_derivation_mode = kron_flag;
         
         % Compute perturbation parameter derivatives (first and optionally second order)
@@ -520,8 +515,6 @@ if analytic_derivation
             D2Yss = DERIVS.d2Yss(iv,:,:);
         end
         
-        options_.order = old_order; %make sure order is reset (not sure if necessary)
-        options_.analytic_derivation_mode = old_analytic_derivation_mode;%make sure analytic_derivation_mode is reset (not sure if necessary)
     else
         DT = derivatives_info.DT(iv,iv,:);
         DOm = derivatives_info.DOm(iv,iv,:);
