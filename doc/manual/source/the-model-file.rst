@@ -13128,9 +13128,9 @@ Optimal Simple Rules (OSR)
         Different ways to compute derivatives either analytically or numerically.
         Possible values are:
 
-            * ``0``: efficient sylvester equation method to compute
+            * ``0``: efficient Sylvester equation method to compute
               analytical derivatives
-            * ``1``: kronecker products method to compute analytical
+            * ``1``: Kronecker products method to compute analytical
               derivatives (only at order=1)
             * ``-1``: numerical two-sided finite difference method
               to compute all identification Jacobians (numerical tolerance
