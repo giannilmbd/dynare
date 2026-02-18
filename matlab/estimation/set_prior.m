@@ -74,7 +74,12 @@ if estim_params_.nvx % estimated stderr parameters for structural shocks (ordere
     bayestopt_.p3 = [ bayestopt_.p3; estim_params_.var_exo(:,8) ]; %take generalized distribution into account
     bayestopt_.p4 = [ bayestopt_.p4; estim_params_.var_exo(:,9) ]; %take generalized distribution into account
     bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.var_exo(:,10) ];
-    bayestopt_.name = [ bayestopt_.name; M_.exo_names(estim_params_.var_exo(:,1)) ];
+    baseid = length(bayestopt_.name);
+    bayestopt_.name = [bayestopt_.name; cell(estim_params_.nvx, 1)];
+    for i = 1:estim_params_.nvx
+        bayestopt_.name(baseid+i) = {sprintf('stderr %s', ...
+                                             M_.exo_names{estim_params_.var_exo(i,1)})};
+    end
 end
 
 if estim_params_.nvn % estimated stderr parameters for measurement errors (ordered second in xparam1)
@@ -84,12 +89,16 @@ if estim_params_.nvn % estimated stderr parameters for measurement errors (order
         M_.H = zeros(nvarobs,nvarobs);
         M_.Correlation_matrix_ME = eye(nvarobs);
     end
+    baseid = length(bayestopt_.name);
+    bayestopt_.name = [bayestopt_.name; cell(estim_params_.nvn, 1)];
     for i=1:estim_params_.nvn
         obsi_ = strmatch(M_.endo_names{estim_params_.var_endo(i,1)}, options_.varobs, 'exact');
         if isempty(obsi_)
             error(['The variable ' M_.endo_names{estim_params_.var_endo(i,1)} ' has to be declared as observable since you assume a measurement error on it.'])
         end
         estim_params_.nvn_observable_correspondence(i,1)=obsi_;
+        bayestopt_.name(baseid+i) = {sprintf('stderr %s', ...
+                                             options_.varobs{obsi_})};
     end
     xparam1 = [xparam1; estim_params_.var_endo(:,2)];
     ub = [ub; estim_params_.var_endo(:,4)];
@@ -100,7 +109,6 @@ if estim_params_.nvn % estimated stderr parameters for measurement errors (order
     bayestopt_.p3 = [ bayestopt_.p3; estim_params_.var_endo(:,8)]; %take generalized distribution into account
     bayestopt_.p4 = [ bayestopt_.p4; estim_params_.var_endo(:,9)]; %take generalized distribution into account
     bayestopt_.jscale = [ bayestopt_.jscale; estim_params_.var_endo(:,10)];
-    bayestopt_.name = [ bayestopt_.name; options_.varobs(estim_params_.nvn_observable_correspondence)];
 end
 
 if estim_params_.ncx % estimated corr parameters for structural shocks (ordered third in xparam1)
