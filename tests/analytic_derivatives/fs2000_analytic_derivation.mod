@@ -111,7 +111,7 @@ estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/f
 fval_ML_1=oo_.likelihood_at_initial_parameters;
 estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=500,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_ML_2=oo_.likelihood_at_initial_parameters;
-options_.analytic_derivation=0;
+options_.analytic_derivation=false;
 estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',kalman_algo=1,datafile=my_data,nobs=500,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_ML_3=oo_.likelihood_at_initial_parameters;
 
@@ -148,7 +148,7 @@ estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/f
 fval_Bayes_1=oo_.likelihood_at_initial_parameters;
 estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=500,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_Bayes_2=oo_.likelihood_at_initial_parameters;
-options_.analytic_derivation=0;
+options_.analytic_derivation=false;
 estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',kalman_algo=1,datafile=my_data,nobs=500,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_Bayes_3=oo_.likelihood_at_initial_parameters;
 

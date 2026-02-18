@@ -218,7 +218,7 @@ end
 
 % Evaluate the likelihood.
 ana_deriv = options_.analytic_derivation;
-options_.analytic_derivation=0;
+options_.analytic_derivation=false;
 if ~isequal(options_.mode_compute,11) || ...
         (isequal(options_.mode_compute,11) && isequal(options_.order,1))
     %shut off potentially automatic switch to diffuse filter for the

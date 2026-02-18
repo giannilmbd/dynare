@@ -413,7 +413,11 @@ if options_.analytic_derivation
     if options_.lik_init == 3
         error('analytic derivation is incompatible with diffuse filter')
     end
-    options_.analytic_derivation = 1;
+    % Validate analytic_Hessian string option
+    valid_hess_options = {'', 'full', 'opg', 'asymptotic'};
+    if ~ismember(options_.analytic_Hessian, valid_hess_options)
+        error('options_.analytic_Hessian must be one of: '''', ''full'', ''opg'', ''asymptotic''');
+    end
     if estim_params_.np || isfield(options_,'identification_check_endogenous_params_with_no_prior')
         % check if steady state changes param values
         M_local=M_;

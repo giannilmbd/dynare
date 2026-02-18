@@ -293,7 +293,9 @@ if info(1) == 0 %no errors in solution
                     options_.kalman_algo         = 1;
                 end
                 analytic_derivation              = options_.analytic_derivation;
-                options_.analytic_derivation     = -2; %this sets asy_Hess=1 in dsge_likelihood.m                
+                analytic_Hessian                 = options_.analytic_Hessian;
+                options_.analytic_derivation     = true;
+                options_.analytic_Hessian        = 'asymptotic'; %this sets asy_Hess in Kalman filters                
                 [info, oo_, options_, M_] = stoch_simul(M_, options_, oo_, options_.varobs);
                 dataset_ = dseries(oo_.endo_simul(options_.varobs_id,100+1:end)',dates('1Q1'), options_.varobs); %get information on moments
                 % set info on missing data
@@ -311,6 +313,7 @@ if info(1) == 0 %no errors in solution
                 [~, info, ~, ~, AHess] = dsge_likelihood(params', dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr, oo_.steady_state,oo_.exo_steady_state, oo_.exo_det_steady_state, derivatives_info);
                     %note that for the order of parameters in AHess we have: stderr parameters come first, corr parameters second, model parameters third. the order within these blocks corresponds to the order specified in the estimated_params block
                 options_.analytic_derivation = analytic_derivation; %reset option
+                options_.analytic_Hessian = analytic_Hessian; %reset option
                 AHess = -AHess; %take negative of Hessian
                 if min(eig(AHess))<-tol_rank
                     error('identification.analysis: Analytic Hessian is not positive semi-definite!')

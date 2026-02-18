@@ -428,7 +428,8 @@ options_.Harvey_scale_factor = 10;
 options_.heteroskedastic_filter = false;
 options_.MaxNumberOfBytes = 1e8;
 options_.MaximumNumberOfMegaBytes = 111;
-options_.analytic_derivation = 0; % Not a boolean, can also take values -1 or 2
+options_.analytic_derivation = false; % Boolean: whether to compute analytic score (gradient) of likelihood
+options_.analytic_Hessian = ''; % String: '', 'full', 'opg', 'asymptotic' - how to compute Hessian when analytic_derivation=true
 options_.analytic_derivation_mode = 0;
 options_.bayesian_irf = false;
 options_.bayesian_th_moments = 0;

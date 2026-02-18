@@ -1,4 +1,4 @@
-function [LIK, likk, a] = kalman_filter_ss(Y,start,last,a,T,K,iF,log_dF,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,D2a,D2T,D2Yss)
+function [LIK, likk, a] = kalman_filter_ss(Y,start,last,a,T,K,iF,log_dF,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,analytic_Hessian,D2a,D2T,D2Yss)
 % Computes the log-likelihood of a stationary state space model (steady-state Kalman filter).
 
 %
@@ -14,13 +14,14 @@ function [LIK, likk, a] = kalman_filter_ss(Y,start,last,a,T,K,iF,log_dF,Z,pp,Zfl
 % - Z                       [matrix]      [pp x mm] measurement matrix, or index vector when Zflag=0
 % - pp                      [integer]     number of observed variables
 % - Zflag                   [integer]     0 if Z is an index vector; 1 if Z is a [pp x mm] matrix
-% - analytic_derivation     [integer]     derivative mode: 0 (none), 1 (score), 2 (score and Hessian), or asymptotic-Hessian mode
-% - Da, DT, DYss            [array]       first-derivative objects used when analytic_derivation > 0
-% - D2a, D2T, D2Yss         [array]       second-derivative objects used when analytic_derivation == 2
+% - analytic_derivation     [logical]     whether to compute analytic derivatives (true/false)
+% - Da, DT, DYss            [array]       first-derivative objects used when analytic_derivation is true
+% - analytic_Hessian        [string]      Hessian mode: '' (none), 'full' (analytic), 'opg' (outer product), 'asymptotic'
+% - D2a, D2T, D2Yss         [array]       second-derivative objects used when analytic_Hessian=='full'
 %
 % OUTPUTS
-% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation>0, returns cell array {LIK,DLIK[,Hess]}
-% - likk                    [vector|cell] [smpl x 1] period-wise log-likelihood contributions; if analytic_derivation>0, returns {likk,dlikk}
+% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation is true, returns cell array {LIK,DLIK[,Hess]}
+% - likk                    [vector|cell] [smpl x 1] period-wise log-likelihood contributions; if analytic_derivation is true, returns {likk,dlikk}
 % - a                       [vector]      [mm x 1] filtered state estimate for next period, E_T(alpha_{T+1})
 %
 % This function is called by: kalman_filter
@@ -53,27 +54,28 @@ t    = start;              % Initialization of the time index.
 likk = zeros(smpl,1);      % Initialization of the vector gathering the densities.
 LIK  = Inf;                % Default value of the log likelihood.
 notsteady = 0;
-asy_hess=0;
 if nargin<12
-    analytic_derivation = 0;
+    analytic_derivation = false;
+end
+if nargin<16
+    analytic_Hessian = '';
 end
 
-if  analytic_derivation == 0
+% Extract Hessian mode flags from string
+full_Hess = strcmp(analytic_Hessian, 'full');
+asy_hess = strcmp(analytic_Hessian, 'asymptotic');
+
+if ~analytic_derivation
     DLIK=[];
     Hess=[];
 else
     k = size(DT,3);                                 % number of structural parameters
     DLIK  = zeros(k,1);                             % Initialization of the score.
     dlikk = zeros(smpl,k);
-    if analytic_derivation==2
+    if full_Hess || asy_hess
         Hess  = zeros(k,k);                             % Initialization of the Hessian
     else
-        asy_hess=D2a;
-        if asy_hess
-            Hess  = zeros(k,k);                             % Initialization of the Hessian
-        else
-            Hess=[];
-        end
+        Hess=[];
     end
 end
 
@@ -85,13 +87,13 @@ while t <= last
     end
     tmp = (a+K*v);
     if analytic_derivation
-        if analytic_derivation==2
+        if full_Hess
             [Da,~,DLIKt,D2a,~, Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,[],iF,Da,DYss,DT,[],[],[],notsteady,D2a,D2Yss,D2T,[],[],[]);
         else
             [Da,~,DLIKt,Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,[],iF,Da,DYss,DT,[],[],[],notsteady);
         end
         DLIK = DLIK + DLIKt;
-        if analytic_derivation==2 || asy_hess
+        if full_Hess || asy_hess
             Hess = Hess + Hesst;
         end
         dlikk(t-start+1,:)=DLIKt;
@@ -114,12 +116,12 @@ if analytic_derivation
     DLIK = DLIK/2;
     likk = {likk, dlikk};
 end
-if analytic_derivation==2 || asy_hess
-    if asy_hess==0
+if full_Hess || asy_hess
+    if ~asy_hess
         Hess = Hess + tril(Hess,-1)';
     end
     Hess = -Hess/2;
     LIK={LIK,DLIK,Hess};
-elseif analytic_derivation==1
+elseif analytic_derivation
     LIK={LIK,DLIK};
 end

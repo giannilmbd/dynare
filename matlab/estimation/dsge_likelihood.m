@@ -82,6 +82,7 @@ end
 
 % Set flag related to analytical derivatives.
 analytic_derivation = options_.analytic_derivation;
+analytic_Hessian = options_.analytic_Hessian;
 
 if analytic_derivation
     if options_.loglinear
@@ -93,7 +94,8 @@ if analytic_derivation
 end
 
 if nargout==1
-    analytic_derivation=0;
+    analytic_derivation = false;
+    analytic_Hessian = '';
 end
 
 %------------------------------------------------------------------------------
@@ -465,11 +467,11 @@ if analytic_derivation
     else
         derivatives_info_input = derivatives_info;
     end
-    [analytic_deriv_info, analytic_derivation, no_DLIK, full_Hess, asy_Hess, outer_product_gradient, DLIK, DH] = ...
-        compute_analytic_derivation_info(analytic_derivation, estim_params_, dr, derivatives_info_input, ...
+    [analytic_deriv_info, analytic_derivation, no_DLIK, DLIK, DH] = ...
+        compute_analytic_derivation_info(analytic_derivation, analytic_Hessian, estim_params_, dr, derivatives_info_input, ...
         M_, options_, endo_steady_state, exo_steady_state, exo_det_steady_state, xparam1, H, T, Pstar);
 else
-    analytic_deriv_info={0};
+    analytic_deriv_info={false, [], [], [], [], [], ''};
 end
 
 %------------------------------------------------------------------------------
@@ -577,7 +579,7 @@ if ((kalman_algo==1) || (kalman_algo==3)) || (kalman_algo == 5) % Multivariate K
     else
         if options_.lik_init==3
             LIK = LIK + dLIK;
-            if analytic_derivation==0 && nargout>3
+            if ~analytic_derivation && nargout>3
                 if ~singular_diffuse_filter
                     lik = [dlik; lik];
                 else
@@ -596,8 +598,8 @@ if (kalman_algo==2) || (kalman_algo==4)
         mmm = mm;
         if analytic_derivation
             DH = zeros(pp,length(xparam1));
-            if full_Hess
-                analytic_deriv_info{10} = zeros(pp,length(xparam1),length(xparam1));
+            if strcmp(analytic_Hessian, 'full')
+                analytic_deriv_info{11} = zeros(pp,length(xparam1),length(xparam1));
             end
         end
     else
@@ -610,14 +612,14 @@ if (kalman_algo==2) || (kalman_algo==4)
                     tmp(j,:)=DH(j,j,:);
                 end
                 DH=tmp;
-                if full_Hess
-                    D2H_full = analytic_deriv_info{10};
+                if strcmp(analytic_Hessian, 'full')
+                    D2H_full = analytic_deriv_info{11};
                     nk = size(D2H_full,3);
                     D2H_uni = zeros(pp,nk,nk);
                     for j=1:pp
                         D2H_uni(j,:,:) = D2H_full(j,j,:,:);
                     end
-                    analytic_deriv_info{10} = D2H_uni;
+                    analytic_deriv_info{11} = D2H_uni;
                 end
             end
         else
@@ -675,32 +677,34 @@ if (kalman_algo==2) || (kalman_algo==4)
                     % DH for univariate becomes zero since H1 = 0
                     DH = zeros(pp, nk);
 
-                    if full_Hess
-                        D2H_full = analytic_deriv_info{10};
-                        mmm_aug = mm + pp;
-                        ncols = size(analytic_deriv_info{7}, 2);
+                    if strcmp(analytic_Hessian, 'full')
+                        D2H_full = analytic_deriv_info{11};
+                        % Get dimensions of original state space from D2T size
+                        D2T_orig = analytic_deriv_info{8};
+                        ncols = size(D2T_orig, 2);
+                        mm_orig = sqrt(size(D2T_orig, 1));  % D2T is vec(T), so rows = mm^2
+                        mmm_aug = mm_orig + pp;
 
-                        % D2T: vec format. Map mm x mm positions into mmm_aug x mmm_aug.
-                        D2T_orig = analytic_deriv_info{7};
-                        [r_grid, c_grid] = ndgrid(1:mm, 1:mm);
+                        % D2T: vec format. Map mm_orig x mm_orig positions into mmm_aug x mmm_aug.
+                        [r_grid, c_grid] = ndgrid(1:mm_orig, 1:mm_orig);
                         aug_vec_idx = (c_grid(:)-1)*mmm_aug + r_grid(:);
                         D2T_aug = zeros(mmm_aug^2, ncols);
                         D2T_aug(aug_vec_idx,:) = D2T_orig;
-                        analytic_deriv_info{7} = D2T_aug;
+                        analytic_deriv_info{8} = D2T_aug;
 
                         % D2Yss
-                        D2Yss_orig = analytic_deriv_info{8};
+                        D2Yss_orig = analytic_deriv_info{9};
                         D2Yss_aug = zeros(mmm_aug, size(D2Yss_orig,2), size(D2Yss_orig,3));
-                        D2Yss_aug(1:mm, :, :) = D2Yss_orig;
-                        analytic_deriv_info{8} = D2Yss_aug;
+                        D2Yss_aug(1:mm_orig, :, :) = D2Yss_orig;
+                        analytic_deriv_info{9} = D2Yss_aug;
 
                         % D2Om and D2P: vech format. Build index maps.
                         idx_vech_aug = dyn_unvech(1:mmm_aug*(mmm_aug+1)/2);
-                        orig_vech_idx = dyn_vech(idx_vech_aug(1:mm,1:mm));
-                        H_vech_idx = dyn_vech(idx_vech_aug(mm+1:end,mm+1:end));
+                        orig_vech_idx = dyn_vech(idx_vech_aug(1:mm_orig,1:mm_orig));
+                        H_vech_idx = dyn_vech(idx_vech_aug(mm_orig+1:end,mm_orig+1:end));
 
                         % D2Om
-                        D2Om_orig = analytic_deriv_info{9};
+                        D2Om_orig = analytic_deriv_info{10};
                         D2Om_aug = zeros(mmm_aug*(mmm_aug+1)/2, ncols);
                         D2Om_aug(orig_vech_idx,:) = D2Om_orig;
                         jcount = 0;
@@ -713,10 +717,10 @@ if (kalman_algo==2) || (kalman_algo==4)
                                 end
                             end
                         end
-                        analytic_deriv_info{9} = D2Om_aug;
+                        analytic_deriv_info{10} = D2Om_aug;
 
                         % D2P: same augmentation as D2Om
-                        D2P_orig = analytic_deriv_info{11};
+                        D2P_orig = analytic_deriv_info{12};
                         D2P_aug = zeros(mmm_aug*(mmm_aug+1)/2, ncols);
                         D2P_aug(orig_vech_idx,:) = D2P_orig;
                         jcount = 0;
@@ -729,10 +733,10 @@ if (kalman_algo==2) || (kalman_algo==4)
                                 end
                             end
                         end
-                        analytic_deriv_info{11} = D2P_aug;
+                        analytic_deriv_info{12} = D2P_aug;
 
                         % D2H for univariate = 0 since H1 = 0
-                        analytic_deriv_info{10} = zeros(pp, nk, nk);
+                        analytic_deriv_info{11} = zeros(pp, nk, nk);
                     end
                 end
             end
@@ -763,7 +767,7 @@ if (kalman_algo==2) || (kalman_algo==4)
     end
     if options_.lik_init==3
         LIK = LIK+dLIK;
-        if analytic_derivation==0 && nargout>3
+        if ~analytic_derivation && nargout>3
             lik = [dlik; lik];
         end
     end
@@ -773,10 +777,10 @@ if analytic_derivation
     if no_DLIK==0
         DLIK = LIK1{2};
     end
-    if full_Hess
+    if strcmp(analytic_Hessian, 'full')
         Hess = -LIK1{3};
     end
-    if asy_Hess
+    if strcmp(analytic_Hessian, 'asymptotic')
         Hess = LIK1{3};
     end
 end
@@ -799,7 +803,7 @@ likelihood = LIK;
 % 5. Adds prior if necessary
 % ------------------------------------------------------------------------------
 if analytic_derivation
-    if full_Hess
+    if strcmp(analytic_Hessian, 'full')
         [lnprior, dlnprior, d2lnprior] = priordens(xparam1,bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7,bayestopt_.p3,bayestopt_.p4);
         Hess = Hess - d2lnprior;
     else
@@ -808,7 +812,7 @@ if analytic_derivation
     if no_DLIK==0
         DLIK = DLIK - dlnprior';
     end
-    if outer_product_gradient
+    if strcmp(analytic_Hessian, 'opg')
         dlik = lik1{2};
         dlik=[- dlnprior; dlik(start:end,:)];
         Hess = dlik'*dlik;
@@ -853,13 +857,13 @@ if options_.prior_restrictions.status
     fval = fval - tmp;
 end
 
-if analytic_derivation==0 && nargout>3
+if ~analytic_derivation && nargout>3
     lik=lik(start:end,:);
     DLIK=[-lnprior; lik(:)];
 end
 
-function [analytic_deriv_info, analytic_derivation, no_DLIK, full_Hess, asy_Hess, outer_product_gradient, DLIK, DH] = ...
-    compute_analytic_derivation_info(analytic_derivation, estim_params_, dr, derivatives_info, ...
+function [analytic_deriv_info, analytic_derivation, no_DLIK, DLIK, DH] = ...
+    compute_analytic_derivation_info(analytic_derivation, analytic_Hessian, estim_params_, dr, derivatives_info, ...
     M_, options_, endo_steady_state, exo_steady_state, exo_det_steady_state, xparam1, H, T, Pstar)
 % Compute analytic derivative information for the Kalman filter.
 % This builds the analytic_deriv_info cell array containing first (and
@@ -868,16 +872,7 @@ function [analytic_deriv_info, analytic_derivation, no_DLIK, full_Hess, asy_Hess
 
 offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
 no_DLIK = 0;
-full_Hess = analytic_derivation==2;
-asy_Hess = analytic_derivation==-2;
-outer_product_gradient = analytic_derivation==-1;
-% Normalize special modes to standard first derivative computation.
-% analytic_derivation modes: 1=first deriv, 2=full Hessian,
-% -1=outer product gradient, -2=asymptotic Hessian.
-% Modes -1 and -2 require first derivatives, so normalize to 1.
-if asy_Hess || outer_product_gradient
-    analytic_derivation = 1;
-end
+full_Hess = strcmp(analytic_Hessian, 'full');
 DLIK = [];
 iv = dr.restrict_var_list;
 if isempty(derivatives_info)
@@ -1134,10 +1129,10 @@ if options_.lik_init==1
         end
     end
 end
-if analytic_derivation==1
-    analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,asy_Hess};
+if full_Hess
+    analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,analytic_Hessian,D2T,D2Yss,D2Om,D2H,D2P};
 else
-    analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P};
+    analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,analytic_Hessian};
 end
 
 function[occbin_options, occbin_filter_state_covariance] = set_occbin_options(options_)
