@@ -96,10 +96,6 @@ if nargout==1
     analytic_derivation=0;
 end
 
-if analytic_derivation
-    kron_flag=options_.analytic_derivation_mode;
-end
-
 %------------------------------------------------------------------------------
 % 1. Get the structural parameters & define penalties
 %------------------------------------------------------------------------------
@@ -494,7 +490,6 @@ if analytic_derivation
         else
             indpcorr=[];
         end
-        options_.analytic_derivation_mode = kron_flag;
         
         % Compute perturbation parameter derivatives (first and optionally second order)
         DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, indpcorr, full_Hess);
