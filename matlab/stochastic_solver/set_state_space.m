@@ -1,5 +1,5 @@
-function [dr, state_var]=set_state_space(dr,M_)
-% [dr, state_var]=set_state_space(dr,M_)
+function [dr, state_var_declaration_order, state_var_struct]=set_state_space(dr,M_)
+% [dr, state_var_declaration_order, state_var_struct]=set_state_space(dr,M_)
 % Computes the DR ordering and inverse ordering.
 %
 % INPUTS
@@ -8,9 +8,11 @@ function [dr, state_var]=set_state_space(dr,M_)
 %
 % OUTPUTS
 % - dr            [struct]    MATLAB's structure describing decision and transition rules.
-% - state_var     [vector]    (optional) Indices of state variables (variables with lags) in
+% - state_var_declaration_order     [vector]    (optional) Indices of state variables (variables with lags) in
 %                             declaration order. See also dyn_first_order_solver.m where state_var
 %                             is computed as [no_both_lag_id, both_id].
+% - state_var_struct [struct] (optional) Structure with fields 'declaration_order' and 'dr_order'
+%                             containing state variables in declaration and DR ordering respectively.
 %
 % CALLED BY
 %   check, cli/prior, discretionary_policy/discretionary_policy_1, ep/extended_path_initialization,
@@ -54,5 +56,12 @@ dr.inv_order_var(dr.order_var) = 1:M_.endo_nbr;
 if nargout > 1
     % State variables: variables that appear at t-1 (predetermined)
     % See also: dyn_first_order_solver.m where state_var is computed as [no_both_lag_id, both_id]
-    state_var = [pred_var(:); both_var(:)]';
+    state_var_declaration_order = [pred_var(:); both_var(:)]';
+end
+
+if nargout > 2
+    % Populate M_.state_var structure with both declaration and DR order
+    state_var_dr_order = dr.inv_order_var(state_var_declaration_order);
+    state_var_struct = struct('declaration_order', state_var_declaration_order, ...
+                              'dr_order', state_var_dr_order);
 end

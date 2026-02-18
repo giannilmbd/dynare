@@ -6016,6 +6016,21 @@ M_.npred + M_.nboth`` such variables. Similarly, one has ``M_.nsfwrd =
 M_.nfwrd + M_.nboth``, and ``M_.ndynamic = M_.nfwrd + M_.nboth +
 M_.npred``.
 
+.. matvar:: M_.state_var
+
+   |br| Structure identifying the state variables of the model (purely
+   backward and mixed variables). It has the following fields:
+
+   .. describe:: M_.state_var.declaration_order
+
+      Vector of numerical indices of the state variables in
+      declaration order. `M_.endo_names(M_.state_var.declaration_order)` gives the names of the state variables.
+
+   .. describe:: M_.state_var.dr_order
+
+      Vector of numerical indices of the state variables in
+      DR-order.
+
 
 First-order approximation
 -------------------------
