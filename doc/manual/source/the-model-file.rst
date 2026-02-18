@@ -92,6 +92,8 @@ observed:
 * PARAMETER_NAME (sometimes PARAM_NAME) indicates a parameter name
   starting with an alphabetical character and can’t contain:
   ``()+-\*/^=!;:@#.`` or accentuated characters;
+* DATABASE_NAME indicates the name of a variable in the MATLAB/Octave workspace
+  that can be used as a source of numeric values for model variables;
 * LATEX_NAME (sometimes TEX_NAME) indicates a valid
   LaTeX expression in math mode (not including the
   dollar signs);
@@ -3692,7 +3694,8 @@ speed-up on large models.
 
     |br| Prepares a perfect foresight simulation, by extracting the
     information in the :bck:`initval`, :bck:`endval`, :bck:`shocks`,
-    :bck:`mshocks` and :bck:`perfect_foresight_controlled_paths` blocks
+    :bck:`mshocks`, :bck:`perfect_foresight_controlled_paths` and
+    :bck:`shock_paths` blocks
     and converting them into simulation paths for exogenous and
     endogenous variables.
 
@@ -3743,7 +3746,8 @@ speed-up on large models.
        computing the transitional dynamics by homotopy). Note that this option
        is implicitly enabled if the terminal condition is already a steady
        state at the point of execution of the ``perfect_foresight_solver``
-       command.
+       command. It is also implicitly enabled if shocks are described using the
+       :bck:`shock_paths` block.
 
     .. option:: endval_steady_nocheck
 
@@ -4646,8 +4650,9 @@ and ``endval`` blocks which are given a special ``learnt_in`` option.
 
     |br| Prepares a perfect foresight simulation with expectation errors, by
     extracting the contents of the :bck:`initval`, :bck:`endval`,
-    :bck:`shocks`, :bck:`mshocks` and :bck:`perfect_foresight_controlled_paths`
-    blocks (the latter four types of blocks typically used with the
+    :bck:`shocks`, :bck:`mshocks`, :bck:`perfect_foresight_controlled_paths`
+    and :bck:`shock_paths`
+    blocks (the latter five types of blocks typically used with the
     ``learnt_in`` option); alternatively, the information about future shocks
     can be given in a CSV file using the ``datafile`` option.
 
@@ -4992,6 +4997,266 @@ that have been left free.
         that constraint. Then, when 2004 arrives, they recompute their plan
         under the assumption that ``c`` will be equal to 1.8 in years 2004 and
         2005 (and again that ``x`` will be endogenized accordingly).
+
+Alternative syntax for specifying deterministic shocks
+------------------------------------------------------
+
+.. block:: shock_paths ;
+           shock_paths(OPTIONS...);
+
+    |br| This block provides an alternative way to describe shocks in a
+    deterministic setup. It can be used to provide the same information as in
+    the :bck:`shocks`, :bck:`mshocks`, :bck:`endval` and
+    :bck:`perfect_foresight_controlled_paths` block (and cannot be used in
+    conjunction with any of these, since it then supersedes them).
+
+    In addition to providing a single unified interface for describing
+    temporary shocks, permanent shocks and controlled shocks, this block offers
+    an extended syntax when describing the value of shocks: it is possible to
+    refer to the value of variables from the :bck:`initval` block, from a
+    previous simulation period, from external databases, or from a previous
+    informational period (in the case of a simulation with expectation errors).
+
+    Two types of stanzas can appear within the block: shocks on exogenous
+    variables (temporary and/or permanent), and controlled shocks as in
+    :bck:`perfect_foresight_controlled_paths`.
+
+    Shocks on exogenous variables are described by stanzas of three lines of
+    the following form::
+
+      var EXOGENOUS_NAME;
+      periods INTEGER[:INTEGER|end] | DATE[:DATE|end] | end [, INTEGER[:INTEGER|end] | DATE[:DATE|end] | end]...;
+      values EXPRESSION [, EXPRESSION ]...;
+
+    Such a stanza describes a series of shocks on a given exogenous variable.
+    There must be as many entries in the ``periods`` statement as there are in
+    the ``values`` statement. Each entry gives the value of the exogenous
+    variable over a single period or a range of periods (the latter if the
+    syntax with a colon is used). Periods can be specified eiher as integers,
+    as dates, or with the keyword ``end``; the latter is used to impose a
+    terminal condition on the variable, and thus describes a permanent shock.
+
+    As soon as some period is specified using the ``end`` keyword, the
+    ``shock_paths`` block is considered as describing a permanent shock
+    (possibly in combination with other types of shocks). This in turn implies
+    that the :opt:`endval_steady` option of the
+    :comm:`perfect_foresight_solver` command will be implicitly enabled, so
+    that the terminal condition will be a steady state (also note that the
+    ``shock_paths`` offers no way of specifying the terminal condition for
+    endogenous variables, contrary to the :bck:`endval` block; and if used in
+    combination with the
+    :comm:`perfect_foresight_with_expectation_errors_solver` command, there is
+    no change in behaviour, since the latter command always recomputes the
+    terminal steady state).
+
+    Expressions in the ``values`` statement can be arbitrary algebraic
+    expressions as in the :bck:`model` block. However, when referencing a
+    variable, a “scope” must be given (as a prefix) to indicate where the value
+    should be taken from (this does not apply to parameters which can be
+    referenced without a scope):
+
+    - ``initval.VARIABLE_NAME`` indicates that the value of the variable should
+      be taken from the :bck:`initval` block (for endogenous, it will be the
+      steady state if a :bck:`steady` command follows the ``initval`` block).
+      This can be abbreviated as ``init.VARIABLE_NAME``.
+    - ``self.VARIABLE_NAME(INTEGER)`` refers to the value of the variable given
+      in the ``shock_paths`` block at a previous period (using a lag notation
+      similar to the one used in the :bck:`model` block). For example, this can
+      be useful to construct auto-regressive processes (see the example below).
+    - ``DATABASE_NAME.VARIABLE_NAME`` or
+      ``DATABASE_NAME.VARIABLE_NAME(INTEGER)`` indicates that the value of the
+      variable should be taken from a database (as declared with the
+      :comm:`database` command). If the database has a time dimension, the
+      value will be taken from corresponding period in the ``periods``
+      statement (possibly with a lead or lag if specified). If the database is
+      flat and has no time dimension, then any period information is ignored.
+    - ``prev.VARIABLE_NAME`` or ``prev.VARIABLE_NAME(INTEGER)`` indicates that
+      the value of the variable should be taken from the previous informational
+      period, in the context of a simulation with expectation errors (when the
+      ``learnt_in`` option is passed to the ``shock_paths`` block). In other
+      words, it refers to the value of the variable as declared in the previous
+      ``shock_paths`` block with the most recent value for the ``learnt_in``
+      option. The value will be taken from the corresponding period in the
+      ``periods`` statement (possibly with a lead or lag if specified).
+    - ``learnt_in(INTEGER|DATE).VARIABLE_NAME`` or
+      ``learnt_in(INTEGER|DATE).VARIABLE_NAME(INTEGER)`` is similar to the
+      ``prev.VARIABLE_NAME`` syntax, but offers the possibility to refer to an
+      arbitrary previous ``shock_paths`` block with a different value for the
+      ``learnt_in`` option. The informational period can be specified either as
+      an integer or as a date.
+
+    Note that expressions do not need to be parenthesized as in :bck:`shocks`
+    or :bck:`mshocks`, since separating commas are mandatory.
+
+
+    Controlled shocks are described by stanzas of four lines of the following
+    form::
+
+      exogenize ENDOGENOUS_NAME;
+      periods INTEGER[:INTEGER] | DATE[:DATE] [, INTEGER[:INTEGER] | DATE[:DATE]]...;
+      values EXPRESSION [, EXPRESSION]...;
+      endogenize EXOGENOUS_NAME;
+
+    This tells the perfect foresight solver that the value
+    of some endogenous variables will be controlled (in other words, they will
+    be exogenized). It also gives the period(s) for which this control applies,
+    the value(s) imposed to the endogenous variable(s), and the exogenous
+    variable(s) that are left free at the same period(s) (in other words,
+    those exogenous are endogenized).
+
+    Similarly to the case of exogenous shocks, variables referred in
+    expressions must have a scope specified. Only the ``initval`` scope
+    (possibly abbreviated as ``init``) is currently supported.
+
+    The special ``end`` keyword for period is not supported (in other words, it
+    is not possible to exogenize an endogenous variable for the terminal steady
+    state computation).
+
+    When a controlled shock appears in the block, the same restrictions as for
+    :bck:`perfect_foresight_controlled_paths` apply to the
+    :opt:`stack_solve_algo <stack_solve_algo = INTEGER>` option of the solver
+    commands, and for the :opt:`block` and :opt:`bytecode` options of the
+    :bck:`model` block and :comm:`model_options` commands.
+
+    In the various stanzas above, dates are accepted only if the
+    :opt:`first_simulation_period <first_simulation_period = DATE>` or
+    :opt:`last_simulation_period <last_simulation_period = DATE>`
+    is passed to either :comm:`perfect_foresight_setup` or
+    :comm:`perfect_foresight_with_expectation_errors_setup`.
+
+    *Options*
+
+    .. option:: learnt_in = INTEGER | DATE
+
+       Used in conjunction with
+       :comm:`perfect_foresight_with_expectation_errors_setup` and
+       :comm:`perfect_foresight_with_expectation_errors_solver` commands,
+       specifies the period or date at which this block is
+       learnt by agents. Default: ``1``.
+
+    .. option:: overwrite
+
+       This block cancels and replaces previous ``shock_paths`` blocks that
+       have the same ``learnt_in`` option. Note that a block with an
+       integer-valued ``learnt_in`` option never overwrites a block with a
+       date-valued ``learnt_in`` option, even if they correspond to the same
+       period.
+
+    *Example with integer periods*
+
+        ::
+
+            // The following line is only needed under Octave
+            pkg load datatypes;
+
+            db = table(transpose(linspace(0, 1, 101)), 'VariableNames', {'foo'});
+
+            database db;
+
+            shock_paths;
+              // An autoregressive process for the first 5 periods, which
+              // becomes a permanent shock thereafter.
+              var x;
+              periods 1, 2:5, 6:end;
+              values initval.x*1.05, self.x(-1)*1.05, self.x(-1);
+
+              // A temporary shock whose value is taken from a database
+              // Note that y will be 0 in period 1, 0.01 in period 2, 0.02 in
+              // period 3
+              var y;
+              periods 1:3;
+              values db.foo;
+
+              // A controlled shock
+              exogenize c;
+              periods 2, 4:5;
+              values 1.6, 1.7;
+              endogenize z;
+            end;
+
+	    perfect_foresight_setup(periods = 100);
+	    perfect_foresight_solver;
+
+    *Example with dates*
+
+    It is numerically the same as the previous one.
+
+        ::
+
+            db = dseries(transpose(linspace(0, 1, 101)), '2000Q1', {'foo'});
+
+            database db;
+
+            shock_paths;
+              var x;
+              periods 2000Q1, 2000Q2:2001Q1, 2001Q2:end;
+              values initval.x*1.05, self.x(-1)*1.05, self.x(-1);
+
+              var y;
+              periods 2000Q1:2000Q3;
+              values db.foo;
+
+              // A controlled shock
+              exogenize c;
+              periods 2000Q2, 2000Q4:2001Q1;
+              values 1.6, 1.7;
+              endogenize z;
+            end;
+
+	    perfect_foresight_setup(first_simulation_period = 2000Q1, periods = 100);
+	    perfect_foresight_solver;
+
+    *Example with expectation errors*
+
+        ::
+
+            shock_paths;
+              var x;
+              periods 1, 2:5, 6:end;
+              values initval.x*1.05, self.x(-1)*1.05, self.x(-1);
+            end;
+
+            shock_paths(learnt_in = 6);
+              // The permanent shock turns out to be 5% higher than initially anticipated
+              var x;
+              periods 6:end;
+              values prev.x * 1.05;
+            end;
+
+	    perfect_foresight_with_expectation_errors_setup(first_simulation_period = 2000Q1,
+                                                            periods = 100);
+	    perfect_foresight_with_expectation_errors_solver;
+
+
+.. command:: database DATABASE_NAME [[,] DATABASE_NAME]... ;
+
+   Declares one or more databases to be referenced from expressions in the
+   :bck:`shock_paths` block.
+
+   Each database should correspond to a variable of the same name in the
+   MATLAB/Octave workspace. These variables can either contain:
+
+   - a MATLAB/Octave ``table`` object with a single row of data (no time
+     dimension), and variable names in columns. The single row will be used for
+     all simulation periods (including the terminal condition);
+   - a MATLAB/Octave ``table`` object with several rows (each corresponding to
+     a time period), and variable names in columns. The first row will be used
+     for the first simulation period, and so on up to the last simulation
+     period. The row just after the one corresponding to the last simulation
+     period will be used for the terminal condition;
+   - a :class:`dseries` object. Such an object is accepted only if the
+     :opt:`first_simulation_date <first_simulation_period = DATE>` or
+     :opt:`last_simulation_date <last_simulation_period = DATE>` option
+     is passed to either :comm:`perfect_foresight_setup` or
+     :comm:`perfect_foresight_with_expectation_errors_setup`. Values for a given
+     date in the timeseries object will be used for the corresponding simulation
+     date. The values at the date just after the last simulation period will be
+     used for the terminal condition.
+
+   Note that, under Octave, ``table`` objects are implemented in the
+   `datatypes`_ package, so you may need to load the latter via ``pkg load
+   datatypes`` before being able to construct or manipulate them.
+
 
 .. _stoch-sol:
 
@@ -17364,6 +17629,7 @@ Misc commands
 .. _control: https://gnu-octave.github.io/packages/control/
 .. _io: https://gnu-octave.github.io/packages/io/
 .. _optim: https://gnu-octave.github.io/packages/optim/
+.. _datatypes: https://gnu-octave.github.io/packages/datatypes/
 .. _AIM website: https://www.federalreserve.gov/econres/ama-index.htm
 
 .. rubric:: Footnotes

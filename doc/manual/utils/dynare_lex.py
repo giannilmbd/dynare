@@ -37,7 +37,7 @@ class DynareLexer(RegexLexer):
         "predetermined_variables","trend_var","log_trend_var","external_function",
         "write_latex_original_model","write_latex_dynamic_model",
         "write_latex_static_model","write_latex_steady_state_model","resid","initval_file","histval_file","dsample",
-        "periods","values","scales","corr","stderr","steady","check","model_diagnostics","model_info",
+        "periods","values","scales","corr","stderr","endogenize","exogenize","steady","check","model_diagnostics","model_info",
         "print_bytecode_dynamic_model"," print_bytecode_static_model",
         "perfect_foresight_setup","perfect_foresight_solver","simul","stoch_simul",
         "extended_path","varobs","estimation","bvar_density",
@@ -54,7 +54,8 @@ class DynareLexer(RegexLexer):
         "write_latex_prior_table","collect_latex_files","prior_function",
         "posterior_function","generate_trace_plots","evaluate_planner_objective",
         "occbin_setup","occbin_solver","occbin_write_regimes","occbin_graph","method_of_moments",
-        "var_model","trend_component_model","var_expectation_model","pac_model")
+        "var_model","trend_component_model","var_expectation_model","pac_model",
+        "database")
 
     report_commands = ("report","addPage","addSection","addGraph","addTable",
         "addSeries","addParagraph","addVspace","write","compile")
@@ -77,7 +78,7 @@ class DynareLexer(RegexLexer):
 
             (words((
                 'model','steady_state_model','initval','endval','histval','epilogue',
-                'shocks','mshocks','homotopy_setup','observation_trends',
+                'shocks','mshocks','shock_paths','homotopy_setup','observation_trends',
                 'estimated_params','estimated_params_init','estimated_params_bounds',
                 'shock_groups','conditional_forecast_paths','optim_weights',
                 'osr_params_bounds','ramsey_constraints','irf_calibration',
