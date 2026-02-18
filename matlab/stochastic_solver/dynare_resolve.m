@@ -51,11 +51,8 @@ end
 
 switch nargin
   case 6
-    endo_nbr = M_.endo_nbr;
-    nstatic = M_.nstatic;
-    nspred = M_.nspred;
-    iv = (1:endo_nbr)';
-    ic = [ nstatic+(1:nspred) endo_nbr+(1:size(dr.ghx,2)-nspred) ]';
+    iv = (1:M_.endo_nbr)';
+    ic = [ M_.nstatic+(1:M_.nspred) M_.endo_nbr+(1:size(dr.ghx,2)-M_.nspred) ]';
   case 7
     iv = dr.restrict_var_list;
     ic = dr.restrict_columns;
