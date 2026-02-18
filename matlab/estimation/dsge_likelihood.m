@@ -469,11 +469,12 @@ if analytic_derivation
     full_Hess = analytic_derivation==2;
     asy_Hess = analytic_derivation==-2;
     outer_product_gradient = analytic_derivation==-1;
-    if asy_Hess
-        analytic_derivation=1;
-    end
-    if outer_product_gradient
-        analytic_derivation=1;
+    % Normalize special modes to standard first derivative computation.
+    % analytic_derivation modes: 1=first deriv, 2=full Hessian, 
+    % -1=outer product gradient, -2=asymptotic Hessian.
+    % Modes -1 and -2 require first derivatives, so normalize to 1.
+    if asy_Hess || outer_product_gradient
+        analytic_derivation = 1;
     end
     DLIK = [];
     iv = dr.restrict_var_list;
@@ -500,21 +501,26 @@ if analytic_derivation
         end
         old_analytic_derivation_mode = options_.analytic_derivation_mode;
         options_.analytic_derivation_mode = kron_flag;
-        if full_Hess
-            DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, indpcorr, true);
-            indD2T = reshape(1:M_.endo_nbr^2, M_.endo_nbr, M_.endo_nbr);
-            indD2Om = dyn_unvech(1:M_.endo_nbr*(M_.endo_nbr+1)/2);
-            D2T = DERIVS.d2KalmanA(indD2T(iv,iv),:);
-            D2Om = DERIVS.d2Om(dyn_vech(indD2Om(iv,iv)),:);
-            D2Yss = DERIVS.d2Yss(iv,:,:);
-        else
-            DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, indpcorr, false);
-        end
+        
+        % Compute perturbation parameter derivatives (first and optionally second order)
+        DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, indpcorr, full_Hess);
+        
+        % Extract first-order derivatives
         DT = zeros(M_.endo_nbr, M_.endo_nbr, size(DERIVS.dghx,3));
         DT(:,M_.nstatic+(1:M_.nspred),:) = DERIVS.dghx;
         DT = DT(iv,iv,:);
         DOm = DERIVS.dOm(iv,iv,:);
         DYss = DERIVS.dYss(iv,:);
+        
+        % Extract second-order derivatives if computing full Hessian
+        if full_Hess
+            indD2T = reshape(1:M_.endo_nbr^2, M_.endo_nbr, M_.endo_nbr);
+            indD2Om = dyn_unvech(1:M_.endo_nbr*(M_.endo_nbr+1)/2);
+            D2T = DERIVS.d2KalmanA(indD2T(iv,iv),:);
+            D2Om = DERIVS.d2Om(dyn_vech(indD2Om(iv,iv)),:);
+            D2Yss = DERIVS.d2Yss(iv,:,:);
+        end
+        
         options_.order = old_order; %make sure order is reset (not sure if necessary)
         options_.analytic_derivation_mode = old_analytic_derivation_mode;%make sure analytic_derivation_mode is reset (not sure if necessary)
     else
