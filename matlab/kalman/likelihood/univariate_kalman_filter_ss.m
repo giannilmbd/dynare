@@ -1,4 +1,4 @@
-function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2P)
+function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,D2a,D2T,D2Yss,D2H,D2P)
 % Computes the log-likelihood of a stationary state space model (steady-state univariate Kalman filter).
 
 %
@@ -14,13 +14,14 @@ function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,
 % - Z                       [matrix]      [pp x mm] measurement matrix, or index vector when Zflag=0
 % - pp                      [integer]     number of observed variables
 % - Zflag                   [integer]     0 if Z is an index vector; 1 if Z is a [pp x mm] matrix
-% - analytic_derivation     [integer]     derivative mode: 0 (none), 1 (score), 2 (score and Hessian), or asymptotic-Hessian mode
-% - Da, DT, DYss, DP, DH    [array]       first-derivative objects used when analytic_derivation > 0
-% - D2a, D2T, D2Yss, D2P    [array]       second-derivative objects used when analytic_derivation == 2
+% - analytic_derivation     [logical]     whether to compute analytic derivatives (true/false)
+% - Da, DT, DYss, DP, DH    [array]       first-derivative objects used when analytic_derivation is true
+% - analytic_Hessian        [string]      Hessian mode: '' (none), 'full' (analytic), 'opg' (outer product), 'asymptotic'
+% - D2a, D2T, D2Yss, D2H, D2P    [array]       second-derivative objects used when analytic_Hessian=='full'
 %
 % OUTPUTS
-% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation>0, returns cell array {LIK,DLIK[,Hess]}
-% - likk                    [matrix|cell] [smpl x pp] period/observable log-likelihood contributions; if analytic_derivation>0, returns {likk,dlikk}
+% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation is true, returns cell array {LIK,DLIK[,Hess]}
+% - likk                    [matrix|cell] [smpl x pp] period/observable log-likelihood contributions; if analytic_derivation is true, returns {likk,dlikk}
 % - a                       [vector]      [mm x 1] filtered state mean at the end of the processed sample
 %
 % This function is called by: univariate_kalman_filter
@@ -55,28 +56,29 @@ t    = start;              % Initialization of the time index.
 likk = zeros(smpl,pp);      % Initialization of the vector gathering the densities.
 LIK  = Inf;                % Default value of the log likelihood.
 l2pi = log(2*pi);
-asy_hess=0;
 
 if nargin<12
-    analytic_derivation = 0;
+    analytic_derivation = false;
+end
+if nargin<18
+    analytic_Hessian = '';
 end
 
-if  analytic_derivation == 0
+% Extract Hessian mode flags from string
+full_Hess = strcmp(analytic_Hessian, 'full');
+asy_hess = strcmp(analytic_Hessian, 'asymptotic');
+
+if ~analytic_derivation
     DLIK=[];
     Hess=[];
 else
     k = size(DT,3);                                 % number of structural parameters
     DLIK  = zeros(k,1);                             % Initialization of the score.
     dlikk = zeros(smpl,k);
-    if analytic_derivation==2
+    if full_Hess || asy_hess
         Hess  = zeros(k,k);                             % Initialization of the Hessian
     else
-        asy_hess=D2a;
-        if asy_hess
-            Hess  = zeros(k,k);                             % Initialization of the Hessian
-        else
-            Hess=[];
-        end
+        Hess=[];
     end
 end
 
@@ -86,7 +88,7 @@ while t<=last
     PP = P;
     if analytic_derivation
         DPP = DP;
-        if analytic_derivation==2
+        if full_Hess
             D2PP = D2P;
         end
     end
@@ -106,13 +108,13 @@ while t<=last
             PP = PP - PPZ*Ki';
             likk(s,i) = log(Fi) + prediction_error*prediction_error/Fi + l2pi;
             if analytic_derivation
-                if analytic_derivation==2
-                    [Da,DPP,DLIKt,D2a,D2PP, Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,D2a,D2Yss,D2PP);
+                if full_Hess
+                    [Da,DPP,DLIKt,D2a,D2PP, Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,D2a,D2Yss,squeeze(D2H(i,:,:)),D2PP);
                 else
                     [Da,DPP,DLIKt,Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0);
                 end
                 DLIK = DLIK + DLIKt;
-                if analytic_derivation==2 || asy_hess
+                if full_Hess || asy_hess
                     Hess = Hess + Hesst;
                 end
                 dlikk(s,:)=dlikk(s,:)+DLIKt';
@@ -123,7 +125,7 @@ while t<=last
         end
     end
     if analytic_derivation
-        if analytic_derivation==2
+        if full_Hess
             [Da,~,D2a] = univariate_computeDstate(k,a,P,T,Da,DP,DT,[],0,D2a,D2P,D2T);
         else
             Da = univariate_computeDstate(k,a,P,T,Da,DP,DT,[],0);
@@ -141,10 +143,10 @@ if analytic_derivation
     DLIK = DLIK/2;
     likk = {likk, dlikk};
 end
-if analytic_derivation==2 || asy_hess
+if full_Hess || asy_hess
     %     Hess = (Hess + Hess')/2;
     Hess = -Hess/2;
     LIK={LIK,DLIK,Hess};
-elseif analytic_derivation==1
+elseif analytic_derivation
     LIK={LIK,DLIK};
 end

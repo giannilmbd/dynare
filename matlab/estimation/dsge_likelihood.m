@@ -82,6 +82,7 @@ end
 
 % Set flag related to analytical derivatives.
 analytic_derivation = options_.analytic_derivation;
+analytic_Hessian = options_.analytic_Hessian;
 
 if analytic_derivation
     if options_.loglinear
@@ -93,11 +94,8 @@ if analytic_derivation
 end
 
 if nargout==1
-    analytic_derivation=0;
-end
-
-if analytic_derivation
-    kron_flag=options_.analytic_derivation_mode;
+    analytic_derivation = false;
+    analytic_Hessian = '';
 end
 
 %------------------------------------------------------------------------------
@@ -464,139 +462,16 @@ switch options_.lik_init
 end
 
 if analytic_derivation
-    offset = estim_params_.nvx;
-    offset = offset+estim_params_.nvn;
-    offset = offset+estim_params_.ncx;
-    offset = offset+estim_params_.ncn;
-    no_DLIK = 0;
-    full_Hess = analytic_derivation==2;
-    asy_Hess = analytic_derivation==-2;
-    outer_product_gradient = analytic_derivation==-1;
-    if asy_Hess
-        analytic_derivation=1;
-    end
-    if outer_product_gradient
-        analytic_derivation=1;
-    end
-    DLIK = [];
-    iv = dr.restrict_var_list;
-    if nargin<13 || isempty(derivatives_info)
-        [~,~,~,~,dr, M_.params] = dynare_resolve(M_,options_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
-        if ~isempty(estim_params_.var_exo)
-            indexo=estim_params_.var_exo(:,1);
-        else
-            indexo=[];
-        end
-        if ~isempty(estim_params_.param_vals)
-            indparam=estim_params_.param_vals(:,1);
-        else
-            indparam=[];
-        end
-        old_order = options_.order;
-        if options_.order > 1%not sure whether this check is necessary
-            options_.order = 1; fprintf('Reset order to 1 for analytical parameter derivatives.\n');
-        end
-        old_analytic_derivation_mode = options_.analytic_derivation_mode;
-        options_.analytic_derivation_mode = kron_flag;
-        if full_Hess
-            DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, [], true);
-            indD2T = reshape(1:M_.endo_nbr^2, M_.endo_nbr, M_.endo_nbr);
-            indD2Om = dyn_unvech(1:M_.endo_nbr*(M_.endo_nbr+1)/2);
-            D2T = DERIVS.d2KalmanA(indD2T(iv,iv),:);
-            D2Om = DERIVS.d2Om(dyn_vech(indD2Om(iv,iv)),:);
-            D2Yss = DERIVS.d2Yss(iv,:,:);
-        else
-            DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, [], false);
-        end
-        DT = zeros(M_.endo_nbr, M_.endo_nbr, size(DERIVS.dghx,3));
-        DT(:,M_.nstatic+(1:M_.nspred),:) = DERIVS.dghx;
-        DT = DT(iv,iv,:);
-        DOm = DERIVS.dOm(iv,iv,:);
-        DYss = DERIVS.dYss(iv,:);
-        options_.order = old_order; %make sure order is reset (not sure if necessary)
-        options_.analytic_derivation_mode = old_analytic_derivation_mode;%make sure analytic_derivation_mode is reset (not sure if necessary)
+    if nargin < 13
+        derivatives_info_input = [];
     else
-        DT = derivatives_info.DT(iv,iv,:);
-        DOm = derivatives_info.DOm(iv,iv,:);
-        DYss = derivatives_info.DYss(iv,:);
-        if isfield(derivatives_info,'full_Hess')
-            full_Hess = derivatives_info.full_Hess;
-        end
-        if full_Hess
-            D2T = derivatives_info.D2T;
-            D2Om = derivatives_info.D2Om;
-            D2Yss = derivatives_info.D2Yss;
-        end
-        if isfield(derivatives_info,'no_DLIK')
-            no_DLIK = derivatives_info.no_DLIK;
-        end
-        clear('derivatives_info');
+        derivatives_info_input = derivatives_info;
     end
-    DYss = [zeros(size(DYss,1),offset) DYss];
-    DH=zeros([length(H),length(H),length(xparam1)]);
-    DQ=zeros([size(Q),length(xparam1)]);
-    DP=zeros([size(T),length(xparam1)]);
-    if full_Hess
-        for j=1:size(D2Yss,1)
-            tmp(j,:,:) = blkdiag(zeros(offset,offset), squeeze(D2Yss(j,:,:)));
-        end
-        D2Yss = tmp;
-        D2H=sparse(size(D2Om,1),size(D2Om,2));
-        D2P=sparse(size(D2Om,1),size(D2Om,2));
-        jcount=0;
-    end
-    if options_.lik_init==1
-        for i=1:estim_params_.nvx
-            k =estim_params_.var_exo(i,1);
-            DQ(k,k,i) = 2*sqrt(Q(k,k));
-            dum =  lyapunov_symm(T,DOm(:,:,i),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-            DP(:,:,i)=dum;
-            if full_Hess
-                for j=1:i
-                    jcount=jcount+1;
-                    dum =  lyapunov_symm(T,dyn_unvech(D2Om(:,jcount)),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-                    D2P(:,jcount)=dyn_vech(dum);
-                end
-            end
-        end
-    end
-    offset = estim_params_.nvx;
-    for i=1:estim_params_.nvn
-        k = estim_params_.var_endo(i,1);
-        DH(k,k,i+offset) = 2*sqrt(H(k,k));
-        if full_Hess
-            D2H(k,k,i+offset,i+offset) = 2;
-        end
-    end
-    offset = offset + estim_params_.nvn;
-    if options_.lik_init==1
-        for j=1:estim_params_.np
-            dum =  lyapunov_symm(T,DT(:,:,j+offset)*Pstar*T'+T*Pstar*DT(:,:,j+offset)'+DOm(:,:,j+offset),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-            DP(:,:,j+offset)=dum;
-            if full_Hess
-                DTj = DT(:,:,j+offset);
-                DPj = dum;
-                for i=1:j+offset
-                    jcount=jcount+1;
-                    DTi = DT(:,:,i);
-                    DPi = DP(:,:,i);
-                    D2Tij = reshape(D2T(:,jcount),size(T));
-                    D2Omij = dyn_unvech(D2Om(:,jcount));
-                    tmp = D2Tij*Pstar*T' + T*Pstar*D2Tij' + DTi*DPj*T' + DTj*DPi*T' + T*DPj*DTi' + T*DPi*DTj' + DTi*Pstar*DTj' + DTj*Pstar*DTi' + D2Omij;
-                    dum = lyapunov_symm(T,tmp,options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
-                    D2P(:,jcount) = dyn_vech(dum);
-                end
-            end
-        end
-    end
-    if analytic_derivation==1
-        analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,asy_Hess};
-    else
-        analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P};
-        clear DT DYss DOm DP D2T D2Yss D2Om D2H D2P
-    end
+    [analytic_deriv_info, analytic_derivation, no_DLIK, DLIK, DH] = ...
+        compute_analytic_derivation_info(analytic_derivation, analytic_Hessian, estim_params_, dr, derivatives_info_input, ...
+        M_, options_, endo_steady_state, exo_steady_state, exo_det_steady_state, xparam1, H, T, Pstar);
 else
-    analytic_deriv_info={0};
+    analytic_deriv_info={false, [], [], [], [], [], ''};
 end
 
 %------------------------------------------------------------------------------
@@ -704,7 +579,7 @@ if ((kalman_algo==1) || (kalman_algo==3)) || (kalman_algo == 5) % Multivariate K
     else
         if options_.lik_init==3
             LIK = LIK + dLIK;
-            if analytic_derivation==0 && nargout>3
+            if ~analytic_derivation && nargout>3
                 if ~singular_diffuse_filter
                     lik = [dlik; lik];
                 else
@@ -723,6 +598,9 @@ if (kalman_algo==2) || (kalman_algo==4)
         mmm = mm;
         if analytic_derivation
             DH = zeros(pp,length(xparam1));
+            if strcmp(analytic_Hessian, 'full')
+                analytic_deriv_info{11} = zeros(pp,length(xparam1),length(xparam1));
+            end
         end
     else
         if all(all(abs(H-diag(diag(H)))<1e-14))% ie, the covariance matrix is diagonal...
@@ -734,6 +612,15 @@ if (kalman_algo==2) || (kalman_algo==4)
                     tmp(j,:)=DH(j,j,:);
                 end
                 DH=tmp;
+                if strcmp(analytic_Hessian, 'full')
+                    D2H_full = analytic_deriv_info{11};
+                    nk = size(D2H_full,3);
+                    D2H_uni = zeros(pp,nk,nk);
+                    for j=1:pp
+                        D2H_uni(j,:,:) = D2H_full(j,j,:,:);
+                    end
+                    analytic_deriv_info{11} = D2H_uni;
+                end
             end
         else
             if ~expanded_state_vector_for_univariate_filter
@@ -757,6 +644,101 @@ if (kalman_algo==2) || (kalman_algo==4)
                 Pinf  = blkdiag(Pinf,zeros(pp));
                 H1 = zeros(pp,1);
                 Zflag=1;
+                if analytic_derivation
+                    % Augment first-derivative arrays for expanded state space.
+                    % Augmented system absorbs H into the state dynamics:
+                    %   T_aug = blkdiag(T, 0),  Om_aug = blkdiag(Om, H),
+                    %   Pstar_aug = blkdiag(Pstar, H),  H1 = 0.
+                    nk = length(xparam1);
+                    DH_3D = DH;  % Save 3D DH (pp x pp x nk) before overwriting
+
+                    DT_orig = analytic_deriv_info{2};
+                    DT_aug = zeros(mm+pp, mm+pp, nk);
+                    DT_aug(1:mm, 1:mm, :) = DT_orig;
+                    analytic_deriv_info{2} = DT_aug;
+
+                    DYss_orig = analytic_deriv_info{3};
+                    DYss_aug = zeros(mm+pp, size(DYss_orig,2));
+                    DYss_aug(1:mm, :) = DYss_orig;
+                    analytic_deriv_info{3} = DYss_aug;
+
+                    DOm_orig = analytic_deriv_info{4};
+                    DOm_aug = zeros(mm+pp, mm+pp, nk);
+                    DOm_aug(1:mm, 1:mm, :) = DOm_orig;
+                    DOm_aug(mm+1:end, mm+1:end, :) = DH_3D;
+                    analytic_deriv_info{4} = DOm_aug;
+
+                    DP_orig = analytic_deriv_info{6};
+                    DP_aug = zeros(mm+pp, mm+pp, nk);
+                    DP_aug(1:mm, 1:mm, :) = DP_orig;
+                    DP_aug(mm+1:end, mm+1:end, :) = DH_3D;
+                    analytic_deriv_info{6} = DP_aug;
+
+                    % DH for univariate becomes zero since H1 = 0
+                    DH = zeros(pp, nk);
+
+                    if strcmp(analytic_Hessian, 'full')
+                        D2H_full = analytic_deriv_info{11};
+                        % Get dimensions of original state space from D2T size
+                        D2T_orig = analytic_deriv_info{8};
+                        ncols = size(D2T_orig, 2);
+                        mm_orig = sqrt(size(D2T_orig, 1));  % D2T is vec(T), so rows = mm^2
+                        mmm_aug = mm_orig + pp;
+
+                        % D2T: vec format. Map mm_orig x mm_orig positions into mmm_aug x mmm_aug.
+                        [r_grid, c_grid] = ndgrid(1:mm_orig, 1:mm_orig);
+                        aug_vec_idx = (c_grid(:)-1)*mmm_aug + r_grid(:);
+                        D2T_aug = zeros(mmm_aug^2, ncols);
+                        D2T_aug(aug_vec_idx,:) = D2T_orig;
+                        analytic_deriv_info{8} = D2T_aug;
+
+                        % D2Yss
+                        D2Yss_orig = analytic_deriv_info{9};
+                        D2Yss_aug = zeros(mmm_aug, size(D2Yss_orig,2), size(D2Yss_orig,3));
+                        D2Yss_aug(1:mm_orig, :, :) = D2Yss_orig;
+                        analytic_deriv_info{9} = D2Yss_aug;
+
+                        % D2Om and D2P: vech format. Build index maps.
+                        idx_vech_aug = dyn_unvech(1:mmm_aug*(mmm_aug+1)/2);
+                        orig_vech_idx = dyn_vech(idx_vech_aug(1:mm_orig,1:mm_orig));
+                        H_vech_idx = dyn_vech(idx_vech_aug(mm_orig+1:end,mm_orig+1:end));
+
+                        % D2Om
+                        D2Om_orig = analytic_deriv_info{10};
+                        D2Om_aug = zeros(mmm_aug*(mmm_aug+1)/2, ncols);
+                        D2Om_aug(orig_vech_idx,:) = D2Om_orig;
+                        jcount = 0;
+                        for ii = 1:nk
+                            for jj = 1:ii
+                                jcount = jcount + 1;
+                                D2H_ij = D2H_full(:,:,jj,ii);
+                                if any(D2H_ij(:))
+                                    D2Om_aug(H_vech_idx, jcount) = dyn_vech(D2H_ij);
+                                end
+                            end
+                        end
+                        analytic_deriv_info{10} = D2Om_aug;
+
+                        % D2P: same augmentation as D2Om
+                        D2P_orig = analytic_deriv_info{12};
+                        D2P_aug = zeros(mmm_aug*(mmm_aug+1)/2, ncols);
+                        D2P_aug(orig_vech_idx,:) = D2P_orig;
+                        jcount = 0;
+                        for ii = 1:nk
+                            for jj = 1:ii
+                                jcount = jcount + 1;
+                                D2H_ij = D2H_full(:,:,jj,ii);
+                                if any(D2H_ij(:))
+                                    D2P_aug(H_vech_idx, jcount) = dyn_vech(D2H_ij);
+                                end
+                            end
+                        end
+                        analytic_deriv_info{12} = D2P_aug;
+
+                        % D2H for univariate = 0 since H1 = 0
+                        analytic_deriv_info{11} = zeros(pp, nk, nk);
+                    end
+                end
             end
             mmm   = mm+pp;
             if singularity_has_been_detected
@@ -785,7 +767,7 @@ if (kalman_algo==2) || (kalman_algo==4)
     end
     if options_.lik_init==3
         LIK = LIK+dLIK;
-        if analytic_derivation==0 && nargout>3
+        if ~analytic_derivation && nargout>3
             lik = [dlik; lik];
         end
     end
@@ -795,10 +777,10 @@ if analytic_derivation
     if no_DLIK==0
         DLIK = LIK1{2};
     end
-    if full_Hess
+    if strcmp(analytic_Hessian, 'full')
         Hess = -LIK1{3};
     end
-    if asy_Hess
+    if strcmp(analytic_Hessian, 'asymptotic')
         Hess = LIK1{3};
     end
 end
@@ -821,7 +803,7 @@ likelihood = LIK;
 % 5. Adds prior if necessary
 % ------------------------------------------------------------------------------
 if analytic_derivation
-    if full_Hess
+    if strcmp(analytic_Hessian, 'full')
         [lnprior, dlnprior, d2lnprior] = priordens(xparam1,bayestopt_.pshape,bayestopt_.p6,bayestopt_.p7,bayestopt_.p3,bayestopt_.p4);
         Hess = Hess - d2lnprior;
     else
@@ -830,7 +812,7 @@ if analytic_derivation
     if no_DLIK==0
         DLIK = DLIK - dlnprior';
     end
-    if outer_product_gradient
+    if strcmp(analytic_Hessian, 'opg')
         dlik = lik1{2};
         dlik=[- dlnprior; dlik(start:end,:)];
         Hess = dlik'*dlik;
@@ -875,9 +857,282 @@ if options_.prior_restrictions.status
     fval = fval - tmp;
 end
 
-if analytic_derivation==0 && nargout>3
+if ~analytic_derivation && nargout>3
     lik=lik(start:end,:);
     DLIK=[-lnprior; lik(:)];
+end
+
+function [analytic_deriv_info, analytic_derivation, no_DLIK, DLIK, DH] = ...
+    compute_analytic_derivation_info(analytic_derivation, analytic_Hessian, estim_params_, dr, derivatives_info, ...
+    M_, options_, endo_steady_state, exo_steady_state, exo_det_steady_state, xparam1, H, T, Pstar)
+% Compute analytic derivative information for the Kalman filter.
+% This builds the analytic_deriv_info cell array containing first (and
+% optionally second) order derivatives of the state-space system matrices
+% with respect to the estimated parameters.
+
+offset = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
+no_DLIK = 0;
+full_Hess = strcmp(analytic_Hessian, 'full');
+DLIK = [];
+iv = dr.restrict_var_list;
+if isempty(derivatives_info)
+    if ~isempty(estim_params_.var_exo)
+        indexo=estim_params_.var_exo(:,1);
+    else
+        indexo=[];
+    end
+    if ~isempty(estim_params_.param_vals)
+        indparam=estim_params_.param_vals(:,1);
+    else
+        indparam=[];
+    end
+    if ~isempty(estim_params_.corrx)
+        indpcorr=estim_params_.corrx(:,1:2);
+    else
+        indpcorr=[];
+    end
+
+    % Compute perturbation parameter derivatives (first and optionally second order)
+    DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, indparam, indexo, indpcorr, full_Hess);
+
+    % Extract first-order derivatives
+    DT = zeros(M_.endo_nbr, M_.endo_nbr, size(DERIVS.dghx,3));
+    DT(:,M_.nstatic+(1:M_.nspred),:) = DERIVS.dghx;
+    DT = DT(iv,iv,:);
+    DOm = DERIVS.dOm(iv,iv,:);
+    DYss = DERIVS.dYss(iv,:);
+
+    % Extract second-order derivatives if computing full Hessian
+    if full_Hess
+        indD2T = reshape(1:M_.endo_nbr^2, M_.endo_nbr, M_.endo_nbr);
+        indD2Om = dyn_unvech(1:M_.endo_nbr*(M_.endo_nbr+1)/2);
+        D2T = DERIVS.d2KalmanA(indD2T(iv,iv),:);
+        D2Om = DERIVS.d2Om(dyn_vech(indD2Om(iv,iv)),:);
+        D2Yss = DERIVS.d2Yss(iv,:,:);
+    end
+
+else
+    DT = derivatives_info.DT(iv,iv,:);
+    DOm = derivatives_info.DOm(iv,iv,:);
+    DYss = derivatives_info.DYss(iv,:);
+    if isfield(derivatives_info,'full_Hess')
+        full_Hess = derivatives_info.full_Hess;
+    end
+    if full_Hess
+        D2T = derivatives_info.D2T;
+        D2Om = derivatives_info.D2Om;
+        D2Yss = derivatives_info.D2Yss;
+    end
+    if isfield(derivatives_info,'no_DLIK')
+        no_DLIK = derivatives_info.no_DLIK;
+    end
+end
+% The DERIVS arrays from get_perturbation_params_derivs use parameter
+% ordering [stderr_shock(1:nvx), corr_shock(1:ncx), model_params(1:np)].
+% The estimation ordering is [nvx, nvn, ncx, ncn, np]. T and Om do
+% not depend on nvn or ncn parameters, so we insert zero slices for
+% those positions.
+n_inserted = estim_params_.nvn + estim_params_.ncn;
+if n_inserted > 0
+    DT = cat(3, DT(:,:,1:estim_params_.nvx), ...
+                zeros(size(DT,1), size(DT,2), estim_params_.nvn), ...
+                DT(:,:,estim_params_.nvx+1:estim_params_.nvx+estim_params_.ncx), ...
+                zeros(size(DT,1), size(DT,2), estim_params_.ncn), ...
+                DT(:,:,estim_params_.nvx+estim_params_.ncx+1:end));
+    DOm = cat(3, DOm(:,:,1:estim_params_.nvx), ...
+                 zeros(size(DOm,1), size(DOm,2), estim_params_.nvn), ...
+                 DOm(:,:,estim_params_.nvx+1:estim_params_.nvx+estim_params_.ncx), ...
+                 zeros(size(DOm,1), size(DOm,2), estim_params_.ncn), ...
+                 DOm(:,:,estim_params_.nvx+estim_params_.ncx+1:end));
+    if full_Hess
+        % Remap D2T and D2Om columns from DERIVS vech-ordering
+        % (nvx+ncx+np parameters) to estimation vech-ordering
+        % (nvx+nvn+ncx+ncn+np parameters). Columns corresponding to
+        % nvn/ncn parameter pairs are zero (T and Om do not depend
+        % on them) and are left at their initialized value.
+        totparam_derivs = estim_params_.nvx + estim_params_.ncx + estim_params_.np;
+        totparam_estim  = totparam_derivs + n_inserted;
+        % Build mapping: estimation parameter index -> DERIVS parameter index (0 = not in DERIVS)
+        estim2derivs = zeros(1, totparam_estim);
+        estim2derivs(1:estim_params_.nvx) = 1:estim_params_.nvx;
+        % nvn positions map to 0 (not in DERIVS)
+        estim2derivs(estim_params_.nvx + estim_params_.nvn + 1 : estim_params_.nvx + estim_params_.nvn + estim_params_.ncx) = estim_params_.nvx + 1 : estim_params_.nvx + estim_params_.ncx;
+        % ncn positions map to 0 (not in DERIVS)
+        estim2derivs(estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn + 1 : end) = estim_params_.nvx + estim_params_.ncx + 1 : totparam_derivs;
+        D2T_old  = D2T;
+        D2Om_old = D2Om;
+        ncols_estim = totparam_estim*(totparam_estim+1)/2;
+        D2T  = zeros(size(D2T_old,1),  ncols_estim);
+        D2Om = zeros(size(D2Om_old,1), ncols_estim);
+        jcount_estim = 0;
+        for ii = 1:totparam_estim
+            for jj = 1:ii
+                jcount_estim = jcount_estim + 1;
+                di = estim2derivs(ii);
+                dj = estim2derivs(jj);
+                if di > 0 && dj > 0
+                    % Both parameters exist in DERIVS; look up the
+                    % corresponding vech column index in the original arrays
+                    di_large = max(di, dj);
+                    dj_small = min(di, dj);
+                    jcount_derivs = di_large*(di_large-1)/2 + dj_small;
+                    D2T(:, jcount_estim)  = D2T_old(:, jcount_derivs);
+                    D2Om(:, jcount_estim) = D2Om_old(:, jcount_derivs);
+                end
+            end
+        end
+    end
+end
+DYss = [zeros(size(DYss,1),offset) DYss];
+DH=zeros([length(H),length(H),length(xparam1)]);
+DP=zeros([size(T),length(xparam1)]);
+if full_Hess
+    tmp = zeros(size(D2Yss,1), offset+size(D2Yss,2), offset+size(D2Yss,3));
+    for j=1:size(D2Yss,1)
+        tmp(j,:,:) = blkdiag(zeros(offset,offset), squeeze(D2Yss(j,:,:)));
+    end
+    D2Yss = tmp;
+    D2H=zeros([length(H),length(H),length(xparam1),length(xparam1)]);
+    D2P=zeros(size(D2Om,1),size(D2Om,2));
+    jcount=0;
+end
+if options_.lik_init==1
+    for i=1:estim_params_.nvx
+        dum =  lyapunov_symm(T,DOm(:,:,i),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
+        DP(:,:,i)=dum;
+        if full_Hess
+            for j=1:i
+                jcount=jcount+1;
+                dum =  lyapunov_symm(T,dyn_unvech(D2Om(:,jcount)),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
+                D2P(:,jcount)=dyn_vech(dum);
+            end
+        end
+    end
+end
+offset = estim_params_.nvx;
+for i=1:estim_params_.nvn
+    % Use observable index (position in varobs) for H and DH, not
+    % endogenous variable index from var_endo.
+    k = estim_params_.nvn_observable_correspondence(i,1);
+    sigma_k = sqrt(H(k,k));
+    % Full derivative of H w.r.t. σ_k including off-diagonals.
+    % H = diag(σ)*Corr*diag(σ), so ∂H(a,b)/∂σ_k equals:
+    %   H(a,b)/σ_k  when a=k xor b=k (off-diagonal in row/col k)
+    %   2σ_k         when a=b=k (diagonal)
+    %   0             otherwise
+    DH(k,:,i+offset) = H(k,:) / sigma_k;
+    DH(:,k,i+offset) = H(:,k) / sigma_k;
+    DH(k,k,i+offset) = 2 * sigma_k;
+    if full_Hess
+        D2H(k,k,i+offset,i+offset) = 2;
+        % Advance jcount for nvn vs earlier params: D2P is zero since
+        % measurement error parameters do not affect T or Om.
+        % Also compute nvn-nvn cross-derivatives for off-diagonal H:
+        % ∂²H(k_i,k_j)/∂σ_{k_i}∂σ_{k_j} = Corr(k_i,k_j) when k_i≠k_j
+        for j=1:i+offset
+            jcount=jcount+1;
+            if j > estim_params_.nvx && j <= estim_params_.nvx + estim_params_.nvn && j ~= i + offset
+                jj = j - estim_params_.nvx;
+                kj = estim_params_.nvn_observable_correspondence(jj,1);
+                if kj ~= k
+                    sigma_kj = sqrt(H(kj,kj));
+                    corr_val = H(k,kj) / (sigma_k * sigma_kj);
+                    D2H(k,kj,i+offset,j) = corr_val;
+                    D2H(kj,k,i+offset,j) = corr_val;
+                    D2H(k,kj,j,i+offset) = corr_val;
+                    D2H(kj,k,j,i+offset) = corr_val;
+                end
+            end
+        end
+    end
+end
+offset = offset + estim_params_.nvn;
+% Shock correlation parameters: DOm already populated from DERIVS.
+% Only DP (and D2P) need to be computed here.
+for i=1:estim_params_.ncx
+    if options_.lik_init==1
+        dum = lyapunov_symm(T,DOm(:,:,i+offset),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
+        DP(:,:,i+offset) = dum;
+    end
+    if full_Hess
+        DPi = DP(:,:,i+offset);
+        for j=1:i+offset
+            jcount=jcount+1;
+            D2Omij = dyn_unvech(D2Om(:,jcount));
+            if any(D2Omij(:))
+                if options_.lik_init==1
+                    DTj = DT(:,:,j);
+                    % DT(:,:,i+offset) is zero for ncx, so terms
+                    % with DTi drop out and DPj is not needed.
+                    tmpv = DTj*DPi*T' + T*DPi*DTj' + D2Omij;
+                    dum = lyapunov_symm(T,tmpv,options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
+                    D2P(:,jcount) = dyn_vech(dum);
+                end
+            end
+        end
+    end
+end
+offset = offset + estim_params_.ncx;
+% Measurement error correlation parameters: ∂H(k1,k2)/∂ρ = sqrt(H(k1,k1))*sqrt(H(k2,k2))
+% These only affect H, not T or Om.
+for i=1:estim_params_.ncn
+    k1 = estim_params_.corrn_observable_correspondence(i,1);
+    k2 = estim_params_.corrn_observable_correspondence(i,2);
+    dHij = sqrt(H(k1,k1))*sqrt(H(k2,k2));
+    DH(k1,k2,i+offset) = dHij;
+    DH(k2,k1,i+offset) = dHij;
+    if full_Hess
+        % Cross-derivatives of H w.r.t. ncn param i and nvn params:
+        % ∂²H(k1,k2)/∂ρ_{k1,k2} ∂σ_{kj} = σ_{k_other}
+        for j=1:i+offset
+            jcount=jcount+1;
+            if j > estim_params_.nvx && j <= estim_params_.nvx + estim_params_.nvn
+                jj = j - estim_params_.nvx;
+                kj = estim_params_.nvn_observable_correspondence(jj,1);
+                if kj == k1
+                    D2H(k1,k2,j,i+offset) = sqrt(H(k2,k2));
+                    D2H(k2,k1,j,i+offset) = D2H(k1,k2,j,i+offset);
+                    D2H(k1,k2,i+offset,j) = D2H(k1,k2,j,i+offset);
+                    D2H(k2,k1,i+offset,j) = D2H(k1,k2,j,i+offset);
+                end
+                if kj == k2
+                    D2H(k1,k2,j,i+offset) = D2H(k1,k2,j,i+offset) + sqrt(H(k1,k1));
+                    D2H(k2,k1,j,i+offset) = D2H(k1,k2,j,i+offset);
+                    D2H(k1,k2,i+offset,j) = D2H(k1,k2,j,i+offset);
+                    D2H(k2,k1,i+offset,j) = D2H(k1,k2,j,i+offset);
+                end
+            end
+            % Note: ncn-ncn and ncn-ncx cross-derivatives of H are zero
+            % (H is linear in each correlation param, and ncx/ncn are
+            % independent parameter groups).
+        end
+    end
+end
+offset = offset + estim_params_.ncn;
+if options_.lik_init==1
+    for j=1:estim_params_.np
+        dum =  lyapunov_symm(T,DT(:,:,j+offset)*Pstar*T'+T*Pstar*DT(:,:,j+offset)'+DOm(:,:,j+offset),options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
+        DP(:,:,j+offset)=dum;
+        if full_Hess
+            DTj = DT(:,:,j+offset);
+            DPj = dum;
+            for i=1:j+offset
+                jcount=jcount+1;
+                DTi = DT(:,:,i);
+                DPi = DP(:,:,i);
+                D2Tij = reshape(D2T(:,jcount),size(T));
+                D2Omij = dyn_unvech(D2Om(:,jcount));
+                tmp = D2Tij*Pstar*T' + T*Pstar*D2Tij' + DTi*DPj*T' + DTj*DPi*T' + T*DPj*DTi' + T*DPi*DTj' + DTi*Pstar*DTj' + DTj*Pstar*DTi' + D2Omij;
+                dum = lyapunov_symm(T,tmp,options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,[],options_.debug);
+                D2P(:,jcount) = dyn_vech(dum);
+            end
+        end
+    end
+end
+if full_Hess
+    analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,analytic_Hessian,D2T,D2Yss,D2Om,D2H,D2P};
+else
+    analytic_deriv_info={analytic_derivation,DT,DYss,DOm,DH,DP,analytic_Hessian};
 end
 
 function[occbin_options, occbin_filter_state_covariance] = set_occbin_options(options_)

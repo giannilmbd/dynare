@@ -71,7 +71,7 @@ switch posterior_sampling_method
           options_.mode_compute = sampler_options.mode_compute;
           if options_.mode_compute==5
               if options_.analytic_derivation
-                  options_.analytic_derivation = -1;
+                  options_.analytic_Hessian = 'opg';
               end
           end
           options_.newrat.Save_files = sampler_options.curr_block;

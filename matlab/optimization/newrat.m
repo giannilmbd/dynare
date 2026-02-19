@@ -285,7 +285,7 @@ while norm(gg)>gtol && check==0 && jit<nit
         disp_verbose(['Ftol          ',num2str(ftol)],Verbose)
         disp_verbose(['Htol          ',num2str(max(htol0))],Verbose)
         htol=htol_base;
-        if norm(x(:,icount)-xparam1)>1.e-12 && analytic_derivation==0
+        if norm(x(:,icount)-xparam1)>1.e-12 && ~analytic_derivation
             try
                 if Save_files
                     save('m1.mat','x','fval0','nig','-append')

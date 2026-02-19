@@ -93,6 +93,10 @@ end
 
 % Check init state estimation with endogenous prior
 if options_.estimate_initial_states_endogenous_prior
+    if options_.analytic_derivation
+        error(['estimation option conflict: estimate_initial_states_endogenous_prior isn''t available ' ...
+            'for analytic_derivation'])
+    end
     if not(isequal(options_.posterior_sampler_options.posterior_sampling_method,'slice'))
         error('Init state estimation with endogenous prior is only compatible with slice sampler')
     else
@@ -409,7 +413,11 @@ if options_.analytic_derivation
     if options_.lik_init == 3
         error('analytic derivation is incompatible with diffuse filter')
     end
-    options_.analytic_derivation = 1;
+    % Validate analytic_Hessian string option
+    valid_hess_options = {'', 'full', 'opg', 'asymptotic'};
+    if ~ismember(options_.analytic_Hessian, valid_hess_options)
+        error('options_.analytic_Hessian must be one of: '''', ''full'', ''opg'', ''asymptotic''');
+    end
     if estim_params_.np || isfield(options_,'identification_check_endogenous_params_with_no_prior')
         % check if steady state changes param values
         M_local=M_;

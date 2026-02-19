@@ -200,7 +200,7 @@ end
 options_ident = set_default_option(options_ident,'lik_init',1);
 options_.lik_init=options_ident.lik_init; %make options_ inherit lik_init
 if options_ident.lik_init==3 %user specified diffuse filter using the lik_init option
-    options_ident.analytic_derivation=0; %diffuse filter not compatible with analytic derivation
+    options_ident.analytic_derivation=false; %diffuse filter not compatible with analytic derivation
 end
     % Type of initialization of Kalman filter:
     % 1: stationary models: initial matrix of variance of error of forecast is set equal to the unconditional variance of the state variables
@@ -285,7 +285,7 @@ end
 options_.order = options_ident.order;
 if options_ident.order > 1
     %order>1 is not compatible with analytic derivation in dsge_likelihood.m
-    options_ident.analytic_derivation=0;
+    options_ident.analytic_derivation=false;
     %order>1 is based on pruned state space system
     options_.pruning = true;
 end

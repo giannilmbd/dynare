@@ -1,4 +1,4 @@
-function [LIK, lik,a,P] = univariate_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,presample,T,Q,R,H,Z,mm,pp,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,D2T,D2Yss,D2Om,D2H,D2P)
+function [LIK, lik,a,P] = univariate_kalman_filter(data_index,no_more_missing_observations,Y,start,last,a,P,kalman_tol,riccati_tol,presample,T,Q,R,H,Z,mm,pp,Zflag,diffuse_periods,analytic_derivation,DT,DYss,DOm,DH,DP,analytic_Hessian,D2T,D2Yss,D2Om,D2H,D2P)
 % Computes the log-likelihood of a stationary state space model (univariate approach).
 %
 % The function implements the univariate Kalman filter, processing one
@@ -48,14 +48,15 @@ function [LIK, lik,a,P] = univariate_kalman_filter(data_index,no_more_missing_ob
 % - pp                      [integer]   number of observed variables
 % - Zflag                   [integer]   0 if Z is an index vector; 1 if Z is a [pp x mm] matrix
 % - diffuse_periods         [integer]   number of diffuse-filter periods already consumed during initialization
-% - analytic_derivation     [integer]   derivative mode: 0 (none), 1 (score), 2 (score and Hessian), or asymptotic-Hessian mode
-% - DT, DYss, DOm, DH, DP   [array]     first-derivative objects used when analytic_derivation > 0
+% - analytic_derivation     [logical]   whether to compute analytic derivatives (true/false)
+% - DT, DYss, DOm, DH, DP   [array]     first-derivative objects used when analytic_derivation is true
+% - analytic_Hessian        [string]    Hessian mode: '' (none), 'full' (analytic), 'opg' (outer product), 'asymptotic'
 % - D2T, D2Yss, D2Om, D2H, D2P
-%                           [array]     second-derivative objects used when analytic_derivation == 2
+%                           [array]     second-derivative objects used when analytic_Hessian=='full'
 %
 % OUTPUTS
-% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation>0, returns cell array {LIK,DLIK[,Hess]}
-% - lik                     [matrix|cell] [smpl x pp] observable-level log-likelihood contributions; if analytic_derivation>0, returns {lik,dlik}
+% - LIK                     [double|cell] minus log-likelihood; if analytic_derivation is true, returns cell array {LIK,DLIK[,Hess]}
+% - lik                     [matrix|cell] [smpl x pp] observable-level log-likelihood contributions; if analytic_derivation is true, returns {lik,dlik}
 % - a                       [vector]      [mm x 1] filtered state mean at the end of the processed sample
 % - P                       [matrix]      [mm x mm] filtered state covariance at the end of the processed sample
 %
@@ -116,9 +117,12 @@ notsteady = 1;
 
 oldK = Inf;
 K = NaN(mm,pp);
-asy_hess=0;
 
-if  analytic_derivation == 0
+% Extract Hessian mode flags from string
+full_Hess = strcmp(analytic_Hessian, 'full');
+asy_hess = strcmp(analytic_Hessian, 'asymptotic');
+
+if ~analytic_derivation
     DLIK=[];
     Hess=[];
 else
@@ -133,11 +137,10 @@ else
     else
         C=Z;
     end
-    if analytic_derivation==2
+    if full_Hess
         Hess  = zeros(k,k);                             % Initialization of the Hessian
         D2a    = zeros(mm,k,k);                             % State vector.
     else
-        asy_hess=D2T;
         Hess=[];
         D2a=[];
         D2T=[];
@@ -177,14 +180,14 @@ while notsteady && t<=last %loop over t
             end
             lik(s,i) = log(Fi) + (prediction_error*prediction_error)/Fi + l2pi; %Top equation p. 175 in DK (2012)
             if analytic_derivation
-                if analytic_derivation==2
-                    [Da,DP,DLIKt,D2a,D2P, Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,D2a,D2Yss,D2P);
+                if full_Hess
+                    [Da,DP,DLIKt,D2a,D2P, Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,D2a,D2Yss,squeeze(D2H(d_index(i),:,:)),D2P);
                 else
                     [Da,DP,DLIKt,Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady);
                 end
                 if t>presample
                     DLIK = DLIK + DLIKt;
-                    if analytic_derivation==2 || asy_hess
+                    if full_Hess || asy_hess
                         Hess = Hess + Hesst;
                     end
                 end
@@ -208,7 +211,7 @@ while notsteady && t<=last %loop over t
         end
     end
     if analytic_derivation
-        if analytic_derivation==2
+        if full_Hess
             [Da,DP,D2a,D2P] = univariate_computeDstate(k,a,P,T,Da,DP,DT,DOm,notsteady,D2a,D2P,D2T,D2Om);
         else
             [Da,DP] = univariate_computeDstate(k,a,P,T,Da,DP,DT,DOm,notsteady);
@@ -228,7 +231,7 @@ lik(1:s,:) = .5*lik(1:s,:);
 if analytic_derivation
     DLIK = DLIK/2;
     dlik = dlik/2;
-    if analytic_derivation==2 || asy_hess
+    if full_Hess || asy_hess
         %         Hess = (Hess + Hess')/2;
         Hess = -Hess/2;
     end
@@ -237,17 +240,17 @@ end
 % Call steady state univariate Kalman filter if needed.
 if t <= last
     if analytic_derivation
-        if analytic_derivation==2
+        if full_Hess
             [tmp, tmp2] = univariate_kalman_filter_ss(Y,t,last,a,P,kalman_tol,T,H,Z,pp,Zflag, ...
-                                                      analytic_derivation,Da,DT,DYss,DP,DH,D2a,D2T,D2Yss,D2P);
+                                                      analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,D2a,D2T,D2Yss,D2H,D2P);
         else
             [tmp, tmp2] = univariate_kalman_filter_ss(Y,t,last,a,P,kalman_tol,T,H,Z,pp,Zflag, ...
-                                                      analytic_derivation,Da,DT,DYss,DP,DH,asy_hess);
+                                                      analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian);
         end
         lik(s+1:end,:)=tmp2{1};
         dlik(s+1:end,:)=tmp2{2};
         DLIK = DLIK + tmp{2};
-        if analytic_derivation==2 || asy_hess
+        if full_Hess || asy_hess
             Hess = Hess + tmp{3};
         end
     else
@@ -263,7 +266,7 @@ else
 end
 
 if analytic_derivation
-    if analytic_derivation==2 || asy_hess
+    if full_Hess || asy_hess
         LIK={LIK, DLIK, Hess};
     else
         LIK={LIK, DLIK};

@@ -236,7 +236,9 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
             if current_optimizer==5
                 if options_.analytic_derivation
                     old_analytic_derivation = options_.analytic_derivation;
-                    options_.analytic_derivation=-1; %force analytic outer product gradient Hessian for each iteration
+                    old_analytic_Hessian = options_.analytic_Hessian;
+                    options_.analytic_derivation = true;
+                    options_.analytic_Hessian = 'opg'; %force analytic outer product gradient Hessian for each iteration
                 end
             end
         end
@@ -254,6 +256,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                 new_rat_hess_info = new_rat_hess_info.new_rat_hess_info;
                 if options_.analytic_derivation
                     options_.analytic_derivation = old_analytic_derivation;
+                    options_.analytic_Hessian = old_analytic_Hessian;
                 end
             elseif current_optimizer==6 %save scaling factor
                 save([M_.dname filesep 'Output' filesep M_.fname '_optimal_mh_scale_parameter.mat'],'Scale');
@@ -265,10 +268,13 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
             if options_.cova_compute == 1 %user did not request covariance not to be computed
                 if options_.analytic_derivation && strcmp(func2str(objective_function),'dsge_likelihood')
                     ana_deriv_old = options_.analytic_derivation;
-                    options_.analytic_derivation = 2;
+                    ana_hess_old = options_.analytic_Hessian;
+                    options_.analytic_derivation = true;
+                    options_.analytic_Hessian = 'full';
                     [~,~,~,~,hh] = feval(objective_function,xparam1, ...
                                          dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                     options_.analytic_derivation = ana_deriv_old;
+                    options_.analytic_Hessian = ana_hess_old;
                 elseif ~isnumeric(current_optimizer) || ~(isequal(current_optimizer,5) && newratflag~=1 && strcmp(func2str(objective_function),'dsge_likelihood'))
                     % enter here if i) not mode_compute_5, ii) if mode_compute_5 and newratflag==1;
                     % with flag==0 or 2 and dsge_likelihood, we force to use
@@ -331,7 +337,7 @@ end
 
 if options_.mode_check.status && ~options_.mh_posterior_mode_estimation && ~issmc(options_)
     ana_deriv_old = options_.analytic_derivation;
-    options_.analytic_derivation = 0;
+    options_.analytic_derivation = false;
     mode_check(objective_function,xparam1,hh,options_,M_,estim_params_,bayestopt_,bounds,false,...
                dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     options_.analytic_derivation = ana_deriv_old;
@@ -447,7 +453,7 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
             options_.posterior_sampler_options.current_options = posterior_sampler_options;
             if options_.mh_replic
                 ana_deriv_old = options_.analytic_derivation;
-                options_.analytic_derivation = 0;
+                options_.analytic_derivation = false;
                 posterior_sampler(objective_function,posterior_sampler_options.proposal_distribution,xparam1,posterior_sampler_options,bounds,dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,oo_,dispString);
                 options_.analytic_derivation = ana_deriv_old;
             end

@@ -184,7 +184,7 @@ options_mom_ = set_default_option(options_mom_,'huge_number',1e7);              
 options_mom_.mom = set_default_option(options_mom_.mom,'analytic_jacobian',false); % use analytic Jacobian in optimization, only available for GMM and gradient-based optimizers
 options_mom_.optimizer_vec = [options_mom_.mode_compute;num2cell(options_mom_.additional_optimizer_steps)];
 options_mom_.mom.analytic_jacobian_optimizers = [1, 3, 4, 13, 101];                % these are currently supported optimizers that are able to use the analytic_jacobian option
-options_mom_.analytic_derivation = 0;                                              % force to 0 as we check this seperately in dynare_minimize_objective.m
+options_mom_.analytic_derivation = false;                                          % force to false as we check this seperately in dynare_minimize_objective.m
 options_mom_ = set_default_option(options_mom_,'mode_file','');                    % name of the file containing initial values for the mode
 options_mom_ = set_default_option(options_mom_,'cova_compute',true);               % 1: computed covariance via Hessian after the computation of the mode, 0: turn off computation of covariance matrix
 
