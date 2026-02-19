@@ -1,9 +1,13 @@
-function estim_params_=check_for_calibrated_covariances(estim_params_,M_)
-% function check_for_calibrated_covariances(estim_params_,M)
+function estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id)
+% function estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id)
 % find calibrated covariances to consider during estimation
 % Inputs
 %   -estim_params_  [structure] describing parameters to be estimated
 %   -M_             [structure] describing the model
+%   -varobs_id      [vector]    index of observed variables in declaration order
+%                               (options_.varobs_id), used to map corrn entries
+%                               (endogenous variable indices) to observable
+%                               positions in M_.H
 %
 % Outputs
 %   -estim_params_  [structure] describing parameters to be estimated
@@ -62,8 +66,10 @@ end
 
 if estim_params_.ncn %delete preset entries actually estimated
     for i=1:estim_params_.ncn
-        shock_1 = estim_params_.corrn(i,1);
-        shock_2 = estim_params_.corrn(i,2);
+        % corrn contains endogenous variable indices (declaration order),
+        % but M_.H is indexed by observable position. Map via varobs_id.
+        shock_1 = find(varobs_id == estim_params_.corrn(i,1));
+        shock_2 = find(varobs_id == estim_params_.corrn(i,2));
         estimated_corr_pos=find(rows_calibrated==shock_1 & columns_calibrated==shock_2);
         if ~isempty(estimated_corr_pos)
             rows_calibrated(estimated_corr_pos)=[];
@@ -95,7 +101,8 @@ estim_params_.ncn=1;
 estim_params_.corrx=[2 1 NaN -1 1 3 0 0.2000 NaN NaN NaN];
 estim_params_.corrn=[2 1 NaN -1 1 3 0 0.2000 NaN NaN NaN];
 
-estim_params_=check_for_calibrated_covariances(estim_params_,M_);
+varobs_id=[1 2];
+estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id);
 if isfield(estim_params_,'calibrated_covariances_ME') || isfield(estim_params_,'calibrated_covariances')
     t(1)=false;
 else
@@ -111,7 +118,8 @@ estim_params_.ncn=0;
 
 estim_params_.corrx=[2 1 NaN -1 1 3 0 0.2000 NaN NaN NaN];
 estim_params_.corrn=[];
-estim_params_=check_for_calibrated_covariances(estim_params_,M_);
+varobs_id=[1 2];
+estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id);
 t(2)=isequal(estim_params_.calibrated_covariances_ME.position,[2;3]);
 t(3)=isequal(estim_params_.calibrated_covariances_ME.cov_value,[-0.1;-0.1]);
 
@@ -124,11 +132,41 @@ estim_params_.ncn=1;
 
 estim_params_.corrx=[2 1 NaN -1 1 3 0 0.2000 NaN NaN NaN];
 estim_params_.corrn=[2 1 NaN -1 1 3 0 0.2000 NaN NaN NaN];
-estim_params_=check_for_calibrated_covariances(estim_params_,M_);
+varobs_id=[1 2];
+estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id);
 if isfield(estim_params_,'calibrated_covariances_ME') || isfield(estim_params_,'calibrated_covariances')
     t(4)=false;
 else
     t(4)=true;
 end
+
+%% Test 5: Non-trivial varobs mapping
+% corrn uses endogenous variable indices [12 11], but H is 2x2 indexed by
+% observable position. With varobs_id=[12 11], corrn(12,11) maps to
+% observable positions (1,2), which should match the calibrated entry.
+M_.Sigma_e=[1 0; 0 1];
+M_.H=[1 -0.3; -0.3 1];
+estim_params_.ncx=0;
+estim_params_.ncn=1;
+estim_params_.corrx=[];
+estim_params_.corrn=[12 11 NaN -1 1 3 0 0.2000 NaN NaN NaN];
+varobs_id=[12 11];
+estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id);
+% The estimated corrn should remove the calibrated entry from H
+
+t(5)=~isfield(estim_params_,'calibrated_covariances_ME'); % should have been removed since we estimate this corr
+
+%% Test 6: Non-trivial mapping with calibrated entry NOT estimated
+M_.Sigma_e=[1 0; 0 1];
+M_.H=[1 -0.3; -0.3 1];
+estim_params_.ncx=0;
+estim_params_.ncn=0;
+estim_params_.corrx=[];
+estim_params_.corrn=[];
+varobs_id=[12 11];
+estim_params_=check_for_calibrated_covariances(estim_params_,M_,varobs_id);
+t(6)=isequal(estim_params_.calibrated_covariances_ME.position,[2;3]);
+t(7)=isequal(estim_params_.calibrated_covariances_ME.cov_value,[-0.3;-0.3]);
+
 T = all(t);
 %@eof:1

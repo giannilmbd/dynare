@@ -238,7 +238,7 @@ end
 
 %check for calibrated covariances before updating parameters
 if ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && sum(estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.nendoinit+estim_params_.np)==0)
-    estim_params_=check_for_calibrated_covariances(estim_params_,M_);
+    estim_params_=check_for_calibrated_covariances(estim_params_,M_,options_.varobs_id);
 end
 
 %%read out calibration that was set in mod-file and can be used for initialization
