@@ -9016,6 +9016,7 @@ Posterior sampling options
        researchers).
 
     .. option:: estimate_initial_states_endogenous_prior
+                estimate_initial_states_endogenous_prior = BOOLEAN
 
        Jointly estimate the initial states along with the other parameters. 
        This contrasts to the usual approach of marginalizing with respect to
@@ -13403,6 +13404,7 @@ Optimal Simple Rules (OSR)
         optimizer-specific values. Default: ``1e-7``.
 
     .. option:: analytic_derivation
+                analytic_derivation = BOOLEAN
 
        Triggers estimation with analytic gradient of the objective function.
        It is only supported for the linear-quadratic approach at ``order=1``
