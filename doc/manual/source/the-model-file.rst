@@ -6544,6 +6544,8 @@ All of these elements are discussed in the following.
 
     *Options*
 
+    .. rubric:: Simulation options
+
     .. option:: simul_periods = INTEGER
 
        Number of periods of the simulation. Default: 100.
@@ -6566,6 +6568,13 @@ All of these elements are discussed in the following.
        at some point due to regimes that last very long in expectations. This may considerably slow
        down convergence in subsequent periods. Default: not enabled.
 
+    .. option:: simul_reset_regime_in_new_period
+                simul_reset_regime_in_new_period = BOOLEAN
+
+         Disable the default feature that the guess regime in period $t+1$ equals the 1-step-ahead expected
+         regime in period $t$. This can improve convergence when the expected regime is inconsistent with the
+         regime triggered by new shocks in $t+1$. Default: not enabled.
+
     .. option:: simul_max_check_ahead_periods = INTEGER
 
        If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods
@@ -6585,9 +6594,25 @@ All of these elements are discussed in the following.
        that lead to oscillations between regiems and may be prevented by allowing for a small buffer in regime
        transitions. Default: not enabled.
 
+    .. option:: simul_periodic_solution_threshold = INTEGER
+
+       Maximum difference allowed between regimes in the periodic loop. A value of 1 means the duration of a
+       constrained regime can change by at most 1 period; otherwise, the periodic solution is rejected.
+       Default: 1.
+
+    .. option:: simul_periodic_solution_strict
+                simul_periodic_solution_strict = BOOLEAN
+
+       Enforce strict acceptance of a periodic solution consistent with
+       ``simul_periodic_solution_threshold``. When disabled, a periodic solution is accepted if at least one
+       forward path of regimes within the periodic loop does not violate constraints in expectation.
+       Default: true.
+
     .. option:: simul_debug
 
        Provide additional debugging information during solving. Default: not enabled.
+
+    .. rubric:: Smoother options
 
     .. option:: smoother_periods = INTEGER
 
@@ -6620,6 +6645,39 @@ All of these elements are discussed in the following.
        Accept periodic solution where solution alternates between two sets of results (equivalent of ``simul_periodic_solution``).
        Default: not enabled.
 
+    .. option:: smoother_max_check_ahead_periods = INTEGER
+
+       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods 
+       (i.e. when we want agents to be myopic beyond some future period) instead of potentially endogenously increasing
+       ``likelihood_check_ahead_periods`` ever further. Equivalent of ``simul_max_check_ahead_periods``. Default: Inf.
+
+    .. option:: smoother_inversion_filter
+
+       Employ the inversion filter of :cite:t:`CubaBorda:2019` when running the
+       smoother. The underlying assumption is that the system starts at the steady state. In this case, the 
+       inversion filter will provide the required smoother output. Default: not enabled.
+
+    .. option:: smoother_piecewise_kalman_filter
+
+       Employ the piecewise Kalman filter of :cite:t:`Giovannini:2021` when running the
+       smoother. Default: enabled.
+
+    .. option:: smoother_plot
+
+       Plot linear vs piecewise linear smoothed shock estimates. Default: enabled.
+
+    .. option:: smoother_first_period_occbin_update = INTEGER
+
+       First period in which PKF filter steps are used when running the smoother. If greater than 1,
+       linear Kalman filter steps are used before this period. Default: 1.
+
+    .. option:: smoother_max_number_of_iterations = INTEGER
+
+       Maximum number of smoother iterations that attempt to find a consistent sequence of shocks and
+       regimes. Default: 10.
+       
+    .. rubric:: Likelihood computation options
+
     .. option:: likelihood_periods = INTEGER
 
        Number of periods employed during the simulation when computing the likelihood
@@ -6634,12 +6692,6 @@ All of these elements are discussed in the following.
 
        Number of periods for which to check ahead for return to the baseline regime during the
        simulation when computing the likelihood  (equivalent of ``simul_check_ahead_periods``). Default: 200.
-
-    .. option:: smoother_max_check_ahead_periods = INTEGER
-
-       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods
-       (i.e. when we want agents to be myopic beyond some future period) instead of potentially endogenously increasing
-       ``likelihood_check_ahead_periods`` ever further. Equivalent of ``simul_max_check_ahead_periods``. Default: Inf.
 
     .. option:: likelihood_curb_retrench
 
@@ -6665,17 +6717,8 @@ All of these elements are discussed in the following.
     .. option:: likelihood_max_kalman_iterations
 
        Maximum number of iterations of the outer loop for the piecewise Kalman filter. Default: 10.
-
-    .. option:: smoother_inversion_filter
-
-       Employ the inversion filter of :cite:t:`CubaBorda:2019` when running the
-       smoother. The underlying assumption is that the system starts at the steady state. In this case, the
-       inversion filter will provide the required smoother output. Default: not enabled.
-
-    .. option:: smoother_piecewise_kalman_filter
-
-       Employ the piecewise Kalman filter of :cite:t:`Giovannini:2021` when running the
-       smoother. Default: enabled.
+       
+    .. rubric:: Piecewise Kalman filter and particle filter options
 
     .. option:: filter_use_relaxation
 
@@ -6683,6 +6726,152 @@ All of these elements are discussed in the following.
        Kalman filter. When old and new guess regime differ to much, use a new guess closer to the previous guess.
        In case of multiple solutions, tends to provide an occasionally binding regime with a shorter duration (typically preferable).
        Specifying this option may slow down convergence. Default: not enabled.
+
+    .. option:: filter_particle_draw_states_from_empirical_density
+                filter_particle_draw_states_from_empirical_density = BOOLEAN
+
+      When using the particle filter, draw state particles from the empirical density of past draws.
+      Default: true.
+
+    .. option:: filter_particle_state_importance_sampling_pkf_init
+                filter_particle_state_importance_sampling_pkf_init = BOOLEAN
+
+      Use the piecewise Kalman filter proposal density in the particle filter's state-importance-sampling step.
+      Default: enabled.
+
+    .. option:: filter_particle_state_importance_sampling_logpost_crit_threshold = DOUBLE
+  
+      Log-posterior critical threshold between PKF and PPF data density estimates above which additional robustness checks for PPF filter step are triggered.
+
+      Default: 5.
+
+    .. option:: filter_particle_state_importance_sampling_slice_override_iteration = INTEGER
+
+      Number of importance sampling iterations (sequential Monte Carlo iterations) before resorting to slice sampling for state update.
+
+      Default: 100.
+
+    .. option:: filter_particle_state_importance_sampling_slice_burnin = INTEGER
+
+      Burn-in iterations for slice sampling in state importance sampling.
+      Default: 10.
+
+    .. option:: filter_particle_initial_state_ergodic_simul
+                filter_particle_initial_state_ergodic_simul = BOOLEAN
+
+      Draw initial states from an ergodic simulation when initializing the particle filter.
+      Default: false.
+
+    .. option:: filter_particle_diagnostics
+                filter_particle_diagnostics = BOOLEAN
+
+      Trigger diagnostic tests/plots for the particle filter state update.
+      Default: false.
+
+    .. option:: filter_particle_diagnostics_graph_periods = INTEGER_VECTOR
+
+      Select specific critical periods for which to run the diagnostic tests.
+      Default: empty.
+
+    .. option:: filter_particle_diagnostics_nograph
+                filter_particle_diagnostics_nograph = BOOLEAN
+
+      Disable diagnostic graphs.
+      Default: true.
+
+    .. option:: filter_particle_number_of_particles  = INTEGER
+ 
+      Number of particles used by the particle filter. 
+      Default: 127.
+
+    .. option:: filter_particle_number_of_shocks_per_particle = INTEGER
+ 
+      Number of shock draws per particle. 
+      Default: 1.
+
+    .. option:: filter_particle_state_draws   = NUMERICAL_VECTOR
+ 
+      Provide a fixed set of state draws for particle filtering. Default: empty (draw internally).
+
+    .. option:: particle_filtering
+                particle_filtering = BOOLEAN
+
+      Activate the particle filter branch within OccBin filtering. Default: false.
+
+    .. option:: filter_particle_use_pkf_updated_state_threshold = INTEGER
+ 
+      Threshold controlling when to re-use PKF-updated states in the particle filter. Default: 1.
+
+    .. option:: filter_init_periods_using_particles
+                filter_init_periods_using_particles = BOOLEAN
+
+      This triggers particle filtering only for initial periods, in an
+      otherwise standard PKF likelihood evaluation. Since state uncertainty is
+      larger in first periods, this may be enough to robustify estimates when
+      constraints are binding at the beginning of the sample. 
+      The algorithm automatically swithes to PKF (no particles) once all
+      constraints become slack for the first time.
+      Default: false.
+       
+    .. rubric:: Posterior importance sampling
+    
+    .. option:: posterior_importance_sampling
+                posterior_importance_sampling = BOOLEAN
+
+      Enables posterior importance sampling of estimated parameters/shocks
+      starting from a previous MCMC estimation. For example after MCMC estimation
+      with linear model, re-sample posterior draws using the piecewise
+      Kalman filter (``pkf``) or the piecewise particle filter (``ppf``). Or,
+      after estimating with piecewise Kalman filter, run this with piecewise
+      particle filter. Given that the piecewise Kalman filter is more
+      computationally intensive than the standard Kalman filter and that the
+      piecewise particle filter more costly than the piecewise Kalman filter,
+      this allows for faster robustness checks regarding the possible bias of
+      the estimation when using the original (KF or PKF) filter. 
+      This requires mh results from previous estimation to be present in ``metropolis`` folder
+
+      Default: false.
+
+    .. option:: posterior_importance_sampling_filter = QUOTED_STRING
+
+       Sets the new filter to be used for importance sampling. Values are:
+
+           ``'pkf'``
+
+               Uses the piecewise Kalman filter.
+
+           ``'ppf'``
+
+               Uses the piecewise particle filter.
+
+       Default: ``'pkf'``.
+
+    .. option:: posterior_importance_sampling_orig_filter = QUOTED_STRING
+
+       Indicates the filter used for original posterior draws. Values are:
+
+           ``'linear'``
+
+
+           ``'pkf'``
+
+       Default: ``'linear'``.
+
+    .. option:: posterior_importance_sampling_sub_draws = INTEGER
+
+       Sets the number of sub-draws to be used for evaluating posterior kernel
+       with new filter and subsequent importance sampling. Default: the one
+       specified with :opt:`sub_draws <sub_draws = INTEGER>`.
+
+    .. option:: posterior_importance_sampling_orig_dname = FILENAME
+
+       Sets the ``results`` folder if it is not the default one. Default:
+       current ``dirname``.
+
+    .. option:: posterior_importance_sampling_orig_fname = FILENAME
+
+       Sets the name of the original model, in case it is different from
+       current one. Default: current ``FNAME``.
 
    *Output*
 
