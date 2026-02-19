@@ -61,7 +61,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    use iso_c_binding
    implicit none (type, external)
 
-   type(c_ptr), dimension(*), intent(in), target :: prhs
+   type(c_ptr), dimension(*), intent(in) :: prhs
    type(c_ptr), dimension(*), intent(out) :: plhs
    integer(c_int), intent(in), value :: nlhs, nrhs
 

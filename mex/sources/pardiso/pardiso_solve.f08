@@ -14,7 +14,7 @@
 ! NB: the present MEX and the pardiso_init MEX could easily be extended to
 ! solve other types of systems (symmetric, complex)
 
-! Copyright © 2025 Dynare Team
+! Copyright © 2025-2026 Dynare Team
 !
 ! This file is part of Dynare.
 !
@@ -37,7 +37,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
   use panua_pardiso
   implicit none (type, external)
 
-  type(c_ptr), dimension(*), intent(in), target :: prhs
+  type(c_ptr), dimension(*), intent(in) :: prhs
   type(c_ptr), dimension(*), intent(out) :: plhs
   integer(c_int), intent(in), value :: nlhs, nrhs
 

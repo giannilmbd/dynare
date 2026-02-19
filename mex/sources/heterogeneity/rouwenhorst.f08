@@ -44,7 +44,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     implicit none (type, external)
 
     ! MATLAB MEX API
-    type(c_ptr), dimension(*), intent(in), target :: prhs
+    type(c_ptr), dimension(*), intent(in) :: prhs
     type(c_ptr), dimension(*), intent(out) :: plhs
     integer(c_int), intent(in), value :: nlhs, nrhs
     type(c_ptr) :: rho_mx, sigma_mx, N_mx, tol_mx, maxiter_mx  ! Input arguments
