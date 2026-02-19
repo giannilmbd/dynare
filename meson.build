@@ -368,6 +368,15 @@ block_trust_region_src = [ 'mex/sources/block_trust_region/dulmage_mendelsohn.f0
                            'mex/sources/block_trust_region/mexFunction.f08' ]
 shared_module('block_trust_region', block_trust_region_src, kwargs : mex_kwargs, dependencies : [ mex_fortran_dep, lapack_fortran_dep ])
 
+trust_region_test_exe = executable('trust_region_test',
+                                   [ 'mex/sources/block_trust_region/trust_region.f08',
+                                     'mex/sources/block_trust_region/test/trust_region_test.f08' ],
+                                   dependencies : lapack_fortran_dep,
+                                   link_args : exe_link_args,
+                                   build_rpath : exe_rpath,
+                                   fortran_args : mex_kwargs['fortran_args'])
+test('trust_region', trust_region_test_exe, timeout : 0)
+
 bytecode_src = [ 'mex/sources/bytecode/bytecode.cc',
                  'mex/sources/bytecode/Interpreter.cc',
                  'mex/sources/bytecode/Mem_Mngr.cc',

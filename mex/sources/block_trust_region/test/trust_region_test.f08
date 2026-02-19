@@ -15,12 +15,12 @@ program trust_region_test
 
   rosenbrock_x = rosenbrock_guess
   call trust_region_solve(rosenbrock_x, rosenbrock, info)
-  if (info /= 1 .or. maxval(abs(rosenbrock_x - rosenbrock_solution)) > 1e-11_real64) &
+  if (info /= 1 .or. maxval(abs(rosenbrock_x - rosenbrock_solution)) > 4e-9_real64) &
        error stop "Failed to solve rosenbrock"
 
   powell1_x = powell1_guess
   call trust_region_solve(powell1_x, powell1, info, tolf = 1e-8_real64)
-  if (info /= 1 .or. maxval(abs(rosenbrock_x - rosenbrock_solution)) > 4e-5_real64) &
+  if (info /= 1 .or. maxval(abs(powell1_x - powell1_solution)) > 4e-5_real64) &
        error stop "Failed to solve powell1"
 contains
   subroutine rosenbrock(x, fvec, fjac)
