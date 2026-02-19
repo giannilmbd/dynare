@@ -202,9 +202,7 @@ while newRank && t<smpl
                 % The univariate diffuse Kalman filter should be used.
                 % Display debugging information about singular combination
                 if debug
-                    if debug
-                        check_stochastic_singularity(Finf, di, varobs, t,'forecast-error variance matrix Finf of nonstationary variables');
-                    end
+                    check_stochastic_singularity(Finf, di, varobs, t,'forecast-error variance matrix Finf of nonstationary variables');
                 end
                 alphahat = Inf;
                 error_flag = 420;
