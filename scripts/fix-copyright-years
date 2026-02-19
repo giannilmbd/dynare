@@ -16,6 +16,7 @@
 
 LAST_UPDATE_COMMIT=a3afba706bf2a6e3ba8f96874cc47ded7e39db9d # dynare.git
 #LAST_UPDATE_COMMIT=12c91b786ce59e2f1fc7fefcbf0a94a062ea0c5d # dseries.git
+#LAST_UPDATE_COMMIT=a1728ec6bfc760ab7f0d48f5897ec27baebf211b # preprocessor.git
 
 if [[ -z $1 ]]; then
     echo "Give a filename in argument"
