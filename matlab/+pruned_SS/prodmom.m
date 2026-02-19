@@ -19,9 +19,9 @@
 % This function is part of replication codes of the following paper:
 % Kan, R.: "From moments of sum to moments of product." Journal of 
 % Multivariate Analysis, 2008, vol. 99, issue 3, pages 542-554.
-% =========================================================================
+
 % Copyright © 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
-% Copyright © 2019-2023 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -37,7 +37,7 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
+
 function y = prodmom(V,ii,nu)
 if nargin<3
    nu = ones(size(ii));

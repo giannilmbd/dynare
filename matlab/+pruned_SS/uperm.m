@@ -1,8 +1,8 @@
 function p = uperm(a)
 % Return all unique permutations of possibly-repeating array elements
-% =========================================================================
+
 % Copyright © 2014 Bruno Luong <brunoluong@yahoo.com>
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2023 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -18,7 +18,7 @@ function p = uperm(a)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
+%
 % Original author: Bruno Luong <brunoluong@yahoo.com>, April 20, 2014
 % https://groups.google.com/d/msg/comp.soft-sys.matlab/yQKVPTYrv6Q/gw1MzNd9sYkJ
 % https://stackoverflow.com/a/42810388

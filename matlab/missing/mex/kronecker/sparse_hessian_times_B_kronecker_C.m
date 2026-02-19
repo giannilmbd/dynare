@@ -43,7 +43,7 @@ function D = sparse_hessian_times_B_kronecker_C(varargin)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 1996-2020 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

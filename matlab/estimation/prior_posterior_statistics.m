@@ -22,7 +22,7 @@ function oo_=prior_posterior_statistics(type,dataset_,dataset_info,M_,oo_,option
 % See the comments in the posterior_sampler.m function.
 
 
-% Copyright © 2005-2025 Dynare Team
+% Copyright © 2005-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -8,7 +8,7 @@ function i = write_mh_history_file(MetropolisFolder, ModelName, record)
 % Outputs:
 %   i                   [scalar]    number of the mh_history file
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

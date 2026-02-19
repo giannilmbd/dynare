@@ -13,7 +13,7 @@ function x = get_shock_skew_by_name(varargin)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

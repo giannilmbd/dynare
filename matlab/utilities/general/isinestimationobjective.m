@@ -2,7 +2,7 @@ function b = isinestimationobjective()
 
 % Returns true iff the caller function is called by a routine defining the objective of an estimation algorithm.
 
-% Copyright © 2014-2020 Dynare Team
+% Copyright © 2014-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

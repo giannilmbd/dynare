@@ -27,7 +27,7 @@ function i = issquare(A)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2012-2017 Dynare Team
+% Copyright © 2012-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

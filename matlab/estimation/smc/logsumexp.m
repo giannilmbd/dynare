@@ -14,7 +14,7 @@ function [lse,sm] = logsumexp(x)
 %
 %    Taken from https://de.mathworks.com/matlabcentral/fileexchange/84892-logsumexp-softmax
 %
-% Copyright (c) 2020, Nicholas J. Higham 
+% Copyright © 2020, Nicholas J. Higham 
 % All rights reserved.
 %
 % Redistribution and use in source and binary forms, with or without

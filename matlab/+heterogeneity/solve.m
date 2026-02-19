@@ -35,7 +35,7 @@ function dr = solve(M_, options_solve, oo_het, varargin)
 % - populate_dr_timing_fields_transposed: Populates dr with transposed structure
 % - populate_dr_timing_fields_reshape_2d: Populates dr with reshape for curlyDs
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

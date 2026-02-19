@@ -12,7 +12,7 @@ function display_problematic_vars_Jacobian(problemrow, problemcol, M_, x, type, 
 %                               Jacobian
 %   caller_string   [string] contains name of calling function for printing
 
-% Copyright © 2014-2024 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -22,9 +22,9 @@ function [y,dy] = bivmom(p,rho)
 % Kotz, Balakrishnan, and Johnson (2000), Continuous Multivariate Distributions, Vol. 1, p.261
 % Note that there is a typo in Eq.(46.25), there should be an extra rho in front 
 % of the equation.
-% =========================================================================
+
 % Copyright © 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
-% Copyright © 2019-2020 Dynare Team
+% Copyright © 2019-2023 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -40,7 +40,7 @@ function [y,dy] = bivmom(p,rho)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
+
 s1 = p(1);
 s2 = p(2);
 rho2 = rho^2;

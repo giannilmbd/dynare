@@ -32,7 +32,7 @@ function [z, endo_names, endo_names_tex, steady_state, i_var, oo_] = annualized_
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

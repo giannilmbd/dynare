@@ -17,7 +17,7 @@ function [K,iF,P] = steady_state_kalman_gain(T,R,Q,H,mf)
 % SPECIAL REQUIREMENTS
 %   Needs a solver for Riccati equations (dare.m)
 
-% Copyright © 2004-2017 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

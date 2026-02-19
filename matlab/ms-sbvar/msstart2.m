@@ -12,7 +12,7 @@
 %
 % February 2004
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

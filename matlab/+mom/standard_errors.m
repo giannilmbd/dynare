@@ -38,7 +38,7 @@ function [stderr_values, asympt_cov_mat] = standard_errors(xparam, objective_fun
 %  o mom.optimal_weighting_matrix
 % -------------------------------------------------------------------------
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

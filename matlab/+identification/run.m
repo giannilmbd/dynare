@@ -52,7 +52,7 @@ function [pdraws, STO_REDUCEDFORM, STO_MOMENTS, STO_DYNAMIC, STO_si_dDYNAMIC, ST
 %    * vnorm
 % =========================================================================
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

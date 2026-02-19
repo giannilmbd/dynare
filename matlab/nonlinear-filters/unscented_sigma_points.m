@@ -20,7 +20,7 @@ function [nodes,W_m,W_c] = unscented_sigma_points(n,unscented_options)
 % 
 % NOTES
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

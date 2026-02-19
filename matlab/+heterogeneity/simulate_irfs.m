@@ -18,7 +18,7 @@ function oo_irfs = simulate_irfs(M_, options_, oo_, var_list, shock_list)
 %   This is a lightweight function with minimal validation. For full input
 %   validation and automatic mode detection, use heterogeneity.simulate() instead.
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

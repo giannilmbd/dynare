@@ -92,7 +92,7 @@ function [x,FVAL,EXITFLAG,OUTPUT,JACOB] = lmmcp(FUN,x,lb,ub,options,varargin)
 
 % Copyright © 2005 Christian Kanzow and Stefania Petra
 % Copyright © 2013 Christophe Gouel
-% Copyright © 2014-2017 Dynare Team
+% Copyright © 2014-2022 Dynare Team
 %
 % Unlimited permission is granted to everyone to use, copy, modify or
 % distribute this software.

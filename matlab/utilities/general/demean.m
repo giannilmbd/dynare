@@ -8,7 +8,7 @@ function c = demean(x)
 % OUTPUTS
 % - c    [double]   T*N matrix of demeaned data.
 
-% Copyright © 2011-2018 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

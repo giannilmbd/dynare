@@ -36,7 +36,7 @@ function autocov = nanautocovariance(data,order)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2011-2014 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

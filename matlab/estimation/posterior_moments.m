@@ -22,7 +22,7 @@ function [post_mean, post_median, post_var, hpd_interval, post_deciles, density]
 %                                                   kernel_density_estimate.m.
 %
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

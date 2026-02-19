@@ -36,7 +36,7 @@ function [oo_,M_,options_,bayestopt_,Smoothed_variables_declaration_order_deviat
 %    None
 %
 
-% Copyright © 2010-2025 Dynare Team
+% Copyright © 2010-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

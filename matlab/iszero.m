@@ -2,7 +2,7 @@ function b = iszero(A)
 
 % Returns true iff all the elements of array A are 0.    
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

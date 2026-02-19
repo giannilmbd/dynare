@@ -14,7 +14,7 @@ function [Q, A0, Aplus, Zeta] = load_flat_file(file_tag)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2013 Dynare Team
+% Copyright © 2013-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

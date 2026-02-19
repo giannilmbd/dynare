@@ -26,7 +26,7 @@ function b = isauxiliary(var, types)
 %   - 10,    Variable created when diff was taken of unary operator (log, exp)
 %   - 11,    Lead on Diff
 
-% Copyright © 2018-2021 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

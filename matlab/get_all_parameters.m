@@ -15,7 +15,7 @@ function xparam1 = get_all_parameters(estim_params_, M_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2013-2025 Dynare Team
+% Copyright © 2013-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

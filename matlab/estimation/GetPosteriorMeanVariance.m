@@ -10,7 +10,7 @@ function [mean, variance] = GetPosteriorMeanVariance(options_, M_)
 % - mean             [double]    n×1 vector, posterior expectation.
 % - variance         [double]    n×n matrix, posterior variance.
 
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

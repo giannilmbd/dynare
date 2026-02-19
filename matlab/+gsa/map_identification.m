@@ -14,7 +14,7 @@ function map_identification(OutputDirectoryName,opt_gsa,M_,oo_,options_,estim_pa
 % marco.ratto@ec.europa.eu
 
 % Copyright © 2012-2016 European Commission
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

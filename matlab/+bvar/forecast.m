@@ -11,7 +11,7 @@ function forecast(nlags)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2007-2023 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

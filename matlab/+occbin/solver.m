@@ -22,7 +22,7 @@ function [dr, out, ss] = solver(M_, options_, dr ,steady_state, exo_steady_state
 %                                               - R: [n_vars by n_exo by n_shock_period] array of shock response matrices
 %                                               - C: [n_vars by n_shock_period] array of constants
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -1,7 +1,7 @@
 classdef report_series < handle
     % report_series Class to write a page to the report
     %
-    % Copyright © 2013-2022 Dynare Team
+    % Copyright © 2013-2023 Dynare Team
     %
     % This file is part of Dynare.
     %

@@ -20,7 +20,7 @@ function [TT, RR, CC, regime_history] = check_regimes(TT, RR, CC, opts_regime, M
 % - regime_history  [structure]         contains the regime history
 
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -8,7 +8,7 @@ function graph(var_list,M_, oo_,options_)
 %   o oo_                   outputs structure
 %   o options_              options structure
 
-% Copyright © 2008-2023 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

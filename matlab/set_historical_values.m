@@ -9,7 +9,7 @@ function set_historical_values(ds, initialperiod)
 % OUTPUTS
 % - none
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -11,7 +11,7 @@ function x = get_shock_stderr_by_name(exoname)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

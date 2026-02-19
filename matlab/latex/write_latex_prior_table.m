@@ -11,7 +11,7 @@ function write_latex_prior_table
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2015-2019 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

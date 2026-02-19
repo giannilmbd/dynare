@@ -12,7 +12,7 @@ function WriteShockDecomp2Excel(z,shock_names,endo_names,i_var,initial_date,M_,o
 %   options_        [structure]                     Dynare options structure
 %   opts_decomp     [structure]                     decomposition options structure
 
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

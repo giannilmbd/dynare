@@ -23,7 +23,7 @@ function [q_alph] = csn_quantile(alph, mu, Sigma, Gamma, nu, Delta, mvnlogcdf, o
 % - q_alph      [p by 1]    alpha quantile vector of the CSN(mu,Sigma,Gamma,nu,Delta) distribution
 
 % Copyright © 2022-2023 Gaygysyz Guljanov, Willi Mutschler
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

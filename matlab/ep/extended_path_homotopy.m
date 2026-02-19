@@ -21,7 +21,7 @@ function [info_convergence, endo_simul] = extended_path_homotopy(endo_simul, exo
 % Called by: extended_path_core.m
 
 
-% Copyright © 2016-2025 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

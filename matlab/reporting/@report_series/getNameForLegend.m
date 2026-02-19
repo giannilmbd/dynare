@@ -1,7 +1,7 @@
 function s = getNameForLegend(o)
 %function s = getNameForLegend(o)
 
-% Copyright © 2014-2015 Dynare Team
+% Copyright © 2014-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

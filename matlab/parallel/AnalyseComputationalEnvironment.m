@@ -83,7 +83,7 @@ dynareParallelMkDir(RemoteTmpFolder,DataInput);
 % Currently when errors are detected execution simply stops and users can
 % fix configuration errors according to the error type.
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

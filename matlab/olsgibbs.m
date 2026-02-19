@@ -30,7 +30,7 @@ function ds = olsgibbs(ds, eqtag, BetaPriorExpectation, BetaPriorVariance, s2, n
 % SPECIAL REQUIREMENTS
 %   Dynare must have been run with the option: json=compute
 
-% Copyright © 2018-2023 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

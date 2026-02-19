@@ -1,6 +1,6 @@
 function o2WysrOISH  = load_m_file_data_legacy(datafile, U7ORsJ0vy3)
 % o2WysrOISH  = load_m_file_data_legacy(datafile, U7ORsJ0vy3)
-% Copyright © 2014-2023 Dynare Team
+% Copyright © 2014-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

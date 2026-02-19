@@ -82,7 +82,7 @@ function csn = csn_update_specification(Var, Skew)
 % - Azzalini, A. & Capitanio, A. (2014). "The Skew-Normal and Related Families"
 %   Cambridge University Press
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -12,7 +12,7 @@ function density(maxnlags)
 %    none
 
 % Copyright © 2003-2007 Christopher Sims
-% Copyright © 2007-2023 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

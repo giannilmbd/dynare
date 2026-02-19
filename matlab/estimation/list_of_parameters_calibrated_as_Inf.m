@@ -13,7 +13,7 @@ function list = list_of_parameters_calibrated_as_Inf(M_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2017-2018 Dynare Team
+% Copyright © 2017-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

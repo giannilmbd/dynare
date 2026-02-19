@@ -28,7 +28,7 @@ function display(pdraws, ide_reducedform, ide_moments, ide_spectrum, ide_minimal
 % This function is called by
 %   * identification.run
 % =========================================================================
-% Copyright © 2010-2021 Dynare Team
+% Copyright © 2010-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -12,7 +12,7 @@ function o = addGraph(o, varargin)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2013-2020 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

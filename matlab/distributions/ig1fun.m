@@ -1,5 +1,5 @@
 function err = ig1fun(nu,mu2,sigma2)
-% Copyright © 2011 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -15,7 +15,7 @@ function [shocks, spfm_exo_simul, oo_] = extended_path_shocks(pfm, exogenousvari
 %
 % Called by: extended_path.m, extended_path_mc.m
 
-% Copyright © 2016-2025 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

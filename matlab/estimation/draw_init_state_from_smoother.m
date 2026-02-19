@@ -52,7 +52,7 @@ function [xparam1, logpost0, mh_bounds, M_, neval] = draw_init_state_from_smooth
 %   get_init_state_prior - computes Pstar-based constraints for initial-state consistency.
 %   set_init_state - enforces null-space projection on init-state parameters.
 
-% Copyright © 2024-2025 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

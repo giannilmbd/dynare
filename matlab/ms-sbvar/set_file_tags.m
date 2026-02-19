@@ -11,7 +11,7 @@ function [options_]=set_file_tags(options_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2011-2012 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

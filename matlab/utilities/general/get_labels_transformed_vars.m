@@ -11,7 +11,7 @@ function labels=get_labels_transformed_vars(endo_names,var_indices,options_,TeX)
 % OUTPUTS
 %   labels              [cell]        cell array of variable labels
 %
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

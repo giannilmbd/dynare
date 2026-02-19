@@ -23,7 +23,7 @@ function X = gensylv_fp(A, B, C, D, block, tol)
 %
 % SPECIAL REQUIREMENTS
 %   none.
-% Copyright © 1996-2017 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

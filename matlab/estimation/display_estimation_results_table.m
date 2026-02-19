@@ -20,7 +20,7 @@ function oo_=display_estimation_results_table(xparam1,stdh,M_,options_,estim_par
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2014-2025 Dynare Team
+% Copyright © 2014-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

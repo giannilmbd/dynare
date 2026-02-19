@@ -1,5 +1,5 @@
 function info = test_kron(test,number_of_threads)
-% Copyright © 2007-2021 Dynare Team
+% Copyright © 2007-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

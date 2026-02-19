@@ -40,7 +40,7 @@ function out = numerical_objective(params, outputflag, estim_params_, M_, option
 %   * resol
 %   * vec
 % =========================================================================
-% Copyright © 2011-2020 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

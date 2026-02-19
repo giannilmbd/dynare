@@ -28,7 +28,7 @@ function options = simpsaset(varargin)
 
 % Copyright © 2005 Henning Schmidt, FCC, henning@fcc.chalmers.se
 % Copyright © 2006 Brecht Donckels, BIOMATH, brecht.donckels@ugent.be
-% Copyright © 2013-2017 Dynare Team.
+% Copyright © 2013-2022 Dynare Team.
 %
 % This file is part of Dynare.
 %

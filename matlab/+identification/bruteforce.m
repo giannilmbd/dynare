@@ -24,7 +24,7 @@ function [pars, cosnJ] = bruteforce(dname,fname,J, max_dim_cova_group, TeX, name
 % This function is called by
 %   * identification.analysis.m
 % =========================================================================
-% Copyright © 2009-2023 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

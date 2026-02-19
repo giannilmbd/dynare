@@ -23,7 +23,7 @@ function [DP6,DP6inv] = Q6_plication(p)
 %   * mue (embedded)
 %   * uperm
 % =========================================================================
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

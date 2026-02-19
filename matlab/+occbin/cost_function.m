@@ -19,7 +19,7 @@ function [cost, out] = cost_function(err_0, current_obs, weights, opts_simul,...
 % - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables                                    
 % - options_            [structure]     MATLAB's structure describing the current options (options_).
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

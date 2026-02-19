@@ -16,7 +16,7 @@ function [fval,info,exit_flag,Q,H]=check_bounds_and_definiteness_estimation(xpar
 % - Q                       [matrix]              Covariance matrix of structural shocks
 % - H                       [matrix]              Covariance matrix of measurement errors
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

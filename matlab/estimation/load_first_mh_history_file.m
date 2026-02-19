@@ -2,7 +2,7 @@ function record = load_first_mh_history_file(MetropolisFolder, ModelName)
 
 % This routine requires that the MCMC draws were obtained with a Dynare version greater than 4.3.3.
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

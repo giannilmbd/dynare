@@ -7,7 +7,7 @@ function Vector = dyn_vech(Matrix)
 % OUTPUTS
 %   Vector             [double]   a n*(n+1)/2 vector.
 
-% Copyright © 2010-2017 Dynare Team
+% Copyright © 2010-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

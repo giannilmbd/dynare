@@ -10,7 +10,7 @@ function options_=set_option(options_,options_occbin_,fieldname)
 % Outputs:
 % - options_            [structure]     MATLAB's structure containing the options
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

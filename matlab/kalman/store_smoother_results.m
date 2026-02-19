@@ -58,7 +58,7 @@ function [oo_, yf]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,da
 %   First all smoothed variables are saved without trend and constant.
 %       Then trend and constant are added for the observed variables.
 %
-% Copyright © 2014-2018 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

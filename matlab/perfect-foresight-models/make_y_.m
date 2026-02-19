@@ -10,7 +10,7 @@ function oo_=make_y_(M_, options_, oo_)
 % OUTPUTS
 % - oo_         [struct]   Updated Dynare results structure
 
-% Copyright © 1996-2024 Dynare Team
+% Copyright © 1996-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

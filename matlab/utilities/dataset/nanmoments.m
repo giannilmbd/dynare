@@ -1,7 +1,7 @@
 function m = nanmoments(data, n)
 % Compute centered marginal moments of order n (possibly with missing observations).
 
-% Copyright © 2014 Dynare Team
+% Copyright © 2014-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -21,7 +21,7 @@ function var_decomp=compute_variance_decomposition(M_,options_,var_stationary,A,
 % OUTPUTS
 %   stationary_vars   [double]      [#stationary vars by shocks] Matrix containing the variance decomposition 
 %
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

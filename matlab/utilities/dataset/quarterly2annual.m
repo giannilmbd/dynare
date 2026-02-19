@@ -27,7 +27,7 @@ function [ya, yass, gya, gyass] = quarterly2annual(y,yss,GYTREND0,type,islog,aux
 % gya      annual growth rate
 % gyass    annual growth rate steadystate
 
-% Copyright © 2017 Dynare Team
+% Copyright © 2017-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

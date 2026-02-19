@@ -2,7 +2,7 @@ function fwriten(fid, str)
 
 % Writes a line in a file, with newline character at the end of the line.
 
-% Copyright © 2017 Dynare Team
+% Copyright © 2017-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

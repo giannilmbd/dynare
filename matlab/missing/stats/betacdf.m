@@ -10,7 +10,7 @@ function cdf = betacdf (x, a, b)
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 
 % Copyright © 1995, 1996, 1997, 2005, 2006, 2007 Kurt Hornik
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

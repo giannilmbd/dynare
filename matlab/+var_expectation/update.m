@@ -8,7 +8,7 @@ function update(varexpectationmodelname)
 % OUTPUTS
 % None
 
-% Copyright © 2018-2021 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

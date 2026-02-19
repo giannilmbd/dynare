@@ -6,7 +6,7 @@ function a = struct2array(s)
 % OUPUTS
 % - a  [double]  column vector with sum(n_i*m_i, i=1,...,N) elements.
 
-% Copyright © 2017 Dynare Team
+% Copyright © 2017-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

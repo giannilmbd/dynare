@@ -13,7 +13,7 @@ function writeSeriesForGraph(o, fid, xrange, series_num)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2014-2019 Dynare Team
+% Copyright © 2014-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

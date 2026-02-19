@@ -39,7 +39,7 @@ function X = fastgensylv(A, B, C, D, tol,maxit,X0)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2012-2017 Dynare Team
+% Copyright © 2012-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

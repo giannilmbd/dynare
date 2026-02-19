@@ -30,7 +30,7 @@ function [xparam1, icheck] = set_init_state(xparam1, ys0, options_,M_,estim_para
 % SEE ALSO
 %   get_init_state_prior - computes the Pstar-based subspace (UP, XP) used here.
 
-% Copyright © 2024-2025 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

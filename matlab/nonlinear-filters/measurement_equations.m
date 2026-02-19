@@ -11,7 +11,7 @@ function measure = measurement_equations(StateVectors,ReducedForm,options_, M_)
 %  - measure                [double]    scalar, likelihood
 
 
-% Copyright © 2013-2025 Dynare Team
+% Copyright © 2013-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

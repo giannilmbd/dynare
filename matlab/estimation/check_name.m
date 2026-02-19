@@ -1,6 +1,6 @@
 function n = check_name(vartan,varname)
 
-% Copyright © 2008-2009 Dynare Team
+% Copyright © 2008-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

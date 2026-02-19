@@ -10,7 +10,7 @@ function M_=set_shocks_param(M_,estim_params_,xparam1)
 %
 % Notes: closely follows set_all_parameters.m
 
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -27,7 +27,7 @@ function forecast = run(var_list,M_,options_,oo_,task,dataset_info)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -1,7 +1,7 @@
 function block = get_internal_doc_block(fname,fpath)
 % Extract doc sections from MATLAB's routine.
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

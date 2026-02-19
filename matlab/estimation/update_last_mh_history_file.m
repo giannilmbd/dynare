@@ -7,7 +7,7 @@ function update_last_mh_history_file(MetropolisFolder, ModelName, record)
 %   record              [structure] structure storing the MH history
 % Outputs:  none
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

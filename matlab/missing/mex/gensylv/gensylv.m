@@ -19,7 +19,7 @@ function E = gensylv(kron_prod,A,B,C0,D)
 % SPECIAL REQUIREMENTS
 %   none.
 
-% Copyright © 1996-2020 Dynare Team
+% Copyright © 1996-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

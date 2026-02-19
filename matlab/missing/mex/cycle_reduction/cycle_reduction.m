@@ -43,7 +43,7 @@ function [X, info] = cycle_reduction(A0, A1, A2, cvg_tol, max_it, ch)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -1,7 +1,7 @@
 function model_info(options_model_info_)
 %function model_info(options_model_info_)
 
-% Copyright © 2008-2022 Dynare Team
+% Copyright © 2008-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

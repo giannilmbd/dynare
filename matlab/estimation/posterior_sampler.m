@@ -37,7 +37,7 @@ function posterior_sampler(objective_function,ProposalFun,xparam1,sampler_option
 % Then the comments write here can be used for all the other pairs of
 % parallel functions and also for management functions.
 
-% Copyright © 2006-2025 Dynare Team
+% Copyright © 2006-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -13,7 +13,7 @@ function [il,l1,ik,k1] = indices_lagged_leaded_exogenous_variables(k,M_)
 % ik: indices of non lagged or leaded variable in vector k
 % k1: value of non lagged or leaded variable in vector k
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

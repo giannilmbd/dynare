@@ -23,7 +23,7 @@ function b = admissible(o, d)
 %
 %   1
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

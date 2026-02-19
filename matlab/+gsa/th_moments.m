@@ -16,7 +16,7 @@ function [vdec, corr, autocorr, z, zz] = th_moments(dr,options_,M_)
 %                                 deviation, and variance vector
 % - zz            [double]        autocorrelation matrix
 
-% Copyright © 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

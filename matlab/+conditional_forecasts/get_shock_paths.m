@@ -51,7 +51,7 @@ function [forcs, e] = get_shock_paths(cL, H, mcValue, shocks, forcs, T, R, mv, m
 %   confidence bands around the point conditional forecast.
 %   is used for forecasting
 
-% Copyright © 2006-2022 Dynare Team
+% Copyright © 2006-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -16,7 +16,7 @@ function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstLine 
 % OUTPUTS
 % - draws:                 [double]   NumberOfDraws×1 vector, draws from posterior distribution.
 
-% Copyright © 2005-2024 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

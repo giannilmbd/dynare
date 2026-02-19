@@ -2,7 +2,7 @@ function clear_persistent_variables(folder, writelistofroutinestobecleared)
 % clear_persistent_variables(folder, writelistofroutinestobecleared)
 % Clear all the functions with persistent variables in directory folder (and subdirectories).
 
-% Copyright © 2015-2019 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

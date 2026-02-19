@@ -11,7 +11,7 @@ function plot_classical_smoother_results(M_,oo_,options_,dataset_info,dataset_,e
 % Outputs:
 %   None
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

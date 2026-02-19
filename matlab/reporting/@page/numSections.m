@@ -11,7 +11,7 @@ function ns = numSections(p)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2013-2015 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

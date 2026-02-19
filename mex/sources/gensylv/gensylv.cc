@@ -1,6 +1,6 @@
 /*
  * Copyright © 2005-2011 Ondra Kamenik
- * Copyright © 2019-2022 Dynare Team
+ * Copyright © 2019-2023 Dynare Team
  *
  * This file is part of Dynare.
  *

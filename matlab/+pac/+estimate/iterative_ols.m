@@ -22,7 +22,7 @@ function iterative_ols(eqname, params, data, range)
 %     equation must have NaN values in the object.
 % [4] It is assumed that the residual is additive.
 
-% Copyright © 2018-2021 Dynare Team
+% Copyright © 2018-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

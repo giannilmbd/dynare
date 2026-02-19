@@ -13,7 +13,7 @@ function estim_params_= get_matrix_entries_for_psd_check(M_,estim_params_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

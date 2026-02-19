@@ -11,7 +11,7 @@ function x = get_param_by_name(pname)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2006-2017 Dynare Team
+% Copyright © 2006-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

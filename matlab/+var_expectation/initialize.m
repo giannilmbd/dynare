@@ -11,7 +11,7 @@ function initialize(varexpectationmodel)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

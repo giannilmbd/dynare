@@ -1,6 +1,6 @@
 function a = isodd(b)
 
-% Copyright © 2014 Dynare Team
+% Copyright © 2014-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

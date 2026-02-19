@@ -47,7 +47,7 @@ function [X,info] = quadratic_matrix_equation_solver(A,B,C,tol,maxit,line_search
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2012-2017 Dynare Team
+% Copyright © 2012-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

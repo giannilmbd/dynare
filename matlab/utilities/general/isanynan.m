@@ -1,7 +1,7 @@
 function yes = isanynan(array)
 % Return one if the array contains at least one NaN, 0 otherwise.
 
-% Copyright © 2011-2014 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

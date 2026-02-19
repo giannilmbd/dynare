@@ -1,7 +1,7 @@
 function runDynareReport(dc_a, dc_q, db_a, db_q)
 %function runDynareReport(dc_a, dc_q, db_a, db_q)
 
-% Copyright © 2013-2019 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -13,7 +13,7 @@ function [nCPU]= GiveCPUnumber (ComputerInformations, Environment)
 % SPECIAL REQUIREMENTS
 % none
 
-% Copyright © 2010-2017 Dynare Team
+% Copyright © 2010-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

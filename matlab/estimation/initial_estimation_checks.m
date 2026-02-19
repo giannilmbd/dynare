@@ -20,7 +20,7 @@ function oo_ = initial_estimation_checks(objective_function,xparam1,dataset_,dat
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2025 Dynare Team
+% Copyright © 2003-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

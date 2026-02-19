@@ -17,7 +17,7 @@ function [x, objectivevalue, errorflag] = gauss_newton(fun, x0)
 % - objectivevalue  [double]   scalar, optimal value of the objective.
 % - errorflag       [integer]  scalar, nonzero if algorithm did not converge.
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

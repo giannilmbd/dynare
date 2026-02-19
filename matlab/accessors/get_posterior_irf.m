@@ -1,6 +1,6 @@
 function r = get_posterior_irf(endo, exo)
 
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

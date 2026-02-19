@@ -17,7 +17,7 @@ function [E_csn] = csn_mean(mu, Sigma, Gamma, nu, Delta, mvnlogcdf)
 % - E_csn         [p by 1]   expectation vector of the CSN(mu,Sigma,Gamma,nu,Delta) distribution
 
 % Copyright © 2022-2023 Gaygysyz Guljanov
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

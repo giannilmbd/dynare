@@ -2,7 +2,7 @@ function str = exactstrrep(str, old, new)
 
 % Same as strrep but with exact word matching.
 
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

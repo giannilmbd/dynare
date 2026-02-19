@@ -32,9 +32,9 @@ function [y,dy] = prodmom_deriv(V,ii,nu,dV,dC)
 %  Gaussian Distribution, Mathematical Scientist
 %  Kotz, Balakrishnan, and Johnson (2000), Continuous Multivariate 
 %  Distributions, Vol. 1, p.261
-% =========================================================================
+
 % Copyright © 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
-% Copyright © 2019-2020 Dynare Team
+% Copyright © 2019-2023 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -50,7 +50,7 @@ function [y,dy] = prodmom_deriv(V,ii,nu,dV,dC)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
+
 if nargin<3
     nu = ones(size(ii));
 end

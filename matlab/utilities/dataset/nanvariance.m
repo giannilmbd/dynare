@@ -30,7 +30,7 @@ function variances = nanvariance(data)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

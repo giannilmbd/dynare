@@ -1,6 +1,6 @@
 function bool = issmc(options_)
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

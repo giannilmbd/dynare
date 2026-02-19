@@ -2,7 +2,7 @@ function check_dsge_var_model(M_, estim_params_, bayestopt_)
 
 % Check if the dsge model can be estimated with the DSGE-VAR approach.
 
-% Copyright © 2013-2014 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

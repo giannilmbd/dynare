@@ -16,7 +16,7 @@ function graphName = writeGraphFile(o, pg, sec, row, col, rep_dir)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2013-2020 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

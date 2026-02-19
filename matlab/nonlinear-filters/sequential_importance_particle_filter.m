@@ -20,7 +20,7 @@ function [LIK,lik] = sequential_importance_particle_filter(ReducedForm,Y,start,P
 % Journal of the American Statistical Association, March 2004, 99(465)
 
 
-% Copyright © 2011-2025 Dynare Team
+% Copyright © 2011-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

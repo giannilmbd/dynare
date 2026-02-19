@@ -13,7 +13,7 @@ function x0=run(M_,oo_,options_,bayestopt_,estim_params_,options_gsa)
 % M. Ratto (2008), Analysing DSGE Models with Global Sensitivity Analysis, 
 % Computational Economics (2008), 31, pp. 115–139
 
-% Copyright © 2008-2024 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

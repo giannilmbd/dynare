@@ -11,7 +11,7 @@ function autocov = multivariate_sample_autocovariance(data,q)
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

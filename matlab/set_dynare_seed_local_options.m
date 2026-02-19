@@ -21,7 +21,7 @@ function DynareRandomStreams=set_dynare_seed_local_options(DynareRandomStreams,i
 %   o DynareRandomStreams   options structure relating to options_.DynareRandomStreams
 
 
-% Copyright © 2010-2025 Dynare Team
+% Copyright © 2010-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -38,7 +38,7 @@ function oo_ = simulate_news_shocks(M_, options_, oo_, var_list, shock_list)
 %   The caller must have called make_ex_(M_, options_, oo_) before calling this function
 %   to populate oo_.exo_simul.
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

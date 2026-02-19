@@ -18,7 +18,7 @@ function [ts,oo_] = extended_path(initialconditions, samplesize, exogenousvariab
 % REMARKS
 % If errorflag==true, because the nonlinear solver failed in period T<samplesize, ts holds the simulations for periods 1 to T-1.
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

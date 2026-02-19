@@ -11,7 +11,7 @@ function str = subst_auxvar(var_index, aux_lead_lag, M_)
 % OUTPUTS
 % - str                 [string]    name of auxiliary
 
-% Copyright © 2001-2022 Dynare Team
+% Copyright © 2001-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

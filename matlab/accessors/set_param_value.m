@@ -1,6 +1,6 @@
 function set_param_value(pname,value)
 
-% Copyright © 2007-2009 Dynare Team
+% Copyright © 2007-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

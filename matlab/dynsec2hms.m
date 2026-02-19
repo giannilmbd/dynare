@@ -1,7 +1,7 @@
 function hms = dynsec2hms(secs)
 % DYNSEC2HMS Converts a number of seconds into a hours-minutes-seconds string
 
-% Copyright © 2008-2009 Dynare Team
+% Copyright © 2008-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

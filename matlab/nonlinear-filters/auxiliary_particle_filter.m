@@ -15,7 +15,7 @@ function [LIK,lik] = auxiliary_particle_filter(ReducedForm,Y,start,ParticleOptio
 % - LIK                [double]    scalar, likelihood
 % - lik                [double]    (T-s+1)×1 vector, density of observations in each period.
 
-% Copyright © 2011-2025 Dynare Team
+% Copyright © 2011-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

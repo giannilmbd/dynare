@@ -4,7 +4,7 @@ function [expression, lhs] = rewrite_equation_with_tables(expression, lhs, islag
 % and replace parameters by elements of a vector and variables by columns of a
 % data matrix.
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

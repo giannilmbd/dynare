@@ -1,7 +1,7 @@
 classdef report_graph < handle
     % report_graph Class
     %
-    % Copyright © 2013-2022 Dynare Team
+    % Copyright © 2013-2023 Dynare Team
     %
     % This file is part of Dynare.
     %

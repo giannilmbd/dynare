@@ -32,7 +32,7 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr, atT, inno
 % - atT                     [double]        (m*T) matrix, smoothed endogenous variables (a_{t|T})  (decision-rule order)
 % - innov                   [double]        (r*T) matrix, smoothed structural shocks (r>n is the umber of shocks).
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

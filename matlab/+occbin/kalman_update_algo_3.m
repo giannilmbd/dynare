@@ -55,7 +55,7 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % constraints, Working Papers 2021-03, Joint Research Centre, European Commission 
 
 
-% Copyright © 2021-2024 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

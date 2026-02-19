@@ -39,7 +39,7 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
 %                  .mat - interpolation and transition matrices
 %                  .indices - variable and equation indices
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

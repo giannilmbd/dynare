@@ -16,7 +16,7 @@ function [nvar,vartan,CovarFileNumber] = dsge_simulated_theoretical_covariance(S
 %   vartan            [char]     array of characters (with nvar rows).
 %   CovarFileNumber   [integer]  scalar, number of prior or posterior data files (for covariance).
 
-% Copyright © 2007-2024 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

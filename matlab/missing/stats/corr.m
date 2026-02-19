@@ -39,7 +39,7 @@ function retval = corr(x, y)
 % Copyright © 1993-1996 Kurt Hornik
 % Copyright © 1996-2015 John W. Eaton
 % Copyright © 2013-2015 Julien Bect
-% Copyright © 2016-2023 Dynare Team
+% Copyright © 2016-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

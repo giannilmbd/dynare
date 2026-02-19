@@ -36,7 +36,7 @@ function dr = dyn_second_order_solver(g1, g2, dr, M_, threads_BC)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

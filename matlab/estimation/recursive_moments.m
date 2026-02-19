@@ -19,7 +19,7 @@ function [mu,sigma,offset] = recursive_moments(m0,s0,data,offset)
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2006-2017 Dynare Team
+% Copyright © 2006-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

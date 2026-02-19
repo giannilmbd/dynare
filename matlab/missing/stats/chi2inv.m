@@ -9,7 +9,7 @@ function inv = chi2inv (x, n)
 % Original author: TT <Teresa.Twaroch@ci.tuwien.ac.at>
 
 % Copyright © 1995, 1996, 1997, 2005, 2006, 2007 Kurt Hornik
-% Copyright © 2008-2009 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

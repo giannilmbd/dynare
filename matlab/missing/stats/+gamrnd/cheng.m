@@ -12,7 +12,7 @@ function  g = cheng(a, b)
 % REMARKS
 % The definition of aa is wrong in Devroye (1986).
 
-% Copyright © 2006-2018 Dynare Team
+% Copyright © 2006-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

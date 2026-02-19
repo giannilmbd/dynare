@@ -17,7 +17,7 @@ function [ast] = getEquationsByTags(ast, tagname, tagvalue)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2017-2021 Dynare Team
+% Copyright © 2017-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

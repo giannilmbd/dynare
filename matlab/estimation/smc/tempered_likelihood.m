@@ -12,7 +12,7 @@ function [tlogpostkernel,loglikelihood] = tempered_likelihood(objective_function
 % - tlogpostkernel      [double]   scalar, value of the tempered posterior kernel.
 % - loglikelihood       [double]   scalar, value of the log likelihood.
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

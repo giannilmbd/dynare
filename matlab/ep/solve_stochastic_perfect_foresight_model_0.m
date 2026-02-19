@@ -18,7 +18,7 @@ function [errorflag, endo_simul, errorcode, y, pfm, options_] = solve_stochastic
 %  o  pfm              [struct]    perfect foresight model description
 %  o  options_         [structure] describing the options
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

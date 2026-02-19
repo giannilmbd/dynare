@@ -16,7 +16,7 @@ function CutSample(M_, options_, dispString)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -13,7 +13,7 @@ function d=jacob_element(func,element,args)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2010-2020 Dynare Team
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

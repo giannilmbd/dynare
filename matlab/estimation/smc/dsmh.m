@@ -32,7 +32,7 @@ function mdd = dsmh(objective_function, mh_bounds, dataset_, dataset_info, optio
 % functions have been parallelized using the same methodology.
 % Then the comments write here can be used for all the other pairs of
 % parallel functions and also for management functions.
-% Copyright © 2022-2024 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

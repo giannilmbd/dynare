@@ -36,7 +36,7 @@ function [x, errorflag, info] = trust_region(objfun, x, j1, j2, jacobianflag, gs
 %        4 if iteration is not making good progress, as measured by the improvement from the last 15 iterations.
 %        5 if no further improvement in the approximate solution x is possible (xtol is too small).
 
-% Copyright © 2014-2023 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -15,7 +15,7 @@ function o = printSeries(o, fid, dser, dates, precision)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2014-2019 Dynare Team
+% Copyright © 2014-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

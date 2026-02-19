@@ -2,7 +2,7 @@ function [noprint, opt] = opt4nls(varargin)
 
 % Sets options for NLS routines.
 
-% Copyright © 021 Dynare Team
+% Copyright © 2021 Dynare Team
 %
 % This file is part of Dynare.
 %

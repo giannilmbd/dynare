@@ -9,7 +9,7 @@ function G = buildGmatrix(alpha, beta)
 % OUTPUTS 
 % - G         [double]    (m+1)*(m+1) matrix.
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

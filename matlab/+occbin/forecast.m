@@ -19,7 +19,7 @@ function [forecast, error_flag, yf] = forecast(options_,M_,dr,endo_steady_state,
 % SPECIAL REQUIREMENTS
 %   none.
 
-% Copyright © 2022-2024 Dynare Team
+% Copyright © 2022-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

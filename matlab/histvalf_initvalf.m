@@ -11,7 +11,7 @@ function [series, p] = histvalf_initvalf(caller, M_, options)
 % - series           [dseries]   selected data from a file or a dseries
 % - p                [integer]   number of periods (excluding the initial and terminal conditions)
 
-% Copyright © 2003-2024 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

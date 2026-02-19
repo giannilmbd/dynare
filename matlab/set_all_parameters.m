@@ -19,7 +19,7 @@ function M_ = set_all_parameters(xparam1,estim_params_,M_)
 %   prior_posterior_statistics_core, prior_sampler
 % -------------------------------------------------------------------------
 
-% Copyright © 2003-2025 Dynare Team
+% Copyright © 2003-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

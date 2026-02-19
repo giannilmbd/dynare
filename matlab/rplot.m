@@ -14,7 +14,7 @@ function rplot(s1)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

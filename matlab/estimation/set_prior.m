@@ -19,7 +19,7 @@ function [xparam1, estim_params_, bayestopt_, lb, ub, M_]=set_prior(estim_params
 % SPECIAL REQUIREMENTS
 %    None
 
-% Copyright © 2003-2025 Dynare Team
+% Copyright © 2003-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

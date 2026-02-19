@@ -1,6 +1,6 @@
 function check_matlab_path(change_path_flag)
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

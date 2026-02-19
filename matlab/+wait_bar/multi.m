@@ -81,7 +81,8 @@ function [cancel,figh] = multi( label, varargin )
 
 %   Based on the work by Ben Tordoff
 %
-%   Copyright 2007-2025 The MathWorks, Inc.
+%   Copyright © 2007-2025 The MathWorks, Inc.
+%
 %   All rights reserved.
 % 
 %   Redistribution and use in source and binary forms, with or without

@@ -19,7 +19,7 @@ function print(varexpectationmodelname, withcalibration)
 % after in another mod file (ie included with the macro directive @#include). A MATLAB routine is also
 % created for evaluating (dseries) the var-expectations.
 
-% Copyright © 2018-2021 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

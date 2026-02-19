@@ -17,7 +17,7 @@ function [xparam1, hh] = check_mode_file(xparam1, hh, options_, bayestopt_)
 %  o dynare_estimation_init.m
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

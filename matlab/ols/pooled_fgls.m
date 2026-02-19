@@ -23,7 +23,7 @@ function pooled_fgls(ds, param_common, param_regex, eqtags, model_name, param_na
 % SPECIAL REQUIREMENTS
 %   Dynare must have been run with the option: json=compute
 
-% Copyright © 2017-2019 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

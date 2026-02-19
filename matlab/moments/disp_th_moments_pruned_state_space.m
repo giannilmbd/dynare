@@ -24,7 +24,7 @@ function oo_=disp_th_moments_pruned_state_space(dr,M_,options_,i_var,oo_)
 %           conditional_variance_decomposition      [array]     Conditional variance decomposition array
 %           conditional_variance_decomposition_ME   [array]     Conditional variance decomposition array with measurement error
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

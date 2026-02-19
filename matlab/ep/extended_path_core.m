@@ -23,7 +23,7 @@ function [y1, info_convergence, endo_simul, y, pfm, options_] = ...
 %  o  options_         [structure] describing the options
 
 
-% Copyright © 2016-2025 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -22,7 +22,7 @@ function  IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, Sta
 % OUTPUTS
 %    IncrementalWeights  [double]   updated weights  
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

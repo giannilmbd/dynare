@@ -19,7 +19,7 @@ function [oo_] = UnivariateSpectralDensity(M_,oo_,options_,var_list)
 
 % Adapted from th_autocovariances.m.
 
-% Copyright © 2006-2024 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -43,7 +43,7 @@ function [y_out,exo_simul] =simult(y0, dr,M_,options_)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2001-2025 Dynare Team
+% Copyright © 2001-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

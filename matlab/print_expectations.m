@@ -24,7 +24,7 @@ function print_expectations(eqname, expectationmodelname, expectationmodelkind, 
 %
 % The variable expectationmodelkind can take two values 'var' or 'pac'.
 
-% Copyright © 2018-2023 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

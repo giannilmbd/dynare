@@ -16,7 +16,7 @@ function mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, opti
 % SPECIAL REQUIREMENTS
 % None.
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

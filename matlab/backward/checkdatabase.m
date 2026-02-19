@@ -6,7 +6,7 @@ function [dbase, info] = checkdatabase(dbase, M_, inversionflag, simulationflag)
 % endogenous variables in difference (which may be lagged), or lags on the
 % exogenous variables, then thee routine complete the database.
 
-% Copyright © 2018-2024 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

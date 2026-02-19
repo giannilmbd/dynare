@@ -11,7 +11,7 @@ function sigma = long_run_variance(data,band)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2009-2010 Dynare Team
+% Copyright © 2009-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

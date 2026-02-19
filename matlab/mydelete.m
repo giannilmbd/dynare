@@ -1,7 +1,7 @@
 function mydelete(fname,pname)
 % Specialized version of delete() function
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

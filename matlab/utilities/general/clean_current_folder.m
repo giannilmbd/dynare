@@ -1,6 +1,6 @@
 function clean_current_folder()
 
-% Copyright © 2014-2024 Dynare Team
+% Copyright © 2014-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

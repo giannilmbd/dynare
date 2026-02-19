@@ -12,7 +12,7 @@ function [info, oo_, options_, M_] = discretionary_policy(M_, options_, oo_, var
 % - options_      [structure]     MATLAB's structure describing the current options (options_).
 % - M_            [structure]     MATLAB's structure describing the model (M_).
 
-% Copyright © 2007-2023 Dynare Team
+% Copyright © 2007-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

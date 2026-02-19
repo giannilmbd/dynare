@@ -2,7 +2,7 @@ function update_all_parameters_in_workspace(M_)
 % update_all_parameters_in_workspace(M_)
 % Updates all parameter values in MATLAB/Octave base workspace.
 
-% Copyright © 2018-2023 Dynare Team
+% Copyright © 2018-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

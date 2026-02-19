@@ -21,7 +21,7 @@ function mh_jscale = tune_mcmc_mh_jscale_wrapper(invhess, options_, M_, objectiv
 %  o mom.run
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -12,7 +12,7 @@ function tf = ver_less_than(ver1, ver2)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2015-2022 Dynare Team
+% Copyright © 2015-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

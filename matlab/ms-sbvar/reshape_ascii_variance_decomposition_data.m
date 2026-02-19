@@ -13,7 +13,7 @@ function vd_data=reshape_ascii_variance_decomposition_data(endo_nbr, psize, hori
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2011-2012 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

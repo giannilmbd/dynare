@@ -16,7 +16,7 @@ function M_ = set_parameters_locally(M_,xparam1)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2017-2025 Dynare Team
+% Copyright © 2017-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

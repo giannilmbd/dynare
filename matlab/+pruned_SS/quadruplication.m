@@ -22,7 +22,7 @@ function [QP,QPinv] = quadruplication(p)
 %   * mue (embedded)
 %   * uperm
 % =========================================================================
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

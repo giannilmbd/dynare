@@ -20,7 +20,8 @@ function indcorr = stability_mapping_bivariate(x,alpha2, pvalue_crit, M_,options
 % marco.ratto@ec.europa.eu
 
 % Copyright © 2011-2016 European Commission
-% Copyright © 2011-2023 Dynare Team
+% Copyright © 2011-2025 Dynare Team
+%
 % This file is part of Dynare.
 %
 % Dynare is free software: you can redistribute it and/or modify

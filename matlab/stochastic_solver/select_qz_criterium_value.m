@@ -11,7 +11,7 @@ function options_=select_qz_criterium_value(options_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2016-2017 Dynare Team
+% Copyright © 2016-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

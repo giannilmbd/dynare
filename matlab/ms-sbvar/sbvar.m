@@ -15,7 +15,7 @@ function sbvar(M, options)
 %   none.
 %
 
-% Copyright © 2011-2013 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

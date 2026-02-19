@@ -12,7 +12,7 @@ function folder_name=get_posterior_folder_name(options_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -8,7 +8,7 @@ function graph(M_, options_, options_occbin_, oo_, var_list)
 % - oo_                 [structure]     MATLAB's structure containing the results
 % - var_list            [char]          list of the variables to plot 
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

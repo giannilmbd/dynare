@@ -2,7 +2,7 @@ function [r, J] = dynamic_model(z, dynamic_resid, dynamic_g1, ylag, x, params, s
 % [r, J] = dynamic_model(z, dynamic_resid, dynamic_g1, ylag, x, params, steady_state, sparse_rowval, sparse_colval, sparse_colptr)
 % Dynamic routine's wrapper used by dynare_solve for simulating backward models
 
-% Copyright © 2017-2023 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

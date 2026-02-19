@@ -13,7 +13,7 @@ function plot_irfs(M_,irfs,options_,var_list)
 % SPECIAL REQUIREMENTS
 %   none.
 
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

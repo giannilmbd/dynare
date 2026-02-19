@@ -10,7 +10,7 @@ function smoother(parameters, varlist)
 % OUTPUTS
 % None
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

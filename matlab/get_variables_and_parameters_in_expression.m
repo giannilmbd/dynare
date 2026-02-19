@@ -8,7 +8,7 @@ function objects = get_variables_and_parameters_in_expression(expr)
 % OUTPUTS
 % - objects    [cell]             cell of row char arrays, names of the variables and parameters in expr.
 
-% Copyright © 2020-2022 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -12,7 +12,7 @@ function [sub_draws, error_flag, NumberOfDrawsPerChain]=set_number_of_subdraws(M
 %   NumberOfDrawsPerChain [integer]     number of available posterior draws
 %                                       per chain
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

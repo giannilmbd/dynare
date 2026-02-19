@@ -15,7 +15,7 @@ function [NewFilesFrom, NewFileList]=dynareParallelFindNewFiles(FileList,Paralle
 %  o NewFilesFrom          []   ...
 %  o NewFileList           []   ...
 %
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

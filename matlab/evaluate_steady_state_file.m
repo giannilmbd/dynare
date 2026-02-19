@@ -19,7 +19,7 @@ function [ys,params,info] = evaluate_steady_state_file(ys_init,exo_ss,M_,options
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

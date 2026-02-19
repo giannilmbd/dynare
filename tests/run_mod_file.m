@@ -1,4 +1,4 @@
-% Copyright © 2011-2023 Dynare Team
+% Copyright © 2011-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

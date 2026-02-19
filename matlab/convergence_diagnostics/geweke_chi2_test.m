@@ -26,7 +26,7 @@ function results_struct = geweke_chi2_test(results1,results2,results_struct,opti
 % SPECIAL REQUIREMENTS
 %   None.
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -77,7 +77,7 @@ function [alphahat,epsilonhat,etahat,a,P1,aK,PK,decomp,V, aalphahat,eetahat,d,al
 %   Models", S.J. Koopman and J. Durbin (2003), in Journal of Time Series
 %   Analysis, vol. 24(1), pp. 85-98.
 
-% Copyright © 2004-2025 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

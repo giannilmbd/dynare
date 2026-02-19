@@ -10,7 +10,7 @@ function ldens = prior(parameters)
 % OUTPUTS
 % None
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

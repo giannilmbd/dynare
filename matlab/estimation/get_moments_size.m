@@ -11,7 +11,7 @@ function s=get_moments_size(options)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

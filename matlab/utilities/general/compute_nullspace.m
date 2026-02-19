@@ -3,7 +3,7 @@ function result = compute_nullspace(matrix, jacobian_tolerance)
 % Helper function to compute null space with appropriate method
 % based on MATLAB/Octave version and tolerance settings
 
-% Copyright © 1996-2025 Dynare Team
+% Copyright © 1996-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

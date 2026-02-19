@@ -25,7 +25,7 @@ function [lnpriormom] = endogenous_prior(data,dataset_info, Pstar,bayestopt_,H)
 
 
 % Copyright © 2011 Lawrence J. Christiano, Mathias Trabandt and Karl Walentin
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

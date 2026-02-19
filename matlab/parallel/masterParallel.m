@@ -63,7 +63,7 @@ function [fOutVar,nBlockPerCPU, totCPU] = masterParallel(Parallel,fBlock,nBlock,
 %                              the number of CPUs declared in "Parallel", if
 %                              the number of required threads is lower)
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

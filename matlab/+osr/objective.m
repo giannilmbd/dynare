@@ -20,7 +20,7 @@ function [loss,info,exit_flag,df,vx]=objective(x,M_, oo_, options_,i_params,i_va
 %
 % SPECIAL REQUIREMENTS
 %   none
-% Copyright © 2005-2023 Dynare Team
+% Copyright © 2005-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

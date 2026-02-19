@@ -17,7 +17,7 @@ function invhess = set_mcmc_jumping_covariance(invhess, xparam_nbr, MCMC_jumping
 %  o dynare_estimation_1.m
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

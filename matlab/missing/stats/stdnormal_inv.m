@@ -9,7 +9,7 @@ function inv = stdnormal_inv (x)
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 
 % Copyright © 1995, 1996, 1997, 1998, 2000, 2002, 2005, 2006, 2007 Kurt Hornik
-% Copyright © 2008-2017 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

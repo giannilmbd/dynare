@@ -18,7 +18,7 @@ function check_hessian_at_the_mode(hessian_xparam1, xparam1, M_, estim_params_, 
 %  o dynare_estimation_1.m
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

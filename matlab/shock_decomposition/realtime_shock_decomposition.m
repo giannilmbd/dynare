@@ -22,7 +22,7 @@ function oo_ = realtime_shock_decomposition(M_,oo_,options_,varlist,bayestopt_,e
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2009-2024 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

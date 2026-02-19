@@ -21,7 +21,7 @@ function [nCPU, totCPU, nBlockPerCPU, totSLAVES] = distributeJobs(Parallel, fBlo
 %                               It is a number between 1 and length(Parallel).
 
 
-% Copyright © 2010-2017 Dynare Team
+% Copyright © 2010-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

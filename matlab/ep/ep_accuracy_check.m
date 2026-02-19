@@ -9,7 +9,7 @@ function e = ep_accuracy_check(M_,options_,oo_)
 % Outputs: 
 %  o  e                [double] matrix of Euler equation errors  
 
-% Copyright © 2016-2025 Dynare Team
+% Copyright © 2016-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

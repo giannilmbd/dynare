@@ -2,7 +2,7 @@ function delete_stale_file(fname)
 % function delete_old_files(fname)
 % Checks for presence of files and deletes them if necessary
 
-% Copyright © 2015-2017 Dynare Team
+% Copyright © 2015-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

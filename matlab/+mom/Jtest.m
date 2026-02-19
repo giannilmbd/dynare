@@ -32,7 +32,7 @@ function J_test = Jtest(xparam, objective_function, Q, model_moments, m_data, da
 %  o mom.optimal_weighting_matrix
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

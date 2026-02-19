@@ -1,6 +1,6 @@
 function [B,C] = get_cells_id(str,sep)
 
-% Copyright © 2012 Dynare Team
+% Copyright © 2012-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

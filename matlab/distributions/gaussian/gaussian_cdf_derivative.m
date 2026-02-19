@@ -24,7 +24,7 @@ function [term1, term2, evalp_t1, covar_t1, evalp_t2, covar_t2, mult_matr] = gau
 % - mult_matr      [(p-1) by 1]       auxiliary expression Sigma_12/Sigma_22, this expression shows up when evaluating conditional mean and conditional variance out of partitions of mean and variance of joint distribution
 
 % Copyright © 2022-2023 Gaygysyz Guljanov
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

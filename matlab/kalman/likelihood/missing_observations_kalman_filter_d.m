@@ -42,7 +42,7 @@ function [dLIK,dlik,a,Pstar] = missing_observations_kalman_filter_d(data_index,n
 %   Second Edition, Ch. 5 and 7.2
 
 %
-% Copyright © 2004-2021 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

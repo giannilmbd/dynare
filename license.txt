@@ -92,7 +92,7 @@ Files: matlab/optimization/bfgsi1.m matlab/optimization/csolve.m matlab/optimiza
  matlab/+bvar/toolbox.m matlab/partial_information/PI_gensys.m matlab/partial_information/PI_qzswitch.m
  matlab/partial_information/PI_qzdiv.m
 Copyright: 1993-2009 Christopher Sims
-           2006-2024 Dynare Team
+           2006-2025 Dynare Team
 License: GPL-3+
 
 Files: matlab/optimization/cmaes.m
@@ -113,9 +113,14 @@ Copyright: 1995 E.G.Tsionas
            2015-2017 Dynare Team
 License: GPL-3+
 
+Files: matlab/estimation/chol_SE.m
+Copyright: 2015 Johannes Pfeifer
+           2015-2023 Dynare Team
+License: GPL-3+
+
 Files: matlab/estimation/endogenous_prior.m
 Copyright: 2011 Lawrence J. Christiano, Mathias Trabandt and Karl Walentin
-           2013-2017 Dynare Team
+           2013-2023 Dynare Team
 License: GPL-3+
 
 Files: matlab/estimation/smc/logsumexp.m
@@ -123,8 +128,9 @@ Copyright: 2020 Nicholas J. Higham
 License: BSD-2-clause
 
 Files: matlab/one_sided_hp_filter.m
+       matlab/dseries/src/utilities/missing/one_sided_hp_filter/one_sided_hp_filter.m
 Copyright: 2010-2015 Alexander Meyer-Gohde
-           2015-2017 Dynare Team
+           2015-2025 Dynare Team
 License: GPL-3+
 
 Files: matlab/collapse_figures_in_tabgroup.m
@@ -134,17 +140,17 @@ License: GPL-3+
 
 Files: matlab/convergence_diagnostics/raftery_lewis.m
 Copyright: 2016 Benjamin Born and Johannes Pfeifer
-           2016-2017 Dynare Team
+           2016-2023 Dynare Team
 License: GPL-3+
 
 Files: matlab/+pruned_SS/commutation.m matlab/+pruned_SS/duplication.m
 Copyright: 1997 Tom Minka <minka@microsoft.com>
-           2019-2020 Dynare Team
+           2019-2023 Dynare Team
 License: GPL-3+
 
 Files: matlab/+pruned_SS/allVL1.m
 Copyright: 2007-2010 Bruno Luong <brunoluong@yahoo.com> 
-           2020 Dynare Team
+           2020-2023 Dynare Team
 License: GPL-3+
 Comment: The original author gave authorization to change
  the license from BSD-2-clause to GPL-3+ and redistribute 
@@ -152,7 +158,7 @@ Comment: The original author gave authorization to change
 
 Files: matlab/+pruned_SS/uperm.m
 Copyright: 2014 Bruno Luong <brunoluong@yahoo.com> 
-           2020 Dynare Team
+           2020-2023 Dynare Team
 License: GPL-3+
 Comment: The original author gave authorization to change
  the license from BSD-2-clause to GPL-3+ and redistribute 
@@ -160,7 +166,7 @@ Comment: The original author gave authorization to change
 
 Files: matlab/+pruned_SS/prodmom.m matlab/+pruned_SS/bivmom.m
 Copyright: 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
-           2019-2023 Dynare Team
+           2019-2025 Dynare Team
 License: GPL-3+
 Comment: The author gave authorization to redistribute
  these functions under GPL-3+ with Dynare and would 
@@ -198,29 +204,30 @@ Files: matlab/+gsa/cumplot.m
        matlab/+gsa/tcrit.m
        matlab/+gsa/teff.m
 Copyright: 2011-2018 European Commission
-           2011-2023 Dynare Team
+           2011-2025 Dynare Team
 License: GPL-3+
 
 Files: matlab/optimization/simpsa.m matlab/optimization/simpsaget.m matlab/optimization/simpsaset.m
 Copyright: 2005 Henning Schmidt, FCC, henning@fcc.chalmers.se
            2006 Brecht Donckels, BIOMATH, brecht.donckels@ugent.be
-           2013-2017 Dynare Team
+           2013-2022 Dynare Team
 License: GPL-3+
 
 Files: matlab/missing/stats/normpdf.m matlab/missing/stats/gamcdf.m
  matlab/missing/stats/chi2inv.m
+ matlab/missing/stats/common_size.m
  matlab/missing/stats/gaminv.m matlab/missing/stats/gampdf.m
  matlab/missing/stats/stdnormal_inv.m matlab/missing/stats/betacdf.m
  matlab/missing/stats/betapdf.m matlab/missing/stats/normcdf.m
  matlab/missing/stats/stdnormal_cdf.m matlab/missing/stats/norminv.m
  matlab/missing/stats/stdnormal_pdf.m matlab/missing/stats/betainv.m
 Copyright: 1995-2007 Kurt Hornik
-           2008-2017 Dynare Team
+           2008-2025 Dynare Team
 License: GPL-3+
 
 Files: matlab/missing/stats/quantile.m
 Copyright: 2014-2016 Christopher Hummersone
-           2016-2023 Dynare Team
+           2016-2025 Dynare Team
 License: GPL-3+
 
 Files: matlab/missing/stats/corr.m
@@ -277,7 +284,7 @@ License: permissive-lmmcp
 
 Files: matlab/utilities/graphics/distinguishable_colors.m
 Copyright: 2010-2011 Timothy E. Holy
-           2017 Dynare Team
+           2017-2025 Dynare Team
 License: BSD-2-clause
 
 Files: matlab/utilities/graphics/colorspace.m
@@ -287,7 +294,7 @@ License: BSD-2-clause
 
 Files: examples/fs2000_data.m tests/estimation/pct/fs2000_data.m
 Copyright: 2000-2022 Frank Schorfheide
-           2023 Dynare Team
+           2023-2025 Dynare Team
 License: CC-BY-SA-4.0
 
 Files: examples/usmodel_data.mat tests/estimation/pct/SW_2007_fmincon_parallel.m
@@ -306,13 +313,13 @@ Files: matlab/distributions/closed_skew_normal/csn_mean.m
        matlab/distributions/closed_skew_normal/csn_variance.m
        matlab/distributions/gaussian/gaussian_cdf_derivative.m
 Copyright: 2022-2023 Gaygysyz Guljanov
-           2025 Dynare Team
+           2025-2026 Dynare Team
 License: GPL-3+
 
 Files: matlab/distributions/closed_skew_normal/csn_prune_distribution.m
        matlab/distributions/closed_skew_normal/csn_quantile.m
 Copyright: 2022-2023 Gaygysyz Guljanov, Willi Mutschler
-           2025 Dynare Team
+           2025-2026 Dynare Team
 License: GPL-3+
 
 Files: matlab/distributions/closed_skew_normal/csn_singular_to_csn_proper.m
@@ -369,6 +376,7 @@ License: GPL-3+
 Files: mex/sources/gensylv/gensylv.cc
        mex/sources/libkorder/kord/* mex/sources/libkorder/sylv/*
        mex/sources/libkorder/tl/* mex/sources/libkorder/utils/*
+       mex/sources/k_order_welfare/approximation_welfare.cc
 Copyright: 2004-2011 Ondra Kamenik
            2019-2026 Dynare Team
 License: GPL-3+

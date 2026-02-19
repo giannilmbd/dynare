@@ -11,7 +11,7 @@ function tf = isZero(o)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2015 Dynare Team
+% Copyright © 2015-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

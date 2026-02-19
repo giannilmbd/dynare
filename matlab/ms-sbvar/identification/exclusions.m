@@ -16,7 +16,7 @@ function [Ui,Vi,n0,np,ixmC0Pres,Qi,Ri] = exclusions(nvar,nexo,options_ms)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

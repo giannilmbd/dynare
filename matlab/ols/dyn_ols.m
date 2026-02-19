@@ -28,7 +28,7 @@ function ds = dyn_ols(ds, fitted_names_dict, eqtags, model_name, param_names, ds
 % SPECIAL REQUIREMENTS
 %   dynare must have been run with the option: json=compute
 
-% Copyright © 2017-2021 Dynare Team
+% Copyright © 2017-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

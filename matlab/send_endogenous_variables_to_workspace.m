@@ -1,7 +1,7 @@
 function send_endogenous_variables_to_workspace()
 % Saves all the endogenous variables in MATLAB's workspace.
 
-% Copyright © 2009-2018 Dynare Team
+% Copyright © 2009-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

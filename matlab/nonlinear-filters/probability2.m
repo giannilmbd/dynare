@@ -10,7 +10,7 @@ function [density] = probability2(mu,S,X)
 % OUTPUTS
 %    density        [double]   Gaussian pdf of X
 
-% Copyright © 2009-2025 Dynare Team
+% Copyright © 2009-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

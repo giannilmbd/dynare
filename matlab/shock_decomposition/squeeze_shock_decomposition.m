@@ -12,7 +12,7 @@ function oo_ = squeeze_shock_decomposition(M_,oo_,options_,var_list_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

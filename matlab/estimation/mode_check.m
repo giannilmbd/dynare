@@ -26,7 +26,7 @@ function mcheck = mode_check(objective_function,xparam,hessian_mat,options_,M_,e
 % - mom.run
 % -------------------------------------------------------------------------
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

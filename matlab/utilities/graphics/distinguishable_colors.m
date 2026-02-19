@@ -55,7 +55,7 @@ function colors = distinguishable_colors(n_colors,bg,func)
 %   c = distinguishable_colors(25,'w',func);
 
 % Copyright © 2010-2011 by Timothy E. Holy
-% Copyright © 2017 Dynare Team
+% Copyright © 2017-2025 Dynare Team
 %
 % Redistribution and use in source and binary forms, with or without
 % modification, are permitted provided that the following conditions are

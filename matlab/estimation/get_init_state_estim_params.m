@@ -25,7 +25,7 @@ function [index_init_state, IS, index_deep_parameters] = get_init_state_estim_pa
 % - `IS` is computed via intersection of init names and the restricted
 %   state-name list constructed in decision-rule order for states.
 % 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

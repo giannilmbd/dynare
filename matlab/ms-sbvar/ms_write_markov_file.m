@@ -10,7 +10,7 @@ function ms_write_markov_file(fname, options)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -21,7 +21,7 @@ function [s,nu] = inverse_gamma_specification(mu, sigma2, lb, type, use_fzero_fl
 % more often in finding an interval for nu containing a sign change because it expands the interval on both sides and eventually
 % violates  the condition nu>2.
 
-% Copyright © 2003-2023 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

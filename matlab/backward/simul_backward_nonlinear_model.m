@@ -23,7 +23,7 @@ function [simulations, oo_,  errorflag] = simul_backward_nonlinear_model(initial
 % [3] If the first input argument is empty, the endogenous variables are initialized with 0, or if available with the information
 %     provided through the histval block.
 
-% Copyright (©) 2012-2023 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

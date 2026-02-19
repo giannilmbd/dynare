@@ -8,7 +8,7 @@ function record = load_last_mh_history_file(MetropolisFolder, ModelName)
 %   record              [struct]    structure storing the MH history
 %
 
-% Copyright © 2013-2023 Dynare Team
+% Copyright © 2013-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

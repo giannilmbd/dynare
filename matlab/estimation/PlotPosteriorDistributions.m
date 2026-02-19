@@ -15,7 +15,7 @@ function oo_ = PlotPosteriorDistributions(estim_params_, M_, options_, bayestopt
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2005-2025 Dynare Team
+% Copyright © 2005-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

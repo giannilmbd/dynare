@@ -1,6 +1,6 @@
 function data  = load_mat_file_data_legacy(datafile, varobs)
 
-% Copyright © 2017-2018 Dynare Team
+% Copyright © 2017-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

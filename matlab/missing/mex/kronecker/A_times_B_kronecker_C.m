@@ -41,7 +41,7 @@ function D = A_times_B_kronecker_C(A,B,C)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 1996-2020 Dynare Team
+% Copyright © 1996-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

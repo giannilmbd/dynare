@@ -8,7 +8,7 @@ function A = isconst(B)
 % OUTPUTS
 % - A        [logical]   1×m vector.
 
-% Copyright © 2008-2019 Dynare Team
+% Copyright © 2008-2021 Dynare Team
 %
 % This file is part of Dynare.
 %

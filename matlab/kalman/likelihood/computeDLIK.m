@@ -1,6 +1,6 @@
 function [Da,DP,DLIK,D2a,D2P,Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady,D2a,D2Yss,D2T,D2Om,D2P)
 
-% Copyright © 2012-2017 Dynare Team
+% Copyright © 2012-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

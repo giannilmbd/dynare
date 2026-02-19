@@ -10,7 +10,7 @@ function indices = kitagawa(weights, noise, m)
 % OUTPUTS
 % - indices   [integer]   m×1 vector of indices in [1:n]
 
-% Copyright © 2022-2024 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

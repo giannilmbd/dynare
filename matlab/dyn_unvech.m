@@ -7,7 +7,7 @@ function Matrix = dyn_unvech(Vector)
 % OUTPUTS
 %   Matrix             [double]   a n*n symetric matrix, where n solves n*(n+1)/2=m.
 
-% Copyright © 2010-2017 Dynare Team
+% Copyright © 2010-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

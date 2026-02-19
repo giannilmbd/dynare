@@ -15,7 +15,7 @@ function rnd = gamrnd(a, b, method)
 %  The third input is a structure with two fields named `large` and `small`.
 %  These fields define the algorithms to be used if a>1 (large) or a<1 (small).
 
-% Copyright © 2006-2021 Dynare Team
+% Copyright © 2006-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

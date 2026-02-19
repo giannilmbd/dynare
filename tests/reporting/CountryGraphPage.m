@@ -1,5 +1,5 @@
 function rep = CountryGraphPage(rep, countryAbbr, db_q, dc_q, prange, srange)
-% Copyright © 2013-2019 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

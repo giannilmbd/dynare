@@ -1,6 +1,6 @@
 function title=add_filter_subtitle(title,options_)
 
-% Copyright © 2015-2017 Dynare Team
+% Copyright © 2015-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

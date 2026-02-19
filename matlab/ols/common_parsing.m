@@ -25,7 +25,7 @@ function [Y, lhssub, X, startdates, enddates, residnames] = common_parsing(ds, a
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

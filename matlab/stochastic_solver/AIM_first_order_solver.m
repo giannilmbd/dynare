@@ -74,7 +74,7 @@ function [dr,info]=AIM_first_order_solver(g1,M_,dr,qz_criterium)
 %
 % Initially written by George Perendia
 
-% Copyright © 2001-2024 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

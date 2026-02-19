@@ -15,7 +15,7 @@ function online_auxiliary_filter(xparam1, dataset_, options_, M_, estim_params_,
 % in Sequential Monte Carlo Methods in Practice, Eds. Doucet, Freitas and Gordon, Springer Verlag, Chapter
 % 10, 197-223.
 
-% Copyright © 2013-2025 Dynare Team
+% Copyright © 2013-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

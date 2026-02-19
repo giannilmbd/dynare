@@ -9,8 +9,8 @@ function fjac = fjaco(f,x,varargin)
 %   P1,P2,... : additional arguments for f (optional)
 % OUTPUT
 %   fjac      : finite difference Jacobian
-%
-% Copyright © 2010-2017,2019-2023 Dynare Team
+
+% Copyright © 2010-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

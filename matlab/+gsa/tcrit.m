@@ -9,7 +9,7 @@ function t_crit = tcrit(n,pval0)
 % marco.ratto@ec.europa.eu
 
 % Copyright © 2011-2012 European Commission
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

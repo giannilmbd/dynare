@@ -8,7 +8,7 @@ function ida = get_aux_variable_id(var)
 % OUTPUTS
 % - ida   [integer]          Corresponding index in M_.aux_vars.
 
-% Copyright © 2018-2019 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

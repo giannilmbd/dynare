@@ -1,6 +1,6 @@
 function [pacmodl, lhs, rhs, pnames, enames, xnames, rname, pid, eid, xid, pnames_, ipnames_, params, data, islaggedvariables] =  init(M_, oo_, eqname, params, data, range)
 
-% Copyright © 2018-2021 Dynare Team
+% Copyright © 2018-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

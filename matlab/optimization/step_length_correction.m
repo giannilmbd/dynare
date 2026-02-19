@@ -1,6 +1,6 @@
 function c = step_length_correction(x,scale,i)
 
-% Copyright © 2013-2017 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

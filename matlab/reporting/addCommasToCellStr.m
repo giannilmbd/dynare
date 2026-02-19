@@ -11,7 +11,7 @@ function str = addCommasToCellStr(cs)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2016 Dynare Team
+% Copyright © 2016-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

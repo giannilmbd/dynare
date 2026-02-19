@@ -14,7 +14,7 @@ function [info, oo_, options_, M_] = stoch_simul(M_, options_, oo_, var_list)
 % - options_      [structure]     MATLAB's structure describing the current options
 % - M             [structure]     MATLAB's structure describing the model
 
-% Copyright © 2001-2025 Dynare Team
+% Copyright © 2001-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

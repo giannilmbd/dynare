@@ -20,7 +20,7 @@ function trace_plot(options_,M_,estim_params_,type,blck,name1,name2,name3)
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2003-2025 Dynare Team
+% Copyright © 2003-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

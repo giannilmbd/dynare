@@ -1,7 +1,7 @@
 classdef paragraph < handle
     % paragraph Class
     %
-    % Copyright © 2014-2022 Dynare Team
+    % Copyright © 2014-2023 Dynare Team
     %
     % This file is part of Dynare.
     %

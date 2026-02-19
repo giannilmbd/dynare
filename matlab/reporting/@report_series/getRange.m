@@ -1,7 +1,7 @@
 function dd = getRange(o)
 %function dd = getRange(o)
 
-% Copyright © 2013-2015 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -10,7 +10,7 @@ function writedata_text(fname)
 % SPECIAL REQUIREMENT
 %   none
 
-% Copyright © 2007-2018 Dynare Team
+% Copyright © 2007-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

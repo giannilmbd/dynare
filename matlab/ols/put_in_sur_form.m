@@ -15,7 +15,7 @@ function [Yvec, lhssubvec, Xmat, constrained] = put_in_sur_form(Y, lhssub, X)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

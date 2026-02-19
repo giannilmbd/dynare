@@ -12,7 +12,7 @@ function [A0, AR, B] = get_companion_matrix_legacy(auxiliary_model_name, auxilia
 % OUTPUTS
 % - None
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

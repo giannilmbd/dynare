@@ -12,7 +12,7 @@ function [hptrend,hpcycle] = sample_hp_filter(y,s)
 % SPECIAL REQUIREMENTS
 %
 
-% Copyright © 2010-2017 Dynare Team
+% Copyright © 2010-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -7,7 +7,7 @@ function [H,prob,d] = smirnov_test(x1 , x2 , alpha, iflag )
 % marco.ratto@ec.europa.eu
 
 % Copyright © 2012 European Commission
-% Copyright © 2012-2017 Dynare Team
+% Copyright © 2012-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -16,7 +16,7 @@ function V_csn = csn_variance(Sigma, Gamma, nu, Delta, mvnlogcdf)
 % - V_csn       [p by p]   covariance matrix of the CSN(mu,Sigma,Gamma,nu,Delta) distribution
 
 % Copyright © 2022-2023 Gaygysyz Guljanov
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

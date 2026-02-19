@@ -11,7 +11,7 @@ function plot_ms_probabilities(computed_probabilities, options_)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

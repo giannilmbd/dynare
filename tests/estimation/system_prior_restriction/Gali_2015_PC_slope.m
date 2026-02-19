@@ -24,7 +24,7 @@ function output_cell =Gali_2015_PC_slope(xparam1,M_,options_,oo_,estim_params_,b
 %   output_cell  [1 by n cell]   1 by n Matlab cell allowing to store any
 %                                desired computation or result (strings, matrices, structures, etc.)
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -19,7 +19,7 @@ function json = cherrypick(infile, outfold, eqtags, noresids, json, substituteta
 % It is expected that the file infile.mod has already been run, and
 % that the associated JSON output is available.
 
-% Copyright © 2019-2024 Dynare Team
+% Copyright © 2019-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

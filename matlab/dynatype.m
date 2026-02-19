@@ -13,7 +13,7 @@ function dynatype (s,var_list)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2001-2020 Dynare Team
+% Copyright © 2001-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

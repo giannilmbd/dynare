@@ -12,7 +12,7 @@ function [pdraws, log_posterior]=get_posterior_subsample(M_,options_,SampleSize)
 %   pdraws          [double]        SampleSize by npar matrix of parameter draws
 %   log_posterior   [double]        SampleSize by 1 vector of log posterior
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

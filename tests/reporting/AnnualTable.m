@@ -1,5 +1,5 @@
 function rep = AnnualTable(rep, db_a, dc_a, seriesRootName, arange)
-% Copyright © 2013-2019 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

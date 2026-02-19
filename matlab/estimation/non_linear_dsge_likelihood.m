@@ -29,7 +29,7 @@ function [fval,info,exit_flag,DLIK,Hess,ys,trend_coeff,M_,bayestopt_,dr] = non_l
 % - bayestopt_              [struct]              See INPUTS section.
 % - dr                      [struct]              decision rule structure described in INPUTS section.
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

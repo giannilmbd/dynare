@@ -18,7 +18,7 @@ function [info,description] = check_posterior_analysis_data(type,M_,options_)
 %                                   info = 6; % Ok (nothing to do ;-)
 %   description [string]        Message corresponding to info
 
-% Copyright © 2008-2024 Dynare Team
+% Copyright © 2008-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

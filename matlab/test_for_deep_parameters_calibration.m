@@ -13,7 +13,7 @@ function info=test_for_deep_parameters_calibration(M_)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2010-2018 Dynare Team
+% Copyright © 2010-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

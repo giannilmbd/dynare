@@ -10,7 +10,7 @@ function varargout = printline(n, s, fid)
 % OUTPUTS
 %   None
 
-% Copyright © 2015-2017 Dynare Team
+% Copyright © 2015-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

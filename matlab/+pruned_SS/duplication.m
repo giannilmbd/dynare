@@ -13,8 +13,9 @@ function [Dp,DpMPinv] = duplication(p)
 % This function is called by
 %   * identification.get_jacobians.m (previously getJJ.m)
 % =========================================================================
+
 % Copyright © 1997 Tom Minka <minka@microsoft.com>
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2023 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -30,7 +31,7 @@ function [Dp,DpMPinv] = duplication(p)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
-% =========================================================================
+%
 % Original author: Thomas P Minka (tpminka@media.mit.edu), April 22, 2013
 
 a = tril(ones(p));

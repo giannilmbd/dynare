@@ -14,7 +14,7 @@ function irfs = irf(M_,oo_,options_)
 %   none.
 %
 %
-% Copyright © 2022-2023 Dynare Team
+% Copyright © 2022-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -17,7 +17,7 @@
 % dynare/mex/sources/k_order_welfare/k_order_welfare.cc and it uses code provided by
 % dynare++
 
-% Copyright © 2021-2022 Dynare Team
+% Copyright © 2021-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

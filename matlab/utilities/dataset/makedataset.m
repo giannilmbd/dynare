@@ -22,7 +22,7 @@ function [dataset_, dataset_info, newdatainterface] = makedataset(options_, init
 %
 % See also dynare_estimation_init
 
-% Copyright © 2014-2024 Dynare Team
+% Copyright © 2014-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

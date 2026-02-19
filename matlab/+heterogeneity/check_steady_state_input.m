@@ -58,7 +58,7 @@ function [steady_state, sizes, indices] = check_steady_state_input(M_, options_h
 %    - agg [integer]: number of aggregate variables
 % - indices [structure]: structure containing index and ordering information
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

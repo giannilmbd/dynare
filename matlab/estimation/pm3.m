@@ -28,7 +28,7 @@ function [oo_, B1]=pm3(M_,options_,oo_,n1,n2,ifil,B,tit1,tit2,tit_tex,names1,nam
 % See also the comment in posterior_sampler.m function.
 
 
-% Copyright © 2007-2025 Dynare Team
+% Copyright © 2007-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

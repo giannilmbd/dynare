@@ -3,7 +3,7 @@ function set_dynare_seed(varargin)
 % Set seeds depending on MATLAB (Octave) version. This routine is
 % a wrapper for set_dynare_seed_local_options
 
-% Copyright © 2010-2023 Dynare Team
+% Copyright © 2010-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

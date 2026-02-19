@@ -21,7 +21,7 @@ function [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 % None.
 % 
 
-% Copyright © 2004-2025 Dynare Team
+% Copyright © 2004-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

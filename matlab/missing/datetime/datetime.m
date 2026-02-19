@@ -6,7 +6,7 @@
 % Hence, it only works as a substitute for the real datetime in the context of
 % formatted output.
 
-% Copyright © 2021 Dynare Team
+% Copyright © 2021-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -14,7 +14,7 @@ function dyn_saveas(h, fname, nodisplay, graph_format)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2012-2019 Dynare Team
+% Copyright © 2012-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

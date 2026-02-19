@@ -1,5 +1,5 @@
 function rep = CommResidTablePage(rep, db_q, dc_q, trange, vline_after)
-% Copyright © 2013-2019 Dynare Team
+% Copyright © 2013-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

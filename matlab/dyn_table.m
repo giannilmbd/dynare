@@ -17,7 +17,7 @@ function dyn_table(title, preamble, afterward, rows, cols, indent, data)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2017-2019 Dynare Team
+% Copyright © 2017-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

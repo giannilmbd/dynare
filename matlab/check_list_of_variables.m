@@ -14,7 +14,7 @@ function varlist = check_list_of_variables(options_, M_, varlist)
 %
 % SPECIAL REQUIREMENTS
 
-% Copyright © 2003-2018 Dynare Team
+% Copyright © 2003-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

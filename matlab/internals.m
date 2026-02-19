@@ -56,7 +56,7 @@ function internals(flag, varargin)
 %! @end deftypefn
 %@eod:
 
-% Copyright © 2011-2023 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -9,7 +9,7 @@ function num_logical_cores=num_procs
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2020 Dynare Team
+% Copyright © 2020-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

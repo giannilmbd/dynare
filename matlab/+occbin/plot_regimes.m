@@ -5,7 +5,7 @@ function plot_regimes(regimes,M_,options_)
 % - M_              [structure]     MATLAB's structure describing the model
 % - options_        [structure]     MATLAB's structure containing the options
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

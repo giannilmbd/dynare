@@ -9,7 +9,7 @@ function i = iota(n, idx)
 % OUTPUTS 
 % - i      [integer]   n*1 vector. All elements are zero except those specified in idx.
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

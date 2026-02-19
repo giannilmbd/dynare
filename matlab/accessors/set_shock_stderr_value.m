@@ -1,6 +1,6 @@
 function set_shock_stderr_value(exoname,value)
 
-% Copyright © 2019 Dynare Team
+% Copyright © 2019-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

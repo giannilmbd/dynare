@@ -6,7 +6,7 @@ function oo_=PCL_Part_info_moments(M_, oo_, options_, varobs, dr, ivar)
 % Pearlman, Currie and Levine 1986 solution.
 % 22/10/06 - Version 2 for new Riccati with 4 params instead 5
 
-% Copyright © 2006-2024 Dynare Team
+% Copyright © 2006-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

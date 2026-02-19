@@ -20,7 +20,7 @@ function [yf,yf_CI,yf_CI_ME]=stochastic_classical(dr,y0,horizon,var_list,M_,opti
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2003-2024 Dynare Team
+% Copyright © 2003-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

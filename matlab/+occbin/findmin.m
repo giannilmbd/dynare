@@ -14,7 +14,7 @@ function [y, out, cost] = findmin(d_index, a0, P1, Qt, Y, ZZ, opts_simul,M_, dr,
 % - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables                                    
 % - options_            [structure]     MATLAB's structure describing the current options
 
-% Copyright © 2023 Dynare Team
+% Copyright © 2023-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

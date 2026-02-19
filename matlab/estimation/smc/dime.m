@@ -23,7 +23,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
 % SPECIAL REQUIREMENTS
 % None.
 
-% Copyright © 2024 Dynare Team
+% Copyright © 2024-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

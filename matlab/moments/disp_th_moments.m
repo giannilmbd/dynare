@@ -23,7 +23,7 @@ function oo_ = disp_th_moments(dr, var_list, M_, options_, oo_)
 %           conditional_variance_decomposition      [array]     Conditional variance decomposition array
 %           conditional_variance_decomposition_ME   [array]     Conditional variance decomposition array with measurement error
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -13,7 +13,7 @@ function [dr,info,params] =compute_decision_rules(M_,options_, dr, endo_steady_s
 % - info          [integer]       scalar or vector, error code.
 % - params        [double]        vector of potentially updated parameters
 
-% Copyright © 2020-2023 Dynare Team
+% Copyright © 2020-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

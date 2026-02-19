@@ -13,7 +13,7 @@ function dxp=getPowerDeriv(x,p,k)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2011-2012 Dynare Team
+% Copyright © 2011-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

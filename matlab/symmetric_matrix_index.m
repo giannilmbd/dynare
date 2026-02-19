@@ -11,7 +11,7 @@ function k = symmetric_matrix_index(i,j,n)
 % Outputs:
 %   k   [scalar]    index of variable combination in vech(A)
 
-% Copyright © 2007-2017 Dynare Team
+% Copyright © 2007-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -8,7 +8,7 @@ function boo = isdiff(var)
 % OUTPUTS
 % - boo   [logical]          true/false.
 
-% Copyright © 2018 Dynare Team
+% Copyright © 2018-2022 Dynare Team
 %
 % This file is part of Dynare.
 %

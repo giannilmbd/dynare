@@ -21,7 +21,7 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
 %                        - oo_het.sizes : grid size structure
 %                        - oo_het.mat : interpolation and policy function matrices
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

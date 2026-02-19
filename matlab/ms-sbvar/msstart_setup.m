@@ -1,6 +1,6 @@
 %function []= msstart_setup(options_)
 
-% Copyright © 2011-2017 Dynare Team
+% Copyright © 2011-2023 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -19,7 +19,7 @@ function [A,B,ys,info,dr,params] = dynare_resolve(M_,options_,dr,endo_steady_sta
 % - dr                  [structure]     Reduced form model.
 % - params              [double]        vector of potentially updated parameters
 
-% Copyright © 2001-2023 Dynare Team
+% Copyright © 2001-2025 Dynare Team
 %
 % This file is part of Dynare.
 %

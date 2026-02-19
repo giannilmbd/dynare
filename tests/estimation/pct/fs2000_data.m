@@ -3,7 +3,7 @@
 %(replication data). Version: 1. Journal of Applied Econometrics. Dataset.
 %http://dx.doi.org/10.15456/jae.2022314.0708799949
 % Copyright: 2000-2022 Frank Schorfheide
-% Copyright: 2023 Dynare Team
+% Copyright: 2023-2025 Dynare Team
 
 % License: CC BY 4.0
 % (https://creativecommons.org/licenses/by/4.0/legalcode)

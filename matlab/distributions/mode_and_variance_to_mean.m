@@ -17,7 +17,7 @@ function [mu, parameters] = mode_and_variance_to_mean(m,s2,distribution,lower_bo
 %    parameters       [double]    2*1 vector, parameters of the distribution.
 %
 
-% Copyright © 2009-2017 Dynare Team
+% Copyright © 2009-2024 Dynare Team
 %
 % This file is part of Dynare.
 %

@@ -22,7 +22,7 @@ function data = simulate_data_with_missing_observations(n,m,S,options)
 % SPECIAL REQUIREMENTS
 %    none
 
-% Copyright © 2010 Dynare Team
+% Copyright © 2010-2022 Dynare Team
 %
 % This file is part of Dynare.
 % 

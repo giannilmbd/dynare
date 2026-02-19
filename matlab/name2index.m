@@ -19,7 +19,7 @@ function i = name2index(M_, estim_params_, type, name1, name2, name3 )
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2008-2025 Dynare Team
+% Copyright © 2008-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

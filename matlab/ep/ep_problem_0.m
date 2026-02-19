@@ -16,7 +16,7 @@ function [res, A, info] = ep_problem_0(y, x, pfm)
 % REMARKS:
 % [1] The structure pfm holds the given initial condition for the states (pfm.y0) and the terminal condition
 
-% Copyright © 2025 Dynare Team
+% Copyright © 2025-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

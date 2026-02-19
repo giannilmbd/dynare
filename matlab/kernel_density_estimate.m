@@ -24,7 +24,7 @@ function [abscissa,f] = kernel_density_estimate(data,number_of_grid_points,numbe
 %    The code is adapted from Anders Holtsberg's MATLAB toolbox (stixbox).
 %
 
-% Copyright © 2004-2017 Dynare Team
+% Copyright © 2004-2025 Dynare Team
 %
 % This file is part of Dynare.
 %
