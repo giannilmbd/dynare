@@ -41,8 +41,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     use matlab_mex
     use expectations
     implicit none (type, external)
-    integer(c_int), value :: nlhs, nrhs
-    type(c_ptr) :: plhs(*), prhs(*)
+    integer(c_int), intent(in), value :: nlhs, nrhs
+    type(c_ptr), intent(in) :: prhs(*)
+    type(c_ptr), intent(out) :: plhs(*)
 
     ! MATLAB inputs as raw pointers
     type(c_ptr) :: x_mx, ind_mx, w_mx, invh_mx, mu_mx, dims_mx

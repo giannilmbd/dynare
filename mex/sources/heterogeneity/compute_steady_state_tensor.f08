@@ -58,8 +58,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     use pack_output
     use markov
     implicit none (type, external)
-    integer(c_int), value :: nlhs, nrhs
-    type(c_ptr) :: plhs(*), prhs(*)
+    integer(c_int), intent(in), value :: nlhs, nrhs
+    type(c_ptr), intent(in) :: prhs(*)
+    type(c_ptr), intent(out) :: plhs(*)
 
     ! MATLAB input pointers
     type(c_ptr) :: M_fname_mx, equation_names_mx, M_params_mx, &
