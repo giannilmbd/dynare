@@ -8463,6 +8463,10 @@ Posterior objects
        ``oo_.FilteredVariables`` (see below for a description of this
        variable)
 
+    .. option:: frequentist_smoother = BOOLEAN
+
+       If set to ``true``, the frequentist smoother will be run in cases where the Bayesian smoother usually triggered with :opt:`smoother` is not run  (e.g. ML estimation or ``mh_replic=0``). Default: true.
+
     .. option:: smoother
 
        Triggers the computation of the posterior distribution of

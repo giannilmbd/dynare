@@ -77,26 +77,26 @@ varobs gp_obs gy_obs;
 
 options_.solve_tolf = 1e-12;
 
-estimation(order=1,mode_compute=9,silent_optimizer,analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,prior_trunc=0);
+estimation(order=1,mode_compute=9,silent_optimizer,analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,prior_trunc=0,frequentist_smoother=false);
 if (isoctave && user_has_octave_package('optim', '1.6')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
-    estimation(order=1,mode_compute=1,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0
+    estimation(order=1,mode_compute=1,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false
     %,optim = ('DerivativeCheck', 'on','FiniteDifferenceType','central')
     );
-    estimation(order=1,mode_compute=3,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
-    estimation(order=1,mode_compute=101,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);    
+    estimation(order=1,mode_compute=3,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
+    estimation(order=1,mode_compute=101,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);    
 end
 if ~isoctave % This estimation randomly fails on Octave
-estimation(order=1,mode_compute=5,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
+estimation(order=1,mode_compute=5,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
 end
-estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
-estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
+estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
+estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
 options_.debug=1;
-estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0);
+estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_ML_1=oo_.likelihood_at_initial_parameters;
-estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0);
+estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_ML_2=oo_.likelihood_at_initial_parameters;
 options_.analytic_derivation=0;
-estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0);
+estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_ML_3=oo_.likelihood_at_initial_parameters;
 
 if abs(fval_ML_1-fval_ML_2)>1e-5 || abs(fval_ML_1-fval_ML_3)>1e-5
@@ -112,26 +112,26 @@ stderr e_a, inv_gamma_pdf, 0.035449, inf;
 stderr e_m, inv_gamma_pdf, 0.008862, inf;
 end;
 
-estimation(order=1,mode_compute=9,silent_optimizer,analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,prior_trunc=0);
+estimation(order=1,mode_compute=9,silent_optimizer,analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,prior_trunc=0,frequentist_smoother=false);
 if (isoctave && user_has_octave_package('optim', '1.6')) || (~isoctave && user_has_matlab_license('optimization_toolbox'))
-    estimation(order=1,mode_compute=1,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0
+    estimation(order=1,mode_compute=1,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false
     %,optim = ('DerivativeCheck', 'on','FiniteDifferenceType','central')
     );
-    estimation(order=1,mode_compute=3,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
-    estimation(order=1,mode_compute=101,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);    
+    estimation(order=1,mode_compute=3,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
+    estimation(order=1,mode_compute=101,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);    
 end
 if ~isoctave % This estimation randomly fails on Octave
-estimation(order=1,mode_compute=5,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
+estimation(order=1,mode_compute=5,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
 end
-estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
-estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0);
+estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
+estimation(order=1,mode_compute=4,silent_optimizer,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,mh_nblocks=2,mh_jscale=0.8,plot_priors=0,frequentist_smoother=false);
 options_.debug=1;
-estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0);
+estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_Bayes_1=oo_.likelihood_at_initial_parameters;
-estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0);
+estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',analytic_derivation,kalman_algo=2,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_Bayes_2=oo_.likelihood_at_initial_parameters;
 options_.analytic_derivation=0;
-estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0);
+estimation(order=1,mode_compute=0,mode_file='fs2000_analytic_derivation/Output/fs2000_analytic_derivation_mode',kalman_algo=1,datafile=my_data,nobs=192,mh_replic=0,plot_priors=0,frequentist_smoother=false);
 fval_Bayes_3=oo_.likelihood_at_initial_parameters;
 
 if abs(fval_Bayes_1-fval_Bayes_2)>1e-5 || abs(fval_Bayes_1-fval_Bayes_3)>1e-5

@@ -592,8 +592,10 @@ elseif options_.partial_information ||...
     options_.order>1 %no particle smoother
     % smoothing not yet supported
 else
-    %% ML estimation, or posterior mode without Metropolis-Hastings or Metropolis without Bayesian smoothed variables
-    oo_=save_display_classical_smoother_results(xparam1,M_,oo_,options_,bayestopt_,dataset_,dataset_info,estim_params_);
+    %% Frequentist smoother: ML estimation, or posterior mode without Metropolis-Hastings or Metropolis without Bayesian smoothed variables
+    if options_.frequentist_smoother
+        oo_=save_display_classical_smoother_results(xparam1,M_,oo_,options_,bayestopt_,dataset_,dataset_info,estim_params_);
+    end
 end
 
 if options_.forecast == 0 || options_.mh_replic > 0 || options_.load_mh_file
