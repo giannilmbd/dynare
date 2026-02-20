@@ -975,7 +975,7 @@ sphinx_build_exe = find_program('sphinx-build', required : false, disabler : tru
 
 sphinx_src = [ 'doc/manual/source/conf.py',
                'doc/manual/source/time-series.rst',
-               'doc/manual/source/the-configuration-file.rst',
+               'doc/manual/source/parallel-execution.rst',
                'doc/manual/source/index.rst',
                'doc/manual/source/dynare-misc-commands.rst',
                'doc/manual/source/bibliography.rst',
