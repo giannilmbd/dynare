@@ -150,6 +150,15 @@ else
         Hess  = zeros(k,k);                             % Initialization of the Hessian
     end
     LIK={inf,DLIK,Hess};
+    DDK = zeros(mm, pp, k);
+    DDF = zeros(pp, k);
+    if full_Hess
+        DD2K = zeros(mm, pp, k, k);
+        DD2F = zeros(pp, k, k);
+    else
+        DD2K = [];
+        DD2F = [];
+    end
 end
 
 while notsteady && t<=last %loop over t
@@ -181,9 +190,9 @@ while notsteady && t<=last %loop over t
             lik(s,i) = log(Fi) + (prediction_error*prediction_error)/Fi + l2pi; %Top equation p. 175 in DK (2012)
             if analytic_derivation
                 if full_Hess
-                    [Da,DP,DLIKt,D2a,D2P, Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,D2a,D2Yss,squeeze(D2H(d_index(i),:,:)),D2P);
+                    [Da,DP,DLIKt,Hesst,DDK,DDF,D2a,D2P,DD2K,DD2F] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,true,DDK,DDF,D2a,D2Yss,squeeze(D2H(d_index(i),:,:)),D2P,DD2K,DD2F);
                 else
-                    [Da,DP,DLIKt,Hesst] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady);
+                    [Da,DP,DLIKt,Hesst,DDK,DDF] = univariate_computeDLIK(k,i,z(i,:),Zflag,prediction_error,Ki,PZ,Fi,Da,DYss,DP,DH(d_index(i),:),notsteady,false,DDK,DDF);
                 end
                 if t>presample
                     DLIK = DLIK + DLIKt;
@@ -242,10 +251,10 @@ if t <= last
     if analytic_derivation
         if full_Hess
             [tmp, tmp2] = univariate_kalman_filter_ss(Y,t,last,a,P,kalman_tol,T,H,Z,pp,Zflag, ...
-                                                      analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,D2a,D2T,D2Yss,D2H,D2P);
+                                                      analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,DDK,DDF,D2a,D2T,D2Yss,D2H,D2P,DD2K,DD2F);
         else
             [tmp, tmp2] = univariate_kalman_filter_ss(Y,t,last,a,P,kalman_tol,T,H,Z,pp,Zflag, ...
-                                                      analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian);
+                                                      analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,DDK,DDF);
         end
         lik(s+1:end,:)=tmp2{1};
         dlik(s+1:end,:)=tmp2{2};

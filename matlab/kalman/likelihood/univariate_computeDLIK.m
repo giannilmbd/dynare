@@ -1,9 +1,9 @@
-function [Da,DP1,DLIK,D2a,D2P,Hesst] = univariate_computeDLIK(k,indx,Z,Zflag,v,K,PZ,F,Da,DYss,DP,DH,notsteady,D2a,D2Yss,D2H,D2P)
-% [Da,DP1,DLIK,D2a,D2P,Hesst] = univariate_computeDLIK(k,indx,Z,Zflag,v,K,PZ,F,Da,DYss,DP,DH,notsteady,D2a,D2Yss,D2H,D2P)
+function [Da,DP1,DLIK,Hesst,DDK,DDF,D2a,D2P,DD2K,DD2F] = univariate_computeDLIK(k,indx,Z,Zflag,v,K,PZ,F,Da,DYss,DP,DH,notsteady,full_Hess,DDK,DDF,D2a,D2Yss,D2H,D2P,DD2K,DD2F)
+% [Da,DP1,DLIK,Hesst,DDK,DDF,D2a,D2P,DD2K,DD2F] = univariate_computeDLIK(k,indx,Z,Zflag,v,K,PZ,F,Da,DYss,DP,DH,notsteady,full_Hess,DDK,DDF,D2a,D2Yss,D2H,D2P,DD2K,DD2F)
 % Compute first and second derivatives of the univariate Kalman filter log-likelihood
 %
 % USAGE:
-%   [Da,DP1,DLIK,D2a,D2P,Hesst] = univariate_computeDLIK(k,indx,Z,Zflag,v,K,PZ,F,Da,DYss,DP,DH,notsteady,D2a,D2Yss,D2H,D2P)
+%   [Da,DP1,DLIK,Hesst,DDK,DDF,D2a,D2P,DD2K,DD2F] = univariate_computeDLIK(k,indx,Z,Zflag,v,K,PZ,F,Da,DYss,DP,DH,notsteady,full_Hess,DDK,DDF,D2a,D2Yss,D2H,D2P,DD2K,DD2F)
 %
 % INPUTS:
 %   k           - number of parameters
@@ -19,18 +19,27 @@ function [Da,DP1,DLIK,D2a,D2P,Hesst] = univariate_computeDLIK(k,indx,Z,Zflag,v,K
 %   DP          - derivatives of state covariance (input/output)
 %   DH          - derivatives of measurement error variance
 %   notsteady   - flag indicating if not at steady state
-%   D2a         - second derivatives of state prediction (input/output)
-%   D2Yss       - second derivatives of steady state
-%   D2H         - second derivatives of measurement error variance
-%   D2P         - second derivatives of state covariance (input/output)
+%   full_Hess   - flag indicating if full Hessian computation is requested
+%   DDK         - [mm x pp x k] cached Kalman gain derivatives (input/output)
+%   DDF         - [pp x k] cached forecast error variance derivatives (input/output)
+%   D2a         - second derivatives of state prediction (input/output, full_Hess only)
+%   D2Yss       - second derivatives of steady state (full_Hess only)
+%   D2H         - second derivatives of measurement error variance (full_Hess only)
+%   D2P         - second derivatives of state covariance (input/output, full_Hess only)
+%   DD2K        - [mm x pp x k x k] cached second Kalman gain derivatives (input/output, full_Hess only)
+%   DD2F        - [pp x k x k] cached second forecast error variance derivatives (input/output, full_Hess only)
 %
 % OUTPUTS:
 %   Da          - updated derivatives of state prediction
 %   DP1         - updated derivatives of filtered state covariance
 %   DLIK        - (k x 1) first derivatives of log-likelihood
-%   D2a         - second derivatives of state prediction (if nargout > 4)
-%   D2P         - second derivatives of state covariance (if nargout > 4)
-%   Hesst       - Hessian of log-likelihood w.r.t. parameters (if nargout == 6)
+%   Hesst       - Hessian contribution (full Hessian or OPG approximation)
+%   DDK         - updated cached Kalman gain derivatives
+%   DDF         - updated cached forecast error variance derivatives
+%   D2a         - second derivatives of state prediction (full_Hess only)
+%   D2P         - second derivatives of state covariance (full_Hess only)
+%   DD2K        - updated cached second Kalman gain derivatives (full_Hess only)
+%   DD2F        - updated cached second forecast error variance derivatives (full_Hess only)
 %
 % APPROACH:
 %   The function computes the gradient and Hessian of the univariate Kalman filter
@@ -60,9 +69,6 @@ function [Da,DP1,DLIK,D2a,D2P,Hesst] = univariate_computeDLIK(k,indx,Z,Zflag,v,K
 
 % AUTHOR(S) marco.ratto@jrc.ec.europa.eu
 
-%% Persistent storage for derivatives across univariate filter recursions
-persistent DDK DDF DD2K DD2F
-
 %% Compute derivatives of Kalman filter quantities if not at steady state
 if notsteady
     if Zflag
@@ -81,7 +87,7 @@ if notsteady
         end
 
         % Compute second derivatives if requested
-        if nargout>4
+        if full_Hess
             D2F = zeros(k,k);
             D2v = zeros(k,k);
             D2K = zeros(rows(K),k,k);
@@ -111,7 +117,7 @@ if notsteady
         DK = squeeze(DP(:,Z,:))/F-PZ*transpose(DF)/F^2;
 
         % Compute second derivatives if requested
-        if nargout>4
+        if full_Hess
             D2F = zeros(k,k);
             D2K = zeros(rows(K),k,k);
             D2v   = squeeze(-D2a(Z,:,:) - D2Yss(Z,:,:));
@@ -133,18 +139,18 @@ if notsteady
         end
     end
 
-    % Store computed derivatives in persistent storage for this observation index
-    if nargout>4
+    % Store computed derivatives in cache arrays for this observation index
+    if full_Hess
         DD2K(:,indx,:,:)=D2K;
         DD2F(indx,:,:)=D2F;
     end
     DDK(:,indx,:)=DK;
     DDF(indx,:)=DF;
 else
-    % At steady state: retrieve pre-computed derivatives from persistent storage
+    % At steady state: retrieve pre-computed derivatives from cache arrays
     DK = squeeze(DDK(:,indx,:));
     DF = DDF(indx,:)';
-    if nargout>4
+    if full_Hess
         D2K = squeeze(DD2K(:,indx,:,:));
         D2F = squeeze(DD2F(indx,:,:));
     end
@@ -152,7 +158,7 @@ else
     % Compute innovation derivatives (state-dependent even at steady state)
     if Zflag
         Dv   = -Z*Da(:,:) - Z*DYss(:,:);
-        if nargout>4
+        if full_Hess
             D2v = zeros(k,k);
             for j=1:k
                 D2v(:,j)   = -Z*D2a(:,:,j) - Z*D2Yss(:,:,j);
@@ -160,7 +166,7 @@ else
         end
     else
         Dv   = -Da(Z,:) - DYss(Z,:);
-        if nargout>4
+        if full_Hess
             D2v   = squeeze(-D2a(Z,:,:) - D2Yss(Z,:,:));
         end
     end
@@ -171,13 +177,13 @@ end
 DLIK = DF/F + 2*Dv'/F*v - v^2/F^2*DF;
 
 %% Compute second derivative of log-likelihood (Hessian) or approximate Hessian
-if nargout==6
+if full_Hess
     % Full Hessian computation
     Hesst = D2F/F-1/F^2*(DF*DF') + 2*D2v/F*v + 2*(Dv'*Dv)/F - 2*(DF*Dv)*v/F^2 ...
             - v^2/F^2*D2F - 2*v/F^2*(Dv'*DF') + 2*v^2/F^3*(DF*DF');
-elseif nargout==4
+else
     % Approximate Hessian using outer product of scores
-    D2a = 1/F^2*(DF*DF') + 2*(Dv'*Dv)/F ;
+    Hesst = 1/F^2*(DF*DF') + 2*(Dv'*Dv)/F ;
 end
 
 %% Update state prediction derivatives
@@ -185,7 +191,7 @@ end
 Da = Da + DK*v+K*Dv;
 
 %% Update second derivatives of state prediction if requested
-if nargout>4
+if full_Hess
     D2a = D2a + D2K*v;
     for j=1:k
         for i=1:j
@@ -213,7 +219,7 @@ if notsteady
     end
 
     % Update second derivatives of filtered covariance if requested
-    if nargout>4
+    if full_Hess
         if Zflag
             jcount = 0;
             for j=1:k

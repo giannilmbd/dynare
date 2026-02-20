@@ -1,4 +1,4 @@
-function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,D2a,D2T,D2Yss,D2H,D2P)
+function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,T,H,Z,pp,Zflag,analytic_derivation,Da,DT,DYss,DP,DH,analytic_Hessian,DDK,DDF,D2a,D2T,D2Yss,D2H,D2P,DD2K,DD2F)
 % Computes the log-likelihood of a stationary state space model (steady-state univariate Kalman filter).
 
 %
@@ -17,7 +17,11 @@ function [LIK,likk,a] = univariate_kalman_filter_ss(Y,start,last,a,P,kalman_tol,
 % - analytic_derivation     [logical]     whether to compute analytic derivatives (true/false)
 % - Da, DT, DYss, DP, DH    [array]       first-derivative objects used when analytic_derivation is true
 % - analytic_Hessian        [string]      Hessian mode: '' (none), 'full' (analytic), 'opg' (outer product), 'asymptotic'
+% - DDK                     [array]       [mm x pp x k] cached Kalman gain derivatives
+% - DDF                     [array]       [pp x k] cached forecast error variance derivatives
 % - D2a, D2T, D2Yss, D2H, D2P    [array]       second-derivative objects used when analytic_Hessian=='full'
+% - DD2K                    [array]       [mm x pp x k x k] cached second Kalman gain derivatives (full Hessian only)
+% - DD2F                    [array]       [pp x k x k] cached second forecast error variance derivatives (full Hessian only)
 %
 % OUTPUTS
 % - LIK                     [double|cell] minus log-likelihood; if analytic_derivation is true, returns cell array {LIK,DLIK[,Hess]}
@@ -109,9 +113,9 @@ while t<=last
             likk(s,i) = log(Fi) + prediction_error*prediction_error/Fi + l2pi;
             if analytic_derivation
                 if full_Hess
-                    [Da,DPP,DLIKt,D2a,D2PP, Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,D2a,D2Yss,squeeze(D2H(i,:,:)),D2PP);
+                    [Da,DPP,DLIKt,Hesst,DDK,DDF,D2a,D2PP,DD2K,DD2F] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,true,DDK,DDF,D2a,D2Yss,squeeze(D2H(i,:,:)),D2PP,DD2K,DD2F);
                 else
-                    [Da,DPP,DLIKt,Hesst] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0);
+                    [Da,DPP,DLIKt,Hesst,DDK,DDF] = univariate_computeDLIK(k,i,Z(i,:),Zflag,prediction_error,Ki,PPZ,Fi,Da,DYss,DPP,DH(i,:),0,false,DDK,DDF);
                 end
                 DLIK = DLIK + DLIKt;
                 if full_Hess || asy_hess

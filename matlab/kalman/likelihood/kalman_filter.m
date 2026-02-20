@@ -125,6 +125,10 @@ else
     end
     LIK={inf,DLIK,Hess};
     LIKK={likk,dlikk};
+    DK = [];
+    DF = [];
+    D2K = [];
+    D2F = [];
 end
 
 rescale_prediction_error_covariance0=rescale_prediction_error_covariance;
@@ -185,9 +189,9 @@ while notsteady && t<=last
         tmp = (a+K*v);
         if analytic_derivation
             if full_Hess
-                [Da,DP,DLIKt,D2a,D2P, Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady,D2a,D2Yss,D2T,D2Om,D2H,D2P);
+                [Da,DP,DLIKt,Hesst,DK,DF,D2a,D2P,D2K,D2F] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady,true,DK,DF,D2a,D2Yss,D2T,D2Om,D2H,D2P,D2K,D2F);
             else
-                [Da,DP,DLIKt,Hesst] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady);
+                [Da,DP,DLIKt,Hesst,DK,DF] = computeDLIK(k,tmp,Z,Zflag,v,T,K,P,iF,Da,DYss,DT,DOm,DP,DH,notsteady,false,DK,DF);
             end
             if t>presample
                 DLIK = DLIK + DLIKt;
@@ -228,9 +232,9 @@ end
 if t <= last
     if analytic_derivation
         if full_Hess
-            [tmp, tmp2] = kalman_filter_ss(Y, t, last, a, T, K, iF, log_dF, Z, pp, Zflag, analytic_derivation, Da, DT, DYss, analytic_Hessian, D2a, D2T, D2Yss);
+            [tmp, tmp2] = kalman_filter_ss(Y, t, last, a, T, K, iF, log_dF, Z, pp, Zflag, analytic_derivation, Da, DT, DYss, analytic_Hessian, DK, DF, D2a, D2T, D2Yss, D2K, D2F);
         else
-            [tmp, tmp2] = kalman_filter_ss(Y, t, last, a, T, K, iF, log_dF, Z, pp, Zflag, analytic_derivation, Da, DT, DYss, analytic_Hessian);
+            [tmp, tmp2] = kalman_filter_ss(Y, t, last, a, T, K, iF, log_dF, Z, pp, Zflag, analytic_derivation, Da, DT, DYss, analytic_Hessian, DK, DF);
         end
         likk(s+1:end) = tmp2{1};
         dlikk(s+1:end,:) = tmp2{2};
