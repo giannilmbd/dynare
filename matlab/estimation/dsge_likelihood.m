@@ -253,7 +253,6 @@ switch options_.lik_init
         kalman_algo = 1;
     end
     Pstar=lyapunov_solver(T,R,Q,options_);
-    Pinf  = [];
     a     = zeros(mm,1);
     a=set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1=T*a; %set state prediction for first Kalman step;
@@ -273,7 +272,6 @@ switch options_.lik_init
         kalman_algo = 1;
     end
     Pstar = options_.Harvey_scale_factor*eye(mm);
-    Pinf  = [];
     a     = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm0 = a;
@@ -415,7 +413,6 @@ switch options_.lik_init
         options_.lik_init = 1;
         Pstar=lyapunov_solver(T,R,Q,options_);
     end
-    Pinf  = [];
     a     = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1 = T*a;
@@ -444,7 +441,6 @@ switch options_.lik_init
     T_tmp = T(stable,stable);
     Pstar_tmp=lyapunov_solver(T_tmp,R_tmp,Q,options_);
     Pstar(stable, stable) = Pstar_tmp;
-    Pinf  = [];
     a = zeros(mm,1);
     a = set_Kalman_starting_values(a,M_,dr,options_,bayestopt_);
     a_0_given_tm1 = T*a;
@@ -629,7 +625,6 @@ if (kalman_algo==2) || (kalman_algo==4)
                     Z1(jz,Z(jz))=1;
                 end
                 Z = [Z1, eye(pp)];
-                Zflag=1;
                 T = blkdiag(T,zeros(pp));
                 if options_.heteroskedastic_filter
                     clear Q
@@ -641,7 +636,6 @@ if (kalman_algo==2) || (kalman_algo==4)
                 end
                 R = blkdiag(R,eye(pp));
                 Pstar = blkdiag(Pstar,H);
-                Pinf  = blkdiag(Pinf,zeros(pp));
                 H1 = zeros(pp,1);
                 Zflag=1;
                 if analytic_derivation
