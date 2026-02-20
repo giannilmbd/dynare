@@ -548,7 +548,7 @@ bibtex_default_style = 'mystyle'
 
 bibtex_reference_style = 'author_year_round'
 
-source_suffix = '.rst'
+source_suffix = {'.rst': 'restructuredtext'}
 
 templates_path = ['_templates']
 
