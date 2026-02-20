@@ -95,19 +95,19 @@ end
 %         equal to each other                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isoctave % array2table is not available in Octave
-fprintf('\n<strong>smoothed eta_r</strong>\n');
+fprintf('\n<strong>Smoothed Gaussian eta_r</strong>\n');
 disp(array2table([smoothed_shocks_0.eta_r smoothed_shocks_5.eta_r (smoothed_shocks_0.eta_r-smoothed_shocks_5.eta_r)], ...
      'RowNames', "t="+string(1:options_.nobs), ...
      'VariableNames', ["kalman_algo=0", "kalman_algo=5", "dev"]));
-fprintf('\n<strong>smoothed eta_z</strong>\n');
+fprintf('\n<strong>Smoothed Gaussian eta_z</strong>\n');
 disp(array2table([smoothed_shocks_0.eta_z smoothed_shocks_5.eta_z (smoothed_shocks_0.eta_z-smoothed_shocks_5.eta_z)], ...
      'RowNames', "t="+string(1:options_.nobs), ...
      'VariableNames', ["kalman_algo=0", "kalman_algo=5", "dev"]));
-fprintf('\n<strong>smoothed eta_e</strong>\n');
+fprintf('\n<strong>Smoothed Gaussian eta_e</strong>\n');
 disp(array2table([smoothed_shocks_0.eta_e smoothed_shocks_5.eta_e (smoothed_shocks_0.eta_e-smoothed_shocks_5.eta_e)], ...
      'RowNames', "t="+string(1:options_.nobs), ...
      'VariableNames', ["kalman_algo=0", "kalman_algo=5", "dev"]));
-fprintf('\n<strong>smoothed eta_a</strong>\n');
+fprintf('\n<strong>Smoothed Gaussian eta_a</strong>\n');
 disp(array2table([smoothed_shocks_0.eta_a smoothed_shocks_5.eta_a (smoothed_shocks_0.eta_a-smoothed_shocks_5.eta_a)], ...
      'RowNames', "t="+string(1:options_.nobs), ...
      'VariableNames', ["kalman_algo=0", "kalman_algo=5", "dev"]));
@@ -158,15 +158,13 @@ estimation(datafile = 'ireland2004_post1980.csv'
           ,skewed_kalman_prune_tol = 0.02
           ,skewed_kalman_rank_deficiency_transform
           ,skewed_kalman_mvnlogcdf = 'gaussian_log_mvncdf_mendell_elston'
-          ,skewed_kalman_smoother_skip
           ,tex
           );
 
 % check whether options have been correctly passed by the preprocessor
 if (options_.skewed_kalman.prune_tol ~= 0.02) || ...
      (options_.skewed_kalman.rank_deficiency_transform ~= true) || ...
-       ~strcmp(options_.skewed_kalman.mvnlogcdf, 'gaussian_log_mvncdf_mendell_elston') || ...
-       (options_.skewed_kalman.skip_smoother ~= 1)
+       ~strcmp(options_.skewed_kalman.mvnlogcdf, 'gaussian_log_mvncdf_mendell_elston')
     error('skewed kalman options were not passed correctly')
 end
 
