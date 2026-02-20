@@ -6,9 +6,125 @@
 
 .. _conf-file:
 
-######################
-The configuration file
-######################
+#########################################
+Parallel Execution and Configuration File
+#########################################
+
+Dynare offers two approaches for parallelizing computations:
+
+1. **Parallel Computing Toolbox (PCT)**: A simple, built-in approach
+   that uses MATLAB's Parallel Computing Toolbox to distribute work
+   across cores on a single machine. No configuration file is needed.
+   See :ref:`pct-parallel` below.
+
+2. **Cluster-based parallelization**: A more flexible approach that
+   spawns separate MATLAB/Octave processes on local or remote machines,
+   communicating via SMB (Windows) or SSH (Unix). This requires a
+   configuration file and the ``parallel`` command-line option. See
+   :ref:`cluster-parallel` below.
+
+
+.. _pct-parallel:
+
+Parallel Computing Toolbox (PCT)
+================================
+
+Starting with Dynare 7, certain estimation tasks can be parallelized
+using MATLAB's Parallel Computing Toolbox (PCT). This is the
+recommended approach for users running Dynare on a single multi-core
+machine, as it requires no configuration file, no SSH setup, and no
+PsTools installation.
+
+**Requirements:**
+
+    * MATLAB R2024b or later
+    * Parallel Computing Toolbox installed and licensed
+
+**Currently supported tasks:**
+
+    * The MCMC posterior sampler (each chain is dispatched to a separate
+      worker via ``parfeval``)
+
+**Usage:**
+
+Parallelization via PCT is controlled by the :opt:`use_pct` option of the
+``estimation`` command. By default, ``use_pct`` is ``true``, meaning that
+if PCT is available, the MCMC sampler will automatically run chains in
+parallel using the current parallel pool. If no pool is open, one will
+be created for the duration of the computation and closed afterwards.
+
+**Tips for tuning the parallel pool:**
+
+    * You can control the pool configuration before calling
+      ``estimation``::
+
+          c = parcluster('local');
+          c.NumThreads = 2;
+          parpool(c, 4);
+
+    * Thread pools are not supported; use a process pool.
+
+.. _cluster-parallel:
+
+Cluster-based Parallel Configuration
+====================================
+
+This section explains the alternative way to configure Dynare for parallelizing some tasks that require very little inter-process communication.
+
+The parallelization is done by running several MATLAB or Octave
+processes, either on local or on remote machines. Communication
+between leader and follower processes are done through SMB on Windows and
+SSH on UNIX. Input and output data, and also some short status
+messages, are exchanged through network file systems. Currently, the
+system works only with homogenous grids: only Windows or only Unix
+machines.
+
+The following routines are currently parallelized:
+
+    * the posterior sampling algorithms when using multiple chains;
+    * the Metropolis-Hastings diagnostics;
+    * the posterior IRFs;
+    * the prior and posterior statistics;
+    * some plotting routines.
+
+Note that creating the configuration file is not enough in order to
+trigger parallelization of the computations: you also need to specify
+the ``parallel`` option to the ``dynare`` command. For more details,
+and for other options related to the parallelization engine, see
+:ref:`dyn-invoc`.
+
+You also need to verify that the following requirements are met by
+your cluster (which is composed of a leader and of one or more
+followers):
+
+For a Windows grid:
+
+        * a standard Windows network (SMB) must be in place;
+        * the `PsTools`_ suite must be installed in the path of the
+          leader Windows machine;
+        * the Windows user on the leader machine has to be user of any
+          other follower machine in the cluster, and that user will be
+          used for the remote computations.
+        * detailed step-by-step setup instructions can be found in
+          :ref:`win-ssg`.
+
+For a UNIX grid:
+
+        * SSH must be installed on the leader and on the follower machines;
+        * SSH keys must be installed so that the SSH connection from
+          the leader to the follower can be done without passwords, or
+          using an SSH agent.
+
+.. warning:: Compatibility considerations between leader and follower
+
+    It is highly recommended to use the same version of Dynare on both the
+    leader and all followers. Different versions regularly cause problems like
+    zero acceptance rates during estimation. When upgrading to a newer Dynare
+    version do not forget to adjust the ``DynarePath``.
+
+
+The Configuration File
+----------------------
 
 The configuration file is used to provide Dynare with information not
 related to the model (and hence not placed in the model file). At the
@@ -64,178 +180,6 @@ conventions such as ``USER_NAME`` have been excluded for concision):
 
     Is ``true`` or ``false``.
 
-
-Dynare Configuration
-====================
-
-This section explains how to configure Dynare for general
-processing. Currently, there is only one option available.
-
-.. confblock:: [hooks]
-
-    |br| This block can be used to specify configuration options that will
-    be used when running Dynare.
-
-    *Options*
-
-    .. option:: GlobalInitFile = PATH_AND_FILE
-
-        The location of a global initialization file that can be used to
-        customize some Dynare internals (typically default option values). This
-        is a MATLAB/Octave script.
-
-        If this option is not specified, Dynare will look for a
-        ``global_init.m`` file in its configuration directory (typically
-        ``$HOME/.config/dynare/global_init.m`` under Linux and macOS, and
-        ``c:\Users\USERNAME\AppData\Roaming\dynare\global_init.m`` under
-        Windows).
-
-    *Example*
-
-        ::
-
-            [hooks]
-            GlobalInitFile = /home/usern/dynare/myInitFile.m
-
-
-.. confblock:: [paths]
-
-    |br| This block can be used to specify paths that will be used
-    when running Dynare.
-
-    *Options*
-
-    .. option:: Include = PATH
-
-        A colon-separated path to use when searching for files to
-        include via ``@#include``. Paths specified via :opt:`-I
-        <-I\<\<path\>\>>` take priority over paths specified here,
-        while these paths take priority over those specified by
-        ``@#includepath``.
-
-    *Example*
-
-        ::
-
-            [paths]
-            Include = /path/to/folder/containing/modfiles:/path/to/another/folder
-
-.. _paral-conf:
-
-Parallel Configuration
-======================
-
-Dynare offers two approaches for parallelizing computations:
-
-1. **Parallel Computing Toolbox (PCT)**: A simple, built-in approach
-   that uses MATLAB's Parallel Computing Toolbox to distribute work
-   across cores on a single machine. No configuration file is needed.
-   See :ref:`pct-parallel` below.
-
-2. **Cluster-based parallelization**: A more flexible approach that
-   spawns separate MATLAB/Octave processes on local or remote machines,
-   communicating via SMB (Windows) or SSH (Unix). This requires a
-   configuration file and the ``parallel`` command-line option. See
-   :ref:`cluster-parallel` below.
-
-.. _pct-parallel:
-
-Parallel Computing Toolbox (PCT)
---------------------------------
-
-Starting with Dynare 7, certain estimation tasks can be parallelized
-using MATLAB's Parallel Computing Toolbox (PCT). This is the
-recommended approach for users running Dynare on a single multi-core
-machine, as it requires no configuration file, no SSH setup, and no
-PsTools installation.
-
-**Requirements:**
-
-    * MATLAB R2024b or later
-    * Parallel Computing Toolbox installed and licensed
-
-**Currently supported tasks:**
-
-    * The MCMC posterior sampler (each chain is dispatched to a separate
-      worker via ``parfeval``)
-
-**Usage:**
-
-Parallelization via PCT is controlled by the :opt:`use_pct` option of the
-``estimation`` command. By default, ``use_pct`` is ``true``, meaning that
-if PCT is available, the MCMC sampler will automatically run chains in
-parallel using the current parallel pool. If no pool is open, one will
-be created for the duration of the computation and closed afterwards.
-
-**Tips for tuning the parallel pool:**
-
-    * You can control the pool configuration before calling
-      ``estimation``::
-
-          c = parcluster('local');
-          c.NumThreads = 2;
-          parpool(c, 4);
-
-    * Thread pools are not supported; use a process pool.
-
-.. _cluster-parallel:
-
-Cluster-based Parallel Configuration
--------------------------------------
-
-This section explains how to configure Dynare for parallelizing some
-tasks which require very little inter-process communication.
-
-The parallelization is done by running several MATLAB or Octave
-processes, either on local or on remote machines. Communication
-between leader and follower processes are done through SMB on Windows and
-SSH on UNIX. Input and output data, and also some short status
-messages, are exchanged through network file systems. Currently, the
-system works only with homogenous grids: only Windows or only Unix
-machines.
-
-The following routines are currently parallelized:
-
-    * the posterior sampling algorithms when using multiple chains;
-    * the Metropolis-Hastings diagnostics;
-    * the posterior IRFs;
-    * the prior and posterior statistics;
-    * some plotting routines.
-
-Note that creating the configuration file is not enough in order to
-trigger parallelization of the computations: you also need to specify
-the ``parallel`` option to the ``dynare`` command. For more details,
-and for other options related to the parallelization engine, see
-:ref:`dyn-invoc`.
-
-You also need to verify that the following requirements are met by
-your cluster (which is composed of a leader and of one or more
-followers):
-
-For a Windows grid:
-
-        * a standard Windows network (SMB) must be in place;
-        * the `PsTools`_ suite must be installed in the path of the
-          leader Windows machine;
-        * the Windows user on the leader machine has to be user of any
-          other follower machine in the cluster, and that user will be
-          used for the remote computations.
-        * detailed step-by-step setup instructions can be found in
-          :ref:`win-ssg`.
-
-For a UNIX grid:
-
-        * SSH must be installed on the leader and on the follower machines;
-        * SSH keys must be installed so that the SSH connection from
-          the leader to the follower can be done without passwords, or
-          using an SSH agent.
-
-.. warning:: Compatibility considerations between leader and follower
-
-    It is highly recommended to use the same version of Dynare on both the
-    leader and all followers. Different versions regularly cause problems like
-    zero acceptance rates during estimation. When upgrading to a newer Dynare
-    version do not forget to adjust the ``DynarePath``.
 
 We now turn to the description of the configuration directives. Note
 that comments in the configuration file can be provided by separate
@@ -413,7 +357,7 @@ lines starting with a hashtag (#).
 .. _win-ssg:
 
 Windows Step-by-Step Guide
-==========================
+--------------------------
 
 This section outlines the steps necessary on most Windows systems to
 set up Dynare for parallel execution. Note that the steps 3 to 6 are
@@ -487,5 +431,61 @@ with the ``parallel_use_psexec=false`` option.
     MatlabOctavePath=matlab
     #Dynare path you are using
     DynarePath=C:/dynare/4.7.0/matlab
+
+Dynare Configuration
+====================
+
+This section explains how to configure Dynare for general
+processing. Currently, there is only one option available.
+
+.. confblock:: [hooks]
+
+    |br| This block can be used to specify configuration options that will
+    be used when running Dynare.
+
+    *Options*
+
+    .. option:: GlobalInitFile = PATH_AND_FILE
+
+        The location of a global initialization file that can be used to
+        customize some Dynare internals (typically default option values). This
+        is a MATLAB/Octave script.
+
+        If this option is not specified, Dynare will look for a
+        ``global_init.m`` file in its configuration directory (typically
+        ``$HOME/.config/dynare/global_init.m`` under Linux and macOS, and
+        ``c:\Users\USERNAME\AppData\Roaming\dynare\global_init.m`` under
+        Windows).
+
+    *Example*
+
+        ::
+
+            [hooks]
+            GlobalInitFile = /home/usern/dynare/myInitFile.m
+
+
+.. confblock:: [paths]
+
+    |br| This block can be used to specify paths that will be used
+    when running Dynare.
+
+    *Options*
+
+    .. option:: Include = PATH
+
+        A colon-separated path to use when searching for files to
+        include via ``@#include``. Paths specified via :opt:`-I
+        <-I\<\<path\>\>>` take priority over paths specified here,
+        while these paths take priority over those specified by
+        ``@#includepath``.
+
+    *Example*
+
+        ::
+
+            [paths]
+            Include = /path/to/folder/containing/modfiles:/path/to/another/folder
+
 
 .. _PsTools: https://technet.microsoft.com/sysinternals/pstools.aspx

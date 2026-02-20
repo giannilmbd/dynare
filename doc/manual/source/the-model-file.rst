@@ -1144,7 +1144,7 @@ The model is declared inside a ``model`` block:
 
         Declares a list of extra files that should be transferred to
         follower nodes when doing a parallel computation (see
-        :ref:`paral-conf`).
+        :ref:`cluster-parallel`).
 
     .. option:: balanced_growth_test_tol = DOUBLE
 

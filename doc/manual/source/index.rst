@@ -40,7 +40,7 @@ A copy of the license can be found at `https://www.gnu.org/licenses/fdl.txt <htt
    installation-and-configuration
    running-dynare
    the-model-file
-   the-configuration-file
+   parallel-execution
    time-series
    reporting
    examples
