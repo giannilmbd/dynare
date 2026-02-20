@@ -1,7 +1,7 @@
 /* Tests the correctness of the Ramsey command when used together with a steady state file by
  * checking whether the results coincide with the ones when used with an initval block
  *
- * The example is taken from Juillard, Michel (2011): User manual for optimal policy package, 
+ * The example is taken from Juillard, Michel (2011): User manual for optimal policy package,
  * MONFISPOL FP7 project SSH-225149, Deliverable 1.1.2
 */
 
@@ -53,6 +53,6 @@ if any( [ max(abs((benchmark.oo_.steady_state-oo_.steady_state)))>1e-5, ...
     max(max(abs(benchmark.oo_.dr.Gy-oo_.dr.Gy)))>1e-5, ...
     abs(benchmark.oo_.planner_objective_value.unconditional-oo_.planner_objective_value.unconditional)>1e-5, ...
     abs(benchmark.oo_.planner_objective_value.conditional.zero_initial_multiplier-oo_.planner_objective_value.conditional.zero_initial_multiplier)>1e-5, ...
-    abs(benchmark.oo_.planner_objective_value.conditional.steady_initial_multiplier-oo_.planner_objective_value.conditional.steady_initial_multiplier)>1e-5] ) 
+    abs(benchmark.oo_.planner_objective_value.conditional.steady_initial_multiplier-oo_.planner_objective_value.conditional.steady_initial_multiplier)>1e-5] )
     error('Initval and steady state file yield different results')
 end

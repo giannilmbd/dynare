@@ -1,6 +1,6 @@
 function Qvec=get_Qvec_heteroskedastic_filter(Q,smpl,M_)
 % function Qvec=get_Qvec_heteroskedastic_filter(Q,smpl,M_)
-% 
+%
 % INPUTS
 %   Q:      baseline non-heteroskadastic covariance matrix of shocks
 %   smpl:   scalar storing end of sample

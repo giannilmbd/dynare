@@ -198,7 +198,7 @@ while t <= last
         % log-likelihood step 3/6: compute Kalman gains
         K_Gauss = Sigma_t_tm1*Z'*invOmega;
         K_Skewed = Gamma_t_tm1*K_Gauss;
-        
+
         % log-likelihood step 4/6: evaluate Gaussian cdfs (specific to skewed Kalman filter)
         % bottom one: mvncdf(0,nu_y,Delta_y + Gamma_y*Sigma_y*Gamma_y')
         % top one: mvncdf(Gamma_y*(y(t)-mu_y),nu_y,Delta_y)
@@ -279,7 +279,7 @@ while t <= last
 
         % log-likelihood step 6/6: collect likelihood contribution
         likk(s) = log_gaussian_cdf_top - log_gaussian_cdf_bottom + log_gaussian_pdf;
-        
+
         %%%%%%%%%%%%%%%%%%%
         % STATE FILTERING %
         %%%%%%%%%%%%%%%%%%%
@@ -318,6 +318,6 @@ function res_mat = blkdiag_two(mat1, mat2)
     lower_mat = zeros(nrow_mat2, ncol_mat1);
     res_mat = [mat1, upper_mat; lower_mat, mat2];
 end % blkdiag_two
-  
+
 
 end % kalman_filter_pruned_skewed

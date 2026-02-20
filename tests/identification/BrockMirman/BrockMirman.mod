@@ -29,7 +29,7 @@ varobs C;
 varexo
     eps_A    ${\varepsilon_A}$ (long_name='TFP shock')
 ;
-    
+
 parameters
     alph    ${\alpha}$   (long_name='capital share')
     betta   ${\beta}$    (long_name='discount factor')
@@ -45,7 +45,7 @@ sigA  = 0.6;
 model;
 [name='Euler equation']
 C^(-1)=alph*betta*C(+1)^(-1)*A(+1)*K^(alph-1);
-[name='capital law of motion'] 
+[name='capital law of motion']
 K=A*K(-1)^alph-C;
 [name='exogenous TFP process']
 log(A)=rhoA*log(A(-1))+sigA*eps_A;

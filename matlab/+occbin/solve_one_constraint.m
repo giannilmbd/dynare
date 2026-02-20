@@ -1,7 +1,7 @@
 function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, solve_DM, console_mode)
 %function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, solve_DM, console_mode)
 %
-% INPUT: 
+% INPUT:
 % - M_                  [structure]     MATLAB's structure describing the model (M_).
 % - dr                  [structure]     decision rules for the model
 % - opts_simul          [structure]     MATLAB's structure containing the OccBin options (opts_simul).
@@ -19,7 +19,7 @@ function [data, SS_out, error_flag ] = solve_one_constraint(M_,dr, opts_simul_, 
 %                                           - C: [n_vars by n_shock_period] array of constants
 % - error_flag          [integer]       1 if a problem was encountered, 0 otherwise
 
-% Original authors: Luca Guerrieri and Matteo Iacoviello 
+% Original authors: Luca Guerrieri and Matteo Iacoviello
 % Original file downloaded from:
 % https://www.matteoiacoviello.com/research_files/occbin_20140630.zip
 % Adapted for Dynare by Dynare Team.
@@ -74,14 +74,14 @@ if solve_DM
     % get the matrices holding the first derivatives for the model
     % each regime is treated separately
     [DM.Cbarmat, DM.Bbarmat, DM.Abarmat, DM.Jbarmat] = occbin.get_deriv(M_base,data.ys);
-    
+
     Mstar_= M_base;
     Mstar_.params(M_.occbin.pswitch(1))= 1;
     [DM.Cstarbarmat, DM.Bstarbarmat, DM.Astarbarmat, DM.Jstarbarmat, DM.Dstarbarmat] = occbin.get_deriv(Mstar_,data.ys);
-    
+
     [DM.decrulea,DM.decruleb]=occbin.get_pq(dr_base);
-    
-    update_flag=true;    
+
+    update_flag=true;
 else
     update_flag=false;
 end
@@ -121,7 +121,7 @@ for shock_period = 1:n_shocks_periods
     if opts_simul_.waitbar
         [~,length_of_old_string]=wait_bar.run(shock_period/n_shocks_periods, hh_fig, sprintf('Period %u of %u', shock_period,n_shocks_periods), console_mode, length_of_old_string);
     end
-    
+
     regime_change_this_iteration=true;
     iter = 0;
     nperiods_endogenously_increased = false;
@@ -129,7 +129,7 @@ for shock_period = 1:n_shocks_periods
     if guess_history && (shock_period<=length(regime_history_guess)) %beyond guess regime history
         guess_history_it = true;
     end
-    
+
     is_periodic=false;
     is_periodic_loop=false;
     binding_indicator_history={};
@@ -137,7 +137,7 @@ for shock_period = 1:n_shocks_periods
     regime_violates_constraint_in_expectation = false(max_iter,1);
     number_of_periods_with_violations = zeros(max_iter,1);
     regime_exit_period = ones(max_iter,1);
-    
+
     while (regime_change_this_iteration && iter<max_iter && ~is_periodic && ~is_periodic_loop)
         iter = iter +1;
         if binding_indicator(end) && nperiods_0<opts_simul_.max_check_ahead_periods
@@ -153,7 +153,7 @@ for shock_period = 1:n_shocks_periods
         if length(binding_indicator)<(nperiods_0 + 1)
             binding_indicator=[binding_indicator; false(nperiods_0 + 1-length(binding_indicator),1)];
         end
-               
+
         if iter==1 && guess_history_it
             regime = regime_history_guess(shock_period).regime;
             regime_start = regime_history_guess(shock_period).regimestart;
@@ -168,7 +168,7 @@ for shock_period = 1:n_shocks_periods
         [regime, regime_start, error_code_period]=occbin.map_regime(binding_indicator,opts_simul_.debug);
         regime_history(shock_period).regime = regime;
         regime_history(shock_period).regimestart = regime_start;
-        
+
         % get the hypothesized piece wise linear solution
         if shock_period==1 || shock_period>1 && any(data.shocks_sequence(shock_period,:))
             if iter==1 && opts_simul_.reset_regime_in_new_period
@@ -185,11 +185,11 @@ for shock_period = 1:n_shocks_periods
                 regime_history(shock_period).regime = regime;
                 regime_history(shock_period).regimestart = regime_start;
             end
-            
+
             [zdatalinear_, SS_out.T(:,:,shock_period), SS_out.R(:,:,shock_period), SS_out.C(:,shock_period), SS, update_flag]=occbin.mkdatap_anticipated_dyn(nperiods_0,DM,...
                 regime_start(end)-1,binding_indicator,...
                 data.exo_pos,data.shocks_sequence(shock_period,:),endo_init,update_flag);
-            
+
             [binding, relax, err]=feval([M_.fname,'.occbin_difference'],zdatalinear_+repmat(dr_base.ys',size(zdatalinear_,1),1),M_.params,dr_base.ys);
 
             if ~isinf(opts_simul_.max_check_ahead_periods) && opts_simul_.max_check_ahead_periods<length(binding_indicator)
@@ -215,7 +215,7 @@ for shock_period = 1:n_shocks_periods
                 max_err(iter) = 0;
             end
 
-            % if max_check_ahead_periods<inf, enforce unconstrained regime for period larger than max_check_ahead_periods 
+            % if max_check_ahead_periods<inf, enforce unconstrained regime for period larger than max_check_ahead_periods
             binding_constraint_new=[binding.constraint_1(1:end_periods);last_indicator];
             relaxed_constraint_new = [relax.constraint_1(1:end_periods);not(last_indicator)];
             number_of_periods_with_violations(iter) = sum(binding_indicator -((binding_indicator | binding_constraint_new) & ~(binding_indicator & relaxed_constraint_new)));
@@ -229,12 +229,12 @@ for shock_period = 1:n_shocks_periods
                 max_relax_constraint_1=find(relax.constraint_1(1:end_periods) & binding_indicator(1:end_periods),1,'last');
                 if ~isempty(max_relax_constraint_1) && find(relax.constraint_1(1:end_periods),1,'last')>=find(binding_indicator(1:end_periods),1,'last')
                     retrench(max_relax_constraint_1) = true;
-                end                
+                end
                 binding_indicator = (binding_indicator | binding_constraint_new) & ~ retrench;
            else
                 binding_indicator = (binding_indicator | binding_constraint_new) & ~(binding_indicator & relaxed_constraint_new);
             end
-            
+
             if iter>1 && regime_change_this_iteration && ~nperiods_endogenously_increased
                 % check for periodic solution only if nperiods is not
                 % increased endogenously
@@ -266,7 +266,7 @@ for shock_period = 1:n_shocks_periods
                 is_periodic_all =is_periodic;
                 is_periodic =  any(is_periodic);
                 is_periodic_strict = is_periodic;
-                
+
                 if is_periodic_loop && ~is_periodic
                     if ~opts_simul_.periodic_solution_strict && any(number_of_periods_with_violations(~regime_violates_constraint_in_expectation(1:iter))<=opts_simul_.periodic_solution_threshold)
                         is_periodic=true;
@@ -293,15 +293,15 @@ for shock_period = 1:n_shocks_periods
                         [regime, regime_start, error_code_period]=occbin.map_regime(binding_indicator,opts_simul_.debug);
                         regime_history(shock_period).regime = regime;
                         regime_history(shock_period).regimestart = regime_start;
-                        
+
                         % get the hypothesized piece wise linear solution
                         [zdatalinear_, SS_out.T(:,:,shock_period), SS_out.R(:,:,shock_period), SS_out.C(:,shock_period), SS, update_flag]=occbin.mkdatap_anticipated_dyn(nperiods_0,DM,...
                             regime_start(end)-1,binding_indicator,...
-                            data.exo_pos,data.shocks_sequence(shock_period,:),endo_init,update_flag);                        
-                    end                    
+                            data.exo_pos,data.shocks_sequence(shock_period,:),endo_init,update_flag);
+                    end
                 end
             end
-            
+
         else
             regime_change_this_iteration=false;
             zdatalinear_(1:end-1,:)=zdatalinear_(2:end,:);
@@ -322,10 +322,10 @@ for shock_period = 1:n_shocks_periods
             end
             binding_indicator_history{iter}=binding_indicator;
         end
-        
+
     end
-    
-    if regime_change_this_iteration ==1 
+
+    if regime_change_this_iteration ==1
         if max_iter>opts_simul_.algo_truncation
             disp_verbose(['occbin solver:: period ' int2str(shock_period) '::'],opts_simul_.debug)
             if is_periodic
@@ -358,15 +358,15 @@ for shock_period = 1:n_shocks_periods
         error_flag = 312;
         return
     end
-    
+
     endo_init = zdatalinear_(1,:);
     zdatapiecewise_(shock_period,:)=endo_init;
     endo_init= endo_init';
-    
+
     % reset binding_indicator for next period's shock -- this resetting is
     % consistent with expecting no additional shocks
     binding_indicator=[binding_indicator(2:end); false];
-    
+
 end
 
 % if necessary, fill in the rest of the path with the remainder of the
@@ -384,5 +384,5 @@ if ~opts_simul_.piecewise_only
 end
 
 if opts_simul_.waitbar
-    wait_bar.close(hh_fig,console_mode); 
+    wait_bar.close(hh_fig,console_mode);
 end

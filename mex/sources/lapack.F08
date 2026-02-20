@@ -111,7 +111,7 @@ module lapack
      end function dlange
 
      function ilaenv(ispec, name, opts, n1, n2, n3, n4)
-       import :: blint  
+       import :: blint
        implicit none
        integer(blint) :: ispec, n1, n2, n3, n4
        character(len=*), intent(in) :: name, opts
@@ -130,7 +130,7 @@ contains
      integer(blint), intent(inout) :: info
      integer(blint) :: m, n
 #ifdef DEBUG
-     if (size(ipiv) /= size(A,1)) then 
+     if (size(ipiv) /= size(A,1)) then
         print *, "Inconsistent number of rows of A and size of ipiv"
      end if
      if (size(A,2) /= size(B,1)) then

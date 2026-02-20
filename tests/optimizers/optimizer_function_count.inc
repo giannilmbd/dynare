@@ -1,4 +1,4 @@
-profile off; 
+profile off;
 if ~isoctave
 profData = profile('info');
 % profile viewer % this opens the GUI

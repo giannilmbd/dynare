@@ -12,7 +12,7 @@ function [ysim, xsim, oo_, errorflag] = simul_linear_model(initialconditions, sa
 %
 % OUTPUTS
 % - ysim                [double]      simulated endogenous variables
-% - xsim                [double]      simulated exogenous variables  
+% - xsim                [double]      simulated exogenous variables
 % - oo_                 [struct]      Dynare's oo_ global structure.
 % - errorflag           [logical]     scalar, equal to false iff the simulation did not fail.
 %

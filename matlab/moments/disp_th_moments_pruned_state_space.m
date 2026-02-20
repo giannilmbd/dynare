@@ -10,7 +10,7 @@ function oo_=disp_th_moments_pruned_state_space(dr,M_,options_,i_var,oo_)
 % i_var         [double]    Index of requested variables in declaration order
 % oo_           [struct]    structure describing the Model
 %
-% OUTPUTS: 
+% OUTPUTS:
 %           gamma_y                                 [cell]      MATLAB cell of nar+1 arrays, where nar is the order of the autocorrelation function.
 %           gamma_y{1}                              [double]    Covariance matrix.
 %           gamma_y{i+1}                            [double]    Autocorrelation function (for i=1,...,options_.ar).
@@ -77,7 +77,7 @@ if ~options_.noprint %options_.nomoments == 0
         labels = M_.endo_names_tex(i_var,:);
         lh = cellofchararraymaxlength(labels)+2;
         dyn_latex_table(M_,options_,title,'th_moments',headers,labels,z,lh,11,4);
-    end        
+    end
 end
 
 if isempty(i1)
@@ -89,12 +89,12 @@ end
 
 if options_.nocorr == 0 % && size(stationary_vars, 1) > 0
     corr=pruned_state_space.Corr_y;
-    if options_.contemporaneous_correlation 
+    if options_.contemporaneous_correlation
         oo_.contemporaneous_correlation = corr;
     end
     if ~options_.noprint
         skipline()
-        title='MATRIX OF CORRELATIONS BASED ON PRUNED STATE SPACE';            
+        title='MATRIX OF CORRELATIONS BASED ON PRUNED STATE SPACE';
         labels = M_.endo_names(i_var,:);
         headers = ['Variables';labels];
         lh = cellofchararraymaxlength(labels)+2;
@@ -114,9 +114,9 @@ if options_.ar > 0 %&& size(stationary_vars, 1) > 0
         oo_.autocorr{i} = oo_.gamma_y{i+1};
         z(:,i) = diag(oo_.gamma_y{i+1}(i1,i1));
     end
-    if ~options_.noprint    
-        skipline()    
-        title='COEFFICIENTS OF AUTOCORRELATION BASED ON PRUNED STATE SPACE';            
+    if ~options_.noprint
+        skipline()
+        title='COEFFICIENTS OF AUTOCORRELATION BASED ON PRUNED STATE SPACE';
         labels = M_.endo_names(i_var(i1),:);
         headers = ['Order ';cellstr(int2str([1:options_.ar]'))];
         lh = cellofchararraymaxlength(labels)+2;
@@ -126,7 +126,7 @@ if options_.ar > 0 %&& size(stationary_vars, 1) > 0
             lh = cellofchararraymaxlength(labels)+2;
             dyn_latex_table(M_,options_,title,'th_autocorr_matrix',headers,labels,z,lh,8,4);
         end
-    end  
+    end
 end
 
 if options_.order==2 && ~options_.nodecomposition && M_.exo_nbr > 1% do variance decomposition

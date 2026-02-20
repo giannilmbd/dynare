@@ -22,17 +22,17 @@ function DERIVS = get_perturbation_params_derivs(M_, options_, estim_params_, dr
 %   dr                      [structure]             Reduced form model.
 %   endo_steady_state       [vector]                steady state value for endogenous variables
 %   exo_steady_state        [vector]                steady state value for exogenous variables
-%   exo_det_steady_state    [vector]                steady state value for exogenous deterministic variables                                    
+%   exo_det_steady_state    [vector]                steady state value for exogenous deterministic variables
 %   indpmodel:              [modparam_nbr by 1]     index of selected (estimated) parameters in M_.params;
-%                                                   corresponds to model parameters (no stderr and no corr) 
+%                                                   corresponds to model parameters (no stderr and no corr)
 %                                                   in estimated_params block
 %   indpstderr:             [stderrparam_nbr by 1]  index of selected (estimated) standard errors,
-%                                                   i.e. for all exogenous variables where 'stderr' is given 
+%                                                   i.e. for all exogenous variables where 'stderr' is given
 %                                                   in the estimated_params block
 %   indpcorr:               [corrparam_nbr by 2]    matrix of selected (estimated) correlations,
-%                                                   i.e. for all exogenous variables where 'corr' is given in 
+%                                                   i.e. for all exogenous variables where 'corr' is given in
 %                                                   the estimated_params block
-%   d2flag:                 [boolean]               flag to compute second-order parameter derivatives of steady state 
+%   d2flag:                 [boolean]               flag to compute second-order parameter derivatives of steady state
 %                                                   and first-order Kalman transition matrices
 % -------------------------------------------------------------------------
 % OUTPUTS
@@ -154,7 +154,7 @@ gstep        = options_.gstep;
 order        = options_.order;
 if isempty(options_.qz_criterium)
     % set default value for qz_criterium: if there are no unit roots one can use 1.0
-    % If they are possible, you may have have multiple unit roots and the accuracy 
+    % If they are possible, you may have have multiple unit roots and the accuracy
     % decreases when computing the eigenvalues in lyapunov_symm. Hence, we normally use 1+1e-6
     options_ = select_qz_criterium_value(options_);
 end

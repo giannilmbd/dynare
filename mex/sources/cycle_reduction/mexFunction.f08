@@ -35,7 +35,7 @@ contains
       logical, intent(in) :: check
       integer, intent(in) :: max_it
       real(c_double), dimension(2), intent(inout) :: info
-      
+
       real(real64), dimension(:,:), allocatable :: A02, &
       Q0, Q2, Ahat, invA1_A02, A1i, A0_tmp, A1_tmp
       integer :: it, n, dn
@@ -53,7 +53,7 @@ contains
       A1i = A1
       it = 0
 loop: do
-         ! Computing [A0;A2]*(A1\[A0 A2]) 
+         ! Computing [A0;A2]*(A1\[A0 A2])
          A1_tmp = A1i
          invA1_A02 = A02
          call left_divide(A1_tmp, invA1_A02, ipiv, info_inv)
@@ -117,7 +117,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    integer(c_int), intent(in), value :: nlhs, nrhs
 
    integer :: i, n, max_it
-   character(kind=c_char, len=2) :: num2str 
+   character(kind=c_char, len=2) :: num2str
    real(real64) :: cvg_tol
    real(real64), dimension(:,:), pointer,  contiguous :: A0, A1, A2, X
    real(real64), dimension(2) :: info
@@ -127,9 +127,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    if (nrhs < 4) call mexErrMsgTxt("Must have at least 4 inputs")
    if (nrhs > 5) call mexErrMsgTxt("Too many input arguments")
    if (nlhs > 2) call mexErrMsgTxt("Too many output arguments")
-   
+
    do i=1,3
-      if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. & 
+      if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. &
           (.not. mxIsComplex(prhs(i))) .and. (.not. mxIsSparse(prhs(i))))) then
             write (num2str,"(i2)") i
             call mexErrMsgTxt("Argument" // trim(num2str) // " should be a real dense matrix")
@@ -155,7 +155,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
         .or. n /= mxGetM(prhs(3))  &   ! Number of lines of A2
         .or. n /= mxGetN(prhs(3))) &   ! Number of columns of A2
         call mexErrMsgTxt("Input dimension mismatch")
-   
+
    ! 1. Storing the relevant information in Fortran format
    A0(1:n,1:n) => mxGetDoubles(prhs(1))
    A1(1:n,1:n) => mxGetDoubles(prhs(2))

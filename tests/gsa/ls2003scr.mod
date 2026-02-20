@@ -20,12 +20,12 @@ stderr e_ys,inv_gamma_pdf,1.2533,0.6551;
 stderr e_pies,inv_gamma_pdf,1.88,0.9827;
 end;
 
-  
+
 disp('CREATE SCREENING SAMPLE, CHECK FOR STABILITY AND PERFORM SENSITIVITY ANALYSIS');
 % disp('PRESS ENTER TO CONTUNUE');
 % pause;
 
-sensitivity(morris=1, morris_nliv=6, morris_ntra=20, redform=1, 
+sensitivity(morris=1, morris_nliv=6, morris_ntra=20, redform=1,
   namendo=(:), namexo=(:), namlagendo=(:));
 
 stoch_simul(order=1,irf=40);

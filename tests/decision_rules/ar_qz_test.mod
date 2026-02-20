@@ -26,11 +26,11 @@ stoch_simul(order=1);
 
 options_.qz_criterium=1-1e-6;
 error_indicator=0;
-try 
+try
     info=stoch_simul(var_list_)
     error_indicator=1
 catch
-    
+
 end
 if error_indicator
     error('qz_criterion did not work')

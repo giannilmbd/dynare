@@ -5,7 +5,7 @@
 // The zero lower bound andestimation accuracy.Journal of Monetary Economics
 // original codes provided by Alexander Richter
 // adapted for dynare implementation
-// adapted to avoid stochastic singularity at the ZLB 
+// adapted to avoid stochastic singularity at the ZLB
 // ------------------------- Settings -----------------------------------------//
 
 @#ifndef small_model
@@ -112,28 +112,28 @@ model;
 @#if !(small_model)
     [name = 'HH FOC utilization (1)']
     rk = steady_state(rk)*exp(sigups*(ups-1));
-    
+
     [name = 'Utilization definition (3)']
     u = steady_state(rk)*(exp(sigups*(ups-1))-1)/sigups;
-    
+
     [name = 'Firm FOC capital (4)']
     rk = mc*alpha*g*yf/(ups*k(-1));
-    
+
     [name = 'HH FOC capital (17)']
     q = beta*(lam/lam(+1))*(rk(+1)*ups(+1)-u(+1)+(1-delta)*q(+1))/g(+1);
-    
+
     [name = 'HH FOC investment (18)']
     1 = q*(1-nu*(xg-1)^2/2-nu*(xg-1)*xg)+beta*nu*gbar*q(+1)*(lam/lam(+1))*xg(+1)^2*(xg(+1)-1)/g(+1);
-    
+
     [name = 'Wage Phillips Curve (20)']
     varphiw*(wg-1)*wg = ((1-thetaw)*w+thetaw*wf)*n/yf + beta*varphiw*(lam/lam(+1))*(wg(+1)-1)*wg(+1)*(yf(+1)/yf)   ;
-    
+
     [name = 'Real wage growth gap (6)']
     wg = pigap*g*w/(gbar*w(-1));
-    
+
     [name = 'Law of motion for capital (15)']
     k = (1-delta)*(k(-1)/g)+x*(1-nu*(xg-1)^2/2);
-    
+
     [name = 'Investment growth gap (14)']
     xg = g*x/(gbar*x(-1));
 @#endif
@@ -142,28 +142,28 @@ model;
 @#if small_model
     [name = 'Production function (2)']
     yf = n;
-    
+
     [name = 'Firm FOC labor (5)']
     w = mc*yf/n;
-    
+
     [name = 'Output definition (7)']
     y = (1-varphip*(pigap-1)^2/2)*yf;
-    
+
     [name = 'ARC (13)']
     c = y;
-    
+
     [name = 'Household labpur supply equals flex wage']
     w = wf;
 @#else
     [name = 'Production function (2)']
     yf = (ups*k(-1)/g)^alpha*n^(1-alpha);
-    
+
     [name = 'Firm FOC labor (5)']
     w = (1-alpha)*mc*yf/n;
-    
+
     [name = 'Output definition (7)']
     y = (1-varphip*(pigap-1)^2/2-varphiw*(wg-1)^2/2)*yf - u*k(-1)/g;
-    
+
     [name = 'ARC (13)']
     x = y-c;
 @#endif

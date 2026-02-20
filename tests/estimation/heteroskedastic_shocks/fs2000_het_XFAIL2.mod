@@ -1,7 +1,7 @@
 // See fs2000.mod in the examples/ directory for details on the model
 // Tests that setting scale and value in same period for same shock is correctly filtered out
 
-@#include "fs2000_het_model.inc" 
+@#include "fs2000_het_model.inc"
 
 shocks;
 var e_a; stderr 0.014;

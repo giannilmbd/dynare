@@ -1,17 +1,17 @@
-// This file replicates the estimation of the CIA model from 
-// Frank Schorfheide (2000) "Loss function-based evaluation of DSGE models" 
+// This file replicates the estimation of the CIA model from
+// Frank Schorfheide (2000) "Loss function-based evaluation of DSGE models"
 // Journal of  Applied Econometrics, 15, 645-670.
 // the data are the ones provided on Schorfheide's web site with the programs.
 // http://www.econ.upenn.edu/~schorf/programs/dsgesel.ZIP
 // You need to have fsdat.m in the same directory as this file.
-// This file replicates: 
+// This file replicates:
 // -the posterior mode as computed by Frank's Gauss programs
 // -the parameter mean posterior estimates reported in the paper
 // -the model probability (harmonic mean) reported in the paper
 // This file was tested with dyn_mat_test_0218.zip
 // the smooth shocks are probably stil buggy
 //
-// The equations are taken from J. Nason and T. Cogley (1994) 
+// The equations are taken from J. Nason and T. Cogley (1994)
 // "Testing the implications of long-run neutrality for monetary business
 // cycle models" Journal of Applied Econometrics, 9, S37-S70.
 // Note that there is an initial minus sign missing in equation (A1), p. S63.
@@ -73,7 +73,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
   Y_obs = 1;
@@ -89,12 +89,12 @@ var e_m; stderr 0.005;
 end;
 
 steady(nocheck);
- 
+
 stoch_simul(dr=aim, order=1, irf=0);
- 
+
 benchmark = load(['fs2000_b1L1L' filesep 'Output' filesep 'fs2000_b1L1L_results']);
 threshold = 1e-8;
- 
+
 if max(max(abs(benchmark.oo_.dr.ghx-oo_.dr.ghx))) > threshold
   error('error in ghx');
 elseif max(max(abs(benchmark.oo_.dr.ghu-oo_.dr.ghu))) > threshold

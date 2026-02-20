@@ -25,12 +25,12 @@ module tensors
    type tensor
       real(real64), pointer, contiguous, dimension(:,:) :: m
       ! real(real64), dimension(:,:), allocatable :: m
-   end type tensor 
+   end type tensor
 
    ! A type to contain the unfolded tensor [gᵥᵐ]. For each offset j, ind(j)
-   ! contains the associated unfolded index and s(j) stores the number of state 
-   ! variables in the index, i.e. if v = (x,u[,σ]) where x is the s-sized state 
-   ! variables vector and ind(j) = (α₁,…,αₘ), s(j) stores the number of 
+   ! contains the associated unfolded index and s(j) stores the number of state
+   ! variables in the index, i.e. if v = (x,u[,σ]) where x is the s-sized state
+   ! variables vector and ind(j) = (α₁,…,αₘ), s(j) stores the number of
    ! coordinates αᵢ such that  αᵢ ≤ s.
    type unfolded_tensor
       type(index), dimension(:), allocatable :: ind
@@ -59,10 +59,10 @@ contains
    ! 1. Filling g%ind
    ! The unfolded indices of [gᵥᵐ⁺¹] are the unfolded indices of [gᵥᵐ]
    ! with all numbers 1,...,n appended upfront. In other words, any
-   ! index of [gᵥᵐ⁺¹] writes (α₁,α) with α₁∈ { 1, ..., n } and α 
+   ! index of [gᵥᵐ⁺¹] writes (α₁,α) with α₁∈ { 1, ..., n } and α
    ! an index of [gᵥᵐ]
    ! 2. Filling g%s
-   ! s(α₁,α) is s(α)+1 if α₁ ≤ ns and s(α) otherwise 
+   ! s(α₁,α) is s(α)+1 if α₁ ≤ ns and s(α) otherwise
    subroutine fill_list_unfolded_tensor(g, s, n)
       type(unfolded_tensor), dimension(:), intent(inout) :: g
       integer, intent(in) :: s, n ! number of state variables and size of v
@@ -101,42 +101,42 @@ contains
       end do
    end subroutine fill_list_unfolded_tensor
 
-   ! Allocates the members ind, count and s of a tensor [gᵥᵐ] denoted g 
+   ! Allocates the members ind, count and s of a tensor [gᵥᵐ] denoted g
    ! using the Pascal triangle p. n is the size of v.
    subroutine allocate_folded_tensor(g, m, n, p)
       type(folded_tensor), intent(inout) :: g
-      integer, intent(in) :: m, n ! 
+      integer, intent(in) :: m, n
       type(pascal_triangle),intent(in) :: p
       integer :: d
       d = get(m,n+m-1,p)
       allocate(g%ind(d), g%count(d), g%s(d))
    end subroutine allocate_folded_tensor
-   
-   ! Fills the already allocated members ind, count and s of a tensor [gᵥᵐ] 
+
+   ! Fills the already allocated members ind, count and s of a tensor [gᵥᵐ]
    ! denoted g using the Pascal triangle p. n is the size of v.
    ! 1. Filling g%ind
-   ! The algorithm to get the folded index associated with a folded offset 
-   ! relies on the definition of the lexicographic order. 
+   ! The algorithm to get the folded index associated with a folded offset
+   ! relies on the definition of the lexicographic order.
    ! Consideri appended upfront.ng α = (α₁,…,αₘ) with αᵢ ∈ { 1, ..., n },
    ! the next index α' is such that there exists i that verifies
    ! αⱼ = αⱼ' for all j < i, αᵢ' > αᵢ. Note that all the coordinates
    ! αᵢ', ... , αₘ' need to be as small as the lexicographic order allows
    ! for α' to immediately follow α.
-   ! Suppose j is the latest incremented coordinate: 
+   ! Suppose j is the latest incremented coordinate:
    ! if αⱼ < n, then αⱼ' = αⱼ + 1
    ! otherwise αⱼ = n, set αₖ' =  αⱼ₋₁ + 1 for all k ≥ j-1
-   ! if αⱼ₋₁ = n, set j := j-1  
+   ! if αⱼ₋₁ = n, set j := j-1
    ! otherwise, set j := m
    ! 2. Filling g%count
    ! The algorithm to count the number of equivalent unfolded indices
-   ! works as follows. A folded index can be written as 
+   ! works as follows. A folded index can be written as
    ! α = (x₁, ..., x₁, ..., xₚ, ..., xₚ) such that x₁ < x₂ < ... < xₚ.
    ! Denote kᵢ the number of coordinates equal to xᵢ.
-   ! The number of unfolded indices equivalent to α is 
+   ! The number of unfolded indices equivalent to α is
    ! c(α) = ⎛        m        ⎞
    !        ⎝ k₁, k₂, ..., kₚ ⎠
    ! k is an array such that k(ℓ,j) contains the number of coordinates
-   ! equal to ℓ for the folded index asociated with offset j. 
+   ! equal to ℓ for the folded index asociated with offset j.
    ! Suppose j is the latest incremented coordinate.
    ! If αⱼ < n, then αⱼ' = αⱼ + 1, k(αⱼ) := k(αⱼ)-1, k(αⱼ') := k(αⱼ')+1.
    ! In this case, c(α') = c(α)*(k(αⱼ)+1)/k(αⱼ')
@@ -146,7 +146,7 @@ contains
    ! 3. Filling g%s
    ! Suppose j is the latest incremented coordinate.
    ! If αⱼ < n, then αⱼ' = αⱼ + 1: s' = s-1 if αⱼ = ns and s'=s otherwise
-   ! Otherwise, αⱼ = n: set αₖ' =  αⱼ₋₁ + 1 for all k ≥ j-1. Thus, 
+   ! Otherwise, αⱼ = n: set αₖ' =  αⱼ₋₁ + 1 for all k ≥ j-1. Thus,
    ! s' = m if αⱼ₋₁ < ns; s'=s-1 if αⱼ₋₁ = ns; s'=s  otherwise
    subroutine fill_folded_tensor(g, k, m, s, n, p)
       type(folded_tensor), intent(inout) :: g
@@ -172,13 +172,13 @@ contains
             k(g%ind(j)%coor(lastinc-1),j) = m - (lastinc-1) + 1
             g%count(j) = multinomial(k(:,j),m,p)
             if (g%ind(j-1)%coor(lastinc-1) < s) then
-               g%s(j) = m 
+               g%s(j) = m
             elseif (g%ind(j-1)%coor(lastinc-1) == s) then
                g%s(j) = g%s(j-1)-1
             else
                g%s(j) = g%s(j-1)
             end if
-            if (g%ind(j)%coor(m) == n) then 
+            if (g%ind(j)%coor(m) == n) then
                lastinc = lastinc-1
             else
                lastinc = m
@@ -189,7 +189,7 @@ contains
             g%count(j) = g%count(j-1)*k(g%ind(j-1)%coor(lastinc),j)/k(g%ind(j)%coor(lastinc),j)
             k(g%ind(j-1)%coor(lastinc),j) = k(g%ind(j-1)%coor(lastinc),j-1)-1
             if (g%ind(j-1)%coor(lastinc) == s) then
-               g%s(j) = g%s(j-1)-1 
+               g%s(j) = g%s(j-1)-1
             else
                g%s(j) = g%s(j-1)
             end if
@@ -198,23 +198,23 @@ contains
       end do
    end subroutine
 
-   ! Fills a tensor [gᵥᵐ] given the tensor [gᵥᵐ⁺¹] 
-   ! 1. Filling g%ind 
+   ! Fills a tensor [gᵥᵐ] given the tensor [gᵥᵐ⁺¹]
+   ! 1. Filling g%ind
    ! If (α₁,…,αₘ₊₁) is a folded index for [gᵥᵐ⁺¹], then (α₂,…,αₘ₊₁) is a folded
    ! index of [gᵥᵐ]. The folded indices of [gᵥᵐ] are thus the tails of the first
    ! ⎛ m+n-1 ⎞ folded indices of [gᵥᵐ⁺¹]
    ! ⎝   m   ⎠
    ! 2. Filling g%count
    ! If α=(α₁,…,αₘ₊₁) is a folded index for [gᵥᵐ⁺¹], then α'=(α₂,…,αₘ₊₁) is a
-   ! folded index of [gᵥᵐ]. We thus have c(α') = c(α)*k(α₁)/(m+1) and 
+   ! folded index of [gᵥᵐ]. We thus have c(α') = c(α)*k(α₁)/(m+1) and
    ! perform k(α₁):=k(α₁)-1.
    ! 3. Filling g%s
    ! If α=(α₁,…,αₘ₊₁) is a folded index for [gᵥᵐ⁺¹], then α'=(α₂,…,αₘ₊₁) is a
-   ! folded index of [gᵥᵐ]. We thus have s(α') = s(α)-1 if α₁ ≤ s and 
+   ! folded index of [gᵥᵐ]. We thus have s(α') = s(α)-1 if α₁ ≤ s and
    ! s(α') = s(α) otherwise
    subroutine fill_folded_tensor_backward(g_m, k, g_mp1, m, s)
       type(folded_tensor), intent(inout) :: g_m ! tensor [gᵥᵐ]
-      ! k array from previous fill_folded_tensor_backward or 
+      ! k array from previous fill_folded_tensor_backward or
       ! fill_folded_tensor call. See definition in fill_folded_tensor
       integer, contiguous, intent(inout) :: k(:,:)
       type(folded_tensor), intent(in) :: g_mp1 ! tensor [gᵥᵐ⁺¹]
@@ -239,14 +239,14 @@ contains
       type(folded_tensor), dimension(:), intent(inout) :: g
       integer, intent(in) :: s, n ! number of state variables and size of v
       type(pascal_triangle) :: p
-      integer :: q, m 
+      integer :: q, m
       integer, dimension(:,:), allocatable :: k
       q = size(g)
       ! Case m = q
       m = q
       call allocate_folded_tensor(g(m), m, n, p)
       allocate(k(n,size(g(m)%ind)))
-      call fill_folded_tensor(g(m), k, m, s, n, p) 
+      call fill_folded_tensor(g(m), k, m, s, n, p)
       ! Case m < q
       do m=q-1,1,-1
          call allocate_folded_tensor(g(m), m, n, p)
@@ -266,7 +266,7 @@ end module tensors
 !    type(folded_tensor) :: g, h
 !    integer :: n, m, s, i, j
 !    integer, allocatable, dimension(:,:) :: k
- 
+
 !    n = 3
 !    m = 3
 !    s = 2

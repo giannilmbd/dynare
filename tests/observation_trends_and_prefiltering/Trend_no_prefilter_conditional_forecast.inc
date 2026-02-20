@@ -16,7 +16,7 @@ cond_forecast=oo_.conditional_forecast;
 if max(abs(cond_forecast.uncond.Mean.P_obs(2:end)-oo_.forecast.Mean.P_obs))>1e-8
     error('Unconditional Forecasts do not match')
 end
-        
+
 %compare conditional forecasts; histval here sets initval condition for capital different from steady state
 initial_condition_states=NaN(size(oo_.dr.ys));
 initial_condition_states(strmatch('Y_obs',M_.endo_names,'exact')) = oo_.SmoothedVariables.Y_obs(end)-oo_.Smoother.Trend.Y_obs(end);

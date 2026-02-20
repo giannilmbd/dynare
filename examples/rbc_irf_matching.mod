@@ -1,6 +1,6 @@
 /*
- * This file presents a baseline RBC model with government spending shocks where the persistence of the 
- *  government spending shock is estimated via impulse response function (IRF) matching. 
+ * This file presents a baseline RBC model with government spending shocks where the persistence of the
+ *  government spending shock is estimated via impulse response function (IRF) matching.
  *
  * Notes:
  *  - The empirical IRFs were estimated using the Blanchard/Perotti (2002) approach, see
@@ -13,17 +13,17 @@
  *  - Of course the RBC model is not capable of generating the consumption increase
  *    after a government spending shock. For that reason, this mod-file only targets the IRFs for G and Y.
  *  - The weighting matrix uses a diagonal matrix with the inverse of the pointwise IRF variances on the main diagonal.
- *  - The empirical IRFs and model IRFs use an impulse size of 1 percent. Thus, there is no uncertainty about the 
+ *  - The empirical IRFs and model IRFs use an impulse size of 1 percent. Thus, there is no uncertainty about the
  *    initial impact. The IRF matching therefore only targets the G-response starting in the second period.
  *  - Note that for the current model, the number of IRFs exceeds the number of VAR parameters. Therefore,
- *    the distribution of the estimator will be non-standard, see Guerron-Quintana/Inoue/Kilian (2016), 
+ *    the distribution of the estimator will be non-standard, see Guerron-Quintana/Inoue/Kilian (2016),
  *    http://dx.doi.org/10.1016/j.jeconom.2016.09.009
  *  - The mod-file also shows how to estimate an AR(2)-process by working with the roots of the autoregressive
- *    process instead of the coefficients. This allows for easily restricting the process to the stability region and 
- *    would allow specifying e.g. a beta prior for both roots as was done in Born/Peter/Pfeifer (2013), Fiscal news 
+ *    process instead of the coefficients. This allows for easily restricting the process to the stability region and
+ *    would allow specifying e.g. a beta prior for both roots as was done in Born/Peter/Pfeifer (2013), Fiscal news
  *    and macroeconomic volatility, https://doi.org/10.1016/j.jedc.2013.06.011
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -48,7 +48,7 @@
  */
 
 %----------------------------------------------------------------
-% define variables 
+% define variables
 %----------------------------------------------------------------
 @#define IRF_periods=80
 
@@ -60,7 +60,7 @@ var y           ${y}$ (long_name='output')
     ghat        ${\hat g}$ (long_name='government spending')
     r           ${r}$ (long_name='annualized interest rate')
     w           ${w}$ (long_name='real wage')
-    invest      ${i}$ (long_name='investment') 
+    invest      ${i}$ (long_name='investment')
     log_y       ${\log(y)}$ (long_name='log output')
     log_k       ${\log(k)}$ (long_name='log capital stock')
     log_c       ${\log(c)}$ (long_name='log consumption')
@@ -77,7 +77,7 @@ varexo eps_z ${\varepsilon_z}$ (long_name='TFP shock')
 % define parameters
 %----------------------------------------------------------------
 
-parameters 
+parameters
     beta     ${\beta}$       (long_name='discount factor')
     psi      ${\psi}$        (long_name='labor disutility parameter')
     sigma    ${\sigma}$      (long_name='risk aversion')
@@ -107,7 +107,7 @@ c^(-sigma)=beta/gammax*c(+1)^(-sigma)*
     (alpha*exp(z(+1))*(k/l(+1))^(alpha-1)+(1-delta));
 [name='Labor FOC']
 psi*c^sigma*1/(1-l)=w;
-[name='Law of motion capital'] 
+[name='Law of motion capital']
 gammax*k=(1-delta)*k(-1)+invest;
 [name='resource constraint']
 y=invest+c+g_ss*exp(ghat);
@@ -144,7 +144,7 @@ steady_state_model;
     delta = i_y/k_y-x-n-n*x;
     beta = (1+x)*(1+n)/(alpha/k_y+(1-delta));
     l = l_ss;
-    k = ((1/beta*(1+n)*(1+x)-(1-delta))/alpha)^(1/(alpha-1))*l; 
+    k = ((1/beta*(1+n)*(1+x)-(1-delta))/alpha)^(1/(alpha-1))*l;
     invest = (x+n+delta+n*x)*k;
     y = k^alpha*l^(1-alpha);
     g = gshare*y;
@@ -159,7 +159,7 @@ steady_state_model;
     log_l = log(l);
     log_w = log(w);
     log_invest = log(invest);
-    z = 0; 
+    z = 0;
     ghat =0;
 end;
 
@@ -179,7 +179,7 @@ gshare   = 0.2038;
 l_ss     = 1/3;
 
 shocks;
-var eps_g = 1; 
+var eps_g = 1;
 end;
 steady;
 check;
@@ -199,7 +199,7 @@ end;
 xx = [1.007,1.117,1.092];
 ww = [51,52];
 
-matched_irfs; 
+matched_irfs;
 var log_y ;  varexo eps_g ;  periods 1, 2   ;  values 0.20, 0.17   ;  weights 360, 140 ;
 var ghat  ;  varexo eps_g ;  periods 2 3:5  ;  values 1.01, (xx)   ;  weights 50, 20   ;
 var y     ;  varexo eps_g ;  periods 10:11  ;  values (log(1.05))  ;  weights (ww)     ;

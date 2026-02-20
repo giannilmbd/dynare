@@ -8,7 +8,7 @@ calib_smoother(datafile='Tr_prefilt_first_obs_cal_smooth_AR1_trend_data_with_con
 //         filter_decomposition,
         filtered_vars, filter_step_ahead = [1,2,4]) P_obs Y_obs;
 load('Tr_prefilt_first_obs_cal_smooth_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Tr_prefilt_first_obs_cal_smooth_orig_params');
 if max(abs((M_.params-loaded_par.orig_params([1:4,7:8]))./loaded_par.orig_params([1:4,7:8])))>0.03

@@ -1,6 +1,6 @@
 heterogeneity_dimension households;
 
-var(heterogeneity=households) 
+var(heterogeneity=households)
     c  // Consumption
     a  // Assets
     Va // Derivative of the value function w.r.t assets
@@ -30,7 +30,7 @@ parameters
 
 model(heterogeneity=households);
     beta*Va(+1)-c^(-1/eis)=0 ⟂ a>=0;
-    (1+r)*a(-1)+w*e*u-c-a; 
+    (1+r)*a(-1)+w*e*u-c-a;
     Va = (1+r)*c^(-1/eis);
 end;
 

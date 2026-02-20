@@ -25,7 +25,7 @@ function [a, a1, P, P1, v, T, R, C, regimes_, error_flag, M_, lik, etahat, alpha
 % - options_        [structure]             MATLAB's structure describing the current options
 % - occbin_options_ [structure]             MATLAB's structure describing the OccBin options.
 % - kalman_tol      [double]                tolerance for reciprocal condition number
-% 
+%
 % Outputs
 % - a               [N by 2]                t-1_t updated state estimate
 % - a1              [N by 2]                state predictions made at t-1:t
@@ -45,7 +45,7 @@ function [a, a1, P, P1, v, T, R, C, regimes_, error_flag, M_, lik, etahat, alpha
 %
 % Notes: The algorithm and implementation is based on Massimo Giovannini,
 % Philipp Pfeiffer, Marco Ratto (2021), Efficient and robust inference of models with occasionally binding
-% constraints, Working Papers 2021-03, Joint Research Centre, European Commission 
+% constraints, Working Papers 2021-03, Joint Research Centre, European Commission
 
 % Copyright © 2021-2026 Dynare Team
 %
@@ -104,8 +104,8 @@ if any(any(isnan(F)))
     warning(orig_warning_state);
     return;
 end
-if rank(F)<size(F,1) 
-    % here we trap cases when some OBC regime triggers singularity 
+if rank(F)<size(F,1)
+    % here we trap cases when some OBC regime triggers singularity
     % e.g. no shock to interest rate at ZLB
     error_flag=326;
     warning(orig_warning_state);
@@ -377,7 +377,7 @@ if isempty(di)
     a(:,t)     = a1(:,t);
     L(:,:,t)        = eye(mm);
     P1(:,:,t+1)      = T*P(:,:,t)*T' + QQ;                               %p. 111, DK(2012)
-    lik=0; 
+    lik=0;
 else
     ZZ = Z(di,:);
     v(di,t)      = Y(di,t) - ZZ*a(:,t);
@@ -388,8 +388,8 @@ else
         warning(orig_warning_state);
         return;
     end
-    if rank(F)<size(F,1) 
-        % here we trap cases when some OBC regime triggers singularity 
+    if rank(F)<size(F,1)
+        % here we trap cases when some OBC regime triggers singularity
         % e.g. no shock to interest rate at ZLB
         error_flag=326;
         warning(orig_warning_state);
@@ -410,13 +410,13 @@ else
     if IF_likelihood == 0
         lik = log_dF + transpose(v(di,t))*iF(di,di,t)*v(di,t) + length(di)*log(2*pi);
     end
-    
+
     PZI         = P(:,:,t)*ZZ'*iF(di,di,t);
     a(:,t) = a(:,t) + PZI*v(di,t);
     K    = PZI*ZZ;
     L(:,:,t)    = (eye(mm) - K);
     P(:,:,t)  = P(:,:,t) - K*P(:,:,t);
-    
+
 end
 
 %% do backward pass
@@ -456,12 +456,12 @@ while t > 1
         if size(Gmat1,1) == size(Gmat1,2)
             log_det_jacobian = log(det(Q(ishocks,ishocks))) + 2*log(abs(det(Gmat1)));
             trace_term = etahat(ishocks,t)'*(Q(ishocks,ishocks)\etahat(ishocks,t));
-            
+
             lik = log_det_jacobian + trace_term  + length(di)*log(2*pi);
         else
             lik = inf;
         end
-        
+
     end
 end
 

@@ -23,7 +23,7 @@ model;
     u = ( (1-bbetaL)*c^((ies-1)/ies) + bbetaL*exp(gbar*(ies-1)/ies)*uaux^((ies-1)/(ies*(1-crra))))^(ies/(ies-1));
     R = (1-Rpers)*Rbar + Rpers*R(-1) + eeps;
     ca = b*exp(gbar)-b(-1);
-  
+
 end;
 
 steady_state_model;

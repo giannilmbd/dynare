@@ -80,14 +80,14 @@ if ismember(flag,{'forecast','all'})
     options_occbin_.forecast.waitbar=true;
 end
 
-if ismember(flag,{'irf','all'})    
+if ismember(flag,{'irf','all'})
     options_occbin_.irf.check_ahead_periods=30;
     options_occbin_.irf.exo_names=M_.exo_names;
     options_occbin_.irf.init_regime=[];
     options_occbin_.irf.maxit=30;
 %     options_occbin_.irf.periods=options_.irf;
     options_occbin_.irf.shocksize=[];
-    options_occbin_.irf.shocksigns = {'pos','neg'}; 
+    options_occbin_.irf.shocksigns = {'pos','neg'};
     options_occbin_.irf.t0=0;
 end
 
@@ -124,7 +124,7 @@ if ismember(flag,{'plot_irf','all'})
     options_occbin_.plot_irf.grid            = true;
     options_occbin_.plot_irf.ncols            = 3;
     options_occbin_.plot_irf.nrows            = 3;
-    options_occbin_.plot_irf.shocksigns = {'pos','neg'}; 
+    options_occbin_.plot_irf.shocksigns = {'pos','neg'};
     options_occbin_.plot_irf.simulname='';
 end
 
@@ -162,10 +162,10 @@ if ismember(flag,{'plot_simul','all'})
     options_occbin_.plot_simul.log_normalize_graph = false;
     options_occbin_.plot_simul.marg_h(1)        = 0.08;
     options_occbin_.plot_simul.marg_h(2)        = 0.055;
-    options_occbin_.plot_simul.mycolors         = get(groot,'DefaultAxesColorOrder');     
+    options_occbin_.plot_simul.mycolors         = get(groot,'DefaultAxesColorOrder');
     options_occbin_.plot_simul.my_dir           = 'OccBinSimul';
     options_occbin_.plot_simul.mystyles         = {'-','--',':','-.'};
-    options_occbin_.plot_simul.mystst_simul_pos = false; 
+    options_occbin_.plot_simul.mystst_simul_pos = false;
     options_occbin_.plot_simul.ncols            = 3;
     options_occbin_.plot_simul.normalization_point = 1;
     options_occbin_.plot_simul.nrows            = 3;
@@ -178,7 +178,7 @@ if ismember(flag,{'plot_simul','all'})
     options_occbin_.plot_simul.threshold        = 10^-6;
     options_occbin_.plot_simul.timeaxis         = [];
     options_occbin_.plot_simul.use_grid         = true;
-    
+
 end
 
 if ismember(flag,{'posterior_importance_sampling','all'})
@@ -186,7 +186,7 @@ if ismember(flag,{'posterior_importance_sampling','all'})
     options_occbin_.posterior_importance_sampling.filter = 'pkf'; % can be pkf or ppf
     options_occbin_.posterior_importance_sampling.orig_dname = M_.dname;
     options_occbin_.posterior_importance_sampling.orig_fname = M_.fname;
-    options_occbin_.posterior_importance_sampling.orig_filter = 'linear'; % can be linear or pkf    
+    options_occbin_.posterior_importance_sampling.orig_filter = 'linear'; % can be linear or pkf
     options_occbin_.posterior_importance_sampling.sub_draws = [];
 end
 

@@ -132,7 +132,7 @@ elseif length(horizon)==2
         if isfinite(horizon(1))
             if isint(horizon(1))
                 if horizon(1)>=0
-                    if isinf(horizon(2)) || (isint(horizon(2)) && horizon(2)>horizon(1)) 
+                    if isinf(horizon(2)) || (isint(horizon(2)) && horizon(2)>horizon(1))
                         wrong_horizon_parameter = false;
                     end
                 end
@@ -161,7 +161,7 @@ if length(horizon)==1
     % Compute the reduced form parameters of the (discounted) forecast in period t+horizon(1)
     if varexpectationmodel.horizon==1
         parameters = discountfactor*(alpha*CompanionMatrix);
-    elseif horizon>1 
+    elseif horizon>1
         parameters = alpha*mpower(discountfactor*CompanionMatrix, varexpectationmodel.horizon);
     end
     if timeshift<0
@@ -181,13 +181,13 @@ else
         % First compute the parameters implied by the discounted sum from h=0 to h=horizon(1)-1
         tmp1 = zeros(n);
         for h=0:horizon(1)-1
-            tmp1 = tmp1 + mpower(DiscountedCompanionMatrix, h); 
+            tmp1 = tmp1 + mpower(DiscountedCompanionMatrix, h);
         end
         tmp1 = alpha*tmp1;
         if timeshift<0
             tmp1 = tmp1*mpower(CompanionMatrix, -timeshift);
         end
-        % Second compute the parameters implied by the discounted sum from h=0 to h=Inf 
+        % Second compute the parameters implied by the discounted sum from h=0 to h=Inf
         tmp2 = alpha/(eye(n)-DiscountedCompanionMatrix);
         if timeshift<0
             tmp2 = tmp2*mpower(CompanionMatrix, -timeshift);

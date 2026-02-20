@@ -116,7 +116,7 @@ T = all(t);
 try
     mu = [0.3; -0.7]; Sigma = [1.0 0.4; 0.4 1.5];
     h = 1e-6; % step size for finite difference
-    
+
     % test derivative with respect to first element
     mu_plus = mu; mu_plus(1) = mu(1) + h;
     mu_minus = mu; mu_minus(1) = mu(1) - h;
@@ -127,7 +127,7 @@ try
     analytical_deriv1 = term1 * term2;
     % function returns magnitude, numerical has opposite sign due to chain rule
     t(1) = abs(-numerical_deriv1 - analytical_deriv1) < 1e-5;
-    
+
     % test derivative with respect to second element
     mu_plus = mu; mu_plus(2) = mu(2) + h;
     mu_minus = mu; mu_minus(2) = mu(2) - h;
@@ -149,7 +149,7 @@ T = all(t);
 try
     mu = [0.2; -0.5; 0.8]; Sigma = [1.0 0.3 0.1; 0.3 1.2 -0.2; 0.1 -0.2 0.9];
     h = 1e-6;
-    
+
     test_results = true(3, 2);
     for which_el = 1:3
         % numerical derivative of d/d(mu) Phi(0 | mu, Sigma)
@@ -158,12 +158,12 @@ try
         cdf_plus = mvncdf(zeros(1,3), mu_plus', Sigma);
         cdf_minus = mvncdf(zeros(1,3), mu_minus', Sigma);
         numerical_deriv = (cdf_plus - cdf_minus) / (2*h);
-        
+
         % analytical derivative using mvncdf (returns -d/d(mu))
         [term1_mv, term2_mv] = gaussian_cdf_derivative(mu, Sigma, which_el, 'mvncdf');
         analytical_deriv_mv = term1_mv * term2_mv;
         test_results(which_el, 1) = abs(-numerical_deriv - analytical_deriv_mv) < 1e-4;
-        
+
         % analytical derivative using gaussian_log_mvncdf_mendell_elston
         [term1_me, term2_me] = gaussian_cdf_derivative(mu, Sigma, which_el, 'gaussian_log_mvncdf_mendell_elston');
         analytical_deriv_me = term1_me * term2_me;
@@ -179,22 +179,22 @@ T = all(t);
 %@test:4
 % verify conditional distribution properties: covar_t2 should be conditional covariance
 try
-    mu = [1; 2; 3]; 
+    mu = [1; 2; 3];
     Sigma = [4 1 0.5; 1 3 0.8; 0.5 0.8 2];
     which_el = 2;
-    
+
     [~, ~, evalp_t1, covar_t1, evalp_t2, covar_t2, mult_matr] = gaussian_cdf_derivative(mu, Sigma, which_el, 'mvncdf');
-    
+
     % after permutation, element 2 moves to last position
     % remaining elements are [1, 3] in positions [1, 2]
     idx_remain = [1, 3];
     Sigma_11 = Sigma(idx_remain, idx_remain);
     Sigma_12 = Sigma(idx_remain, which_el);
     Sigma_22 = Sigma(which_el, which_el);
-    
+
     % conditional covariance: Sigma_11 - Sigma_12 * Sigma_22^(-1) * Sigma_12'
     expected_cond_var = Sigma_11 - (Sigma_12 / Sigma_22) * Sigma_12';
-    
+
     t(1) = norm(covar_t2 - expected_cond_var, 'Inf') < 1e-14;
     t(2) = abs(covar_t1 - Sigma_22) < 1e-14;
     t(3) = norm(mult_matr - Sigma_12 / Sigma_22, 'Inf') < 1e-14;
@@ -208,13 +208,13 @@ T = all(t);
 % standard normal case: verify known values at mu=0
 try
     mu = [0; 0]; Sigma = eye(2);
-    
+
     [term1, term2] = gaussian_cdf_derivative(mu, Sigma, 1, 'mvncdf');
     % for standard normal at mu=0: term1 = normpdf(0) = 1/sqrt(2*pi)
     t(1) = abs(term1 - normpdf(0)) < 1e-14;
     % term2 = normcdf(0) = 0.5 (since independent and conditional mean is 0)
     t(2) = abs(term2 - 0.5) < 1e-10;
-    
+
     % derivative should be normpdf(0) * normcdf(0) = 0.5/sqrt(2*pi)
     expected_deriv = normpdf(0) * normcdf(0);
     t(3) = abs(term1 * term2 - expected_deriv) < 1e-10;
@@ -232,7 +232,7 @@ try
              0.5  1.5 -0.3  0.4;
              0.2 -0.3  1.8  0.2;
              0.1  0.4  0.2  1.2];
-    
+
     test_results = true(4, 1);
     for which_el = 1:4
         [term1_mv, term2_mv] = gaussian_cdf_derivative(mu, Sigma, which_el, 'mvncdf');

@@ -1,4 +1,4 @@
-@#include "../Trend_exp_model_no_prefilter_common.inc" 
+@#include "../Trend_exp_model_no_prefilter_common.inc"
 
 addpath('..');
 generate_trend_stationary_AR1(M_.fname);
@@ -9,7 +9,7 @@ estimation(order=1,datafile='Trend_loglinear_no_prefilter_MC_Exp_AR1_trend_data_
     filtered_vars, filter_step_ahead = [1,2,4],
     mh_nblocks=1,mh_jscale=0.3,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
 load('Trend_loglinear_no_prefilter_MC_Exp_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Trend_loglinear_no_prefilter_MC_orig_params');
 if max(abs((M_.params-loaded_par.orig_params)./loaded_par.orig_params))>0.03

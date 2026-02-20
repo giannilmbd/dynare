@@ -1,5 +1,5 @@
 /*
- * An elementary RBC model (same as perfect_foresight_rbc.mod), simulated in perfect 
+ * An elementary RBC model (same as perfect_foresight_rbc.mod), simulated in perfect
  * foresight with expectation errors: agents behave as under perfect foresight, but they
  * can still be surprised by unexpected shocks, and thus recompute their
  * optimal plans when such an unexpected shock happens.
@@ -9,7 +9,7 @@
         z for period 1.
  * - a shocks-block sets a one-time TFP shock in the first period
  * - shocks(learnt_in = period) blocks are used to set surprise shocks learned in later periods
- * - an endval(learnt_in = period) is used to set a permanent shock and the 
+ * - an endval(learnt_in = period) is used to set a permanent shock and the
  *      associated terminal condition
  * - rplot is used to plot the simulation results
 */

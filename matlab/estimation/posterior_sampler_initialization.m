@@ -193,7 +193,7 @@ if ~options_.load_mh_file && ~options_.mh_recover
             while ~validate && trial <= 10
                 if isempty(d)
                     candidate = Prior.draw();
-                    if options_.occbin.likelihood.status    
+                    if options_.occbin.likelihood.status
                         options_.occbin.likelihood.brute_force_extra_regime_guess = false;
                     end
                 else

@@ -43,20 +43,20 @@ trend_component_model(model_name=toto, eqtags=['eq:y1', 'eq:y4', 'eq:y2', 'eq:y3
 model;
 
 [name='eq:y1']
-diff(y1) = B11*(y1(-1)-y3(-1)) + B12*(y2(-1)-y4(-1)) + 
+diff(y1) = B11*(y1(-1)-y3(-1)) + B12*(y2(-1)-y4(-1)) +
      A111*diff(y1(-1)) + A112*diff(y2(-1)) +
      A211*diff(y1(-2)) + A212*diff(y2(-2)) +
-     A311*diff(y1(-3)) + A312*diff(y2(-3)) + e1; 
+     A311*diff(y1(-3)) + A312*diff(y2(-3)) + e1;
 
 
 [name='eq:y2']
 diff(y2) = B21*(y1(-1)-y3(-1)) + B22*(y2(-1)-y4(-1)) +
      A121*diff(y1(-1)) + A122*diff(y2(-1)) +
      A221*diff(y1(-2)) + A222*diff(y2(-2)) +
-     A321*diff(y1(-3)) + A322*diff(y2(-3)) + e2; 
+     A321*diff(y1(-3)) + A322*diff(y2(-3)) + e2;
 
 [name='eq:y3']
-y3 = y3(-1) + e3; 
+y3 = y3(-1) + e3;
 
 [name='eq:y4']
 y4 = y4(-1) + e4;

@@ -43,7 +43,7 @@ maximum_number_non_missing_observations=max(sum(~isnan(dataset_.data(2:end,:)),2
 init_number_non_missing_observations=sum(~isnan(dataset_.data(1,:)),2);
 
 if options_.heteroskedastic_filter
-    if options_.order>1 
+    if options_.order>1
         error('initial_estimation_checks:: heteroskedastic shocks are only supported with the Kalman filter/smoother')
     end
     observations_by_period=sum(~isnan(dataset_.data),2);
@@ -81,16 +81,16 @@ if options_.occbin.likelihood.status || options_.occbin.smoother.status
         error('initial_estimation_checks:: OccBin is incompatible with the prefilter option due to the sample mean generally not corresponding to the steady state with an occasionally binding constraint.')
     end
     if ~options_.occbin.likelihood.inversion_filter && (options_.kalman_algo==2 || options_.kalman_algo==4)
-        error('initial_estimation_checks:: OccBin is incompatible with the selected univariate Kalman filter.')        
+        error('initial_estimation_checks:: OccBin is incompatible with the selected univariate Kalman filter.')
     end
     if options_.fast_kalman_filter
-        error('initial_estimation_checks:: OccBin is incompatible with the fast Kalman filter.')        
+        error('initial_estimation_checks:: OccBin is incompatible with the fast Kalman filter.')
     end
     if options_.bayesian_irf
-        error('initial_estimation_checks:: OccBin is incompatible with the bayesian_irf option.')                
+        error('initial_estimation_checks:: OccBin is incompatible with the bayesian_irf option.')
     end
     if options_.moments_varendo
-        error('initial_estimation_checks:: OccBin is incompatible with the moments_varendo option.')                
+        error('initial_estimation_checks:: OccBin is incompatible with the moments_varendo option.')
     end
 end
 
@@ -168,7 +168,7 @@ if (any(bayestopt_.pshape  >0 ) && options_.mh_replic) && options_.mh_nblck<1
 end
 
 if options_.mh_drop<0 || options_.mh_drop>=1
-    error('initial_estimation_checks:: mh_drop must be in [0,1).')    
+    error('initial_estimation_checks:: mh_drop must be in [0,1).')
 end
 
 if options_.estimate_initial_states_endogenous_prior && ...
@@ -181,7 +181,7 @@ if options_.estimate_initial_states_endogenous_prior && ...
         end
     end
 end
-                
+
 % check and display warnings if steady-state solves static model (except if diffuse_filter == 1) and if steady-state changes estimated parameters
 [oo_.steady_state] = check_steady_state_changes_parameters(M_,estim_params_,oo_,options_, [options_.diffuse_filter==0 options_.diffuse_filter==0] );
 

@@ -517,7 +517,7 @@ if ~isempty(indx_moment)
                 if options_.TeX
                     options_mcf.beha_title_latex = 'moment restriction';
                     options_mcf.nobeha_title_latex = 'NO moment restriction';
-                end                
+                end
                 options_mcf.title = atitle0;
                 if ~isempty(indx1) && ~isempty(indx2)
                     gsa.monte_carlo_filtering_analysis(xmat, indx1, indx2, options_mcf, M_, options_, bayestopt_, estim_params_);

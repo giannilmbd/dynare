@@ -77,7 +77,7 @@ end
 yhat1_KKSS = chol(oo_.var(state_idx,state_idx))*randn(nstates, nparticles);
 yhat2_KKSS = chol(oo_.var(state_idx,state_idx))*randn(nstates, nparticles);
 yhat1_AVR = yhat1_KKSS;
-yhat2_AVR = yhat2_KKSS-yhat1_AVR; 
+yhat2_AVR = yhat2_KKSS-yhat1_AVR;
 yhat3_AVR = chol(oo_.var(state_idx,state_idx))*randn(nstates, nparticles);
 yhat_AVR = [yhat1_AVR;yhat2_AVR;yhat3_AVR];
 nstatesandobs = size(rf_ghx,1);

@@ -1,17 +1,17 @@
-// This file replicates the estimation of the CIA model from 
-// Frank Schorfheide (2000) "Loss function-based evaluation of DSGE models" 
+// This file replicates the estimation of the CIA model from
+// Frank Schorfheide (2000) "Loss function-based evaluation of DSGE models"
 // Journal of  Applied Econometrics, 15, 645-670.
 // the data are the ones provided on Schorfheide's web site with the programs.
 // http://www.econ.upenn.edu/~schorf/programs/dsgesel.ZIP
 // You need to have fsdat.m in the same directory as this file.
-// This file replicates: 
+// This file replicates:
 // -the posterior mode as computed by Frank's Gauss programs
 // -the parameter mean posterior estimates reported in the paper
 // -the model probability (harmonic mean) reported in the paper
 // This file was tested with dyn_mat_test_0218.zip
 // the smooth shocks are probably stil buggy
 //
-// The equations are taken from J. Nason and T. Cogley (1994) 
+// The equations are taken from J. Nason and T. Cogley (1994)
 // "Testing the implications of long-run neutrality for monetary business
 // cycle models" Journal of Applied Econometrics, 9, S37-S70.
 // Note that there is an initial minus sign missing in equation (A1), p. S63.
@@ -61,7 +61,7 @@ n = 0.19;
 l = 0.86;
 y = 0.6;
 gy_obs = exp(gam);
-gp_obs = exp(-gam); 
+gp_obs = exp(-gam);
 dA = exp(gam);
 end;
 
@@ -75,4 +75,4 @@ steady;
 check;
 
 stoch_simul(order=1,irf=0);
- 
+

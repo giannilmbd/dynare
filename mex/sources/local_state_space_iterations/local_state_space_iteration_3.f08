@@ -27,7 +27,7 @@ module pparticle_3
       real(real64), pointer, contiguous :: e(:,:), ghx(:,:), ghu(:,:), &
      &ghxu(:,:), ghxx(:,:), ghuu(:,:), ghs2(:), &
      &ghxxx(:,:), ghuuu(:,:), ghxxu(:,:), ghxuu(:,:), ghxss(:,:), ghuss(:,:), &
-     &ss(:), y3(:,:) 
+     &ss(:), y3(:,:)
       real(real64), pointer :: yhat3(:,:), yhat2(:,:), yhat1(:,:), ylat3(:,:), &
      &ylat2(:,:), ylat1(:,:)
       type(index), pointer, contiguous :: xx_idcs(:), uu_idcs(:), &
@@ -41,7 +41,7 @@ contains
 
    ! Fills y3 as y3 = ybar + ½ghss + ghx·ŷ+ghu·ε + ½ghxx·ŷ⊗ŷ + ½ghuu·ε⊗ε +
    !                  ghxu·ŷ⊗ε + (1/6)·ghxxx ŷ⊗ŷ⊗ŷ + (1/6)·ghuuu·ε⊗ε⊗ε +
-   !                  (3/6)·ghxxu·ŷ⊗ŷ⊗ε + (3/6)·ghxuu·ŷ⊗ε⊗ε + 
+   !                  (3/6)·ghxxu·ŷ⊗ŷ⊗ε + (3/6)·ghxuu·ŷ⊗ε⊗ε +
    !                  (3/6)·ghxss·ŷ + (3/6)·ghuss·ε
    ! in td3
    subroutine thread_eval_3(arg) bind(c)
@@ -65,7 +65,7 @@ contains
 
       do is=start,end
          do im=1,td3%m
-            ! y3 = ybar + ½ghss 
+            ! y3 = ybar + ½ghss
             td3%y3(im,is) = td3%ss(im)+0.5_real64*td3%ghs2(im)
             ! y3 += ghx·ŷ+(3/6)·ghxss·ŷ + first n folded indices for ½ghxx·ŷ⊗ŷ
             ! + first n folded indices for (1/6)ghxxx·ŷ⊗ŷ⊗ŷ
@@ -73,8 +73,8 @@ contains
                td3%y3(im,is) = td3%y3(im,is)+&
               &(0.5_real64*td3%ghxss(j,im)+td3%ghx(j,im))*td3%yhat3(j,is)+&
               &(0.5_real64*td3%ghxx(j,im)+(1._real64/6._real64)*td3%ghxxx(j,im)*td3%yhat3(1, is))*&
-              &td3%yhat3(1, is)*td3%yhat3(j,is) 
-               ! y3 += ghxu·ŷ⊗ε 
+              &td3%yhat3(1, is)*td3%yhat3(j,is)
+               ! y3 += ghxu·ŷ⊗ε
                ! + first n*q folded indices of (3/6)·ghxxu·ŷ⊗ŷ⊗ε
                do k=1,td3%q
                   td3%y3(im,is) = td3%y3(im,is) + &
@@ -153,11 +153,11 @@ contains
 
    end subroutine thread_eval_3
 
-   ! Fills ylat1, ylat2, ylat3 and y3 as 
-   ! ylat1 = ghx·ŷ1 + ghu·ε 
+   ! Fills ylat1, ylat2, ylat3 and y3 as
+   ! ylat1 = ghx·ŷ1 + ghu·ε
    ! ylat2 = ½ghss + ghx·ŷ2 + ½ghxx·ŷ1⊗ŷ1 + ½ghuu·ε⊗ε + ghxu·ŷ1⊗ε
-   ! ylat3 = ghx·ŷ3 + ghxx·ŷ1⊗ŷ2 + ghxu·ŷ2⊗ε + (1/6)·ghxxx·ŷ1⊗ŷ1⊗ŷ1 
-   !         + (1/6)·ghuuu·ε⊗ε⊗ε + (3/6)·ghxxu·ŷ1⊗ŷ1⊗ε 
+   ! ylat3 = ghx·ŷ3 + ghxx·ŷ1⊗ŷ2 + ghxu·ŷ2⊗ε + (1/6)·ghxxx·ŷ1⊗ŷ1⊗ŷ1
+   !         + (1/6)·ghuuu·ε⊗ε⊗ε + (3/6)·ghxxu·ŷ1⊗ŷ1⊗ε
    !         + (3/6)·ghxuu·ŷ1⊗ε⊗ε + (3/6)·ghxss·ŷ1 + (3/6)·ghuss·ε
    ! y3 = ybar + ylat1 + ylat2 + ylat3
    ! in td3
@@ -181,7 +181,7 @@ contains
 
       do is=start,end
          do im=1,td3%m
-            ! y1 = 0 
+            ! y1 = 0
             ! y2 = ½ghss
             ! y3 = 0
             td3%ylat1(im,is) = td3%ss(im)
@@ -201,7 +201,7 @@ contains
               &td3%ghx(j,im)*td3%yhat3(j,is)+&
               &0.5_real64*td3%ghxss(j,im)*td3%yhat1(j,is)+&
               &(1._real64/6._real64)*td3%ghxxx(j,im)*&
-              &td3%yhat1(1, is)*td3%yhat1(1, is)*td3%yhat1(j,is) 
+              &td3%yhat1(1, is)*td3%yhat1(1, is)*td3%yhat1(j,is)
                ! y2 += + ghxu·ŷ1⊗ε
                ! y3 += + ghxu·ŷ2⊗ε
                !       + first n*q folded indices of (3/6)·ghxxu·ŷ1⊗ŷ1⊗ε
@@ -347,7 +347,7 @@ end module pparticle_3
 !
 ! Output:
 ! plhs[1] y3             [double]  m×s array, time t+1 particles.
-! plhs[2] ylat           [double]  3m×s array, time t+1 particles for the 
+! plhs[2] ylat           [double]  3m×s array, time t+1 particles for the
 ! pruning latent variables up to the 3rd order. Rows 1 to m contain the pruned
 ! first order. Rows m+1 to 2*m contain the pruned second order. Rows 2*m+1
 ! to 3*m contain the pruned third order.
@@ -384,7 +384,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    do i=1,15
       if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. &
           (.not. mxIsComplex(prhs(i))) .and. (.not. mxIsSparse(prhs(i))))) then
-         write (arg_nber,"(i2)") i 
+         write (arg_nber,"(i2)") i
          call mexErrMsgTxt("Argument " // trim(arg_nber) // " should be a real dense matrix")
       end if
    end do
@@ -448,14 +448,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    ! 1. Getting relevant information to take advantage of symmetries
    ! There are symmetries in the ghxx, ghuu, ghxxx, ghuuu, ghxxu and ghxuu terms
    ! that we may exploit to avoid unnecessarily repeating operations in matrix-vector
-   ! multiplications, e.g in ghxx·ŷ⊗ŷ. 
+   ! multiplications, e.g in ghxx·ŷ⊗ŷ.
    ! In matrix-vector multiplications such as ghxx·ŷ⊗ŷ, we loop through all the folded offsets
    ! and thus need for each one of them :
    !    (i) the corresponding folded index, e.g (α₁,α₂), α₁≤α₂ for ghxx
    !    (i) the corresponding offset in the unfolded matrix
    !    (ii) the corresponding number of equivalent unfolded indices (1 if α₁=α₂, 2 otherwise)
-   ! It is better to compute these beforehand as it avoids repeating the calculation for 
-   ! each particle. The `folded_offset_loop` routine carries out this operation. 
+   ! It is better to compute these beforehand as it avoids repeating the calculation for
+   ! each particle. The `folded_offset_loop` routine carries out this operation.
 
    p = pascal_triangle(max(n,q)+3-1)
    xx_size = get(2,n+2-1,p)
@@ -524,7 +524,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
          td3%ghxx(j,i) = xx_nbeq(j)*ghxx(i,xx_off(j))
          td3%ghxxx(j,i) = xxx_nbeq(j)*ghxxx(i,xxx_off(j))
          do k=1,q
-            td3%ghxu(q*(j-1)+k,i) = ghxu(i,q*(j-1)+k) 
+            td3%ghxu(q*(j-1)+k,i) = ghxu(i,q*(j-1)+k)
             td3%ghxxu(q*(j-1)+k,i) = xx_nbeq(j)*ghxxu(i,q*(xx_off(j)-1)+k)
          end do
       end do
@@ -577,7 +577,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    if (numthreads == 1) then
       if (pruning) then
          call thread_eval_3_pruning(c_loc(routines(1)))
-      else 
+      else
          call thread_eval_3(c_loc(routines(1)))
       end if
    else

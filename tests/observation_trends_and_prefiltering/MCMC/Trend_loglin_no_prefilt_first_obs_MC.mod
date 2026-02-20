@@ -1,4 +1,4 @@
-@#include "../Trend_exp_model_no_prefilter_common.inc" 
+@#include "../Trend_exp_model_no_prefilter_common.inc"
 
 addpath('..');
 generate_trend_stationary_AR1(M_.fname);
@@ -9,13 +9,13 @@ estimation(order=1,datafile='Trend_loglin_no_prefilt_first_obs_MC_Exp_AR1_trend_
     filtered_vars, filter_step_ahead = [1,2,4],
     mh_nblocks=1,mh_jscale=0.3,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
 load('Trend_loglin_no_prefilt_first_obs_MC_Exp_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Trend_loglin_no_prefilt_first_obs_MC_orig_params');
 if max(abs((M_.params-loaded_par.orig_params)./loaded_par.orig_params))>0.03
     error('Parameter estimates do not match')
 end
-        
+
 y_forecast_100_periods=loaded_par.orig_params(strmatch('const_y',loaded_par.param_names,'exact'))+(options_.first_obs+options_.nobs-1+options_.forecast)*loaded_par.orig_params(strmatch('g_y',loaded_par.param_names,'exact'));
 p_forecast_100_periods=loaded_par.orig_params(strmatch('const_p',loaded_par.param_names,'exact'))+(options_.first_obs+options_.nobs-1+options_.forecast)*loaded_par.orig_params(strmatch('g_p',loaded_par.param_names,'exact'));
 

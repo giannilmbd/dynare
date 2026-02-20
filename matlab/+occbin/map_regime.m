@@ -12,7 +12,7 @@ function [regime, regime_start, error_flag]=map_regime(binding_indicator,debug_s
 % - error_flag      [boolean]   1 if regime never leaves 1 or is still there at the end of nperiods
 %                               0 otherwise
 
-% Original authors: Luca Guerrieri and Matteo Iacoviello 
+% Original authors: Luca Guerrieri and Matteo Iacoviello
 % Original file downloaded from:
 % https://www.matteoiacoviello.com/research_files/occbin_20140630.zip
 % Adapted for Dynare by Dynare Team.

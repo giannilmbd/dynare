@@ -64,7 +64,7 @@ if isnumeric(x) && isvector(x) && all(~isnan(x))
 elseif isnumeric(x) && isvector(x) && all(isnan(x))
     if nargout==1
         h = 1.0/(n+1);
-        fval = zeros(length(x), 1); 
+        fval = zeros(length(x), 1);
         for j=1:n
             fval(j) = j*h;
         end

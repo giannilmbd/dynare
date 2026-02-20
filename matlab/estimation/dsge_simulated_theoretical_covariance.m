@@ -36,7 +36,7 @@ function [nvar,vartan,CovarFileNumber] = dsge_simulated_theoretical_covariance(S
 nodecomposition = 1;
 
 folder_name=get_posterior_folder_name(options_);
-    
+
 % Get information about the _posterior_draws files.
 if strcmpi(type,'posterior')
     NumberOfDrawsFiles = length(dir([M_.dname filesep folder_name filesep M_.fname '_' type '_draws*' ]));
@@ -126,9 +126,9 @@ for file = 1:NumberOfDrawsFiles
             tmp = th_autocovariances(dr,ivar,M_,options_,nodecomposition);
         else
             pruned_state_space = pruned_SS.pruned_state_space_system(M_, options_, dr, obs_var, options_.ar, 1, 0);
-            tmp{1} = pruned_state_space.Var_y;            
+            tmp{1} = pruned_state_space.Var_y;
             for i=1:nar
-                tmp{i+1} = pruned_state_space.Corr_yi(:,:,i);                
+                tmp{i+1} = pruned_state_space.Corr_yi(:,:,i);
             end
         end
         for i=1:nvar
@@ -176,6 +176,6 @@ for file = 1:NumberOfDrawsFiles
             else
                 clear('Correlation_array');
             end
-        end        
+        end
     end
 end

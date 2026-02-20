@@ -34,30 +34,30 @@ for fig = 1:nbplt
             subplot(lr,lc,plt);
         else
             subplot(nr,nc,plt);
-        end        
+        end
         for data_set_iter=1:ndsets
             h1(data_set_iter)=plot(xvalues,data_series(:,(fig-1)*nstar+plt,data_set_iter),style_cell{1+mod(data_set_iter-1,length(style_cell))},'linewidth',2);
             hold on
         end
         grid on
-            
+
         max_y = max(max(data_series(:,(fig-1)*nstar+plt,:)));
         min_y = min(min(data_series(:,(fig-1)*nstar+plt,:)));
-        
+
         y_bottom = min_y - .01*abs(min_y);
-        
+
         y_top = max_y + 0.01*abs(max_y);
         if y_bottom==y_top
             y_top=y_bottom+1;
         end
-        
+
         axis([1 nperiods y_bottom y_top])
         if plt==1
             if numel(strvcat(legendlist(1,:)))
                 h=legend(legendlist,'Location','Northwest','Fontsize',8);
             end
         end
-        
+
         title(titlelist(plt,:),'Fontsize',11);
         ylabel(ylabels(plt,:))
         if nvars==(fig-1)*nstar+plt

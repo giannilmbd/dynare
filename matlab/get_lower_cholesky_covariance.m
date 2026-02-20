@@ -7,7 +7,7 @@ function chol_sigma=get_lower_cholesky_covariance(Sigma_e,add_tiny_number_to_cho
 %   Sigma_e         [double]      covariance matrix
 %
 % OUTPUTS
-%   chol_sigma      [cell]        Cholesky factor 
+%   chol_sigma      [cell]        Cholesky factor
 %
 % ALGORITHM
 %   Add small value to diagonal to break perfect correlation
@@ -37,7 +37,7 @@ if nargin<2
 end
 std_deviation=sqrt(diag(Sigma_e));
 non_zero_indices=find(std_deviation~=0); %find non-zero shocks;
-try    
+try
     chol_sigma=zeros(size(Sigma_e));
     chol_sigma(non_zero_indices,non_zero_indices)=chol(Sigma_e(non_zero_indices,non_zero_indices),'lower');
 catch
@@ -55,7 +55,7 @@ return % --*-- Unit tests --*--
 Sigma_e=diag(4*ones(3,1));
 Sigma_e(2,2)=0;
 chol_1=get_lower_cholesky_covariance(Sigma_e);
-if max(max(abs(chol_1-diag([2,0,2]))))>eps 
+if max(max(abs(chol_1-diag([2,0,2]))))>eps
     t(1)=false;
 else
     t(1)=true;
@@ -78,7 +78,7 @@ if chol_4(2,2)~=0 || any(any(triu(chol_4,1)))
     t(3)=false;
 else
     t(3)=true;
-end   
+end
 
 Sigma_e=[4 0.5 0; 0.5 9 0; 0 0 16];
 chol_5=get_lower_cholesky_covariance(Sigma_e,1e-14);

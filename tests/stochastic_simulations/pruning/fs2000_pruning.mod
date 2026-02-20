@@ -1,4 +1,4 @@
-/* 
+/*
 Compare simulation results with pruning at second order
  */
 
@@ -53,7 +53,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -73,7 +73,7 @@ stoch_simul(order=2, nograph, irf=0);
 
 % simult_.m: implements KKSS
 options_.pruning = true;
-Y2_simult = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order); 
+Y2_simult = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order);
 
 % local_state_space_iteration_2 mex: implements KKSS
 constant = oo_.dr.ys(oo_.dr.order_var)+0.5*oo_.dr.ghs2;
@@ -125,7 +125,7 @@ end
 % 3rd order
 stoch_simul(order=3, nograph, irf=0);
 % simult_.m
-Y3_simult = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order); 
+Y3_simult = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order);
 % pruned_state_space_system.m
 pss = pruned_SS.pruned_state_space_system(M_, options_, oo_.dr, [], 0, false, false);
 Y3_an = zeros(M_.endo_nbr,T+1);

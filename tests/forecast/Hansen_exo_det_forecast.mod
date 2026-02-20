@@ -2,10 +2,10 @@
 * The Hansen model following McCandless, George T. (2008): The ABCs of RBCs, Hardvard University Press, Chapter 6
 *
 * This mod-file tests the correctness of forecasting with exogenous deterministic variables.
-* A forecast starting at the steady state in t=0, where the only shock is a perfectly 
+* A forecast starting at the steady state in t=0, where the only shock is a perfectly
 * anticipated shock in t=8, is equal to the IRF to a 7 period anticipated news shock.
-* Note the timing difference due to the fact that in forecasting. the agent starts at the 
-* steady state at time 0 and has the first endogenous reaction period at t=1 so that the shock at 
+* Note the timing difference due to the fact that in forecasting. the agent starts at the
+* steady state at time 0 and has the first endogenous reaction period at t=1 so that the shock at
 * t=8 is only 7 period anticipated
 
 * This implementation was written by Johannes Pfeifer. Please note that the
@@ -81,7 +81,7 @@ stoch_simul(irf=40,nomoments, order=1);
 forecast(periods=40);
 figure
 for ii=1:M_.orig_endo_nbr
-    subplot(3,3,ii)    
+    subplot(3,3,ii)
     var_name=M_.endo_names{ii};
     var_index=strmatch(var_name, M_.endo_names,'exact');
     plot(1:40,oo_.dr.ys(var_index)+oo_.irfs.([var_name,'_eps_a_antic']),'b',1:40,... %
@@ -91,5 +91,5 @@ for ii=1:M_.orig_endo_nbr
 end
 
 if max(max(abs(difference)))>1e-10
-   error('Forecasts with exogenous deterministic variable is wrong') 
+   error('Forecasts with exogenous deterministic variable is wrong')
 end

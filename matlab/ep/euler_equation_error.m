@@ -10,8 +10,8 @@ function e = euler_equation_error(y0,x,M_,options_,oo_,pfm,nodes,weights)
 %  o  nodes            [double]    integration nodes
 %  o  weights          [double]    weights of nodes
 %
-% Outputs: 
-%  o  e                [double]    matrix of Euler equation errors  
+% Outputs:
+%  o  e                [double]    matrix of Euler equation errors
 
 % Called by ep_accuracy_check.m
 

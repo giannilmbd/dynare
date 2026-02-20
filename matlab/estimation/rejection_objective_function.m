@@ -35,8 +35,8 @@ function [fval, exit_flag, arg1, arg2] = rejection_objective_function(fcn, x, th
 
     % dataset_,dataset_info,options_,M_,estim_params_,bayestopt_,BoundsInfo,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,derivatives_info)
     % 1        2            3        4  5             6          7          8   9                  10                11                   12
-     
- 
+
+
 lnprior = priordens(x(:),varargin{6}.pshape,varargin{6}.p6,varargin{6}.p7,varargin{6}.p3,varargin{6}.p4);
 varargin{3}.likelihood_base_value    = (threshold_val-lnprior);
 

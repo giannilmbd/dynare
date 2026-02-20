@@ -52,7 +52,7 @@ end;
 options_.solve_algo = 12;
 options_.mcp = 1;
 //options_.linear_approximation = 1;
-perfect_foresight_setup(periods=200);    
+perfect_foresight_setup(periods=200);
 
 perfect_foresight_solver(stack_solve_algo=7);
 

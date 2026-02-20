@@ -152,7 +152,7 @@ for t=1:sample_size
                     error('Pruning is not available for orders > 3');
                     end
                 else
-                    if order == 1 
+                    if order == 1
                         tmp = bsxfun(@plus,ReducedForm.constant,ReducedForm.ghx*yhat);
                     elseif order == 2
                         tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, options_.threads.local_state_space_iteration_2);
@@ -196,14 +196,14 @@ for t=1:sample_size
                     solve_model_for_online_filter(false, candidate, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
                 if ~info(1)
                     xparam(:,i) = candidate ;
-                    if ~ReducedForm.use_k_order_solver                        
+                    if ~ReducedForm.use_k_order_solver
                         if pruning
                             if order == 2
                                 state_variables_steady_state_ = ReducedForm.state_variables_steady_state;
                                 mf0_ = mf0;
                             elseif order == 3
                                 state_variables_steady_state_ = repmat(ReducedForm.state_variables_steady_state,3,1);
-                                mf0_ = repmat(mf0,1,3); 
+                                mf0_ = repmat(mf0,1,3);
                                 mask2 = number_of_state_variables+1:2*number_of_state_variables;
                                 mask3 = 2*number_of_state_variables+1:number_of_state_variables;
                                 mf0_(mask2) = mf0_(mask2)+size(ReducedForm.ghx,1);
@@ -283,7 +283,7 @@ for t=1:sample_size
         if t==sample_size
             param = xparam ;
             save(sprintf('%s%sparameters_particles_final.mat', SimulationFolder, filesep()), 'param');
-        end 
+        end
     else
         mean_xparam(:,t) = xparam*(weights');
         mat_var_cov = bsxfun(@minus, xparam,mean_xparam(:,t));
@@ -313,7 +313,7 @@ for t=1:sample_size
         if t==sample_size
             param = xparam(:,kitagawa(weights));
             save(sprintf('%s%sparameters_particles_final.mat', SimulationFolder, filesep()), 'param');
-        end 
+        end
     end
     save(sprintf('%s%sparameters_particles-%u.mat', SimulationFolder, filesep(), t), 'xparam');
     dyntable(options_,'', {'Parameter'; 'Lower Bound (95%)';'Mean';'Upper Bound (95%)'}, bayestopt_.name, [lb95_xparam(:,t), mean_xparam(:,t), ub95_xparam(:,t)], cellofchararraymaxlength(bayestopt_.name)+2, 10, 6)

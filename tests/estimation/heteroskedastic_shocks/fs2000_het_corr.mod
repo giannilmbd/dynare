@@ -2,7 +2,7 @@
 // tests heteroskedastic filter/smoother
 // includes lagged exogenous variable introduced by preprocessor
 
-@#include "fs2000_het_model.inc" 
+@#include "fs2000_het_model.inc"
 
 shocks;
 var e_a; stderr 0.014;
@@ -34,4 +34,4 @@ end;
 estimation(order=1,datafile='../fsdat_simul',nobs=192,mode_compute=5,silent_optimizer,loglinear,mh_replic=0,smoother,filtered_vars,forecast=8,filter_step_ahead=[1:8],consider_all_endogenous,heteroskedastic_filter);
 
 @#define mode_file_name="'fs2000_het_corr/Output/fs2000_het_corr_mode'"
-@#include "fs2000_het_check.inc" 
+@#include "fs2000_het_check.inc"

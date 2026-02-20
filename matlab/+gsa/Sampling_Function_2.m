@@ -1,6 +1,6 @@
 function [Outmatrix, OutFact] = Sampling_Function_2(p, k, r, UB, LB, GroupMat)
 %[Outmatrix, OutFact] = Sampling_Function_2(p, k, r, UB, LB, GroupMat)
-%  Inputs: 
+%  Inputs:
 %           k (1,1)                      := number of factors examined or number of groups examined.
 %                                           In case the groups are chosen the number of factors is stores in NumFact and
 %                                           sizea becomes the number of created groups.
@@ -35,7 +35,7 @@ function [Outmatrix, OutFact] = Sampling_Function_2(p, k, r, UB, LB, GroupMat)
 %           AuxMat(sizeb,sizea) := Delta*0.5*((2*B - A) * DD0 + A) in Morris, 1991. The AuxMat is used as in Morris design
 %                                  for single factor analysis, while it constitutes an intermediate step for the group analysis.
 %
-% Outputs: 
+% Outputs:
 %           Outmatrix(sizeb*r, sizea) := for the entire sample size computed In(i,j) matrices
 %           OutFact(sizea*r,1)        := for the entire sample size computed Fact(i,1) vectors
 %

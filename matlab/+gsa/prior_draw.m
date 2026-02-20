@@ -8,7 +8,7 @@ function pdraw = prior_draw(M_,bayestopt_,options_,estim_params_,init,rdraw)
 %  - options_           [structure] describing the options
 %  - estim_params_      [structure] characterizing parameters to be estimated
 %  - init               [integer]   scalar equal to 1 (first call) or 0.
-%  - rdraw              
+%  - rdraw
 %
 % OUTPUTS
 %   o pdraw          [double]   draw from the joint prior density.
@@ -40,7 +40,7 @@ function pdraw = prior_draw(M_,bayestopt_,options_,estim_params_,init,rdraw)
 %
 % You should have received a copy of the GNU General Public License
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
- 
+
 persistent npar pshape p6 p7 p3 p4 lbcum ubcum
 
 if init

@@ -15,12 +15,12 @@ function [y,dy] = bivmom(p,rho)
 % -------------------------------------------------------------------------
 % This function is based upon bivmom.m which is part of replication codes
 % of the following paper:
-% Kan, R.: "From moments of sum to moments of product." Journal of 
+% Kan, R.: "From moments of sum to moments of product." Journal of
 % Multivariate Analysis, 2008, vol. 99, issue 3, pages 542-554.
 % bivmom.m can be retrieved from http://www-2.rotman.utoronto.ca/~kan/papers/prodmom.zip
 % Further references:
 % Kotz, Balakrishnan, and Johnson (2000), Continuous Multivariate Distributions, Vol. 1, p.261
-% Note that there is a typo in Eq.(46.25), there should be an extra rho in front 
+% Note that there is a typo in Eq.(46.25), there should be an extra rho in front
 % of the equation.
 
 % Copyright © 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
@@ -62,7 +62,7 @@ end
 odd = 2*rem(s1,2);
 for j=1:min(r,s)
     if nargout > 1
-        dc = 2*dc*(r+1-j)*(s+1-j)*rho2/(j*(2*j-1+odd)) + 2*c*(r+1-j)*(s+1-j)*drho2/(j*(2*j-1+odd));    
+        dc = 2*dc*(r+1-j)*(s+1-j)*rho2/(j*(2*j-1+odd)) + 2*c*(r+1-j)*(s+1-j)*drho2/(j*(2*j-1+odd));
     end
     c = 2*c*(r+1-j)*(s+1-j)*rho2/(j*(2*j-1+odd));
     y = y+c;

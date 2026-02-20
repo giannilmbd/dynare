@@ -107,7 +107,7 @@ else
     end
 end
 
-fig_name=[fig_name '_' parameter_set]; 
+fig_name=[fig_name '_' parameter_set];
 parameter_set_string=get_parameter_set_name(parameter_set);
 
 %% write LaTeX-Header
@@ -195,12 +195,12 @@ for j=1:nvar
         ylabel(abs(ylabel)<eps)=0;
         set(ax,'yticklabel',num2str(ylabel,'%4.2g'))
     end
-    
+
     if ~isempty(options_.plot_shock_decomp.forecast_length)
         forecast_init_date = gend-options_.plot_shock_decomp.forecast_length+1.5;
         hold on, plot([forecast_init_date forecast_init_date],ylim,'-r','linewidth',.5);
     end
-    
+
     set(ax,'xlim',[xmin xmax]);
     hold off;
 

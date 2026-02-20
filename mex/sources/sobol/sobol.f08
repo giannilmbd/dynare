@@ -42,7 +42,7 @@ function i8_bit_hi1 ( n )
   !       0           0     0
   !       1           1     1
   !       2          10     2
-  !       3          11     2 
+  !       3          11     2
   !       4         100     3
   !       5         101     3
   !       6         110     3
@@ -63,7 +63,7 @@ function i8_bit_hi1 ( n )
   !
   !  Licensing:
   !
-  !    This code is distributed under the GNU LGPL license. 
+  !    This code is distributed under the GNU LGPL license.
   !
   !  Modified:
   !
@@ -124,7 +124,7 @@ function i8_bit_lo0 ( n )
   !       0           0     1
   !       1           1     2
   !       2          10     1
-  !       3          11     3 
+  !       3          11     3
   !       4         100     1
   !       5         101     2
   !       6         110     1
@@ -145,7 +145,7 @@ function i8_bit_lo0 ( n )
   !
   !  Licensing:
   !
-  !    This code is distributed under the GNU LGPL license. 
+  !    This code is distributed under the GNU LGPL license.
   !
   !  Modified:
   !
@@ -198,7 +198,7 @@ subroutine i8_sobol ( dim_num, seed, quasi )
   !
   !    The routine adapts the ideas of Antonov and Saleev.
   !
-  !    This routine uses the integer and real precisions corresponding 
+  !    This routine uses the integer and real precisions corresponding
   !    respectively to a KIND of int64 and real64.
   !
   !    Thanks to Francis Dalaudier for pointing out that the range of allowed
@@ -206,7 +206,7 @@ subroutine i8_sobol ( dim_num, seed, quasi )
   !
   !  Licensing:
   !
-  !    This code is distributed under the GNU LGPL license. 
+  !    This code is distributed under the GNU LGPL license.
   !
   !  Modified:
   !
@@ -232,7 +232,7 @@ subroutine i8_sobol ( dim_num, seed, quasi )
   !
   !    Bennett Fox,
   !    Algorithm 647:
-  !    Implementation and Relative Efficiency of Quasirandom 
+  !    Implementation and Relative Efficiency of Quasirandom
   !    Sequence Generators,
   !    ACM Transactions on Mathematical Software,
   !    Volume 12, Number 4, December 1986, pages 362-376.
@@ -248,8 +248,8 @@ subroutine i8_sobol ( dim_num, seed, quasi )
   !    USSR Computational Mathematics and Mathematical Physics,
   !    Volume 16, 1977, pages 236-242.
   !
-  !    Ilya Sobol, YL Levitan, 
-  !    The Production of Points Uniformly Distributed in a Multidimensional 
+  !    Ilya Sobol, YL Levitan,
+  !    The Production of Points Uniformly Distributed in a Multidimensional
   !    Cube (in Russian),
   !    Preprint IPM Akademii Nauk SSSR,
   !    Number 40, Moscow 1976.

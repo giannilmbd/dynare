@@ -135,5 +135,5 @@ end;
 
 varobs gp_obs gy_obs;
 
-estimation(order=1, datafile=fs2000_data, loglinear,logdata, mode_compute=4, mh_replic=20000, 
+estimation(order=1, datafile=fs2000_data, loglinear,logdata, mode_compute=4, mh_replic=20000,
            nodiagnostic, mh_nblocks=4, mh_jscale=0.8, posterior_sampler_options = ('save_tmp_file', 1),nograph);

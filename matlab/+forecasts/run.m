@@ -57,7 +57,7 @@ end
 if options_.order>2 && M_.exo_det_nbr > 0
     error('forecasts.run: forecasting with varexo_det does not support order>2.')
 end
-if options_.order==2 && M_.exo_det_nbr > 0 && options_.pruning 
+if options_.order==2 && M_.exo_det_nbr > 0 && options_.pruning
     error('forecasts.run: forecasting with varexo_det does not support pruning.')
 end
 

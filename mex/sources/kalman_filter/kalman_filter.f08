@@ -24,11 +24,11 @@
 !                                     of the covariance matrix of the prediction
 !                                     errors)
 ! prhs[5]  riccati_tol        [double] tolerance parameter (iteration over the
-!                                      Riccati equation). 
+!                                      Riccati equation).
 ! prhs[6]  T                  [double] m x m transition matrix of the state
-!                                      equation 
+!                                      equation
 ! prhs[7]  Q                  [double] r x r variance-covariance matrix of the
-!                                      structural innovations (noise in the 
+!                                      structural innovations (noise in the
 !                                      state equation).
 ! prhs[8]  R                  [double] m x r second matrix of the state equation
 !                                      relating the structural innovations to
@@ -39,13 +39,13 @@
 ! Optional inputs:
 ! prhs[10] Zflag             [integer] equal to 0 if Z is a vector of indices
 !                                      targeting the observed variables in the
-!                                      state vector (default), equal to 1 if 
+!                                      state vector (default), equal to 1 if
 !                                      Z is a p x m matrix.
 ! prhs[11] H                  [double] p x p variance-covariance matrix of the
 !                                      measurement errors. If no measurement
 !                                      errors set H as a zero scalar (default).
-! prhs[12] diffuse_periods   [integer] number of diffuse filter periods in the 
-!                                      initialization step (default is 0).   
+! prhs[12] diffuse_periods   [integer] number of diffuse filter periods in the
+!                                      initialization step (default is 0).
 ! prhs[13] presample          [integer] presampling if strictly positive (number
 !                                       of initial iterations to be discarded
 !                                       when evaluating the likelihood, default
@@ -83,7 +83,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
                                &tmp_m_m(:,:), tmp_m_p(:,:), tmp_m_r(:,:),&
                                &tmp_m_m_prime(:,:), tmp_v(:), a_next(:), &
                                &old_K(:,:), P_iter(:,:), a_iter(:)
-   integer(blint), allocatable :: iwork(:), ipiv(:) 
+   integer(blint), allocatable :: iwork(:), ipiv(:)
 
    real(real64), parameter :: pi = 4._real64*DATAN(1._real64)
 
@@ -162,7 +162,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       if (mxGetM(Z_mx) /= p .or. mxGetN(Z_mx) /= m) &
            call mexErrMsgTxt("Input dimension mismatch in Z")
       Z(1:p,1:m) => mxGetDoubles(Z_mx)
-      ! Initialization to avoid compilation warnings 
+      ! Initialization to avoid compilation warnings
       ! (-Wmaybe-uninitialized flag)
       allocate (indZ(0))
    else
@@ -239,7 +239,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    old_K = huge(0._real64)
    a_iter = a
    P_iter = PP
-   do 
+   do
       if ((t > nper) .or. (steady_flag)) exit
       s = s+1
       ! v <- Y(:,t) - Z*a
@@ -265,7 +265,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
          end if
       end if
 
-      ! Compute the reciprocal condition number of F using its LU 
+      ! Compute the reciprocal condition number of F using its LU
       ! decomposition
       ! (i) LU decomposition of F
       lu = F
@@ -280,7 +280,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       do i=1,p
          log_dF = log_dF+log(abs(lu(i,i)))
       end do
-      
+
       ! Compute the inverse of F using its LU decomposition
       call dgetri(p, lu, p, ipiv, work_inv, lwork, info)
 
@@ -299,7 +299,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
          ! (ii) K <- tmp*F^{-1}
          call matmul_add("N", "N", 1._real64, tmp_m_p, lu, 0._real64, K)
       else
-         ! Compute K = P(:,Z)F^{-1} 
+         ! Compute K = P(:,Z)F^{-1}
          call matmul_add("N", "N", 1._real64, P_iter(:,indZ), lu, 0._real64, K)
       end if
 
@@ -321,7 +321,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
          call matmul_add("N", "N", -1._real64, K, Z, 1._real64, tmp_m_m_prime)
          ! (ii) tmp_m_m <- tmp'*P
          call matmul_add("N", "N", 1._real64, tmp_m_m_prime, P_iter, 0._real64, tmp_m_m)
-         ! (iii) tmp_m_m' <- T*tmp_m_m 
+         ! (iii) tmp_m_m' <- T*tmp_m_m
          call matmul_add("N", "N", 1._real64, TT, tmp_m_m, 0._real64, tmp_m_m_prime)
          ! (iv) P_next <- tmp_m_m'*T' + P_next
          call matmul_add("N", "T", 1._real64, tmp_m_m_prime, TT, 1._real64, P_next)
@@ -341,7 +341,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       call matvecmul_add("N", 1._real64, K, v, 1._real64, a_iter)
       ! (ii) a_next <- T*tmp_v
       call matvecmul_add("N", 1._real64, TT, a_iter, 0._real64, a_next)
-      
+
       ! Check the wedge between gain matrices
       steady_flag = (norm(K-old_K, "M") <= riccati_tol)
 
@@ -355,7 +355,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
    ! Add observation's densities constants and divide by two.
    likk(1:s) = 0.5_real64*(likk(1:s) + p*log(2*pi))
 
-   ! Call kalman_filter_ss if necessary 
+   ! Call kalman_filter_ss if necessary
    if (t <= nper) then
       ! call mexPrintf("Calling kalman_filter_ss!")
       call_rhs(1) = Y_mx
@@ -392,7 +392,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name="mexFunction")
       lik = sum(likk)
    end if
    plhs(1) = mxCreateDoubleScalar(real(lik, c_double))
-      
+
    ! N.B.: An alternative using Cholesky and the symmetry of matrices goes
    ! (1) P = L*L' (dpotrf)
    ! (2) F <- Z*L*(Z*L)' + H (dsyrk)

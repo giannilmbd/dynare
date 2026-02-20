@@ -80,7 +80,7 @@ end;
 varobs gp_obs gy_obs;
 if ~isoctave
 
-estimation(order=1,datafile='../fsdat_simul',nobs=192,silent_optimizer,loglinear,mh_replic=50,mh_nblocks=1,mh_drop=0.2, 
+estimation(order=1,datafile='../fsdat_simul',nobs=192,silent_optimizer,loglinear,mh_replic=50,mh_nblocks=1,mh_drop=0.2,
 posterior_sampling_method='slice',
 posterior_sampler_options=('save_tmp_file',1)
 );
@@ -90,7 +90,7 @@ copyfile([M_.dname filesep 'metropolis' filesep M_.dname '_mh1_blck1.mat'],[M_.d
 delete([M_.dname filesep 'metropolis' filesep M_.dname '_mh1_blck1.mat'])
 copyfile([M_.fname '_mh_tmp_blck1.mat'],[M_.dname filesep 'metropolis' filesep M_.dname '_mh_tmp_blck1.mat'])
 
-estimation(order=1,datafile='../fsdat_simul',nobs=192,silent_optimizer,loglinear,mh_replic=50,mh_nblocks=1,mh_drop=0.2, 
+estimation(order=1,datafile='../fsdat_simul',nobs=192,silent_optimizer,loglinear,mh_replic=50,mh_nblocks=1,mh_drop=0.2,
 posterior_sampling_method='slice',
 posterior_sampler_options=('save_tmp_file',1)
 ,mh_recover);
@@ -101,7 +101,7 @@ temp2=load([M_.dname filesep 'metropolis' filesep M_.dname '_mh1_blck1.mat']);
 
 if max(max(abs(temp1.x2./temp2.x2-1)))>5e-3
     max(max(abs(temp1.x2./temp2.x2-1)))
-    temp1.x2 
+    temp1.x2
     temp2.x2
     error('Draws of unaffected chain are not the same')
 end

@@ -3,11 +3,11 @@ function [cost, out] = cost_function(err_0, current_obs, weights, opts_simul,...
 % [cost, out] = cost_function(err_0, current_obs, opts_simul,...
 %                             M_, dr,endo_steady_state,exo_steady_state,exo_det_steady_state, options_)
 % Outputs:
-%  - cost               [double]        penalty 
+%  - cost               [double]        penalty
 %  - out                [structure]     OccBin's results structure
 %
 % Inputs
-% - err_0               [double]        value of shocks 
+% - err_0               [double]        value of shocks
 % - current_obs         [double]        [1 by n_obs] current value of observables
 % - weights             [double]        [1 by n_obs] variance of observables,
 % - opts_simul          [structure]     Structure with simulation options
@@ -16,7 +16,7 @@ function [cost, out] = cost_function(err_0, current_obs, weights, opts_simul,...
 % - dr_                 [structure]     model information structure
 % - endo_steady_state   [vector]        steady state value for endogenous variables
 % - exo_steady_state    [vector]        steady state value for exogenous variables
-% - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables
 % - options_            [structure]     MATLAB's structure describing the current options (options_).
 
 % Copyright © 2023-2025 Dynare Team

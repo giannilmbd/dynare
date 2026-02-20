@@ -29,7 +29,7 @@ end
 if isoctave
     tol_crit=5e-6;
 else
-    tol_crit=1e-8;    
+    tol_crit=1e-8;
 end
 
 if max(max(abs(SmoothedVariables-repmat(SmoothedVariables(:,:,1),[1,1,2]))))>tol_crit

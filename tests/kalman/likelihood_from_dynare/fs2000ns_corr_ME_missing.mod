@@ -1,4 +1,4 @@
-@#include "fs2000ns_model.inc" 
+@#include "fs2000ns_model.inc"
 
 estimated_params;
 alp, 0.33;
@@ -15,5 +15,5 @@ end;
 @#define mode_file_name="'fs2000ns_corr_ME_missing/Output/fs2000ns_corr_ME_missing_mode'"
 @#define data_file_name="fs_ns_dat_simul_corr_ME_missing"
 
-@#include "fs2000ns_estimation_check.inc" 
+@#include "fs2000ns_estimation_check.inc"
 

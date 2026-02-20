@@ -1,5 +1,5 @@
 % Test whether preprocessor recognizes state variables introduced by optimal policy Github #1193
-        
+
 var pai, c, n, r, a;
 varexo u;
 parameters beta, rho, epsilon, omega, phi, gamma;

@@ -90,7 +90,7 @@ for shock_sign_iter = 1:numel(shocksigns)
     else
        error('Unknown shock sign %s',shocksign);
     end
-        
+
     for shock_iter=1:size(shock_names,1)
         j1   = 0;
         isub = 0;
@@ -145,7 +145,7 @@ for shock_sign_iter = 1:numel(shocksigns)
 
             if options_.occbin.plot_irf.grid
                 grid on
-            end     
+            end
             xlim([1 max(max_irf_length_1,max_irf_length_2)]);
             if options_.TeX
                 title(['$' M_.endo_names_tex{i_var(var_iter)}, '$'],'Interpreter','latex')

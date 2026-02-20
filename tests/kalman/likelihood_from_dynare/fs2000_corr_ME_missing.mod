@@ -1,4 +1,4 @@
-@#include "fs2000_model.inc" 
+@#include "fs2000_model.inc"
 
 estimated_params;
 alp, 0.356;
@@ -15,4 +15,4 @@ end;
 @#define mode_file_name="'fs2000_corr_ME_missing/Output/fs2000_corr_ME_missing_mode'"
 @#define data_file_name="fsdat_simul_corr_ME_missing"
 
-@#include "fs2000_estimation_check.inc" 
+@#include "fs2000_estimation_check.inc"

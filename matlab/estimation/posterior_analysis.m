@@ -125,7 +125,7 @@ function SampleAddress = select_posterior_draws(M_,options_,dr,endo_steady_state
 %   o dr                    [structure]     Reduced form model.
 %   o endo_steady_state     [vector]        steady state value for endogenous variables
 %   o exo_steady_state      [vector]        steady state value for exogenous variables
-%   o exo_det_steady_state  [vector]        steady state value for exogenous deterministic variables                                    
+%   o exo_det_steady_state  [vector]        steady state value for exogenous deterministic variables
 %   o SampleSize            [integer]       Size of the sample to build.
 %   o drsize                [double]        structure dr is drsize megaoctets.
 %

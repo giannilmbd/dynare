@@ -206,7 +206,7 @@ else
 end
 
 switch realtime_
-    
+
     case 0 %standard or initval_decomposition
         if isempty(options_.shock_decomp.forecast_type)%not forecasts
             if ~expand
@@ -239,7 +239,7 @@ switch realtime_
             end
             fig_name1=[fig_name ' realtime (rolling)'];
         end
-        
+
     case 2 % conditional
         if vintage_
             if ~expand
@@ -255,7 +255,7 @@ switch realtime_
             end
             fig_name1=[fig_name ' 1-step ahead conditional forecast (rolling)'];
         end
-        
+
     case 3 % forecast
         if vintage_
             if ~expand

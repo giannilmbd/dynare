@@ -65,7 +65,7 @@ M_.endo_initial_state.status=true;
 isp = find(diag(XP)>options_.kalman_tol);
 dd=diag(XP(isp,isp));
 isp = isp(1:sum((dd./dd(1))>eps));
-isn = length(isp)+1:length(XP); 
+isn = length(isp)+1:length(XP);
 
 UPN = UP(:,isn);
 [~,im]=max(abs(UPN));

@@ -27,9 +27,9 @@
 @#include "RBC_MoM_common.inc"
 
 shocks;
-var u_a; stderr 0.0072;        
+var u_a; stderr 0.0072;
 var n; stderr 0.01;
-end; 
+end;
 
 varobs n c iv;
 

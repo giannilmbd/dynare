@@ -69,7 +69,7 @@ if ~all(M_.H==0)
         if options_.bandpass.indicator
             y_ME_only_filtered=y_ME_only_filtered(options_.bandpass.K+1:end-options_.bandpass.K,:); %remove NaN
         end
-        
+
         s2_ME = mean(y_ME.*y_ME);
         s_ME = sqrt(s2_ME);
         zero_variance_ME_var_index=index_subset(abs(s_ME')<zero_moments_tolerance);
@@ -194,7 +194,7 @@ if ~options_.nodecomposition
                 y_sim_one_shock=y_sim_one_shock(options_.bandpass.K+1:end-options_.bandpass.K,:); %remove NaN
             end
 
-            oo_.variance_decomposition(:,i_exo_var(shock_iter))=var(y_sim_one_shock)./s2*100;            
+            oo_.variance_decomposition(:,i_exo_var(shock_iter))=var(y_sim_one_shock)./s2*100;
         end
         oo_.variance_decomposition(zero_variance_var_index,:)=NaN;
         if ME_present

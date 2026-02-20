@@ -25,9 +25,9 @@
 
 
 /*
- * Wanted: monetary policy shock is not in period t information set of agents 
- *         (just as in VAR identified with Choleski decomp.) 
- *         All other shocks are in period t information set. 
+ * Wanted: monetary policy shock is not in period t information set of agents
+ *         (just as in VAR identified with Choleski decomp.)
+ *         All other shocks are in period t information set.
  * Solution: create two parallel economies which are structurally identical.
  *           One which is subject to the monetary shock only.
  *           This shock is not in period t info set.
@@ -45,22 +45,22 @@
 var
 wpR wpF wR wF psiR cR RR piR iR pkprimeR FR KR ukR
 kbarR lR xR varthetR phaloR yR JR UR GDPR fR vR
-unempR VR AAR vTotR QR piwR whaloR FwR KwR 
+unempR VR AAR vTotR QR piwR whaloR FwR KwR
 varthetpR
-;  
+;
 
 // Endogenous variables (F economy)
 var
 psiF cF RF piF iF pkprimeF FF KF ukF
-kbarF lF xF varthetF phaloF yF JF UF GDPF fF 
+kbarF lF xF varthetF phaloF yF JF UF GDPF fF
 vF unempF VF AAF vTotF QF piwF whaloF FwF KwF
-muzF mupsiF muF nGF nPHIF nGAMF nDF nKAPF 
+muzF mupsiF muF nGF nPHIF nGAMF nDF nKAPF
 varthetpF
 ;
 
 // Endogenous variables (AGG economy)
 var
-GDPAGG piAGG RAGG ukAGG lAGG wAGG cAGG 
+GDPAGG piAGG RAGG ukAGG lAGG wAGG cAGG
 iAGG unempAGG vTotAGG fAGG pinvestAGG
 ;
 
@@ -71,15 +71,15 @@ epsR_eps muz_eps mupsi_eps
 
 parameters
 ydiffdataPercent,idiffdataPercent,alfa,rho,u,Q,sigm,
-betta,lambda,deltak,tau,nuf,etag,kappa,b,xi,D,delta,gamma,Spp 
+betta,lambda,deltak,tau,nuf,etag,kappa,b,xi,D,delta,gamma,Spp
 sigmab sigmaa phi rhoR rpi ry sig_epsR sigmam kappaf DSHARE deltapercent
-recSHAREpercent iota doNash eta doEHL xiw lambdaw AEHL  
-f rhomupsi rhomuz sig_mupsi sig_muz thetaG thetaPHI thetaKAP thetaD 
-dolagZBAR profy varkappaw pibreve thetaw varkappaf M sigmaL 
+recSHAREpercent iota doNash eta doEHL xiw lambdaw AEHL
+f rhomupsi rhomuz sig_mupsi sig_muz thetaG thetaPHI thetaKAP thetaD
+dolagZBAR profy varkappaw pibreve thetaw varkappaf M sigmaL
 tau_SS epsilon_SS upsilon_SS zetac_SS g_SS pibar thetaGAM kappaw
 unemp_SS vTot_SS alp1 alp2 alp3 alp4 bet1 bet2 bet3 s searchSHAREpercent
 ;
-   
+
 model;
 
 // auxiliary equations for R economy such that current realization fo monetary policy shock is not in information set
@@ -95,7 +95,7 @@ model;
 #mupsiR=STEADY_STATE(mupsiF);
 #mupsiR_tp1=STEADY_STATE(mupsiF);
 #muzR=STEADY_STATE(muzF);
-#muR=alfa/(1-alfa)*STEADY_STATE(mupsiF)+STEADY_STATE(muzF); 
+#muR=alfa/(1-alfa)*STEADY_STATE(mupsiF)+STEADY_STATE(muzF);
 #muR_tp1=STEADY_STATE(muF);
 #nGR=STEADY_STATE(nGF);
 #nPHIR=STEADY_STATE(nPHIF);
@@ -114,7 +114,7 @@ model;
 #UR_tp1=EXPECTATION(-1)(UR(+1));
 #fR_tp1=EXPECTATION(-1)(fR(+1));
 #wR_tp1=EXPECTATION(-1)(wR(+1));
-#VR_tp1=EXPECTATION(-1)(VR(+1)); 
+#VR_tp1=EXPECTATION(-1)(VR(+1));
 #ukR_tp1=EXPECTATION(-1)(ukR(+1));
 #piwR_tp1=EXPECTATION(-1)(piwR(+1));
 #KwR_tp1=EXPECTATION(-1)(KwR(+1));
@@ -133,7 +133,7 @@ model;
 #StildeR=(0.5*(exp(sqrt(Spp)*(exp(iR)/exp(iR(-1))*exp(muR)*exp(mupsiR)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))+exp(-sqrt(Spp)*(exp(iR)/exp(iR(-1))*exp(muR)*exp(mupsiR)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))-2));
 #StildeprimeR=(0.5*sqrt(Spp)*(exp(sqrt(Spp)*(exp(iR)/exp(iR(-1))*exp(muR)*exp(mupsiR)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))-exp(-sqrt(Spp)*(exp(iR)/exp(iR(-1))*exp(muR)*exp(mupsiR)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))));
 #StildeprimeR_tp1=(0.5*sqrt(Spp)*(exp(sqrt(Spp)*(exp(iR_tp1)/exp(iR)*exp(muR_tp1)*exp(mupsiR_tp1)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))-exp(-sqrt(Spp)*(exp(iR_tp1)/exp(iR)*exp(muR_tp1)*exp(mupsiR_tp1)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))));
-#mcR=tauR+alfa*mupsiR+( (1-doEHL)*varthetR+doEHL*wR) +log(nuf*(exp(RRinfo))+1-nuf)-epsilonR-log(1-alfa)-alfa*(kbarR(-1)+ukR-muR-lR-(doEHL*(lambdaw/(lambdaw-1))*whaloR) ); 
+#mcR=tauR+alfa*mupsiR+( (1-doEHL)*varthetR+doEHL*wR) +log(nuf*(exp(RRinfo))+1-nuf)-epsilonR-log(1-alfa)-alfa*(kbarR(-1)+ukR-muR-lR-(doEHL*(lambdaw/(lambdaw-1))*whaloR) );
 #pitildewpiR=-piwR+kappaw*piR(-1)+(1-kappaw-varkappaw)*log(pibar)+varkappaw*log(pibreve)+thetaw*STEADY_STATE(muF);
 #pitildewpiR_tp1=-piwR_tp1+kappaw*piR+(1-kappaw-varkappaw)*log(pibar)+varkappaw*log(pibreve)+thetaw*STEADY_STATE(muF);
 #pitildepiR=-piR+kappaf*piR(-1)+(1-kappaf-varkappaf)*log(pibar)+varkappaf*log(pibreve);
@@ -143,7 +143,7 @@ model;
 exp(psiR)=exp(zetacR)/(exp(cR)-b*exp(cR(-1))/exp(muR))-betta*b*(exp(zetacR_tp1)/
 (exp(cR_tp1)*exp(muR_tp1)-b*exp(cR)));
 
-//R2 - Bond FOC (Fisher equation) 
+//R2 - Bond FOC (Fisher equation)
 exp(psiR)=betta*exp(psiR_tp1)/exp(muR_tp1)*exp(RRinfo)/exp(piR_tp1);
 
 //R3 - Investment FOC
@@ -160,10 +160,10 @@ exp(kbarR)=(1-deltak)/(exp(muR)*exp(mupsiR))*exp(kbarR(-1))+exp(upsilonR)*(1-Sti
 
 //R7 - Production
 exp(yR)=exp(phaloR)^(lambda/(lambda-1))*(exp(epsilonR)*((doEHL*exp(whaloR)^(lambdaw/(lambdaw-1))+(1-doEHL)*1)*exp(lR))^(1-alfa)*
-             (exp(kbarR(-1)+ukR)/(exp(muR)*exp(mupsiR)))^alfa-phi*exp(nPHIR)); 
+             (exp(kbarR(-1)+ukR)/(exp(muR)*exp(mupsiR)))^alfa-phi*exp(nPHIR));
 
 //R8 - Resource Constraint
-exp(yR)=exp(gR)*exp(nGR)+exp(cR)+exp(iR)+aofukR*exp(kbarR(-1))/(exp(mupsiR)*exp(muR)) 
+exp(yR)=exp(gR)*exp(nGR)+exp(cR)+exp(iR)+aofukR*exp(kbarR(-1))/(exp(mupsiR)*exp(muR))
   +(1-doEHL)*( s*exp(nKAPR)*exp(xR)/exp(QR)*exp(lR(-1))  +  kappa*exp(nKAPR)*exp(xR)*exp(lR(-1))   );
 
 //R9 Monetary Policy Rule
@@ -172,7 +172,7 @@ RR=rhoR*RR(-1)+(1-rhoR)*(STEADY_STATE(RR)+rpi*(piR-STEADY_STATE(piF))+ry*(GDPR-S
 //R10 Pricing 1
 exp(FR)-exp(psiR+yR)-betta*xi*exp( pitildepiR_tp1  /(1-lambda)+FR_tp1);
 
-//R11 Pricing 2 
+//R11 Pricing 2
 exp(KR)-lambda*exp(psiR+yR+mcR)-betta*xi*exp( pitildepiR_tp1 *lambda/(1-lambda)+KR_tp1);
 
 //R12 Pricing 3
@@ -197,7 +197,7 @@ doEHL*(exp(JR)-exp(STEADY_STATE(JF)))=(1-doEHL)*(-exp(JR)+exp(varthetpR)-exp(wpR
 //R18 Value of work
 doEHL*(exp(VR)-exp(STEADY_STATE(VF)))=(1-doEHL)*(-exp(VR)+exp(wpR)+exp(AAR));
 
-//R19 Present value of worker payoff after separation 
+//R19 Present value of worker payoff after separation
 doEHL*(exp(AAR)-exp(STEADY_STATE(AAF)))=(1-doEHL)*(-exp(AAR)+(1-rho)*betta*exp(psiR_tp1)/exp(psiR)*(exp(fR_tp1)*exp(VR_tp1)
 +(1-exp(fR_tp1))*exp(UR_tp1))+rho*betta*exp(psiR_tp1)/exp(psiR)*exp(AAR_tp1));
 
@@ -206,7 +206,7 @@ doEHL*(exp(UR)-exp(STEADY_STATE(UF)))=(1-doEHL)*(-exp(UR)+D*exp(nDR)+betta*exp(p
 
 //R21 Sharing rule
 doEHL*(exp(varthetR)-STEADY_STATE(exp(varthetF)))=(1-doEHL)*(doNash*(exp(VR)-exp(UR)-eta*(exp(JR)+exp(VR)-exp(UR)))+(1-doNash)*(
-  
+
 -exp(JR)+bet1*(exp(VR)-exp(UR))-bet2*exp(nGAMR)*gamma+bet3*(exp(varthetR)-exp(nDR)*D)
 
 ));
@@ -218,7 +218,7 @@ exp(GDPR)=exp(gR)*exp(nGR)+exp(cR)+exp(iR);
 doEHL*(exp(unempR)-exp(STEADY_STATE(unempF)))=(1-doEHL)*(-exp(unempR)+1-exp(lR));
 
 //R24 Job finding rate
-doEHL*(exp(fR)-exp(STEADY_STATE(fF)))=(1-doEHL)*(-exp(fR)+exp(xR)*exp(lR(-1))/(1-rho*exp(lR(-1)))); 
+doEHL*(exp(fR)-exp(STEADY_STATE(fF)))=(1-doEHL)*(-exp(fR)+exp(xR)*exp(lR(-1))/(1-rho*exp(lR(-1))));
 
 //R25 Matching function
 doEHL*(exp(vTotR)-exp(STEADY_STATE(vTotF)))=(1-doEHL)*(-exp(xR)*exp(lR(-1))+sigmam*(1-rho*exp(lR(-1)))^sigm*(exp(vTotR))^(1-sigm));
@@ -241,16 +241,16 @@ doEHL*(-exp(FwR) + exp(psiR)/lambdaw*exp(whaloR)^( lambdaw/(lambdaw-1))*exp(lR) 
 =(1-doEHL)*(exp(FwR)-exp(STEADY_STATE(FwF)));
 
 //R31 Law of motion of employment or EHL wage setting 2
-doEHL*(-exp(KwR) + ( exp(whaloR)^( lambdaw/(lambdaw-1))*exp(lR))^(1+sigmaL) + betta*xiw*(exp(pitildewpiR_tp1))^( lambdaw*(1+sigmaL)/(1-lambdaw) )*exp(KwR_tp1))    
+doEHL*(-exp(KwR) + ( exp(whaloR)^( lambdaw/(lambdaw-1))*exp(lR))^(1+sigmaL) + betta*xiw*(exp(pitildewpiR_tp1))^( lambdaw*(1+sigmaL)/(1-lambdaw) )*exp(KwR_tp1))
 =(1-doEHL)*(-exp(lR)+(rho+exp(xR))*exp(lR(-1)));
 
 //R32 wage setting 3 (EHL)
 doEHL*(1-(1-xiw)*(AEHL*exp(KwR)/(exp(FwR)*exp(wR)))^( 1/( 1-lambdaw*(1+sigmaL) )) - xiw*(exp(pitildewpiR))^(1/(1-lambdaw)))=(1-doEHL)*(exp(KwR)-exp(STEADY_STATE(KwF)));
 
-////////////////////////////////////////////////////////////////////// 
-//F economy, other shocks, current realization in info set /////////// 
-////////////////////////////////////////////////////////////////////// 
-//set not needed exogenous variables to steady states 
+//////////////////////////////////////////////////////////////////////
+//F economy, other shocks, current realization in info set ///////////
+//////////////////////////////////////////////////////////////////////
+//set not needed exogenous variables to steady states
 #tauF=tau_SS;
 #upsilonF=upsilon_SS;
 #upsilonF_tp1=upsilon_SS;
@@ -268,7 +268,7 @@ doEHL*(1-(1-xiw)*(AEHL*exp(KwR)/(exp(FwR)*exp(wR)))^( 1/( 1-lambdaw*(1+sigmaL) )
 #StildeF=(0.5*(exp(sqrt(Spp)*(exp(iF)/exp(iF(-1))*exp(muF)*exp(mupsiF)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))+exp(-sqrt(Spp)*(exp(iF)/exp(iF(-1))*exp(muF)*exp(mupsiF)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))-2));
 #StildeprimeF=(0.5*sqrt(Spp)*(exp(sqrt(Spp)*(exp(iF)/exp(iF(-1))*exp(muF)*exp(mupsiF)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))-exp(-sqrt(Spp)*(exp(iF)/exp(iF(-1))*exp(muF)*exp(mupsiF)-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))));
 #StildeprimeF_tp1=(0.5*sqrt(Spp)*(exp(sqrt(Spp)*(exp(iF(+1))/exp(iF)*exp(muF(+1))*exp(mupsiF(+1))-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))-exp(-sqrt(Spp)*(exp(iF(+1))/exp(iF)*exp(muF(+1))*exp(mupsiF(+1))-exp(STEADY_STATE(muF))*exp(STEADY_STATE(mupsiF))))));
-#mcF=tauF+alfa*mupsiF+( (1-doEHL)*varthetF+doEHL*wF) +log(nuf*(exp(RF))+1-nuf)-epsilonF-log(1-alfa)-alfa*(kbarF(-1)+ukF-muF-lF-(doEHL*(lambdaw/(lambdaw-1))*whaloF) ); 
+#mcF=tauF+alfa*mupsiF+( (1-doEHL)*varthetF+doEHL*wF) +log(nuf*(exp(RF))+1-nuf)-epsilonF-log(1-alfa)-alfa*(kbarF(-1)+ukF-muF-lF-(doEHL*(lambdaw/(lambdaw-1))*whaloF) );
 #pitildewpiF=-piwF+kappaw*piF(-1)+(1-kappaw-varkappaw)*log(pibar)+varkappaw*log(pibreve)+thetaw*STEADY_STATE(muF);
 #pitildewpiF_tp1=-piwF(+1)+kappaw*piF+(1-kappaw-varkappaw)*log(pibar)+varkappaw*log(pibreve)+thetaw*STEADY_STATE(muF);
 #pitildepiF=-piF+kappaf*piF(-1)+(1-kappaf-varkappaf)*log(pibar)+varkappaf*log(pibreve);
@@ -278,7 +278,7 @@ doEHL*(1-(1-xiw)*(AEHL*exp(KwR)/(exp(FwR)*exp(wR)))^( 1/( 1-lambdaw*(1+sigmaL) )
 exp(psiF)=exp(zetacF)/(exp(cF)-b*exp(cF(-1))/exp(muF))-betta*b*(exp(zetacF_tp1)/
 (exp(cF(+1))*exp(muF(+1))-b*exp(cF)));
 
-//F2 - Bond FOC (Fisher equation) 
+//F2 - Bond FOC (Fisher equation)
 exp(psiF)=betta*exp(psiF(+1))/exp(muF(+1))*exp(RF)/exp(piF(+1));
 
 //F3 - Investment FOC
@@ -295,10 +295,10 @@ exp(kbarF)=(1-deltak)/(exp(muF)*exp(mupsiF))*exp(kbarF(-1))+exp(upsilonF)*(1-Sti
 
 //F7 - Production
 exp(yF)=exp(phaloF)^(lambda/(lambda-1))*(exp(epsilonF)*(     (doEHL*exp(whaloF)^(lambdaw/(lambdaw-1))+(1-doEHL)*1)*exp(lF)     )^(1-alfa)*
-             (exp(kbarF(-1)+ukF)/(exp(muF)*exp(mupsiF)))^alfa-phi*exp(nPHIF)); 
+             (exp(kbarF(-1)+ukF)/(exp(muF)*exp(mupsiF)))^alfa-phi*exp(nPHIF));
 
 //F8 - Resource Constraint
-exp(yF)=exp(gF)*exp(nGF)+exp(cF)+exp(iF)+aofukF*exp(kbarF(-1))/(exp(mupsiF)*exp(muF)) 
+exp(yF)=exp(gF)*exp(nGF)+exp(cF)+exp(iF)+aofukF*exp(kbarF(-1))/(exp(mupsiF)*exp(muF))
   +(1-doEHL)*( s*exp(nKAPF)*exp(xF)/exp(QF)*exp(lF(-1))  +  kappa*exp(nKAPF)*exp(xF)*exp(lF(-1))   );
 
 
@@ -308,7 +308,7 @@ RF=rhoR*RF(-1)+(1-rhoR)*(STEADY_STATE(RF)+rpi*(piF-STEADY_STATE(piF))+ry*(GDPF-S
 //F10 Pricing 1
 exp(FF)-exp(psiF+yF)-betta*xi*exp( pitildepiF_tp1 /(1-lambda)+FF(+1));
 
-//F11 Pricing 2 
+//F11 Pricing 2
 exp(KF)-lambda*exp(psiF+yF+mcF)-betta*xi*exp( pitildepiF_tp1*lambda/(1-lambda)+KF(+1));
 
 //F12 Pricing 3
@@ -333,9 +333,9 @@ doEHL*(exp(JF)-STEADY_STATE(exp(JF)))=(1-doEHL)*(-exp(JF)+exp(varthetpF)-exp(wpF
 //F18 Value of work
 doEHL*(exp(VF)-exp(STEADY_STATE(VF)))=(1-doEHL)*(-exp(VF)+exp(wpF)+exp(AAF));
 
-//F19 Present value of worker payoff after separation 
+//F19 Present value of worker payoff after separation
 doEHL*(exp(AAF)-exp(STEADY_STATE(AAF)))=(1-doEHL)*(-exp(AAF)+(1-rho)*betta*exp(psiF(+1))/exp(psiF)*(exp(fF(+1))*exp(VF(+1))+(1-exp(fF(+1)))*exp(UF(+1)))+rho*betta*exp(psiF(+1))/exp(psiF)*exp(AAF(+1)));
- 
+
 //F20 Unempoyment value
 doEHL*(exp(UF)-exp(STEADY_STATE(UF)))=(1-doEHL)*(-exp(UF)+D*exp(nDF)+betta*exp(psiF(+1))/exp(psiF)*(exp(fF(+1))*exp(VF(+1))+(1-exp(fF(+1)))*exp(UF(+1))));
 
@@ -353,7 +353,7 @@ exp(GDPF)=exp(gF)*exp(nGF)+exp(cF)+exp(iF);
 doEHL*(exp(unempF)-exp(STEADY_STATE(unempF)))=(1-doEHL)*(-exp(unempF)+1-exp(lF));
 
 //F24 Finding rate
-doEHL*(exp(fF)-exp(STEADY_STATE(fF)))=(1-doEHL)*(-exp(fF)+exp(xF)*exp(lF(-1))/(1-rho*exp(lF(-1)))); 
+doEHL*(exp(fF)-exp(STEADY_STATE(fF)))=(1-doEHL)*(-exp(fF)+exp(xF)*exp(lF(-1))/(1-rho*exp(lF(-1))));
 
 //F25 Matching function
 doEHL*(exp(vTotF)-exp(STEADY_STATE(vTotF)))=(1-doEHL)*(-exp(xF)*exp(lF(-1))+sigmam*(1-rho*exp(lF(-1)))^sigm*(exp(vTotF))^(1-sigm));
@@ -375,8 +375,8 @@ doEHL*(exp(whaloF*lambdaw/(1-lambdaw))-(1-xiw)^(1-lambdaw)*(1-xiw*exp(pitildewpi
 doEHL*(-exp(FwF) + exp(psiF)/lambdaw*exp(whaloF)^( lambdaw/(lambdaw-1))*exp(lF) + betta*xiw*(exp(wF(+1))/exp(wF))*(exp(pitildewpiF_tp1))^( 1/(1-lambdaw) )*exp(FwF(+1))    )
 =(1-doEHL)*(exp(FwF)-exp(STEADY_STATE(FwF)));
 
-//F31 Law of motion of employment or EHL wage setting 2  
-doEHL*(-exp(KwF) + ( exp(whaloF)^( lambdaw/(lambdaw-1))*exp(lF))^(1+sigmaL) + betta*xiw*( exp(pitildewpiF_tp1) )^( lambdaw*(1+sigmaL)/(1-lambdaw) )*exp(KwF(+1)))    
+//F31 Law of motion of employment or EHL wage setting 2
+doEHL*(-exp(KwF) + ( exp(whaloF)^( lambdaw/(lambdaw-1))*exp(lF))^(1+sigmaL) + betta*xiw*( exp(pitildewpiF_tp1) )^( lambdaw*(1+sigmaL)/(1-lambdaw) )*exp(KwF(+1)))
 =(1-doEHL)*(-exp(lF)+(rho+exp(xF))*exp(lF(-1)));
 
 //F32 wage setting 3 (EHL)
@@ -400,45 +400,45 @@ muzF=(1-rhomuz)*STEADY_STATE(muzF)+rhomuz*muzF(-1)+sig_muz*muz_eps/100;
 //E5  Diffusion of composite technology into fixed costs of production
 nPHIF=nGF;
 
-//E6  Diffusion of composite technology into firm delay costs of bargaining 
+//E6  Diffusion of composite technology into firm delay costs of bargaining
 nGAMF=nGF;
 
 //E7  Diffusion of composite technology into unemployment benefits
 nDF=nGF;
 
-//E8 Diffusion of composite technology into hiring/search costs 
+//E8 Diffusion of composite technology into hiring/search costs
 nKAPF=nGF;
-////////////////////////////////////////////////////////////////////// 
-//Aggregating 'F' and 'R' economies, expressed in percent deviations// 
 //////////////////////////////////////////////////////////////////////
-//A1 
+//Aggregating 'F' and 'R' economies, expressed in percent deviations//
+//////////////////////////////////////////////////////////////////////
+//A1
 GDPAGG-STEADY_STATE(GDPF)=GDPR-STEADY_STATE(GDPF)+GDPF-STEADY_STATE(GDPF);
-//A2 
+//A2
 piAGG-STEADY_STATE(piF)=piR-STEADY_STATE(piF)+piF-STEADY_STATE(piF);
-//A3 
+//A3
 RAGG-STEADY_STATE(RF)=RR-STEADY_STATE(RF)+RF-STEADY_STATE(RF);
-//A4 
+//A4
 ukAGG-STEADY_STATE(ukF)=ukR-STEADY_STATE(ukF)+ukF-STEADY_STATE(ukF);
-//A5 
+//A5
 lAGG-STEADY_STATE(lF)=lR-STEADY_STATE(lF)+lF-STEADY_STATE(lF);
-//A6 
+//A6
 wAGG-STEADY_STATE(wF)=wR-STEADY_STATE(wF)+wF-STEADY_STATE(wF);
-//A7 
+//A7
 cAGG-STEADY_STATE(cF)=cR-STEADY_STATE(cF)+cF-STEADY_STATE(cF);
-//A8 
+//A8
 iAGG-STEADY_STATE(iF)=iR-STEADY_STATE(iF)+iF-STEADY_STATE(iF);
-//A9 
+//A9
 unempAGG-STEADY_STATE(unempF)=unempR-STEADY_STATE(unempF)+unempF-STEADY_STATE(unempF);
-//A10 
+//A10
 vTotAGG-STEADY_STATE(vTotF)=vTotR-STEADY_STATE(vTotF)+vTotF-STEADY_STATE(vTotF);
-//A11 
+//A11
 fAGG-STEADY_STATE(fF)=fR-STEADY_STATE(fF)+fF-STEADY_STATE(fF);
 //A12
-pinvestAGG=-mupsiF; 
-end; 
+pinvestAGG=-mupsiF;
+end;
 /////////////////////////////////
 //End Model            //////////
-///////////////////////////////// 
+/////////////////////////////////
 
 
 % model switches
@@ -462,11 +462,11 @@ Q=0.7;                   %vacancy filling rate
 
 deltapercent=0.3022;     %prob. of barg. session determination
 M=60;                    %maximum bargaining rounds per quarter, needs to be an even number!!!!
- 
-if M<2, error('M must be at least equal to 2!');end
-if mod(M,2)==1, error('M must be an even number so that the worker makes the last offer!');end 
 
-%prices  
+if M<2, error('M must be at least equal to 2!');end
+if mod(M,2)==1, error('M must be an even number so that the worker makes the last offer!');end
+
+%prices
 xi=0.5841;         %Calvo prices
 pibar=1.00625;     %inflation rate, gross, quarterly
 kappaf=0;          %price indexation to past inflation
@@ -484,8 +484,8 @@ Spp=13.6684;       %second derivative of invest. adjustment costs
 sigmaa=0.0760;     %capacity utilization costs
 
 %growth rates of investment and real GDP
-idiffdataPercent=2.9; 
-ydiffdataPercent=1.7; 
+idiffdataPercent=2.9;
+ydiffdataPercent=1.7;
 
 %Preferences
 betta=0.996783170280770; %discount factor households; implies 3% real rate
@@ -505,7 +505,7 @@ thetaPHI=thetaG;    %fixed cost of production
 thetaKAP=thetaG;    %hiring cost
 thetaGAM=thetaG;	%cost of counteroffer
 thetaD=0.7416;      %replacement ratio
-dolagZBAR=1;        %if =1, diffusion speed: zbar_t=(zplus_t-1)^thetaj*(zbar_t-1)^(1-thetaj); 
+dolagZBAR=1;        %if =1, diffusion speed: zbar_t=(zplus_t-1)^thetaj*(zbar_t-1)^(1-thetaj);
                     %if =0, zbar_t=(zplus_t)^thetaj*(zbar_t-1)^(1-thetaj) for j=G,GAM,KAP,BU,PHI
                     %check cet_steadystate.m for further restrictions on
                     %theta parameters!
@@ -517,11 +517,11 @@ profy=0;
 lambdaw=1.2;  %wage markup (EHL)
 xiw=0.75;     %Calvo wage stickiness (EHL)
 sigmaL=1;     %inv. labor supply elast. (EHL)
-kappaw=0;     %wage indexation to past inflation (EHL)  
+kappaw=0;     %wage indexation to past inflation (EHL)
 varkappaw=1;  %wage indexation parameter; if kappaw=0 and varkappaw=1 and pibreve=1 and thetaw=0 -> no indexation at all.
 thetaw=0;     %wage indexation to technology
 
-    
+
 % standard deviation of shocks (%)
 sig_muz     =	0.1362;       %unit root neutral tech.
 sig_mupsi	=	0.1100;       %unit root investment tech.
@@ -537,7 +537,7 @@ sig_zetac	=	0;            %cons. preference
 rhomupsi	=	0.7279; %unit root investment tech.
 rhomuz      =	0;      %unit root neutral tech.
 
-rhoepsilon	=	0;      %stationary neutral tech. 
+rhoepsilon	=	0;      %stationary neutral tech.
 rhoupsilon	=	0;      %stationary invest. tech.
 rhozetac	=	0;      %cons. preference
 rhog        =	0;      %gov. spending
@@ -547,11 +547,11 @@ rhosigmam	=	0;      %matching function shock
 iota=1;      %This parameter does not apprear in the model anymore. Just ignore it.
 
 
-shocks; 
+shocks;
 var epsR_eps        = 1; //monetary policy
 var muz_eps         = 1; //neutral tech.
 var mupsi_eps       = 1; //invest. tech.
-end;    
+end;
 
 steady_state_model;
 %% based on cet_steadystate.m, some code is put into cet_steady_helper.m
@@ -691,7 +691,7 @@ sig_mupsi          ,     ,  -Inf, Inf;
 rhomupsi           ,     ,  -Inf, Inf;
 end;
 
-xi = 0.7363; 
+xi = 0.7363;
 lambda = 1.4082;
 rhoR = 0.8463;
 rpi = 1.4566;

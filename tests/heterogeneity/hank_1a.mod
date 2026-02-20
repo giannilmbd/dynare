@@ -62,7 +62,7 @@ model(heterogeneity=households);
    // Intratemporal FOC for labor supply
    vphi*n^(1/frisch) - w*e*c^(-1/eis);
 
-   // Definition of the effective labor supply 
+   // Definition of the effective labor supply
    ns = n * e;
 end;
 

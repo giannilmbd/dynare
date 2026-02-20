@@ -72,7 +72,7 @@
  where k is the order of approximation.
 
  */
- 
+
 @#define ORDER = 3
 
 var y x;
@@ -175,10 +175,10 @@ for k = 1:length(KRONFLAGS)
     oo_.dr.dg_1 = cat(2,DERIVS.dghx,DERIVS.dghu) + 3/6*cat(2,DERIVS.dghxss,DERIVS.dghuss);
     oo_.dr.dg_2 = 1/2*cat(2,DERIVS.dghxx,DERIVS.dghxu,DERIVS.dghuu);
     oo_.dr.dg_3 = 1/6*[DERIVS.dghxxx DERIVS.dghxxu DERIVS.dghxuu DERIVS.dghuuu];
-    
+
     for ord = 0:@{ORDER}
         g = oo_.dr.(['g_' num2str(ord)])(2,:); % Retrieve computed policy function for variable y
-        dg = oo_.dr.(['dg_' num2str(ord)])(2,:,:);    
+        dg = oo_.dr.(['dg_' num2str(ord)])(2,:,:);
         for m = 0:ord % m is the derivation order with respect to x(-1)
             v = 0;
             dv = zeros(1,M_.exo_nbr + M_.param_nbr);
@@ -205,7 +205,7 @@ for k = 1:length(KRONFLAGS)
                                             +beta.^i.*exp(theta*xbar*i).*ord.*b.^(ord-1).*db(:,:,5).*rho^m.*c.^p...
                                             +beta.^i.*exp(theta*xbar*i).*b.^ord.*rho^m.*p.*c.^(p-1).*dc(:,:,5)...
                                            )/factorial(ord)/factorial(p);%wrt xbar
-                end                
+                end
             end
             if abs(v-g(ord+1-m)) > 1e-14
                 error(['Error in matrix oo_.dr.g_' num2str(ord)])

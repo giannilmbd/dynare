@@ -6,7 +6,7 @@ function graph(M_, options_, options_occbin_, oo_, var_list)
 % - options_            [structure]     MATLAB's structure containing the options
 % - options_occbin_     [structure]     MATLAB's structure containing OccBin options
 % - oo_                 [structure]     MATLAB's structure containing the results
-% - var_list            [char]          list of the variables to plot 
+% - var_list            [char]          list of the variables to plot
 
 % Copyright © 2021-2025 Dynare Team
 %
@@ -88,17 +88,17 @@ for fig = 1:nbplt
         end
         h_zero=plot([1 nperiods],[0 0],'--k','linewidth',0.5);
         hold on
-        h1=plot(1:nperiods,data_to_plot(:,(fig-1)*nstar+plt,1),'b-','linewidth',2); 
+        h1=plot(1:nperiods,data_to_plot(:,(fig-1)*nstar+plt,1),'b-','linewidth',2);
         if ndim==2 && (fig-1)*nstar+plt<=number_of_plots_to_draw_endo
             h2=plot(1:nperiods,data_to_plot(:,(fig-1)*nstar+plt,2),'r--','linewidth',2); hold on
-        end        
+        end
         hold off
-        
+
         max_y = max(max(data_to_plot(:,(fig-1)*nstar+plt,:)));
         min_y = min(min(data_to_plot(:,(fig-1)*nstar+plt,:)));
-        
+
         y_bottom = min_y - .01*abs(min_y);
-        
+
         y_top = max_y + 0.01*abs(max_y);
         if y_bottom==y_top
             y_top=y_bottom+1;
@@ -110,7 +110,7 @@ for fig = 1:nbplt
                 legend([h1,h2],legend_list,'box','off')
             else
                 legend(h1,legend_list,'box','off')
-            end        
+            end
         end
         if options_.TeX
             title(['$' var_list_TeX{(fig-1)*nstar+plt,:} '$'],'Interpreter','latex');

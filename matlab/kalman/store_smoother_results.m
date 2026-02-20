@@ -91,7 +91,7 @@ end
 field_names={'Smoother','SmoothedVariables','UpdatedVariables','FilteredVariables','FilteredVariablesKStepAhead','FilteredVariablesShockDecomposition','FilteredVariablesKStepAheadVariances','SmoothedShocks','SmoothedMeasurementErrors'};
 for field_iter=1:length(field_names)
     if isfield(oo_,field_names(field_iter))
-        oo_=rmfield(oo_,field_names(field_iter));        
+        oo_=rmfield(oo_,field_names(field_iter));
     end
 end
 

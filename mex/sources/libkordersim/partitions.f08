@@ -23,7 +23,7 @@ module partitions
 
    ! index represents the aforementioned (α₁,…,αₘ) objects
    type index
-      integer, dimension(:), allocatable :: coor 
+      integer, dimension(:), allocatable :: coor
    end type index
 
    interface index
@@ -39,7 +39,7 @@ module partitions
 
    interface dict
       module procedure :: init_dict
-   end interface dict 
+   end interface dict
 
    interface operator(/=)
       module procedure :: diff_indices
@@ -50,7 +50,7 @@ module partitions
    type uf_matching
       type(integer), dimension(:), allocatable :: folded
    end type
-   
+
 
    ! A type to contain the integer partitions up to integer n
    ! with up to n parts
@@ -89,7 +89,7 @@ contains
    ! Operators for the index type
    ! Comparison for the index type. Returns true if the two indices are different
    type(logical) function diff_indices(i1,i2)
-      type(index), intent(in) :: i1, i2 
+      type(index), intent(in) :: i1, i2
       if (size(i1%coor) /= size(i2%coor) .or. any(i1%coor /= i2%coor)) then
          diff_indices = .true.
       else
@@ -126,7 +126,7 @@ contains
       type(index), intent(in) :: idx
       u_index_to_f_index = index(idx%coor)
       call sort_int(u_index_to_f_index%coor)
-   end function u_index_to_f_index 
+   end function u_index_to_f_index
 
    ! Converts the offset of an unfolded tensor to the associated unfolded tensor index
    ! Note that the index (α₁,…,αₘ) is such that αᵢ ∈ { 0, ..., n-1 }
@@ -159,7 +159,7 @@ contains
       else
          prefix = get_prefix_length(idx,d)
          tmp = index(idx%coor(prefix+1:) - idx%coor(1))
-         j = get(d, n+d-1, p) - get(d, n-idx%coor(1)+d-1, p) + f_index_to_f_offset(tmp, n-idx%coor(1), d-prefix, p) 
+         j = get(d, n+d-1, p) - get(d, n-idx%coor(1)+d-1, p) + f_index_to_f_offset(tmp, n-idx%coor(1), d-prefix, p)
       end if
    end function f_index_to_f_offset
 
@@ -178,7 +178,7 @@ contains
       u_index_to_u_offset = u_index_to_u_offset + 1
    end function u_index_to_u_offset
 
-   ! Function that searches a value in an array of a given length 
+   ! Function that searches a value in an array of a given length
    type(integer) function find(a, v, l)
       integer, intent(in) :: l ! length of the array
       type(index), dimension(l), intent(in) :: a ! array of indices
@@ -211,9 +211,9 @@ contains
    ! 	(c) has the folded offset already been computed ?
    ! 		(i)   If yes, get the corresponding offset
    ! 		(ii)  If no, compute it (f_index_to_f_offset) and store it for reuse and as a result
-   subroutine fill_folded_indices(folded, n, d, p) 
+   subroutine fill_folded_indices(folded, n, d, p)
       integer, intent(in) :: n, d
-      integer, dimension(n**d), intent(inout) :: folded 
+      integer, dimension(n**d), intent(inout) :: folded
       type(pascal_triangle), intent(in) :: p
       type(dict) :: c
       type(index) :: tmp
@@ -227,16 +227,16 @@ contains
            c%pr = c%pr+1
            c%indices(c%pr) = tmp
            c%offsets(c%pr) = f_index_to_f_offset(tmp,n,d,p)
-           folded(j) = c%offsets(c%pr)  
+           folded(j) = c%offsets(c%pr)
          else
-           folded(j) = c%offsets(found) 
+           folded(j) = c%offsets(found)
          end if
       end do
    end subroutine fill_folded_indices
 
    ! ! Specialized code for local_state_space_iteration_3
    ! ! Considering the folded tensor gᵥᵥ, for each folded offset,
-   ! ! fills (i) the corresponding index, (ii) the corresponding 
+   ! ! fills (i) the corresponding index, (ii) the corresponding
    ! ! unfolded offset in the corresponding unfolded tensor
    ! ! and (iii) the number of equivalent unfolded indices the folded index
    ! ! associated with the folded offset represents
@@ -258,11 +258,11 @@ contains
 
    ! In order to list folded indices α = (α₁,…,αₘ) with αᵢ ∈ { 1, ..., n },
    ! at least 2 algorithms exist: a recursive one and an iterative one.
-   ! The recursive algorithm list_folded_indices(n,m,q) that returns 
+   ! The recursive algorithm list_folded_indices(n,m,q) that returns
    ! the list of all folded indices α = (α₁,…,αₘ) with αᵢ ∈ { 1+q, ..., n+q } works as follows:
    ! if n=0, return an empty list
-   ! else if m=0, return the list containing the sole zero-sized index 
-   ! otherwise,  
+   ! else if m=0, return the list containing the sole zero-sized index
+   ! otherwise,
    ! return the concatenation of ([1+q, ℓ] for ℓ ∈ list_folded_indices(n,m-1,q))
    ! and list_folded_indices(n-1,m,1,q+1)]
    ! A call to list_folded_indices(n,m,0) then returns the list
@@ -270,7 +270,7 @@ contains
    ! The problem with recursive functions is that the compiler may manage poorly
    ! the stack, which slows down the function's execution
    ! recursive function list_folded_indices(n, m, q) result(list)
-   !    integer :: n, m, q 
+   !    integer :: n, m, q
    !    type(index), allocatable, dimension(:) :: list, temp
    !    integer :: j
    !    if (m==0) then
@@ -284,21 +284,21 @@ contains
    ! end function list_folded_indices
 
    ! Considering the folded tensor gᵥᵐ, for each folded offset,
-   ! fills the lists of (i) the corresponding index, (ii) the corresponding 
+   ! fills the lists of (i) the corresponding index, (ii) the corresponding
    ! unfolded offset in the corresponding unfolded tensor
    ! and (iii) the number of equivalent unfolded indices the folded index
    ! (associated with the folded offset) represents
-   ! The algorithm to get the folded index associated with a folded offset 
-   ! relies on the definition of the lexicographic order. 
+   ! The algorithm to get the folded index associated with a folded offset
+   ! relies on the definition of the lexicographic order.
    ! Considering α = (α₁,…,αₘ) with αᵢ ∈ { 1, ..., n },
    ! the next index α' is such that there exists i that verifies
    ! αⱼ = αⱼ' for all j < i, αᵢ' > αᵢ. Note that all the coordinates
    ! αᵢ', ... , αₘ' need to be as small as the lexicographic order allows
    ! for α' to immediately follow α.
-   ! Suppose j is the latest incremented coordinate: 
+   ! Suppose j is the latest incremented coordinate:
    ! if αⱼ < n, then αⱼ' = αⱼ + 1
    ! otherwise αⱼ = n, set αₖ' =  αⱼ₋₁ + 1 for all k ≥ j-1
-   ! if αⱼ₋₁ = n, set j := j-1  
+   ! if αⱼ₋₁ = n, set j := j-1
    ! otherwise, set j := m
    ! The algorithm to count the number of equivalent unfolded indices
    ! works as follows. A folded index can be written as α = (x₁, ..., x₁, ..., xₚ, ..., xₚ)
@@ -339,7 +339,7 @@ contains
             k(ind(j)%coor(lastinc-1)) = m - (lastinc-1) + 1
             nbeq(j) = multinomial(k,m,p)
             off(j) = u_index_to_u_offset(ind(j), n, m)
-            if (ind(j)%coor(m) == n) then 
+            if (ind(j)%coor(m) == n) then
                lastinc = lastinc-1
             else
                lastinc = m
@@ -353,7 +353,7 @@ contains
          end if
          j = j+1
       end do
-   end subroutine folded_offset_loop 
+   end subroutine folded_offset_loop
 
    ! The following routine computes the partitions of all integers up to integer
    ! n with number of parts up to n, where n is the size of the input
@@ -369,10 +369,10 @@ contains
    ! 𝓟(k-1,n-1) with a 1 appended up front, and (b) solutions to the problem
    ! 𝓟(k,n-k) with a 1 added to all its indices. Denoting p(k,n) the cardinal
    ! of 𝓟(k,n), it thus verifies p(k,n)=p(k-1,n-1)+p(k,n-k).
-   ! A partition of n with k parts can be written as 
-   ! α = (α₁, ..., α₁, ..., αₚ, ..., αₚ) such that α₁ < α₂ < ... < αₚ. 
+   ! A partition of n with k parts can be written as
+   ! α = (α₁, ..., α₁, ..., αₚ, ..., αₚ) such that α₁ < α₂ < ... < αₚ.
    ! Denote kᵢ the number of coordinates equal to αᵢ. The
-   ! number of partitions that are permuted version of α 
+   ! number of partitions that are permuted version of α
    ! is c(α;k) = ⎛       k         ⎞.
    !             ⎝ k₁, k₂, ..., kₚ ⎠
    ! The partitions generated through (b) represent the same number of permuted
@@ -383,16 +383,16 @@ contains
    !           ⎝ k₁', ..., kₚ' ⎠   ⎝ k₁+1, k₂, ..., kₚ ⎠
    ! Otherwise, c(α';k)=k*c(α;k-1)
    subroutine fill_partition_triangle(parts)
-      type(partition_triangle), dimension(:,:), intent(inout) :: parts 
+      type(partition_triangle), dimension(:,:), intent(inout) :: parts
       integer :: n, k, p_km1_nm1, p_k_nmk, p_k_n, l
-      ! Initialization with n=1 
+      ! Initialization with n=1
       parts(1,1)%partition = [index(1,1)]
       parts(1,1)%count = [1]
       do n=2,size(parts,1)
          ! print *, 'n:', n
          ! 𝓟(n,n) unique solution is (1,...,1)
          !                            n times
-         parts(n,n)%partition = [index(n,1)] 
+         parts(n,n)%partition = [index(n,1)]
          parts(n,n)%count = [1]
          ! 𝓟(1,n) unique solution is (n)
          parts(1,n)%partition = [index(1,n)]
@@ -402,7 +402,7 @@ contains
             p_km1_nm1 = size(parts(k-1,n-1)%partition)
             if (2*k>n) then
                p_k_nmk = 0
-            else   
+            else
                p_k_nmk = size(parts(k,n-k)%partition)
             end if
             p_k_n = p_km1_nm1+p_k_nmk
@@ -411,7 +411,7 @@ contains
             ! print *, 'p_k_n:', p_k_n
             allocate(parts(k,n)%partition(p_k_n))
             allocate(parts(k,n)%count(p_k_n))
-            ! 1 appended up front to 𝓟(k-1,n-1) solutions 
+            ! 1 appended up front to 𝓟(k-1,n-1) solutions
             do l=1,p_km1_nm1
                ! print *, 'l:', l
                allocate(parts(k,n)%partition(l)%coor(k))
@@ -458,7 +458,7 @@ end module partitions
 !    ! 0,1,2  6    1,1,2  15   2,1,2  24
 !    ! 0,2,0  7    1,2,0  16   2,2,0  25
 !    ! 0,2,1  8    1,2,1  17   2,2,1  26
-!    ! 0,2,2  9    1,2,2  18   2,2,2  27  
+!    ! 0,2,2  9    1,2,2  18   2,2,2  27
 
 !    ! Folded indices and offsets
 !    ! 0,0,0  1     1,1,1   7      2,2,2   10
@@ -467,11 +467,11 @@ end module partitions
 !    ! 0,1,1  4
 !    ! 0,1,2  5
 !    ! 0,2,2  6
- 
+
 !    n = 3
 !    d = 3
 !    uj = 8
-!    p = pascal_triangle(n+d-1)   
+!    p = pascal_triangle(n+d-1)
 
 !    ! u_offset_to_u_index
 !    uidx = u_offset_to_u_index(uj,n,d)

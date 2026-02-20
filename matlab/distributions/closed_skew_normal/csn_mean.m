@@ -63,7 +63,7 @@ for jj = 1:q
             % requires zero mean and correlation matrix as inputs
             normalization2 = diag(1./sqrt(diag(condVar)));
             eval_point2 = normalization2*(nu2(1:q-1) - condMean);
-            Corr_mat2 = normalization2*condVar*normalization2; 
+            Corr_mat2 = normalization2*condVar*normalization2;
             Corr_mat2 = 0.5*(Corr_mat2 + Corr_mat2');
             term2 = exp(gaussian_log_mvncdf_mendell_elston(eval_point2, Corr_mat2));
         elseif strcmp(mvnlogcdf,"mvncdf")
@@ -167,7 +167,7 @@ try
              1 -0.3 0  ];
     nu = [2; -0.5];
     Delta = [1 0.12; 0.12 1];
-    
+
     rng(123);
     n = 1e6; tol = 1e-3; % tolerance for empirical vs theoretical
     X = rand_multivariate_csn(n, mu, Sigma, Gamma, nu, Delta);

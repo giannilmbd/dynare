@@ -127,7 +127,7 @@ for ii = 1:k
             else
                 d2vij  = -D2Yss(Z,jj,ii)  - D2a(Z,jj,ii);
             end
-            
+
             % Compute second derivative of state update
             d2tmpij = D2a(:,jj,ii) + d2Kij*v + dKj*Dv(:,ii) + dKi*Dv(:,jj) + K*d2vij;
             D2a(:,jj,ii) = reshape(D2T(:,jcount),size(T))*tmp + DT(:,:,jj)*dtmp(:,ii) + DT(:,:,ii)*dtmp(:,jj) + T*d2tmpij;
@@ -141,7 +141,7 @@ for ii = 1:k
 
     % Update state derivative: Da(t+1) = DT*tmp + T*dtmp
     Da(:,ii)   = DT(:,:,ii)*tmp + T*dtmp(:,ii);
-    
+
     % Accumulate first derivative of log-likelihood
     % DLIK = trace(iF*DF) + 2*Dv'*iF*v - v'*(iF*DF*iF)*v
     DLIK(ii,1)  = trace( iF*DF(:,:,ii) ) + 2*Dv(:,ii)'*iF*v - v'*(iF*DF(:,:,ii)*iF)*v;
@@ -180,7 +180,7 @@ function [DK,DF,DP1] = computeDKalman(T,DT,DOm,P,DP1,DH,Z,iF,K)
 % COMPUTEDKALMAN Compute first derivatives of Kalman filter matrices
 %   Used when observation matrix Z is represented as an index vector
 %
-% Computes derivatives of innovation variance (DF), Kalman gain (DK), 
+% Computes derivatives of innovation variance (DF), Kalman gain (DK),
 % and filtered state covariance (DP1) with respect to model parameters
 
 k      = size(DT,3);
@@ -192,10 +192,10 @@ for ii = 1:k
     % Derivative of innovation variance: DF = DP(Z,Z) + DH
     DF(:,:,ii)  = DP1(Z,Z,ii) + DH(:,:,ii);
     DiF = -iF*DF(:,:,ii)*iF;
-    
+
     % Derivative of Kalman gain: DK = DP(:,Z)*iF + P(:,Z)*DiF
     DK(:,:,ii)  = DP1(:,Z,ii)*iF + P(:,Z)*DiF;
-    
+
     % Derivative of filtered covariance: DP(t+1) = DT*tmp*T' + T*Dtmp*T' + T*tmp*DT' + DOm
     Dtmp        = DP1(:,:,ii) - DK(:,:,ii)*P(Z,:) - K*DP1(Z,:,ii);
     DP1(:,:,ii) = DT(:,:,ii)*tmp*T' + T*Dtmp*T' + T*tmp*DT(:,:,ii)' + DOm(:,:,ii);
@@ -219,10 +219,10 @@ for ii = 1:k
     % Derivative of innovation variance: DF = Z*DP*Z' + DH
     DF(:,:,ii)  = Z*DP(:,:,ii)*Z + DH(:,:,ii);
     DiF = -iF*DF(:,:,ii)*iF;
-    
+
     % Derivative of Kalman gain: DK = DP*Z'*iF + P*Z'*DiF
     DK(:,:,ii)  = DP(:,:,ii)*Z*iF + P(:,:)*Z*DiF;
-    
+
     % Derivative of filtered covariance: DP(t+1) = DT*tmp*T' + T*Dtmp*T' + T*tmp*DT' + DOm
     Dtmp        = DP(:,:,ii) - DK(:,:,ii)*Z*P(:,:) - K*Z*DP(:,:,ii);
     DP1(:,:,ii) = DT(:,:,ii)*tmp*T' + T*Dtmp*T' + T*tmp*DT(:,:,ii)' + DOm(:,:,ii);

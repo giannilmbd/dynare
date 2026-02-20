@@ -34,7 +34,7 @@ function check_varobs_are_endo_and_declared_once(varobs,endo_names)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 number_of_observed_variables = length(varobs);
-for i = 1:number_of_observed_variables    
+for i = 1:number_of_observed_variables
     if ~any(strcmp(varobs{i},endo_names))
         error(['VAROBS: unknown variable (' varobs{i} ')!'])
     end
@@ -43,7 +43,7 @@ end
 % Check that a variable is not declared as observed more than once.
 if length(unique(varobs))<length(varobs)
     for i = 1:number_of_observed_variables
-        if sum(strcmp(varobs{i},varobs)) > 1        
+        if sum(strcmp(varobs{i},varobs)) > 1
             error(['VAROBS: a variable cannot be declared as observed more than once (' varobs{i} ')!'])
         end
     end

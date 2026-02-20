@@ -310,7 +310,7 @@ for j = 1:length(anamendo)
     iplo=0;
     for je=1:length(anamlagendo)
         namlagendo = anamlagendo{je};
-        namlagendo_tex = anamlagendo_tex{je};        
+        namlagendo_tex = anamlagendo_tex{je};
         ilagendo=strmatch(namlagendo, M_.endo_names(oo_.dr.order_var(M_.nstatic+1:M_.nstatic+nsok)), 'exact');
         skipline()
         disp(['[', namendo,' vs lagged ',namlagendo,']'])
@@ -451,7 +451,7 @@ for j = 1:length(anamendo)
                     for ip=1:min(np,10)
                         if options_.TeX
                             text(ip,-0.02,deblank(pnames_tex(iso(ip),:)),'rotation',90,'HorizontalAlignment','right','interpreter','latex')
-                        else                           
+                        else
                             text(ip,-0.02,deblank(pnames(iso(ip),:)),'rotation',90,'HorizontalAlignment','right','interpreter','none')
                         end
                     end

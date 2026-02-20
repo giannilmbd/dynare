@@ -1,11 +1,11 @@
 // tests correctly exiting the diffuse filter; prevents regression against https://git.dynare.org/Dynare/dynare/-/merge_requests/2433
 
-var log_y_q_obs yNE l mu y c k i a z; 
+var log_y_q_obs yNE l mu y c k i a z;
 var a_innovation yNE_innovation;
 
 varexo eps_a eps_z eps_yNE yNE_noise;
 
-varobs log_y_q_obs;  
+varobs log_y_q_obs;
 
 parameters beta psi delta alpha  rho_a  rho_z GR_a  GR_yNE rho_yNE yNE_start;
 
@@ -33,45 +33,45 @@ observation_trends;
     log_y_q_obs(GR_a + GR_yNE);
 end;
 
-model; 
+model;
     [name = 'Euler']
     (1/c) = beta*(1/c(+1)/mu(+1))*(1-delta+alpha*y(+1)*mu(+1)/k);
-    
-    [name = 'Labor supply']    
+
+    [name = 'Labor supply']
     psi*c/(1-l) = (1-alpha)*y/l;
-    
-    [name = 'budget constraint']    
+
+    [name = 'budget constraint']
     c + i = y;
-    
-    [name = 'output']    
+
+    [name = 'output']
     y = mu^(-alpha)*exp(z)*(k(-1)^alpha)*l^(1-alpha); %
-    
+
     [name = 'investment']
     i = k-(1-delta)*k(-1)/mu;   %exp(eps_i)*
 
     [name = 'persistent productivity process']
-    z = rho_z*z(-1) + eps_z;   
-    
+    z = rho_z*z(-1) + eps_z;
+
     [name = 'productivity innovation']
     a_innovation = (1-rho_a)*GR_a + rho_a*a_innovation(-1) + eps_a;
 
     [name = 'level_productivity']
-    a = a(-1) + (1-rho_a)*GR_a + rho_a*a_innovation(-1) + eps_a;    
+    a = a(-1) + (1-rho_a)*GR_a + rho_a*a_innovation(-1) + eps_a;
 
     [name = 'level_productivity_gr']
-    log(mu) = a_innovation;       
+    log(mu) = a_innovation;
 
 %% measurement equations
     [name = 'obs: y']
-    log_y_q_obs  =  y  + a + yNE + yNE_start + yNE_noise; %    
+    log_y_q_obs  =  y  + a + yNE + yNE_start + yNE_noise; %
 
 %% NotExplained components' equations
-    % yNE 
+    % yNE
     [name = 'yNE innovation']
     yNE_innovation = (1-rho_yNE)*GR_yNE + rho_yNE*yNE_innovation(-1) + eps_yNE;
 
     [name = 'level_yNE']
-    yNE = yNE(-1) + (1-rho_yNE)*GR_yNE + rho_yNE*yNE_innovation(-1) + eps_yNE;     
+    yNE = yNE(-1) + (1-rho_yNE)*GR_yNE + rho_yNE*yNE_innovation(-1) + eps_yNE;
 
 end;
 
@@ -87,7 +87,7 @@ steady_state_model;
     l = const4;
     k = l/l_over_k_ss;
     i = (mu_ss-1+delta)/mu_ss*k;
-    y = mu_ss^(-alpha)*k^alpha*l^(1-alpha); 
+    y = mu_ss^(-alpha)*k^alpha*l^(1-alpha);
     c = y-i;
     a_innovation = GR_a;
     z = 0;
@@ -103,11 +103,11 @@ shocks;
     var eps_a;
     stderr 0.02;
     var eps_z;
-    stderr 0.02;  
+    stderr 0.02;
     var yNE_noise;
-    stderr 0.001; 
+    stderr 0.001;
     var eps_yNE;
-    stderr 0.001;        
+    stderr 0.001;
 end;
 
 options_.plot_priors=false;
@@ -124,7 +124,7 @@ z_shock_decomposition_initial_3=squeeze(oo_.shock_decomposition(strmatch('z',M_.
 
 calib_smoother(datafile='data_rbc_non_stationary_obs',
     first_obs=2, diffuse_filter,kalman_algo = 4,nobs =99) z;
- 
+
 z_smoothed_4=oo_.SmoothedVariables.z;
 initial_condition_decomposition  z;
 

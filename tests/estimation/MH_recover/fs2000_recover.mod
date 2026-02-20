@@ -34,4 +34,4 @@ if ~isoctave
     if max(max(abs(temp1.x2-temp2.x2)))>1e-10
         error('Draws of affected chain''s affected files are not the same')
     end
-end            
+end

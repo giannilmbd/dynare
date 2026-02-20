@@ -85,7 +85,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gy_obs = exp(gam);
   gp_obs = exp(-gam);
   Y_obs=gy_obs;

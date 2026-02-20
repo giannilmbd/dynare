@@ -27,9 +27,9 @@
 @#include "RBC_MoM_common.inc"
 
 shocks;
-var u_a; stderr 0.0072;        
+var u_a; stderr 0.0072;
 var n; stderr 0.01;
-end; 
+end;
 
 varobs n c iv;
 
@@ -117,7 +117,7 @@ in  = strmatch('n',  M_.endo_names,'exact');
 
 matched_moments_ = {
     [ic     ]  [0   ],  [1  ];
-    [in     ]  [0   ],  [1  ];    
+    [in     ]  [0   ],  [1  ];
     [iiv    ]  [0   ],  [1  ];
     [ic  ic ]  [0  0],  [1 1];
     [ic  iiv]  [0  0],  [1 1];
@@ -192,7 +192,7 @@ end
         %           ,'MaxFunEvals' , 1D6      % maximum number of function evaluations allowed, a positive integer
         %           ,'UseParallel' , 1        % when true (and supported by optimizer) solver estimates gradients in parallel (using Matlab/Octave's parallel toolbox)
         %           ,'Jacobian'    , 'off'    % when 'off' gradient-based solvers approximate Jacobian using finite differences; for GMM we can also pass the analytical Jacobian to gradient-based solvers by setting this 'on'
-        %           )                         
+        %           )
         , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
 
     % Numerical algorithms options

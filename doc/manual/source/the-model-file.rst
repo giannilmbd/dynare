@@ -122,8 +122,8 @@ parameters must not have the same name as Dynare commands or built-in
 functions. In this respect, Dynare is not case-sensitive. For example,
 do not use ``Ln`` or ``shocks`` to name your variable. Not conforming
 to this rule might yield hard-to-debug error messages or
-crashes. Second, when employing user-defined steady state files it is 
-recommended to avoid using the name of MATLAB functions as this may cause 
+crashes. Second, when employing user-defined steady state files it is
+recommended to avoid using the name of MATLAB functions as this may cause
 conflicts. In particular, when working with user-defined steady state files, do not
 use correctly-spelled Greek names like ``alpha``, because there are
 MATLAB functions of the same name. Rather go for ``alppha`` or
@@ -965,8 +965,8 @@ The model is declared inside a ``model`` block:
 
     .. warning::
 
-        In Dynare, only equality signs can delineate the left and right-hand side of an 
-        equation. If Dynare encounters an expression like ``a>=b``, this will therefore not 
+        In Dynare, only equality signs can delineate the left and right-hand side of an
+        equation. If Dynare encounters an expression like ``a>=b``, this will therefore not
         define an inequality constraint. Rather, it is interpreted as the homogenous equation
         ``(a>=b)=0;``, i.e., the Boolean ``(a>=b)`` must evaluate to 0. Inequality constraints
         in Dynare instead need to be set up either via OccBin or as mixed complementarity problems.
@@ -1462,7 +1462,7 @@ Auxiliary variables are also introduced by the
 variables take the form ``AUX_DIFF_FWRD_i``, and are equal to
 ``x-x(-1)`` for some endogenous variable ``x``.
 
-Finally, auxiliary variables will arise in the context of employing the 
+Finally, auxiliary variables will arise in the context of employing the
 ``diff`` operator.
 
 Once created, all auxiliary variables are included in the set of
@@ -1589,7 +1589,7 @@ in this case ``initval`` is used to specify the terminal conditions.
     steady state computation will still be triggered by subsequent
     commands (``stoch_simul``, ``estimation``...).
 
-    As such, ``initval`` allows specifying the initial instrument value for 
+    As such, ``initval`` allows specifying the initial instrument value for
     steady state finding when providing an analytical conditional steady state
     file for ``ramsey_model``-computations.
 
@@ -1942,8 +1942,8 @@ in this case ``initval`` is used to specify the terminal conditions.
           ``histval`` block nevertheless takes the unlogged starting
           values.
         * In :comm:`Ramsey policy <ramsey_model>`, where it also
-          specifies the values of the endogenous states (including 
-          lagged exogenous) at which the objective function of the 
+          specifies the values of the endogenous states (including
+          lagged exogenous) at which the objective function of the
           planner is computed. Note that the
           initial values of the Lagrange multipliers associated with
           the planner’s problem cannot be set (see
@@ -2755,14 +2755,14 @@ blocks.
        skew u, v, w = 2;
        end;
 
-    |br| *In stochastic optimal policy context*   
-    
-    When computing conditional welfare in a ``ramsey_model`` or ``discretionary_policy`` 
-    context, welfare is conditional on the state values inherited by planner when making 
-    choices in the first period. The information set of the first period includes the 
-    respective exogenous shock realizations. Thus, their known value can be specified 
-    using the perfect foresight syntax. Note that i) all other values specified for 
-    periods than period 1 will be ignored and ii) the value of lagged shocks (e.g. 
+    |br| *In stochastic optimal policy context*
+
+    When computing conditional welfare in a ``ramsey_model`` or ``discretionary_policy``
+    context, welfare is conditional on the state values inherited by planner when making
+    choices in the first period. The information set of the first period includes the
+    respective exogenous shock realizations. Thus, their known value can be specified
+    using the perfect foresight syntax. Note that i) all other values specified for
+    periods than period 1 will be ignored and ii) the value of lagged shocks (e.g.
     in the case of news shocks) is specified with ``histval``.
 
     *Example*
@@ -2990,7 +2990,7 @@ Finding the steady state with Dynare nonlinear solver
 
     .. option:: tolx = DOUBLE
 
-       Convergence criterion for termination based on the step tolerance 
+       Convergence criterion for termination based on the step tolerance
        along. Iteration will cease when the attempted step size is smaller than
        ``tolx``. Default: ``eps^(2/3)``
 
@@ -3060,9 +3060,9 @@ Finding the steady state with Dynare nonlinear solver
            ``10``
 
                 Levenberg-Marquardt mixed complementarity problem
-                (LMMCP) solver :cite:p:`kanzow/petra:2004`. The complementarity 
+                (LMMCP) solver :cite:p:`kanzow/petra:2004`. The complementarity
                 conditions are specified using the perpendicular symbol, see
-                :opt:`lmmcp`. 
+                :opt:`lmmcp`.
 
            ``11``
 
@@ -3186,9 +3186,9 @@ Finding the steady state with Dynare nonlinear solver
     .. option:: markowitz = DOUBLE
 
        Value of the Markowitz criterion (in the interval :math:`(0,\infty)`) used to select the
-       pivot with sparse Gaussian elimination (``solve_algo = 5``). This criterion 
-       governs the tradeoff between selecting the pivot resulting in the most 
-       accurate solution (low ``markowitz`` values) and the one that preserves 
+       pivot with sparse Gaussian elimination (``solve_algo = 5``). This criterion
+       governs the tradeoff between selecting the pivot resulting in the most
+       accurate solution (low ``markowitz`` values) and the one that preserves
        maximum sparsity (high ``markowitz`` values). Default: 0.5.
 
     .. option:: fsolve_options = (NAME, VALUE, ...)
@@ -3531,17 +3531,17 @@ Getting information about the model
 .. command:: model_info ;
              model_info (OPTIONS...);
 
-    |br| This command provides information about the model. By default, 
+    |br| This command provides information about the model. By default,
     it will provide a list of predetermined state variables, forward-looking variables,
     and purely static variables.
 
-    The command also allows to display information on the dynamic and static 
+    The command also allows to display information on the dynamic and static
     versions of the block decomposition of the model:
 
     * The normalization of the model: an endogenous variable is
       attributed to each equation of the model (the dependent variable);
     * The block structure of the model: for each block ``model_info``
-      indicates its type, size as well as the equation number(s) or name tags and 
+      indicates its type, size as well as the equation number(s) or name tags and
       endogenous variables belonging to this block.
 
 
@@ -3558,15 +3558,15 @@ Getting information about the model
 
     * ``EVALUATE BACKWARD``
 
-      The block contains only equations where the dependent variable :math:`j` 
-      attributed to the equation appears contemporaneously on the left hand side 
+      The block contains only equations where the dependent variable :math:`j`
+      attributed to the equation appears contemporaneously on the left hand side
       and where no backward looking endogenous variables
       appear. The block has the form: :math:`y_{j,t} = f_j(y_t,
       y_{t+1}, \ldots, y_{t+k})`.
 
     * ``SOLVE BACKWARD x``
 
-      The block contains only equations where the dependent variable :math:`j` 
+      The block contains only equations where the dependent variable :math:`j`
       attributed to the equation does not appear contemporaneously on the
       left hand side and where no forward looking endogenous
       variables appear. The block has the form: :math:`g_j(y_{j,t},
@@ -3576,7 +3576,7 @@ Getting information about the model
 
     * ``SOLVE FORWARD x``
 
-      The block contains only equations where the dependent variable :math:`j` 
+      The block contains only equations where the dependent variable :math:`j`
       attributed to the equation does not appear contemporaneously on the
       left hand side and where no backward looking endogenous
       variables appear. The block has the form: :math:`g_j(y_{j,t},
@@ -3597,11 +3597,11 @@ Getting information about the model
 
     .. option:: block_static
 
-       Prints out the block decomposition of the static model. 
+       Prints out the block decomposition of the static model.
 
     .. option:: block_dynamic
 
-       Prints out the block decomposition of the dynamic model. 
+       Prints out the block decomposition of the dynamic model.
 
     .. option:: incidence
 
@@ -3844,7 +3844,7 @@ speed-up on large models.
                used to control the behaviour of the algorithm:
                :opt:`preconditioner <preconditioner = OPTION>`,
                :opt:`iter_tol <iter_tol = DOUBLE>`, :opt:`iter_maxit <iter_maxit = INTEGER>`,
-               :opt:`gmres_restart <gmres_restart = INTEGER>`. 
+               :opt:`gmres_restart <gmres_restart = INTEGER>`.
                Termination criterion: ``tolf``.
 
            ``3``
@@ -4040,20 +4040,20 @@ speed-up on large models.
 
     .. option:: allow_nonfinite_values
 
-       By default, Dynare sets all NaN and Inf encountered during iterations to 0 
-       and tries to continue solving the model. This approach regularly prevents the 
+       By default, Dynare sets all NaN and Inf encountered during iterations to 0
+       and tries to continue solving the model. This approach regularly prevents the
        usually terminal propation of non-finite values. The current option allows keeping
        non-finite values, which may be useful for debugging purposes.
 
     .. option:: check_jacobian_singularity
 
-       Triggers a check of the dynamic Jacobian for singularity during the first iteration. 
+       Triggers a check of the dynamic Jacobian for singularity during the first iteration.
        Useful for detecting pathologies in the model specification. Available only for
        ``stack_solve_algo`` equal to ``0``, ``2`` or ``3``. Neither compatible
        with the i) ``block``, ``bytecode``, and ``linear`` options of the
        ``model`` block or ``model_options`` command nor ii) the ``linear_approximation`` and ``lmmcp`` options,
        nor iii) with purely forward or backward models.
-       Due to computational intensity and high memory requirements, 
+       Due to computational intensity and high memory requirements,
        it is strongly recommended to conduct this test with a small value for
        the ``periods`` option.
 
@@ -4174,18 +4174,18 @@ speed-up on large models.
        the endogenous variables (such as a zero lower bound, henceforth ZLB, on the nominal interest
        rate or a model with irreversible investment). This option is
        equivalent to ``stack_solve_algo=7`` **and**
-       ``solve_algo=10``. Using the LMMCP solver avoids the need for min/max 
+       ``solve_algo=10``. Using the LMMCP solver avoids the need for min/max
        operators and explicit complementary slackness conditions in the model
-       as they will typically introduce a singularity into the Jacobian. This is 
+       as they will typically introduce a singularity into the Jacobian. This is
        done by setting the problem up as a mixed complementarity problem (MCP) of the form:
 
        .. math::
              LB = X   &\Rightarrow   F(X)>0\\
- 
+
              LB < X < UB &\Rightarrow   F(X)=0\\
 
              X =UB &\Rightarrow   F(X)<0.
- 
+
        where :math:`X` denotes the vector of endogenous variables, :math:`F(X)` the equations
        of the model, :math:`LB` denotes a lower bound, and :math:`UB` an upper bound. Such a setup
        is implemented by specifying the complementarity condition after the
@@ -4194,7 +4194,7 @@ speed-up on large models.
        corresponding to Unicode codepoint U+27C2; or alternatively as pure ASCII, as
        _|_, *i.e.* a vertical bar enclosed within two underscores).
 
-       For instance, a ZLB on the nominal interest rate would be specified 
+       For instance, a ZLB on the nominal interest rate would be specified
        as follows in the model block::
 
             model;
@@ -4216,18 +4216,18 @@ speed-up on large models.
        condition cannot be simply attached to any
        equation; it must be attached to the correct affected
        equation as otherwise the solver will solve a different problem
-       than originally intended. Second, the sign of the residual of the dynamic 
+       than originally intended. Second, the sign of the residual of the dynamic
        equation must conform to the MCP setup outlined above. In case of the ZLB,
-       we are dealing with a lower bound. Consequently, the dynamic equation 
-       needs to return a positive residual. Dynare by default computes the residual 
-       of an equation ``LHS=RHS`` as ``residual=LHS-RHS``, while an implicit equation 
+       we are dealing with a lower bound. Consequently, the dynamic equation
+       needs to return a positive residual. Dynare by default computes the residual
+       of an equation ``LHS=RHS`` as ``residual=LHS-RHS``, while an implicit equation
        ``LHS`` is interpreted as ``LHS=0``. For the above equation this implies
- 
-           ``residual= r - (rho*r(-1) + (1-rho)*(gpi*Infl+gy*YGap) + e);`` 
- 
-       which is correct, since it will be positive if the implied interest rate 
-       ``rho*r(-1) + (1-rho)*(gpi*Infl+gy*YGap) + e`` is  
-       below ``r=-1.94478``. In contrast, specifying the equation as 
+
+           ``residual= r - (rho*r(-1) + (1-rho)*(gpi*Infl+gy*YGap) + e);``
+
+       which is correct, since it will be positive if the implied interest rate
+       ``rho*r(-1) + (1-rho)*(gpi*Infl+gy*YGap) + e`` is
+       below ``r=-1.94478``. In contrast, specifying the equation as
 
             ``rho*r(-1) + (1-rho)*(gpi*Infl+gy*YGap) + e = r;``
 
@@ -4258,8 +4258,8 @@ speed-up on large models.
     .. option:: linear_approximation
 
        Solves the linearized version of the perfect foresight
-       model. The model must be stationary and a steady state 
-       needs to be provided. Linearization is conducted about the 
+       model. The model must be stationary and a steady state
+       needs to be provided. Linearization is conducted about the
        last defined steady state, which can derive from ``initval``,
        ``endval`` or a subsequent ``steady``. Only available with
        ``stack_solve_algo`` option equal to ``0`` or ``7``.
@@ -6048,7 +6048,7 @@ where :math:`y^s` is the steady state value of :math:`y` and
 
         Vector of numerical indices identifying the state variables in the
         vector of declared variables, *given the current parameter values*
-        for which the decision rules have been computed. It is in decision-rule 
+        for which the decision rules have been computed. It is in decision-rule
         ordering.
 
 The coefficients of the decision rules are stored as follows:
@@ -6291,7 +6291,7 @@ Extended path
 
             ``unscented``
 
-                Uses the Unscented Transform for the numerical integration. 
+                Uses the Unscented Transform for the numerical integration.
 
     .. option:: tree = OPTION
 
@@ -6320,7 +6320,7 @@ Extended path
          numerical integration when using
          ``integration=tensor_gaussian_quadrature`` . The provided
          value must be an odd integer. Default: ``5``.
-            
+
 
     *Output*
 
@@ -6337,7 +6337,7 @@ Extended path
     generated by the :comm:`extended_path` command.
 
 .. matvar:: oo_.exo_simul
- 
+
     Values of the exogenous variables simulated by the :comm:`extended_path` command, see :mvar:`oo_.exo_simul`. Note that while the initial, i.e., period 0 shocks are stored, the ones of terminal period ``T+1`` are not. The field will generally be one period shorted than for ``perfect_foresight_solver``.
 
 .. matvar:: oo_.endo_simul
@@ -6382,13 +6382,13 @@ All of these elements are discussed in the following.
     the variables involved are constant by definition so that e.g. the value of the Lagrange
     multiplier on the complementary slackness condition needs to be checked. In these cases,
     it is necessary to provide an explicit condition that can be evaluated in the binding
-    regime that allows to check whether it should be left. 
+    regime that allows to check whether it should be left.
 
-    Note that the baseline regime denotes the steady state of the model where the economy will 
+    Note that the baseline regime denotes the steady state of the model where the economy will
     settle in the long-run without shocks. For that matter, it may be one where e.g. a borrowing
-    constraint is binding. In that type of setup, the ``bind`` condition is used to specify the 
-    condition when this borrowing constraint becomes non-binding so that the alternative regime 
-    is entered. 
+    constraint is binding. In that type of setup, the ``bind`` condition is used to specify the
+    condition when this borrowing constraint becomes non-binding so that the alternative regime
+    is entered.
 
     Three things are important to keep in mind when specifying the expressions.
     First, feasible expressions may only contain contemporaneous endogenous variables.
@@ -6403,10 +6403,10 @@ All of these elements are discussed in the following.
     the levels, not deviations from the steady state. To access the steady state
     level of a variable, the ``STEADY_STATE()`` operator can be used.
 
-    Finally, it's worth keeping in mind that for each simulation period, OccBin will check 
-    the respective conditions for whether the current regime should be left. Small numerical 
+    Finally, it's worth keeping in mind that for each simulation period, OccBin will check
+    the respective conditions for whether the current regime should be left. Small numerical
     differences from the cutoff point for a regime can sometimes lead to oscillations between
-    regimes and cause a spurious periodic solution. Such cases may be prevented by introducing 
+    regimes and cause a spurious periodic solution. Such cases may be prevented by introducing
     a small buffer between the two regimes, e.g.
 
     ::
@@ -6504,26 +6504,26 @@ All of these elements are discussed in the following.
     or the piecewise Kalman filter (default). An issue that can arise in the context of
     estimation is a structural shock dropping out of the model in a particular regime.
     For example, at the zero lower bound on interest rates, the monetary policy shock
-    in the Taylor rule will not appear anymore. This may create a problem if there are 
+    in the Taylor rule will not appear anymore. This may create a problem if there are
     then more observables than shocks. The way to handle this issue depends on the type of filter used.
-    The first step is to set the data points for the zero interest rate period to NaN. For the piecewise 
+    The first step is to set the data points for the zero interest rate period to NaN. For the piecewise
     Kalman filter, the standard deviation of the associated shock needs to be set to 0 for the
     corresponding periods using the ``heteroskedastic_shocks`` block. This avoids stochastic singularity.
     However, this approach does not work for the inversion filter as the ``heteroskedastic_shocks`` block
-    does not do anything here. For the inversion filter, as many shocks as observables are required 
-    at each point in time. Dynare assumes a one-to-one mapping between the declared shocks in 
-    ``varexo`` and declared observables in ``varobs``. For example, if the second declared observable 
+    does not do anything here. For the inversion filter, as many shocks as observables are required
+    at each point in time. Dynare assumes a one-to-one mapping between the declared shocks in
+    ``varexo`` and declared observables in ``varobs``. For example, if the second declared observable
     is NaN in a given period, Dynare will drop the second declared shock.
 
-    .. warning:: If there are missing values, it is imperative for the inversion filter that the 
-        declaration order of shocks and observables is conformable. Sticking with our example, if the nominal 
-        interest is the second ``varobs`` and is set to NaN, the inversion filter will drop the second 
-        declared shock. If that second declared shock is, e.g., a TFP shock, it will be dropped instead 
+    .. warning:: If there are missing values, it is imperative for the inversion filter that the
+        declaration order of shocks and observables is conformable. Sticking with our example, if the nominal
+        interest is the second ``varobs`` and is set to NaN, the inversion filter will drop the second
+        declared shock. If that second declared shock is, e.g., a TFP shock, it will be dropped instead
         of the intended monetary policy shock.
 
-    Note that models with unit roots will require the user to specify the ``diffuse_filter`` option as 
-    otherwise Blanchard-Kahn errors will be triggered. For the piecewise Kalman filter, the 
-    initialization steps in the diffuse filter will always rely on the model solved for the baseline 
+    Note that models with unit roots will require the user to specify the ``diffuse_filter`` option as
+    otherwise Blanchard-Kahn errors will be triggered. For the piecewise Kalman filter, the
+    initialization steps in the diffuse filter will always rely on the model solved for the baseline
     regime, without checking whether this is the actual regime in the first period(s).
 
     *Example*
@@ -6562,13 +6562,13 @@ All of these elements are discussed in the following.
     .. option:: simul_reset_check_ahead_periods
 
        Allows to reset ``simul_check_ahead_periods`` to its specified value at the beginning
-       of each simulation period. Otherwise, the original value may permanently increase endogenously 
-       at some point due to regimes that last very long in expectations. This may considerably slow 
+       of each simulation period. Otherwise, the original value may permanently increase endogenously
+       at some point due to regimes that last very long in expectations. This may considerably slow
        down convergence in subsequent periods. Default: not enabled.
 
     .. option:: simul_max_check_ahead_periods = INTEGER
 
-       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods 
+       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods
        (i.e. when we want agents to be myopic beyond some future period) instead of potentially endogenously increasing
        ``simul_check_ahead_periods`` ever further. Default: Inf.
 
@@ -6582,7 +6582,7 @@ All of these elements are discussed in the following.
 
        Accept a periodic solution where the solution alternates between two sets of results
        across iterations, i.e. is not found to be unique. This is sometimes caused by spurious numerical errors
-       that lead to oscillations between regiems and may be prevented by allowing for a small buffer in regime 
+       that lead to oscillations between regiems and may be prevented by allowing for a small buffer in regime
        transitions. Default: not enabled.
 
     .. option:: simul_debug
@@ -6606,7 +6606,7 @@ All of these elements are discussed in the following.
 
     .. option:: smoother_max_check_ahead_periods = INTEGER
 
-       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods 
+       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods
        (i.e. when we want agents to be myopic beyond some future period) instead of potentially endogenously increasing
        ``smoother_check_ahead_periods`` ever further. Equivalent of ``simul_max_check_ahead_periods``. Default: Inf.
 
@@ -6637,7 +6637,7 @@ All of these elements are discussed in the following.
 
     .. option:: smoother_max_check_ahead_periods = INTEGER
 
-       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods 
+       If set to a finite number, it enforces the OccBin algorithm to check ahead only for the maximum number of periods
        (i.e. when we want agents to be myopic beyond some future period) instead of potentially endogenously increasing
        ``likelihood_check_ahead_periods`` ever further. Equivalent of ``simul_max_check_ahead_periods``. Default: Inf.
 
@@ -6659,7 +6659,7 @@ All of these elements are discussed in the following.
     .. option:: likelihood_piecewise_kalman_filter
 
        Employ the piecewise Kalman filter of :cite:t:`Giovannini:2021` when estimating
-       the model. Note that this filter is incompatible with univariate Kalman filters, i.e. ``kalman_algo=2,4``. 
+       the model. Note that this filter is incompatible with univariate Kalman filters, i.e. ``kalman_algo=2,4``.
        Default: enabled.
 
     .. option:: likelihood_max_kalman_iterations
@@ -6669,7 +6669,7 @@ All of these elements are discussed in the following.
     .. option:: smoother_inversion_filter
 
        Employ the inversion filter of :cite:t:`CubaBorda:2019` when running the
-       smoother. The underlying assumption is that the system starts at the steady state. In this case, the 
+       smoother. The underlying assumption is that the system starts at the steady state. In this case, the
        inversion filter will provide the required smoother output. Default: not enabled.
 
     .. option:: smoother_piecewise_kalman_filter
@@ -6755,13 +6755,13 @@ All of these elements are discussed in the following.
 .. matvar:: oo_.occbin.simul.regime_history
 
     |br| Structure storing information on the regime history, conditional on the shock that
-    happened in the respective period (stored along the rows). ``type`` is equal to either ``smoother`` 
+    happened in the respective period (stored along the rows). ``type`` is equal to either ``smoother``
     or ``simul``, depending on whether the output comes from a run of simulations or the smoother.
     The subfield ``regime`` contains
     a vector storing the regime state, while the the subfield ``regimestart`` indicates the
     expected start of the respective regime state. For example, if row 40 contains ``[1,0]`` for
     ``regime2`` and  ``[1,6]`` for ``regimestart2``, it indicates that - after the shock in period 40
-    has occurred - the second constraint became binding (1) and is expected to revert to non-binding (0) after 
+    has occurred - the second constraint became binding (1) and is expected to revert to non-binding (0) after
     six periods including the current one, i.e. period 45.
 
 .. matvar:: oo_.occbin.simul.ys
@@ -6834,7 +6834,7 @@ Specifying the dataset, observables, and trends
 
     .. option:: file = FILENAME
 
-        The name of the file containing the data: See :opt:`datafile = FILENAME` for syntax 
+        The name of the file containing the data: See :opt:`datafile = FILENAME` for syntax
         and supported file types. Mandatory input if :opt:`series = DSERIES` is not specified.
 
     .. option:: series = DSERIES
@@ -6849,7 +6849,7 @@ Specifying the dataset, observables, and trends
     .. option:: xls_range = RANGE
 
         See :opt:`xls_range = RANGE`
-    
+
     .. option:: nobs = INTEGER
 
         See :opt:`nobs = INTEGER`
@@ -6860,7 +6860,7 @@ Specifying the dataset, observables, and trends
 
     .. option:: first_obs = DATE
 
-        The date (see :ref:`dates-members`) of the first observation to be 
+        The date (see :ref:`dates-members`) of the first observation to be
         used in the file.
 
     .. option:: first_obs = INTEGER
@@ -6873,7 +6873,7 @@ Specifying the dataset, observables, and trends
 
     .. option:: last_obs = DATE
 
-        The date (see :ref:`dates-members`) of the last observation to be 
+        The date (see :ref:`dates-members`) of the last observation to be
         used in the file.
 
 
@@ -7063,7 +7063,7 @@ Specifying the estimated parameters and priors
     .. option:: PRIOR_4TH_PARAMETER
 
         A fourth parameter of the prior used for generalized beta
-        distribution, the truncated normal, and for the uniform distribution. 
+        distribution, the truncated normal, and for the uniform distribution.
         Default: ``Inf`` for normal distribution, ``1`` otherwise.
 
     .. option:: SCALE_PARAMETER
@@ -7071,8 +7071,8 @@ Specifying the estimated parameters and priors
         A parameter specific scale parameter for the jumping
         distribution’s covariance matrix of the Metropolis-Hasting
         algorithm. If no ``SCALE_PARAMETER`` parameter is specified,
-        :opt:`mh_jscale <mh_jscale = DOUBLE>` is used for all parameters. If 
-        :opt:`mh_jscale <mh_jscale = DOUBLE>` isn’t set, the default value of 
+        :opt:`mh_jscale <mh_jscale = DOUBLE>` is used for all parameters. If
+        :opt:`mh_jscale <mh_jscale = DOUBLE>` isn’t set, the default value of
         ``0.2`` applies for all parameters. If ``mode_compute=6`` is
         used or the ``posterior_sampler_option`` called ``scale_file`` is
         specified, the values set in ``estimated_params`` will be
@@ -7333,7 +7333,7 @@ The estimation command
     convergence diagnostic.
 
     The inefficiency factors are computed as in :cite:t:`Giordani:2011` based on Parzen windows as in e.g. :cite:t:`Andrews:1991`.
-    
+
 
 Data treatment options
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -7591,8 +7591,8 @@ Mode computing options
 
            ``11``
 
-                Currently not in use. The :cite:t:`Liu:2001` filter that 
-                used to be available under this option value is now triggered with 
+                Currently not in use. The :cite:t:`Liu:2001` filter that
+                used to be available under this option value is now triggered with
                 ``posterior_sampling_method='online'``.
 
 
@@ -7837,7 +7837,7 @@ Mode computing options
                    ``'InitialCovarianceMatrix'``
 
                        Initial covariance matrix of the jumping
-                       distribution. It is also used to initialize the covariance 
+                       distribution. It is also used to initialize the covariance
                        matrix during recursive updating. Default is ``'previous'`` if
                        option ``mode_file`` is used, ``'prior'``
                        otherwise. The user can also specify ``'identity'``, which will
@@ -8160,7 +8160,7 @@ Kalman filtering and likelihood options
 
        Do not use the Kalman filter to evaluate the likelihood, but instead
        evaluate the conditional likelihood, based on the first order reduced
-       form of the model, by assuming that the initial state vector is at its 
+       form of the model, by assuming that the initial state vector is at its
        steady state. This approach requires that:
 
        1. The number of structural innovations is equal to the number of observed variables.
@@ -8287,8 +8287,8 @@ Kalman filtering and likelihood options
        Uses the diffuse Kalman filter (as described in :cite:t:`Durbin:2012` and :cite:t:`Koopman:2003` for the
        multivariate and :cite:t:`Koopman:2000` for the univariate
        filter) to estimate models with non-stationary observed
-       variables. This option will also reset the ``qz_criterium`` to 
-       count unit root variables towards the stable variables. Trying to estimate 
+       variables. This option will also reset the ``qz_criterium`` to
+       count unit root variables towards the stable variables. Trying to estimate
        a model with unit roots will otherwise result in a Blanchard-Kahn error.
 
        When ``diffuse_filter`` is used the ``lik_init`` option of
@@ -8663,7 +8663,7 @@ Posterior sampling options
 
            ``'dime_mcmc'``
 
-               Instructs Dynare to use the Differential-Independence Mixture Ensemble ("DIME") MCMC sampler of :cite:t:`Boehl:2022` instead of the standard Random-Walk Metropolis-Hastings. DIME is robust for odd shaped, multimodal, black-box distributions and shown to require significantly less likelihood evaluations than alternative samplers. Many chains run simultaneously, thereby further increasing sampling speed. The algorithm is based on a gradient-free global multi-start optimizer and does not require any posterior mode density maximization prior to MCMC sampling. DIME proposals are generated from an endogenous and adaptive proposal distribution, thereby providing close-to-optimal proposal distributions for black box target distributions without manual fine-tuning. Does not yet support ``moments_varendo``, ``bayesian_irf``, and ``smoother``. 
+               Instructs Dynare to use the Differential-Independence Mixture Ensemble ("DIME") MCMC sampler of :cite:t:`Boehl:2022` instead of the standard Random-Walk Metropolis-Hastings. DIME is robust for odd shaped, multimodal, black-box distributions and shown to require significantly less likelihood evaluations than alternative samplers. Many chains run simultaneously, thereby further increasing sampling speed. The algorithm is based on a gradient-free global multi-start optimizer and does not require any posterior mode density maximization prior to MCMC sampling. DIME proposals are generated from an endogenous and adaptive proposal distribution, thereby providing close-to-optimal proposal distributions for black box target distributions without manual fine-tuning. Does not yet support ``moments_varendo``, ``bayesian_irf``, and ``smoother``.
 
                Note that, since DIME is using parameter transformations, setting parameter bounds is often counterproductive. The ``prior_trunc`` option is disabled and set to zero.
 
@@ -8699,15 +8699,15 @@ Posterior sampling options
                Instructs Dynare to use the Slice sampler of :cite:t:`Planas:2015`. Note that ``'slice'`` is
                incompatible with ``prior_trunc=0``.
 
-               Whereas one Metropolis-Hastings iteration requires one 
-               evaluation of the posterior, one slice iteration requires :math:`neval` 
+               Whereas one Metropolis-Hastings iteration requires one
+               evaluation of the posterior, one slice iteration requires :math:`neval`
                evaluations, where, as a rule of thumb, :math:`neval=7\times npar` with
-               :math:`npar` denoting the number of estimated parameters. Spending 
-               the same computational budget of :math:`N` posterior evaluations in the 
-               slice sampler then implies setting ``mh_replic=N/neval``. 
-               
+               :math:`npar` denoting the number of estimated parameters. Spending
+               the same computational budget of :math:`N` posterior evaluations in the
+               slice sampler then implies setting ``mh_replic=N/neval``.
+
                Note that the slice sampler will typically return less autocorrelated Monte Carlo Markov
-               Chain draws than the MH-algorithm. Its relative (in)efficiency can be investigated via 
+               Chain draws than the MH-algorithm. Its relative (in)efficiency can be investigated via
                the reported inefficiency factors.
 
            ``'hssmc'``
@@ -8724,7 +8724,7 @@ Posterior sampling options
                standard Random-Walk Metropolis-Hastings.
 
            ``'online'``
-            
+
                 Instructs Dynare to treat the (estimated) parameters as
                 state variables and estimate them jointly with the
                 original state variables of the model using a
@@ -8792,15 +8792,15 @@ Posterior sampling options
 
            ``'dime_mcmc'``
 
-               Available options are:           
-           
+               Available options are:
+
                   ``'niter'``
 
                   Number of iterations. Default value is 1500.
 
                   ``'nchain'``
 
-                  Number of chains/particles. A range between :math:`4 ndim` and :math:`6 ndim` is recommended. For very difficult problems, double the number of chains. Default value is: :math:`5 ndim`. 
+                  Number of chains/particles. A range between :math:`4 ndim` and :math:`6 ndim` is recommended. For very difficult problems, double the number of chains. Default value is: :math:`5 ndim`.
 
                   ``'tune'``
 
@@ -8892,8 +8892,8 @@ Posterior sampling options
 
            ``'tailored_random_block_metropolis_hastings'``
 
-               Available options are:           
-           
+               Available options are:
+
                   ``'proposal_distribution'``
 
                   Specifies the statistical distribution used for the
@@ -8932,8 +8932,8 @@ Posterior sampling options
 
            ``'hssmc'``
 
-               Available options are:           
-           
+               Available options are:
+
                   ``'particles'``
 
                   Number of particles. Default value is: 20000.
@@ -8958,8 +8958,8 @@ Posterior sampling options
 
                   ``'scale'``
 
-                  Scale parameter in the mutation step (on the proposal covariance matrix of the MH iteration). Default value is: .5.                  
-                  
+                  Scale parameter in the mutation step (on the proposal covariance matrix of the MH iteration). Default value is: .5.
+
     .. option:: sub_draws = INTEGER
 
        Number of draws from the MCMC that are used to compute
@@ -9011,7 +9011,7 @@ Posterior sampling options
     .. option:: estimate_initial_states_endogenous_prior
                 estimate_initial_states_endogenous_prior = BOOLEAN
 
-       Jointly estimate the initial states along with the other parameters. 
+       Jointly estimate the initial states along with the other parameters.
        This contrasts to the usual approach of marginalizing with respect to
        the states while estimating parameters, and then estimating the states
        offline using the smoother. This option uses the unconditional
@@ -9022,7 +9022,7 @@ Posterior sampling options
        combined with offline state estimation via the smoother.
        The initial state values are treated as additional parameters to be
        estimated. The option automatically sets ``lik_init=2`` and requires
-       ``posterior_sampling_method='slice'``.  This option is useful for 
+       ``posterior_sampling_method='slice'``.  This option is useful for
        nonlinear models estimated e.g. via OccBin.
 
 
@@ -9095,7 +9095,7 @@ MCMC options
        at the beginning of Dynare execution, i.e. the default will not
        take into account potential changes in ``mh_jscale`` introduced
        by either ``mode_compute=6`` or the
-       ``posterior_sampler_options`` option :ref:`scale_file<scale-file>`. 
+       ``posterior_sampler_options`` option :ref:`scale_file<scale-file>`.
        If ``mh_init_scale`` is too wide during
        initalization of the posterior sampler so that 100 tested draws
        are inadmissible (e.g. Blanchard-Kahn conditions are always
@@ -9165,7 +9165,7 @@ MCMC options
 
     .. option:: mh_posterior_mode_estimation
 
-       Skip optimizer-based mode-finding and instead compute the mode based 
+       Skip optimizer-based mode-finding and instead compute the mode based
        on a run of a MCMC. The MCMC will start at the prior mode and use the prior
        variances to compute the inverse Hessian.
 
@@ -9365,7 +9365,7 @@ Non-linear filter options
     .. option:: pruning
 
        See :opt:`pruning`. Governs the creation of posterior objects during estimation.
-       When using nonlinear filters, it should be consistent with the setting of 
+       When using nonlinear filters, it should be consistent with the setting of
        the ``pruning`` option of ``particle_filter_options``. Default: not enabled.
 
     .. option:: number_of_particles = INTEGER
@@ -9393,7 +9393,7 @@ Non-linear filter options
            ``gmf``
 
                Gaussian mixture filter of the :cite:t:`Kotecha:2003:Sum` type.
-               
+
            ``cpf``
 
                Conditional particle filter of the :cite:t:`Ionides:2003` type as used in, e.g., :cite:t:`Amisano:2010`.
@@ -9435,16 +9435,16 @@ Non-linear filter options
     .. option:: resampling_method = OPTION
 
        Sets the resampling method. Possible values for OPTION are:
-       ``kitagawa``, ``stratified`` and ``smooth``. The ``smooth`` option is 
+       ``kitagawa``, ``stratified`` and ``smooth``. The ``smooth`` option is
        incompatible with ``filter_algorithm=apf``
 
     .. option:: proposal_approximation = OPTION
 
        Sets the method for approximating the proposal
-       distribution in case of the ``filter_algorithm=cpf``, ``gf``, ``gpf`` and ``nlkf`` filters. Possible values for OPTION are: 
-       
+       distribution in case of the ``filter_algorithm=cpf``, ``gf``, ``gpf`` and ``nlkf`` filters. Possible values for OPTION are:
+
            ``unscented``
-                
+
                Unscented transform as in :cite:t:`Julier:1997` and :cite:t:`Wan:2001`. This is the default.
 
            ``cubature``
@@ -9454,7 +9454,7 @@ Non-linear filter options
            ``montecarlo``
 
                Monte Carlo integration method. Not available with ``filter_algorithm=gmf``.
-       
+
     .. option:: distribution_approximation = OPTION
 
        Sets the method for approximating the particle distribution for
@@ -9468,14 +9468,14 @@ Non-linear filter options
     .. option:: cpf_weights = OPTION
 
        Controls the method used to update the weights in conditional
-       particle filter, possible values are 
-       
+       particle filter, possible values are
+
            ``amisanotristani``
 
                Use the approach in :cite:t:`Amisano:2010`.  This is the default.
-       
-           ``murrayjonesparslow`` 
-           
+
+           ``murrayjonesparslow``
+
                Use the approach in :cite:t:`Murray:2013`.
 
     .. option:: nonlinear_filter_initialization = INTEGER
@@ -9516,7 +9516,7 @@ Non-linear filter options
 
            ``'liu_west_delta'``
 
-               Set the value for delta for the Liu/West online filter (``posterior_sampling_method='online'``). 
+               Set the value for delta for the Liu/West online filter (``posterior_sampling_method='online'``).
                Default: ``0.99``.
 
            ``'unscented_alpha'``
@@ -9842,7 +9842,7 @@ Estimation output variables
     .. matvar:: oo_.UpdatedVariables
 
         Variable set by the ``estimation`` command (if used with the
-        :opt:`smoother` option), or by the :comm:`calib_smoother` 
+        :opt:`smoother` option), or by the :comm:`calib_smoother`
         command. Contains the estimation of the expected value of
         variables given the information available at the current date.
 
@@ -9918,7 +9918,7 @@ Estimation output variables
     .. matvar:: oo_.Smoother.TrendCoeffs
 
         Variable set by the ``estimation`` command (if used with the
-        :opt:`smoother` option) without Metropolis, or by the :comm:`calib_smoother` 
+        :opt:`smoother` option) without Metropolis, or by the :comm:`calib_smoother`
         command. Contains the trend coefficients of the observed
         variables used in the smoother in order of declaration of the
         observed variables.
@@ -9927,7 +9927,7 @@ Estimation output variables
     .. matvar:: oo_.Smoother.Trend
 
         Variable set by the ``estimation`` command (if used with the
-        :opt:`smoother` option), or by the :comm:`calib_smoother` 
+        :opt:`smoother` option), or by the :comm:`calib_smoother`
         command. Contains the trend component of the variables used in
         the smoother.
 
@@ -9939,7 +9939,7 @@ Estimation output variables
     .. matvar:: oo_.Smoother.Constant
 
         Variable set by the ``estimation`` command (if used with the
-        :opt:`smoother` option), or by the :comm:`calib_smoother` 
+        :opt:`smoother` option), or by the :comm:`calib_smoother`
         command. Contains the constant part of the endogenous
         variables used in the smoother, accounting e.g. for the data
         mean when using the prefilter option.
@@ -10259,7 +10259,7 @@ Estimation output variables
     .. matvar:: oo_.convergence.raftery_lewis
 
         Variable set by the convergence diagnostics of the ``estimation``
-        command when used with :opt:`raftery_lewis_diagnostics`. There is a subfield in the struct array 
+        command when used with :opt:`raftery_lewis_diagnostics`. There is a subfield in the struct array
         for each MCMC chain. Contains the results of the test in individual fields.
 
 
@@ -10455,7 +10455,7 @@ Method of moments specific blocks
 
     |br| This block specifies the values and diagonal weights of the empirical IRFs that are matched in estimation.
     The ``overwrite`` option replaces the current ``matched_irfs`` block with the new one.
-    
+
     Each line inside of the block should be of the form::
 
         var ENDOGENOUS_NAME;
@@ -10479,7 +10479,7 @@ Method of moments specific blocks
     For ``values``  and ``weights`` you can use expressions (e.g. variables or anonymous functions
     in the workspace) by by putting paranthesis around them.
     A new statement is started with either the ``var`` or ``varexo`` keyword.
-    
+
     *Example*
 
     You can either enter the values directly or load them from variables in the workspace.
@@ -10526,7 +10526,7 @@ Method of moments specific blocks
 
     |br| This optional block specifies elements of the weighting matrix used for IRF matching.
     The ``overwrite`` option replaces the current ``matched_irfs_weights`` block with the new one.
-    
+
     The weighting matrix is initialized as a diagonal matrix with ones on the diagonal.
     Each line inside of the block should be of the form::
 
@@ -10536,7 +10536,7 @@ Method of moments specific blocks
     `EXOGENOUS_NAME_1` and `EXOGENOUS_NAME_2` are the names of exogenous variables,
     `HORIZON_1` and `HORIZON_2` are integers indicating the horizon of the IRFs
     and `WEIGHT` is a double value of the weight one wants to assign to the covariance between the two specified IRFs.
-    
+
     *Example*
 
     You can either enter the values directly or load them from variables in the workspace.
@@ -10573,7 +10573,7 @@ Method of moments specific blocks
     This block lists all parameters to be estimated and specifies
     bounds and priors as necessary.
     See :bck:`estimated_params` for details and syntax.
-    
+
 .. block:: estimated_params_init ;
 
     |br| Optional.
@@ -10619,7 +10619,7 @@ Necessary Options
 
 Common Options
 ^^^^^^^^^^^^^^
-    
+
     .. option:: order = INTEGER
 
         Order of perturbation approximation. For GMM only orders 1|2|3 are
@@ -10632,7 +10632,7 @@ Common Options
         Discard higher order terms when iteratively computing simulations
         of the solution. See :opt:`pruning <pruning>` for more details.
         Default: not set for SMM and IRF matching, always set for GMM.
-    
+
     .. option:: verbose
 
         Display and store intermediate estimation results in ``oo_.mom``.
@@ -10769,19 +10769,19 @@ IRF matching specific options
         taking the cumulative sum, creating ratios etc.
         See ``NK_irf_matching_file.m`` in the examples directory for an example.
         Default: empty, i.e. model IRFs exactly match empirical IRFs.
-    
+
     .. option:: add_tiny_number_to_cholesky = DOUBLE
 
         In case of a non-positive definite covariance matrix,
         a tiny number is added to the Cholesky factor
         to avoid numerical problems when computing IRFs.
         Default: `1e-14`.
-    
+
     .. option:: drop = INTEGER
 
         Truncation when computing IRFs with perturbation at orders greater than 1.
         Default: ``100``.
-    
+
     .. option:: relative_irf
 
         Requests the computation of normalized IRFs.
@@ -10790,7 +10790,7 @@ IRF matching specific options
 
     .. option:: replic = INTEGER
 
-        Number of simulated series used to compute the IRFs.        
+        Number of simulated series used to compute the IRFs.
         Default: ``1`` if ``order=1``, and ``50`` otherwise.
 
 
@@ -10883,7 +10883,7 @@ Optimization options
 
         See :opt:`mode_compute <mode_compute = INTEGER | FUNCTION_NAME>`.
         Default: ``13`` for GMM and SMM and ``5`` for IRF matching.
-    
+
     .. option:: additional_optimizer_steps = [INTEGER]
                 additional_optimizer_steps = [INTEGER1:INTEGER2]
                 additional_optimizer_steps = [INTEGER1 INTEGER2]
@@ -10912,12 +10912,12 @@ Optimization options
 
         See :opt:`silent_optimizer`.
         Default: not set.
-    
+
     .. option:: use_penalized_objective_for_hessian
 
         See :opt:`use_penalized_objective_for_hessian <use_penalized_objective_for_hessian>`.
         Default: not set.
-    
+
 
 Bayesian estimation options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -10978,12 +10978,12 @@ Bayesian estimation options
 
         See :opt:`mh_conf_sig <mh_conf_sig = DOUBLE>`.
         Default: ``0.9``.
-    
+
     .. option:: mh_drop = DOUBLE
 
         See :opt:`mh_drop <mh_drop = DOUBLE>`.
         Default: ``0.5``.
-    
+
     .. option:: mh_init_scale_factor = DOUBLE
 
         See :opt:`mh_init_scale_factor <mh_init_scale_factor = DOUBLE>`.
@@ -11054,22 +11054,22 @@ Bayesian estimation options
 
         See :opt:`load_mh_file`.
         Default: not set.
-    
+
     .. option:: load_results_after_load_mh
 
         See :opt:`load_results_after_load_mh`.
         Default: not set.
-    
+
     .. option:: mh_initialize_from_previous_mcmc
 
         See :opt:`mh_initialize_from_previous_mcmc`.
         Default: not set.
-    
+
     .. option:: mh_initialize_from_previous_mcmc_directory = FILENAME
 
         See :opt:`mh_initialize_from_previous_mcmc_directory <mh_initialize_from_previous_mcmc_directory = FILENAME>`.
         Default: empty.
-    
+
     .. option:: mh_initialize_from_previous_mcmc_prior = FILENAME
 
         See :opt:`mh_initialize_from_previous_mcmc_prior <mh_initialize_from_previous_mcmc_prior = FILENAME>`.
@@ -11079,7 +11079,7 @@ Bayesian estimation options
 
         See :opt:`mh_initialize_from_previous_mcmc_record <mh_initialize_from_previous_mcmc_record = FILENAME>`.
         Default: empty.
-        
+
     .. option:: mh_recover
 
         See :opt:`mh_recover`.
@@ -11096,7 +11096,7 @@ Bayesian estimation options
 
         See :opt:`brooks_gelman_plotrows <brooks_gelman_plotrows = INTEGER>`.
         Default: ``3``.
-    
+
     .. option:: geweke_interval = [DOUBLE DOUBLE]
 
         See :opt:`geweke_interval <geweke_interval = [DOUBLE DOUBLE]>`.
@@ -11106,7 +11106,7 @@ Bayesian estimation options
 
         See :opt:`taper_steps <taper_steps = [INTEGER1 INTEGER2 ...]>`.
         Default: ``[4 8 15]``.
-    
+
     .. option:: raftery_lewis_diagnostics
 
         See :opt:`raftery_lewis_diagnostics`.
@@ -11170,7 +11170,7 @@ Numerical algorithms options
 
         See :opt:`lyapunov_doubling_tol <lyapunov_doubling_tol = DOUBLE>`.
         Default: ``1e-16``.
-    
+
     .. option:: qz_criterium = DOUBLE
 
         See :opt:`qz_criterium <qz_criterium = DOUBLE>`.
@@ -11232,7 +11232,7 @@ Method of moments specific outputs
         of the selected empirical moments/IRFs of data. NaN values due to leads/lags
         or missing data are omitted when computing the mean for moments.
         Vector of dimension equal to the number of orthogonality conditions or IRFs.
-    
+
     .. matvar:: oo_.mom.model_moments
 
         Variable set by the ``method_of_moments`` command. Stores the implied
@@ -11241,7 +11241,7 @@ Method of moments specific outputs
         whereas for SMM these are based on averages of simulated data.
         Model IRFs are computed from the specified `simulation_method`.
         Vector of dimension equal to the number of orthogonality conditions.
-    
+
     .. matvar:: oo_.mom.model_moments_params_derivs
 
         Variable set by the ``method_of_moments`` command. Stores the analytically
@@ -11249,19 +11249,19 @@ Method of moments specific outputs
         respect to the estimated parameters. Only for GMM with :opt:`analytic_standard_errors`.
         Matrix with dimension equal to the number of orthogonality conditions
         times number of estimated parameters.
-    
+
     .. matvar:: oo_.mom.weighting_info
 
         Variable set by the ``method_of_moments`` command.
         Stores the currently used weighting matrix (`W`), its Cholesky factor (`Sw`),
-        and an indicator whether the weighting matrix is the optimal one (`Woptflag`).        
+        and an indicator whether the weighting matrix is the optimal one (`Woptflag`).
         The inverse (`Winv`) and its log determinant (`Winv_logdet`) are also stored.
-    
+
     .. matvar:: oo_.mom.Q
 
         Variable set by the ``method_of_moments`` command. Stores the scalar
         value of the quadratic moment's distance objective function.
-    
+
     .. matvar:: oo_.mom.verbose
 
         Structure that contains intermediate estimation results if ``verbose`` is used.
@@ -11278,7 +11278,7 @@ Method of moments specific outputs
 
     .. matvar:: oo_.mom.gmm_mode
     .. matvar:: oo_.mom.smm_mode
-    
+
         Variables set by the ``method_of_moments`` command when estimating
         with GMM or SMM. Stores the estimated values of the final stage.
         The structures contain the following fields:
@@ -11291,7 +11291,7 @@ Method of moments specific outputs
 
     .. matvar:: oo_.mom.gmm_std_at_mode
     .. matvar:: oo_.mom.smm_std_at_mode
-    
+
         Variables set by the ``method_of_moments`` command when estimating
         with GMM or SMM. Stores the estimated standard errors of the final stage.
         The structures contain the following fields:
@@ -11301,7 +11301,7 @@ Method of moments specific outputs
         - ``parameters``: standard error of estimated model parameters
         - ``shocks_corr``: standard error of estimated correlation between two structural shocks.
         - ``shocks_std``: standard error of estimated standard deviation of structural shocks.
-        
+
     .. matvar:: oo_.mom.J_test
 
         Variable set by the ``method_of_moments`` command. Structure where the
@@ -11334,7 +11334,7 @@ Method of moments specific outputs
            ``mean``
 
                Prior mean parameter vector.
-            
+
             ``mode``
 
                Prior mode parameter vector.
@@ -11347,7 +11347,7 @@ Method of moments specific outputs
 
                Vectors of hyperparameters of the prior distributions stored in fields
                ``first`` and ``second``.
-               
+
         .. matvar:: oo_.mom.posterior.optimization
 
         Variable set by the ``method_of_moments`` command if mode-finding is used.
@@ -11468,7 +11468,7 @@ Method of moments specific outputs
         Fields are of the form::
 
             oo_.mom.posterior_median.ESTIMATED_OBJECT.VARIABLE_NAME
-    
+
     .. matvar:: oo_.mom.posterior_deciles
 
         Variable set by the ``method_of_moments`` command, if it is used with
@@ -11476,7 +11476,7 @@ Method of moments specific outputs
         Fields are of the form::
 
             oo_.mom.posterior_deciles.ESTIMATED_OBJECT.VARIABLE_NAME
-    
+
     .. matvar:: oo_.mom.MarginalDensity.LaplaceApproximation
 
         Variable set by the ``method_of_moments`` command. Stores the marginal
@@ -11489,7 +11489,7 @@ Method of moments specific outputs
         marginal data density based on :cite:t:`Geweke:1999` Modified
         Harmonic Mean estimator.
 
-    
+
 
 Model Comparison
 ================
@@ -11587,13 +11587,13 @@ Shock Decomposition
     which variables the decomposition is plotted.
 
     Note that, in case of an estimated model, this command must come after ``estimation``.
-    
+
     Forecasts can also be shock decomposed. That applies to both unconditional
-    forecast  generated by the  :comm:`forecast` command, 
+    forecast  generated by the  :comm:`forecast` command,
     the :comm:`estimation` with the :opt:`forecast
-    <forecast = INTEGER>` option and conditional forecasts generated by the 
-    :comm:`conditional_forecast` command. Note that these 
-    forecasts need to have been computed before calling 
+    <forecast = INTEGER>` option and conditional forecasts generated by the
+    :comm:`conditional_forecast` command. Note that these
+    forecasts need to have been computed before calling
     ``shock_decomposition``.
 
     *Options*
@@ -11702,9 +11702,9 @@ Shock Decomposition
         the historical shock decomposition for the given sample based on
         the Kalman smoother. In case of unconditional forecasts, the ones
         generated by the :comm:`forecast` command will be
-        decomposed if ``parameter_set=calibration``, and mean forecasts 
-        generated by ``estimation`` otherwise. If this option is specified, the 
-        shock decomposition plot displays the historical and the forecast 
+        decomposed if ``parameter_set=calibration``, and mean forecasts
+        generated by ``estimation`` otherwise. If this option is specified, the
+        shock decomposition plot displays the historical and the forecast
         periods, with a vertical bar separating the two periods. Default: not
         set, i.e. only historical shock decomposition is computed.
 
@@ -11728,11 +11728,11 @@ Shock Decomposition
 
     .. matvar:: oo_.forecast_shock_decomposition
 
-        The results from the forecast shock decomposition are stored in the 
-        field ``oo_.forecast_shock_decomposition``. It is a structure that will 
-        have a field ``unconditional`` for unconditional forecasts and a field 
+        The results from the forecast shock decomposition are stored in the
+        field ``oo_.forecast_shock_decomposition``. It is a structure that will
+        have a field ``unconditional`` for unconditional forecasts and a field
         ``conditional`` for conditional ones. Each field is a three dimensional
-        array, where the third dimension stores the time periods, including the 
+        array, where the third dimension stores the time periods, including the
         forecast horizon.
 
 .. block:: shock_groups ;
@@ -12621,7 +12621,7 @@ the :comm:`bvar_forecast` command.
 
         .. math::
 
-           y_{u,t} = T_{u,c}y_{c,t-1} + T_{u,u}y_{u,t-1} +  R_{u,c}\varepsilon_{c,t} + R_{u,u}\varepsilon_{u,t}    
+           y_{u,t} = T_{u,c}y_{c,t-1} + T_{u,u}y_{u,t-1} +  R_{u,c}\varepsilon_{c,t} + R_{u,u}\varepsilon_{u,t}
 
     By iterating over these two blocks of equations, we can build a forecast
     for all the endogenous variables in the system conditional on paths for a
@@ -12952,40 +12952,40 @@ with ``discretionary_policy`` or for optimal simple rules with ``osr``
              evaluate_planner_objective (OPTIONS...);
 
     This command computes, displays, and stores the value of the
-    planner objective function under Ramsey policy or discretion in 
-    ``oo_.planner_objective_value``. It will provide both unconditional welfare 
-    and welfare conditional on the initial (i.e. period 0) values of the endogenous 
-    and exogenous state variables inherited by the planner. In a deterministic context, 
-    the respective initial values are set using ``initval`` or ``histval`` (depending 
-    on the exact context). 
+    planner objective function under Ramsey policy or discretion in
+    ``oo_.planner_objective_value``. It will provide both unconditional welfare
+    and welfare conditional on the initial (i.e. period 0) values of the endogenous
+    and exogenous state variables inherited by the planner. In a deterministic context,
+    the respective initial values are set using ``initval`` or ``histval`` (depending
+    on the exact context).
 
-    In a stochastic context, if no initial state values have 
+    In a stochastic context, if no initial state values have
     been specified with ``histval``, their values are taken to be the steady state
     values. Because conditional welfare is computed conditional on optimal
     policy by the planner in the first endogenous period (period 1), it is conditional
-    on the information set in the period 1. This information set includes both the 
-    predetermined states inherited from period 0 (specified via ``histval`` for both 
+    on the information set in the period 1. This information set includes both the
+    predetermined states inherited from period 0 (specified via ``histval`` for both
     endogenous and lagged exogenous states) as well as the period 1 values of
-    the exogenous shocks. The latter are specified using the perfect foresight syntax 
-    of the ``shocks`` block. 
+    the exogenous shocks. The latter are specified using the perfect foresight syntax
+    of the ``shocks`` block.
 
     At the current stage, the stochastic context does not support the ``pruning`` option.
-    At ``order>3``, only the computation of conditional welfare with steady state Lagrange 
+    At ``order>3``, only the computation of conditional welfare with steady state Lagrange
     multipliers is supported. Note that at ``order=2``, the output is based on the second-order
     accurate approximation of the variance stored in ``oo_.var``.
-    
+
     *Options*
-    
+
     .. option:: periods = INTEGER
 
        The value of the option specifies the number of periods to use in the
        simulations in the computation of unconditional welfare at higher order.
-       
+
        Default: ``10000``.
 
     .. option:: drop = INTEGER
 
-        The number of burn-in draws out of ``periods`` discarded before computing 
+        The number of burn-in draws out of ``periods`` discarded before computing
         the unconditional welfare at higher order. Default: ``1000``.
 
     *Example (stochastic context)*
@@ -13018,14 +13018,14 @@ with ``discretionary_policy`` or for optimal simple rules with ``osr``
     .. matvar:: oo_.planner_objective_value.unconditional
 
     Scalar storing the value of unconditional welfare. In a perfect foresight context,
-    it corresponds to welfare in the long-run, approximated as welfare in the terminal 
-    simulation period. 
+    it corresponds to welfare in the long-run, approximated as welfare in the terminal
+    simulation period.
 
     .. matvar:: oo_.planner_objective_value.conditional
 
-    In a non-Ramsey context, this field will be a scalar storing the value of 
-    welfare conditional on the specified initial condition. In a perfect foresight Ramsey 
-    context, this field will be a scalar storing the value of 
+    In a non-Ramsey context, this field will be a scalar storing the value of
+    welfare conditional on the specified initial condition. In a perfect foresight Ramsey
+    context, this field will be a scalar storing the value of
     welfare conditional on the specified initial condition and zero initial Lagrange
     multipliers.
 
@@ -13043,7 +13043,7 @@ with ``discretionary_policy`` or for optimal simple rules with ``osr``
     Lagrange multipliers associated with the planner’s problem are set
     to 0, i.e. it is assumed that the planner exploits its
     ability to surprise private agents in the first period of
-    implementing Ramsey policy. This value corresponds to the planner 
+    implementing Ramsey policy. This value corresponds to the planner
     implementing optimal policy for the first time and committing not to
     re-optimize in the future.
 
@@ -13202,7 +13202,7 @@ conditions in the ``model`` block and a ``planner_objective`` as well as potenti
     Lagrange multipliers.
 
     Note that the variables in the list after the ``ramsey_policy``
-    or ``stoch_simul`` command can also contain multiplier names, but 
+    or ``stoch_simul`` command can also contain multiplier names, but
     in a case-sensititve way (e.g. ``MULT_1``). In that case, Dynare
     will for example display the IRFs of the respective multipliers
     when ``irf>0``.
@@ -13276,7 +13276,7 @@ Optimal Simple Rules (OSR)
              osr (OPTIONS...) [VARIABLE_NAME...];
 
     |br| This command computes optimal simple policy rules. There are two
-    different supported approaches. The first one chooses a set of parameters 
+    different supported approaches. The first one chooses a set of parameters
     :math:`\gamma` to maximize the expected lifetime value of a :comm:`planner_objective`:
 
         .. math::
@@ -13287,10 +13287,10 @@ Optimal Simple Rules (OSR)
 
         * :math:`E` denotes the unconditional expectations operator;
         * :math:`\gamma` are parameters to be optimized. They must be
-          specified as parameters in the ``params`` command and be 
+          specified as parameters in the ``params`` command and be
           entered in the ``model`` block;
         * :math:`U` is the period objective function of the planner, specified with
-          :comm:`planner_objective`. 
+          :comm:`planner_objective`.
         * :math:`\tilde \beta` is the discount factor the planner employs
           (see :opt:`planner_discount <planner_discount = EXPRESSION>`).
 
@@ -13298,11 +13298,11 @@ Optimal Simple Rules (OSR)
     rule is to be optimized, :math:`\gamma`, must be listed with
     :comm:`osr_params`.
 
-    Dynare will invoke this approach whenever it encounters an :comm:`osr` command 
+    Dynare will invoke this approach whenever it encounters an :comm:`osr` command
     in conjunction with a :comm:`planner_objective`.
 
-    The second (legacy) approach will be triggered if an :comm:`optim_weights` block 
-    is present instead of a :comm:`planner_objective`. Dynare then solves linear-quadratic 
+    The second (legacy) approach will be triggered if an :comm:`optim_weights` block
+    is present instead of a :comm:`planner_objective`. Dynare then solves linear-quadratic
     problems of the form:
 
         .. math::
@@ -13337,13 +13337,13 @@ Optimal Simple Rules (OSR)
     selected endogenous variables’ deviations from their steady state,
     i.e. in case they are not already mean 0 the variables entering
     the loss function are automatically demeaned so that the centered
-    second moments are minimized. Second, ``osr`` with this syntax only 
+    second moments are minimized. Second, ``osr`` with this syntax only
     solves linear quadratic problems of the type resulting from combining the
     specified quadratic loss function with a first order approximation
     to the model’s equilibrium conditions. The reason is that the
     first order state-space representation is used to compute the
-    unconditional (co)-variances. Hence, ``osr`` without a 
-    :comm:`planner_objective` is only compatible with 
+    unconditional (co)-variances. Hence, ``osr`` without a
+    :comm:`planner_objective` is only compatible with
     ``order=1``. Third, because the objective involves
     minimizing a weighted sum of unconditional second moments, those
     second moments must be finite. In particular, unit roots in
@@ -13566,14 +13566,14 @@ Optimal Simple Rules (OSR)
 
     After an execution of the ``osr`` command, this sparse matrix
     contains the weighting matrix associated with the variables in the
-    objective function. The field is only set if the legacy linear-quadratic 
+    objective function. The field is only set if the legacy linear-quadratic
     approach without a :comm:`planner_objective` is used.
 
 .. matvar:: M_.osr.variable_indices
 
     After an execution of the ``osr`` command, this vector contains
     the indices of the variables entering the objective function in
-    ``M_.endo_names``. The field is only set if the legacy linear-quadratic 
+    ``M_.endo_names``. The field is only set if the legacy linear-quadratic
     approach without a :comm:`planner_objective` is used.
 
 
@@ -13643,8 +13643,8 @@ Performing sensitivity analysis
         If equal to ``0``, ANOVA mapping (Type I error) If equal to
         ``1``, Screening analysis (Type II error). If equal to ``2``,
         Analytic derivatives (similar to Type II error, only valid
-        when identification=1). The ANOVA mapping requires the SS-ANOVA-R MATLAB 
-        Toolbox available at https://joint-research-centre.ec.europa.eu/system/files/2025-01/ss_anova_recurs.zip 
+        when identification=1). The ANOVA mapping requires the SS-ANOVA-R MATLAB
+        Toolbox available at https://joint-research-centre.ec.europa.eu/system/files/2025-01/ss_anova_recurs.zip
         Default: ``1`` when ``identification=1``, ``0`` otherwise.
 
     .. option:: morris_nliv = INTEGER
@@ -13976,7 +13976,7 @@ IRF and moment calibration can be defined in ``irf_calibration`` and
     to be fulfilled by a logical OR. A list of restrictions must
     always be fulfilled with logical AND. The moment restrictions generally apply to
     auto- and cross-correlations between variables. The only exception is a restriction
-    on the unconditional variance of an endogenous variable, specified as shown in 
+    on the unconditional variance of an endogenous variable, specified as shown in
     the example below.
 
     *Example*
@@ -15543,7 +15543,7 @@ Variables that vary across heterogeneous agents must be declared with the ``hete
         ;
 
         varexo(heterogeneity=households)
-            e  (long_name=`idiosyncratic productivity shock') 
+            e  (long_name=`idiosyncratic productivity shock')
         ;
 
 Heterogeneous Agent Model Block
@@ -15551,7 +15551,7 @@ Heterogeneous Agent Model Block
 
 .. block:: model(heterogeneity=NAME);
 
-    Declares equations describing the behavior of heterogeneous agents.  
+    Declares equations describing the behavior of heterogeneous agents.
     The ``heterogeneity`` option specifies which heterogeneity dimension these equations pertain to.
 
     The complementarity operator ``⟂`` (Unicode U+27C2) or its alternative pure-ASCII syntax ``_|_`` can be used to specify inequality constraints on variables. As a best practice, it is recommended to write equations with complementarity conditions following the same conventions as described in :opt:`lmmcp` to ensure correct economic interpretation and compatibility with the LMMCP numerical solver.
@@ -15569,7 +15569,7 @@ Heterogeneous Shocks Block
 
 .. block:: shocks(heterogeneity=NAME);
 
-    Declares variances of exogenous shocks for a specific heterogeneity dimension.  
+    Declares variances of exogenous shocks for a specific heterogeneity dimension.
     The ``heterogeneity`` option specifies which heterogeneity dimension these shocks belong to.
 
     *Example*::
@@ -15652,7 +15652,7 @@ heterogeneity_load_steady_state
 
     .. option:: variable = STRING
 
-        Variable name within the MAT file to load.  
+        Variable name within the MAT file to load.
         Default: ``'steady_state'``
 
     *Steady-State Structure*
@@ -15748,7 +15748,7 @@ heterogeneity_solve
 .. command:: heterogeneity_solve ;
              heterogeneity_solve (OPTIONS...);
 
-    Computes the linearized solution using the Sequence-Space Jacobian method.  
+    Computes the linearized solution using the Sequence-Space Jacobian method.
     ``heterogeneity_load_steady_state`` must be called first.
 
     *Options*
@@ -16878,7 +16878,7 @@ every selected element of an array.
 .. rubric:: Function
 
 Functions can be defined in the macro processor using the ``@#define``
-directive (see below). A function is evaluated at the time it is invoked during 
+directive (see below). A function is evaluated at the time it is invoked during
 the macroprocessing stage, not
 at define time. Functions can be included in expressions and the operators that
 can be combined with them depend on their return type.
@@ -17249,7 +17249,7 @@ Example setup:
 Dynare can be called on ``simul.mod`` and ``estim.mod``, but it makes
 no sense to run it on ``modeldesc.mod``.
 
-The main advantage is that you don't have to copy/paste the whole model (during initial development) 
+The main advantage is that you don't have to copy/paste the whole model (during initial development)
 or changes to the model (during development).
 
 
@@ -17336,7 +17336,7 @@ and the labor share in GDP is defined as:
 In the model, :math:`\alpha` is a (share) parameter and :math:`lab\_rat_t` is an
 endogenous variable.
 
-It is clear that setting a value for :math:`\alpha` is not straightforward. But 
+It is clear that setting a value for :math:`\alpha` is not straightforward. But
 we have real world data for :math:`lab\_rat_t`, and it
 is clear that these two objects are economically linked.
 
@@ -17410,7 +17410,7 @@ to run simulations for three values: :math:`\rho = 0.8, 0.9,
         end
 
     Here the loop is not unrolled, MATLAB/Octave manages the
-    iterations. This is interesting when there are a lot of iterations. 
+    iterations. This is interesting when there are a lot of iterations.
     It is strongly advised to always check whether the error flag ``info(1)==0``
     to prevent erroneously relying on stale results from previous iterations.
 
@@ -17636,7 +17636,7 @@ Misc commands
     ``pdflatex`` and automatically tries to load all required
     packages. Requires the following LaTeX packages:
     ``breqn``, ``psfrag``, ``graphicx``, ``epstopdf``, ``longtable``,
-    ``booktabs``, ``caption``, ``float,`` ``amsmath``, ``amsfonts``, ``amssymb``, 
+    ``booktabs``, ``caption``, ``float,`` ``amsmath``, ``amsfonts``, ``amssymb``,
     and ``morefloats``.
 
 
@@ -17701,5 +17701,5 @@ Misc commands
 .. [#f11] An example can be found at
           `<https://git.dynare.org/Dynare/dynare/blob/master/tests/ms-dsge/test_ms_dsge.mod>`__.
 
-.. [#fEP] An ungated and up-to-date version of the document is available as     
+.. [#fEP] An ungated and up-to-date version of the document is available as
           :cite:t:`Adjemian:2025:WP`.

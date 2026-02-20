@@ -101,7 +101,7 @@ save_realtime = options_.shock_decomp.save_realtime;
 if isnan(options_.nobs)
     error('realtime_shock_decomposition: the nobs-option must be set.')
 end
-    
+
 zreal = zeros(M_.endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs+forecast_);
 zcond = zeros(M_.endo_nbr+length(M_.epilogue_names)*with_epilogue,nshocks+2,options_.nobs);
 
@@ -142,7 +142,7 @@ for j=presample+1:nobs
             gend0 = size(oo0.SmoothedShocks.(M_.exo_names{1}),1);
             options_.nobs=j;
         end
-        
+
         if ismember(j,fast_realtime) && gend0<j
             [oo_local,M_,~,~,Smoothed_Variables_deviation_from_mean] = evaluate_smoother(parameter_set,varlist,M_,oo_,options_,bayestopt_,estim_params_);
             gend = size(oo_local.SmoothedShocks.(M_.exo_names{1}),1);
@@ -160,12 +160,12 @@ for j=presample+1:nobs
                 gend0 = size(oo0.SmoothedShocks.(M_.exo_names{1}),1);
                 options_.nobs=j;
             end
-            
+
             gend = j;
             oo_local=oo0;
             Smoothed_Variables_deviation_from_mean = Smoothed_Variables_deviation_from_mean0(:,1:gend);
         end
-        
+
     end
     % reduced form
     dr = oo_local.dr;

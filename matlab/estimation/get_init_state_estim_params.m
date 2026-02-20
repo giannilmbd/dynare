@@ -24,7 +24,7 @@ function [index_init_state, IS, index_deep_parameters] = get_init_state_estim_pa
 % - The name convention is 'init <state_name>' for init-state parameters.
 % - `IS` is computed via intersection of init names and the restricted
 %   state-name list constructed in decision-rule order for states.
-% 
+%
 % Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
@@ -54,7 +54,7 @@ index_deep_parameters = find(~tmp);
 nam=M_.endo_names(dr.order_var);
 nam=nam(dr.restrict_var_list(bayestopt_.mf0));
 for k=1:length(nam)
-    nam{k} = ['init ' nam{k}]; 
+    nam{k} = ['init ' nam{k}];
 end
 [~,~,IS] = intersect(bayestopt_.name(index_init_state),nam,'stable');
 % IS contains state indices in decision rule order corresponding estim params

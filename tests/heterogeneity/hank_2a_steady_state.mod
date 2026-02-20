@@ -133,7 +133,7 @@ model;
    // Returns on illiquid asset
    pshare * (div + p) / p(-1) + (1 - pshare) * (1 + r) - 1 - ra;
 
-   // Fisher equation 
+   // Fisher equation
    1 + i(-1) - (1 + r) * (1 + pi);
 
    // Wage inflation
@@ -150,9 +150,9 @@ model;
    [name='illiquid_asset_market_clearing']
    p - SUM(a);
 
-   // Liquid asset clearing 
+   // Liquid asset clearing
    [name='liquid_asset_market_clearing']
-   Bg - SUM(b); 
+   Bg - SUM(b);
 end;
 
 load 'hank_2a_sp.mat';

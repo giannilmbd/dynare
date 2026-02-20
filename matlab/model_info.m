@@ -45,7 +45,7 @@ else
     temp_string=sprintf('\nInformation about %s (dynamic model)\n',M_.fname);
     fprintf(temp_string);
     if dynamic_ && ~isfield(M_,'block_structure')
-        fprintf('\nmodel_info: block information not present; skipping display.\n')        
+        fprintf('\nmodel_info: block information not present; skipping display.\n')
         return;
     elseif dynamic_
         nb_leadlag = length([M_.block_structure.incidence.lead_lag]);
@@ -153,7 +153,7 @@ if dynamic_ || static_ || incidence %block information requested
         disp(topp);
         skipline;
         disp(bott);
-        
+
         %printing the reordered incidence matrix
         IM_star_reordered = char([kron(ones(M_.endo_nbr, M_.endo_nbr-1), double(blanks(3))) double(blanks(M_.endo_nbr)')]);
         eq(block_structure.equation_reordered) = seq;
@@ -196,7 +196,7 @@ if dynamic_ || static_ || incidence %block information requested
             end
         end
         fprintf('\n1: non-null element, X: non-null element related to a state variable\n');
-        
+
         i_last = 0;
         block = {};
         % Map each state variable to its block so order does not matter.
@@ -229,7 +229,7 @@ if dynamic_ || static_ || incidence %block information requested
                 end
             end
         end
-        
+
         bott = [int2str(block_structure.equation_reordered') blanks(M_.endo_nbr)' blanks(M_.endo_nbr)' IM_star_reordered];
         fprintf('\nReordered incidence matrix\n');
         fprintf('==========================\n');
@@ -249,7 +249,7 @@ else %non-block information
     else
         lag_index=[];
     end
-    
+
     %print forward-looking variables
     if M_.maximum_endo_lead~=0
         lead_index = find(M_.lead_lag_incidence(M_.maximum_lag+2,:));
@@ -260,7 +260,7 @@ else %non-block information
     else
         lead_index=[];
     end
-    
+
     %print purely static ones
     static_index = setdiff(1:M_.endo_nbr,union(lag_index,lead_index));
     if ~isempty(static_index)

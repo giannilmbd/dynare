@@ -396,7 +396,7 @@ function solve_time_iteration_tensor( &
                     ! coefficient
                     beta = beta * gc_cache_next%r_up(1,kf)
                     ! For the expected derivative, we update the coefficient for
-                    ! dimensions k /= kf 
+                    ! dimensions k /= kf
                     do k = 1, dims%n_states
                         if (kf /= k) dbeta(k) = dbeta(k) * gc_cache_next%r_up(1,kf)
                     end do

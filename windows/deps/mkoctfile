@@ -213,7 +213,7 @@ Options:
 
   -s, --strip             Strip output file.
 
-  --mex                   Create a MEX file.  
+  --mex                   Create a MEX file.
                           Set the default output extension to ".mex".
 
   -o FILE, --output FILE  Output file name.  Default extension is .oct

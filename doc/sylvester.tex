@@ -51,16 +51,16 @@ For any $n\times n$ matrix $A$ and $\beta_1\beta_2>0$, if there is
 exactly one solution of
 $$\left(I_2\otimes I_n +
 \begin{pmatrix}\alpha&\beta_1\cr-\beta_2&\alpha\end{pmatrix}
-\otimes A\right)\begin{pmatrix} x_1\cr x_2\end{pmatrix} = 
+\otimes A\right)\begin{pmatrix} x_1\cr x_2\end{pmatrix} =
 \begin{pmatrix} d_1\cr d_2\end{pmatrix},$$
 then it can be obtained as solution of
 \begin{align*}
-\left(I_n + 2\alpha A+(\alpha^2+\beta^2)A^2\right)x_1 & = 
+\left(I_n + 2\alpha A+(\alpha^2+\beta^2)A^2\right)x_1 & =
 \widehat{d_1}\\
-\left(I_n + 2\alpha A+(\alpha^2+\beta^2)A^2\right)x_2 & = 
+\left(I_n + 2\alpha A+(\alpha^2+\beta^2)A^2\right)x_2 & =
 \widehat{d_2}
 \end{align*}
-where $\beta=\sqrt{\beta1\beta2}$, and 
+where $\beta=\sqrt{\beta1\beta2}$, and
 $$
 \begin{pmatrix} \widehat{d_1}\cr\widehat{d_2}\end{pmatrix} =
 \left(I_2\otimes I_n +
@@ -68,7 +68,7 @@ $$
 \otimes A\right)\begin{pmatrix} d_1\cr d_2\end{pmatrix}$$
 \end{lemma}
 
-\begin{proof} Since 
+\begin{proof} Since
 $$
 \begin{pmatrix} \alpha&\beta_1\cr-\beta_2&\alpha\end{pmatrix}
 \begin{pmatrix} \alpha&-\beta_1\cr\beta_2&\alpha\end{pmatrix}
@@ -187,7 +187,7 @@ and after reordering
 (\alpha^2+\beta^2)(\gamma^2+\delta^2)A^2)&
 \end{align*}
 Now it suffices to compare $a_1=\alpha\gamma-\beta\delta$ and verify
-that 
+that
 \begin{align*}
 b_1^2 & = (\alpha^2+\beta^2)(\gamma^2+\delta^2)-a_1^2 =\cr
       & = \alpha^2\gamma^2+\beta^2\gamma^2+\alpha^2\beta^2+\beta^2\delta^2-
@@ -238,7 +238,7 @@ d_k - \frac{f_{\bar jk}}{f}y$$
 
 \item if $F_j=\begin{pmatrix}\alpha&\beta_1\cr -\beta_2&\alpha\end{pmatrix}$,
 we return $x_j=\solvii(r\alpha, r\beta_1, r\beta_2, d_j, i-1)$. Then
-we precalculate 
+we precalculate
 $$y=\left(\begin{pmatrix}\alpha&-\beta_1\cr \beta_2&\alpha\end{pmatrix}
 \otimes I_{m^{i-1}}\otimes I_n\right)
 \begin{pmatrix} d_{\bar j} - x_{\bar j}\cr
@@ -280,7 +280,7 @@ The function $x=\solviip(\alpha,\beta^2,d,i)$ solves equation
 $$
 \left(I_{m^i}\otimes I_n + 2\alpha\iF\otimes K +
 (\alpha^2+\beta^2)\iF^2\otimes K^2\right)x = d
-$$ 
+$$
 The function proceedes as follows:
 
 If $i=0$, the matrix $I_n+2\alpha K+(\alpha^2+\beta^2)K^2$ is
@@ -290,10 +290,10 @@ Now note that diagonal blocks of $F^{2T}$ are of the form $F_j^2$,
 since if the $F^T$ is block partitioned according to diagonal blocks,
 then it is lower triangular.
 
-If $i>0$, then we go through diagonal blocks $F_j$ for $j=1,\ldots, m_r+m_c$ 
+If $i>0$, then we go through diagonal blocks $F_j$ for $j=1,\ldots, m_r+m_c$
 and perform:
 \begin{enumerate}
-\item if $F_j=(f_{\bar j\bar j})=(f)$ then $j$-th diagonal block of 
+\item if $F_j=(f_{\bar j\bar j})=(f)$ then $j$-th diagonal block of
 $$
 I_{m^i}\otimes I_n + 2\alpha\iF\otimes K +
 (\alpha^2+\beta^2)\iF^2\otimes K^2
@@ -309,7 +309,7 @@ Then we need to eliminate guys below $F_j$. Note that $|f^2|<|f|$,
 therefore we precalculate $y_2=(\alpha^2+\beta^2)f^2(\imF^2\otimes K^2)x_j$,
 and then precalculate
 $$y_1 = 2\alpha f(\imF\otimes K)x_j = d_j-x_j-y_2.$$
-Let $g_{pq}$ denote element of $F^{2T}$ at position $(q,p)$. 
+Let $g_{pq}$ denote element of $F^{2T}$ at position $(q,p)$.
 The elimination is done by going through $k=\bar j+1,\ldots, m$ and
 putting
 \begin{align*}
@@ -343,7 +343,7 @@ x_{\bar j+1}&=
 \end{align*}
 
 Now we need to eliminate guys below $F_j$. Since $\Vert F^2_j\Vert <
-\Vert F_j\Vert$, we precalculate 
+\Vert F_j\Vert$, we precalculate
 
 \begin{align*}
 y_2&=(\alpha^2+\beta^2)(\gamma^2+\delta^2)
@@ -399,7 +399,7 @@ $$
 since this equation is
 multiplied by $I_2\otimes I_{m^i}\otimes (PA)+(D-C)\otimes\,\iF\otimes PB$,
 and the diagonal
-result 
+result
 $$
 I_2\otimes I_{m^i}\otimes (PAPA) + 2D\otimes\,\iF\otimes (PAPB) +
 (D^2-C^2)\otimes\,\iF^2\otimes (PBPB)

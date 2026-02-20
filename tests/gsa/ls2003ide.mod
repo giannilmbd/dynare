@@ -20,7 +20,7 @@ stderr e_ys,inv_gamma_pdf,1.2533,0.6551;
 stderr e_pies,inv_gamma_pdf,1.88,0.9827;
 end;
 
-  
+
 disp('CREATE SCREENING SAMPLE, CHECK FOR STABILITY AND PERFORM A SCREENING FOR IDENTIFICATION ANALYSIS');
 disp('TYPE II ERRORS')
 disp(' ')

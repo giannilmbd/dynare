@@ -129,12 +129,12 @@ else
             liky1=liky;
             use_new_state_update = false;
             if ~StateVectors.use_modified_harmonic_mean
-                orig_slice_override_iteration = options_.occbin.filter.particle.state_importance_sampling.slice_override_iteration; 
-                options_.occbin.filter.particle.state_importance_sampling.slice_override_iteration = 1; 
+                orig_slice_override_iteration = options_.occbin.filter.particle.state_importance_sampling.slice_override_iteration;
+                options_.occbin.filter.particle.state_importance_sampling.slice_override_iteration = 1;
                 set_dynare_random_generator_state(LastSeeds.Unifor, LastSeeds.Normal);
                 [StateVectors_tmp, StateVectorsPKF_tmp, StateVectorsPPF_tmp, liky_tmp, updated_regimes_tmp, updated_sample_tmp, updated_mode_tmp, use_pkf_distribution_tmp, error_flag_tmp] = occbin.ppf.state_importance_sampling(StateVector0, a, P, P1, Py, alphahaty, V, t, data_index,Z,v,Y,H,QQQ,T0,R0,TT,RR,CC,info,regimes0,base_regime,regimesy,M_, ...
                     dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
-                options_.occbin.filter.particle.state_importance_sampling.slice_override_iteration = orig_slice_override_iteration; 
+                options_.occbin.filter.particle.state_importance_sampling.slice_override_iteration = orig_slice_override_iteration;
                 if abs(liky_tmp-likpkf)<options_.occbin.filter.particle.state_importance_sampling.logpost_crit_threshold || isinf(liky)
                     use_new_state_update = true;
                 end
@@ -172,14 +172,14 @@ else
                 options_.kalman_tol = kalman_tol0;
             end
             if use_new_state_update
-                StateVectors = StateVectors_tmp; 
-                StateVectorsPKF = StateVectorsPKF_tmp; 
-                StateVectorsPPF = StateVectorsPPF_tmp; 
-                liky = liky_tmp; 
-                updated_regimes = updated_regimes_tmp; 
-                updated_sample = updated_sample_tmp; 
-                updated_mode = updated_mode_tmp; 
-                use_pkf_distribution = use_pkf_distribution_tmp; 
+                StateVectors = StateVectors_tmp;
+                StateVectorsPKF = StateVectorsPKF_tmp;
+                StateVectorsPPF = StateVectorsPPF_tmp;
+                liky = liky_tmp;
+                updated_regimes = updated_regimes_tmp;
+                updated_sample = updated_sample_tmp;
+                updated_mode = updated_mode_tmp;
+                use_pkf_distribution = use_pkf_distribution_tmp;
                 error_flag = error_flag_tmp;
             end
         end

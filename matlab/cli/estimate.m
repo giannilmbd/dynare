@@ -1,5 +1,5 @@
 function estimate(method, data, varargin)
-    
+
 % Copyright © 2017-2022 Dynare Team
 %
 % This file is part of Dynare.
@@ -36,7 +36,7 @@ method = tmp{1}{1};
 tmp = regexp(data, 'data\(((?=[\w])[^_0-9][\w]*)\)', 'tokens');
 ds = tmp{1}{1};
 if ismember(ds, evalin('caller','who'))
-    ts = evalin('caller', ds); 
+    ts = evalin('caller', ds);
     if ~isdseries(ts)
         error('estimate:: %s has to be a dseries object!', ds)
     end

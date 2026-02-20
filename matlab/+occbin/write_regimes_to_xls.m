@@ -30,7 +30,7 @@ if strcmpi(options_.occbin.write_regimes.type,'simul') || strcmpi(options_.occbi
     if isfield(occbin_struct,options_.occbin.write_regimes.type) && isfield(occbin_struct.(options_.occbin.write_regimes.type),'regime_history')
         regime_history=occbin_struct.(lower(options_.occbin.write_regimes.type)).regime_history;
     else
-        error('write_regimes_to_xls: the required field does not exist');    
+        error('write_regimes_to_xls: the required field does not exist');
     end
 else
     error('write_regimes_to_xls: output type can only be simul or smoother.')

@@ -37,13 +37,13 @@ parameters gn gz betta delta psi sigma theta rho_z eps_z_sigma rho_g eps_g_sigma
 
 gn    = 0.00243918275778010;
 gz    = 0.00499789993972673;
-betta = 0.9722^(1/4)/(1+gz); 
+betta = 0.9722^(1/4)/(1+gz);
 delta = 1-(1-0.0464)^(1/4);
 psi   = 2.24;
 sigma = 1.000001;
 theta = 0.35;
 
-zbar  = 0.0023;  
+zbar  = 0.0023;
 gbar  = -0.0382;
 
 rho_z = 0.8;
@@ -62,7 +62,7 @@ q12 = -0.0002;
 
 model;
 % Intratemporal Optimality Condition
-(psi*c)/(1-l) = (1-theta)*(k(-1)^theta)*(l^(-theta))*(exp(z)^(1-theta)); 
+(psi*c)/(1-l) = (1-theta)*(k(-1)^theta)*(l^(-theta))*(exp(z)^(1-theta));
 % Intertemporal Optimality Condition
 (c^(-sigma))*((1-l)^(psi*(1-sigma))) = betta*((c(+1))^(-sigma))*((1-l(+1))^(psi*(1-sigma)))*(theta*(k^(theta-1))*((exp(z(+1))*l(+1))^(1-theta))+(1-delta));
 % Aggregate Resource Constraint

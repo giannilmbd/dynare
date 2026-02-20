@@ -359,7 +359,7 @@ else
         else
             planner_objective_value.conditional = sim(end,1);
         end
-        if options_.ramsey_policy            
+        if options_.ramsey_policy
             % Conditional welfare (ii) with Lagrange multipliers set to 0
             yhat_start(M_.nstatic+1:M_.nstatic+M_.npred+M_.nboth) = yhat_L_0;
             [~,sim] = k_order_mean(options_.order, M_.nstatic, M_.npred, M_.nboth, M_.nfwrd+1, M_.exo_nbr, 1, 0, yhat_start, u, ysteady, dr);

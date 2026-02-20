@@ -57,7 +57,7 @@ elseif order==2
             ys_(oo_.dr.order_var)=ys_(oo_.dr.order_var)+oo_.dr.ghs2./2;
         end
     else
-        error('get_mean: decision rules need to be present in oo_ to compute mean') 
+        error('get_mean: decision rules need to be present in oo_ to compute mean')
     end
 else
     error('get_mean: order>2 not implemented')

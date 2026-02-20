@@ -1,12 +1,12 @@
 function G = buildGmatrix(alpha, beta)
-    
+
 % Builds the G matrix needed for PAC.
 %
-% INPUTS 
+% INPUTS
 % - alpha    [double]    m*1 vector of PAC parameters (lag polynomial parameters).
 % - beta     [double]    scalar, discount factor.
 %
-% OUTPUTS 
+% OUTPUTS
 % - G         [double]    (m+1)*(m+1) matrix.
 
 % Copyright © 2018-2022 Dynare Team
@@ -33,12 +33,12 @@ end
 % Return an error if the first input is not a real vector.
 if ~isnumeric(alpha) || ~isreal(alpha) || ~isvector(alpha)
     error('First input argument has to be a vector of doubles!')
-end 
+end
 
 % Return an error if the second input argument is not a discount factor
 if ~isnumeric(beta) || ~isreal(beta) || ~isscalar(beta) || beta<eps || beta>1-eps
     error('Second input argument has to be a discount factor!')
-end 
+end
 
 % Get the number of parameters
 m = length(alpha);

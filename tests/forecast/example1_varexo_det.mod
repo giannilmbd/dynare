@@ -25,7 +25,7 @@ y = exp(a)*(k(-1)^alpha)*(h^(1-alpha));
 k = exp(b)*(y-c)+(1-delta)*k(-1);
 a = ahat + rho*a(-1) + rho2*a(-2) + tau*b(-1) + e;
 b = bhat + tau*a(-1) + rho*b(-1) + u;
-end; 
+end;
 
 initval;
 y = 1.08068253095672;

@@ -3,7 +3,7 @@ function y = get_filtered_time_series(y, m, options_)
 % Computes filtered time series
 % INPUTS
 %   y                   [double]       nvar*nperiods vector of simulated variables.
-%   m                   [double]       nvar mean to be subtracted in case of no filtering 
+%   m                   [double]       nvar mean to be subtracted in case of no filtering
 %   options_            [structure]    Dynare's options structure
 %
 % OUTPUTS

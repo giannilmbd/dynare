@@ -33,7 +33,7 @@
 % otherwise the results are loaded from Andreasen_et_al_2018_Dynare44Pruning_v2.mat
 @#define Andreasen_et_al_toolbox = 0
 
-var YGR INFL INT 
+var YGR INFL INT
     c p R g y z; %if ordering of var is changed comparison code below needs to be adapted
 varexo e_r e_g e_z e_junk;
 parameters tau nu kap cyst psi1 psi2 rhor rhog rhoz rrst pist gamst;
@@ -97,7 +97,7 @@ steady; check; model_diagnostics;
 
 @#for orderApp in [1, 2, 3]
     stoch_simul(order=@{orderApp},pruning,irf=0,periods=0);
-    pruned_state_space.order_@{orderApp} = pruned_SS.pruned_state_space_system(M_, options_, oo_.dr, [], options_.ar, 1, 0);                                                    
+    pruned_state_space.order_@{orderApp} = pruned_SS.pruned_state_space_system(M_, options_, oo_.dr, [], options_.ar, 1, 0);
     @#if Andreasen_et_al_toolbox
         addpath('Dynare44Pruning_v2/simAndMoments3order'); %provide path to toolbox
         optPruning.orderApp   = @{orderApp};
@@ -139,7 +139,7 @@ for iorder = 1:3
     fprintf('max(sum(abs(Corr[x,x(-1)]''))): %d\n',norm_Corr_xi1);
     norm_Corr_xi2 = norm(pruned.Corr_yi(M_.nstatic+(1:M_.nspred),M_.nstatic+(1:M_.nspred),2) - outAndreasen.Corr_v(1:M_.nspred,1:M_.nspred,2) , Inf);
     fprintf('max(sum(abs(Corr[x,x(-2)]''))): %d\n',norm_Corr_xi2);
-    
+
     if iorder < 3 && any([norm_E_yx norm_Var_y norm_Var_x norm_Corr_yi1 norm_Corr_yi2 norm_Corr_xi1 norm_Corr_xi2] > 1e-5)
         error('Something wrong with pruned_state_space.m compared to Andreasen et al 2018 Toolbox v2 at order %d.',iorder);
     end
@@ -163,21 +163,21 @@ end
 % fprintf('  Now note that xf=hx*xf(-1)+hu*u is Gaussian, that is E[kron(kron(xf,xf),xf)]=0, and Var[kron(kron(xf,xf),xf)] are the sixth-order product moments\n');
 % fprintf('  which can be computed using the prodmom.m function by providing E[xf*xf''] as covariance matrix.\n');
 % fprintf('  In order to replicate this you have to change UnconditionalMoments_3rd_Lyap.m to also output Var_z.\n')
-% 
+%
 % dynare_nx    = M_.nspred;
 % dynare_E_xf2 = pruned_state_space.order_3.Var_z(1:dynare_nx,1:dynare_nx);
 % dynare_E_xf6 = pruned_state_space.order_3.Var_z((end-dynare_nx^3+1):end,(end-dynare_nx^3+1):end);
 % dynare_E_xf6 = dynare_E_xf6(:);
-%         
+%
 % Andreasen_nx    = M_.nspred+M_.exo_nbr;
 % Andreasen_E_xf2 = outAndreasenetal.order_3.Var_z(1:Andreasen_nx,1:Andreasen_nx);
 % Andreasen_E_xf6 = outAndreasenetal.order_3.Var_z((end-Andreasen_nx^3+1):end,(end-Andreasen_nx^3+1):end);
 % Andreasen_E_xf6 = Andreasen_E_xf6(:);
-% 
+%
 % fprintf('Second-order product moments of xf and u are the same:\n')
 % norm_E_xf2 = norm(dynare_E_xf2-Andreasen_E_xf2(1:M_.nspred,1:M_.nspred),Inf)
 % norm_E_uu  = norm(M_.Sigma_e-Andreasen_E_xf2(M_.nspred+(1:M_.exo_nbr),M_.nspred+(1:M_.exo_nbr)),Inf)
-% 
+%
 % % Compute unique sixth-order product moments of xf, i.e. unique(E[kron(kron(kron(kron(kron(xf,xf),xf),xf),xf),xf)],'stable')
 % dynare_nx6     = dynare_nx*(dynare_nx+1)/2*(dynare_nx+2)/3*(dynare_nx+3)/4*(dynare_nx+4)/5*(dynare_nx+5)/6;
 % dynare_Q6Px    = Q6_plication(dynare_nx);
@@ -188,7 +188,7 @@ end
 % end
 % dynare_true_E_xf6 = dynare_Q6Px*dynare_true_E_xf6; %add duplicate entries
 % norm_dynare_E_xf6 = norm(dynare_true_E_xf6 - dynare_E_xf6, Inf);
-% 
+%
 % Andreasen_nx6     = Andreasen_nx*(Andreasen_nx+1)/2*(Andreasen_nx+2)/3*(Andreasen_nx+3)/4*(Andreasen_nx+4)/5*(Andreasen_nx+5)/6;
 % Andreasen_Q6Px    = Q6_plication(Andreasen_nx);
 % Andreasen_COMBOS6 = flipud(allVL1(Andreasen_nx, 6)); %all possible (unique) combinations of powers that sum up to six
@@ -198,7 +198,7 @@ end
 % end
 % Andreasen_true_E_xf6 = Andreasen_Q6Px*Andreasen_true_E_xf6; %add duplicate entries
 % norm_Andreasen_E_xf6 = norm(Andreasen_true_E_xf6 - Andreasen_E_xf6, Inf);
-% 
+%
 % fprintf('Sixth-order product moments of xf and u are not the same!\n');
 % fprintf('    Dynare maximum absolute deviations of sixth-order product moments of xf: %d\n',norm_dynare_E_xf6)
 % fprintf('    Andreasen et al maximum absolute deviations of sixth-order product moments of xf: %d\n',norm_Andreasen_E_xf6)

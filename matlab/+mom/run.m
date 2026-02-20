@@ -208,7 +208,7 @@ end
 % matched_moments: checks and transformations
 % -------------------------------------------------------------------------
 if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_method,'SMM')
-    M_.matched_moments = mom.matched_moments_block(M_.matched_moments, options_mom_.mom.mom_method);    
+    M_.matched_moments = mom.matched_moments_block(M_.matched_moments, options_mom_.mom.mom_method);
     % Check if both prefilter and first moments were specified
     first_moment_indicator = cellfun(@(x) sum(abs(x))==1,M_.matched_moments(:,3));
     options_mom_.mom.mom_nbr = size(M_.matched_moments,1);
@@ -430,8 +430,8 @@ if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_meth
         error('method_of_moments: Dataset is too short to compute higher than first moments!');
     end
     if dataset_info.missing.state && (options_mom_.hp_filter || options_mom_.one_sided_hp_filter || options_.bandpass.indicator)
-        error('method_of_moments: missing data is incompatible with filtering data!');        
-    end 
+        error('method_of_moments: missing data is incompatible with filtering data!');
+    end
     % provide info on data moments handling
     fprintf('Computing data moments. Note that NaN values in the moments (due to leads and lags or missing data) are replaced by the mean of the corresponding moment.\n');
     % get data moments for the method of moments
@@ -440,10 +440,10 @@ if strcmp(options_mom_.mom.mom_method,'GMM') || strcmp(options_mom_.mom.mom_meth
     %get first moments separately on unfiltered data (either statistical filter or options_mom_.prefilter)
     [first.moments, first.m_data]=mom.get_data_moments(dataset_info.rawdata, options_mom_.mom.obs_var, oo_.dr.inv_order_var, M_.matched_moments(first_moment_indicator,:));
     [other.moments, other.m_data] = mom.get_data_moments(get_filtered_time_series(dataset_.data, zeros(1,dataset_.vobs), options_mom_), options_mom_.mom.obs_var, oo_.dr.inv_order_var, M_.matched_moments(~first_moment_indicator,:));
-    oo_.mom.data_moments(first_moment_indicator)=first.moments; 
-    oo_.mom.data_moments(~first_moment_indicator)=other.moments; 
-    oo_.mom.m_data(:,first_moment_indicator)=first.m_data; 
-    oo_.mom.m_data(:,~first_moment_indicator)=other.m_data; 
+    oo_.mom.data_moments(first_moment_indicator)=first.moments;
+    oo_.mom.data_moments(~first_moment_indicator)=other.moments;
+    oo_.mom.m_data(:,first_moment_indicator)=first.m_data;
+    oo_.mom.m_data(:,~first_moment_indicator)=other.m_data;
     clear first other;
     if ~isreal(dataset_.data)
         error('method_of_moments: The data moments contain complex values!');
@@ -645,12 +645,12 @@ if do_bayesian_estimation && ~options_mom_.mom.penalized_estimator && ~options_m
             oo_.mom.MarginalDensity.LaplaceApproximation = .5*estim_params_nbr*log(2*pi) + .5*log_det_invhess - likelihood;
         else
             oo_.mom.MarginalDensity.LaplaceApproximation = NaN;
-        end        
+        end
         fprintf('\nLog data density [Laplace approximation] is %f.\n',oo_.mom.MarginalDensity.LaplaceApproximation);
     end
 elseif ~do_bayesian_estimation || (do_bayesian_estimation && options_mom_.mom.penalized_estimator)
     % display table with Frequentist estimation results and store parameter estimates and standard errors in oo_
-    oo_.mom = display_estimation_results_table(xparam1, stdh, M_, options_mom_, estim_params_, bayestopt_, oo_.mom, prior_dist_names, options_mom_.mom.mom_method, lower(options_mom_.mom.mom_method));    
+    oo_.mom = display_estimation_results_table(xparam1, stdh, M_, options_mom_, estim_params_, bayestopt_, oo_.mom, prior_dist_names, options_mom_.mom.mom_method, lower(options_mom_.mom.mom_method));
 end
 
 
@@ -688,7 +688,7 @@ if do_bayesian_estimation_mcmc
     % run MCMC sampling
     posterior_sampler_options = options_mom_.posterior_sampler_options.current_options;
     posterior_sampler_options.invhess = invhess;
-    [posterior_sampler_options, options_mom_, bayestopt_] = check_posterior_sampler_options(posterior_sampler_options, M_.fname, M_.dname, options_mom_, BoundsInfo, bayestopt_,'method_of_moments');    
+    [posterior_sampler_options, options_mom_, bayestopt_] = check_posterior_sampler_options(posterior_sampler_options, M_.fname, M_.dname, options_mom_, BoundsInfo, bayestopt_,'method_of_moments');
     options_mom_.posterior_sampler_options.current_options = posterior_sampler_options; % store current options
     if options_mom_.mh_replic>0
         posterior_sampler(objective_function,posterior_sampler_options.proposal_distribution,xparam1,posterior_sampler_options,BoundsInfo,oo_.mom.data_moments,oo_.mom.weighting_info,options_mom_,M_,estim_params_,bayestopt_,oo_,'method_of_moments::mcmc');
@@ -734,9 +734,9 @@ if do_bayesian_estimation_mcmc
                     oo_.mom.(field_names{1,field_iter}) = oo_load_mh.oo_.mom.(field_names{1,field_iter});
                 end
             end
-            if isfield(oo_load_mh.oo_.mom,'MarginalDensity') && isfield(oo_load_mh.oo_.mom.MarginalDensity,'ModifiedHarmonicMean') % field set by marginal_density            
+            if isfield(oo_load_mh.oo_.mom,'MarginalDensity') && isfield(oo_load_mh.oo_.mom.MarginalDensity,'ModifiedHarmonicMean') % field set by marginal_density
                 oo_.mom.MarginalDensity.ModifiedHarmonicMean = oo_load_mh.oo_.mom.MarginalDensity.ModifiedHarmonicMean;
-            end            
+            end
             if isfield(oo_load_mh.oo_.mom,'posterior') && isfield(oo_load_mh.oo_.mom.posterior,'metropolis') % field set by GetPosteriorMeanVariance
                 oo_.mom.posterior.metropolis = oo_load_mh.oo_.mom.posterior.metropolis;
             end
@@ -774,7 +774,7 @@ if do_bayesian_estimation_mcmc
             %        end
             %     end
             %     oo_ = compute_moments_varendo('posterior',options_,M_,oo_,var_list_);
-            % end            
+            % end
         else
             fprintf('''sub_draws'' was set to 0. Skipping posterior computations.');
         end

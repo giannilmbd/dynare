@@ -9,12 +9,12 @@ function [x_t_plus_1, x_t_plus_1_pruned_state_space]=iterate_law_of_motion(initi
 %  - use_k_order_solver         [boolean]   indicator whether the k_order_solver should be used
 %  - pruning                    [boolean]   indicator whether pruning should be used
 %  - initial_pruned_state_space [double]    components of the augmented pruned state space (required for pruning)
-% 
+%
 % Outputs:
 % - x_t_plus_1                  [double]    simulated series next period
 % - x_t_plus_1_pruned_state_space [double]  components of the pruned state space of the simulated series next period
 
-if pruning 
+if pruning
     if nargin<8
         error('iterate_law_of_motion: with pruning, the components of the augmented pruned state space are an required input')
     end

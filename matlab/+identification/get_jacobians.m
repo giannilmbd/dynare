@@ -254,16 +254,16 @@ end
 %% Compute dMOMENTS
 if ~no_identification_moments
     E_yy  = pruned.Var_y;  dE_yy  = pruned.dVar_y;
-    if useautocorr        
+    if useautocorr
         E_yyi = pruned.Corr_yi; dE_yyi = pruned.dCorr_yi;
-    else        
+    else
         E_yyi = pruned.Var_yi;  dE_yyi = pruned.dVar_yi;
     end
     MOMENTS = [MEAN; dyn_vech(E_yy)];
     for i=1:nlags
         MOMENTS = [MOMENTS; vec(E_yyi(:,:,i))];
     end
-    
+
     if kronflag == -1
         %numerical derivative of autocovariogram
         dMOMENTS = identification.fjaco(str2func('identification.numerical_objective'), xparam1, 1, estim_params, M_, options_, indpmodel, indpstderr, indvobs, useautocorr, nlags, grid_nbr, dr, endo_steady_state, exo_steady_state, exo_det_steady_state); %[outputflag=1]
@@ -315,8 +315,8 @@ if ~no_identification_spectrum
         %In the following we focus on method 3
     %Symmetry:
     %  Note that for the compuation of the G matrix we focus only on positive Fourier frequencies due to symmetry of the real part of the spectral density and, hence, the G matrix (which is real by construction).
-    %  E.g. if grid_nbr=4, then we subdivide the intervall [-pi;pi] into [-3.1416;-1.5708;0;1.5708;3.1416], but focus only on [0;1.5708;3.1416] for the computation of the G matrix, 
-    %  keeping in mind that the frequencies [1.5708;3.1416] need to be added twice, whereas the 0 frequency is only added once.    
+    %  E.g. if grid_nbr=4, then we subdivide the intervall [-pi;pi] into [-3.1416;-1.5708;0;1.5708;3.1416], but focus only on [0;1.5708;3.1416] for the computation of the G matrix,
+    %  keeping in mind that the frequencies [1.5708;3.1416] need to be added twice, whereas the 0 frequency is only added once.
     freqs = (0 : pi/(grid_nbr/2):pi); % we focus only on positive frequencies
     tpos  = exp( sqrt(-1)*freqs); %positive Fourier frequencies
     tneg  = exp(-sqrt(-1)*freqs); %negative Fourier frequencies
@@ -396,8 +396,8 @@ if ~no_identification_minimal
         warning_KomunjerNg = 'WARNING: Komunjer and Ng (2011) failed:\n';
         warning_KomunjerNg = [warning_KomunjerNg '       There are more shocks and measurement errors than observables, this is not implemented (yet).\n'];
         warning_KomunjerNg = [warning_KomunjerNg '       Skip identification analysis based on minimal state space system.\n'];
-        fprintf(warning_KomunjerNg);        
-        dMINIMAL = [];        
+        fprintf(warning_KomunjerNg);
+        dMINIMAL = [];
     else
         % Derive and check minimal state vector of first-order
         SYS.A  = dr.ghx(pruned.indx,:);
@@ -409,12 +409,12 @@ if ~no_identification_minimal
         SYS.D  = dr.ghu(pruned.indy,:);
         SYS.dD = dr.derivs.dghu(pruned.indy,:,:);
         [CheckCO,minnx,SYS] = identification.get_minimal_state_representation(SYS,1);
-        
+
         if CheckCO == 0
             warning_KomunjerNg = 'WARNING: Komunjer and Ng (2011) failed:\n';
             warning_KomunjerNg = [warning_KomunjerNg '         Conditions for minimality are not fullfilled:\n'];
             warning_KomunjerNg = [warning_KomunjerNg '         Skip identification analysis based on minimal state space system.\n'];
-            fprintf(warning_KomunjerNg); %use sprintf to have line breaks            
+            fprintf(warning_KomunjerNg); %use sprintf to have line breaks
             dMINIMAL = [];
         else
             minA = SYS.A; dminA = SYS.dA;

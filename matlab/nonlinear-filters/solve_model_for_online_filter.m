@@ -57,7 +57,7 @@ end
 M_ = set_all_parameters(xparam1,estim_params_,M_);
 
 [~,info,~,Q,H]=check_bounds_and_definiteness_estimation(xparam1, M_, estim_params_, bounds);
-if info(1)    
+if info(1)
     return
 end
 

@@ -123,11 +123,11 @@ end;
 % Compare whether toolbox yields equivalent moments at second order
 %--------------------------------------------------------------------------
 % Note that we compare results for orderApp=1|2 and not for orderApp=3, because
-% there is a small error in the replication files of the original article in the 
+% there is a small error in the replication files of the original article in the
 % computation of the covariance matrix of the extended innovations vector.
-% The authors have been contacted, fixed it, and report that the results 
+% The authors have been contacted, fixed it, and report that the results
 % change only slightly at orderApp=3 to what they report in the paper. At
-% orderApp=2 all is correct and so the following part tests whether we get 
+% orderApp=2 all is correct and so the following part tests whether we get
 % the same model moments at the calibrated parameters (we do not optimize).
 % We compare it to the replication file RunGMM_standardModel_RRA.m with the
 % following settings: orderApp=1|2, seOn=0, q_lag=10, weighting=1;
@@ -230,11 +230,11 @@ method_of_moments(
         , order = @{orderApp}                 % order of Taylor approximation in perturbation
         , pruning                             % use pruned state space system at higher-order
         % , verbose                           % display and store intermediate estimation results
-        , weighting_matrix = ['DIAGONAL']      % weighting matrix in moments distance objective function; possible values: OPTIMAL|IDENTITY_MATRIX|DIAGONAL|filename        
+        , weighting_matrix = ['DIAGONAL']      % weighting matrix in moments distance objective function; possible values: OPTIMAL|IDENTITY_MATRIX|DIAGONAL|filename
         % , TeX                               % print TeX tables and graphics
-        % Optimization options that can be set by the user in the mod file, otherwise default values are provided        
+        % Optimization options that can be set by the user in the mod file, otherwise default values are provided
         %, huge_number=1D10                   % value for replacing the infinite bounds on parameters by finite numbers. Used by some optimizers for numerical reasons
-        , mode_compute = 0                    % specifies the optimizer for minimization of moments distance, note that by default there is a new optimizer        
+        , mode_compute = 0                    % specifies the optimizer for minimization of moments distance, note that by default there is a new optimizer
         , optim = ('TolFun', 1e-6
                    ,'TolX', 1e-6
                    ,'MaxIter', 3000
@@ -281,9 +281,9 @@ method_of_moments(
         , order = 3                           % order of Taylor approximation in perturbation
         , pruning                             % use pruned state space system at higher-order
         % , verbose                           % display and store intermediate estimation results
-        , weighting_matrix = ['DIAGONAL', 'OPTIMAL']      % weighting matrix in moments distance objective function; possible values: OPTIMAL|IDENTITY_MATRIX|DIAGONAL|filename        
+        , weighting_matrix = ['DIAGONAL', 'OPTIMAL']      % weighting matrix in moments distance objective function; possible values: OPTIMAL|IDENTITY_MATRIX|DIAGONAL|filename
         % , TeX                               % print TeX tables and graphics
-        % Optimization options that can be set by the user in the mod file, otherwise default values are provided        
+        % Optimization options that can be set by the user in the mod file, otherwise default values are provided
         %, huge_number=1D10                   % value for replacing the infinite bounds on parameters by finite numbers. Used by some optimizers for numerical reasons
         , mode_compute = 13                   % specifies the optimizer for minimization of moments distance, note that by default there is a new optimizer
         , additional_optimizer_steps = [13]

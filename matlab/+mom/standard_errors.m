@@ -24,7 +24,7 @@ function [stderr_values, asympt_cov_mat] = standard_errors(xparam, objective_fun
 %  - exo_steady_state:     [vector]     steady state value for exogenous variables (initval)
 %  - exo_det_steady_state: [vector]     steady state value for exogenous deterministic variables (initval)
 % -------------------------------------------------------------------------
-% OUTPUTS 
+% OUTPUTS
 %   o stderr_values        [nparam x 1] vector of standard errors
 %   o asympt_cov_mat       [nparam x nparam] asymptotic covariance matrix
 % -------------------------------------------------------------------------
@@ -66,24 +66,24 @@ if strcmp(options_mom_.mom.mom_method,'GMM') && options_mom_.mom.analytic_standa
     D = model_moments_params_derivs; % already computed in objective function via get_perturbation_params.m
     idx_nan = find(any(isnan(D)));
     if any(idx_nan)
-        for i = idx_nan            
+        for i = idx_nan
              fprintf('No standard errors available for parameter %s\n',get_the_name(i,options_mom_.TeX, M_, estim_params_, options_mom_.varobs))
-        end        
+        end
         warning('There are NaN in the analytical Jacobian of Moments. Check your bounds and/or priors, or use a different optimizer.')
         asympt_cov_mat = NaN(length(xparam),length(xparam));
         stderr_values = NaN(length(xparam),1);
         return
     end
-else    
+else
     fprintf('\nComputing standard errors using numerical derivatives of moments\n');
     for i=1:dim_params
         % positive step
         xparam_eps_p      = xparam;
-        xparam_eps_p(i,1) = xparam_eps_p(i) + eps_value;        
+        xparam_eps_p(i,1) = xparam_eps_p(i) + eps_value;
         [~, info_p, ~, ~, ~, ~, model_moments_p] = feval(objective_function, xparam_eps_p, data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
         % negative step
         xparam_eps_m      = xparam;
-        xparam_eps_m(i,1) = xparam_eps_m(i) - eps_value;        
+        xparam_eps_m(i,1) = xparam_eps_m(i) - eps_value;
         [~, info_m, ~, ~, ~, ~, model_moments_m] = feval(objective_function, xparam_eps_m, data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
         % the Jacobian
         if nnz(info_p)==0 && nnz(info_m)==0

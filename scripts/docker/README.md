@@ -54,7 +54,7 @@ To connect to the Ubuntu desktop, either:
 
 - Point a browser to port 6080 of the docker host machine running this container (`http://hostname:6080`).
 - Use a VNC client to connect to display 1 of the docker host machine (`hostname:1`). The VNC password is `matlab` by default, you can change that by adjusting the `PASSWORD` environment variable in the run command.
-- If you are behind a firewall, we recommend to use a VPN such as [Tailscale](https://tailscale.com) such that you can access the VNC server via the Tailscale address of the server. 
+- If you are behind a firewall, we recommend to use a VPN such as [Tailscale](https://tailscale.com) such that you can access the VNC server via the Tailscale address of the server.
 
 ### Run Dynare with Octave in an interactive command prompt
 

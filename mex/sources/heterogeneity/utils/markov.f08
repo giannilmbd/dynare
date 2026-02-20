@@ -43,7 +43,7 @@ contains
         real(real64), intent(in) :: rho, sigma, tol
         real(real64), dimension(N), intent(inout) :: y, p_vec
         real(real64), dimension(N, N), intent(inout) :: P_mat
-        
+
         integer(int32) :: i, k
         real(real64) :: p, scale_factor
         real(real64), allocatable :: P1(:, :), P2(:, :), P3(:, :), P4(:, :)

@@ -20,7 +20,7 @@ function o2WysrOISH  = load_m_file_data_legacy(datafile, U7ORsJ0vy3)
 [pathtocXDHdrXnqo5KwwVpTRuc6OprAW,cXDHdrXnqo5KwwVpTRuc6OprAW,cXDHdrXnqo5KwwVpTRuc6OprAW_ext] = fileparts(datafile);
 
 if ~strcmp(cXDHdrXnqo5KwwVpTRuc6OprAW_ext,'.m')
-    error('You did not provide a .m file as the datafile.')    
+    error('You did not provide a .m file as the datafile.')
 end
 
 if ~isempty(pathtocXDHdrXnqo5KwwVpTRuc6OprAW)

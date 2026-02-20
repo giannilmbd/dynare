@@ -12,7 +12,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %   o dr            [structure] model information structure
 %   o endo_steady_state       [vector]     steady state value for endogenous variables
 %   o exo_steady_state        [vector]     steady state value for exogenous variables
-%   o exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
+%   o exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables
 %   o options_      [structure] describing the options
 %   o bayestopt_    [structure] describing the priors
 %   o estim_params_ [structure] characterizing parameters to be estimated
@@ -41,7 +41,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %                               and requested smoothed variables in decision rules (decision rule order))
 %   o alphahat0     [double]  (m*1) matrix, smoothed endogenous variables
 %                              (a_{0}) for initial period from PKF
-%   o state_uncertainty0 [double] (K,K) matrix storing the uncertainty about 
+%   o state_uncertainty0 [double] (K,K) matrix storing the uncertainty about
 %                                   the smoothed state for the initial
 %                                   period from the KF
 %   o d             [integer]   number of diffuse periods
@@ -114,20 +114,20 @@ end
 %------------------------------------------------------------------------------
 length_varargin=length(varargin);
 if ~options_.smoother_redux
-    
+
     %store old setting of restricted var_list
     oldoo.restrict_var_list = dr.restrict_var_list;
     oldoo.restrict_columns = dr.restrict_columns;
     dr.restrict_var_list = bayestopt_.smoother_var_list;
     dr.restrict_columns = bayestopt_.smoother_restrict_columns;
-    
+
     [T,R,SteadyState,info,dr,M_.params] = dynare_resolve(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state);
-    
+
     %get location of observed variables and requested smoothed variables in
     %decision rules
     bayestopt_.mf = bayestopt_.smoother_var_list(bayestopt_.smoother_mf);
     mf = bayestopt_.mf;
-    
+
 else
     if ~options_.occbin.smoother.status
         [T,R,SteadyState,info,dr,M_.params] = dynare_resolve(M_,options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,'restrict');
@@ -144,7 +144,7 @@ if options_.occbin.smoother.status
     occbin_info.status = true;
     occbin_info.info= [{options_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,M_} varargin];
 else
-    occbin_info.status = false;    
+    occbin_info.status = false;
 end
 
 if info~=0
@@ -365,7 +365,7 @@ if kalman_algo == 2 || kalman_algo == 4
             %do nothing, state vector was already expanded
         end
     end
-    
+
     a_initial     = zeros(np,1);
     if options_.smoother_redux
         a_initial=set_Kalman_starting_values(a_initial,M_,dr,options_,bayestopt_);
@@ -417,13 +417,13 @@ if ~options_.smoother_redux
     dr.restrict_columns = oldoo.restrict_columns;
 else
     ic = [ M_.nstatic+(1:M_.nspred) M_.endo_nbr+(1:size(dr.ghx,2)-M_.nspred) ]';
-    
+
     if isempty(options_.nk)
         nk=1;
     else
         nk=options_.nk;
     end
-        
+
     if options_.occbin.smoother.status
         if isempty(alphahat0)
             % something went wrong
@@ -479,7 +479,7 @@ else
             static_var_list0(static_var_list) = ilagged;
             static_var_list(static_var_list) = ~ilagged;
             aaa(static_var_list,k+1) = AS(~ilagged,:)*alphahat(:,k)+BS(~ilagged,:)*etahat(:,k)+CS(~ilagged);
-            if any(ilagged) 
+            if any(ilagged)
                 if k>1
                     aaa(static_var_list0,k+1) = Tstar(ilagged,:)*alphahat(:,k-1)+Rstar(ilagged,:)*etahat(:,k)+Cstar(ilagged);
                 else
@@ -487,7 +487,7 @@ else
                 end
 
             end
-            
+
         end
         alphahat0=aaa(:,1);
         alphahat=aaa(:,2:end);
@@ -548,7 +548,7 @@ else
             P=PP;
             clear PP
         end
-        
+
         if ~isempty(state_uncertainty)
             mm=size(T,1);
             sstate_uncertainty=zeros(M_.endo_nbr,M_.endo_nbr,gend);
@@ -563,16 +563,16 @@ else
             state_uncertainty0=sstate_uncertainty;
             clear sstate_uncertainty
         end
-        
+
         aaa = zeros(nk,M_.endo_nbr,gend+nk);
         aaa(:,dr.restrict_var_list,:)=aK;
-        
+
         if isoccbin
             tstart = 1;
         else
             % we enter here in the first occbin smoother iteration
             % occbin Kalman update is not yet able to accommodate diffuse steps!
-            tstart=d+2; 
+            tstart=d+2;
         end
         for k=2:gend+1
             opts_simul.curb_retrench = options_.occbin.smoother.curb_retrench;
@@ -660,7 +660,7 @@ else
             end
         end
         aK=aaa;
-        
+
         if ~isempty(PK)
             PP = zeros(nk,M_.endo_nbr,M_.endo_nbr,gend+nk);
             PP(:,dr.restrict_var_list,dr.restrict_var_list,:) = PK;
@@ -697,7 +697,7 @@ else
         end
         alphahat0=aaa(:,1);
         alphahat=aaa(:,2:end);
-        
+
         % reconstruct updated variables
         aaa=zeros(M_.endo_nbr,gend);
         aaa(dr.restrict_var_list,:)=ahat;
@@ -733,12 +733,12 @@ else
         end
         aK=aaa;
         ahat=ahat1;
-        
+
         % reconstruct P
         if ~isempty(P)
             PP=zeros(M_.endo_nbr,M_.endo_nbr,gend+1);
             PP(dr.restrict_var_list,dr.restrict_var_list,:)=P;
-            if ~options_.heteroskedastic_filter                
+            if ~options_.heteroskedastic_filter
                 DQD=D(~ilagged,:)*Q*transpose(D(~ilagged,:))+C(~ilagged,:)*R*Q*transpose(D(~ilagged,:))+D(~ilagged,:)*Q*transpose(C(~ilagged,:)*R);
                 DQR=D(~ilagged,:)*Q*transpose(R);
             end
@@ -754,7 +754,7 @@ else
             P=PP;
             clear PP
         end
-        
+
         % reconstruct state_uncertainty
         if ~isempty(state_uncertainty)
             mm=size(T,1);
@@ -782,7 +782,7 @@ else
             state_uncertainty0=sstate_uncertainty;
             clear sstate_uncertainty
         end
-        
+
         % reconstruct PK
         if ~isempty(PK)
             PP = zeros(nk,M_.endo_nbr,M_.endo_nbr,gend+nk);
@@ -802,7 +802,7 @@ else
             clear PP
         end
     end
-    
+
     bayestopt_.mf = bayestopt_.smoother_var_list(bayestopt_.smoother_mf);
     mf = bayestopt_.mf;
 end
@@ -820,7 +820,7 @@ function a=set_Kalman_smoother_starting_values(a,M_,dr,options_)
 % OUTPUTS
 %   o a             [double]    (p*1) vector of set initial states
 
-if isfield(M_,'endo_initial_state') && ~isempty(M_.endo_initial_state) && M_.endo_initial_state.status 
+if isfield(M_,'endo_initial_state') && ~isempty(M_.endo_initial_state) && M_.endo_initial_state.status
     % direct assignment
     state_indices=dr.order_var(dr.restrict_columns);
     if ~isempty(M_.endo_initial_state.values)

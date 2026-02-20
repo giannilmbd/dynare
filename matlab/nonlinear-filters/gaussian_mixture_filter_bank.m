@@ -14,7 +14,7 @@ function [StateMuPrior, StateSqrtPPrior, StateWeightsPrior, StateMuPost, StateSq
 % - StateSqrtP                     [double]        square root of the state covariance matrix
 % - StateWeights                   [double]        weights of the state particles
 % - StructuralShocksMu             [double]        mean of the structural shocks
-% - StructuralShocksSqrtP	       [double]        square root of covariance matrix of the structural shocks    
+% - StructuralShocksSqrtP	       [double]        square root of covariance matrix of the structural shocks
 % - StructuralShocksWeights	       [double]        weights of structural shocks
 % - ObservationShocksWeights       [double]        weights of measurement errors
 % - H                              [double]        Measurement error covariance

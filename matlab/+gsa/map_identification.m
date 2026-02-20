@@ -29,7 +29,7 @@ function map_identification(OutputDirectoryName,opt_gsa,M_,oo_,options_,estim_pa
 % GNU General Public License for more details.
 %
 % You should have received a copy of the GNU General Public License
-% along with Dynare.  If not, see <https://www.gnu.org/licenses/>. 
+% along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 fname_ = M_.fname;
 dr=oo_.dr;
@@ -261,7 +261,7 @@ if opt_gsa.morris==1
             text(ip,-0.02,param_name_tex_temp,'rotation',90,'HorizontalAlignment','right','interpreter','latex')
         else
             text(ip,-0.02,bayestopt_.name{ip},'rotation',90,'HorizontalAlignment','right','interpreter','none')
-        end      
+        end
     end
     xlabel(' ')
     title('Elementary effects in the model')
@@ -272,7 +272,7 @@ elseif opt_gsa.morris==3
     return
 elseif opt_gsa.morris==2   % ISKREV stuff
     return
-else  
+else
     error('gsa/map_identification: unsupported option morris=%u',opt_gsa.morris)
 end
 

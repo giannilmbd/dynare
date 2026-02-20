@@ -7,8 +7,8 @@
 // 1. Variable declaration
 //---------------------------------------------------------------------
 
-var c, d, erp1, i, k, m1, r1, rf1, w, y, z, mu; 
-varexo ez;                          
+var c, d, erp1, i, k, m1, r1, rf1, w, y, z, mu;
+varexo ez;
 
 //---------------------------------------------------------------------
 // 2. Parameter declaration and calibration
@@ -25,21 +25,21 @@ g          = 1.005;   //quarterly growth rate (note zero growth =>g=1)
 tau        = 5;       // curvature parameter with respect to c
 rho        = 0.95;    // AR(1) parameter for technology shock
 
-a1         = (g-1+delt)^(1/xi);             
-a2         = (g-1+delt)-(((g-1+delt)^(1/xi))/(1-(1/xi)))*((g-1+delt)^(1-(1/xi))); 
+a1         = (g-1+delt)^(1/xi);
+a2         = (g-1+delt)-(((g-1+delt)^(1/xi))/(1-(1/xi)))*((g-1+delt)^(1-(1/xi)));
 betstar    = g/1.011138;
-bet        = betstar/(g^(1-tau));             
+bet        = betstar/(g^(1-tau));
 
 //---------------------------------------------------------------------
 // 3. Model declaration
 //---------------------------------------------------------------------
 
-model(use_dll);  
+model(use_dll);
 g*k  = (1-delt)*k(-1) + ((a1/(1-1/xi))*(g*i/k(-1))^(1-1/xi)+a2)*k(-1);
-d    = y - w - i; 
+d    = y - w - i;
 w    = (1-alf)*y;
 y    = z*g^(-alf)*k(-1)^alf;
-c    = w + d; 
+c    = w + d;
 mu   = ((c-chihab*c(-1)/g)^(-tau)-chihab*bet*(c(+1)*g-chihab*c)^(-tau))/1e4;
 mu   = (betstar/g)*mu(+1)*(a1*(g*i/k(-1))^(-1/xi))*(alf*z(+1)*g^(1-alf)*
        (k^(alf-1))+((1-delt+(a1/(1-1/xi))*(g*i(+1)/k)^(1-1/xi)+a2))/
@@ -80,17 +80,17 @@ end;
 
 resid;
 
-steady;                      
+steady;
 
 //---------------------------------------------------------------------
-// 5. Shock declaration  
-//                       
+// 5. Shock declaration
+//
 //---------------------------------------------------------------------
 
 for i=1:1:100;
 s = i/10000;
 shocks;
-var ez; stderr s;  
+var ez; stderr s;
 end;
 
 options_.risky_steadystate = true;

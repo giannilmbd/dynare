@@ -9,7 +9,7 @@ function [dr, info, params] = resol(check_flag, M_, options_, dr_in, endo_steady
 % - dr_in         [structure]     model information structure
 % - endo_steady_state       [vector]     steady state value for endogenous variables
 % - exo_steady_state        [vector]     steady state value for exogenous variables
-% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - dr            [structure]     Reduced form model.

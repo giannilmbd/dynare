@@ -339,7 +339,7 @@ lines starting with a hashtag (#).
     .. option:: MatlabOctavePath = PATH_AND_FILE
 
         The path to the MATLAB or Octave executable. The default value
-        is ``matlab`` as MATLAB’s executable is typically in the %PATH% environment 
+        is ``matlab`` as MATLAB’s executable is typically in the %PATH% environment
         variable. When using full paths on Windows, you may need to enclose the path
         in quoted strings, e.g. ``MatlabOctavePath="C:\Program Files\MATLAB\R2023b\bin\matlab.exe"``
 
@@ -354,27 +354,27 @@ lines starting with a hashtag (#).
         will launch 3 MATLAB instances in parallel, each of which will compute 8 chains sequentially.
         Note that this option does not dictate the number of maximum threads utilized by each MATLAB/Octave instance,
         see related option :opt:`SingleCompThread <SingleCompThread = BOOLEAN>` for this.
-        Particularly for very large models, setting this option to 2 might distribute the workload in a 
+        Particularly for very large models, setting this option to 2 might distribute the workload in a
         more efficient manner, depending on your hardware and task specifics.
         It’s advisable to experiment with different values to achieve optimal performance.
-        The default value is ``1``.        
-        
+        The default value is ``1``.
+
 
     .. option:: SingleCompThread = BOOLEAN
 
-        This option allows you to enable or disable MATLAB’s native multithreading capability. When set to ``true``, 
-        the additional MATLAB instances are initiated in single thread mode utilizing the ``-singleCompThread`` startup option, 
-        thereby disabling MATLAB’s native multithreading. When set to ``false``, MATLAB’s native multithreading 
+        This option allows you to enable or disable MATLAB’s native multithreading capability. When set to ``true``,
+        the additional MATLAB instances are initiated in single thread mode utilizing the ``-singleCompThread`` startup option,
+        thereby disabling MATLAB’s native multithreading. When set to ``false``, MATLAB’s native multithreading
         is enabled, e.g. the actual number of threads utilized by each MATLAB instance is usually determined by the number of CPU cores
         (you can check this by running ``maxNumCompThreads`` in MATLAB’s command window).
-        Note: While MATLAB aims to accelerate calculations by distributing them across your computer’s threads, 
+        Note: While MATLAB aims to accelerate calculations by distributing them across your computer’s threads,
         certain tasks, like MCMC estimations, may exhibit slowdowns with MATLAB’s multitasking especially when Dynare’s parallel computing is turned on
         as we do not use MATLAB’s parallel toolbox.
         So in many cases it is advisable to set this setting to ``true``.
         If you want to have more control, you can manually add the MATLAB command `maxNumCompThreads(N)` at the beginning of `fParallel.m`.
         The default value is ``false``. This option is ineffective under Octave.
 
-        
+
     .. option:: OperatingSystem = OPERATING_SYSTEM
 
         The operating system associated with a node. Only necessary
@@ -416,9 +416,9 @@ Windows Step-by-Step Guide
 ==========================
 
 This section outlines the steps necessary on most Windows systems to
-set up Dynare for parallel execution. Note that the steps 3 to 6 are 
-required unless parallel execution is confined to a local pool 
-with the ``parallel_use_psexec=false`` option. 
+set up Dynare for parallel execution. Note that the steps 3 to 6 are
+required unless parallel execution is confined to a local pool
+with the ``parallel_use_psexec=false`` option.
 
     1. Write a configuration file containing the options you want. A
        minimum working example setting up a cluster consisting of two

@@ -127,7 +127,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
         call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
    ysteady => mxGetDoubles(ysteady_mx)
 
-   allocate(h(0:order), fdr(0:order), udr(0:order)) 
+   allocate(h(0:order), fdr(0:order), udr(0:order))
    do i = 0, order
       write (fieldname, '(a2, i1)') "g_", i
       tmp = mxGetField(dr_mx, 1_mwIndex, trim(fieldname))
@@ -156,9 +156,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    end if
 
    allocate(dyu(nvar), mean(endo_nbr), sim(endo_nbr,nper))
-   ! Getting the predetermined part of the endogenous variable vector 
+   ! Getting the predetermined part of the endogenous variable vector
    dyu(1:nys) = yhat_start(nstatic+1:nstatic+nys)
-   dyu(nys+1:) = shocks(:,1) 
+   dyu(nys+1:) = shocks(:,1)
    ! Using the Horner algorithm to evaluate the decision rule at the chosen dyu
    call eval(h, dyu, udr, endo_nbr, nvar, order)
    sim(:,1) = h(0)%m(:,1) + ysteady
@@ -166,7 +166,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
    ! Carrying out the simulation
    do t=2,nper
-      dyu(1:nys) = h(0)%m(nstatic+1:nstatic+nys,1) 
+      dyu(1:nys) = h(0)%m(nstatic+1:nstatic+nys,1)
       dyu(nys+1:) = shocks(:,t)
       call eval(h, dyu, udr, endo_nbr, nvar, order)
       sim(:,t) = h(0)%m(:,1) + ysteady

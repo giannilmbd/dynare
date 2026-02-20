@@ -1,7 +1,7 @@
 function new_particles = univariate_smooth_resampling(weights,particles,number_of_new_particles)
 % new_particles = univariate_smooth_resampling(weights,particles,number_of_new_particles)
 % Smooth Resampling of the particles (univariate version).
-% 
+%
 % INPUTS
 %  - weights                    [double]    n*1 vector of particles' weights.
 %  - particles                  [double]    n*1 vector of particles

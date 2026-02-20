@@ -67,7 +67,7 @@ generate_trend_stationary_AR1(M_.fname);
 
 estimation(order=1,datafile='Trend_no_prefilter_selected_var_AR1_trend_data_with_constant',mh_replic=0,
         mode_compute=4,first_obs=1,nobs=1000,
-        filtered_vars, filter_step_ahead = [1,2,4],        
+        filtered_vars, filter_step_ahead = [1,2,4],
         diffuse_filter,filter_covariance,smoother,forecast=0,prefilter=0,filter_decomposition) P_obs Y_obs junk2;
 
 %Test selected_variables_only option
@@ -84,11 +84,11 @@ oo_.SmoothedShocks  = [];
 set_dynare_seed('default');
 estimation(order=1,datafile='Trend_no_prefilter_selected_var_AR1_trend_data_with_constant',mh_replic=0,
         mode_compute=4,first_obs=1,nobs=1000,silent_optimizer,
-        filtered_vars, filter_step_ahead = [1,2,4],        
+        filtered_vars, filter_step_ahead = [1,2,4],
         diffuse_filter,smoother,forecast=0,filter_covariance,prefilter=0,filter_decomposition,selected_variables_only) P_obs Y_obs junk2;
 
 % do checks
-        
+
 if max(abs(oo_.SmoothedVariables.Y_obs-oo_all_variables.SmoothedVariables.Y_obs))>1e-8 ||...
     max(abs(oo_.SmoothedVariables.P_obs-oo_all_variables.SmoothedVariables.P_obs))>1e-8 || ...
     max(abs(oo_.SmoothedVariables.junk2-oo_all_variables.SmoothedVariables.junk2))>1e-8
@@ -102,18 +102,18 @@ if max(abs(oo_.UpdatedVariables.Y_obs-oo_all_variables.UpdatedVariables.Y_obs))>
 end
 
 if mean(abs(oo_.FilteredVariables.Y_obs-oo_all_variables.FilteredVariables.Y_obs))>1e-8 ||...
-    mean(abs(oo_.FilteredVariables.P_obs-oo_all_variables.FilteredVariables.P_obs))>1e-8 
+    mean(abs(oo_.FilteredVariables.P_obs-oo_all_variables.FilteredVariables.P_obs))>1e-8
     error('Smoothed Variables are wrong')
 end
 
-   
+
 Y_pos=strmatch('Y_obs',M_.endo_names,'exact');
 P_pos=strmatch('P_obs',M_.endo_names,'exact');
 junk2_pos=strmatch('junk2',M_.endo_names,'exact');
 
 [junk_arg,order_index]=sort([Y_pos,P_pos,junk2_pos]);
 
-   
+
 if max(max(max(abs(oo_.FilteredVariablesKStepAhead-oo_all_variables.FilteredVariablesKStepAhead(:,[Y_pos;P_pos;junk2_pos],:)))))>1e-8
     error('FilteredVariablesKStepAhead is wrong')
 end
@@ -125,7 +125,7 @@ end
 if max(max(max(max(abs(oo_.FilteredVariablesShockDecomposition-oo_all_variables.FilteredVariablesShockDecomposition(:,[Y_pos;P_pos;junk2_pos],:,:))))))>1e-8
     error('FilteredVariablesShockDecomposition is wrong')
 end
-        
+
 if max(abs(oo_.SmoothedShocks.e_y-oo_all_variables.SmoothedShocks.e_y))>1e-8 || max(abs(oo_.SmoothedShocks.e_p-oo_all_variables.SmoothedShocks.e_p))>1e-8
     error('Smoothed Shocks are wrong')
 end

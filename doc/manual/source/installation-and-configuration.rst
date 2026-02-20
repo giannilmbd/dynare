@@ -22,14 +22,14 @@ In order to run Dynare, you need one of the following:
 The following optional extensions are also useful to benefit from
 extra features, but are in no way required:
 
-* If under MATLAB: the 
+* If under MATLAB: the
 
-  * Optimization Toolbox (providing various optimizers 
+  * Optimization Toolbox (providing various optimizers
     like ``fminsearch``, ``fmincon``, or ``fminunc``, used in e.g. ``mode_compute``,
-    ``opt_algo`` or ``ALGO``), 
-  * Statistics Toolbox (for faster and sometimes more robust implementations of 
-    statistical distributions), 
-  * Global Optimization Toolbox (for ``particleswarm`` and ``simulannealbnd``, used in 
+    ``opt_algo`` or ``ALGO``),
+  * Statistics Toolbox (for faster and sometimes more robust implementations of
+    statistical distributions),
+  * Global Optimization Toolbox (for ``particleswarm`` and ``simulannealbnd``, used in
     e.g. ``mode_compute``, ``opt_algo`` or ``ALGO``)
   * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``lyapunov=square_root_solver``)
   * Parallel Computing Toolbox (to speed up the ``dime`` sampler)
@@ -124,7 +124,7 @@ The default installation directory is ``/Applications/Dynare/x.y-arch``.
 It is recommended to install the Xcode Command Line Tools (this is an Apple product)
 and GCC via Homebrew_ (see :ref:`prerequisites-macos`).
 
-To uninstall Dynare, simply delete the folder where you installed the program. The package installer does 
+To uninstall Dynare, simply delete the folder where you installed the program. The package installer does
 not put any files anywhere else in the system.
 
 
@@ -217,7 +217,7 @@ You can check this e.g. by running the following command in the MATLAB command w
   mex -setup
 
 Moreover, we recommend making use of optimized compilation flags when using :opt:`use_dll` and for this you need to install GCC via Homebrew_::
-  
+
   brew install gcc
 
 If you already have installed GCC, Dynare will automatically prefer it for :opt:`use_dll`

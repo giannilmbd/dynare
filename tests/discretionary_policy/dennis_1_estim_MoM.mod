@@ -64,7 +64,7 @@ method_of_moments(
         , additional_optimizer_steps = [13]   % vector of additional mode-finders run after mode_compute
         , optim = ('TolFun'      , 1D-6       % termination tolerance on the function value, a positive scalar
                   ,'TolX'        , 1e-6       % termination tolerance on x, a positive scalar
-                  )                         
+                  )
         , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
         , mode_check                               % plot the target function for values around the computed minimum for each estimated parameter in turn
     );

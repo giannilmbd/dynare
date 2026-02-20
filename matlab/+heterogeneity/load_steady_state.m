@@ -38,7 +38,7 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
 %
 % Original author: Normann Rion <normann@dynare.org>
    assert(isscalar(M_.heterogeneity), 'Heterogeneous-agent models with more than one heterogeneity dimension are not allowed yet!');
-   
+
    if nargin < 4
       file_name = options_het.steady_state_file_name;
       variable_name = options_het.steady_state_variable_name;

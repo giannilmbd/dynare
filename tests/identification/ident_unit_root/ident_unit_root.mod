@@ -51,7 +51,7 @@ end;
 
 steady;
 check;
-varobs delta_y; 
+varobs delta_y;
 stoch_simul(order=1,irf=0);
 
 

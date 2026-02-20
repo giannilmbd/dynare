@@ -1,7 +1,7 @@
 function [y,dy] = prodmom_deriv(V,ii,nu,dV,dC)
 % Computes the product moments (and its derivatives with respect to standard
 % errors and correlation parameters) of normally distributed variables, i.e.
-% this function computes the product moment of 
+% this function computes the product moment of
 % X_{i_1}^{nu_1}X_{i_2}^{nu_2}...X_{i_m}^{nu_m}, where X_{i_j} are elements
 % from X ~ N(0_n,V) and V is positive semidefinite.
 % Example: To get E[X_2X_4^3X_7^2], use prodmom_deriv(V,[2 4 7],[1 3 2])
@@ -24,13 +24,13 @@ function [y,dy] = prodmom_deriv(V,ii,nu,dV,dC)
 % -------------------------------------------------------------------------
 % This function is based upon prodmom.m which is part of replication codes
 % of the following paper:
-% Kan, R.: "From moments of sum to moments of product." Journal of 
+% Kan, R.: "From moments of sum to moments of product." Journal of
 % Multivariate Analysis, 2008, vol. 99, issue 3, pages 542-554.
 % prodmom.m can be retrieved from http://www-2.rotman.utoronto.ca/~kan/papers/prodmom.zip
 % Further references:
 %  Triantafyllopoulos (2003) On the Central Moments of the Multidimensional
 %  Gaussian Distribution, Mathematical Scientist
-%  Kotz, Balakrishnan, and Johnson (2000), Continuous Multivariate 
+%  Kotz, Balakrishnan, and Johnson (2000), Continuous Multivariate
 %  Distributions, Vol. 1, p.261
 
 % Copyright © 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
@@ -112,7 +112,7 @@ if m==2
         tmp = pruned_SS.bivmom(nu,rho);
     end
     y = V(1,1)^(nu(1)/2)*V(2,2)^(nu(2)/2)*tmp;
-    return  
+    return
 end
 %
 %  Regular case

@@ -2,7 +2,7 @@ function [info, oo_, options_, M_] = run(M_, options_, oo_, var_list, params, i_
 % [info, oo_, options_, M_] = osr(M_, options_, oo_, var_list, params, i_var,W)
 % Function computing the solution to the optimal simple rule-problem. There
 % are two calling syntaxes. The first one with 5 inputs assumes a
-% planner_objective is present. The second (legacy) one at order==1 requires 
+% planner_objective is present. The second (legacy) one at order==1 requires
 % an optim_weights block to provide two more inputs.
 %
 % INPUTS
@@ -19,7 +19,7 @@ function [info, oo_, options_, M_] = run(M_, options_, oo_, var_list, params, i_
 %
 % OUTPUTS
 %   info        [integer]           scalar or vector, error code.
-%   oo_         [structure]         Dynare's results structure, containing subfield   
+%   oo_         [structure]         Dynare's results structure, containing subfield
 %       osr_res:    results structure containing:
 %                   - objective_function [scalar double]   value of the objective
 %                                                           function at the optimum
@@ -54,7 +54,7 @@ else
     error('OSR: wrong number of input arguments.')
 end
 
-if ~use_planner_objective 
+if ~use_planner_objective
     if options_.order ~= 1
         error ('OSR: OSR without planner_objective only supports order=1.');
     end
@@ -167,7 +167,7 @@ else
         [p, f, ~, ~, ~, ~, optimization_info] = ...
             dynare_minimize_objective(str2func('osr.objective'),par_0,options_.osr.opt_algo,options_,M_.osr.param_bounds,M_.param_names(i_params),[],[], M_,oo_,options_,i_params,...
             inv_order_var(i_var),W(i_var,i_var));
-    end    
+    end
 end
 
 osr_res.objective_function = f;
@@ -184,7 +184,7 @@ if ~options_.noprint
     lh = cellofchararraymaxlength(labels)+2;
     dyntable(options_, my_title, headers, labels, p, lh, 10, 6);
     if options_.TeX
-        labels = M_.param_names_tex(i_params);       
+        labels = M_.param_names_tex(i_params);
         lh = cellofchararraymaxlength(labels)+2;
         dyn_latex_table(M_, options_, my_title, 'osr', headers, labels, p, lh, 10, 6);
     end

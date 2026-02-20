@@ -1,7 +1,7 @@
 //Tests Occbin estimation with IVF and PKF with 1 constraints and redundant shocks
 
 // this file implements the model in:
-// Atkinson, T., A. W. Richter, and N. A. Throckmorton (2019). 
+// Atkinson, T., A. W. Richter, and N. A. Throckmorton (2019).
 // The zero lower bound andestimation accuracy.Journal of Monetary Economics
 // original codes provided by Alexander Richter
 // adapted for dynare implementation
@@ -13,14 +13,14 @@
 
 // if ~exist('run_ivf','var')
 run_ivf=0;
-// end        
+// end
 
 // ----------------- Defintions -----------------------------------------//
-var        
-    c          //1  Consumption 
+var
+    c          //1  Consumption
     n          //2  Labor
     y          //5  Output
-    yf         //6  Final goods       
+    yf         //6  Final goods
     yg         //11 Output growth gap
     w          //12 Real wage rate
     wf         //13 Flexible real wage
@@ -28,31 +28,31 @@ var
     inom       //16 Nominal interest rate
     inomnot    //17 Notional interest rate
     mc         //19 Real marginal cost
-    lam        //20 Inverse marginal utility of wealth  
-    g          //21 Growth shock       
+    lam        //20 Inverse marginal utility of wealth
+    g          //21 Growth shock
     s          //22 Risk premium shock
-    mp         //23 Monetary policy shock    
-    pi      //24 Observed inflation    
+    mp         //23 Monetary policy shock
+    pi      //24 Observed inflation
     @#if !(small_model)
         x          //3  Investment
-        k          //4  Capital    
+        k          //4  Capital
         u          //7  Utilization cost
         ups        //8  Utilization choice
-        wg         //9  Real wage growth gap    
+        wg         //9  Real wage growth gap
         xg         //10 Investment growth
         rk         //14 Real rental rate
-        q          //18 Tobins q   
+        q          //18 Tobins q
     @#endif
 ;
-varexo          
+varexo
     junk1
     epsg       // Productivity growth shock
     epsi       // Notional interest rate shock
     epss       // Risk premium shock
     junk2
-;        
+;
 parameters
-    // Calibrated Parameters    
+    // Calibrated Parameters
     beta        // Discount factor
     chi         // Labor disutility scale
     thetap      // Elasticity of subs. between intermediate goods
@@ -63,8 +63,8 @@ parameters
     alpha       // Capital share
     gbar        // Mean growth rate
     pibar       // Inflation target
-    inombar     // Steady gross nom interest rate    
-    inomlb      // Effective lower bound on gross nominal interest rate    
+    inombar     // Steady gross nom interest rate
+    inomlb      // Effective lower bound on gross nominal interest rate
     sbar        // Average risk premium
     // Parameters for DGP and Estimated parameters
     varphip     // Rotemberg price adjustment cost
@@ -78,11 +78,11 @@ parameters
     phipi       // Inflation responsiveness
     phiy        // Output responsiveness
     nu          // Investment adjustment cost
-    sigups      // Utilization    
+    sigups      // Utilization
  ;
 
 
-// ---------------- Calibration -----------------------------------------//   
+// ---------------- Calibration -----------------------------------------//
 
 beta     = 0.9949;    // Discount factor
 thetap   = 6;         // Elasticity of subs. between intermediate goods
@@ -107,11 +107,11 @@ sigs     = 0.005;     // Standard deviation
 sigi     = 0.002;      // Standard deviation
 phipi    = 2.0;       // Inflation responsiveness
 phiy     = 0.5;       // Output responsiveness
-inomlb   = 1 ;         // Inom LB  
-        
-// ---------------- Model -----------------------------------------------//               
+inomlb   = 1 ;         // Inom LB
+
+// ---------------- Model -----------------------------------------------//
 model;
-    
+
     @#if !(small_model)
         [name = 'HH FOC utilization (1)']
         rk = steady_state(rk)*exp(sigups*(ups-1));
@@ -133,86 +133,86 @@ model;
 
         [name = 'Real wage growth gap (6)']
         wg = pigap*g*w/(gbar*w(-1));
-        
+
         [name = 'Law of motion for capital (15)']
-        k = (1-delta)*(k(-1)/g)+x*(1-nu*(xg-1)^2/2);                   
+        k = (1-delta)*(k(-1)/g)+x*(1-nu*(xg-1)^2/2);
 
         [name = 'Investment growth gap (14)']
-        xg = g*x/(gbar*x(-1));    
-    @#endif 
-    
-            
-    @#if small_model         
+        xg = g*x/(gbar*x(-1));
+    @#endif
+
+
+    @#if small_model
         [name = 'Production function (2)']
-        yf = n;   
-    
-        [name = 'Firm FOC labor (5)']            
+        yf = n;
+
+        [name = 'Firm FOC labor (5)']
         w = mc*yf/n;
-        
+
         [name = 'Output definition (7)']
         y = (1-varphip*(pigap-1)^2/2)*yf;
-        
+
         [name = 'ARC (13)']
         c = y;
-        
+
         [name = 'Household labpur supply equals flex wage']
         w = wf;
-    @#else     
+    @#else
         [name = 'Production function (2)']
         yf = (ups*k(-1)/g)^alpha*n^(1-alpha);
-    
-        [name = 'Firm FOC labor (5)']            
+
+        [name = 'Firm FOC labor (5)']
         w = (1-alpha)*mc*yf/n;
-    
+
        	[name = 'Output definition (7)']
         y = (1-varphip*(pigap-1)^2/2-varphiw*(wg-1)^2/2)*yf - u*k(-1)/g;
-      
+
         [name = 'ARC (13)']
         x = y-c;
-    @#endif 
-    
+    @#endif
+
     [name = 'Output growth gap (8)']
     yg = g*y/(gbar*y(-1)) + junk1 + junk2;
-       
+
     [name = 'Notional Interest Rate (9)']
     inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi);
-    
+
     [name = 'Nominal Interest Rate (10)', bind='zlb']
     inom = inomlb*exp(mp);
     [name = 'Nominal Interest Rate (10)', relax='zlb']
     inom = inomnot*exp(mp);
-                  
+
     [name = 'Inverse MUC (11)']
     lam = c-h*c(-1)/g;
-    
+
     [name = 'Flexible real wage definition (12)']
     wf = chi*n^eta*lam;
-    
+
     [name = 'HH FOC bond (16)']
     1 = beta*(lam/lam(+1))*s*inom/(g(+1)*pibar*pigap(+1));
-       
+
     [name = 'Price Phillips Curve (19)']
     varphip*(pigap-1)*pigap = 1-thetap+thetap*mc+beta*varphip*(lam/lam(+1))*(pigap(+1)-1)*pigap(+1)*(yf(+1)/yf);
-     
+
     [name = 'Stochastic productivity growth (21)']
     g = gbar+ sigz*epsg;
-    
+
     [name = 'Risk premium shock (22)']
-    s = (1-rhos)*sbar + rhos*s(-1)+sigs*epss     ;      
-    
+    s = (1-rhos)*sbar + rhos*s(-1)+sigs*epss     ;
+
     [name = 'Notional interest rate shock (23)']
     mp = sigi*epsi;
-    
+
     [name = 'Observed inflation (24)']
     pi = pigap*pibar;
-     
+
 end;
 
 occbin_constraints;
 name 'zlb'; bind inomnot <=  inomlb; relax inomnot > inomlb;
 end;
 
-// ---------------- Steady state -----------------------------------------//        
+// ---------------- Steady state -----------------------------------------//
 steady_state_model;
     mp = 0;
     xg = 1;
@@ -226,7 +226,7 @@ steady_state_model;
     pigap = 1;
     wg =1;
     pi = pigap*pibar;
-    // FOC bond 
+    // FOC bond
     inom = gbar*pibar/(beta*s);
     inomnot = inom;
     inombar = inom;
@@ -258,15 +258,15 @@ steady_state_model;
     // FOC labor
     lam = (1-h/gbar)*c;
     chi = wf/(n^eta*lam);
-    
+
     // try log observables
 end;
 
-// ---------------- Checks -----------------------------------------//        
+// ---------------- Checks -----------------------------------------//
 steady;
 check;
 
-// ---------------- Simulation -----------------------------------------//        
+// ---------------- Simulation -----------------------------------------//
 shocks;
     var epsi   =  1;
     var epss   =  1;
@@ -274,10 +274,10 @@ shocks;
 end;
 
 steady;
-check;  
-        
-// ---------------- Estimation -----------------------------------------//        
-        
+check;
+
+// ---------------- Estimation -----------------------------------------//
+
 varobs yg inom pi;
     estimated_params;
         // PARAM NAME, INITVAL, LB, UB, PRIOR_SHAPE, PRIOR_P1, PRIOR_P2, PRIOR_P3, PRIOR_P4, JSCALE
@@ -291,28 +291,28 @@ varobs yg inom pi;
         sigz,,,,INV_GAMMA_PDF,0.005,0.005;
         sigs,,,,INV_GAMMA_PDF,0.005,0.005;
         sigi,,,,INV_GAMMA_PDF,0.002,0.002;
-    end;    
-    
- 
+    end;
+
+
 
     estimation(
             datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
             nodisplay,consider_all_endogenous);
-    
+
     oo0=oo_;
-    
+
     // use inversion filter (note that IF provides smoother together with likelihood)
     options_.occbin.likelihood.inversion_filter  = 1;
     options_.occbin.smoother.inversion_filter  = 1;
-            
+
     estimation(
             datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
             nodisplay, consider_all_endogenous);
-            
+
     // show initial condition effect of IF
     figure,
     subplot(221)

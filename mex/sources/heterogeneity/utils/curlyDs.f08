@@ -61,7 +61,7 @@ contains
         acc = 0.0_real64
         do i=1,N_e
             do concurrent (k=1:S, j=1:N_a)
-                m = (j-1)*N_e + i 
+                m = (j-1)*N_e + i
                 a = (ind(i+(j-1)*N_e,1)-1)*N_e + i
                 a_next = a+N_e
                 inc = inv_h(m,1)*om(m)*a_hat(m,k,1)

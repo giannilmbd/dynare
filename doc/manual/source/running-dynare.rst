@@ -193,7 +193,7 @@ by the ``dynare`` command.
        Instructs the preprocessor to output derivatives of the dynamic model at
        least up to the given order. The `first` option is useful in
        larger models when debugging steady state computation, because it allows
-       overriding the default computation and output of dynamic second order derivatives 
+       overriding the default computation and output of dynamic second order derivatives
        in case of the mod-file not containing commands for further computations.
 
     .. option:: language=matlab|julia
@@ -409,10 +409,10 @@ by the ``dynare`` command.
 
     .. option:: fast
 
-        Don’t rewrite the output files otherwise written to the disk by the preprocessor 
-        when re-running the same model file while the lists of variables and the equations 
-        haven’t changed. Note that the whole model still needs to be preprocessed. This option 
-        is most useful with model option :opt:`use_dll`, because 
+        Don’t rewrite the output files otherwise written to the disk by the preprocessor
+        when re-running the same model file while the lists of variables and the equations
+        haven’t changed. Note that the whole model still needs to be preprocessed. This option
+        is most useful with model option :opt:`use_dll`, because
         the time-consuming compilation of the MEX files will be skipped. We use a 32
         bit checksum, stored in ``<model filename>/checksum``. There
         is a very small probability that the preprocessor misses a
@@ -436,15 +436,15 @@ by the ``dynare`` command.
 
         By default, if no Dynare commands related to stochastic models
         (``stoch_simul``, ``estimation``, ``osr``, ``discretionary_policy``,
-        ``calib_smoother``, ``identification``, ``method_of_moments``, 
-        ``sensitivity``) are present in the ``.mod`` file, 
-        Dynare treats the model to be solved as deterministic. 
-        This option instructs Dynare that the model to be solved is stochastic 
-        and that there is an implicit conditional expectation operator in the 
-        model equations. It modifies the internal handling of 
-        nonlinear forward-looking terms to account for Jensen's Inequality. 
-        This option is useful when the user wants to work with a stochastic 
-        model but does not want to use any of the stochastic Dynare 
+        ``calib_smoother``, ``identification``, ``method_of_moments``,
+        ``sensitivity``) are present in the ``.mod`` file,
+        Dynare treats the model to be solved as deterministic.
+        This option instructs Dynare that the model to be solved is stochastic
+        and that there is an implicit conditional expectation operator in the
+        model equations. It modifies the internal handling of
+        nonlinear forward-looking terms to account for Jensen's Inequality.
+        This option is useful when the user wants to work with a stochastic
+        model but does not want to use any of the stochastic Dynare
         commands, e.g., due to calling Matlab functions directly.
 
     .. _exclude_eqs:
@@ -565,9 +565,9 @@ by the ``dynare`` command.
     called ``FILENAME_results.mat`` located in the ``MODFILENAME/Output`` folder.
     If they exist, ``estim_params_``,
     ``bayestopt_``, ``dataset_``, ``oo_recursive_`` and
-    ``estimation_info`` are saved in the same file. Note that MATLAB 
-    by default only allows ``.mat`` files up to 2GB. You can lift this 
-    restriction by enabling the ``save -v7.3`` option in 
+    ``estimation_info`` are saved in the same file. Note that MATLAB
+    by default only allows ``.mat`` files up to 2GB. You can lift this
+    restriction by enabling the ``save -v7.3`` option in
     ``Preferences -> General -> MAT-Files``.
 
     .. matvar:: M_

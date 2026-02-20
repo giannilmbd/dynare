@@ -1,4 +1,4 @@
-@#include "fs2000_model.inc" 
+@#include "fs2000_model.inc"
 
 stoch_simul(periods=200, order=1,irf=0);
 temp=oo_.endo_simul;
@@ -32,4 +32,4 @@ end;
 @#define mode_file_name="'fs2000_uncorr_ME/Output/fs2000_uncorr_ME_mode'"
 @#define data_file_name="fsdat_simul_uncorr_ME"
 
-@#include "fs2000_estimation_check.inc" 
+@#include "fs2000_estimation_check.inc"

@@ -1,7 +1,7 @@
 /* Mod file tests the correctness of the Ramsey command when used together with a steady state file by
  * - checking whether the results coincide with the ones when used with an initval block
  * - checking whether between stoch_simul and ramsey_planner are consistent
- * The example is taken from Juillard, Michel (2011): User manual for optimal policy package, 
+ * The example is taken from Juillard, Michel (2011): User manual for optimal policy package,
  * MONFISPOL FP7 project SSH-225149, Deliverable 1.1.2
 */
 

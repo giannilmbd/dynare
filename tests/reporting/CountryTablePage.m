@@ -57,7 +57,7 @@ for i = 1:length(seriesNames)
         'tableDataRhs', db_a{[seriesNames{i}{1} countryAbbr]});
     delta = db_q{[seriesNames{i}{1} countryAbbr]}-dc_q{[seriesNames{i}{1} countryAbbr]};
     delta.tex_rename_('$\Delta$');
-    
+
     deltaa = db_a{[seriesNames{i}{1} countryAbbr]}-dc_a{[seriesNames{i}{1} countryAbbr]};
     deltaa.tex_rename_('$\Delta$');
     rep.addSeries('data', delta, ...

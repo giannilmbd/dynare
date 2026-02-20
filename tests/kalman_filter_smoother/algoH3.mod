@@ -36,7 +36,7 @@ stderr w, inv_gamma_pdf, 0.01,inf;
 end;
 
 varobs w x y;
-       
+
 estimation(datafile=data_algo,first_obs=1000,silent_optimizer,nobs=200,mh_replic=0,diffuse_filter,smoothed_state_uncertainty);
 
 stoch_simul(irf=0);

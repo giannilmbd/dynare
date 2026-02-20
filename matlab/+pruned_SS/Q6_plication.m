@@ -57,7 +57,7 @@ for i1=1:p
                             DP6(n,m)=1;
                         end
                         counti = counti+1;
-                    end                
+                    end
                 end
             end
         end

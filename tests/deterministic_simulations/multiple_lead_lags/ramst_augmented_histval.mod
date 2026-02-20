@@ -1,4 +1,4 @@
-//Version of the ramst.mod augmented with purely backward looking AR-process that should not 
+//Version of the ramst.mod augmented with purely backward looking AR-process that should not
 //alter any dynamics of original
 
 // Endogenous variables: consumption and capital
@@ -70,7 +70,7 @@ end
 if max(abs(junk(M_.maximum_lag+1:end)-oo_.endo_simul(strmatch('y_backward',M_.endo_names,'exact'),1:end-M_.maximum_lead)))>1e-10
     error('Solution of purely backwards model not correct')
 end
-        
+
 ramst_results=load('../../deterministic_simulations/ramst/Output/ramst_results.mat');
 if max(abs(ramst_results.oo_.endo_simul(strmatch('k',ramst_results.M_.endo_names,'exact'),1:end-M_.maximum_lead)-oo_.endo_simul(strmatch('k',M_.endo_names,'exact'),1:end-M_.maximum_lead)))>1e-10
     error('Solution of forward part of the model not correct')
@@ -79,4 +79,4 @@ end
 if max(abs(ramst_results.oo_.endo_simul(strmatch('c',ramst_results.M_.endo_names,'exact'),2:end-M_.maximum_lead)-oo_.endo_simul(strmatch('c',M_.endo_names,'exact'),2:end-M_.maximum_lead)))>1e-10
     error('Solution of forward part of the model not correct')
 end
-        
+

@@ -2,7 +2,7 @@ function parameter_set_string=get_parameter_set_name(parameter_set)
 % parameter_set_string=get_parameter_set_name(options_)
 % Inputs:
 %   parameter_set           [string]    content of options_.parameter_set
-% 
+%
 % Outputs:
 %   parameter_set_string    [string]    associated name
 

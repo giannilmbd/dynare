@@ -51,7 +51,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -94,7 +94,7 @@ estimation(order=1,silent_optimizer,datafile=fsdat_simul,nobs=192,loglinear,mh_r
 if ~isequal(options_.convergence.geweke.taper_steps,[4 7 15]') || ~isequal(options_.convergence.geweke.geweke_interval,[0.19 0.49])
     error('Interface for Geweke diagnostics not working')
 end
-        
+
 if ~isequal(options_.convergence.rafterylewis.qrs,[0.025 0.01 0.95]) || ~isequal(options_.convergence.rafterylewis.indicator,1)
     error('Interface for Raftery/Lewis diagnostics not working')
 end
@@ -103,7 +103,7 @@ end
 options_.bayesian_irf=0;
 options_.smoother=0;
 options_.moments_varendo=0;
-options_.forecast=0;   
+options_.forecast=0;
 copyfile([M_.dname filesep 'metropolis' filesep M_.dname '_mh1_blck1.mat'],[M_.dname '_mh1_blck1.mat'])
 estimation(mode_compute=0,mode_file='fs2000/Output/fs2000_mode',order=1, datafile=fsdat_simul, nobs=192, loglinear, mh_replic=1500, mh_nblocks=1, mh_jscale=0.8);
 hh=eye(size(bayestopt_.name,1));
@@ -119,7 +119,7 @@ if ~isoctave
         error('Adding draws did not result in the same chain')
     end
 end
-        
+
 if ~isfolder(sprintf('%s/Output', M_.dname))
     mkdir(sprintf('%s/Output', M_.dname));
 end

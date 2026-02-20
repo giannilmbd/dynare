@@ -22,7 +22,7 @@ model;
   [name='euler equation']
   k = beta*(((exp(b)*c)/(exp(b(+1))*c(+1)))
     *(exp(b(+1))*alpha*y(+1)+(1-delta)*k));
-  
+
   [name='production function']
   y = exp(a)*(k(-1)^alpha)*(h^(1-alpha));
 

@@ -177,7 +177,7 @@ function id = match_parameter_name_with_stderr(search_name, search_list)
 % OUTPUTS
 %   id: [int or empty] Index of the match if found, empty otherwise
 
-% Ensure search_name is a char array 
+% Ensure search_name is a char array
 if isstring(search_name)
     search_name = char(search_name);
 end

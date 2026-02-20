@@ -13,13 +13,13 @@ for ii=1: length(varlist_FV)
 end
 
 % order in states of FV et al. paper:
-% exogenous: usigmar usigmatb ur utb ug 
-varlist_FV_exo_states={'u_sigma_r';'u_sigma_tb';'u_r';'u_tb';'u_x'}; 
+% exogenous: usigmar usigmatb ur utb ug
+varlist_FV_exo_states={'u_sigma_r';'u_sigma_tb';'u_r';'u_tb';'u_x'};
 for ii=1: length(varlist_FV_exo_states)
     FV_exo_order(ii)=strmatch(varlist_FV_exo_states{ii},M_.exo_names,'exact');
 end
 
-%followed by endogenous: sigmarlag sigmatblag erlag etblag glag investlag debt capital Lambda        
+%followed by endogenous: sigmarlag sigmatblag erlag etblag glag investlag debt capital Lambda
 varlist_FV_endo_states={'sigma_r';'sigma_tb';'eps_r';'eps_tb';'X';'I';'D';'K'};
 for ii=1: length(varlist_FV_endo_states)
     FV_endo_state_order(ii)=strmatch(varlist_FV_endo_states{ii},M_.endo_names(state_vars),'exact');
@@ -90,7 +90,7 @@ for endo_iter_1=1:nx
          for exo_iter=1:nu
             gxxx_dyn(nu+endo_iter_1,nu+endo_iter_2,exo_iter,:)=dr.ghxxu(FV_endo_order,(FV_endo_state_order(endo_iter_1)-1)*nx*nu+(FV_endo_state_order(endo_iter_2)-1)*nu+FV_exo_order(exo_iter));
             gxxx_dyn(exo_iter,nu+endo_iter_2,nu+endo_iter_1,:)=dr.ghxxu(FV_endo_order,(FV_endo_state_order(endo_iter_1)-1)*nx*nu+(FV_endo_state_order(endo_iter_2)-1)*nu+FV_exo_order(exo_iter));
-            gxxx_dyn(nu+endo_iter_1,exo_iter,nu+endo_iter_2,:)=dr.ghxxu(FV_endo_order,(FV_endo_state_order(endo_iter_1)-1)*nx*nu+(FV_endo_state_order(endo_iter_2)-1)*nu+FV_exo_order(exo_iter));      
+            gxxx_dyn(nu+endo_iter_1,exo_iter,nu+endo_iter_2,:)=dr.ghxxu(FV_endo_order,(FV_endo_state_order(endo_iter_1)-1)*nx*nu+(FV_endo_state_order(endo_iter_2)-1)*nu+FV_exo_order(exo_iter));
          end
     end
 end

@@ -51,7 +51,7 @@ if ~options_.nograph
     end
     if options_.TeX
         gsa.scatter_plots(lpmat, xdata, param_names_tex, '.', [fname_, '_', amcf_name], OutputDirectoryName, amcf_title, xx, options_)
-    else 
+    else
         gsa.scatter_plots(lpmat, xdata, param_names, '.', [fname_, '_', amcf_name], OutputDirectoryName, amcf_title, xx, options_)
     end
 end

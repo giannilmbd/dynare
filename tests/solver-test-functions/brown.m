@@ -57,7 +57,7 @@ if isnumeric(x) && isvector(x) && all(~isnan(x))
     end
 elseif isnumeric(x) && isvector(x) && all(isnan(x))
     if nargout==1
-        fval = 0.5*ones(length(x), 1); 
+        fval = 0.5*ones(length(x), 1);
     else
         error('One output is required for initialization mode.')
     end

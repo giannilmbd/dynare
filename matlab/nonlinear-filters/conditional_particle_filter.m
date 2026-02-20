@@ -97,7 +97,7 @@ for t=1:T
     if any(flags)
         LIK = -Inf;
         lik(t) = -Inf;
-        return 
+        return
     end
     SumSampleWeights = sum(SampleWeights);
     lik(t) = log(SumSampleWeights);

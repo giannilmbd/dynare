@@ -49,7 +49,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -78,10 +78,10 @@ end;
 // List the observed variables.
 varobs gp_obs gy_obs;
 
-// Instantiate a dseries object from an m file. Note that the dseries object has more than two variables. 
+// Instantiate a dseries object from an m file. Note that the dseries object has more than two variables.
 ts = dseries('fsdat_simul.m');
 
-// Load directly the dseries object as data for the estimation. The declared observed variables must be in the dseries object ts. 
+// Load directly the dseries object as data for the estimation. The declared observed variables must be in the dseries object ts.
 data(series=ts, first_obs=1950Q3, last_obs=2000Q3);
 
 // Print the first date of the sample.

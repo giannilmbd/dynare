@@ -68,7 +68,7 @@ varobs Obs_Gr_C Obs_Gr_I Obs_Infl Obs_r1 Obs_r40 Obs_xhr40 Obs_GoY Obs_hours;
 %--------------------------------------------------------------------------
 % Exogenous shocks
 %--------------------------------------------------------------------------
-varexo 
+varexo
 eps_a
 eps_d
 eps_g
@@ -77,7 +77,7 @@ eps_g
 %--------------------------------------------------------------------------
 % Parameter declaration
 %--------------------------------------------------------------------------
-parameters 
+parameters
 BETTA
 B
 INHABIT
@@ -181,22 +181,22 @@ model;
 % The growth rate in lambda
 #myla_cup  = (la_cup/la_cu)*(AA*evf_cu^(1/(1-PHI3))/mvf_cup)^PHI3*myzstar_cup^(-PHI2*(1-PHI4)-PHI4);
 
-% The relation between the optimal price for the firms and the pris and inflation 
+% The relation between the optimal price for the firms and the pris and inflation
 %ptil_cu   = ((1-ALFA*(pai_ba1^CHI/pai_cu )^(1-ETA))/(1-ALFA))^(1/(1-ETA));
 %ptil_cup  = ((1-ALFA*(pai_cu ^CHI/pai_cup)^(1-ETA))/(1-ALFA))^(1/(1-ETA));
 #ptil_cu   = ((1-ALFA*(1/pai_cu )^(1-ETA))/(1-ALFA))^(1/(1-ETA));
 #ptil_cup  = ((1-ALFA*(1/pai_cup)^(1-ETA))/(1-ALFA))^(1/(1-ETA));
-        
+
 % From the households' FOC for labor
 #w_cu      = d_cu*PHIzero*(1-h_cu )^(-PHI1)/la_cu;
 #w_cup     = d_cu*PHIzero*(1-h_cup)^(-PHI1)/la_cup;
 % Shouldn't w_cup include d_cup? Let's stick to the original (wrong) code in the replication files as results don't change dramatically... [@wmutschl]
 
-% The firms' FOC for labor 
+% The firms' FOC for labor
 #mc_cu     = w_cu /((1-THETA)*a_cu *myyps_cu ^(-THETA/(1-THETA))*myz_cu ^-THETA *k_cu ^THETA*h_cu ^(-THETA));
 #mc_cup    = w_cup/((1-THETA)*a_cup*myyps_cup^(-THETA/(1-THETA))*myz_cup^-THETA *k_cup^THETA*h_cup^(-THETA));
 
-% The firms' FOC for capital 
+% The firms' FOC for capital
 #rk_cu     = mc_cu *THETA* a_cu *myyps_cu *myz_cu ^(1-THETA)*k_cu ^(THETA-1)*h_cu ^(1-THETA);
 #rk_cup    = mc_cup*THETA* a_cup*myyps_cup*myz_cup^(1-THETA)*k_cup^(THETA-1)*h_cup^(1-THETA);
 
@@ -224,13 +224,13 @@ model;
 
 [name='Nonlinear pricing, relation for x1 = (ETA-1)/ETA*x2']
 0= -(ETA-1)/ETA*x2_cu+y_cu*mc_cu*ptil_cu^(-ETA-1) +ALFA*BETTA*myla_cup*(ptil_cu/ptil_cup)^(-ETA-1)*(1/pai_cup)^(-ETA)*(ETA-1)/ETA*x2_cup*myzstar_cup;
-  
+
 [name='Nonlinear pricing, relation for x2']
 0=-x2_cu+y_cu*ptil_cu^-ETA +ALFA*BETTA*myla_cup*(ptil_cu/ptil_cup)^(-ETA)*(1/pai_cup)^(1-ETA)*x2_cup*myzstar_cup;
 
 [name='Nonlinear pricing, relation for s']
 0= -s_cup+(1-ALFA)*ptil_cu^(-ETA)+ALFA*(pai_cu/1)^ETA*s_cu;
-  
+
 [name='Interest rate rule']
 0 = -log(r_cu/R)+RHOR*log(r_ba1/R)+(1-RHOR)*(BETTAPAI*log(pai_cu/PAI)+BETTAY*log(y_cu/Y) + BETTAxhr*(BETTAxhr40*xhr40_cu - removeMeanXhr*Exhr_cu));
 
@@ -316,7 +316,7 @@ MYZSTARBAR       = MYYPS^(THETA/(1-THETA))*MYZ;
 MYLABAR          = MYZSTARBAR^(-PHI2*(1-PHI4)-PHI4);
 
 % The relative optimal price for firms
-PTILBAR 		  = ((1-ALFA*PAI^((CHI-1)*(1-ETA)))/(1-ALFA))^(1/(1-ETA)); 
+PTILBAR 		  = ((1-ALFA*PAI^((CHI-1)*(1-ETA)))/(1-ALFA))^(1/(1-ETA));
 
 % The state variable s for distortions between output and produktion
 SBAR             = ((1-ALFA)*PTILBAR^(-ETA))/(1-ALFA*PAI^((1-CHI)*ETA));
@@ -332,21 +332,21 @@ RKBAR            = QBAR*(MYYPS/(BETTA*MYLABAR)-(1-DELTA));
 
 % The marginal costs in the firms
 MCBAR            = (1-ALFA*BETTA*MYLABAR*PAI^((1-CHI)*ETA)*MYZSTARBAR)*(ETA-1)/ETA*PTILBAR/(1-ALFA*BETTA*MYLABAR*PAI^((CHI-1)*(1-ETA))*MYZSTARBAR);
-            
-% The capital stock 
+
+% The capital stock
 KBAR             = H*(RKBAR/(MCBAR*THETA*MYYPS*MYZ^(1-THETA)))^(1/(THETA-1));
 
-% The wage level 
+% The wage level
 WBAR             = MCBAR*(1-THETA)*MYYPS^(-THETA/(1-THETA))*MYZ^-THETA*(KBAR/H)^THETA;
 
 % The level of investment
-IVBAR            = KBAR - (1-DELTA)*KBAR*MYYPS^(-1/(1-THETA))*MYZ^-1; 
+IVBAR            = KBAR - (1-DELTA)*KBAR*MYYPS^(-1/(1-THETA))*MYZ^-1;
 
 % The consumption level
 CBAR              = ((1-GoY)*(KBAR*MYYPS^(-1/(1-THETA))*MYZ^-1)^THETA*H^(1-THETA))/SBAR-IVBAR;
 
-% The output level 
-YBAR             = (CBAR + IVBAR)/(1-GoY); 
+% The output level
+YBAR             = (CBAR + IVBAR)/(1-GoY);
 
 % The value of lambda
 LABAR            = (CBAR-B*CBAR*MYZSTARBAR^-1)^-PHI2 - INHABIT*B*BETTA*(CBAR-B*CBAR*MYZSTARBAR^-1)^-PHI2*MYZSTARBAR^(-PHI2*(1-PHI4)-PHI4);
@@ -354,7 +354,7 @@ LABAR            = (CBAR-B*CBAR*MYZSTARBAR^-1)^-PHI2 - INHABIT*B*BETTA*(CBAR-B*C
 % The value of PHIzero
 PHIzero       = LABAR*WBAR*(1-H)^PHI1;
 
-% The level of the value function 
+% The level of the value function
 VFBAR            = 1/(1-BETTA*MYZSTARBAR^((1-PHI4)*(1-PHI2)))*(1/(1-PHI2)*((CBAR-B*CBAR*MYZSTARBAR^-1)^(1-PHI2)-1)+PHIzero/(1-PHI1)*(1-H)^(1-PHI1));
 UBAR             = 1/(1-PHI2)*((CBAR-B*CBAR*MYZSTARBAR^-1)^(1-PHI2)-1)+PHIzero/(1-PHI1)*(1-H)^(1-PHI1);
 [AA, EVFBAR, PHI3, negVf, info]= AFVRR_steady_helper(VFBAR,RBAR,IVBAR,CBAR,KBAR,LABAR,QBAR,YBAR,  BETTA,B,PAI,H,PHIzero,PHI1,PHI2,THETA,MYYPS,MYZ,INHABIT,RRA,CONSxhr40);
@@ -363,7 +363,7 @@ X2BAR            = YBAR*PTILBAR^(-ETA)/(1-BETTA*ALFA*MYLABAR*PAI^((CHI-1)*(1-ETA
 
 % Government spending
 GBAR             = GoY*YBAR;
-%**************************************************************************        
+%**************************************************************************
 
 % map into model variables
 ln_k = log(KBAR);
@@ -508,8 +508,8 @@ verbatim;
 % From 1961Q3 to 2007Q4
 DataUS = xlsread('Data_PruningPaper_v5.xlsx','Data_used','E3:M188');
 %                                         ANNUALIZED (except for hours and GoY)
-%           1   2      3     4     5        6      7    8     9        
-% Lables: Date Gr_C   Gr_I  GoY   hours   Infl_C   r1   r40  xhr40   
+%           1   2      3     4     5        6      7    8     9
+% Lables: Date Gr_C   Gr_I  GoY   hours   Infl_C   r1   r40  xhr40
 %label_data = {'Gr_C   ', 'Gr_I   ','Infl  ', 'r1    ', 'r40   ', 'xhr40  ','GoY    ', 'hours  '};
 %DataUS     = [DataUS(:,2:3) DataUS(:,6:8)  DataUS(:,9) log(DataUS(:,4)) 4*log(DataUS(:,5))/100];
 Obs_Gr_C  = DataUS(:,2);

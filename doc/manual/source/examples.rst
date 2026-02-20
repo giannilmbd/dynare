@@ -26,7 +26,7 @@ description, please refer to the comments inside the files themselves.
 
 ``example3.mod``
 
-    A small RBC model in a stochastic setup, presented in :cite:t:`Collard:2001`. 
+    A small RBC model in a stochastic setup, presented in :cite:t:`Collard:2001`.
     The steady state is solved analytically using the
     ``steady_state_model`` block (see :bck:`steady_state_model`).
 
@@ -42,7 +42,7 @@ description, please refer to the comments inside the files themselves.
 
 ``bkk.mod``
 
-    Multi-country RBC model with time to build, presented in :cite:t:`Backus:1992`. 
+    Multi-country RBC model with time to build, presented in :cite:t:`Backus:1992`.
     The file shows how to use Dynare’s macro processor.
 
 ``agtrend.mod``
@@ -58,7 +58,7 @@ description, please refer to the comments inside the files themselves.
 
 ``NK_baseline.mod``
 
-    Baseline New Keynesian Model estimated in :cite:t:`FernandezVillaverde:2010`. 
+    Baseline New Keynesian Model estimated in :cite:t:`FernandezVillaverde:2010`.
     It demonstrates how to use an explicit steady state file
     to update parameters and call a numerical solver.
 
@@ -69,13 +69,13 @@ description, please refer to the comments inside the files themselves.
 
 ``Ramsey_Example.mod``
 
-    File demonstrating how to conduct optimal policy experiments in a 
+    File demonstrating how to conduct optimal policy experiments in a
     simple New Keynesian model either under commitment (Ramsey) or using
     optimal simple rules (OSR)
 
 ``Ramsey_steady_file.mod``
 
-    File demonstrating how to conduct optimal policy experiments in a 
+    File demonstrating how to conduct optimal policy experiments in a
     simple New Keynesian model under commitment (Ramsey) with a user-defined
     conditional steady state file
 

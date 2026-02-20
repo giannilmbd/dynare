@@ -104,7 +104,7 @@ date_in_parens = field('year', apply_func=lambda y: f"({str(y).strip()})")
 
 class MyStyle(BaseStyle):
     default_sorting_style = 'author_year_title'
-    
+
     def format_names(self, role, as_sentence=True):
         formatted_names = names(role, sep=', ', sep2 = ' and ', last_sep=', and ')
         if as_sentence:
@@ -491,17 +491,17 @@ class MyStyle(BaseStyle):
         return words [
             'URL:',
             href [
-                field('url', raw=True),		
-                field('url', raw=True)		
+                field('url', raw=True),
+                field('url', raw=True)
                 ]
         ]
 
     def format_pubmed(self, e):
         # based on urlbst format.pubmed
-        return href [            
+        return href [
             join [
-                'https://www.ncbi.nlm.nih.gov/pubmed/',		
-                field('pubmed', raw=True)		
+                'https://www.ncbi.nlm.nih.gov/pubmed/',
+                field('pubmed', raw=True)
                 ],
             join [
                 'PMID:',
@@ -513,8 +513,8 @@ class MyStyle(BaseStyle):
         # based on urlbst format.doi
         return href [
             join [
-                'https://doi.org/',		
-                field('doi', raw=True)		
+                'https://doi.org/',
+                field('doi', raw=True)
                 ],
             join [
                 'doi:',
@@ -526,8 +526,8 @@ class MyStyle(BaseStyle):
         # based on urlbst format.eprint
         return href [
             join [
-                'https://arxiv.org/abs/',		
-                field('eprint', raw=True)		
+                'https://arxiv.org/abs/',
+                field('eprint', raw=True)
                 ],
             join [
                 'arXiv:',
@@ -539,7 +539,7 @@ class MyStyle(BaseStyle):
         return join(sep=' ') [ 'ISBN', field('isbn') ]
 
 
-#end definition mystyle 
+#end definition mystyle
 
 pybtex.plugin.register_plugin("pybtex.style.formatting", "mystyle", MyStyle)
 

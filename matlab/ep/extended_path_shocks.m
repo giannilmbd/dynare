@@ -37,7 +37,7 @@ if isempty(exogenousvariables)
     switch options_.ep.innovation_distribution
       case 'gaussian'
         shocks = zeros(sample_size, M_.exo_nbr); %non-zero mean steady states are filtered out in extended_path.m
-        shocks(:,pfm.positive_var_indx) = transpose(transpose(pfm.Omega)*randn(pfm.effective_number_of_shocks,sample_size)); %Omega is covariance_matrix_upper_cholesky 
+        shocks(:,pfm.positive_var_indx) = transpose(transpose(pfm.Omega)*randn(pfm.effective_number_of_shocks,sample_size)); %Omega is covariance_matrix_upper_cholesky
       case 'calibrated'
         options = options_;
         options.periods = options.ep.periods;

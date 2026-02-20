@@ -170,15 +170,15 @@ for k=1:number_of_particles
         if likxc<likxmode
             likxmode = likxc;
             updated_mode.likxc = likxc;
-            updated_mode.a = ax; 
-            updated_mode.a1 = a1x; 
+            updated_mode.a = ax;
+            updated_mode.a1 = a1x;
             updated_mode.P = Px;
-            updated_mode.P1 = P1x; 
-            updated_mode.v = vx; 
-            updated_mode.T = Tx; 
-            updated_mode.R = Rx; 
-            updated_mode.C = Cx; 
-            updated_mode.regimes = regimesx; 
+            updated_mode.P1 = P1x;
+            updated_mode.v = vx;
+            updated_mode.T = Tx;
+            updated_mode.R = Rx;
+            updated_mode.C = Cx;
+            updated_mode.regimes = regimesx;
             if options_.occbin.filter.particle.diagnostics.status
                 updated_mode.lik = updated_regimes(this_updated_regime).lik;
             end
@@ -267,7 +267,7 @@ else
     pkf_indicator =  max(chi2)<chi2inv(1-1/number_of_particles/2,ns);
 
     if not(options_.occbin.filter.particle.diagnostics.nograph)
-        
+
         GraphDirectoryName = CheckPath('occbin_ppf_graphs',M_.dname);
         schi2 = sort(chi2);
         x = zeros(size(schi2));
@@ -275,7 +275,7 @@ else
             p=0.5*1/number_of_particles+(j-1)/number_of_particles;
             x(j,1) = chi2inv(p,ns);
         end
-        
+
         % qqplot with chi square distribution
         if isnan(StateVector0.graph_info.hfig(6))
             hfig(6) = figure;

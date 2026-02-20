@@ -80,7 +80,7 @@ steady_state_model;
   y  = k^alp*n^(1-alp)*gst^alp;
   R  = mst/bet;
   W  = l/n;
-  e = 1;  
+  e = 1;
   gp_obs = m/dA;
   gy_obs = dA;
 end;

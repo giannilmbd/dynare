@@ -40,7 +40,7 @@ if ~issmc(options_)
 else
     if ishssmc(options_)
        if max(chain_number)>1
-           error('generate_trace_plots:: HSSMC only has one chain')           
+           error('generate_trace_plots:: HSSMC only has one chain')
        end
     elseif isdime(options_)
         error('generate_trace_plots:: DIME does not support generate_trace_plots')

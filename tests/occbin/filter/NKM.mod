@@ -1,7 +1,7 @@
 //Tests Occbin estimation with IVF and PKF with 1 constraints
 
 // this file implements the model in:
-// Atkinson, T., A. W. Richter, and N. A. Throckmorton (2019). 
+// Atkinson, T., A. W. Richter, and N. A. Throckmorton (2019).
 // The zero lower bound andestimation accuracy.Journal of Monetary Economics
 // original codes provided by Alexander Richter
 // adapted for dynare implementation
@@ -13,7 +13,7 @@
 @#endif
 
 // ----------------- Defintions -----------------------------------------//
-var        
+var
     c       $c$         (long_name='Consumption')
     n                   (long_name='Labor')
     y       $y$         (long_name='Output')
@@ -35,19 +35,19 @@ var
         k               (long_name='Capital')
         u               (long_name='Utilization cost')
         ups             (long_name='Utilization choice')
-        wg              (long_name='Real wage growth gap')    
+        wg              (long_name='Real wage growth gap')
         xg              (long_name='Investment growth')
         rk              (long_name='Real rental rate')
         q               (long_name='Tobins q')
     @#endif
 ;
-varexo          
+varexo
     epsg    ${\varepsilon_g}$   (long_name='Productivity growth shock')
     epsi                        (long_name='Notional interest rate shock')
     epss                        (long_name='Risk premium shock')
-;        
+;
 parameters
-    // Calibrated Parameters    
+    // Calibrated Parameters
     beta    $\beta$    (long_name='Discount factor')
     chi                 (long_name='Labor disutility scale')
     thetap              (long_name='Elasticity of subs. between intermediate goods')
@@ -77,7 +77,7 @@ parameters
  ;
 
 
-// ---------------- Calibration -----------------------------------------//   
+// ---------------- Calibration -----------------------------------------//
 
 beta     = 0.9949;    // Discount factor
 thetap   = 6;         // Elasticity of subs. between intermediate goods
@@ -102,11 +102,11 @@ sigs     = 0.005;     // Standard deviation
 sigi     = 0.002;      // Standard deviation
 phipi    = 2.0;       // Inflation responsiveness
 phiy     = 0.5;       // Output responsiveness
-inomlb   = 1 ;         // Inom LB  
-        
-// ---------------- Model -----------------------------------------------//               
+inomlb   = 1 ;         // Inom LB
+
+// ---------------- Model -----------------------------------------------//
 model;
-    
+
     @#if !(small_model)
         [name = 'HH FOC utilization (1)']
         rk = steady_state(rk)*exp(sigups*(ups-1));
@@ -128,86 +128,86 @@ model;
 
         [name = 'Real wage growth gap (6)']
         wg = pigap*g*w/(gbar*w(-1));
-        
+
         [name = 'Law of motion for capital (15)']
-        k = (1-delta)*(k(-1)/g)+x*(1-nu*(xg-1)^2/2);                   
+        k = (1-delta)*(k(-1)/g)+x*(1-nu*(xg-1)^2/2);
 
         [name = 'Investment growth gap (14)']
-        xg = g*x/(gbar*x(-1));    
-    @#endif 
-    
-            
-    @#if small_model         
+        xg = g*x/(gbar*x(-1));
+    @#endif
+
+
+    @#if small_model
         [name = 'Production function (2)']
-        yf = n;   
-    
-        [name = 'Firm FOC labor (5)']            
+        yf = n;
+
+        [name = 'Firm FOC labor (5)']
         w = mc*yf/n;
-        
+
         [name = 'Output definition (7)']
         y = (1-varphip*(pigap-1)^2/2)*yf;
-        
+
         [name = 'ARC (13)']
         c = y;
-        
+
         [name = 'Household labpur supply equals flex wage']
         w = wf;
-    @#else     
+    @#else
         [name = 'Production function (2)']
         yf = (ups*k(-1)/g)^alpha*n^(1-alpha);
-    
-        [name = 'Firm FOC labor (5)']            
+
+        [name = 'Firm FOC labor (5)']
         w = (1-alpha)*mc*yf/n;
-    
+
        	[name = 'Output definition (7)']
         y = (1-varphip*(pigap-1)^2/2-varphiw*(wg-1)^2/2)*yf - u*k(-1)/g;
-      
+
         [name = 'ARC (13)']
         x = y-c;
-    @#endif 
-    
+    @#endif
+
     [name = 'Output growth gap (8)']
     yg = g*y/(gbar*y(-1));
-       
+
     [name = 'Notional Interest Rate (9)']
     inomnot = inomnot(-1)^rhoi*(inombar*pigap^phipi*yg^phiy)^(1-rhoi);
-    
+
     [name = 'Nominal Interest Rate (10)', bind='zlb']
     inom = inomlb*exp(mp);
     [name = 'Nominal Interest Rate (10)', relax='zlb']
     inom = inomnot*exp(mp);
-                  
+
     [name = 'Inverse MUC (11)']
     lam = c-h*c(-1)/g;
-    
+
     [name = 'Flexible real wage definition (12)']
     wf = chi*n^eta*lam;
-    
+
     [name = 'HH FOC bond (16)']
     1 = beta*(lam/lam(+1))*s*inom/(g(+1)*pibar*pigap(+1));
-       
+
     [name = 'Price Phillips Curve (19)']
     varphip*(pigap-1)*pigap = 1-thetap+thetap*mc+beta*varphip*(lam/lam(+1))*(pigap(+1)-1)*pigap(+1)*(yf(+1)/yf);
-     
+
     [name = 'Stochastic productivity growth (21)']
     g = gbar+ sigz*epsg;
-    
+
     [name = 'Risk premium shock (22)']
-    s = (1-rhos)*sbar + rhos*s(-1)+sigs*epss     ;      
-    
+    s = (1-rhos)*sbar + rhos*s(-1)+sigs*epss     ;
+
     [name = 'Notional interest rate shock (23)']
     mp = sigi*epsi;
-    
+
     [name = 'Observed inflation (24)']
     pi = pigap*pibar;
-     
+
 end;
 options_.TeX=1;
 occbin_constraints;
 name 'zlb'; bind inomnot <=  inomlb; relax inomnot > inomlb;
 end;
 
-// ---------------- Steady state -----------------------------------------//        
+// ---------------- Steady state -----------------------------------------//
 steady_state_model;
     mp = 0;
     xg = 1;
@@ -221,7 +221,7 @@ steady_state_model;
     pigap = 1;
     wg =1;
     pi = pigap*pibar;
-    // FOC bond 
+    // FOC bond
     inom = gbar*pibar/(beta*s);
     inomnot = inom;
     inombar = inom;
@@ -253,15 +253,15 @@ steady_state_model;
     // FOC labor
     lam = (1-h/gbar)*c;
     chi = wf/(n^eta*lam);
-    
+
     // try log observables
 end;
 
-// ---------------- Checks -----------------------------------------//        
+// ---------------- Checks -----------------------------------------//
 steady;
 check;
 
-// ---------------- Simulation -----------------------------------------//        
+// ---------------- Simulation -----------------------------------------//
 shocks;
     var epsi   =  1;
     var epss   =  1;
@@ -269,10 +269,10 @@ shocks;
 end;
 
 steady;
-check;  
-        
-// ---------------- Estimation -----------------------------------------//        
-        
+check;
+
+// ---------------- Estimation -----------------------------------------//
+
 varobs yg inom pi;
     estimated_params;
         varphip,,0,inf,NORMAL_PDF,100,25;
@@ -284,20 +284,20 @@ varobs yg inom pi;
         sigz,,,,INV_GAMMA_PDF,0.005,0.005;
         sigs,,,,INV_GAMMA_PDF,0.005,0.005;
         sigi,,,,INV_GAMMA_PDF,0.002,0.002;
-    end;    
-    
+    end;
 
-    // -----------------Occbin ----------------------------------------------//   
+
+    // -----------------Occbin ----------------------------------------------//
     options_.occbin.smoother.debug=1;
     occbin_setup(likelihood_piecewise_kalman_filter);
 
-    // use PKF  
+    // use PKF
     estimation(
             datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=0, plot_priors=0, smoother,
             consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
-    
+
     // plot regimes
     occbin.plot_regimes(oo_.occbin.smoother.regime_history,M_,options_)
 
@@ -340,8 +340,8 @@ varobs yg inom pi;
             consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
 
     // check consistency of smoother_redux
-    for k=1:M_.endo_nbr, 
-        mer(k)=max(abs(oo_.SmoothedVariables.(M_.endo_names{k})-oo0.SmoothedVariables.(M_.endo_names{k}))); 
+    for k=1:M_.endo_nbr,
+        mer(k)=max(abs(oo_.SmoothedVariables.(M_.endo_names{k})-oo0.SmoothedVariables.(M_.endo_names{k})));
     end
     if max(mer)>1.e-10
         error('smoother redux does not recover full smoother results!')
@@ -349,27 +349,27 @@ varobs yg inom pi;
         disp('smoother redux successfully recovers full smoother results!')
     end
 
-    for k=1:M_.endo_nbr, 
-    mer(k)=max(abs(oo_.UpdatedVariables.(M_.endo_names{k})-oo0.UpdatedVariables.(M_.endo_names{k}))); 
+    for k=1:M_.endo_nbr,
+    mer(k)=max(abs(oo_.UpdatedVariables.(M_.endo_names{k})-oo0.UpdatedVariables.(M_.endo_names{k})));
     end
     if max(mer)>1.e-10
     error('smoother redux does not recover full updated variables results!')
     else
     disp('smoother redux successfully recovers full updated variables results!')
     end
-    
-    
-    for k=1:M_.endo_nbr, 
-    mer(k)=max(abs(oo_.FilteredVariables.(M_.endo_names{k})-oo0.FilteredVariables.(M_.endo_names{k}))); 
+
+
+    for k=1:M_.endo_nbr,
+    mer(k)=max(abs(oo_.FilteredVariables.(M_.endo_names{k})-oo0.FilteredVariables.(M_.endo_names{k})));
     end
     if max(mer)>1.e-10
     error('smoother redux does not recover full filtered variables results!')
     else
     disp('smoother redux successfully recovers full filtered variables results!')
     end
-    
-    for k=1:M_.endo_nbr, 
-        mer(k)=max(max(max(abs(oo_.FilteredVariablesKStepAhead(:,k,:)-oo0.FilteredVariablesKStepAhead(:,k,:))))); 
+
+    for k=1:M_.endo_nbr,
+        mer(k)=max(max(max(abs(oo_.FilteredVariablesKStepAhead(:,k,:)-oo0.FilteredVariablesKStepAhead(:,k,:)))));
     end
     if max(mer)>1.e-10
     error('smoother redux does not recover full k-step ahead variables results!')
@@ -387,13 +387,13 @@ varobs yg inom pi;
 
     // use inversion filter (note that IF provides smoother together with likelihood)
     occbin_setup(likelihood_inversion_filter,smoother_inversion_filter);
-            
+
     estimation(
             datafile=dataobsfile, mode_file=NKM_mh_mode_saved,
             mode_compute=0, nobs=120, first_obs=1,
             mh_replic=50, plot_priors=0, smoother,
             consider_all_endogenous,filter_step_ahead=[1:8],smoothed_state_uncertainty);
-            
+
     // show initial condition effect of IF
     figure('Name','OccBin: Smoothed shocks')
     subplot(221)

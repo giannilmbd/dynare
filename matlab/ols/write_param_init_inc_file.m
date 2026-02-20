@@ -6,7 +6,7 @@ function write_param_init_inc_file(subfolder, fnameroot, idxs, estimated_params)
 %   subfolder        [string] subfolder in which to place file
 %   fnameroot        [string] root of filename
 %   idxs             [vector] indexes in M_.params of estimated parameters
-%   estimated_params [vector] estimated parameters  
+%   estimated_params [vector] estimated parameters
 %
 % OUTPUTS
 %   none

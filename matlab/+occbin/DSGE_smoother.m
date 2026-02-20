@@ -97,16 +97,16 @@ end
 %% keep these commented lines for the moment, should some nasty problem in the future call back for this option
 %     shocks1     = etahat(:,2:end)';
 %     clear regime_history ;
-%         
+%
 %     for ii = 1:gend-1
-% 
+%
 %         fprintf('Period number %d out of %d \n',ii,gend-1)
 %         opts_simul.SHOCKS = shocks1(ii,:);
 %         opts_simul.endo_init = alphahat(oo_.dr.inv_order_var,ii);
-%         out =  occbin.runsim_fn(opts_simul, M_, oo_, options_); 
+%         out =  occbin.runsim_fn(opts_simul, M_, oo_, options_);
 %         regime_history(ii) = out.regime_history;
-%     end    
-%  
+%     end
+%
 %     [TT,RR] = dynare_resolve(M_,options_,oo_);
 %     CC = zeros([size(RR,1),gend ]);
 % else
@@ -193,7 +193,7 @@ oo_.occbin.smoother.error_flag=0;
 is_last_simulation_converged = true;
 if out.error_flag
     is_last_simulation_converged = false;
-    disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)    
+    disp_verbose('OccBin smoother:: simulation within smoother did not converge.',options_.verbosity)
     oo_.occbin.smoother.error_flag=321;
     % store regimes consistent with the last smoother run
     out.regime_history = regime_history ;
@@ -205,7 +205,7 @@ elseif not(isequal(out.regime_history(1:options_.occbin.likelihood.first_period_
 end
 regime_history = out.regime_history;
 if options_.smoother_redux
-    occbin_options.opts_simul.restrict_state_space =1;  
+    occbin_options.opts_simul.restrict_state_space =1;
     [T0,R0] = dynare_resolve(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
     oo_.occbin.linear_smoother.T0=T0;
     oo_.occbin.linear_smoother.R0=R0;
@@ -220,7 +220,7 @@ opts_regime.binding_indicator = [];
 is_changed = ~isequal(regime_history0,regime_history);
 if isempty(regime_history0)
     regime_history0 = regime_history;
-end    
+end
 iter=1;
 
 is_periodic = 0;
@@ -357,11 +357,11 @@ while is_changed && maxiter>iter && ~is_periodic && is_last_simulation_converged
     if occbin_smoother_debug
         save('Occbin_smoother_debug_regime_history','regime_history0');
     end
-    
+
     sto_CC = CC;
     sto_RR = RR;
     sto_TT = TT;
-    
+
     opts_simul.SHOCKS = [etahat(:,1:end)'; zeros(1,M_.exo_nbr)];
     opts_simul.endo_init = alphahat0(oo_.dr.inv_order_var,1);
     options_.occbin.simul=opts_simul;
@@ -423,7 +423,7 @@ while is_changed && maxiter>iter && ~is_periodic && is_last_simulation_converged
         end
         is_periodic = (is_changed && is_tmp);
     end
-    
+
     if is_changed
         eee=NaN(size(TT,1),size(TT,3));
         for k=1:size(TT,3)
@@ -455,7 +455,7 @@ while is_changed && maxiter>iter && ~is_periodic && is_last_simulation_converged
                                  horzcat(num2cell(indx_init_1), regime_, start_, regime_new, start_new)))
                 end
             end
-            
+
             indx_init_2 = find(isdiff_(:,2));
             if ~isempty(indx_init_2)
                 regime_ = cell(0);
@@ -602,7 +602,7 @@ if (~is_changed || (occbin_smoother_debug && iter>1)) && nargin==12
         end
         if ~options_.occbin.simul.piecewise_only &&  isfield(out,'linear')
             oo_.occbin.smoother.simul.linear = out.linear(1:end-1,:);
-        end        
+        end
     end
     if options_.occbin.smoother.plot
         GraphDirectoryName = CheckPath('graphs',M_.fname);

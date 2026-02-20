@@ -1,14 +1,14 @@
 function log_cdf = gaussian_log_mvncdf_mendell_elston(Zj, R, cutoff)
 % log_cdf = gaussian_log_mvncdf_mendell_elston(Zj, R, cutoff)
-% ------------------------------------------------------------------------- 
+% -------------------------------------------------------------------------
 % Approximates Gaussian log(CDF) function according to Mendell and Elston (1974)
-% ------------------------------------------------------------------------- 
-% INPUTS 
+% -------------------------------------------------------------------------
+% INPUTS
 % - Zj       [n by 1]   column vector of points where Gaussian CDF is evaluated at
 % - R        [n by n]   correlation matrix
 % - cutoff   [2 by 1]   optional threshold points at which values in Zj are too low/high to be evaluated, defaults to [6 38]
-% ------------------------------------------------------------------------- 
-% OUTPUTS 
+% -------------------------------------------------------------------------
+% OUTPUTS
 % log_cdf    [double]   approximate value of Gaussian log(CDF)
 
 % Copyright © 2015 Dietmar Bauer (original implementation)
@@ -36,13 +36,13 @@ end
 % cutoff tails as these are too low to be evaluated
 Zj(Zj>cutoff(1))  = cutoff(1);
 Zj(Zj<-cutoff(1)) = -cutoff(1);
-n = length(Zj); % remaining dimension of Z 
+n = length(Zj); % remaining dimension of Z
 
 % first element
 cdf_val = phid(Zj(1));
 pdf_val = phip(Zj(1));
 log_cdf = log(cdf_val); % perform all calculations in logs
- 
+
 for jj = 1:(n-1)
     ajjm1 = pdf_val / cdf_val;
 
@@ -278,16 +278,16 @@ try
     % create a valid correlation matrix using compound symmetry structure
     rho = 0.1;
     R = (1 - rho) * eye(n) + rho * ones(n, n);
-    
+
     % test at different z values to verify monotonicity
     Zj1 = zeros(n, 1);
     Zj2 = 0.5 * ones(n, 1);
     Zj3 = ones(n, 1);
-    
+
     log_cdf1 = gaussian_log_mvncdf_mendell_elston(Zj1, R);
     log_cdf2 = gaussian_log_mvncdf_mendell_elston(Zj2, R);
     log_cdf3 = gaussian_log_mvncdf_mendell_elston(Zj3, R);
-    
+
     % verify results are finite
     t(1) = isfinite(log_cdf1) && isfinite(log_cdf2) && isfinite(log_cdf3);
     % verify monotonicity: larger z values should give larger log_cdf

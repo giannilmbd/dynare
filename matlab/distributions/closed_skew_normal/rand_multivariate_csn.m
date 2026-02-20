@@ -82,12 +82,12 @@ try
     nu = 0;
     Delta = 1;
     n = 50;
-    
+
     rng(12345);
     X1 = rand_multivariate_csn(n, mu, Sigma, Gamma, nu, Delta);
     rng(12345);
     X2 = rand_multivariate_csn(n, mu, Sigma, Gamma, nu, Delta);
-    
+
     t(1) = isequal(X1, X2);
 catch
     t = false;
@@ -103,18 +103,18 @@ try
     Gamma = [0 0];
     nu = 0;
     Delta = 1;
-    
+
     rng(111);
     n = 1e5;
     X = rand_multivariate_csn(n, mu, Sigma, Gamma, nu, Delta);
-    
+
     % for Gamma=0, mean should be mu, covariance should be Sigma,
     % skewness should be 0, kurtosis should be 3
     empirical_mean = mean(X, 2);
     empirical_cov = cov(X');
     empirical_skew = skewness(X');
     empirical_kurt = kurtosis(X');
-    
+
     t(1) = norm(empirical_mean - mu, 'Inf') < 0.006;
     t(2) = norm(empirical_cov - Sigma, 'Inf') < 0.02;
     t(3) = norm(empirical_skew, 'Inf') < 0.01;
@@ -153,11 +153,11 @@ try
     Gamma = [1 1]; % constraint: x1 + x2 + nu < 0
     nu = 0;
     Delta = 1;
-    
+
     rng(666);
     n = 1000;
     X = rand_multivariate_csn(n, mu, Sigma, Gamma, nu, Delta);
-    
+
     % the CSN distribution is constructed such that the density is
     % proportional to phi(x) * Phi(Gamma*x + nu), so samples should
     % have a tendency towards Gamma*x + nu > 0 (i.e., x1 + x2 > 0)

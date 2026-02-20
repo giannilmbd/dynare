@@ -21,12 +21,12 @@
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 % =========================================================================
 
-var 
+var
 y        ${y}$             (long_name='output')
 c        ${c}$             (long_name='consumption')
-lam      ${\lambda}$       (long_name='marginal utility, i.e. lagrange multiplier budget')  
-R        ${R}$             (long_name='nominal interest rate')  
-pie      ${\pi}$           (long_name='inflation rate')    
+lam      ${\lambda}$       (long_name='marginal utility, i.e. lagrange multiplier budget')
+R        ${R}$             (long_name='nominal interest rate')
+pie      ${\pi}$           (long_name='inflation rate')
 n        ${n}$             (long_name='labor')
 w        ${w}$             (long_name='real wage')
 mc       ${mc}$            (long_name='marginal costs')
@@ -50,7 +50,7 @@ parameters
 BETA     ${\beta}$         (long_name='discount factor')
 PIESTAR  ${\pi^\ast}$      (long_name='annual target inflation rate')
 PSIPIE   ${\psi_\pi}$      (long_name='Taylor rule parameter inflation')
-PSIY     ${\psi_y}$        (long_name='Taylor rule parameter output')  
+PSIY     ${\psi_y}$        (long_name='Taylor rule parameter output')
 RHOR     ${\rho_R}$        (long_name='persistence Taylor rule')
 SIGR     ${\sigma_R}$      (long_name='standard deviation monetary policy shock')
 ETA      ${\eta}$          (long_name='elasticity of substitution')

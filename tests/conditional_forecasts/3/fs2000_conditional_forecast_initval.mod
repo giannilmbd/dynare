@@ -1,7 +1,7 @@
 /* Mod file tests the correctness of the conditional_forecast command when used together with initval by
- * - checking whether the unconditional forecast from the conditional_forecast-command 
+ * - checking whether the unconditional forecast from the conditional_forecast-command
  *      coincides with the one from the forecast command
- * - checking whether the conditional forecast coincides with the path of 
+ * - checking whether the conditional forecast coincides with the path of
  *      capital derived when simulating the model with simult_ and the computed exogenous instruments
  * - initval should not play a role as initial conditions need to be set with histval; with initval
  *      the subsequently computed steady state is used
@@ -76,7 +76,7 @@ end;
 
 %set capital to non-steady state value
 initval;
-k = 6; 
+k = 6;
 end;
 
 conditional_forecast(periods=100,parameter_set=calibration,replic=10000, controlled_varexo=(e_m,e_a));
@@ -89,10 +89,10 @@ cond_forecast=oo_.conditional_forecast;
 if max(abs(cond_forecast.uncond.Mean.k(2:end)-oo_.forecast.Mean.k))>1e-8
     error('Unconditional Forecasts do not match')
 end
-        
+
 %compare conditional forecasts; initval should not play a role as initial
-%conditions need to be set with histval; 
-initial_condition_states = oo_.dr.ys; 
+%conditions need to be set with histval;
+initial_condition_states = oo_.dr.ys;
 shock_matrix = zeros(options_cond_fcst_.periods ,M_.exo_nbr); %create shock matrix with found controlled shocks
 shock_matrix(1:5,strmatch('e_a',M_.exo_names,'exact')) = cond_forecast.controlled_exo_variables.Mean.e_a; %set controlled shocks to their values
 shock_matrix(1:5,strmatch('e_m',M_.exo_names,'exact')) = cond_forecast.controlled_exo_variables.Mean.e_m; %set controlled shocks to their values

@@ -2,7 +2,7 @@ function pruned_state_space = pruned_state_space_system(M_, options_, dr, indy, 
 % Set up the pruned state space ABCD representation:
 %   z =      c + A*z(-1) + B*inov
 %   y = ys + d + C*z(-1) + D*inov
-% References: 
+% References:
 % - Andreasen, Martin M., Jesús Fernández-Villaverde and Juan F. Rubio-Ramírez (2018):
 %   "The Pruned State-Space System for Non-Linear DSGE Models: Theory and Empirical Applications",
 %   Review of Economic Studies, Volume 85, Issue 1, Pages 1–49.
@@ -48,7 +48,7 @@ function pruned_state_space = pruned_state_space_system(M_, options_, dr, indy, 
 %                 contemporenous correlation matrix of controls y
 %   Corr_yi     [y_nbr by y_nbr by nlags]
 %                 autocorrelation matrix of controls y
-%   E_y         [y_nbr by 1] 
+%   E_y         [y_nbr by 1]
 %                 unconditional theoretical mean of control variables y
 %
 % if compute_derivs == 1, then the following additional fields are outputed:
@@ -114,7 +114,7 @@ function pruned_state_space = pruned_state_space_system(M_, options_, dr, indy, 
 % =========================================================================
 
 %% MAIN IDEA:
-%   Decompose the state vector x into first-order effects xf, second-order 
+%   Decompose the state vector x into first-order effects xf, second-order
 %   effects xs, and third-order effects xrd, i.e. x=xf+xs+xrd. Then, Dynare's
 %   perturbation approximation for the state vector up to third order
 %   (with Gaussian innovations u, i.e. no odd moments, hxxs=huus=hxus=hsss=0) is:
@@ -153,7 +153,7 @@ function pruned_state_space = pruned_state_space_system(M_, options_, dr, indy, 
 %     gxxx = dr.ghxxx(indy,:); guuu = dr.ghuuu(indy,:); gxxu = dr.ghxxu(indy,:); gxuu = dr.ghxxu(indy,:); gxss = dr.ghxss(indy,:); guss = dr.ghuss(indy,:);
 %
 %   PRUNING means getting rid of terms higher than the approximation order, i.e.
-%         - involving fourth-order effects:  kron(xf,xrd), kron(xs,xs), kron(xrd,xf), kron(xrd,u), 
+%         - involving fourth-order effects:  kron(xf,xrd), kron(xs,xs), kron(xrd,xf), kron(xrd,u),
 %                                            kron(kron(xf,xf),xs), kron(kron(xf,xs),xf), kron(kron(xs,xf),xf)
 %                                            kron(kron(xf,xs),u), kron(kron(xs,xf),u)
 %                                            kron(kron(xs,u),u)
@@ -177,15 +177,15 @@ function pruned_state_space = pruned_state_space_system(M_, options_, dr, indy, 
 %
 %   First-order effects: keep xf and u
 %       xf = hx*xf(-1) + hu*u
-%       Note that we 
+%       Note that we
 %
 %   Second-order effects: keep xs, kron(xf,xf), kron(u,u), kron(xf,u), and sig^2
-%       xs = hx*xs(-1) + 1/2*hxx*kron(xf(-1),xf(-1)) + 1/2*huu*(kron(u,u)-Sigma_e(:)+Sigma_e(:)) + hxu*kron(xf(-1),u) + 1/2*hss*sig^2%     
+%       xs = hx*xs(-1) + 1/2*hxx*kron(xf(-1),xf(-1)) + 1/2*huu*(kron(u,u)-Sigma_e(:)+Sigma_e(:)) + hxu*kron(xf(-1),u) + 1/2*hss*sig^2%
 %
 %   Third-order effects: keep xrd, kron(xf,xs), kron(xs,xf), kron(xs,u), kron(kron(xf,xf),xf), kron(kron(u,u),u), kron(kron(xf,xf),u), kron(kron(xf,u),u), xf*sig^2, u*sig^2
 %       xrd = hx*xrd(-1) + 1/2*hxx*(kron(xf(-1),xs(-1))+kron(xs(-1),xf(-1))) + hxu*kron(xs(-1),u) + 1/6*hxxx*kron(xf(-1),kron(xf(-1),xf(-1))) + 1/6*huuu*kron(u,kron(u,u)) + 3/6*hxxu*kron(xf(-1),kron(xf(-1),u)) + 3/6*hxuu*kron(xf(-1),kron(u,u)) + 3/6*hxss*xf(-1)*sig^2 + 3/6*huss*u*sig^2
 %     Simplified (due to symmetry in hxx):
-%       xrd = hx*xrd(-1) + hxx*(kron(xf(-1),xs(-1)) + hxu*kron(xs(-1),u) + 1/6*hxxx*kron(xf(-1),kron(xf(-1),xf(-1))) + 1/6*huuu*kron(u,kron(u,u)) + 3/6*hxxu*kron(xf(-1),kron(xf(-1),u)) + 3/6*hxuu*kron(xf(-1),kron(u,u)) + 3/6*hxss*xf(-1)*sig^2 + 3/6*huss*u*sig^2%     
+%       xrd = hx*xrd(-1) + hxx*(kron(xf(-1),xs(-1)) + hxu*kron(xs(-1),u) + 1/6*hxxx*kron(xf(-1),kron(xf(-1),xf(-1))) + 1/6*huuu*kron(u,kron(u,u)) + 3/6*hxxu*kron(xf(-1),kron(xf(-1),u)) + 3/6*hxuu*kron(xf(-1),kron(u,u)) + 3/6*hxss*xf(-1)*sig^2 + 3/6*huss*u*sig^2%
 %
 %   Auxiliary equation kron(xf,xf) to set up the VAR(1) pruned state space system
 %       kron(xf,xf) = kron(hx,hx)*kron(xf(-1),xf(-1)) + kron(hu,hu)*(kron(u,u)-Sigma_e(:)+Sigma_e(:)) + kron(hx,u)*kron(xf(-1),u) + kron(u,hx)*kron(u,xf(-1))
@@ -247,7 +247,7 @@ persistent QPu COMBOS4 Q6Pu COMBOS6 K_u_xx K_u_ux K_xx_x
 order = options_.order;
 if isempty(options_.qz_criterium)
     % set default value for qz_criterium: if there are no unit roots one can use 1.0
-    % If they are possible, you may have have multiple unit roots and the accuracy 
+    % If they are possible, you may have have multiple unit roots and the accuracy
     % decreases when computing the eigenvalues in lyapunov_symm. Hence, we normally use 1+1e-6
     % Note that unit roots are only possible at first-order, at higher order we set it to 1
     options_.qz_criterium = 1+1e-6;
@@ -279,11 +279,11 @@ if compute_derivs
 	dE_uu  = dr.derivs.dSigma_e;
 end
 
-% first-order approximation indices for extended state vector z and extended innovations vector inov 
+% first-order approximation indices for extended state vector z and extended innovations vector inov
 id_z1_xf    = (1:x_nbr);
 id_inov1_u  = (1:u_nbr);
 if order > 1
-    % second-order approximation indices for extended state vector z and extended innovations vector inov 
+    % second-order approximation indices for extended state vector z and extended innovations vector inov
     id_z2_xs      = id_z1_xf(end)     + (1:x_nbr);
     id_z3_xf_xf   = id_z2_xs(end)     + (1:x_nbr*x_nbr);
     id_inov2_u_u  = id_inov1_u(end)   + (1:u_nbr*u_nbr);
@@ -297,7 +297,7 @@ if order > 1
     guu = dr.ghuu(indy,:);
     hss = dr.ghs2(indx,:);
     gss = dr.ghs2(indy,:);
-    if compute_derivs        
+    if compute_derivs
         dhxx = dr.derivs.dghxx(indx,:,:);
         dgxx = dr.derivs.dghxx(indy,:,:);
         dhxu = dr.derivs.dghxu(indx,:,:);
@@ -309,7 +309,7 @@ if order > 1
     end
 end
 if order > 2
-    % third-order approximation indices for extended state vector z and extended innovations vector inov 
+    % third-order approximation indices for extended state vector z and extended innovations vector inov
     id_z4_xrd        = id_z3_xf_xf(end)      + (1:x_nbr);
     id_z5_xf_xs      = id_z4_xrd(end)        + (1:x_nbr*x_nbr);
     id_z6_xf_xf_xf   = id_z5_xf_xs(end)      + (1:x_nbr*x_nbr*x_nbr);
@@ -365,7 +365,7 @@ E_xf        = zeros(x_nbr,1);
 lyapunov_symm_method = 1; %method=1 to initialize persistent variables
 [Var_z,Schur_u] = lyapunov_symm(A, Om_z,... %at first-order this algorithm is well established and also used in th_autocovariances.m
                                 options_.lyapunov_fixed_point_tol, options_.qz_criterium, options_.lyapunov_complex_threshold,...
-                                lyapunov_symm_method,...       
+                                lyapunov_symm_method,...
                                 options_.debug); %we use Schur_u to take care of (possible) nonstationary VAROBS variables in moment computations
 %find stationary vars
 stationary_vars = (1:y_nbr)';
@@ -517,21 +517,21 @@ if order > 1
         dE_xs        = zeros(x_nbr,totparam_nbr);
         dE_inovzlag1 = zeros(inov_nbr,z_nbr,totparam_nbr);
         dVar_z       = zeros(z_nbr,z_nbr,totparam_nbr);
-        
+
         for jp2 = 1:totparam_nbr
             if jp2 <= (stderrparam_nbr+corrparam_nbr)
                 dE_uu_jp2      = dE_uu(:,:,jp2);
-                dE_u_u_u_u_jp2 = QPu*dE_u_u_u_u(:,jp2);                
+                dE_u_u_u_u_jp2 = QPu*dE_u_u_u_u(:,jp2);
             else
                 dE_uu_jp2      = zeros(u_nbr,u_nbr);
-                dE_u_u_u_u_jp2 = zeros(u_nbr^4,1);            
+                dE_u_u_u_u_jp2 = zeros(u_nbr^4,1);
             end
             dhx_jp2        = dhx(:,:,jp2);
             dhu_jp2        = dhu(:,:,jp2);
             dhxx_jp2       = dhxx(:,:,jp2);
             dhxu_jp2       = dhxu(:,:,jp2);
             dhuu_jp2       = dhuu(:,:,jp2);
-            dhss_jp2       = dhss(:,jp2);            
+            dhss_jp2       = dhss(:,jp2);
             dgx_jp2        = dgx(:,:,jp2);
             dgu_jp2        = dgu(:,:,jp2);
             dgxx_jp2       = dgxx(:,:,jp2);
@@ -571,10 +571,10 @@ if order > 1
             dVarinov(id_inov1_u    , id_inov1_u    , jp2) = dE_uu_jp2;
             dVarinov(id_inov2_u_u  , id_inov2_u_u  , jp2) = reshape(dE_u_u_u_u_jp2,u_nbr^2,u_nbr^2) - dE_uu_jp2(:)*E_uu(:)' - E_uu(:)*dE_uu_jp2(:)';
             dVarinov(id_inov3_xf_u , id_inov3_xf_u , jp2) = dE_xfxf_uu_jp2;
-            
+
             dE_xs(:,jp2) = invIx_hx*( dhx_jp2*E_xs + 1/2*dhxx_jp2*E_xfxf(:) + 1/2*hxx*dE_xfxf_jp2(:) + dc(id_z2_xs,jp2) );
             dOm_z_jp2    = dB(:,:,jp2)*Varinov*B' + B*dVarinov(:,:,jp2)*B' + B*Varinov*dB(:,:,jp2)';
-            
+
             [dVar_z(:,:,jp2), errorflag] = disclyap_fast(A, dA(:,:,jp2)*Var_z*A' + A*Var_z*dA(:,:,jp2)' + dOm_z_jp2, options_.lyapunov_doubling_tol);
             if errorflag
                 dVar_z(:,:,jp2) = lyapunov_symm(A, dA(:,:,jp2)*Var_z*A' + A*Var_z*dA(:,:,jp2)' + dOm_z_jp2,...
@@ -587,8 +587,8 @@ if order > 1
             end
             % Make sure some stuff is zero due to Gaussianity
             dVar_z(id_z1_xf    , id_z2_xs    , jp2) = zeros(x_nbr,x_nbr);
-            dVar_z(id_z1_xf    , id_z3_xf_xf , jp2) = zeros(x_nbr,x_nbr^2);    
-            dVar_z(id_z2_xs    , id_z1_xf    , jp2) = zeros(x_nbr,x_nbr);    
+            dVar_z(id_z1_xf    , id_z3_xf_xf , jp2) = zeros(x_nbr,x_nbr^2);
+            dVar_z(id_z2_xs    , id_z1_xf    , jp2) = zeros(x_nbr,x_nbr);
             dVar_z(id_z3_xf_xf , id_z1_xf    , jp2) = zeros(x_nbr^2,x_nbr);
         end
     end
@@ -668,7 +668,7 @@ if order > 1
         end
 
         % Compute unique sixth-order product moments of u, i.e. unique(E[kron(kron(kron(kron(kron(u,u),u),u),u),u)],'stable')
-        u_nbr6        = u_nbr*(u_nbr+1)/2*(u_nbr+2)/3*(u_nbr+3)/4*(u_nbr+4)/5*(u_nbr+5)/6;       
+        u_nbr6        = u_nbr*(u_nbr+1)/2*(u_nbr+2)/3*(u_nbr+3)/4*(u_nbr+4)/5*(u_nbr+5)/6;
         if isempty(Q6Pu) || ~isequal(size(Q6Pu,1),u_nbr^6)
             Q6Pu          = pruned_SS.Q6_plication(u_nbr);
             COMBOS6       = flipud(pruned_SS.allVL1(u_nbr, 6)); %all possible (unique) combinations of powers that sum up to six
@@ -817,7 +817,7 @@ if order > 1
         Om_z = B*Varinov*transpose(B) + Binovzlag1A + transpose(Binovzlag1A);
 
         lyapunov_symm_method = 1; %method=1 to initialize persistent variables
-        [Var_z, errorflag] = disclyap_fast(A,Om_z,options_.lyapunov_doubling_tol);        
+        [Var_z, errorflag] = disclyap_fast(A,Om_z,options_.lyapunov_doubling_tol);
         if errorflag %use Schur-based method
             fprintf('PRUNED_STATE_SPACE_SYSTEM: error flag in disclyap_fast at order=3, use lyapunov_symm\n');
             Var_z = lyapunov_symm(A,Om_z,...
@@ -843,7 +843,7 @@ if order > 1
         Var_z(id_z5_xf_xs    , id_z3_xf_xf)    = zeros(x_nbr^2,x_nbr^2);
         Var_z(id_z6_xf_xf_xf , id_z2_xs)       = zeros(x_nbr^3,x_nbr);
         Var_z(id_z6_xf_xf_xf , id_z3_xf_xf)    = zeros(x_nbr^3,x_nbr^2);
-        
+
         if compute_derivs
             dA           = zeros(z_nbr,z_nbr,totparam_nbr);
             dB           = zeros(z_nbr,inov_nbr,totparam_nbr);
@@ -855,7 +855,7 @@ if order > 1
             dE_xrd       = zeros(x_nbr,totparam_nbr);
             dE_inovzlag1 = zeros(inov_nbr,z_nbr,totparam_nbr);
             dVar_z       = zeros(z_nbr,z_nbr,totparam_nbr);
-            
+
             for jp3 = 1:totparam_nbr
                 if jp3 <= (stderrparam_nbr+corrparam_nbr)
                     dE_uu_jp3          = dE_uu(:,:,jp3);
@@ -890,9 +890,9 @@ if order > 1
                 dguuu_jp3     = dguuu(:,:,jp3);
                 dgxss_jp3     = dgxss(:,:,jp3);
                 dguss_jp3     = dguss(:,:,jp3);
-                
+
                 dhx_hx_jp3    = kron(dhx_jp3,hx) + kron(hx,dhx_jp3);
-                dhx_hu_jp3    = kron(dhx_jp3,hu) + kron(hx,dhu_jp3);                
+                dhx_hu_jp3    = kron(dhx_jp3,hu) + kron(hx,dhu_jp3);
                 dhu_hu_jp3    = kron(dhu_jp3,hu) + kron(hu,dhu_jp3);
                 dhx_hss2_jp3  = kron(dhx_jp3,1/2*hss) + kron(hx,1/2*dhss_jp3);
                 dhu_hss2_jp3  = kron(dhu_jp3,1/2*hss) + kron(hu,1/2*dhss_jp3);
@@ -917,7 +917,7 @@ if order > 1
                 dE_xf_xfxs_jp3    = dE_xf_xfxs(:,:,jp3);
                 dE_xf_xfxf_xf_jp3 = dE_xf_xfxf_xf(:,:,jp3);
                 dE_xrdxf_jp3      = dE_xrdxf(:,:,jp3);
-                
+
                 dA(id_z1_xf       , id_z1_xf       , jp3) = dhx_jp3;
                 dA(id_z2_xs       , id_z2_xs       , jp3) = dhx_jp3;
                 dA(id_z2_xs       , id_z3_xf_xf    , jp3) = 1/2*dhxx_jp3;
@@ -997,7 +997,7 @@ if order > 1
 
                 dBinovzlag1A_jp3 = dB(:,:,jp3)*E_inovzlag1*transpose(A) + B*dE_inovzlag1(:,:,jp3)*transpose(A) + B*E_inovzlag1*transpose(dA(:,:,jp3));
                 dOm_z_jp3 = dB(:,:,jp3)*Varinov*transpose(B) + B*dVarinov(:,:,jp3)*transpose(B) + B*Varinov*transpose(dB(:,:,jp3)) + dBinovzlag1A_jp3 + transpose(dBinovzlag1A_jp3);
-                
+
                 [dVar_z(:,:,jp3), errorflag] = disclyap_fast(A, dA(:,:,jp3)*Var_z*A' + A*Var_z*dA(:,:,jp3)' + dOm_z_jp3, options_.lyapunov_doubling_tol);
                 if errorflag
                     dVar_z(:,:,jp3) = lyapunov_symm(A, dA(:,:,jp3)*Var_z*A' + A*Var_z*dA(:,:,jp3)' + dOm_z_jp3,...
@@ -1068,7 +1068,7 @@ if compute_derivs
                                                         + dC(stationary_vars,:,jpV)*transpose(E_inovzlag1)*D(stationary_vars,:)' + C(stationary_vars,:)*transpose(dE_inovzlag1(:,:,jpV))*D(stationary_vars,:)' + C(stationary_vars,:)*transpose(E_inovzlag1)*dD(stationary_vars,:,jpV)'...
                                                         + dD(stationary_vars,:,jpV)*Varinov*D(stationary_vars,:)' + D(stationary_vars,:)*dVarinov(:,:,jpV)*D(stationary_vars,:)' + D(stationary_vars,:)*Varinov*dD(stationary_vars,:,jpV)';
         end
-        dVar_y_tmp(abs(dVar_y_tmp) < 1e-12) = 0; %find values that are numerical zero       
+        dVar_y_tmp(abs(dVar_y_tmp) < 1e-12) = 0; %find values that are numerical zero
         dVar_y(stationary_vars,stationary_vars,jpV) = dVar_y_tmp;
         if useautocorr
             dsy = 1/2./sdy.*diag(dVar_y(:,:,jpV));
@@ -1103,7 +1103,7 @@ for i = 1:nlags
         E_inovzlagi(id_inov6_xf_u_u , id_z5_xf_xs    ) = kron(hxi*reshape(K_xx_x*vec(E_xsxf_xf),x_nbr,x_nbr^2),vec(E_uu));
         E_inovzlagi(id_inov6_xf_u_u , id_z6_xf_xf_xf ) = kron(hxi*reshape(E_xf_xfxf_xf,x_nbr,x_nbr^3),E_uu(:));
         Var_yi(stationary_vars,stationary_vars,i)      = C(stationary_vars,:)*Var_zi*C(stationary_vars,:)' + C(stationary_vars,:)*Ai*tmp + D(stationary_vars,:)*E_inovzlagi*C(stationary_vars,:)';
-    end    
+    end
     if useautocorr
         Corr_yi(stationary_vars,stationary_vars,i) = Var_yi(stationary_vars,stationary_vars,i)./sy;
     end
@@ -1112,12 +1112,12 @@ end
 
 if compute_derivs
     dVar_yi = NaN*ones(y_nbr,y_nbr,nlags,totparam_nbr);
-    for jpVi=1:totparam_nbr        
+    for jpVi=1:totparam_nbr
         Ai          = eye(z_nbr);   dAi_jpVi          = zeros(z_nbr,z_nbr);
         hxi         = eye(x_nbr);   dhxi_jpVi         = zeros(x_nbr,x_nbr);
         E_inovzlagi = E_inovzlag1;  dE_inovzlagi_jpVi = dE_inovzlag1(:,:,jpVi);
         Var_zi      = Var_z;        dVar_zi_jpVi      = dVar_z(:,:,jpVi);
-        if order <= 2            
+        if order <= 2
             dtmp_jpVi = dA(:,:,jpVi)*Var_z*C(stationary_vars,:)' + A*dVar_z(:,:,jpVi)*C(stationary_vars,:)' + A*Var_z*dC(stationary_vars,:,jpVi)'...
                       + dB(:,:,jpVi)*Varinov*D(stationary_vars,:)' + B*dVarinov(:,:,jpVi)*D(stationary_vars,:)' + B*Varinov*dD(stationary_vars,:,jpVi)';
         else
@@ -1132,7 +1132,7 @@ if compute_derivs
                 Var_zi       = A*Var_zi + B*E_inovzlagi;
                 dVar_zi_jpVi = dA(:,:,jpVi)*Var_zi + A*dVar_zi_jpVi + dB(:,:,jpVi)*E_inovzlagi + + B*dE_inovzlagi_jpVi;
                 dhxi_jpVi = dhx(:,:,jpVi)*hxi + hx*dhxi_jpVi;
-                hxi = hx*hxi;                
+                hxi = hx*hxi;
                 E_inovzlagi = zeros(inov_nbr,z_nbr);
                 E_inovzlagi(id_inov6_xf_u_u , id_z1_xf       ) = kron(hxi*E_xfxf,E_uu(:));
                 E_inovzlagi(id_inov6_xf_u_u , id_z4_xrd      ) = kron(hxi*E_xrdxf',E_uu(:));
@@ -1151,13 +1151,13 @@ if compute_derivs
                 dsy = 1/2./sdy.*diag(dVar_y(:,:,jpVi));
                 dsy = dsy(stationary_vars);
                 dsy = dsy*sdy'+sdy*dsy';
-                dCorr_yi(stationary_vars,stationary_vars,i,jpVi) = (dVar_yi(stationary_vars,stationary_vars,i,jpVi).*sy-dsy.*Var_yi(stationary_vars,stationary_vars,i))./(sy.*sy);                
+                dCorr_yi(stationary_vars,stationary_vars,i,jpVi) = (dVar_yi(stationary_vars,stationary_vars,i,jpVi).*sy-dsy.*Var_yi(stationary_vars,stationary_vars,i))./(sy.*sy);
             end
             dAi_jpVi = dAi_jpVi*A + Ai*dA(:,:,jpVi);
             Ai = Ai*A;
         end
     end
-end    
+end
 
 
 %% Mean of control variables

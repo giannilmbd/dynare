@@ -8,8 +8,8 @@ function oo_ = disp_th_moments(dr, var_list, M_, options_, oo_)
 % options_      [struct]    structure describing the options
 % oo_           [struct]    structure describing the Model
 %
-% OUTPUTS: 
-% oo_           [struct]    structure describing the Model, containing       
+% OUTPUTS:
+% oo_           [struct]    structure describing the Model, containing
 %           gamma_y                                 [cell]      MATLAB cell of nar+1 arrays, where nar is the order of the autocorrelation function.
 %           gamma_y{1}                              [double]    Covariance matrix.
 %           gamma_y{i+1}                            [double]    Autocorrelation function (for i=1,...,options_.ar).

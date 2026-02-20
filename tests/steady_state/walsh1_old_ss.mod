@@ -1,13 +1,13 @@
 var y c k m n R pi z u;
-varexo	e sigma;	 
+varexo	e sigma;
 // sigma stands for phi in the eq 2.37 p.69
 
-parameters alphha betta delta gamm phi1 eta a b rho  phi2 Psi thetass;  
+parameters alphha betta delta gamm phi1 eta a b rho  phi2 Psi thetass;
 //phi1 stands for capital phi in eq.2.68 and 2.69
 //phi2 stands for lowercase phi in eq. 2.66
 
 alphha = 0.36;
-betta = 0.989; 
+betta = 0.989;
 gamm = 0.5;
 delta = 0.019;
 phi1 = 2;

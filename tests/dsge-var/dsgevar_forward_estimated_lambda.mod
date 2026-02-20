@@ -79,7 +79,7 @@ varobs pie r rw y;
 ** The dsge_var option triggers the estimation of a DSGE-VAR model instead of the plain DSGE model. The weight of the DSGE prior, dsge_prior_weight,
 ** is estimated. The prior of this parameter is defined in the estimated_params block.
 **
-** REMARK 2. 
+** REMARK 2.
 ** The option bayesian_irf triggers the computation of the DSGE-VAR and DSGE posterior distribution of the IRFs.
 ** The Dashed lines are the first, fifth (ie the median) and ninth posterior deciles of the DSGE-VAR's IRFs, the bold dark curve is the
 ** posterior median of the DSGE's IRfs and the shaded surface covers the space between the first and ninth posterior deciles of the DSGE's IRFs.

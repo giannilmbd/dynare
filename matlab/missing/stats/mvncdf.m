@@ -281,12 +281,12 @@ elseif d == 2 % bivariate case: use bvncdf (Gauss-Legendre quadrature)
         % both lower and upper limits: use inclusion-exclusion principle
         % P(XL <= X <= XU) = sum over subsets of (-1)^|S| * P(X <= x_S)
         % where x_S has XL for indices in S and XU otherwise
-        
+
         % handle degenerate rectangles (XL == XU) by setting both to -Inf
         equalLimits = (XL == XU);
         XU(equalLimits) = -Inf;
         XL(equalLimits) = -Inf;
-        
+
         p = zeros(n, 1);
         for i = 0:d
             k = nchoosek(1:d, i);
@@ -306,18 +306,18 @@ elseif d == 3 % trivariate case: use tvncdf (adaptive quadrature)
     % Rho([2 3 6]) in column-major order gives these elements
     rho_vec = Rho([2 3 6]);
     tol = 1e-8; % default tolerance for tvncdf
-    
+
     if upperLimitOnly
         % upper limit only: direct call to tvncdf with standardized limits (handles N observations)
         p = tvncdf(XU0, rho_vec, tol);
     else
         % both lower and upper limits: use inclusion-exclusion principle
-        
+
         % handle degenerate rectangles (XL0 == XU0) by setting both to -Inf
         equalLimits = (XL0 == XU0);
         XU0(equalLimits) = -Inf;
         XL0(equalLimits) = -Inf;
-        
+
         p = zeros(n, 1);
         for i = 0:d
             k = nchoosek(1:d, i);

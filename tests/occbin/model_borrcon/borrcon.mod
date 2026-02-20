@@ -1,5 +1,5 @@
 /*
-Test Occbin with 1 constraint; Note that the reference regime is one where the borrowing 
+Test Occbin with 1 constraint; Note that the reference regime is one where the borrowing
 constraint is binding, i.e. the relax condition specifies the condition where we return to
 the reference regime with a binding constraint.
 */
@@ -11,7 +11,7 @@ var b ${b}$ (long_name='borrowing')
     y ${y}$ (long_name='Output')
     c_hat ${\hat c}$
     b_hat ${\hat b}$
-    y_hat ${\hat y}$    
+    y_hat ${\hat y}$
     ;
 varexo u $u$;
 
@@ -23,7 +23,7 @@ c = y + b - R*b(-1) ;
 [name = 'borrowing', bind='borrcon']
 lb = 0;
 [name = 'borrowing', relax='borrcon']
-b = M*y;  
+b = M*y;
 lb = 1/c^GAMMAC - BETA*R/c(+1)^GAMMAC ;
 log(y) = RHO*log(y(-1)) + u ;
 c_hat = log(c) - log(steady_state(c));
@@ -35,7 +35,7 @@ occbin_constraints;
  name 'borrcon'; bind lb<0; relax b>M*y; error_bind abs(lb); error_relax abs(b-M*y);
 %name 'borrcon'; bind lb<-STEADY_STATE(lb); relax b>M*y;
 end;
-    
+
 steady_state_model;
 b=M;
 c=1+M-R*M;

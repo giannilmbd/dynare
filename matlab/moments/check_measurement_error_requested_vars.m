@@ -12,7 +12,7 @@ function [ME_present,observable_pos_requested_vars,index_subset,index_observable
 %   ME_present                      [boolean]       indicator whether measurement error is present for requested variables
 %   observable_pos_requested_vars   [integer]       index of observables in list of endogenous variables
 %   index_subset                    [integer]       index of observables in ivar
-%   index_observables               [integer]       index of requested i_var in observables 
+%   index_observables               [integer]       index of requested i_var in observables
 
 % Copyright © 2023-2025 Dynare Team
 %

@@ -66,7 +66,7 @@ else
     end
 end
 
-[~, ~, TotalNumberOfMhDraws]=set_number_of_subdraws(M_,options_); 
+[~, ~, TotalNumberOfMhDraws]=set_number_of_subdraws(M_,options_);
 
 if n_nblocks_to_plot==1
 % Get all the posterior draws:

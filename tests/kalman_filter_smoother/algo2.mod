@@ -57,7 +57,7 @@ end;
 
 o1 = load(['algo1' filesep 'Output' filesep 'algo1_results.mat']);
 obj_endo={'SmoothedVariables'; 'FilteredVariables'; 'UpdatedVariables'};
-obj_exo = {'SmoothedShocks';}; 
+obj_exo = {'SmoothedShocks';};
 nobj_endo = size(obj_endo,1);
 nobj_exo = size(obj_exo,1);
 for i=1:nobj_endo;
@@ -69,7 +69,7 @@ for i=1:nobj_endo;
     end;
     if max(max(abs(err_endo))) > 1e-10;
        error('Test fails');
-    end;     
+    end;
 end;
 
 

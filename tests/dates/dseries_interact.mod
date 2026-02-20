@@ -33,7 +33,7 @@ var eps_a; stderr 1;
 end;
 
 estimated_params;
-alfa, beta_pdf,   0.1, 0.05; 
+alfa, beta_pdf,   0.1, 0.05;
 std_a,   inv_gamma_pdf, 0.05, 1;
 end;
 

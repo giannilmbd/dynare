@@ -67,7 +67,7 @@ if strcmp(options_mom_.mom.mom_method,'IRF_MATCHING')
     end
     if ~isempty(options_mom_.mom.irf_matching_file.name)
         fprintf('\n  - irf_matching_file: %s',[options_mom_.mom.irf_matching_file.path filesep options_mom_.mom.irf_matching_file.name '.m']);
-    end    
+    end
 end
 for i = 1:length(options_mom_.optimizer_vec)
     if i == 1

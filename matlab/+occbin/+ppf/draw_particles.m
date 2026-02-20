@@ -123,7 +123,7 @@ if nargout>2 && not(isempty(PriorStateInfo))
             end
             if isempty(PriorStateInfo.UPR{r})
                 lprior_tmp(r) = 0 - log(p0);
-            else 
+            else
                 vv = PriorStateInfo.UPR{r}'*(yhat(:,k)-PriorStateInfo.Mean(:,r));
                 lprior_tmp(r) = PriorStateInfo.log_dS(r) + transpose(vv)*PriorStateInfo.iS{r}*vv + length(PriorStateInfo.iS{r})*log(2*pi) - log(p0);
             end

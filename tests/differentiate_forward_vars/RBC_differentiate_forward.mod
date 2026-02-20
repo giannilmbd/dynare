@@ -1,13 +1,13 @@
 /*
-* This model shows how to use the  differentiate_forward_vars option to simulate 
+* This model shows how to use the  differentiate_forward_vars option to simulate
 * perfect foresight models  when the steady state is unknown
-* or when the model is very persistent. In this file, we  consider an  RBC model  
-* with a  CES technology  and  very  persistent  productivity shock. We set the 
-* autoregressive  parameter of this exogenous productivity  to 0.999, so that 
-* in period 400 the level of productivity,  after an  initial one percent shock,  
-* is still  0.67\% above its steady state level.  
+* or when the model is very persistent. In this file, we  consider an  RBC model
+* with a  CES technology  and  very  persistent  productivity shock. We set the
+* autoregressive  parameter of this exogenous productivity  to 0.999, so that
+* in period 400 the level of productivity,  after an  initial one percent shock,
+* is still  0.67\% above its steady state level.
 *
-* Written by Stéphane Adjemian. For more information, see 
+* Written by Stéphane Adjemian. For more information, see
 * http://gitlab.ithaca.fr/Dynare/differentiate-forward-variables
 */
 var Capital, Output, Labour, Consumption, Efficiency, efficiency, ExpectedTerm;
@@ -56,17 +56,17 @@ model(differentiate_forward_vars);
 end;
 
 steady_state_model;
-  
+
   efficiency = 0;
   Efficiency = effstar;
-  
+
   // Compute some steady state ratios.
   Output_per_unit_of_Capital=((1/beta-1+delta)/alpha)^(1/(1-psi));
   Consumption_per_unit_of_Capital=Output_per_unit_of_Capital-delta;
   Labour_per_unit_of_Capital=(((Output_per_unit_of_Capital/Efficiency)^psi-alpha)/(1-alpha))^(1/psi);
   Output_per_unit_of_Labour=Output_per_unit_of_Capital/Labour_per_unit_of_Capital;
   Consumption_per_unit_of_Labour=Consumption_per_unit_of_Capital/Labour_per_unit_of_Capital;
-  
+
   // Compute steady state share of capital.
   ShareOfCapital=alpha/(alpha+(1-alpha)*Labour_per_unit_of_Capital^psi);
 

@@ -45,7 +45,7 @@ end
 if nargin<4 || isempty(plotsymbol)
     if n*p<100
         plotsymbol = 'o';
-    else 
+    else
         plotsymbol = '.';
     end
 end
@@ -138,7 +138,7 @@ for i = 1:p
                           'HorizontalAlignment','left','VerticalAlignment','bottom')
                 else
                     title(vnames(i,:),'interpreter','none','Rotation',45, ...
-                          'HorizontalAlignment','left','VerticalAlignment','bottom')            
+                          'HorizontalAlignment','left','VerticalAlignment','bottom')
                 end
             else
                 title(num2str(i))

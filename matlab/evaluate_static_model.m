@@ -43,7 +43,7 @@ if options_.bytecode
         [residuals, junk]= bytecode('evaluate', 'static', M_, options_, ys, ...
             exo_ss, params, ys, 1);
         jacob = junk.g1;
-    end      
+    end
 else
     [residuals, T_order, T] = feval([M_.fname '.static_resid'], ys, exo_ss, params);
     if nargout >= 2

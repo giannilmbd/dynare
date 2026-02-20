@@ -319,12 +319,12 @@ if init
                       posterior_sampler_options.fast_likelihood_evaluation_for_rejection_penalty = options_list{i,2};
 
                    case 'use_prior_draws'
- 
+
                        posterior_sampler_options.use_prior_draws.status = options_list{i,2};
                        posterior_sampler_options.use_prior_draws.mh_blck = repmat(options_list{i,2},[1 options_.mh_nblck]);
 
 
-                  
+
                   case 'draw_init_state_from_smoother'
                     posterior_sampler_options.draw_init_state_from_smoother = options_list{i,2};
 
@@ -333,14 +333,14 @@ if init
 
                   case 'maximize'
                     posterior_sampler_options.maximize = options_list{i,2};
-                    
+
                   case 'maximize_using_mh_bounds'
-                      
+
                       posterior_sampler_options.maximize_using_mh_bounds = options_list{i,2};
-                    
+
                   case 'mode_compute'
                     posterior_sampler_options.mode_compute = options_list{i,2};
-                    
+
                   otherwise
                     warning(['slice_sampler: Unknown option (' options_list{i,1} ')!'])
                 end
@@ -444,14 +444,14 @@ if init
                   end
               end
           end
-          
+
           options_.mode_compute = 0;
           options_.cova_compute = 0;
           options_.mh_replic = 0;
           options_.mh_posterior_mode_estimation = false;
-          
+
       case 'dime_mcmc'
-          
+
           % default options
           posterior_sampler_options = add_fields_(posterior_sampler_options, options_.posterior_sampler_options.dime);
 
@@ -511,7 +511,7 @@ if init
                   end
               end
           end
-          
+
           options_.mode_compute = 0;
           options_.cova_compute = 0;
           options_.mh_replic = 0;
@@ -552,13 +552,13 @@ if init
           end
 
           if posterior_sampler_options.particles<posterior_sampler_options.N*posterior_sampler_options.G
-              error('check_posterior_sampler_options:: DSMH requires particles to be at least than N*G = %u ',posterior_sampler_options.N*posterior_sampler_options.G);             
+              error('check_posterior_sampler_options:: DSMH requires particles to be at least than N*G = %u ',posterior_sampler_options.N*posterior_sampler_options.G);
           end
           options_.mode_compute = 0;
           options_.cova_compute = 0;
           options_.mh_replic = 0;
           options_.mh_posterior_mode_estimation = false;
-              
+
       otherwise
           error('check_posterior_sampler_options:: Unknown posterior_sampling_method option %s ',posterior_sampler_options.posterior_sampling_method);
     end
@@ -608,7 +608,7 @@ if strcmp(posterior_sampler_options.posterior_sampling_method,'slice')
             posterior_sampler_options.invhess=[];
         end
     end
-    if posterior_sampler_options.maximize_using_mh_bounds 
+    if posterior_sampler_options.maximize_using_mh_bounds
         if ~posterior_sampler_options.maximize
             error('check_posterior_sampler_options:: the maximize_using_mh_bounds requires the maximize option.')
         end
@@ -620,8 +620,8 @@ if strcmp(posterior_sampler_options.posterior_sampling_method,'slice')
         end
     end
     if posterior_sampler_options.maximize && posterior_sampler_options.maximize_using_mh_bounds && options_.load_mh_file && not(options_.mh_recover)
-        % restrict maximization within slice in the range of mcmc posterior draws 
-                             
+        % restrict maximization within slice in the range of mcmc posterior draws
+
         params1 = GetAllPosteriorDraws(options_, dname, fname, 'all');
         opt_bounds.lb=min(params1)';
         opt_bounds.ub=max(params1)';

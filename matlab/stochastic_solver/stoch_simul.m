@@ -242,7 +242,7 @@ if ~options_.nomoments
     elseif options_.periods == 0
         if options_.order == 1 || (options_.order == 2 && ~options_.pruning)
             oo_=disp_th_moments(oo_.dr,var_list,M_,options_,oo_);
-        elseif (ismember(options_.order,[2,3])) && options_.pruning  
+        elseif (ismember(options_.order,[2,3])) && options_.pruning
             % There is no code for theoretical moments at 3rd order without pruning
             oo_=disp_th_moments_pruned_state_space(oo_.dr,M_,options_,i_var,oo_);
         end
@@ -272,7 +272,7 @@ if options_.irf
     end
     irf_shocks_indx = getIrfShocksIndx(M_, options_);
     for i=irf_shocks_indx
-        if cs(i,i) > 5e-7            
+        if cs(i,i) > 5e-7
             if PI_PCL_solver
                 y=PCL_Part_info_irf (0, PCL_varobs, i_var, M_, oo_.dr, options_.irf, i);
             else

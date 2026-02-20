@@ -1,7 +1,7 @@
 var a g mc mrs n pie r rw winf y;
 varexo e_a e_g e_lam e_ms;
 
-parameters invsig delta gam rho gampie gamy rhoa rhog bet 
+parameters invsig delta gam rho gampie gamy rhoa rhog bet
     	   thetabig omega eps;
 
 eps=6;

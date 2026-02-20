@@ -1,6 +1,6 @@
 function display_unconditional_variance_decomposition(M_,options_,oo_,ivar,stationary_vars,index_subset,ME_present)
 % display_unconditional_variance_decomposition(M_,options_,oo_,ivar,stationary_vars,index_subset,ME_present)
-% This function displays the unconditional variance decomposition 
+% This function displays the unconditional variance decomposition
 %
 % INPUTS
 %   M_                  [struct]        MATLAB's structure describing the Model

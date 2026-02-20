@@ -3,14 +3,14 @@ function [ys,params,check] = Ramsey_steady_file_steadystate(ys,exo,M_,options_)
 % computes the steady state for the Ramsey_steady_file.mod, conditional on
 % the instrument value provided
 %
-% Inputs: 
+% Inputs:
 %   - ys        [vector] vector of initial values for the steady state of
 %                   the endogenous variables
 %   - exo       [vector] vector of values for the exogenous variables
 %   - M_        [structure] Dynare model structure
 %   - options   [structure] Dynare options structure
 %
-% Output: 
+% Output:
 %   - ys        [vector] vector of steady state values for the the endogenous variables
 %   - params    [vector] vector of parameter values
 %   - check     [scalar] set to 0 if steady state computation worked and to
@@ -36,7 +36,7 @@ function [ys,params,check] = Ramsey_steady_file_steadystate(ys,exo,M_,options_)
 % read out parameters to access them with their name
 beta=NaN; %make parameter known to Matlab function, prevents crashes due to Matlab function with same name;
           %will be overwritten next
-          
+
 NumberOfParameters = M_.param_nbr;
 for ii = 1:NumberOfParameters
   paramname = M_.param_names{ii};

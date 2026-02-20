@@ -88,7 +88,7 @@ in  = strmatch('n',  M_.endo_names,'exact');
 
 matched_moments_ = {
     [ic     ]  [0   ],  [1  ];
-    [in     ]  [0   ],  [1  ];    
+    [in     ]  [0   ],  [1  ];
     [iiv    ]  [0   ],  [1  ];
     [ic  ic ]  [0  0],  [1 1];
     [ic  iiv]  [0  0],  [1 1];
@@ -131,8 +131,8 @@ save('test_matrix.mat','weighting_matrix')
         % , seed = 24051986                   % seed used in simulations
         % , simulation_multiple = 5           % multiple of the data length used for simulation
 
-    % Options for GMM        
-        % , analytic_standard_errors            % compute standard errors using analytical derivatives        
+    % Options for GMM
+        % , analytic_standard_errors            % compute standard errors using analytical derivatives
 
     % General options
         % , dirname = 'MM'                    % directory in which to store estimation output
@@ -164,7 +164,7 @@ save('test_matrix.mat','weighting_matrix')
         %           ,'MaxFunEvals' , 1D6      % maximum number of function evaluations allowed, a positive integer
         %           ,'UseParallel' , 1        % when true (and supported by optimizer) solver estimates gradients in parallel (using Matlab/Octave's parallel toolbox)
         %           ,'Jacobian'    , 'off'    % when 'off' gradient-based solvers approximate Jacobian using finite differences; for GMM we can also pass the analytical Jacobian to gradient-based solvers by setting this 'on'
-        %           )                         
+        %           )
         , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
 
     % Numerical algorithms options

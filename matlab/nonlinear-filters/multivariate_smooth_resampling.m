@@ -1,7 +1,7 @@
 function new_particles = multivariate_smooth_resampling(particles,weights)
 % new_particles = multivariate_smooth_resampling(particles,weights)
 % Smooth Resampling of the particles (multivariate version).
-% 
+%
 % INPUTS
 %  - particles              [double]    n*1 vector of particles
 %  - weights                [double]    n*1 vector of particles' weights.

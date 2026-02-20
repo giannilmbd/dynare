@@ -26,7 +26,7 @@ e_c_m =  .5;
 c_z_1 =  .2;
 c_z_2 = -.1;
 
-gamma =  .7;    
+gamma =  .7;
 
 trend_component_model(model_name=toto, eqtags=['eq:x1', 'eq:x2', 'eq:x1bar', 'eq:x2bar'], targets=['eq:x1bar', 'eq:x2bar']);
 
@@ -44,7 +44,7 @@ diff(y2) = .5*diff(y2(-1)) - .2*diff(y2(-3)) + ey2;
 diff(x1) = a_x1_0*(x1(-1)-x1bar(-1)) + a_x1_1*diff(x1(-1)) + a_x1_2*diff(x1(-2)) + a_x1_x2_1*diff(x2(-1)) + a_x1_x2_2*diff(x2(-2)) + ex1;
 
 [name='eq:x2']
-diff(x2) = a_x2_0*(x2(-1)-x2bar(-1)) + a_x2_1*diff(x1(-1)) + a_x2_2*diff(x1(-2)) + a_x2_x1_1*diff(x2(-1)) + a_x2_x1_2*diff(x2(-2)) + ex2;     
+diff(x2) = a_x2_0*(x2(-1)-x2bar(-1)) + a_x2_1*diff(x1(-1)) + a_x2_2*diff(x1(-2)) + a_x2_x1_1*diff(x2(-1)) + a_x2_x1_2*diff(x2(-2)) + ex2;
 
 [name='eq:x1bar']
 x1bar = x1bar(-1) + ex1bar;

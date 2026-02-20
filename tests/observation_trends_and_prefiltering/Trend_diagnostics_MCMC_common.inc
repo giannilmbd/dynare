@@ -1,4 +1,4 @@
-       
+
 if max(abs(oo_.SmoothedVariables.Mean.Y_obs-Y_obs'))>1e-5 ||...
     max(abs(oo_.SmoothedVariables.Mean.P_obs-P_obs'))>1e-5 || ...
     max(abs(oo_.SmoothedVariables.Mean.junk2-junk2'))>1e-5
@@ -12,14 +12,14 @@ if max(abs(oo_.UpdatedVariables.Mean.Y_obs-Y_obs'))>1e-5 ||...
 end
 
 if mean(abs(oo_.FilteredVariables.Mean.Y_obs(1:end-1)-Y_obs(2:end)'))>1e-3 ||...
-    mean(abs(oo_.FilteredVariables.Mean.P_obs(1:end-1)-P_obs(2:end)'))>1e-3 
+    mean(abs(oo_.FilteredVariables.Mean.P_obs(1:end-1)-P_obs(2:end)'))>1e-3
     error('Filtered Variables are wrong')
 end
 
 if isoctave
     tol_crit=3e-2 ;
 else
-    tol_crit=2e-2 ;    
+    tol_crit=2e-2 ;
 end
 
 if abs(corr(oo_.FilteredVariables.Mean.Y_obs(2:end-1)-Y_obs(3:end)',oo_.FilteredVariables.Mean.Y_obs(1:end-2)-Y_obs(2:end-1)'))>2e-2 ||...
@@ -27,13 +27,13 @@ if abs(corr(oo_.FilteredVariables.Mean.Y_obs(2:end-1)-Y_obs(3:end)',oo_.Filtered
     abs(corr(oo_.FilteredVariables.Mean.junk2(2:end-1)-junk2(3:end)',oo_.FilteredVariables.Mean.junk2(1:end-2)-junk2(2:end-1)'))>tol_crit
     error('Filtered Variables are wrong')
 end
-   
+
 if max(abs(squeeze(oo_.FilteredVariablesKStepAhead(1,1,2:end-(options_.nk-1)))-oo_.FilteredVariables.Mean.P_obs))>1e-5 ||...
     max(abs(squeeze(oo_.FilteredVariablesKStepAhead(1,2,2:end-(options_.nk-1)))-oo_.FilteredVariables.Mean.Y_obs))>1e-5 ||...
     max(abs(squeeze(oo_.FilteredVariablesKStepAhead(1,3,2:end-(options_.nk-1)))-oo_.FilteredVariables.Mean.junk2))>1e-5 ||...
     max(abs(squeeze(oo_.FilteredVariablesKStepAhead(2,1,3:end-options_.nk))-oo_.FilteredVariables.Mean.P_obs(3:end)))>1e-2 ||...
     max(abs(squeeze(oo_.FilteredVariablesKStepAhead(2,2,3:end-options_.nk))-oo_.FilteredVariables.Mean.Y_obs(3:end)))>1e-2 ||...
-    mean(squeeze(oo_.FilteredVariablesKStepAhead(2,3,3:end-options_.nk)))>1e-1 
+    mean(squeeze(oo_.FilteredVariablesKStepAhead(2,3,3:end-options_.nk)))>1e-1
     error('FilteredVariablesKStepAhead is wrong')
 end
 
@@ -42,7 +42,7 @@ if isoctave
 else
   tol_crit=5e-4;
 end
-        
+
 if abs(oo_.PointForecast.Mean.Y_obs(end)- y_forecast_100_periods)>tol_crit || abs(oo_.PointForecast.Mean.P_obs(end)- p_forecast_100_periods)>tol_crit
     error('Mean Point Forecasts do not match')
 end

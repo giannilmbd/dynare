@@ -4,9 +4,9 @@ function [dr, info, params]=discretionary_policy_1(M_, options_, dr, endo_steady
 % - M_            [structure]     MATLAB's structure describing the model (M_).
 % - options_      [structure]     MATLAB's structure describing the current options (options_).
 % - dr            [struct]        Decision rules for stochastic simulations.
-% - endo_steady_state       [vector]     steady state value for endogenous variables                                    
+% - endo_steady_state       [vector]     steady state value for endogenous variables
 % - exo_steady_state        [vector]     steady state value for exogenous variables
-% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - dr            [structure]     Reduced form model.

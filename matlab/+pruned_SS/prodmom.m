@@ -1,23 +1,23 @@
 %
 % prodmom.m		Date: 4/29/2006
 % This MATLAB program computes the product moment of X_{i_1}^{nu_1}X_{i_2}^{nu_2}...X_{i_m}^{nu_m},
-% where X_{i_j} are elements from X ~ N(0_n,V).  
+% where X_{i_j} are elements from X ~ N(0_n,V).
 % V only needs to be positive semidefinite.
 % V: variance-covariance matrix of X
 % ii: vector of i_j
-% nu: power of X_{i_j} 
+% nu: power of X_{i_j}
 % Reference: Triantafyllopoulos (2003) On the Central Moments of the Multidimensional
 %            Gaussian Distribution, Mathematical Scientist
 %            Kotz, Balakrishnan, and Johnson (2000), Continuous Multivariate
 %            Distributions, Vol. 1, p.261
-% Note that there is a typo in Eq.(46.25), there should be an extra rho in front 
+% Note that there is a typo in Eq.(46.25), there should be an extra rho in front
 % of the equation.
 % Usage: prodmom(V,[i1 i2 ... ir],[nu1 nu2 ... nur])
 % Example: To get E[X_2X_4^3X_7^2], use prodmom(V,[2 4 7],[1 3 2])
 %
 % Retrieved from http://www-2.rotman.utoronto.ca/~kan/papers/prodmom.zip
 % This function is part of replication codes of the following paper:
-% Kan, R.: "From moments of sum to moments of product." Journal of 
+% Kan, R.: "From moments of sum to moments of product." Journal of
 % Multivariate Analysis, 2008, vol. 99, issue 3, pages 542-554.
 
 % Copyright © 2008-2015 Raymond Kan <kan@chass.utoronto.ca>
@@ -74,7 +74,7 @@ if m==2
     end
    rho = V(1,2)/sqrt(V(1,1)*V(2,2));
    y = V(1,1)^(nu(1)/2)*V(2,2)^(nu(2)/2)*pruned_SS.bivmom(nu,rho);
-   return  
+   return
 end
 %
 %  Regular case

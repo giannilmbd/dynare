@@ -128,7 +128,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
     else
         gend = 0;
     end
-    
+
     if strcmp(options_.shock_decomp.forecast_type, 'unconditional')
         options_.plot_shock_decomp.forecast_length = length(uf.Mean.(M_.endo_names{i_var(1)}));
         gend = gend + options_.plot_shock_decomp.forecast_length;
@@ -136,16 +136,16 @@ if ~isempty(options_.shock_decomp.forecast_type)
         options_.plot_shock_decomp.forecast_length = length(cf.cond.Mean.(M_.endo_names{i_var(1)}));
         gend = gend + options_.plot_shock_decomp.forecast_length;
     end
-    
+
     if smoothed_data_present && strcmp(options_.shock_decomp.forecast_type, 'conditional')
         % initial condition is in the conditional forecast data
         gend = gend - 1;
     end
-    
+
     % initialization
     epsilon=zeros(nshocks,gend);
     z = zeros(M_.endo_nbr,nshocks+2,gend);
-    
+
     if smoothed_data_present
         smoothed_periods = size(Smoothed_Variables_deviation_from_mean,2);
         for i=1:nshocks
@@ -153,7 +153,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
         end
         z(:,end,1:smoothed_periods) = Smoothed_Variables_deviation_from_mean;
     end
-    
+
     if strcmp(options_.shock_decomp.forecast_type, 'unconditional')
         for i=1:size(i_var, 1)
             z(i_var(i),end,smoothed_periods+1:end) = ...
@@ -164,7 +164,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
             z(i_var(i),end,smoothed_periods+1:end) = ...
                 cf.cond.Mean.(M_.endo_names{i_var(i)})(2:end) - dr.ys(i_var(i));
         end
-        
+
         conditional_periods = length(cf.controlled_exo_variables.Mean.(M_.exo_names{1}));
         for i=1:nshocks
             epsilon(i,smoothed_periods+(1:conditional_periods)) = ...
@@ -174,7 +174,7 @@ if ~isempty(options_.shock_decomp.forecast_type)
 else
     epsilon=NaN(nshocks,gend);
     z = zeros(M_.endo_nbr,nshocks+2,gend);
-    
+
     for i=1:nshocks
         epsilon(i,:) = oo_temp.SmoothedShocks.(M_.exo_names{i});
     end

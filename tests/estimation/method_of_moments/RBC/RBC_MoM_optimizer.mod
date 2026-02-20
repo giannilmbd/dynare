@@ -18,7 +18,7 @@
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 % =========================================================================
 % TO DO
-% [ ] fix optimizers 11 and 12; 
+% [ ] fix optimizers 11 and 12;
 % note that 12 and 102 require GADS_Toolbox which is not available on servers, but need to be tested locally
 
 % Define testscenario
@@ -29,7 +29,7 @@
 @#include "RBC_MoM_common.inc"
 
 shocks;
-var u_a; stderr 0.0072;        
+var u_a; stderr 0.0072;
 end;
 
 varobs c iv n;
@@ -117,12 +117,12 @@ options_.solveopt.TolXConstraint=1e-3;
     end;
 
     @#for optimizer in OPTIMIZERS
-        
+
         @#if estimParams == 2 && optimizer == 13
             %skip due to buggy behavior in Octave
         if ~isoctave
         @#endif
-        
+
     method_of_moments(
           mom_method = GMM         % method of moments method; possible values: GMM|SMM
         , datafile   = 'RBC_Andreasen_Data_2.mat' % name of filename with data
@@ -144,7 +144,7 @@ options_.solveopt.TolXConstraint=1e-3;
         @#endif
         , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
     );
-    
+
         @#if estimParams == 2 && optimizer == 13
             %skip due to buggy behavior in Octave
         end

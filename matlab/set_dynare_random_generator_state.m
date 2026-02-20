@@ -1,5 +1,5 @@
 function set_dynare_random_generator_state(state_u,state_n,current_stream)
-%Set state of MATLAB/Octave random generator 
+%Set state of MATLAB/Octave random generator
 % Outputs:
 %   - None
 % Inputs:
@@ -7,10 +7,10 @@ function set_dynare_random_generator_state(state_u,state_n,current_stream)
 %   - state_n           [integer]       state of normal RNG
 %   - global_stream     [randstream]    RNG stream to be made default stream
 %
-% Notes: 
+% Notes:
 %  - Octave, like older versions of MATLAB keeps one generator for uniformly distributed numbers and
-%    one for normally distributed numbers. 
-%  - For compatibility, we input two vectors, which need to be identical for MATLAB. 
+%    one for normally distributed numbers.
+%  - For compatibility, we input two vectors, which need to be identical for MATLAB.
 %  - For MATLAB, we also meed to define the current stream as it may have changed when
 %       parfor was used
 

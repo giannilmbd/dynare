@@ -71,9 +71,9 @@ parameter_names = bayestopt_.name;
 save([M_.dname filesep outputFolderName filesep M_.fname '_mean.mat'],'xparam1','hh','parameter_names','SIGMA');
 
 fprintf('marginal density: I''m computing the posterior log marginal density (modified harmonic mean)... ');
-try 
+try
     % use this robust option to avoid inf/nan
-    logdetSIGMA = 2*sum(log(diag(chol(SIGMA)))); 
+    logdetSIGMA = 2*sum(log(diag(chol(SIGMA))));
 catch
     % in case SIGMA is not positive definite
     logdetSIGMA = nan;

@@ -1,5 +1,5 @@
 % -------------------------------------------------------------------------
-% Functionality testing of Bayesian IRF matching with 
+% Functionality testing of Bayesian IRF matching with
 % - independent Metropolis-Hastings
 % - more than one MCMC chains
 % -------------------------------------------------------------------------

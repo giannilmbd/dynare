@@ -4,7 +4,7 @@ function v = allVL1(n, L1, L1ops, MaxNbSol)
 % function v=allVL1(n, L1); OR
 % v=allVL1(n, L1, L1opt);
 % v=allVL1(n, L1, L1opt, MaxNbSol);
-% 
+%
 % INPUT
 %    n: length of the vector
 %    L1: target L1 norm
@@ -16,11 +16,11 @@ function v = allVL1(n, L1, L1ops, MaxNbSol)
 %    the permutations.
 % OUTPUT:
 %    v: (m x n) array such as: sum(v,2) == L1,
-%       (or <= or < depending on L1ops)                            
+%       (or <= or < depending on L1ops)
 %       all elements of v is naturel numbers {0,1,...}
 %       v contains all (=m) possible combinations
 %       v is sorted by sum (L1 norm), then by dictionnary sorting criteria
-%    class(v) is same as class(L1) 
+%    class(v) is same as class(L1)
 % Algorithm:
 %    Recursive
 % Remark:
@@ -88,7 +88,7 @@ switch L1ops
     case '<=' % call allVL1eq for various sum targets
         if isnan(MaxCounter)
             % return the number of solutions
-            %v = nchoosek(n+L1,L1)*factorial(n-L1); BUG <- 16/Sep/2009: 
+            %v = nchoosek(n+L1,L1)*factorial(n-L1); BUG <- 16/Sep/2009:
             v = 0;
             for j=0:L1
                 v = v + nchoosek(n+j-1,j);

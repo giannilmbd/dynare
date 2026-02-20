@@ -5,7 +5,7 @@ function ReshapeMatFiles(fname, dname, exo_nbr, endo_nbr, options_, type, type2)
 % 3D-arrays are splitted along the second dimension.
 %
 % INPUTS:
-%   fname:          [string]        filename 
+%   fname:          [string]        filename
 %   dname:          [string]        directory name
 %   exo_nbr:        [integer]       number of exogenous variables
 %   endo_nbr:       [integer]       number of endogenous variables

@@ -1,5 +1,5 @@
 % this is the Smets and Wouters (2007) model for which Komunjer and Ng (2011)
-% derived the minimal state space system. In Dynare, however, we use more 
+% derived the minimal state space system. In Dynare, however, we use more
 % powerful minreal function
 % created by Willi Mutschler (@wmutschl, willi@mutschler.eu)
 % =========================================================================
@@ -29,7 +29,7 @@ parameters tau phi psi1 psi2 rhor rhog rhoz rrst pist gamst nu cyst;
 rrst = 1.0000;
 pist = 3.2000;
 gamst= 0.5500;
-tau  = 2.0000; 
+tau  = 2.0000;
 nu   = 0.1000;
 kap  = 0.3300;
 phi  = tau*(1-nu)/nu/kap/exp(pist/400)^2;

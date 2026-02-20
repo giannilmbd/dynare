@@ -48,4 +48,4 @@ end
 if max(abs(junk(M_.maximum_lag+1:end)-oo_.endo_simul(strmatch('y_backward',M_.endo_names,'exact'),:)))>1e-10
     error('Solution of purely backwards model not correct')
 end
-        
+

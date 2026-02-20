@@ -8,7 +8,7 @@ function [forecast, error_flag, yf] = forecast(options_,M_,dr,endo_steady_state,
 % - dr_in                   [structure]     model information structure
 % - endo_steady_state       [double]        steady state value for endogenous variables
 % - exo_steady_state        [double]        steady state value for exogenous variables
-% - exo_det_steady_state    [double]        steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [double]        steady state value for exogenous deterministic variables
 % - forecast_horizon        [integer]       forecast horizon
 %
 % OUTPUTS
@@ -84,7 +84,7 @@ if opts.replic
     if options_.occbin.forecast.waitbar
         [h,length_of_old_string] = wait_bar.run(0, [], 'Please wait. OccBin forecast replic...', options_.console_mode, 0, 'OccBin forecasts.');
     end
-    
+
     ishock = find(sqrt(diag((M_.Sigma_e))));
     options_.occbin.simul.exo_pos=ishock;
     effective_exo_nbr=  length(ishock);
@@ -138,7 +138,7 @@ if opts.replic
     z.max.piecewise = max(z.piecewise,[],3);
     z.min.linear = min(z.linear,[],3);
     z.max.linear = max(z.linear,[],3);
-    
+
     field_names={'linear','piecewise'};
     post_mean=NaN(forecast_horizon,1);
     post_median=NaN(forecast_horizon,1);

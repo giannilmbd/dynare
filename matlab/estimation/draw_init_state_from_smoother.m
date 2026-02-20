@@ -153,7 +153,7 @@ if options_.occbin.smoother.status
 else
     [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
 end
-% end unconditional smoother to get mean (alphahat0) and covariance (state_uncertainty0) of the proposal for init state 
+% end unconditional smoother to get mean (alphahat0) and covariance (state_uncertainty0) of the proposal for init state
 % now I reset init state estimation stuff
 M_.endo_initial_state = store_endo_initial_state;
 options_.lik_init=2;
@@ -320,7 +320,7 @@ if error_flag==0
         end
         if naccepted==0 && options_.estimate_initial_states_endogenous_prior
             % try reducing variance of state uncertainty in the
-            % proposal and continue with MH centered on alphahat0 
+            % proposal and continue with MH centered on alphahat0
             StateVectorVarianceSquareRoot = StateVectorVarianceSquareRoot*0.66;
         end
     end

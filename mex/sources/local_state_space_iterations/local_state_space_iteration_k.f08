@@ -24,7 +24,7 @@ module pparticle
    implicit none (type, external)
 
    type tdata
-      integer :: nm, nys, endo_nbr, nvar, order, nrestricted, nparticles 
+      integer :: nm, nys, endo_nbr, nvar, order, nrestricted, nparticles
       real(real64), allocatable :: yhat(:,:), e(:,:), ynext(:,:), ys_reordered(:), restrict_var_list(:)
       type(tensor), dimension(:), allocatable :: udr
    end type tdata
@@ -45,7 +45,7 @@ contains
       call c_f_pointer(arg, im)
 
       ! Allocating local arrays
-      allocate(h(0:thread_data%order), dyu(thread_data%nvar)) 
+      allocate(h(0:thread_data%order), dyu(thread_data%nvar))
       do i=0, thread_data%order
          allocate(h(i)%m(thread_data%endo_nbr, thread_data%nvar**i))
       end do
@@ -62,8 +62,8 @@ contains
 
       ! Using the Horner algorithm to evaluate the decision rule at the chosen yhat and epsilon
       do j=start,end
-         dyu(1:thread_data%nys) = thread_data%yhat(:,j) 
-         dyu(thread_data%nys+1:) = thread_data%e(:,j) 
+         dyu(1:thread_data%nys) = thread_data%yhat(:,j)
+         dyu(thread_data%nys+1:) = thread_data%e(:,j)
          call eval(h, dyu, thread_data%udr, thread_data%endo_nbr, thread_data%nvar, thread_data%order)
          do i=1,thread_data%nrestricted
             ind = int(thread_data%restrict_var_list(i))
@@ -181,7 +181,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    e = reshape(mxGetDoubles(epsilon_mx), [exo_nbr, nparticles])
 
 
-   allocate(udr(0:order)) 
+   allocate(udr(0:order))
    do i = 0, order
       write (fieldname, '(a2, i1)') "g_", i
       tmp = mxGetField(udr_mx, 1_mwIndex, trim(fieldname))

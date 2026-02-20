@@ -108,7 +108,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -160,7 +160,7 @@ fsdat_simul_logged;
 if mean(abs(y_(strmatch('gy_obs',M_.endo_names,'exact'),:)'-gy_obs(1:options_.nobs)))>1e-3 ||...
     mean(abs(y_(strmatch('gy_obs',M_.endo_names,'exact'),:)'-oo_.SmoothedVariables.Mean.gy_obs))>1e-3 ||...
     mean(abs(y_(strmatch('gp_obs',M_.endo_names,'exact'),:)'-gp_obs(1:options_.nobs)))>1e-3 ||...
-    mean(abs(y_(strmatch('gp_obs',M_.endo_names,'exact'),:)'-oo_.SmoothedVariables.Mean.gp_obs))>1e-3 
+    mean(abs(y_(strmatch('gp_obs',M_.endo_names,'exact'),:)'-oo_.SmoothedVariables.Mean.gp_obs))>1e-3
 error('Smoother is wrong')
 end
 
@@ -168,7 +168,7 @@ end
 % plot(log(gy_obs))
 % hold on
 % plot(y_(strmatch('gy_obs',M_.endo_names,'exact'),:),'r--')
-% 
+%
 % figure
 % plot(log(gp_obs))
 % hold on

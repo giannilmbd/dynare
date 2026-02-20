@@ -94,7 +94,7 @@ if kk==maxit
 end
 
 if nargin>5 && check
-    res = norm(A*X1*X1 + B*X1 + C, 1); 
+    res = norm(A*X1*X1 + B*X1 + C, 1);
     if res>tol
         info(1) = 413;
         info(2) = log(res);

@@ -34,7 +34,7 @@ function [ide_moments, ide_spectrum, ide_minimal, ide_hess, ide_reducedform, ide
 %                         0: prior does not exist. Identification is checked for all stderr and model parameters, but no corr parameters
 %    * init               [integer]
 %                         flag for initialization of persistent vars. This is needed if one may want to make more calls to identification in the same mod file
-%    * error_indicator    [structure] 
+%    * error_indicator    [structure]
 %                         boolean information on errors (1 is an error, 0 is no error) while computing the criteria stored in fields identification_strength, identification_reducedform, identification_moments, identification_minimal, identification_spectrum
 % -------------------------------------------------------------------------
 % OUTPUTS
@@ -160,10 +160,10 @@ if info(1) == 0 %no errors in solution
                 error_indicator.identification_moments=1;
             end
             ind_dMOMENTS = (find(max(abs(dMOMENTS'),[],1) > tol_deriv)); %index for non-zero rows
-            if isempty(ind_dMOMENTS) && any(any(isnan(dMOMENTS)))                
+            if isempty(ind_dMOMENTS) && any(any(isnan(dMOMENTS)))
                 error('There are NaN in the dMOMENTS matrix.')
                 error_indicator.identification_moments=1;
-            end            
+            end
         end
         if ~options_ident.no_identification_spectrum
             ind_dSPECTRUM = (find(max(abs(dSPECTRUM'),[],1) > tol_deriv)); %index for non-zero rows
@@ -172,7 +172,7 @@ if info(1) == 0 %no errors in solution
                 warning_SPECTRUM = [warning_SPECTRUM '         Skip identification analysis based on spectrum.\n'];
                 fprintf(warning_SPECTRUM);
                 %set indicator to neither display nor plot dSPECTRUM anymore
-                error_indicator.identification_spectrum = 1;                
+                error_indicator.identification_spectrum = 1;
             end
         end
         if ~options_ident.no_identification_minimal
@@ -188,7 +188,7 @@ if info(1) == 0 %no errors in solution
         %The following cannot be reached yet due to erroring out when
         %error_indicator.identification_moments is triggered
         if error_indicator.identification_moments && error_indicator.identification_minimal && error_indicator.identification_spectrum
-            %display error if all three criteria fail            
+            %display error if all three criteria fail
             error(sprintf('identification_analyis: Stationarity condition(s) failed and/or diffuse_filter option missing.\nMake sure that for non-stationary models stationary transformations of non-stationary observables are used for checking identification.\n[TIP: use first differences].'));
         end
 
@@ -231,7 +231,7 @@ if info(1) == 0 %no errors in solution
                 warning_MINIMAL = [warning_MINIMAL '         Skip identification analysis based on minimal state space system.\n'];
                 fprintf(warning_MINIMAL);
                 %set indicator to neither display nor plot dMINIMAL anymore
-                error_indicator.identification_minimal = 1;                
+                error_indicator.identification_minimal = 1;
             end
         end
         %Note that there is no order condition for dSPECTRUM, as the matrix is always of dimension totparam_nbr by totparam_nbr
@@ -283,7 +283,7 @@ if info(1) == 0 %no errors in solution
                 %try to compute asymptotic Hessian for identification strength analysis based on moments
                 if options_.order > 1
                     error('IDENTIFICATION STRENGTH: Analytic computation of Hessian is not available for ''order>1''. Identification strength is based on simulated moment uncertainty');
-                end                
+                end
                 % reset some options for faster computations
                 options_.irf                     = 0;
                 options_.noprint                 = 1;
@@ -295,7 +295,7 @@ if info(1) == 0 %no errors in solution
                 analytic_derivation              = options_.analytic_derivation;
                 analytic_Hessian                 = options_.analytic_Hessian;
                 options_.analytic_derivation     = true;
-                options_.analytic_Hessian        = 'asymptotic'; %this sets asy_Hess in Kalman filters                
+                options_.analytic_Hessian        = 'asymptotic'; %this sets asy_Hess in Kalman filters
                 [info, oo_, options_, M_] = stoch_simul(M_, options_, oo_, options_.varobs);
                 dataset_ = dseries(oo_.endo_simul(options_.varobs_id,100+1:end)',dates('1Q1'), options_.varobs); %get information on moments
                 % set info on missing data
@@ -308,7 +308,7 @@ if info(1) == 0 %no errors in solution
                 end
 
                 derivatives_info.no_DLIK = 1;
-                bounds = prior_bounds(bayestopt_, options_.prior_trunc); %reset bounds as lb and ub must only be operational during mode-finding 
+                bounds = prior_bounds(bayestopt_, options_.prior_trunc); %reset bounds as lb and ub must only be operational during mode-finding
                 %note that for order>1 we do not provide any information on DT,DYss,DOM in derivatives_info, such that dsge_likelihood creates an error. Therefore the computation will be based on simulated_moment_uncertainty for order>1.
                 [~, info, ~, ~, AHess] = dsge_likelihood(params', dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr, oo_.steady_state,oo_.exo_steady_state, oo_.exo_det_steady_state, derivatives_info);
                     %note that for the order of parameters in AHess we have: stderr parameters come first, corr parameters second, model parameters third. the order within these blocks corresponds to the order specified in the estimated_params block
@@ -339,13 +339,13 @@ if info(1) == 0 %no errors in solution
                 flag_score = 1; %this is used for the title in identification.plot.m
             catch
                 %Asymptotic Hessian via simulation
-                if options_.order > 1       
+                if options_.order > 1
                     % reset some options for faster computations
                     options_.irf                     = 0;
                     options_.noprint                 = 1;
                     options_.SpectralDensity.trigger = 0;
                     options_.periods                 = periods+100;
-                end                
+                end
                 replic = max([replic, length(ind_dMOMENTS)*3]);
                 cmm = identification.simulated_moment_uncertainty(ind_dMOMENTS, periods, replic,options_,M_,oo_); %covariance matrix of moments
                 sd = sqrt(diag(cmm));
@@ -422,15 +422,15 @@ if info(1) == 0 %no errors in solution
             ide_hess.deltaM_prior                 = deltaM_prior;
             ide_hess.sensitivity_zero_pos         = sensitivity_zero_pos;
             ide_hess.identified_parameter_indices = indok;
-            ide_hess.flag_score                   = flag_score;            
-            
+            ide_hess.flag_score                   = flag_score;
+
             ide_dynamic.si_dDYNAMICnorm           = si_dDYNAMICnorm;
-            ide_moments.si_dMOMENTSnorm           = si_dMOMENTSnorm;            
-            ide_reducedform.si_dREDUCEDFORMnorm   = si_dREDUCEDFORMnorm;            
+            ide_moments.si_dMOMENTSnorm           = si_dMOMENTSnorm;
+            ide_reducedform.si_dREDUCEDFORMnorm   = si_dREDUCEDFORMnorm;
         end %end of identification strength analysis
     end
-    
-%% Normalization of Jacobians 
+
+%% Normalization of Jacobians
 % For Dynamic, ReducedForm, Moment and Minimal Jacobian: rescale each row by its largest element in absolute value
 % For Spectrum: transform into correlation-type matrices (as above with AHess)
     if normalize_jacobians
@@ -530,7 +530,7 @@ if info(1) == 0 %no errors in solution
         ide_spectrum.dSPECTRUM       = dSPECTRUM;
         ide_spectrum.dSPECTRUM_NO_MEAN = dSPECTRUM_NO_MEAN;
     end
-    
+
 %% Perform identification checks, i.e. find out which parameters are involved
     if checks_via_subsets
         % identification.checks_via_subsets is only for debugging
@@ -552,7 +552,7 @@ if info(1) == 0 %no errors in solution
             [ide_moments.cond, ide_moments.rank, ide_moments.ind0, ide_moments.indno, ide_moments.ino, ide_moments.Mco, ide_moments.Pco, ide_moments.jweak, ide_moments.jweak_pair] = ...
                 identification.checks(dMOMENTS(ind_dMOMENTS,:)./norm_dMOMENTS, 1, tol_rank, tol_sv, totparam_nbr);
         end
-        if ~options_ident.no_identification_minimal 
+        if ~options_ident.no_identification_minimal
             if ~error_indicator.identification_minimal
                 [ide_minimal.cond, ide_minimal.rank, ide_minimal.ind0, ide_minimal.indno, ide_minimal.ino, ide_minimal.Mco, ide_minimal.Pco, ide_minimal.jweak, ide_minimal.jweak_pair] = ...
                     identification.checks(dMINIMAL(ind_dMINIMAL,:)./norm_dMINIMAL, 2, tol_rank, tol_sv, totparam_nbr);

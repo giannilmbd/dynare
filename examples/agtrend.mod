@@ -1,22 +1,22 @@
 /*
  * This file replicates the model studied in:
  * Aguiar, Mark and Gopinath, Gita (2004): “Emerging Market Business Cycles:
- * The Cycle is the Trend” (NBER WP 10734). It is different from version published 
+ * The Cycle is the Trend” (NBER WP 10734). It is different from version published
  * in the Journal of Political Economy.
- * 
- * This model file is intended to show the capabilities of the Dynare macro 
- * languange. It is not intended to provide a full replication of the original 
- * paper due to some differences in model calibration. In 
- * particular, this mod-file does not calibrate the share of debt to GDP 
+ *
+ * This model file is intended to show the capabilities of the Dynare macro
+ * languange. It is not intended to provide a full replication of the original
+ * paper due to some differences in model calibration. In
+ * particular, this mod-file does not calibrate the share of debt to GDP
  * to 0.1 as this would require the use of a steady state file. Rather, the
  * absolute value of debt is set to 0.1. Given that output is close to 1 in
- * the benchmark specification, this results in only a small difference to 
- * the working paper. 
+ * the benchmark specification, this results in only a small difference to
+ * the working paper.
  * The mod-file reproduces Figure 4 of the working paper, which displays the
  * model response to 1 percent shock to trend and cyclical TFP.
  *
- * This implementation was written by Sébastien Villemot and Johannes Pfeifer. 
- * Please note that the following copyright notice only applies to this Dynare 
+ * This implementation was written by Sébastien Villemot and Johannes Pfeifer.
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 

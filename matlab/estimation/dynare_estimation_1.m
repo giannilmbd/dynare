@@ -284,7 +284,7 @@ if ~isequal(options_.mode_compute,0) && ~options_.mh_posterior_mode_estimation &
                         hh = hessian(penalized_objective_function, xparam1, options_.gstep, objective_function, fval, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                     else
                         hh = hessian(objective_function, xparam1, options_.gstep, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, bounds,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
-                    end 
+                    end
                     hh = reshape(hh, nx, nx);
                 elseif isnumeric(current_optimizer) && isequal(current_optimizer,5)
                     % other numerical Hessian options available with optimizer
@@ -422,7 +422,7 @@ if issmc(options_)
         dime(objective_function, xparam1, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
     elseif isdsmh(options_)
         oo_.MarginalDensity.dsmh = dsmh(objective_function, bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, oo_);
-    end 
+    end
 end
 
 %
@@ -528,7 +528,7 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                     fprintf('%s: the bayesian_irf option is not compatible with the use of OccBin.',dispString)
                 else
                     oo_=PosteriorIRF('posterior',options_,estim_params_,oo_,M_,bayestopt_,dataset_,dataset_info,dispString);
-                end                
+                end
             end
             if options_.moments_varendo
                 if error_flag

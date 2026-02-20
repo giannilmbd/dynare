@@ -89,7 +89,7 @@ if CheckCO == 1 % If model is already minimal, we are finished
     minns = nspred;
     minSYS = SYS;
 else
-    %Model is not minimal    
+    %Model is not minimal
     try
         minreal_flag = 1;
         % In future we will use SLICOT TB01PD.f mex file [to do @wmutschl], currently use workaround
@@ -106,7 +106,7 @@ else
                 minSYS.dA = zeros(minns,minns,totparam_nbr);
                 minSYS.dB = zeros(minns,exo_nbr,totparam_nbr);
                 minSYS.dC = zeros(varobs_nbr,minns,totparam_nbr);
-                % Note that orthogonal matrix U is such that (U*dA*U',U*dB,dC*U') is a Kalman decomposition of (dA,dB,dC)                    % 
+                % Note that orthogonal matrix U is such that (U*dA*U',U*dB,dC*U') is a Kalman decomposition of (dA,dB,dC)                    %
                 for jp=1:totparam_nbr
                     dA_tmp = U*SYS.dA(:,:,jp)*U';
                     dB_tmp = U*SYS.dB(:,:,jp);
@@ -118,7 +118,7 @@ else
                 minSYS.dD = SYS.dD;
             end
         else
-            minSYS = []; 
+            minSYS = [];
             minns = [];
             return;
         end

@@ -18,10 +18,10 @@ function [PredictedStateMean, PredictedStateVarianceSquareRoot, StateVectorMean,
 %  - M_                                 [struct]    describing the model
 %
 % OUTPUTS
-%  - PredictedStateMean                 [double]   one-step ahead predicted mean of the states    
-%  - PredictedStateVarianceSquareRoot   [double]   one-step ahead covariance of the states   
-%  - StateVectorMean                    [double]   updated mean of the states   
-%  - StateVectorVarianceSquareRoot      [double]   updated covariance of the states   
+%  - PredictedStateMean                 [double]   one-step ahead predicted mean of the states
+%  - PredictedStateVarianceSquareRoot   [double]   one-step ahead covariance of the states
+%  - StateVectorMean                    [double]   updated mean of the states
+%  - StateVectorVarianceSquareRoot      [double]   updated covariance of the states
 
 % Copyright © 2009-2026 Dynare Team
 %
@@ -50,7 +50,7 @@ if ParticleOptions.proposal_approximation.montecarlo
     nodes = randn(ParticleOptions.number_of_particles, number_of_state_variables+number_of_structural_innovations) ;
     weights = 1/ParticleOptions.number_of_particles ;
     weights_c = weights ;
-elseif ParticleOptions.proposal_approximation.cubature 
+elseif ParticleOptions.proposal_approximation.cubature
     [nodes,weights] = spherical_radial_sigma_points(number_of_state_variables+number_of_structural_innovations) ;
     weights_c = weights ;
 elseif ParticleOptions.proposal_approximation.unscented
@@ -60,7 +60,7 @@ else
 end
 
 xbar = [StateVectorMean ; zeros(number_of_structural_innovations,1)] ;
-sqr_Px = [ StateVectorVarianceSquareRoot, zeros(number_of_state_variables, number_of_structural_innovations); 
+sqr_Px = [ StateVectorVarianceSquareRoot, zeros(number_of_state_variables, number_of_structural_innovations);
            zeros(number_of_structural_innovations, number_of_state_variables) Q_lower_triangular_cholesky];
 sigma_points = bsxfun(@plus, xbar, sqr_Px*(nodes'));
 StateVectors = sigma_points(1:number_of_state_variables,:);

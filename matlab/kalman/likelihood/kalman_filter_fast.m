@@ -1,7 +1,7 @@
 function [LIK, LIKK, a, P] = kalman_filter_fast(Y,start,last,a,P,kalman_tol,presample,T,H,Z,pp,Zflag,diffuse_periods)
 % [LIK, LIKK, a, P] = kalman_filter_fast(Y,start,last,a,P,kalman_tol,presample,T,H,Z,pp,Zflag,diffuse_periods)
 % computes the likelihood of a stationary state space model using the fast
-% implementation of the Kalman filter of Edward Herbst, (2015). Using the 'Chandrasekhar Recursions' 
+% implementation of the Kalman filter of Edward Herbst, (2015). Using the 'Chandrasekhar Recursions'
 % for likelihood evaluation of DSGE models. Computational Economics, 45(4):693–705
 % Useful for models where the number of states is much greater than the
 % number of observables.

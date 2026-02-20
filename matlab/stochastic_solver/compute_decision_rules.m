@@ -6,7 +6,7 @@ function [dr,info,params] =compute_decision_rules(M_,options_, dr, endo_steady_s
 % - dr            [structure]     Reduced form model.
 % - endo_steady_state       [vector]     steady state value for endogenous variables
 % - exo_steady_state        [vector]     steady state value for exogenous variables
-% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - dr            [structure]     Reduced form model.

@@ -1,5 +1,5 @@
-@#include "../Trend_exp_model_prefilter_common.inc" 
-        
+@#include "../Trend_exp_model_prefilter_common.inc"
+
 addpath('..');
 generate_trend_stationary_AR1(M_.fname);
 
@@ -8,9 +8,9 @@ estimation(order=1,datafile='Trend_loglin_prefilt_first_obs_MC_Exp_AR1_trend_dat
     mcmc_jumping_covariance='Trend_loglin_prefilt_first_obs_MC_MCMC_jump_covar_prefilter',
     filtered_vars, filter_step_ahead = [1,2,4],
     mh_nblocks=1,mh_jscale=1e-4,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
-    
+
 load('Trend_loglin_prefilt_first_obs_MC_Exp_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Trend_loglin_prefilt_first_obs_MC_orig_params_prefilter');
 

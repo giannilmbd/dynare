@@ -2,13 +2,13 @@ function alpha = a2alpha(a)
 
 % Computes the m alpha coefficients from the m a coefficients of the PAC model.
 %
-% INPUTS 
+% INPUTS
 % - a      [double]   m×1 vector of coefficients.
 %
-% OUTPUTS 
+% OUTPUTS
 % - alpha  [double]   m×1 vector of coefficients.
 %
-% NOTES 
+% NOTES
 %
 %  Given the current estimate of the PAC parameters a₀, a₁, ..., aₘ₋₁, the routine does the following:
 %
@@ -42,7 +42,7 @@ function alpha = a2alpha(a)
 % Return an error if the input is not a vector
 if ~isvector(a)
     error('Input argument has to be a vector of doubles!')
-end 
+end
 
 % Get the number of PAC parameters (without the discount factor)
 m = length(a);

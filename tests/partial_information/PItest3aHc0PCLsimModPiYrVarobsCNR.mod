@@ -1,11 +1,11 @@
-% inflation target (pitarg) modelled as AR1 
+% inflation target (pitarg) modelled as AR1
 % cy = 0.614479/0.769365 - obtained from the computed steady state from the nonlinear counterpart
 
 
 var pi mc mun muc c y n r g a pitarg;
-varexo eps_g eps_a eps_e eps_m eps_targ; 
+varexo eps_g eps_a eps_e eps_m eps_targ;
 
-parameters beta xi hc wd sigma gamma rho_g rho_a rho_r rho_targ thetap cy varrho; 
+parameters beta xi hc wd sigma gamma rho_g rho_a rho_r rho_targ thetap cy varrho;
 beta = 0.99;
 xi = 0.5034;
 hc = 0.0;

@@ -84,7 +84,7 @@ MaxNumberOfPlotPerFigure=myinputs.MaxNumberOfPlotPerFigure;
 if whoiam
     Parallel=myinputs.Parallel;
 else
-    Parallel=0; %make sure it exists    
+    Parallel=0; %make sure it exists
 end
 
 % To save the figures where the function is computed!
@@ -147,7 +147,7 @@ for i=fpar:npar
                 hold off
             end
             if options_.TeX
-                title(['$' varlist_TeX{j} '$'],'Interpreter','latex')               
+                title(['$' varlist_TeX{j} '$'],'Interpreter','latex')
             else
                 title(varlist{j},'Interpreter','none')
             end

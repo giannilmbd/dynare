@@ -36,6 +36,6 @@ estimation(datafile='my_data.mat',order=2,mode_compute=0,mh_replic=0,filter_algo
                                       'scale',.5,
                                       'target', .25)
 );
-    
+
 end
 end

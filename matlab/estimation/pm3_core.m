@@ -68,7 +68,7 @@ dname=myinputs.dname;
 if whoiam
     Parallel=myinputs.Parallel;
 else
-    Parallel=0; %make sure it exists    
+    Parallel=0; %make sure it exists
 end
 
 if options_.TeX
@@ -104,10 +104,10 @@ for i=fpar:nvar
         xlim([1 n2]);
         hold off;
         if options_.TeX
-            title(['$' varlist_TeX{i,:} '$'],'Interpreter','latex')            
+            title(['$' varlist_TeX{i,:} '$'],'Interpreter','latex')
         else
             title(varlist(i,:),'Interpreter','none')
-        end       
+        end
         yticklabels=get(gca,'yticklabel');
         if size(char(yticklabels),2)>5 %make sure yticks do not screw up figure
             yticks=get(gca,'ytick');

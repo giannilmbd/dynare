@@ -2,7 +2,7 @@
 // tests heteroskedastic filter/smoother
 // includes lagged exogenous variable introduced by preprocessor
 
-@#include "fs2000_het_model.inc" 
+@#include "fs2000_het_model.inc"
 
 shocks;
 var e_a; stderr 0.014;

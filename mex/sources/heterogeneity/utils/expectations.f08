@@ -38,7 +38,7 @@ contains
         real(real64), target, allocatable :: Dx_flat(:,:)
         real(real64), pointer, contiguous :: x_bar_dash(:,:,:)
         integer(int32) :: N_x, N_sp, N_a, N_e, i, a, j, j_a, j_e
-        
+
         ! Sizes
         N_x = size(x,1,int32)
         N_sp = size(x,2,int32)
@@ -56,7 +56,7 @@ contains
 
         ! Weighting with the transition matrix
         allocate(Y_flat(N_x*(N_a-1), N_e))
-        call matmul_add("N", "T", 1.0_real64, Dx_flat, mu, 0.0_real64, Y_flat) 
+        call matmul_add("N", "T", 1.0_real64, Dx_flat, mu, 0.0_real64, Y_flat)
 
         ! Final calculation
         do concurrent (j_a=1:N_a, j_e=1:N_e)
@@ -117,7 +117,7 @@ contains
         do concurrent (j_a=1:N_a,j_e=1:N_e,i=1:N_x)
             x_bar_dash_mat((j_a-1)*N_x+i,j_e) = x_bar_dash(i,j_e,j_a)
         end do
-        call matmul_add("N", "T", 1.0_real64, x_bar_dash_mat, mu, 0.0_real64, Y) 
+        call matmul_add("N", "T", 1.0_real64, x_bar_dash_mat, mu, 0.0_real64, Y)
 
         ! ---- Expectations ----
         allocate(sk(n), beta_k(N_sp))
@@ -140,7 +140,7 @@ contains
                     else
                         E(:,k,j) = 0.0_real64
                     end if
-                    
+
                     ! Remaining corners
                     do t=1, Kcorn-1
                         kf = flip_idx(t)
@@ -155,7 +155,7 @@ contains
                                 l_a = l_a - stride(kf)
                                 sk(kf) = .false.
                             end if
-                        else 
+                        else
                             if (.not. sk(kf)) then
                                 ! lower -> upper on dim kf
                                 l_a = l_a + stride(kf)
@@ -230,7 +230,7 @@ contains
         ! Low-corner linear indices in 1, ..., N_a
         allocate(a(N_om))
         call compute_linear_indices(ind, stride, a)
-        
+
         ! Fetch it into 1, ..., N_om
         do concurrent (j=1:N_a, i=1:N_e)
             a((j-1_int32)*N_e+i) = (a((j-1_int32)*N_e+i)-1)*N_e+i

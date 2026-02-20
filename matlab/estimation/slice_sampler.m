@@ -445,7 +445,7 @@ end
 
 
 function ys = get_steady_state(xparam1, options_,M_,estim_params_,~,~,~, endo_steady_state, exo_steady_state, exo_det_steady_state)
-% wrapper function to get steady state 
+% wrapper function to get steady state
 
 M_ = set_all_parameters(xparam1,estim_params_,M_);
 ys = evaluate_steady_state(endo_steady_state,[exo_steady_state; exo_det_steady_state],M_,options_,true);

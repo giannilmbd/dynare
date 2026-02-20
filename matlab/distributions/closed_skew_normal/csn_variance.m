@@ -153,7 +153,7 @@ try
              1 -0.3 0  ];
     nu = [2; -0.5];
     Delta = [1 0.12; 0.12 1];
-    
+
     rng(456);
     n = 1e6; tol = 1e-3; % tolerance for empirical vs theoretical
     X = rand_multivariate_csn(n, mu, Sigma, Gamma, nu, Delta);

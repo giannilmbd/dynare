@@ -1,6 +1,6 @@
 /*
- * This file implements the New Keynesian model with price and wage rigidities under optimal policy 
- * with commitment (Ramsey) of Jordi Galí (2015): Monetary Policy, Inflation, and the Business Cycle, Princeton 
+ * This file implements the New Keynesian model with price and wage rigidities under optimal policy
+ * with commitment (Ramsey) of Jordi Galí (2015): Monetary Policy, Inflation, and the Business Cycle, Princeton
  * University Press, Second Edition, Chapter 6.4
  *
  * THIS MOD-FILE REQUIRES DYNARE 4.6 OR HIGHER
@@ -8,13 +8,13 @@
  * Notes:
  *  - all model variables are expressed in deviations from steady state, i.e. in contrast to
  *      to the chapter, the nominal interest rate, natural output, and the natural real wage are not in log-levels, but rather mean 0
- *  - in the LOM for the discount rate shock z the shock enters with a minus sign in this mod-file to generate the 
+ *  - in the LOM for the discount rate shock z the shock enters with a minus sign in this mod-file to generate the
  *      IRF to a -0.5% shock
  *
  * This implementation was written by Johannes Pfeifer. In case you spot mistakes,
  * email me at jpfeifer@gmx.de
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -35,7 +35,7 @@
  * see <https://www.gnu.org/licenses/>.
  */
 
-%define whether to use interest rate or money growth rate rule 
+%define whether to use interest rate or money growth rate rule
 @#define money_growth_rule=1
 
 var pi_p        ${\pi^p}$               (long_name='price inflation')
@@ -44,13 +44,13 @@ var pi_p        ${\pi^p}$               (long_name='price inflation')
     y           ${y}$                   (long_name='output')
     yhat        ${\hat y}$              (long_name='output deviation from steady state')
     r_nat       ${r^{nat}}$             (long_name='natural interest rate')
-    r_real      ${r^r}$                 (long_name='real interest rate')     
+    r_real      ${r^r}$                 (long_name='real interest rate')
     i           ${i}$                   (long_name='nominal interrst rate')
     n           ${n}$                   (long_name='hours worked')
     m_real      ${(m-p)}$                 (long_name='real money stock')
     m_growth_ann ${\Delta m}$           (long_name='money growth annualized')
     m_nominal   ${m}$                   (long_name='nominal money stock')
-    nu          ${\nu}$                 (long_name='AR(1) monetary policy shock process')    
+    nu          ${\nu}$                 (long_name='AR(1) monetary policy shock process')
     a           ${a}$                   (long_name='AR(1) technology shock process')
     r_real_ann  ${r^{r,ann}}$           (long_name='annualized real interest rate')
     i_ann       ${i^{ann}}$             (long_name='annualized nominal interest rate')
@@ -66,7 +66,7 @@ var pi_p        ${\pi^p}$               (long_name='price inflation')
     w_nat       ${w^{nat}}$             (long_name='natural real wage')
     mu_p        ${\mu^p}$               (long_name='markup')
     pi_w_ann    ${\pi^{w,ann}}$         (long_name='annualized wage inflation rate')
-;     
+;
 
 varexo  eps_a       ${\varepsilon_a}$   (long_name='technology shock')
         eps_nu      ${\varepsilon_\nu}$ (long_name='monetary policy shock')
@@ -112,7 +112,7 @@ theta_w=3/4;
 % First Order Conditions
 %----------------------------------------------------------------
 
-model(linear); 
+model(linear);
 //Composite parameters
 #Omega=(1-alppha)/(1-alppha+alppha*epsilon_p);              %defined on page 166
 #psi_n_ya=(1+varphi)/(siggma*(1-alppha)+varphi+alppha);     %defined on page 171
@@ -186,8 +186,8 @@ end;
 
 
 shocks;
-    var eps_a       = 1; 
-    var eps_z       = 1; 
+    var eps_a       = 1;
+    var eps_z       = 1;
 end;
 
 
@@ -240,7 +240,7 @@ title('Real wage')
 % generate first row of Table 6.1, p. 186
 %----------------------------------------------------------------
 shocks;
-    var eps_a       = 1; 
+    var eps_a       = 1;
 end;
 set_param_value('theta_w',3/4);
 set_param_value('theta_p',3/4);

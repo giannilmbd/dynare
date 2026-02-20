@@ -49,7 +49,7 @@ else
     else
         if options_.one_sided_hp_filter || options_.hp_filter || options_.bandpass.indicator
             fprintf('Estimation::compute_moments_varendo: theoretical pruned moments incompatible with filtering. Skipping computations\n')
-        end        
+        end
     end
 end
 
@@ -115,7 +115,7 @@ if posterior
 else
     oo_ = prior_analysis('correlation', var_list_, NumberOfEndogenousVariables, NumberOfLags, options_, M_, oo_, estim_params_);
 end
- 
+
 
 % VARIANCE DECOMPOSITION.
 if options_.order==1

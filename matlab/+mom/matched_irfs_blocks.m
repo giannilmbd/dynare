@@ -69,7 +69,7 @@ for jj = 1:size(matched_irfs,1)
     if isempty(id_varobs)
         skipline;
         error('method_of_moments: You specified an IRF matching involving variable %s, but it is not declared as a varobs!',endo_names{id_var})
-    end    
+    end
     IRF_PERIODS = []; IRF_VALUES = []; IRF_WEIGHTS = [];
     for kk = 1:size(matched_irfs{jj,3},1)
         irf_periods = matched_irfs{jj,3}{kk,1};
@@ -129,7 +129,7 @@ for jj = 1:size(matched_irfs_weight,1)
     end
     if max([irf_periods1(:);irf_periods2(:)]) > max_irf_horizon
         error('method_of_moments: You specified a ''matched_irfs_weights'' entry for an IRF matching involving %s/%s and %s/%s,\n                   but the horizon is larger than the maximum one declared in the ''matched_irfs'' block!',endo_names{id_var1},exo_names{id_shock1},endo_names{id_var2},exo_names{id_shock2});
-    end    
+    end
     weight_mat_values = matched_irfs_weight{jj,7};
     if length(weight_mat_values)==1 && length(irf_periods1)>1
         weight_mat_values = repmat(weight_mat_values,length(irf_periods1),1);

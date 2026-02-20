@@ -36,7 +36,7 @@ c_z_2 = -.1;
 c_z_dx2 = .3;
 c_z_u = .3;
 c_z_dv = .4;
-c_z_s  = -.2; 
+c_z_s  = -.2;
 
 lambda = 0.5; // Share of optimizing agents.
 

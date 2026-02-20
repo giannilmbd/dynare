@@ -1,7 +1,7 @@
 /*
  * This file is a modified version of 'fs2000.mod'.
  *
- * The difference is that, here, the equations are written in non-stationary form, and we test if 
+ * The difference is that, here, the equations are written in non-stationary form, and we test if
  * we are able to identify the trends.
  *
  */

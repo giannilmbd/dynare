@@ -17,7 +17,7 @@ function display(pdraws, ide_reducedform, ide_moments, ide_spectrum, ide_minimal
 %                       (Komunjer and Ng, 2011).
 %   name:               [totparam_nbr by 1] string cell of parameter names
 %   options_ident:      [structure] identification options
-%   error_indicator     [structure] 
+%   error_indicator     [structure]
 %                       boolean information on errors (1 is an error, 0 is no error)
 %                       while computing the criteria
 

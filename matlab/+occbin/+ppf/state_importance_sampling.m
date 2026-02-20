@@ -187,7 +187,7 @@ while ESS<0.5*number_of_particles || do_resample
             % handle conditional likelihood and updated regime
             number_of_successful_particles = number_of_successful_particles + 1;
             likxx(k) = likxc;
-        
+
         else
             this_base(k,:)=randn(1,ns);
             yhat(:,k) = occbin.ppf.draw_particles(this_base(k,:),StateInfo,PriorStateInfo,1,options_.kalman_tol);
@@ -216,7 +216,7 @@ while ESS<0.5*number_of_particles || do_resample
             ytmp = yhat(:,updated_sample.success);
             ymode = ytmp(:,imax);
         end
-        
+
         lnw0 = -likxx(updated_sample.success)/2-lprior(updated_sample.success)/2+lpost(updated_sample.success)/2; % use posterior kernel to weight t-1 draws based on PKF!
         [weights1, ESS1] = occbin.ppf.compute_weights(lnw0, 1, number_of_particles, number_of_successful_particles, updated_sample.success);
         ess1_history(niter,1) = ESS1;
@@ -339,7 +339,7 @@ while ESS<0.5*number_of_particles || do_resample
             end
 
         end
-        if mod(niter,slice_override_iteration) || is_prior_mixture 
+        if mod(niter,slice_override_iteration) || is_prior_mixture
             % slice sampling is not ready for prior mixture state
             % distribution
             StateInfo.Mean=StateVectorsPPFMean;
@@ -358,7 +358,7 @@ while ESS<0.5*number_of_particles || do_resample
             mcmc_base = xsim(:,(1:number_of_particles)+slice_burnin)';
             ljoint = fsim((1:number_of_particles)+slice_burnin)';
 
-            [ModifiedHarmonicMean, crit_flag] = occbin.ppf.marginal_density(mcmc_base, ljoint, 2/number_of_particles);            
+            [ModifiedHarmonicMean, crit_flag] = occbin.ppf.marginal_density(mcmc_base, ljoint, 2/number_of_particles);
             [yhat, lpost, lprior]  = occbin.ppf.draw_particles(mcmc_base,StateVector0,PriorStateInfo,number_of_particles,options_.kalman_tol);
             smc_scale = 1;
             use_modified_harmonic_mean = crit_flag==0;
@@ -454,7 +454,7 @@ StateVector.Variance_rank = ns;
 StateVector.use_modified_harmonic_mean = use_modified_harmonic_mean;
 StateVector.use_pkf_distribution = use_pkf_distribution;
 
-if not(options_.occbin.filter.particle.diagnostics.nograph) && ns 
+if not(options_.occbin.filter.particle.diagnostics.nograph) && ns
 
     GraphDirectoryName = CheckPath('occbin_ppf_graphs',M_.dname);
     schi2 = sort(chi2);

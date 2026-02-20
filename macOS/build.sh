@@ -126,7 +126,7 @@ if [[ "$PKG_ARCH" == x86_64 ]]; then
     mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-9.8-25.2
 else
     mkdir -p "$PKGFILES"/mex/matlab/"$MATLAB_ARCH"-23.2-25.2
-fi      
+fi
 
 cp -p  "$ROOTDIR"/NEWS.md                                            "$PKGFILES"
 cp -p  "$ROOTDIR"/COPYING                                            "$PKGFILES"

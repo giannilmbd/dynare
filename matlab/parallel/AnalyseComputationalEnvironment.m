@@ -653,7 +653,7 @@ switch ErrorCode
         skipline()
         disp('No errors detected! The computational environment is correctly configured.')
         disp('Dynare can be executed successfully in parallel mode.')
-        
+
     case 1
         disp('STATUS: ERROR')
         skipline()
@@ -661,14 +661,14 @@ switch ErrorCode
         skipline()
         disp('The ''Local'' field must be set to 0 (remote computation) or 1 (local computation).')
         disp('Please check your Dynare configuration file and correct the ''Local'' setting.')
-        
+
     case 2
         disp('STATUS: ERROR')
         skipline()
         disp('Error Code 2: The variable ''CPUnbr'' has a bad value!')
         skipline()
         disp('The ''CPUnbr'' field specifies the number of CPUs to use for parallel computation.')
-        
+
     case 2.1
         disp('STATUS: WARNING')
         skipline()
@@ -676,7 +676,7 @@ switch ErrorCode
         skipline()
         disp('You have requested more CPU cores than are physically available on the machine.')
         disp('This may lead to suboptimal performance. Consider reducing the ''CPUnbr'' value.')
-        
+
     case 2.2
         disp('STATUS: WARNING')
         skipline()
@@ -684,7 +684,7 @@ switch ErrorCode
         skipline()
         disp('Not all available CPU cores are being utilized for parallel computation.')
         disp('Consider increasing the ''CPUnbr'' value to take advantage of all available cores.')
-        
+
     case 2.3
         disp('STATUS: ERROR')
         skipline()
@@ -692,7 +692,7 @@ switch ErrorCode
         skipline()
         disp('The ''NumberOfThreadsPerJob'' must evenly divide the total number of CPUs (''CPUnbr'').')
         disp('Please adjust either ''NumberOfThreadsPerJob'' or ''CPUnbr'' in your configuration file.')
-        
+
     case 3
         disp('STATUS: ERROR')
         skipline()
@@ -704,7 +704,7 @@ switch ErrorCode
         disp('  - The remote computer is powered on and connected to the network')
         disp('  - Firewall settings allow the connection')
         disp('  - Network connectivity between local and remote machines')
-        
+
     case 4
         disp('STATUS: ERROR')
         skipline()
@@ -715,7 +715,7 @@ switch ErrorCode
         disp('  - The ''UserName'' field is not empty')
         disp('  - The ''Password'' field is not empty (Windows only)')
         disp('  - On Unix/Mac, the ''Password'' field should be empty (use SSH keys)')
-        
+
     case 5
         disp('STATUS: ERROR')
         skipline()
@@ -726,7 +726,7 @@ switch ErrorCode
         disp('  - The ''RemoteDrive'' setting (Windows only)')
         disp('  - The ''RemoteDirectory'' path exists on the remote computer')
         disp('  - You have permissions to access the specified directory')
-        
+
     case 6
         disp('STATUS: ERROR')
         skipline()
@@ -738,7 +738,7 @@ switch ErrorCode
         disp('  - Available disk space on the remote machine')
         disp('  - Network share permissions (Windows)')
         disp('  - SSH/SCP configuration (Unix/Mac)')
-        
+
     case 7
         disp('STATUS: ERROR')
         skipline()
@@ -750,7 +750,7 @@ switch ErrorCode
         disp('  - The user has permissions to execute MATLAB/Octave')
         disp('  - The ''UserName'' and ''Password'' credentials are valid')
         disp('  - MATLAB/Octave license is available on the remote machine')
-        
+
     case 8
         disp('STATUS: ERROR')
         skipline()
@@ -761,7 +761,7 @@ switch ErrorCode
         disp('  - The ''DynarePath'' points to the correct Dynare MATLAB directory')
         disp('  - Dynare is properly installed on the remote machine')
         disp('  - The path uses the correct format for the target operating system')
-        
+
     case 9
         disp('STATUS: ERROR')
         skipline()
@@ -772,7 +772,7 @@ switch ErrorCode
         disp('  - Delete permissions on the remote temporary directory')
         disp('  - No other processes are using the temporary files')
         disp('  - The remote file system is not in a read-only state')
-        
+
     otherwise
         disp('STATUS: UNKNOWN ERROR')
         skipline()

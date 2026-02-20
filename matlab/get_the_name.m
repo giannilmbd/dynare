@@ -1,7 +1,7 @@
 function [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 % [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 % -------------------------------------------------------------------------
-% Returns name of estimated parameter number k, following the internal ordering of 
+% Returns name of estimated parameter number k, following the internal ordering of
 % the estimated parameters.
 % Inputs:
 %   - k             [integer]   parameter number.
@@ -19,7 +19,7 @@ function [nam, texnam] = get_the_name(k, TeX, M_, estim_params_, varobs)
 %
 % This function calls:
 % None.
-% 
+%
 
 % Copyright © 2004-2026 Dynare Team
 %

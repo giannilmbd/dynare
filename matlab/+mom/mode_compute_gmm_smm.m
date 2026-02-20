@@ -107,7 +107,7 @@ for stage_iter = 1:size(options_mom_.mom.weighting_matrix,1)
     for optim_iter = 1:length(options_mom_.optimizer_vec)
         options_mom_.current_optimizer = options_mom_.optimizer_vec{optim_iter};
         if options_mom_.optimizer_vec{optim_iter} == 0
-            xparam1 = xparam0; % no minimization, evaluate objective at current values            
+            xparam1 = xparam0; % no minimization, evaluate objective at current values
             fval = feval(objective_function, xparam1, data_moments, weighting_info, options_mom_, M_, estim_params_, bayestopt_, BoundsInfo, dr, endo_steady_state, exo_steady_state, exo_det_steady_state);
             optimization_info = [];
         else
@@ -131,7 +131,7 @@ for stage_iter = 1:size(options_mom_.mom.weighting_matrix,1)
         fprintf('\nStage %d Iteration %d: Value of minimized moment distance objective function: %12.10f.\n',stage_iter,optim_iter,fval);
         if options_mom_.mom.verbose
             fprintf('\n''verbose'' option: ');
-            std_via_invhessian_xparam1_iter = NaN(size(xparam1));            
+            std_via_invhessian_xparam1_iter = NaN(size(xparam1));
             tbl_title_iter = sprintf('FREQUENTIST %s (STAGE %d ITERATION %d) VERBOSE',options_mom_.mom.mom_method,stage_iter,optim_iter);
             field_name_iter = sprintf('%s_stage_%d_iter_%d',lower(options_mom_.mom.mom_method),stage_iter,optim_iter);
             mom_verbose.(field_name_iter) = display_estimation_results_table(xparam1,std_via_invhessian_xparam1_iter,M_,options_mom_,estim_params_,bayestopt_,[],prior_dist_names,tbl_title_iter,field_name_iter);

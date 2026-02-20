@@ -67,24 +67,24 @@ for jexo = unique_shock_entries' % loop over cell with shock names
     [nbplt,nr,nc,lr,lc,nstar] = pltorg(length(unique_variables));
     fig = 0;
     for jvar = 1:length(unique_variables)
-        % get data points, note that periods and values can span over multiple rows 
+        % get data points, note that periods and values can span over multiple rows
         jj = ismember(matched_irfs(:,1), unique_variables(jvar)) & ismember(matched_irfs(:,2), jexo);
         IRF_PERIODS = []; IRF_VALUES = [];
         for kk = 1:size(matched_irfs{jj,3},1)
-            irf_periods = matched_irfs{jj,3}{kk,1};            
+            irf_periods = matched_irfs{jj,3}{kk,1};
             irf_values = matched_irfs{jj,3}{kk,2};
             if length(irf_values)==1
                 irf_values = repmat(irf_values,length(irf_periods),1);
-            end            
+            end
             IRF_PERIODS = [IRF_PERIODS; irf_periods(:)];
             IRF_VALUES = [IRF_VALUES; irf_values(:)];
         end
-        
+
         if jvar==1 || ~( (fig-1)*nstar<jvar && jvar<=fig*nstar )
             fig = fig+1;
             fig_irf = dyn_figure(nodisplay,'Name',['IRF matching shock to ' jexo{:} ' figure ' int2str(fig)]);
         end
-        plt = jvar-(fig-1)*nstar;        
+        plt = jvar-(fig-1)*nstar;
         if nbplt>1 && fig==nbplt
             subplot(lr,lc,plt);
         else

@@ -29,9 +29,9 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    integer(c_int), intent(in), value :: nlhs, nrhs
    type(c_ptr) :: M_mx, options_mx, dr_mx, tmp, g
    type(tensor), dimension(:), allocatable, target :: fdr
-   integer :: order, npred, nboth, nstatic, nfwrd, endo_nbr, exo_nbr, nys, nvar 
+   integer :: order, npred, nboth, nstatic, nfwrd, endo_nbr, exo_nbr, nys, nvar
    type(pascal_triangle) :: p
-   type(uf_matching), dimension(:), allocatable :: matching 
+   type(uf_matching), dimension(:), allocatable :: matching
    character(kind=c_char, len=10), dimension(:), allocatable :: fieldnames
    integer :: d, m, n
 
@@ -55,7 +55,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    nys = npred+nboth
    nvar = nys+exo_nbr
 
-   allocate(fdr(0:order), fieldnames(0:order)) 
+   allocate(fdr(0:order), fieldnames(0:order))
    do d = 0, order
       write (fieldnames(d), '(a2, i1)') "g_", d
       tmp = mxGetField(dr_mx, 1_mwIndex, trim(fieldnames(d)))
@@ -82,11 +82,11 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       ! Pinpointing the corresponding offsets between folded and unfolded tensors
       do d=2,order
          allocate(matching(d)%folded(nvar**d))
-         call fill_folded_indices(matching(d)%folded, nvar, d, p) 
+         call fill_folded_indices(matching(d)%folded, nvar, d, p)
          g = mxCreateDoubleMatrix(int(endo_nbr, mwSize), int(nvar**d, mwSize), mxREAL)
          mxGetDoubles(g) = reshape(fdr(d)%m(:,matching(d)%folded), [size(fdr(d)%m(:,matching(d)%folded))])
          call mxSetField(plhs(1), 1_mwIndex, trim(fieldnames(d)), g)
       end do
    end if
- 
+
 end subroutine mexFunction

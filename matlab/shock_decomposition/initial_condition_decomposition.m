@@ -102,7 +102,7 @@ if ~isfield(oo_,'initval_decomposition') || isequal(varlist,0)
 
     % reduced form
     dr = oo_local.dr;
-   
+
     % initialization
     gend = length(oo_local.SmoothedShocks.(M_.exo_names{1})); %+options_.forecast;
     z = zeros(M_.endo_nbr,M_.endo_nbr+2,gend);

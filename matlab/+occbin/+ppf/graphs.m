@@ -78,7 +78,7 @@ number_of_updated_regimes = length(updated_regimes);
 
 epsilon = updated_sample.epsilon;
 y100 = simulated_sample.y10;
-% store observables to plot predictive density 
+% store observables to plot predictive density
 z100 = ZZ*y100;
 y10 = y100(:,success);
 % store observables for kernel density
@@ -96,7 +96,7 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
         fprintf(fidTeX,' \n');
     end
 
-    % QQ plot 
+    % QQ plot
     % ppf predictive covariance
     PZ10 = cov(z10');
     [UZ,XZ] = svd(PZ10);
@@ -733,7 +733,7 @@ if ~options_.occbin.filter.particle.diagnostics.nograph
             for kp=1:number_of_simulated_regimes
                 plot(ShockVectors(iss(ko),simulated_regimes(my_simulated_regime_order(kp)).index),ShockVectors(iss(koo),simulated_regimes(my_simulated_regime_order(kp)).index),'.','MarkerEdgeColor',my_colororder(kp,:))
                 hold on
-            end            
+            end
             plot(etahaty(iss(ko)),etahaty(iss(koo)),'o','MarkerEdgeColor','k')
             if TeX
                 xlabel(M_.exo_names_tex{iss(ko)})

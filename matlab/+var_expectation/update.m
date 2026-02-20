@@ -4,7 +4,7 @@ function update(varexpectationmodelname)
 %
 % INPUTS
 % - varepxpectationmodelname       [string]    Name of the VAR expectation model.
-% 
+%
 % OUTPUTS
 % None
 

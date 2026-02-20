@@ -1,7 +1,7 @@
 /* Mod file tests the correctness of the conditional_forecast command when used together with histval by
- * - checking whether the unconditional forecast from the conditional_forecast-command 
+ * - checking whether the unconditional forecast from the conditional_forecast-command
  *      coincides with the one from the forecast command
- * - checking whether the conditional forecast coincides with the path of 
+ * - checking whether the conditional forecast coincides with the path of
  *      capital derived when simulating the model with simult_ and the computed exogenous instruments
 */
 
@@ -74,7 +74,7 @@ end;
 
 %set capital to non-steady state value and all other states to steady state
 histval;
-k(0) = 6; 
+k(0) = 6;
 m(0)=1.01100000000000;
 P(0)=2.25815456051727;
 y(0)=0.580764879486831;
@@ -90,7 +90,7 @@ cond_forecast=oo_.conditional_forecast;
 if max(abs(cond_forecast.uncond.Mean.k(2:end)-oo_.forecast.Mean.k))>1e-8
     error('Unconditional Forecasts do not match')
 end
-        
+
 %compare conditional forecasts; histval here sets initval condition for capital different from steady state
 initial_condition_states = oo_.dr.ys;
 initial_condition_states(strmatch('k',M_.endo_names,'exact')) = 6;

@@ -1,8 +1,8 @@
 function [QP,QPinv] = quadruplication(p)
 % Computes the Quadruplication Matrix QP (and its Moore-Penrose inverse)
 % such that for any p-dimensional vector x:
-% y=kron(kron(kron(x,x),x),x)=QP*z 
-% where z is of dimension np=p*(p+1)*(p+2)*(p+3)/2 and is obtained from y 
+% y=kron(kron(kron(x,x),x),x)=QP*z
+% where z is of dimension np=p*(p+1)*(p+2)*(p+3)/2 and is obtained from y
 % by removing each second and later occurence of the same element.
 % This is a generalization of the Duplication matrix.
 % Reference: Meijer (2005) - Matrix algebra for higher order moments.
@@ -48,11 +48,11 @@ counti = 1;
 for l=1:p
     for k=l:p
         for j=k:p
-            for i=j:p                             
+            for i=j:p
                 idx = pruned_SS.uperm([i j k l]);
                 for r = 1:size(idx,1)
                     ii = idx(r,1); jj= idx(r,2); kk=idx(r,3); ll=idx(r,4);
-                    n = ii + (jj-1)*p + (kk-1)*p^2 + (ll-1)*p^3;                    
+                    n = ii + (jj-1)*p + (kk-1)*p^2 + (ll-1)*p^3;
                     m = mue(p,i,j,k,l);
                     QP(n,m)=1;
                     if nargout > 1
@@ -71,7 +71,7 @@ for l=1:p
                         elseif i==j && j>k && k>l
                             QPinv(m,n) = 1/12;
                         elseif i>j && j>k && k>l
-                            QPinv(m,n) = 1/24;                    
+                            QPinv(m,n) = 1/24;
                         end
                     end
                 end

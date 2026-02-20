@@ -1,4 +1,4 @@
-/* 
+/*
 Compare simulation results from mex-file and Matlab without pruning at second order
  */
 
@@ -53,7 +53,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -86,7 +86,7 @@ for it = 1:size(ex,1)
                             M_.exo_nbr,Y2_mexiter(oo_.dr.order_var,it),ex(it,:)', ...
                             oo_.dr.ys(oo_.dr.order_var),oo_.dr,options_.pruning);
     Y2_temp(oo_.dr.order_var,:) = Y2_temp;
-    Y2_mexiter(:,it+1) = Y2_temp(:,2);    
+    Y2_mexiter(:,it+1) = Y2_temp(:,2);
 end
 
 if max((abs(Y2_mex(:) - Y2_mexiter(:))))>1e-8;
@@ -105,7 +105,7 @@ for it = 1:size(ex,1)
                             M_.exo_nbr,Y3_mexiter(oo_.dr.order_var,it),ex(it,:)', ...
                             oo_.dr.ys(oo_.dr.order_var),oo_.dr,options_.pruning);
     Y3_temp(oo_.dr.order_var,:) = Y3_temp;
-    Y3_mexiter(:,it+1) = Y3_temp(:,2);    
+    Y3_mexiter(:,it+1) = Y3_temp(:,2);
 end
 
 if max((abs(Y3_mex(:) - Y3_mexiter(:))))>1e-8;
@@ -114,7 +114,7 @@ end
 
 stoch_simul(order=2,k_order_solver,pruning,nograph,irf=0);
 
-Y2_matlab = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order); 
+Y2_matlab = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order);
 Y2_mex = k_order_simul(options_.order,M_.nstatic,M_.npred,M_.nboth,M_.nfwrd,M_.exo_nbr,   ...
                        oo_.dr.ys(oo_.dr.order_var),ex',oo_.dr.ys(oo_.dr.order_var),oo_.dr,...
                        options_.pruning);
@@ -126,7 +126,7 @@ end
 
 stoch_simul(order=3,k_order_solver,pruning,nograph,irf=0);
 
-Y3_matlab = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order); 
+Y3_matlab = simult_(M_,options_,oo_.dr.ys,oo_.dr,ex,options_.order);
 Y3_mex = k_order_simul(options_.order,M_.nstatic,M_.npred,M_.nboth,M_.nfwrd,M_.exo_nbr,   ...
                        oo_.dr.ys(oo_.dr.order_var),ex',oo_.dr.ys(oo_.dr.order_var),oo_.dr,...
                        options_.pruning);

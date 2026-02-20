@@ -1,19 +1,19 @@
 /*
- * This file implements the optimal monetary policy under commitment exercise 
- * in Jordi Galí (2008): Monetary Policy, Inflation, and the Business Cycle, 
+ * This file implements the optimal monetary policy under commitment exercise
+ * in Jordi Galí (2008): Monetary Policy, Inflation, and the Business Cycle,
  * Princeton University Press, Chapter 5.1.2
  *
  * It demonstrates how to use the ramsey_model command of Dynare.
  *
  * Notes:
- *      - all model variables are expressed in deviations from steady state, i.e. 
- *        in contrast to to the chapter, both the nominal interest rate and 
+ *      - all model variables are expressed in deviations from steady state, i.e.
+ *        in contrast to to the chapter, both the nominal interest rate and
  *        natural output are not in log-levels, but rather mean 0
  *
  * This implementation was written by Johannes Pfeifer. In case you spot mistakes,
  * email me at jpfeifer@gmx.de
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -40,10 +40,10 @@ var pi ${\pi}$ (long_name='inflation')
     y_nat ${y^{nat}}$ (long_name='natural output')
     y ${y}$ (long_name='output')
     r_e  ${r^{e}}$ (long_name='efficient interest rate')
-    y_e  ${y^{nat}}$ (long_name='efficient output') 
+    y_e  ${y^{nat}}$ (long_name='efficient output')
     x ${x}$ (long_name='welfare-relevant output gap')
     r_nat ${r^{nat}}$ (long_name='natural interest rate')
-    r_real ${r^r}$ (long_name='real interest rate')     
+    r_real ${r^r}$ (long_name='real interest rate')
     i ${i}$ (long_name='nominal interest rate')
     n ${n}$ (long_name='hours worked')
     m_growth_ann ${\Delta m}$ (long_name='money growth')
@@ -54,7 +54,7 @@ var pi ${\pi}$ (long_name='inflation')
     r_nat_ann ${r^{nat,ann}}$ (long_name='annualized natural interest rate')
     pi_ann ${\pi^{ann}}$ (long_name='annualized inflation rate')
     p ${p}$ (long_name='price level')
-    ;     
+    ;
 
 varexo eps_a ${\varepsilon_a}$   (long_name='technology shock')
        eps_u ${\varepsilon_u}$   (long_name='monetary policy shock');
@@ -90,7 +90,7 @@ epsilon=6;
 % First Order Conditions
 %----------------------------------------------------------------
 
-model(linear); 
+model(linear);
 //Composite parameters
 #Omega=(1-alppha)/(1-alppha+alppha*epsilon);  //defined on page 47
 #psi_n_ya=(1+phi)/(siggma*(1-alppha)+phi+alppha); //defined on page 48

@@ -1,16 +1,16 @@
 var r, pi, n, w, y, mc, x, rr, yobs, piobs,robs;
-      
+
 var y_star, n_star, w_star;
 var  y_f,pi_f,y_e,pi_e, pi_exp,y_exp;
-%Exogenous process (common to both specifications) 
+%Exogenous process (common to both specifications)
 var a, nu, u;
-%Shocks (common to both specifications) 
+%Shocks (common to both specifications)
 varexo eps_a,eps_nu,eps_u;
-%model parameters (common to both specifications) 
+%model parameters (common to both specifications)
 parameters h, gama, phi, bet, var_omega, kappa, iota_r, iota_y, iota_pi,iota_piexp;
-%shock persistence (common to both specifications) 
+%shock persistence (common to both specifications)
 parameters rho_a,rho_nu,rho_u;
-%some steady state variables (common to both specifications) 
+%some steady state variables (common to both specifications)
 parameters  a_ss, n_ss, mc_ss;
 % learning parameters
 parameters theta, rho,sigmaScale;
@@ -21,13 +21,13 @@ parameters alpha_pi_e, alpha_pi_f, alpha_y_f, alpha_y_e;
 % Parametrization
 %----------------------------------------------------------------
 %model parameters
-h=0.5; %%%%%%%%%%to be matched with moments  habit (0,1) 
-gama=1; %%%%%%%%%%to be matched with moments  inverse of the inter. elasticity of subst. 
-phi=1;%%%%%%%%%%to be matched with moments %inverse of the Frisch 
+h=0.5; %%%%%%%%%%to be matched with moments  habit (0,1)
+gama=1; %%%%%%%%%%to be matched with moments  inverse of the inter. elasticity of subst.
+phi=1;%%%%%%%%%%to be matched with moments %inverse of the Frisch
 bet=0.99; %%%%%%%%%%set
-var_omega=0.75; %%%%%%%%%%to be matched with moments   Calvo's probability 
-kappa=0.5;%%%%%%%%%%to be matched with moments   Past indexation (0,1) 
-%labor 
+var_omega=0.75; %%%%%%%%%%to be matched with moments   Calvo's probability
+kappa=0.5;%%%%%%%%%%to be matched with moments   Past indexation (0,1)
+%labor
 n_ss=0.2;
 %elasticity of substituion across varieties sigma
 sigma=6;
@@ -43,23 +43,23 @@ iota_r=0.2; %set %%%%%%%%%% to be estimated
 iota_y=0.5/4; %set%%%%%%%%%% to be estimated
 iota_pi=1.5;  %set%%%%%%%%%% to be estimated
 iota_piexp=0; %set%%%%%%%%%% to be estimated
-rho_a=0.8; %%%%%%%%%%to be matched with moments persistence tech shock 
-rho_nu=0.8;   %%%%%%%%%%to be matched with moments persistence demand shock 
+rho_a=0.8; %%%%%%%%%%to be matched with moments persistence tech shock
+rho_nu=0.8;   %%%%%%%%%%to be matched with moments persistence demand shock
 rho_u=0.5; %%%%%%%%%%to be matched with moments existence monetary policy shock (usually lower than the other two)
 %Behavioral Parameters
 theta=2; %%%%%%%%%% to be estimated
 rho=0.5; %%%%%%%%%% to be estimated
 sigmaScale=0.005; %%%%%%%%%% Scale Parameter of the logistic function
-alpha_pi_e=0.5; 
-alpha_pi_f=0.5; 
-alpha_y_f=0.5; 
-alpha_y_e=0.5; 
+alpha_pi_e=0.5;
+alpha_pi_f=0.5;
+alpha_y_f=0.5;
+alpha_y_e=0.5;
 
 %----------------------------------------------------------------
-% The Model 
+% The Model
 %----------------------------------------------------------------
-model; 
-//Composite parameters 
+model;
+//Composite parameters
 #messy1=((1-var_omega*bet)/(1+bet*kappa))*(1-var_omega)/var_omega; % I coeff. NKPC
 #messy2=bet/(1+bet*kappa); % II coeff. NKPC
 #messy3=kappa/(1+bet*kappa); % III coeff. NKPC
@@ -131,28 +131,28 @@ nu=rho_nu*nu(-1)+eps_nu;
 u=rho_u*u(-1)+eps_u;
 end;
 
-steady_state_model; 
+steady_state_model;
 mc=0;
-n=0; 
+n=0;
 w=0;
-pi=0; 
-piobs=0;                                                                              
+pi=0;
+piobs=0;
 r=0;
-robs=0;                                                                                  
+robs=0;
 y=0;
 yobs=0;
-x=0; 
+x=0;
 rr=0;
-n_star=0; 
-y_star=0; 
-w_star=0; 
-a=0; 
-nu=0; 
-u=0; 
+n_star=0;
+y_star=0;
+w_star=0;
+a=0;
+nu=0;
+u=0;
 y_f=0;
 pi_f=0;
 y_e=0;
-pi_e=0; 
+pi_e=0;
 pi_exp=0;
 y_exp=0;
 end;
@@ -161,18 +161,18 @@ end;
 steady;
 check;
 
-              
-              
+
+
        M_.Sigma_e=eye(M_.exo_nbr)*0;
      shocks;
       var eps_a; stderr 0.01;
         end;
-     
-       
+
+
       varobs yobs piobs robs  ;
- 
-       
-  
+
+
+
 stoch_simul(order = 1,irf=40, periods=0, partial_information,contemporaneous_correlation,TeX)y,x,pi,r,rr;
 collect_latex_files;
 

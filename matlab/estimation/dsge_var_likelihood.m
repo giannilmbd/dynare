@@ -4,7 +4,7 @@ function [fval,info,exit_flag,grad,hess,SteadyState,trend_coeff,PHI_tilde,SIGMA_
 %
 % INPUTS
 %   o xparam1               [double]    Vector of model's parameters.
-%   o dataset_              [dseries]   object storing the dataset     
+%   o dataset_              [dseries]   object storing the dataset
 %   o dataset_info          [structure] storing information about the sample.
 %   o options_              [structure] describing the options
 %   o M_                    [structure] describing the model

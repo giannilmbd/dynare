@@ -173,24 +173,24 @@ if options_.ramsey_policy
                 fprintf('evaluate_steady_state: This is often a sign of problems.\n');
             end
             [infrow,infcol]=find(isinf(jacob));
-            
+
             if ~isempty(infrow)
                 fprintf('\nevaluate_steady_state: The Jacobian of the dynamic model contains Inf. The problem is associated with:\n\n')
                 display_problematic_vars_Jacobian(infrow,infcol,M_,ys,'static','evaluate_steady_state: ')
             end
-            
+
             if ~isreal(jacob)
                 [imagrow,imagcol]=find(abs(imag(jacob))>1e-15);
                 fprintf('\nevaluate_steady_state: The Jacobian of the dynamic model contains imaginary parts. The problem arises from: \n\n')
                 display_problematic_vars_Jacobian(imagrow,imagcol,M_,ys,'static','evaluate_steady_state: ')
             end
-            
+
             [nanrow,nancol]=find(isnan(jacob));
             if ~isempty(nanrow)
                 fprintf('\nevaluate_steady_state: The Jacobian of the dynamic model contains NaN. The problem is associated with:\n\n')
                 display_problematic_vars_Jacobian(nanrow,nancol,M_,ys,'static','evaluate_steady_state: ')
             end
-            
+
         end
 
     end

@@ -49,4 +49,3 @@ if ~isoctave
         error('Draws of affected chain''s affected files are not the same')
     end
 end
-        

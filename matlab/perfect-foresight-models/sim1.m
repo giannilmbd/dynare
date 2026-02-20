@@ -124,7 +124,7 @@ while ~(converged || iter > options_.simul.maxit)
                 for eq_iter=1:length(variable)
                     fprintf('The derivative with respect to variable %d at time %d is zero for all equations\n',variable(eq_iter),time_period(eq_iter));
                 end
-            end            
+            end
         end
     end
     if iter==1 && options_.simul.check_jacobian_singularity
@@ -375,5 +375,5 @@ if rank_jacob < size(jacob,1)
         end
     end
 else
-    disp(['sim1:  The Jacobian of the dynamic model has full rank.'])    
+    disp(['sim1:  The Jacobian of the dynamic model has full rank.'])
 end

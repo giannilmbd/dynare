@@ -1,7 +1,7 @@
 function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, dr , steady_state, exo_steady_state, exo_det_steady_state)
 %dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, options_, M_, estim_params_, bayestopt_, dr , steady_state, exo_steady_state, exo_det_steady_state)
-% Differential-Independence Mixture Ensemble ("DIME") MCMC sampling 
-% as proposed in "Ensemble MCMC Sampling for Robust Bayesian Inference" 
+% Differential-Independence Mixture Ensemble ("DIME") MCMC sampling
+% as proposed in "Ensemble MCMC Sampling for Robust Bayesian Inference"
 % (Gregor Boehl, 2022, SSRN No. 4250395):
 %
 %   https://gregorboehl.com/live/dime_mcmc_boehl.pdf
@@ -48,7 +48,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
     cumlweight = -inf;
     fixPSD = 1e-16*prop_cov;
 
-    % get options & assign problem specific default value 
+    % get options & assign problem specific default value
     opts = options_.posterior_sampler_options.current_options;
     if isfield(opts,'gamma')
         g0 = opts.gamma;
@@ -133,7 +133,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
             q(xchnge,:) = xcand;
             factors(xchnge) = lprop_old - lprop_new;
 
-            % Metropolis-Hastings 
+            % Metropolis-Hastings
             newlprob = log_prob_fun(funobj, Prior, bounds, opts.parallel, q);
             lnpdiff = factors + newlprob - lprob(idcur);
             accepted = lnpdiff > log(rand(cursize,1));
@@ -225,14 +225,14 @@ function x = ptransform(x, bounds, con2unc)
     dim = size(x,2);
     for j = 1:dim
         % one-sided
-        if ~isinf(lb(j)) && isinf(ub(j))           
+        if ~isinf(lb(j)) && isinf(ub(j))
             if con2unc
                 x(:,j) = log(x(:,j) - lb(j));
             else
                 x(:,j) = lb(j) + exp(x(:,j));
             end
         % two-sided
-        elseif ~isinf(lb(j)) && ~isinf(ub(j))      
+        elseif ~isinf(lb(j)) && ~isinf(ub(j))
             if con2unc
                 y = (x(:,j) - lb(j))/(ub(j) - lb(j));
                 x(:,j) = log(y ./ (1 - y));

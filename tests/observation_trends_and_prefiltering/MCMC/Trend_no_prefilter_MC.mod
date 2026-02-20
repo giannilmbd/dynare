@@ -7,9 +7,9 @@ estimation(order=1,datafile='Trend_no_prefilter_MC_AR1_trend_data_with_constant'
             mode_compute=4,first_obs=1,smoother,mh_nblocks=1,mh_jscale=0.3,
             filtered_vars, filter_step_ahead = [1,2,4],
             mcmc_jumping_covariance='Trend_no_prefilter_MC_MCMC_jump_covar',forecast=100,prefilter=0,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
-            
+
 load('Trend_no_prefilter_MC_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Trend_no_prefilter_MC_orig_params');
 if max(abs((M_.params-loaded_par.orig_params)./loaded_par.orig_params))>0.03

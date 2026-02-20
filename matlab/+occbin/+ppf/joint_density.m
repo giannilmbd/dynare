@@ -41,7 +41,7 @@ function [ldens, infox] = joint_density(x, StateInfo, PriorStateInfo,options_,oc
 %  - dr                     [structure] model information structure
 %  - endo_steady_state      [vector]    steady state value for endogenous variables
 %  - exo_steady_state       [vector]    steady state value for exogenous variables
-%  - exo_det_steady_state   [vector]    steady state value for exogenous deterministic variables 
+%  - exo_det_steady_state   [vector]    steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 %  - ldens                  [double]    -logdensity states and data
@@ -68,7 +68,7 @@ function [ldens, infox] = joint_density(x, StateInfo, PriorStateInfo,options_,oc
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % we enter with standard normal values
-yhat = occbin.ppf.draw_particles(transpose(x),StateInfo,PriorStateInfo,1,options_.kalman_tol);   
+yhat = occbin.ppf.draw_particles(transpose(x),StateInfo,PriorStateInfo,1,options_.kalman_tol);
 
 [likxc, infox] = ...
     occbin.ppf.conditional_data_density(yhat, 1, 2, likxmode, updated_regimes, updated_sample, number_of_updated_regimes, all_updated_regimes, ...

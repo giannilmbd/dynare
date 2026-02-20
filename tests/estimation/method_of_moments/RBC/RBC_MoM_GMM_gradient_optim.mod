@@ -21,7 +21,7 @@
 @#include "RBC_MoM_common.inc"
 
 shocks;
-var u_a; stderr 0.0072;        
+var u_a; stderr 0.0072;
 end;
 
 varobs c iv n;
@@ -86,13 +86,13 @@ end;
 
   estimated_params_init(use_calibration);
   end;
-  
+
   @#for optimizer in [1, 3, 4, 101, 13]
     @#if estimParams == 2 && optimizer == 13
         %skip due to buggy behavior in Octave
         if ~isoctave
     @#endif
-  
+
   method_of_moments(
           mom_method = GMM         % method of moments method; possible values: GMM|SMM
         , datafile   = 'RBC_Andreasen_Data_2.mat' % name of filename with data
@@ -107,17 +107,17 @@ end;
 %                    ,'MaxIter', 3000
 %                    ,'MaxFunEvals', 1D6
 %                    ,'UseParallel' , 1
-%                    ,'Jacobian' , 'on'                   
+%                    ,'Jacobian' , 'on'
 %                    ,'GradObj','on'
 %                   )    % a list of NAME and VALUE pairs to set options for the optimization routines. Available options depend on mode_compute
-        , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between        
+        , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
         , analytic_jacobian
   );
-  
+
     @#if estimParams == 2 && optimizer == 13
         %skip due to buggy behavior in Octave
         end
     @#endif
-  @#endfor  
-  
+  @#endfor
+
 @#endfor

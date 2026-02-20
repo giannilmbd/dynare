@@ -27,7 +27,7 @@ g = uigridlayout(fig, [1,1], Padding = 0);
 % Add a tabgroup
 tg = uitabgroup(g);
 
-% Find all figures with Dynare Tag 
+% Find all figures with Dynare Tag
 f = findobj('-regexp','tag','dynare-figure');
 
 % Loop over all figures and reparent them to a tab. Avoid legends, they are

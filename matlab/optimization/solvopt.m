@@ -284,7 +284,7 @@ if trx
     else
         [f,g]=feval(fun,x',varargin{:});
         n_grad_evals=n_grad_evals+1;
-    end    
+    end
 else
     if app
         f=feval(fun,x,varargin{:});
@@ -711,7 +711,7 @@ while 1
                     exitflag=-3;
                     % don't return with NaN or Inf despite error code
                     x=x1;
-                    f=f1;                  
+                    f=f1;
                     if trx
                         x=x';
                     end
@@ -825,7 +825,7 @@ while 1
             end
             n_f_evals=n_f_evals+fun_count;
         else
-            if trx                
+            if trx
                 [~,g]=feval(fun,x',varargin{:});
             else
                 [~,g]=feval(fun,x,varargin{:});

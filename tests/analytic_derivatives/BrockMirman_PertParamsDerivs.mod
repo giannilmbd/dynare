@@ -131,13 +131,13 @@ indpstderr = estim_params_.var_exo(:,1);
 indpcorr   = estim_params_.corrx(:,1:2);
 [I, ~] = find(M_.lead_lag_incidence');
 
-%% Parameter derivatives of perturbation 
+%% Parameter derivatives of perturbation
 @#if CREATE_SYMBOLIC == 1
     syms Y_ Y0 Yp C_ C0 Cp K_ K0 Kp A_ A0 Ap X_ X0 Xp W_ W0 Wp Z_ Z0 Zp;
     syms epsA0 epsX0 epsY0;
     syms RHO_AX SE_A SE_X SE_Y ALPH BETTA RHOA SIGA SIGX XSS DUMA DUMK DUMEPSA DUMEPSX;
     syms sig;
-    
+
     SYM.corr_params        = [RHO_AX];
     SYM.stderr_params_decl = [SE_A SE_X SE_Y];
     SYM.modparams_decl     = [ALPH BETTA RHOA SIGA SIGX XSS DUMA DUMK DUMEPSA DUMEPSX];
@@ -339,7 +339,7 @@ indpcorr   = estim_params_.corrx(:,1:2);
             save('nBrockMirmanSYM.mat','nSYMprior')
         elseif jj==2
             nSYMcalib = nSYM;
-            save('nBrockMirmanSYM.mat','nSYMcalib','-append')        
+            save('nBrockMirmanSYM.mat','nSYMcalib','-append')
         end
     end
 @#endif
@@ -406,7 +406,7 @@ for jj = 1:2
     lst_vars =   [lst_vars, 'g3','ghxxx','ghxxu','ghxuu','ghuuu','ghxss','ghuss'];
                  @#endif
     lst_dvars = {'dYss','dSigma_e','dg1','dghx','dghu'};
-                 @#if ORDER > 1 
+                 @#if ORDER > 1
     lst_dvars = [lst_dvars, 'dg2','dghxx','dghxu','dghuu','dghs2'];
                  @#endif
                  @#if ORDER > 2
@@ -423,7 +423,7 @@ for jj = 1:2
         nSYM = nSYMcalib;
         xparam1_calib = [];
         for j = 1:length(indpstderr)
-            xparam1_calib = [xparam1_calib; sqrt(calib_Sigma_e(j,j))];            
+            xparam1_calib = [xparam1_calib; sqrt(calib_Sigma_e(j,j))];
         end
         for j = 1:size(indpcorr,1)
             xparam1_calib = [xparam1_calib; calib_Sigma_e(indpcorr(j,1),indpcorr(j,2))/( sqrt(calib_Sigma_e(indpcorr(j,1),indpcorr(j,1))) * sqrt(calib_Sigma_e(indpcorr(j,2),indpcorr(j,2))) )];
@@ -452,18 +452,18 @@ for jj = 1:2
         fprintf('Max absolute deviation for %s: %e\n', lst_vars{id_var}, dx);
         if dx > tol_vars.(sprintf('%s',lst_vars{id_var}))
             error('Something wrong in steady state computation, solution algorithm or preprocessor')
-        end        
+        end
     end
 
 
     for d2flag = [0 1];
         if d2flag
             lst_dvars = [lst_dvars {'d2KalmanA', 'd2Om', 'd2Yss'}];
-        end    
-        KRONFLAG = [-1 -2 0 1];    
+        end
+        KRONFLAG = [-1 -2 0 1];
         for id_kronflag = 1:length(KRONFLAG)
             fprintf('***** %s: d2flag=%d and kronflag=%d *****\n',strparamset, d2flag,KRONFLAG(id_kronflag))
-            options_.analytic_derivation_mode = KRONFLAG(id_kronflag);        
+            options_.analytic_derivation_mode = KRONFLAG(id_kronflag);
             DERIVS = identification.get_perturbation_params_derivs(M_, options_, estim_params_, oo_.dr, oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state, indpmodel, indpstderr, indpcorr, d2flag);
             for id_var = 1:size(lst_dvars,2)
                 dx = norm( vec(nSYM.(sprintf('%s',lst_dvars{id_var}))) - vec(DERIVS.(sprintf('%s',lst_dvars{id_var}))), Inf);

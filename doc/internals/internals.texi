@@ -91,33 +91,33 @@ This is Dynare Internal Documentation, version @value{VERSION}.
 @end ifnottex
 
 @menu
-* Introduction::           
+* Introduction::
 * Dynare Structures::
 * Data::
 * Estimation::
-* Simulation::                    
-* Bibliography::                
-* Function Index::  
-* Variable Index::              
+* Simulation::
+* Bibliography::
+* Function Index::
+* Variable Index::
 
 @detailmenu
  --- The Detailed Node Listing ---
 
 Introduction
 
-* What is Dynare ?::            
-* Documentation sources::       
+* What is Dynare ?::
+* Documentation sources::
 
 Dynare structures
 
-* dataset_::       
-* M_::      
+* dataset_::
+* M_::
 * options_::
-* oo_::               
+* oo_::
 
 Data
 
-* Create a data structure::                  
+* Create a data structure::
 * Compute descripive statistics::
 * Functions::
 
@@ -140,8 +140,8 @@ Simulation
 @chapter Introduction
 
 @menu
-* What is Dynare ?::            
-* Documentation sources::       
+* What is Dynare ?::
+* Documentation sources::
 @end menu
 
 @node What is Dynare ?
@@ -250,15 +250,15 @@ Other useful sources of information include the
 @chapter Dynare structures
 
 @menu
-* options_::       
+* options_::
 * dataset_::
-* M_::                 
-* oo_::    
-* StateSpaceModel_::            
+* M_::
+* oo_::
+* StateSpaceModel_::
 @end menu
 
 The data are organized in structures. General options are stored in @var{options_}, the model is decribed
-in @var{M_}, the dataset used for estimation purposes is given in @var{dataset_}, results are saved in @var{oo_}, ... 
+in @var{M_}, the dataset used for estimation purposes is given in @var{dataset_}, results are saved in @var{oo_}, ...
 
 @node options_
 @section options_
@@ -372,7 +372,7 @@ a relaxation algorithm,'' CEPREMAP, @i{Couverture Orange}, 9602.
 Kim, Jinill, Sunghyun Kim, Ernst Schaumburg, and Christopher A. Sims
 (2008): ``Calculating and using second-order accurate solutions of
 discrete time dynamic equilibrium models,'' @i{Journal of Economic
-Dynamics and Control}, 32(11), 3397--3414. 
+Dynamics and Control}, 32(11), 3397--3414.
 
 @item
 Koopman, S. J. and J. Durbin (2003): ``Filtering and Smoothing of

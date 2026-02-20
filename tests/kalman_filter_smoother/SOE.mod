@@ -64,7 +64,7 @@ model(linear);
     I_o  = gi + 400*i ;
     de_o = ge + 100*(e - e(-1) + z_e);
     z_e = eps_z_e;
-    
+
 end;
 
 

@@ -7,7 +7,7 @@ function draws = GetAllPosteriorDraws(options_, dname, fname, column, FirstLine 
 % - dname                  [char]               name of directory with results.
 % - fname                  [char]               name of mod file.
 % - column                 [integer or string]  scalar, parameter index
-%                                               'all' if all parameters are 
+%                                               'all' if all parameters are
 %                                               requested
 % - FirstMhFile            [integer]            optional scalar, first MH file to be used
 % - FirstLine              [integer]            optional scalar, first line in first MH file to be used

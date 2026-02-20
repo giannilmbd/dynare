@@ -59,45 +59,45 @@ of $B$ nor $g$.
 The following list is a road-map to various classes in the library.
 
 \begin{description}
-  
-\item[Tensor] 
+
+\item[Tensor]
 Virtual base class for all dense tensors, defines \emph{index} as the
 multidimensonal iterator
-\item[FTensor] 
+\item[FTensor]
 Virtual base class for all folded tensors
-\item[UTensor] 
+\item[UTensor]
 Virtual base class for all unfolded tensors
-\item[FFSTensor] 
+\item[FFSTensor]
 Class representing folded full symmetry dense tensor,
 for instance $\left[g_{y^3}\right]$
-\item[FGSTensor] 
+\item[FGSTensor]
 Class representing folded general symmetry dense tensor,
 for instance $\left[g_{y^2u^3}\right]$
-\item[UFSTensor] 
+\item[UFSTensor]
 Class representing unfolded full symmetry dense tensor,
 for instance $\left[g_{y^3}\right]$
-\item[UGSTensor] 
+\item[UGSTensor]
 Class representing unfolded general symmetry dense tensor,
 for instance $\left[g_{y^2u^3}\right]$
-\item[URTensor] 
+\item[URTensor]
 Class representing unfolded/folded full symmetry, row-oriented,
 dense tensor. Row-oriented tensors are used in the Faa Di Bruno
 above as some part (few or one column) of a product of $g$'s. Their
 fold/unfold conversions are special in such a way, that they must
 yield equivalent results if multiplied with folded/unfolded
 column-oriented counterparts.
-\item[URSingleTensor] 
+\item[URSingleTensor]
 Class representing unfolded/folded full symmetry, row-oriented,
 single column, dense tensor. Besides use in the Faa Di Bruno, the
 single column row oriented tensor models also higher moments of normal
 distribution.
-\item[UPSTensor] 
+\item[UPSTensor]
 Class representing unfolded, column-oriented tensor whose symmetry
 is not that of the $\left[B_{y^2u^3}\right]$ but rather of something
 as $\left[B_{yuuyu}\right]$. This tensor evolves during the product
 operation for unfolded tensors and its basic operation is to add
 itself to a tensor with nicer symmetry, here $\left[B_{y^2u^3}\right]$.
-\item[FPSTensor] 
+\item[FPSTensor]
 Class representing partially folded, column-oriented tensor whose
 symmetry is not that of the $\left[B_{y^3u^4}\right]$ but rather
 something as $\left[B_{yu\vert y^3u\vert u^4}\right]$, where the
@@ -105,12 +105,12 @@ portions of symmetries represent folded dimensions which are combined
 in unfolded manner. This tensor evolves during the Faa Di Bruno
 for folded tensors and its basic operation is to add itself to a
 tensor with nicer symmetry, here folded $\left[B_{y^3u^4}\right]$.
-\item[USubTensor] 
+\item[USubTensor]
 Class representing unfolded full symmetry, row-oriented tensor which
 contains a few columns of huge product
 $\prod_{m=1}^l\left[g_{s^{\vert c_m\vert}}\right]^{\gamma_m}_{c_m(\alpha)}$. This is
 needed during the Faa Di Bruno for folded matrices.
-\item[IrregTensor] 
+\item[IrregTensor]
 Class representing a product of columns of derivatives
 $\left[z_{y^ku^l}\right]$, where $z=[y^T,v^T,w^T]^T$. Since the first
 part of $z$ is $y$, the derivatives contain many zeros, which are not
@@ -119,77 +119,77 @@ calculating one step of Faa Di Bruno formula, i.e.
 $\left[h_{y^l}\right]_{\gamma_1\ldots\gamma_l}
 \left(\sum_{c\in M_{l,k}}
 \prod_{m=1}^l\left[g_{s^{\vert c_m\vert}}\right]^{\gamma_m}_{c_m(\alpha)}\right)$.
-\item[FSSparseTensor] 
+\item[FSSparseTensor]
 Class representing full symmetry, column-oriented, sparse tensor. It
 is able to store elements keyed by the multidimensional index, and
 multiply itself with one column of row-oriented tensor.
-\item[FGSContainer] 
+\item[FGSContainer]
 Container of \texttt{FGSTensor}s. It implements the Faa Di Bruno with
 unfolded or folded tensor $h$ yielding folded $B$. The methods are
 \texttt{FGSContainer::multAndAdd}.
-\item[UGSContainer] 
+\item[UGSContainer]
 Container of \texttt{UGSTensor}s. It implements the Faa Di Bruno with
 unfolded tensor $h$ yielding unfolded $B$. The method is
 \texttt{UGSContainer::multAndAdd}.
-\item[StackContainerInterface] 
+\item[StackContainerInterface]
 Virtual pure interface describing all logic
-of stacked containers for which we will do the Faa Di Bruno operation. 
-\item[UnfoldedStackContainer] 
+of stacked containers for which we will do the Faa Di Bruno operation.
+\item[UnfoldedStackContainer]
 Implements the Faa Di Bruno operation for stack of
 containers of unfolded tensors.
-\item[FoldedStackContainer] 
+\item[FoldedStackContainer]
 Implements the Faa Di Bruno for stack of
 containers of folded tensors.
-\item[ZContainer] 
+\item[ZContainer]
 The class implements the interface \texttt{StackContainerInterface} according
 to $z$ appearing in context of DSGE models. By a simple inheritance,
 we obtain \texttt{UnfoldedZContainer} and also \texttt{FoldedZContainer}.
-\item[GContainer] 
+\item[GContainer]
 The class implements the interface \texttt{StackContainerInterface} according
 to $G$ appearing in context of DSGE models. By a simple inheritance,
 we obtain \texttt{UnfoldedGContainer} and also \texttt{FoldedGContainer}.
-\item[Equivalence] 
+\item[Equivalence]
 The class represents an equivalence on $n$-element set. Useful in the
 Faa Di Bruno.
-\item[EquivalenceSet] 
+\item[EquivalenceSet]
 The class representing all equivalences on $n$-element set. Useful in the
 Faa Di Bruno.
-\item[Symmetry] 
+\item[Symmetry]
 The class defines a symmetry of general symmetry tensor. This is it
 defines a basic shape of the tensor. For $\left[B_{y^2u^3}\right]$,
 the symmetry is $y^2u^3$.
-\item[Permutation] 
+\item[Permutation]
 The class represents a permutation of $n$ indices. Useful in the
 Faa Di Bruno.
-\item[IntSequence] 
+\item[IntSequence]
 The class represents a sequence of integers. Useful everywhere.
-\item[TwoDMatrix and ConstTwoDMatrix] 
+\item[TwoDMatrix and ConstTwoDMatrix]
 These classes provide an interface to a code handling two-dimensional
 matrices. The code resides in Sylvester module, in directory {\tt
 sylv/cc}. There is
 no similar interface to \texttt{Vector} and \texttt{ConstVector} classes from the
 Sylvester module and they are used directly.
-\item[KronProdAll] 
+\item[KronProdAll]
 The class represents a Kronecker product of a sequence of arbitrary
 matrices and is able to multiply a matrix from the right without
 storing the Kronecker product in memory.
-\item[KronProdAllOptim] 
+\item[KronProdAllOptim]
 The same as \texttt{KronProdAll} but it optimizes the order of matrices in
 the product to minimize the used memory during the Faa Di Bruno
 operation. Note that it is close to optimal flops.
-\item[FTensorPolynomial and UTensorPolynomial] 
+\item[FTensorPolynomial and UTensorPolynomial]
 Abstractions representing a polynomial whose coefficients are
 folded/unfolded tensors and variable is a column vector. The classes
 provide methods for traditional and horner-like polynomial
 evaluation. This is useful in simulation code.
-\item[FNormalMoments and UNormalMoments] 
+\item[FNormalMoments and UNormalMoments]
 These are containers for folded/unfolded single column tensors for
 higher moments of normal distribution. The code contains an algorithm
 for generating the moments for arbitrary covariance matrix.
-\item[TLStatic] 
+\item[TLStatic]
 The class encapsulates all static information needed for the
 library. It includes precalculated equivalence sets.
-\item[TLException] 
+\item[TLException]
 Simple class thrown as an exception.
 \end{description}
 

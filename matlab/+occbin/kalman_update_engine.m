@@ -34,7 +34,7 @@ function [ax, a1x, Px, P1x, vx, Tx, Rx, Cx, regx, info, M_, likx, etahat, alphah
 % - Px              [N by N by 2]           t-1:t updated covariance of states
 % - P1x             [N by N by 2]           one-step ahead forecast error variance at t-1:t
 % - vx              [N_obs by 2]            prediction error on observables at t-1:t
-% - Tx              [N by N by 2]           state transition matrix at t-1:t (restrict var list) 
+% - Tx              [N by N by 2]           state transition matrix at t-1:t (restrict var list)
 % - Rx              [N by N_exo by 2]       shock impact matrix at t-1:t (restrict var list)
 % - Cx              [N by 2]                state space constant state transition matrix at t-1:t (restrict var list)
 % - regx            [structure]             updated regime info at t:t+2
@@ -204,7 +204,7 @@ if options_.occbin.filter.use_relaxation && diffstart>options_.occbin.filter.use
             if guess_regime(1).(regname)(end-1)==guess_regime(1).(regname)(end)
                 guess_regime(1).(regname)(end-1) = guess_regime(1).(regname)(end-1)-1;
             end
-        end        
+        end
         if is_multivariate
             [axR, a1xR, PxR, P1xR, vxR, TxR, RxR, CxR, regxR, infoR, M_R, likxR, etahatR, alphahatR, VR] = occbin.kalman_update_algo_1(a0,a1,P0,P1,data_index,Z,vv,Y,H,Qt,T0,R0,TT,RR,CC,guess_regime,M_,dr,endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
         else
@@ -271,8 +271,8 @@ if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
             end
             if info2==0
                 use_index= 1;
-                if not(info==0 && isequal(regx2{1},regx)) 
-                    % found a solution, different from previous 
+                if not(info==0 && isequal(regx2{1},regx))
+                    % found a solution, different from previous
                     break
                 end
             end
@@ -347,7 +347,7 @@ if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
                             end
                             if info2==0
                                 use_index= gindex;
-                                if not(info==0 && isequal(regx2{gindex},regx)) 
+                                if not(info==0 && isequal(regx2{gindex},regx))
                                     % found a solution, different from previous one
                                      break
                                 end
@@ -355,7 +355,7 @@ if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
                         end % loop over other regime slack, binding in expectation or binding in current period
 
                         if info2==0
-                            if not(info==0 && isequal(regx2{gindex},regx)) 
+                            if not(info==0 && isequal(regx2{gindex},regx))
                                 % found a solution, different from previous one
                                 break
                             end
@@ -364,7 +364,7 @@ if (options_.occbin.likelihood.brute_force_regime_guess && (info0 && info1)) ...
                     end % loop over current regime binding in expectation vs binding in current period
 
                     if info2==0
-                        if not(info==0 && isequal(regx2{gindex},regx)) 
+                        if not(info==0 && isequal(regx2{gindex},regx))
                             % found a solution, different from previous one
                             break
                         end

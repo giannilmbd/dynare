@@ -1,4 +1,4 @@
-@#include "fs2000_model.inc" 
+@#include "fs2000_model.inc"
 
 estimated_params;
 alp, 0.356;

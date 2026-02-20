@@ -1,6 +1,6 @@
 /*
- * This file replicates the estimation of the cash in advance model (termed M1 
- * in the paper) described in Frank Schorfheide (2000): "Loss function-based 
+ * This file replicates the estimation of the cash in advance model (termed M1
+ * in the paper) described in Frank Schorfheide (2000): "Loss function-based
  * evaluation of DSGE models", Journal of Applied Econometrics, 15(6), 645-670.
  *
  * The data are in file "fsdat_simul.m", and have been artificially generated.
@@ -99,7 +99,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;

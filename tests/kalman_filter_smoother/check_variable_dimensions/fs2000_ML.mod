@@ -87,7 +87,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -121,41 +121,41 @@ estimation(order=1,datafile='../fsdat_simul', nobs=192, silent_optimizer,logline
 
 if size(oo_.FilteredVariablesKStepAhead,3)~=(options_.nobs+max(options_.filter_step_ahead)) || ...
         size(oo_.FilteredVariablesKStepAhead,1)~=(length(options_.filter_step_ahead))
-    error('FilteredVariablesKStepAhead has the wrong length')    
+    error('FilteredVariablesKStepAhead has the wrong length')
 end
 
 if options_.filter_covariance && (size(oo_.FilteredVariablesKStepAheadVariances,4)~=(options_.nobs+max(options_.filter_step_ahead)) || ...
         size(oo_.FilteredVariablesKStepAheadVariances,1)~=(length(options_.filter_step_ahead)))
-    error('FilteredVariablesKStepAhead has the wrong length')    
+    error('FilteredVariablesKStepAhead has the wrong length')
 end
 
 if size(oo_.FilteredVariablesShockDecomposition,4)~=(options_.nobs+max(options_.filter_step_ahead)) || ...
         size(oo_.FilteredVariablesShockDecomposition,1)~=(length(options_.filter_step_ahead))
-    error('FilteredVariablesShockDecomposition has the wrong length')    
+    error('FilteredVariablesShockDecomposition has the wrong length')
 end
 
 if size(oo_.SmoothedVariables.gy_obs,1)~=options_.nobs
-    error('SmoothedVariables has the wrong length')    
+    error('SmoothedVariables has the wrong length')
 end
 
 if size(oo_.FilteredVariables.gy_obs,1)~=options_.nobs
-    error('FilteredVariables has the wrong length')    
+    error('FilteredVariables has the wrong length')
 end
 
 if size(oo_.UpdatedVariables.gy_obs,1)~=options_.nobs
-    error('UpdatedVariables has the wrong length')    
+    error('UpdatedVariables has the wrong length')
 end
 
 if size(oo_.SmoothedShocks.e_a,1)~=options_.nobs
-    error('SmoothedShocks has the wrong length')    
+    error('SmoothedShocks has the wrong length')
 end
 
 if size(oo_.SmoothedMeasurementErrors.gy_obs,1)~=options_.nobs
-    error('SmoothedShocks has the wrong length')    
+    error('SmoothedShocks has the wrong length')
 end
 
 if size(oo_.forecast.Mean.gy_obs,1)~=options_.forecast || ...
     size(oo_.forecast.HPDinf.gy_obs,1)~=options_.forecast || ...
     size(oo_.forecast.HPDsup.gy_obs,1)~=options_.forecast
-    error('Forecasts have the wrong length')    
+    error('Forecasts have the wrong length')
 end

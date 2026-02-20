@@ -1,5 +1,5 @@
 @#include "../Trend_model_prefilter_common.inc"
-        
+
 addpath('..');
 generate_trend_stationary_AR1(M_.fname);
 
@@ -10,7 +10,7 @@ estimation(order=1,datafile='Trend_prefilter_MC_AR1_trend_data_with_constant',mh
     mcmc_jumping_covariance='Trend_prefilter_MC_MCMC_jump_covar_prefilter',forecast=100,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
 
 load('Trend_prefilter_MC_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Trend_prefilter_MC_orig_params_prefilter');
 

@@ -11,7 +11,7 @@ function W_opt = optimal_weighting_matrix(m_data, moments, q_lag)
 %  o moments                 [numMom x 1]       selected estimated moments (either data_moments or estimated model_moments)
 %  o q_lag                   [integer]          Bartlett kernel maximum lag order
 % -------------------------------------------------------------------------
-% OUTPUTS 
+% OUTPUTS
 %   o W_opt                  [numMom x numMom]  optimal weighting matrix
 % -------------------------------------------------------------------------
 % This function is called by

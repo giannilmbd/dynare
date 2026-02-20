@@ -1,7 +1,7 @@
 function return_resample = traditional_resampling(particles,weights,noise)
 % return_resample = traditional_resampling(particles,weights,noise)
 % Resamples particles (Resampling à la Kitagawa or stratified resampling).
-% 
+%
 % INPUTS
 %  - particles              [double]    n*1 vector of particles
 %  - weights                [double]    n*1 vector of particles' weights.

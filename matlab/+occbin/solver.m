@@ -2,15 +2,15 @@ function [dr, out, ss] = solver(M_, options_, dr ,steady_state, exo_steady_state
 % [dr, out, ss] = solver(M_,oo_,options_, dr ,steady_state, exo_steady_state, exo_det_steady_state
 % Solves the model with an OBC and produces simulations/IRFs
 %
-% INPUT: 
+% INPUT:
 % - M_                      [structure]     MATLAB's structure describing the model
 % - options_                [structure]     MATLAB's structure containing the options
 % - dr                      [structure]     model information structure
 % - endo_steady_state       [vector]        steady state value for endogenous variables
 % - exo_steady_state        [vector]        steady state value for exogenous variables
-% - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables
 %
-% OUTPUT: 
+% OUTPUT:
 % - dr                      [structure]     decision rules
 % - out                     [structure]     simulation result containing fields:
 %                                               - linear: paths for endogenous variables ignoring OBC (linear solution)

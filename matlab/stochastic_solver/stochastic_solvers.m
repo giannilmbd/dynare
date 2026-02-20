@@ -9,7 +9,7 @@ function [dr, info] = stochastic_solvers(dr, task, M_, options_, exo_steady_stat
 % - M_         [struct]     Definition of the model.
 % - options_   [struct]     Options.
 % - exo_steady_state        [vector]     steady state value for exogenous variables
-% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - dr         [struct]     Decision rules for stochastic simulations.

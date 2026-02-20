@@ -198,26 +198,26 @@ for i = 5:length(P)
     if (funevals + 2*MCreps*P(i)) > maxfunevals
         break
     end
-    
+
     % Niederreiter point set generator
     q = 2.^((1:MCdims) / (MCdims + 1));
-    
+
     % compute randomized quasi-Monte Carlo estimate with P points
     [THat, sigsqTHat] = estimate_mvtqmc(MCreps, P(i), q, C, nu, a, b);
     funevals = funevals + 2*MCreps*P(i);
-    
+
     % recursively update estimate and error estimate
     p = p + (THat - p) / (1 + sigsqTHat / sigsq);
     sigsq = sigsqTHat / (1 + sigsqTHat / sigsq);
-    
+
     % conservative error estimate: 3.5 times the MC standard error
     err = 3.5 * sqrt(sigsq);
-    
+
     % display iteration info
     if verbose > 1
         fprintf('mvtcdfqmc: %.5g       %.5e   %d\n', p, err, funevals);
     end
-    
+
     % check convergence
     if err < tol
         if verbose > 0
@@ -403,7 +403,7 @@ for rep = 1:MCreps
     % for MVT this is the m-dimensional unit hypercube
     % for MVN this is the (m-1)-dimensional unit hypercube
     w = abs(2 * mod(qq + repmat(rand(size(q)), P, 1), 1) - 1);
-    
+
     % compute mean of integrand over all P points and antithetic points
     THat(rep) = (F_qrsvn(a, b, C, nu, w) + F_qrsvn(a, b, C, nu, 1 - w)) / 2;
 end

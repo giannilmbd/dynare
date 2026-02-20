@@ -75,7 +75,7 @@ try
     [ss, tt, w, sdim, dr.eigval, info1]=mjdgges(E, D, 1.000001, 1e-06);
     if sdim==5
         t(1) = 1;
-    else 
+    else
         t(1) = 0;
     end
 catch

@@ -26,7 +26,7 @@ if max(max(abs(temp1.x2-temp2.x2)))>1e-10
     error('Draws of affected chain''s unaffected files are not the same')
 end
 
-if ~isoctave   
+if ~isoctave
     %check second, affected chain with affected file
     temp1=load([M_.dname '_mh2_blck2.mat']);
     temp2=load([M_.dname filesep 'metropolis' filesep M_.dname '_mh2_blck2.mat']);

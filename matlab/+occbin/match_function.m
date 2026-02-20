@@ -11,7 +11,7 @@ function [resids, grad, state_out, E, M_, out] = match_function(err_0, obs_list,
 %  - out            [structure]     OccBin's results structure
 %
 % Inputs
-% - err_            [double]        value of shocks 
+% - err_            [double]        value of shocks
 % - obs_list        [cell]          names of observables
 % - current_obs     [double]        [1 by n_obs] current value of observables
 % - opts_simul      [structure]     Structure with simulation options
@@ -31,7 +31,7 @@ function [resids, grad, state_out, E, M_, out] = match_function(err_0, obs_list,
 % However the authors would appreciate acknowledgement of the source by
 % citation of any of the following papers:
 %
-% Pablo Cuba-Borda, Luca Guerrieri, Matteo Iacoviello, and Molin Zhong (2019): "Likelihood evaluation of models 
+% Pablo Cuba-Borda, Luca Guerrieri, Matteo Iacoviello, and Molin Zhong (2019): "Likelihood evaluation of models
 % with occasionally binding constraints", Journal of Applied Econometrics,
 % 34(7), 1073-1085
 
@@ -46,7 +46,7 @@ resids = zeros(nobs,1);
 
 if ~out.error_flag
     state_out= out.piecewise(1,:)' - out.ys;
-    
+
     E = ss.R(:,opts_simul.exo_pos);
     grad = ss.R(opts_simul.varobs_id,opts_simul.exo_pos);
     resids = (out.piecewise(1,opts_simul.varobs_id)-current_obs)'; %-out.endo_ss.(obs_list{this_obs});

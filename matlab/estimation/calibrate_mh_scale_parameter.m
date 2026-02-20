@@ -13,8 +13,8 @@ function Scale = calibrate_mh_scale_parameter(objective_function, CovarianceMatr
 % OUTPUTS
 % - Scale                         [double]       scalar, optimal scale parameter for the jumping distribution.
 %
-% Note: program terminates if c3 consecutive runs of stepsize draws occurred where 
-%   i) the overall acceptance rate was less than c1 from target and 
+% Note: program terminates if c3 consecutive runs of stepsize draws occurred where
+%   i) the overall acceptance rate was less than c1 from target and
 %   ii) less than c2 over the last stepsize=2000 draws.
 % Adjustment between steps takes place using a weighted average with the exponent being rho
 

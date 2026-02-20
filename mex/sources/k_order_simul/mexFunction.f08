@@ -41,7 +41,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    integer(c_int), intent(in), value :: nlhs, nrhs
    type(c_ptr) :: order_mx, nstatic_mx, npred_mx, nboth_mx, nfwrd_mx, &
                  &nexog_mx, ystart_mx, shocks_mx, ysteady_mx, dr_mx, &
-                 &pruning_mx 
+                 &pruning_mx
    integer :: order, nstatic, npred, nboth, nfwrd, exo_nbr, endo_nbr, nys, nvar, nper
    real(real64), dimension(:), allocatable :: dy
    real(real64), pointer, contiguous :: ysteady(:), ystart(:), sim(:,:), shocks(:,:)
@@ -110,7 +110,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    if (.not. (int(mxGetM(ysteady_mx)) == endo_nbr)) &
         call mexErrMsgTxt("ysteady should have nstat+npred+nboth+nforw rows")
    ysteady => mxGetDoubles(ysteady_mx)
-   ! Initial value for between the states' starting value and the states' 
+   ! Initial value for between the states' starting value and the states'
    ! steady-state value
    dy = ystart(nstatic+1:nstatic+nys)-ysteady(nstatic+1:nstatic+nys)
 

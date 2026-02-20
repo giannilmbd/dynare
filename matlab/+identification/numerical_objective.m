@@ -17,7 +17,7 @@ function out = numerical_objective(params, outputflag, estim_params_, M_, option
 %   dr                      [structure]     Reduced form model.
 %   endo_steady_state       [vector]        steady state value for endogenous variables
 %   exo_steady_state        [vector]        steady state value for exogenous variables
-%   exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables                                    
+%   exo_det_steady_state    [vector]        steady state value for exogenous deterministic variables
 % -------------------------------------------------------------------------
 % OUTPUTS
 %   out:    dependent on outputflag
@@ -83,7 +83,7 @@ options_ = rmfield(options_,'options_ident');
 pruned = pruned_SS.pruned_state_space_system(M_, options_, dr, indvar, nlags, useautocorr, 0);
 
 %% out = [vech(cov(Y_t,Y_t)); vec(cov(Y_t,Y_{t-1}); ...; vec(cov(Y_t,Y_{t-nlags})] of indvar variables, in DR order. This is Iskrev (2010)'s J matrix.
-if outputflag == 1    
+if outputflag == 1
     out = dyn_vech(pruned.Var_y);
     for i = 1:nlags
         if useautocorr

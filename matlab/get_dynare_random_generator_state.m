@@ -1,15 +1,15 @@
 function [state_u,state_n,global_stream] = get_dynare_random_generator_state()
 % [state_u,state_n,global_stream] = get_dynare_random_generator_state()
-% Get state of MATLAB/Octave random generator 
+% Get state of MATLAB/Octave random generator
 % Outputs:
 %   - state_u           [integer]       state of uniform RNG
 %   - state_n           [integer]       state of normal RNG
 %   - global_stream     [randstream]    current default RNG stream
 %
-% Notes: 
+% Notes:
 %  - Octave, like older versions of MATLAB keeps one generator for uniformly distributed numbers and
-%    one for normally distributed numbers. 
-%  - For compatibility, we return two vectors, which are identical for MATLAB. 
+%    one for normally distributed numbers.
+%  - For compatibility, we return two vectors, which are identical for MATLAB.
 %  - For MATLAB, we also return the current stream as it may change when
 %       using parfor
 

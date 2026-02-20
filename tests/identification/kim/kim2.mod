@@ -1,6 +1,6 @@
 % Created by Marco Ratto (@rattoma, marco.ratto@ec.europa.eu)
-% based on Kim, Jinill, 2003. "Functional equivalence between intertemporal and 
-% multisectoral investment adjustment costs," Journal of Economic Dynamics 
+% based on Kim, Jinill, 2003. "Functional equivalence between intertemporal and
+% multisectoral investment adjustment costs," Journal of Economic Dynamics
 % and Control, 27(4), pages 533-549.
 % =========================================================================
 % Copyright © 2010-2020 Dynare Team
@@ -48,7 +48,7 @@ model;
 //(1-(betae*delta*alph/(1-betae+delta*betae)))^theta/c^(1+theta)/(1+theta)*(1+theta)*(i/(betae*delta*alph/(1-betae+delta*betae)))^theta*(i/k/delta)^phi=betae*(1-(betae*delta*alph/(1-betae+delta*betae)))^theta/c(+1)^(1+theta)/(1+theta)*(alph*(1+theta)*a(+1)^(1+theta)*k^(alph*(1+theta)-1)+(1-delta)*(i(+1)/k/delta)^phi*(1+theta)*(i(+1)/(betae*delta*alph/(1-betae+delta*betae)))^theta);
 lam*(1+theta)*(i/(betae*delta*alph/(1-betae+delta*betae)))^theta*(i/k/delta)^phi=betae*lam(+1)*(alph*(1+theta)*a(+1)^(1+theta)*k^(alph*(1+theta)-1)+(1-delta)*(i(+1)/k/delta)^phi*(1+theta)*(i(+1)/(betae*delta*alph/(1-betae+delta*betae)))^theta);
 k=(delta*(i/delta)^(1-phi)+(1-delta)*k(-1)^(1-phi))^(1/(1-phi));
-((1-(betae*delta*alph/(1-betae+delta*betae)))*(c/(1-(betae*delta*alph/(1-betae+delta*betae))))^(1+theta) + 
+((1-(betae*delta*alph/(1-betae+delta*betae)))*(c/(1-(betae*delta*alph/(1-betae+delta*betae))))^(1+theta) +
 (betae*delta*alph/(1-betae+delta*betae))*(i/(betae*delta*alph/(1-betae+delta*betae)))^(1+theta))^(1/(1+theta))=
 (a*k(-1)^alph);
 a = as+ea;
@@ -127,6 +127,6 @@ for strVars = {'ind0' 'indno' 'jweak' 'jweak_pair'}
 end
 
 % Integration test if identification works without priors
-estim_params_=[]; 
+estim_params_=[];
 dumpy=0;
 identification(advanced=1,max_dim_cova_group=3);

@@ -1,7 +1,7 @@
 function [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_, solve_DM, console_mode)
 % [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_, solve_DM, console_mode)
 %
-% INPUT: 
+% INPUT:
 % - M_                  [structure]     MATLAB's structure describing the model
 % - dr                  [structure]     decision rules for the model
 % - opts_simul          [structure]     MATLAB's structure containing the OccBin options (opts_simul).
@@ -19,7 +19,7 @@ function [ data, SS_out, error_flag] = solve_two_constraints(M_,dr, opts_simul_,
 %                                           - C: [n_vars by n_shock_period] array of constants
 % - error_flag          [integer]       1 if a problem was encountered, 0 otherwise
 
-% Original authors: Luca Guerrieri and Matteo Iacoviello 
+% Original authors: Luca Guerrieri and Matteo Iacoviello
 % Original file downloaded from:
 % https://www.matteoiacoviello.com/research_files/occbin_20140630.zip
 % Adapted for Dynare by Dynare Team.
@@ -68,21 +68,21 @@ data.ys = dr.ys;
 
 if solve_DM %recompute solution matrices
     [DM.Cbarmat ,DM.Bbarmat, DM.Abarmat, DM.Jbarmat] = occbin.get_deriv(M00_,data.ys);
-    
+
     M10_ = M00_;
     M10_.params(M_.occbin.pswitch(1))= 1;
     [DM.Cbarmat10, DM.Bbarmat10, DM.Abarmat10, DM.Jbarmat10, DM.Dbarmat10] = occbin.get_deriv(M10_,data.ys);
-    
+
     M01_ = M00_;
     M01_.params(M_.occbin.pswitch(2))= 1;
     [DM.Cbarmat01, DM.Bbarmat01, DM.Abarmat01, DM.Jbarmat01, DM.Dbarmat01] = occbin.get_deriv(M01_,data.ys);
-    
+
     M11_ = M00_;
     M11_.params(M_.occbin.pswitch(1))= 1;
     M11_.params(M_.occbin.pswitch(2))= 1;
     [DM.Cbarmat11, DM.Bbarmat11, DM.Abarmat11, DM.Jbarmat11, DM.Dbarmat11] = occbin.get_deriv(M11_,data.ys);
-    
-    [DM.decrulea,DM.decruleb]=occbin.get_pq(dr);      
+
+    [DM.decrulea,DM.decruleb]=occbin.get_pq(dr);
     update_flag=true;
     DM.n_vars = M00_.endo_nbr;
     DM.n_exo = M00_.exo_nbr;
@@ -104,7 +104,7 @@ if ~exist('binding_indicator','var')
     % constrain1_; the second to constrain2_.
     % Each row is a period in time.
     % If the boolean is true it indicates the relevant constraint is expected
-    % to evaluate to true. 
+    % to evaluate to true.
     % The default initial guess is consistent with the base model always
     % holding -- equivalent to the linear solution.
 else
@@ -143,7 +143,7 @@ for shock_period = 1:n_shocks_periods
     binding_indicator_history={};
     max_err = NaN(max_iter,1);
     regime_violates_constraint_in_expectation = false(max_iter,1);
-    
+
     while (regime_change_this_iteration && iter<max_iter && ~is_periodic && ~is_periodic_loop)
         iter = iter +1;
         if any(binding_indicator(end,:)) && nperiods_0<opts_simul_.max_check_ahead_periods
@@ -158,12 +158,12 @@ for shock_period = 1:n_shocks_periods
         end
         if size(binding_indicator,1)<(nperiods_0 + 1)
             % to ensure the simulation is run for the required nperiods
-            % even beyond max_check_ahead_periods: the latter controls check ahead periods 
+            % even beyond max_check_ahead_periods: the latter controls check ahead periods
             % and NOT how many periods we simulate after we are back to
             % unconstrained regime (nperiods_0)
             binding_indicator=[binding_indicator; false(nperiods_0 + 1-size(binding_indicator,1),2)];
         end
-        
+
         if iter==1 && guess_history_it
             regime_1 = regime_history_guess(shock_period).regime1;
             regime_start_1 = regime_history_guess(shock_period).regimestart1;
@@ -180,7 +180,7 @@ for shock_period = 1:n_shocks_periods
             nperiods_0 = size(binding_indicator,1)-1; %if history is present, update may be required
         end
         binding_indicator_history{iter}=binding_indicator;
-        
+
         % analyse violvec and isolate contiguous periods in the other regime.
         [regime_1, regime_start_1, error_code_period(1)]=occbin.map_regime(binding_indicator(:,1),opts_simul_.debug);
         regime_history(shock_period).regime1 = regime_1;
@@ -211,7 +211,7 @@ for shock_period = 1:n_shocks_periods
                 DM,Tmax,...
                 binding_indicator,...
                 data.exo_pos,data.shocks_sequence(shock_period,:),endo_init, update_flag);
-            
+
             [binding, relax, err]=feval([M_.fname,'.occbin_difference'],zdatalinear_+repmat(dr.ys',size(zdatalinear_,1),1),M_.params,dr.ys);
 
             if ~isinf(opts_simul_.max_check_ahead_periods) && opts_simul_.max_check_ahead_periods<length(binding_indicator)
@@ -224,7 +224,7 @@ for shock_period = 1:n_shocks_periods
             binding_constraint_new=[binding.constraint_1(1:end_periods); binding.constraint_2(1:end_periods)];
             relaxed_constraint_new = [relax.constraint_1(1:end_periods); relax.constraint_2(1:end_periods)];
             my_binding_indicator = binding_indicator(1:end_periods,:);
-            
+
             err_binding_constraint_new = [err.binding_constraint_1(1:end_periods); err.binding_constraint_2(1:end_periods)];
             err_relaxed_constraint_new = [err.relax_constraint_1(1:end_periods); err.relax_constraint_2(1:end_periods)];
 
@@ -239,7 +239,7 @@ for shock_period = 1:n_shocks_periods
                 regime_change_this_iteration = false;
                 max_err(iter) = 0;
             end
-            
+
             binding_constraint_new=[binding.constraint_1(1:end_periods);last_indicator; binding.constraint_2(1:end_periods);last_indicator];
             relaxed_constraint_new = [relax.constraint_1(1:end_periods);not(last_indicator); relax.constraint_2(1:end_periods);not(last_indicator)];
             tmp_nper(1) = sum(binding_indicator(:,1) - (binding_indicator(:,1) | [binding.constraint_1(1:end_periods);last_indicator]) & ~(binding_indicator(:,1) & [relax.constraint_1(1:end_periods);not(last_indicator)]));
@@ -265,7 +265,7 @@ for shock_period = 1:n_shocks_periods
                 binding_indicator = (binding_indicator(:) | binding_constraint_new) & ~(binding_indicator(:) & relaxed_constraint_new);
             end
             binding_indicator = reshape(binding_indicator,nperiods_0+1,2);
-            
+
             if iter>1 && regime_change_this_iteration && ~nperiods_endogenously_increased
                 % check for periodic solution only if nperiods is not
                 % increased endogenously
@@ -332,10 +332,10 @@ for shock_period = 1:n_shocks_periods
                         [zdatalinear_, SS_out.T(:,:,shock_period), SS_out.R(:,:,shock_period), SS_out.C(:,shock_period), SS, update_flag]=occbin.mkdatap_anticipated_2constraints_dyn(nperiods_0,DM,...
                             Tmax,...
                             binding_indicator,...
-                            data.exo_pos,data.shocks_sequence(shock_period,:),endo_init,update_flag);                        
+                            data.exo_pos,data.shocks_sequence(shock_period,:),endo_init,update_flag);
                     end
                 end
-                
+
             end
         else
             regime_change_this_iteration= false;
@@ -393,15 +393,15 @@ for shock_period = 1:n_shocks_periods
         if opts_simul_.waitbar; wait_bar.close(hh_fig,console_mode); end
         return;
     end
-    
+
     endo_init = zdatalinear_(1,:);
     zdatapiecewise_(shock_period,:)=endo_init;
     endo_init= endo_init';
-    
+
     % update the guess for constraint violations for next period
     % update is consistent with expecting no additional shocks next period
     binding_indicator=[binding_indicator(2:end,:); false(1,2)];
-    
+
 end
 
 zdatapiecewise_(shock_period+1:end,:)=zdatalinear_(2:n_periods-shock_period+1,:);
@@ -415,5 +415,5 @@ if ~opts_simul_.piecewise_only
 end
 
 if opts_simul_.waitbar
-    wait_bar.close(hh_fig,console_mode); 
+    wait_bar.close(hh_fig,console_mode);
 end

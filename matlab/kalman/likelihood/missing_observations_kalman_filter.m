@@ -303,7 +303,7 @@ while notsteady && t<=last
                     M_,dr, endo_steady_state,exo_steady_state,exo_det_steady_state,options_,occbin_options);
                 likx = liky;
                 use_pkf_(t) = use_pkf_distribution;
-                if StateVector.stop_particles 
+                if StateVector.stop_particles
                     options_.occbin.filter.particle.status = false;
                 end
                 if use_pkf_distribution
@@ -385,7 +385,7 @@ while notsteady && t<=last
             LIKUB = -sum(0.5*likUB(1+presample-diffuse_periods:end));
         else
             LIKUB = -sum(0.5*likUB);
-        end        
+        end
         if LIKUB < options_.likelihood_base_value
             t=last+1;
             s  = t-start;

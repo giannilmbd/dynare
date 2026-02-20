@@ -49,10 +49,10 @@ y = rho_1*y(-1) + rho_2*y(-2) + ey;
 x = rho_3*x(-1) + rho_4*x(-2) + ex;
 
 [name='eq:x1']
-diff(x1) = a_x1_0*(x1(-1)-x1bar(-1)) + a_x1_1*diff(x1(-1)) + a_x1_2*diff(x1(-2)) + a_x1_x2_1*diff(x2(-1)) + a_x1_x2_2*diff(x2(-2)) + ex1;     
+diff(x1) = a_x1_0*(x1(-1)-x1bar(-1)) + a_x1_1*diff(x1(-1)) + a_x1_2*diff(x1(-2)) + a_x1_x2_1*diff(x2(-1)) + a_x1_x2_2*diff(x2(-2)) + ex1;
 
 [name='eq:x2']
-diff(x2) = a_x2_0*(x2(-1)-x2bar(-1)) + a_x2_1*diff(x1(-1)) + a_x2_2*diff(x1(-2)) + a_x2_x1_1*diff(x2(-1)) + a_x2_x1_2*diff(x2(-2)) + ex2;     
+diff(x2) = a_x2_0*(x2(-1)-x2bar(-1)) + a_x2_1*diff(x1(-1)) + a_x2_2*diff(x1(-2)) + a_x2_x1_1*diff(x2(-1)) + a_x2_x1_2*diff(x2(-2)) + ex2;
 
 [name='eq:x1bar']
 x1bar = x1bar(-1) + ex1bar;
@@ -87,7 +87,7 @@ initialconditions = dseries(zeros(10, M_.endo_nbr+M_.exo_nbr), 2000Q1, vertcat(M
 // Simulate the model for 500 periods
 TrueData = simul_backward_model(initialconditions, 300);
 
-// Define a structure describing the parameters to be estimated (with initial conditions). 
+// Define a structure describing the parameters to be estimated (with initial conditions).
 clear eparams
 eparams.e_c_m  =  .9;
 eparams.c_z_1  =  .5;
@@ -115,8 +115,8 @@ disp(sprintf('Estimate of lambda: %f', lambda_nls))
 
 skipline(2)
 
-// Define a structure describing the parameters to be estimated (with initial conditions). 
-// Define a structure describing the parameters to be estimated (with initial conditions). 
+// Define a structure describing the parameters to be estimated (with initial conditions).
+// Define a structure describing the parameters to be estimated (with initial conditions).
 clear eparams
 eparams.e_c_m  =  .9;
 eparams.c_z_1  =  .5;

@@ -8,7 +8,7 @@ function [xparam1, hh, gg, fval, igg, hess_info, jit, fcount, exitflag, message]
 %  - func0                  name of the function that also outputs the single contributions at times t=1,...,T
 %                           of the log-likelihood to compute outer product gradient
 %  - x                      starting guess
-%  - bounds                 prior bounds of parameters 
+%  - bounds                 prior bounds of parameters
 %  - analytic_derivation    1 if analytic derivatives, 0 otherwise
 %  - ftol0                  termination criterion for function change
 %  - nit                    maximum number of iterations
@@ -22,7 +22,7 @@ function [xparam1, hh, gg, fval, igg, hess_info, jit, fcount, exitflag, message]
 %  - Save_files             1 if intermediate output is to be saved
 %  - hess_info              structure storing the step sizes for
 %                           computation of Hessian
-%  - prior_std              prior standard deviation of parameters (can be NaN); 
+%  - prior_std              prior standard deviation of parameters (can be NaN);
 %                           passed to mr_hessian
 %  - gradient_epsilon       [double] step size in gradient
 %  - parameter_names        [cell] names of parameters for error messages
@@ -131,7 +131,7 @@ else
 end
 H = igg;
 if Verbose
-    disp_eigenvalues_gradient(gg,hh);   
+    disp_eigenvalues_gradient(gg,hh);
 end
 g=gg;
 check=0;
@@ -178,7 +178,7 @@ while norm(gg)>gtol && check==0 && jit<nit
     end
     ig_pos=find(ig);
     if length(ig_pos)<nx
-        ggx=ggx*0;        
+        ggx=ggx*0;
         ggx(ig_pos)=gg(ig_pos);
         if analytic_derivation || ~outer_product_gradient
             hhx=hh;

@@ -1,11 +1,11 @@
 function [G, alpha, beta] = buildGmatrixWithAlphaAndBeta(params)
-    
+
 % Builds the G matrix needed for PAC.
 %
-% INPUTS 
+% INPUTS
 % - params    [double]    (m+1)*1 vector of PAC parameters.
 %
-% OUTPUTS 
+% OUTPUTS
 % - G         [double]    (m+1)*(m+1) matrix.
 % - alpha     [double]    m*1 vector of PAC parameters.
 % - beta      [double]    scalar, discount factor.
@@ -30,7 +30,7 @@ function [G, alpha, beta] = buildGmatrixWithAlphaAndBeta(params)
 % Return an error if the input is not a vector.
 if ~isvector(params) || ~isnumeric(params) || ~isreal(params)
     error('Input argument has to be a vector of doubles!')
-end 
+end
 
 % Get the number of parameters
 m = length(params)-1;
@@ -47,7 +47,7 @@ beta = params(end);
 % Return an error if beta is not a discount factor
 if beta<eps || beta>1-eps
     error('beta has to be a discount factor!')
-end 
+end
 
 % Initialize the returned G matrix.
 G = zeros(m);

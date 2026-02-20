@@ -1,7 +1,7 @@
 /*
  * This file implements the baseline New Keynesian model of Jordi Galí (2015): Monetary Policy, Inflation,
  * and the Business Cycle, Princeton University Press, Second Edition, Chapter 3
- * 
+ *
  * THIS MOD-FILE REQUIRES DYNARE 4.5 OR HIGHER
  *
  * Notes:
@@ -11,7 +11,7 @@
  * This implementation was written by Johannes Pfeifer. In case you spot mistakes,
  * email me at jpfeifer@gmx.de
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -40,7 +40,7 @@ var pi          ${\pi}$                 (long_name='inflation')
     y           ${y}$                   (long_name='output')
     yhat        ${\hat y}$              (long_name='output deviation from steady state')
     r_nat       ${r^{nat}}$             (long_name='natural interest rate')
-    r_real      ${r^r}$                 (long_name='real interest rate')     
+    r_real      ${r^r}$                 (long_name='real interest rate')
     i           ${i}$                   (long_name='nominal interrst rate')
     n           ${n}$                   (long_name='hours worked')
     m_real      ${m-p}$                 (long_name='real money stock')
@@ -58,7 +58,7 @@ var pi          ${\pi}$                 (long_name='inflation')
     w_real      ${\frac{w}{p}}$         (long_name='real wage')
     mu          ${\mu}$                 (long_name='markup')
     mu_hat      ${\hat \mu}$            (long_name='markup gap')
-;     
+;
 
 varexo  eps_a       ${\varepsilon_a}$       (long_name='technology shock')
         eps_z       ${\varepsilon_z}$   (long_name='preference shock innovation')
@@ -95,7 +95,7 @@ epsilon=9;
 % First Order Conditions
 %----------------------------------------------------------------
 
-model(linear); 
+model(linear);
 //Composite parameters
 #Omega=(1-alppha)/(1-alppha+alppha*epsilon);        %defined on page 60
 #psi_n_ya=(1+varphi)/(siggma*(1-alppha)+varphi+alppha);   %defined on page 62
@@ -154,7 +154,7 @@ end;
 %  define shock variances
 %---------------------------------------------------------------
 shocks;
-var eps_a  = 0.5^2; //unit shock to preferences 
+var eps_a  = 0.5^2; //unit shock to preferences
 end;
 
 planner_objective 0.5*((siggma+(varphi+alppha)/(1-alppha))*yhat^2+epsilon/0.0215*pi^2)/100;

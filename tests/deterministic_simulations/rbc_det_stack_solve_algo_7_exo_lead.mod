@@ -86,7 +86,7 @@ D = load(['rbc_det' filesep 'Output' filesep 'rbc_det_results']);
 if norm(D.oo_.endo_simul(1:D.M_.orig_endo_nbr,D.M_.maximum_lag+1:end-D.M_.maximum_lead) - oo_.endo_simul(1:M_.orig_endo_nbr,M_.maximum_lag+1:end-M_.maximum_lead)) > 1e-30;
    disp(D.oo_.endo_simul(1:D.M_.orig_endo_nbr,D.M_.maximum_lag+1:end-D.M_.maximum_lead) - oo_.endo_simul(1:M_.orig_endo_nbr,M_.maximum_lag+1:end-M_.maximum_lead));
    error('rbc_det_stack_solve_algo_7 failed');
-end;                       
+end;
 
 options_.dynatol.f=1e-10;
 @#define J = [0,1,2,3,4,9,10]
@@ -107,7 +107,7 @@ if isoctave && options_.solve_algo==0
     %%acount for somehow weaker convergence criterion in Octave's fsolve
     tol_crit=1e-4;
 else
-    tol_crit=1e-8;    
+    tol_crit=1e-8;
 end
 if norm(D.oo_.endo_simul(1:D.M_.orig_endo_nbr,D.M_.maximum_lag+1:end-D.M_.maximum_lead) - oo_.endo_simul(1:M_.orig_endo_nbr,M_.maximum_lag+1:end-M_.maximum_lead)) > tol_crit;
     disp(D.oo_.endo_simul(1:D.M_.orig_endo_nbr,D.M_.maximum_lag+1:end-D.M_.maximum_lead) - oo_.endo_simul(1:M_.orig_endo_nbr,M_.maximum_lag+1:end-M_.maximum_lead));

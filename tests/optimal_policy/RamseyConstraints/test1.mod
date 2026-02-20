@@ -35,4 +35,3 @@ options_.solve_algo = 10;
 perfect_foresight_solver;
 
 rplot i;
-      

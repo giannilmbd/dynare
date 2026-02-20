@@ -175,7 +175,7 @@ if newRank
     Pstar_init = Pstar(:,:,1);
     a_init = a(:,1);
     a(:,1)        = T*a(:,1);
-    % only non-stationary part is affected by following line, 
+    % only non-stationary part is affected by following line,
     % hence Pstar on EXIT from diffuse step will NOT change.
     Pstar(:,:,1)  = T*Pstar(:,:,1)*T' + QQ;
 end
@@ -296,7 +296,7 @@ while t<smpl
             return
         end
         iF(di,di,t)   = inv(F./(sig*sig'))./(sig*sig');
-        PZI         = P(:,:,t)*ZZ'*iF(di,di,t);                             %auxiliary variable      
+        PZI         = P(:,:,t)*ZZ'*iF(di,di,t);                             %auxiliary variable
         atilde(:,t) = a(:,t) + PZI*v(di,t);                                 %DK (2012), (4.24)
         K(:,di,t)    = T*PZI;                                               %DK (2012), below (4.24)
         L(:,:,t)    = T-K(:,di,t)*ZZ;                                       %DK (2012), equal to bracket in P_{t+1} in (4.24)

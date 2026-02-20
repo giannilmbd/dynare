@@ -156,16 +156,16 @@ if run_with_pct
     wait_bar.multi('CloseAll');
     cleanupObj = onCleanup(@() wait_bar.multi('CloseAll'));
 
-    % Launch parallel Jobs    
+    % Launch parallel Jobs
     block_iter = 0;
     for curr_block = fblck:nblck
 
         block_iter = block_iter+1;
-        
+
         % Submit current block to a worker. Use parfeval instead of parfor
         % to allow keeping all the mh recovery options.
         F(block_iter) = parfeval(p, @computeMHBlock, 9, ...
-            curr_block, ...            
+            curr_block, ...
             options_, ...
             record.InitialSeeds(curr_block), ...
             BaseName, ...
@@ -196,7 +196,7 @@ if run_with_pct
             refresh_rate, ...
             true, ...
             q);
-        
+
     end
 
     % Retrieve the results in finishing order (not necessarily the same as
@@ -238,7 +238,7 @@ if run_with_pct
         wait_bar.multi(['Chain', int2str(curr_block)], 'Close');
 
     end % End of the loop over the mh-blocks.
-   
+
 else % Run in serial as usual
 
     block_iter=0;
@@ -264,7 +264,7 @@ else % Run in serial as usual
         [accepted_draws_this_chain, feval_this_chain, draw_iter, ...
             LastSeeds, OutputFileName_cb, LastParameters, LastLogPost, ...
             draw_index_current_file_i, NewFile_cb, sampler_options] = computeMHBlock( ...
-            curr_block, ...           
+            curr_block, ...
             options_, ...
             record.InitialSeeds(curr_block), ...
             BaseName, ...
@@ -354,7 +354,7 @@ curr_block_str = int2str(curr_block);
 LastSeeds=[];
 
 if UseParallel
-    send(q, struct('Initialize', true, 'Block', curr_block_str))    
+    send(q, struct('Initialize', true, 'Block', curr_block_str))
 end
 
 try
@@ -509,7 +509,7 @@ function UpdateBar(task, sampler_options, options_)
 bar_title = sampler_options.parallel_bar_title;
 LabelBase = [bar_title ' ('  task.Block '/' int2str(options_.mh_nblck) ')'];
 Name = ['Chain ', task.Block];
-if task.Initialize    
+if task.Initialize
     wait_bar.multi(Name, 0, 'Color', 'b', 'Relabel', [LabelBase, '...'], 'CanCancel', 'on', 'CancelFcn', @(s,e) cancelAllFutures());
 else
     wait_bar.multi(Name, task.Value, 'Relabel', [LabelBase, ' ', task.Text]);

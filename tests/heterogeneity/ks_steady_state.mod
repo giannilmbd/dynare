@@ -1,6 +1,6 @@
 heterogeneity_dimension households;
 
-var(heterogeneity=households) 
+var(heterogeneity=households)
     c  // Consumption
     a  // Assets
 ;
@@ -29,7 +29,7 @@ parameters
 
 model(heterogeneity=households);
     beta*(1+r(+1))*c(+1)^(-1/eis)-c^(-1/eis)=0 ⟂ a>=0;
-    (1+r)*a(-1)+w*e-c-a; 
+    (1+r)*a(-1)+w*e-c-a;
 end;
 
 model;

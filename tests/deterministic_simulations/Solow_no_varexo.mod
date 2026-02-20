@@ -1,8 +1,8 @@
 /*
  * This file studies the transition to steady state in a simple Solow model with Cobb-Douglass production function
  *
- * This implementation was written by Johannes Pfeifer. 
- * Please note that the following copyright notice only applies to this Dynare 
+ * This implementation was written by Johannes Pfeifer.
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 

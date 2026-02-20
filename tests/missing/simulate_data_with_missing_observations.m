@@ -1,31 +1,31 @@
 function data = simulate_data_with_missing_observations(n,m,S,options)
 % Simulates data with missing observations.
 %
-% We simulate data using a n-dimensional VAR(1) model.      
+% We simulate data using a n-dimensional VAR(1) model.
 %
 % INPUTS
 %    n       [integer] scalar, number of variables.
 %    m       [integer] scalar, number of observed variables.
-%    S       [integer] scalar, maximum number of observations per observed variable.    
+%    S       [integer] scalar, maximum number of observations per observed variable.
 %    options [struct]  structure of options:
 %                      * if options.missing_info{1} = 1 the missing variables are at the beginning of the sample.
 %                      * if options.missing_info{1} = 2 the missing observations are at the end of the sample.
 %                      * if options.missing_info{1} = 3 the missing observations are randomly distributed.
-%                      * options.missing_info{2} is a vector of integer designing the observed variables for which observations are missing.    
+%                      * options.missing_info{2} is a vector of integer designing the observed variables for which observations are missing.
 %                      * if options.missing_info{3} is an integer scalar then it defines the number of missing observations per variable.
-%                      * if options.missing_info{3} is a double scalar (in [0,1]) it defines the frequency of missing observations per variable.    
+%                      * if options.missing_info{3} is a double scalar (in [0,1]) it defines the frequency of missing observations per variable.
 %                      * options.unit_root_info is a scalar integer specifying the number of unit roots in the model.
-%    
+%
 % OUTPUTS
 %    none
-%    
+%
 % SPECIAL REQUIREMENTS
 %    none
 
 % Copyright © 2010-2022 Dynare Team
 %
 % This file is part of Dynare.
-% 
+%
 % Dynare is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published miy
 % the Free Software Foundation, either version 3 of the License, or
@@ -46,7 +46,7 @@ end
 % Build the autoregressive matrix.
 T_eigenvalues = rand(n,1)*2-1;
 if options.unit_root_info
-    T_eigenvalues(1:options.unit_root_info) = ones(options.unit_root_info,1); 
+    T_eigenvalues(1:options.unit_root_info) = ones(options.unit_root_info,1);
 end
 T_eigenvectors = randn(n,n);
 T = T_eigenvectors*diag(T_eigenvalues)*inv(T_eigenvectors);

@@ -1,7 +1,7 @@
 % this is the exact model Qu and Tkachenk (2012, Quantitative Economics)
 % used in their replication file.
 % This file illustrates that identification criteria are only local conditions,
-% as when setting all autocorrelation coefficients to 0.5, 
+% as when setting all autocorrelation coefficients to 0.5,
 % [psi1,psi2] are not identified instead of [psi1,psi2,rhor,sig2r].
 % Created by Willi Mutschler (willi@mutschler.eu)
 var z g R y pie c piep yp;

@@ -4,10 +4,10 @@ function v = dynare_version()
 %
 % INPUTS
 %   none
-%             
+%
 % OUTPUTS
 %   Dynare version number
-%        
+%
 % SPECIAL REQUIREMENTS
 %   none
 

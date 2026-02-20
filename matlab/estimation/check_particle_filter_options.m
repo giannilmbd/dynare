@@ -111,7 +111,7 @@ if ~isempty(particle_options.particle_filter_options)
                 else
                     particle_options.liu_west_delta=options_list{i,2};
                 end
-                
+
             otherwise
                 warning(['check_particle_filter_options: Unknown option (' options_list{i,1} ')!'])
         end

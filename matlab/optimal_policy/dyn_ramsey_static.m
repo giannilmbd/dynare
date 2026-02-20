@@ -114,10 +114,10 @@ if options_.steadystate_flag
         steady_state=NaN(M_.endo_nbr,1);
         return
     end
-    if check(1) %return 
+    if check(1) %return
         resids=ones(inst_nbr,1)+sum(abs(x(1:M_.orig_endo_nbr))); %return with penalty
         steady_state=NaN(M_.endo_nbr,1);
-        return        
+        return
     end
 end
 

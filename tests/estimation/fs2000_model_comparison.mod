@@ -51,7 +51,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -94,16 +94,16 @@ model_comparison fs2000(0.25) fs2000_initialize_from_calib(0.25);
 model_comparison (marginal_density=laplace) fs2000(0.5) fs2000_initialize_from_calib(0.5);
 if oo_.Model_Comparison.fs2000.Posterior_Model_Probability < oo_.Model_Comparison.fs2000_initialize_from_calib.Posterior_Model_Probability && ...
         oo_.Model_Comparison.fs2000.Log_Marginal_Density > oo_.Model_Comparison.fs2000_initialize_from_calib.Log_Marginal_Density
-   error('Model Comparison not correct') 
+   error('Model Comparison not correct')
 end
 oo_laplace=oo_;
 model_comparison (marginal_density=modifiedharmonicmean) fs2000(0.5) fs2000_initialize_from_calib(0.75);
 if abs(oo_laplace.Model_Comparison.fs2000.Log_Marginal_Density-oo_.Model_Comparison.fs2000.Log_Marginal_Density)>0.85
-   error('Laplace and Harmonic Mean do not match') 
+   error('Laplace and Harmonic Mean do not match')
 end
 model_comparison (marginal_density=modifiedharmonicmean) fs2000(0) fs2000_initialize_from_calib(1);
 if oo_.Model_Comparison.fs2000.Posterior_Model_Probability~=0 && oo_.Model_Comparison.fs2000_initialize_from_calib.Log_Marginal_Density~=1
-   error('Incorporation of prior wrong') 
+   error('Incorporation of prior wrong')
 end
 
 model_comparison(marginal_density=laplace) fs2000(0.333) fs2000_initialize_from_calib(0.333) fs2000_model_comparison(0.333);

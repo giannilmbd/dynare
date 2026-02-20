@@ -8,14 +8,14 @@
  * THIS MOD-FILE REQUIRES DYNARE 4.5 OR HIGHER
  *
  * Notes:
- *  - in the LOM for the discount rate shock z the shock enters with a minus sign in this mod-file to generate the 
+ *  - in the LOM for the discount rate shock z the shock enters with a minus sign in this mod-file to generate the
  *      IRF to a -0.5% shock
  *
  * This implementation was written by Johannes Pfeifer. In case you spot mistakes,
  * email me at jpfeifer@gmx.de
  *
- * Please note that the following copyright notice only applies to this Dynare 
- * implementation of the model. 
+ * Please note that the following copyright notice only applies to this Dynare
+ * implementation of the model.
  */
 
 /*
@@ -41,9 +41,9 @@ var C               ${C}$           (long_name='Consumption')
     Pi              ${\Pi}$         (long_name='inflation')
     A               ${A}$           (long_name='AR(1) technology process')
     N               ${N}$           (long_name='Hours worked')
-    R               ${R^n}$         (long_name='Nominal Interest Rate') 
+    R               ${R^n}$         (long_name='Nominal Interest Rate')
     realinterest    ${R^{r}}$       (long_name='Real Interest Rate')
-    Y               ${Y}$           (long_name='Output') 
+    Y               ${Y}$           (long_name='Output')
     Q               ${Q}$           (long_name='Bond price')
     Z               ${Z}$           (long_name='AR(1) preference shock process')
     S               ${S}$           (long_name='Price dispersion')
@@ -69,7 +69,7 @@ var C               ${C}$           (long_name='Consumption')
 
 varexo eps_a        ${\varepsilon_a}$   (long_name='technology shock')
        eps_z        ${\varepsilon_z}$   (long_name='preference shock')
-       ;   
+       ;
 
 parameters alppha       ${\alpha}$      (long_name='capital share')
     betta               ${\beta}$       (long_name='discount factor')
@@ -84,7 +84,7 @@ parameters alppha       ${\alpha}$      (long_name='capital share')
     theta               ${\theta}$      (long_name='Calvo parameter')
     tau                 ${\tau}$      (long_name='labor subsidy')
     ;
-    
+
 %----------------------------------------------------------------
 % Parametrization, p. 67  and p. 113-115
 %----------------------------------------------------------------
@@ -164,7 +164,7 @@ model;
     log_Z=log(Z);
 
     y_hat=log(Y)-STEADY_STATE(log(Y));
-    
+
     pi=log(Pi)-STEADY_STATE(log(Pi));
 end;
 
@@ -210,7 +210,7 @@ end;
 %---------------------------------------------------------------
 
 shocks;
-var eps_a  = 0.5^2; //unit shock to preferences 
+var eps_a  = 0.5^2; //unit shock to preferences
 end;
 
 % steady;
@@ -220,9 +220,9 @@ planner_objective 0.5*((siggma+(varphi+alppha)/(1-alppha))*y_hat^2+epsilon/0.021
 discretionary_policy(order=1,instruments=(R),irf=20,planner_discount=betta, periods=0, planner_discount_latex_name = $\beta$) y_hat pi_ann log_y log_N log_W_real log_P;
 
 temp=load(['Gali_2015_chapter_3' filesep 'Output' filesep 'Gali_2015_chapter_3_results.mat']);
-if abs(oo_.planner_objective_value.unconditional-temp.oo_.planner_objective_value.unconditional)>1e-6 ... 
-    || abs(oo_.planner_objective_value.conditional-temp.oo_.planner_objective_value.conditional)>1e-6 ... 
-    ||  abs(oo_.planner_objective_value.conditional-temp.oo_.planner_objective_value.conditional)>1e-6 ... 
+if abs(oo_.planner_objective_value.unconditional-temp.oo_.planner_objective_value.unconditional)>1e-6 ...
+    || abs(oo_.planner_objective_value.conditional-temp.oo_.planner_objective_value.conditional)>1e-6 ...
+    ||  abs(oo_.planner_objective_value.conditional-temp.oo_.planner_objective_value.conditional)>1e-6 ...
    warning('Planner objective does not match linear model')
 end
 if max(max(abs([temp.oo_.irfs.y_eps_a; temp.oo_.irfs.w_real_eps_a; temp.oo_.irfs.n_eps_a; temp.oo_.irfs.pi_ann_eps_a]-...

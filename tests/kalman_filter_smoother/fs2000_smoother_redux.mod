@@ -51,7 +51,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -87,13 +87,13 @@ end
 if max(mserr)>1.e-12
     error('smoother_redux with kalman_algo=1 does not replicate original smoother for shocks!')
 end
-        
+
 vlist = M_.endo_names(oo_.dr.order_var(oo_.dr.restrict_var_list));
 for k=1:length(vlist)
     merr(k)=max(abs(oo0.SmoothedVariables.(vlist{k})-oo1.SmoothedVariables.(vlist{k})));
     merrU(k)=max(abs(oo0.UpdatedVariables.(vlist{k})-oo1.UpdatedVariables.(vlist{k})));
     merrF(k)=max(abs(oo0.FilteredVariables.(vlist{k})-oo1.FilteredVariables.(vlist{k})));
-    
+
 end
 if max(merr)>1.e-12
     error('smoother_redux with kalman_algo=1 does not replicate original smoothed restricted var list!')
@@ -104,7 +104,7 @@ end
 if max(merrF)>1.e-12
     error('smoother_redux with kalman_algo=1 does not replicate original filtered restricted var list!')
 end
-        
+
 vlist1 = M_.endo_names(~ismember(M_.endo_names,vlist));
 for k=1:length(vlist1)
     merr1(k)=max(abs(oo0.SmoothedVariables.(vlist1{k})-oo1.SmoothedVariables.(vlist1{k})));
@@ -124,7 +124,7 @@ merrK = max(max(max(abs(oo0.FilteredVariablesKStepAhead-oo1.FilteredVariablesKSt
 if max(merrK)>1.e-12
     error('smoother_redux with kalman_algo=1 does not replicate original k-step ahead forecasts!')
 end
-verrK = max(max(max(max(abs(oo0.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:)-oo1.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:))))));         
+verrK = max(max(max(max(abs(oo0.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:)-oo1.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:))))));
 if verrK>1.e-12
     error('smoother_redux with kalman_algo=1 does not replicate original k-step ahead forecast variances!')
 end
@@ -144,13 +144,13 @@ end
 if max(mserr)>1.e-12
     error('smoother_redux with kalman_algo=2 does not replicate original smoother for shocks!')
 end
-        
+
 vlist = M_.endo_names(oo_.dr.order_var(oo_.dr.restrict_var_list));
 for k=1:length(vlist)
     merr(k)=max(abs(oo0.SmoothedVariables.(vlist{k})-oo2.SmoothedVariables.(vlist{k})));
     merrU(k)=max(abs(oo0.UpdatedVariables.(vlist{k})-oo2.UpdatedVariables.(vlist{k})));
     merrF(k)=max(abs(oo0.FilteredVariables.(vlist{k})-oo2.FilteredVariables.(vlist{k})));
-    
+
 end
 if max(merr)>1.e-12
     error('smoother_redux with kalman_algo=2 does not replicate original smoothed restricted var list!')
@@ -161,7 +161,7 @@ end
 if max(merrF)>1.e-12
     error('smoother_redux with kalman_algo=2 does not replicate original filtered restricted var list!')
 end
-        
+
 vlist1 = M_.endo_names(~ismember(M_.endo_names,vlist));
 for k=1:length(vlist1)
     merr1(k)=max(abs(oo0.SmoothedVariables.(vlist1{k})-oo2.SmoothedVariables.(vlist1{k})));
@@ -181,7 +181,7 @@ merrK = max(max(max(abs(oo0.FilteredVariablesKStepAhead-oo2.FilteredVariablesKSt
 if max(merrK)>1.e-12
     error('smoother_redux with kalman_algo=2 does not replicate original k-step ahead forecasts!')
 end
-verrK = max(max(max(max(abs(oo0.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:)-oo2.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:))))));         
+verrK = max(max(max(max(abs(oo0.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:)-oo2.FilteredVariablesKStepAheadVariances(:,[1:14 16],[1:14 16],:))))));
 if verrK>1.e-12
     error('smoother_redux with kalman_algo=2 does not replicate original k-step ahead forecast variances!')
 end
@@ -192,4 +192,4 @@ end
 verrS=max(max(max(abs(oo0.Smoother.State_uncertainty([1:14 16],[1:14 16],:)-oo2.Smoother.State_uncertainty([1:14 16],[1:14 16],:)))));
 if verrS>1.e-12
     error('smoother_redux with kalman_algo=2 does not replicate original state covariance!')
-end       
+end

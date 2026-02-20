@@ -113,7 +113,7 @@ else
     end
 end
 
-%compute 2nd order mean correction on stationary variables 
+%compute 2nd order mean correction on stationary variables
 if local_order == 2         % mean correction for 2nd order with no filters; other cases are error out above
     if ~isempty(index_states)
         Ex = (dr.ghs2(index_states)+dr.ghxx(index_states,:)*variance_states(:)+dr.ghuu(index_states,:)*M_.Sigma_e(:))/2;

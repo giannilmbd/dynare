@@ -66,7 +66,7 @@ periods 1;
 values -4;
 end;
 
-perfect_foresight_setup(periods=100);    
+perfect_foresight_setup(periods=100);
 
 perfect_foresight_solver(lmmcp);
 

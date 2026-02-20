@@ -5,10 +5,10 @@ function [zdata, T, R, CONST, ss, update_flag]=mkdatap_anticipated_dyn(n_periods
 %
 % Inputs:
 % - n_periods           [double]        number for periods for simulation
-% - DM                  [structure]     Dynamic model 
+% - DM                  [structure]     Dynamic model
 % - T_max               [Tmax]          last period where constraints bind
-% - binding_indicator   [T+1]           indicator for constraint violations      
-% - irfshock_pos        [double]        shock position 
+% - binding_indicator   [T+1]           indicator for constraint violations
+% - irfshock_pos        [double]        shock position
 % - scalefactor_mod     [double]        shock values
 % - init                [double]        [N by 1] initial value of endogenous variables
 % - update_flag         [boolean]       flag whether to update results
@@ -21,7 +21,7 @@ function [zdata, T, R, CONST, ss, update_flag]=mkdatap_anticipated_dyn(n_periods
 % - ss                  [structure]     state space system
 % - update_flag         [boolean]       flag that results have been updated
 %
-% Original authors: Luca Guerrieri and Matteo Iacoviello 
+% Original authors: Luca Guerrieri and Matteo Iacoviello
 % Original file downloaded from:
 % https://www.matteoiacoviello.com/research_files/occbin_20140630.zip
 % Adapted for Dynare by Dynare Team.
@@ -56,10 +56,10 @@ if nargin<6
     scalefactor_mod=1;
 end
 
- 
+
 % % get the time-dependent decision rules
 
-if ~isempty(dictionary) 
+if ~isempty(dictionary)
     if (length(binding_indicator)>size(dictionary.binding_indicator,1))
         dictionary.binding_indicator = [dictionary.binding_indicator; zeros(length(binding_indicator)-size(dictionary.binding_indicator,1),size(dictionary.binding_indicator,2))];
     end
@@ -67,9 +67,9 @@ if ~isempty(dictionary)
         binding_indicator = [binding_indicator; zeros(size(dictionary.binding_indicator,1)-size(binding_indicator,1),1) ];
     end
 end
-        
-if T_max > 0    
-    if isempty(dictionary)        
+
+if T_max > 0
+    if isempty(dictionary)
         temp = -(DM.Astarbarmat*DM.decrulea+DM.Bstarbarmat)\[DM.Cstarbarmat DM.Jstarbarmat DM.Dstarbarmat];
         dictionary.binding_indicator(:,1) = [1; zeros(n_periods,1)];
         dictionary.ss(1).T = temp(:,1:n_vars);
@@ -77,16 +77,16 @@ if T_max > 0
         dictionary.ss(1).C = temp(:,n_vars+n_exo+1:end);
     end
     ireg(T_max)=1;
-    
+
     % equivalent to pre-multiplying by the inverse above if the target
     % matrix is invertible. Otherwise it yields the minimum state solution
     %P(:,:,Tmax) = -(Astarbarmat*decrulea+Bstarbarmat)\Cstarbarmat;
     %D(:,Tmax) = -(Astarbarmat*decrulea+Bstarbarmat)\Dstarbarmat;
-    
+
     icount=length(dictionary.ss);
-    
+
     for i = T_max-1:-1:1
-        
+
         tmp = 0*binding_indicator;
         tmp(1:end-i+1) = binding_indicator(i:end);
         itmp = find(~any(dictionary.binding_indicator-tmp));
@@ -107,7 +107,7 @@ if T_max > 0
                 dictionary.ss(icount).R = temp(:,n_vars+1:n_vars+n_exo);
                 dictionary.ss(icount).C = temp(:,n_vars+n_exo+1:end);
             end
-        end        
+        end
     end
 
     E = dictionary.ss(ireg(1)).R;

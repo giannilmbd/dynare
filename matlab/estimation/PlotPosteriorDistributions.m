@@ -151,7 +151,7 @@ for i=1:npar
     end
     box on
     axis([borneinf bornesup 0 1.1*top0])
-    if options_.TeX 
+    if options_.TeX
         title(texnam, 'Interpreter', 'latex')
     else
         title(nam, 'Interpreter', 'none')

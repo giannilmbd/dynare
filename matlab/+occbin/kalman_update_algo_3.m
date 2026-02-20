@@ -29,7 +29,7 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % - occbin_options_ [structure]             MATLAB's structure describing the OccBin options.
 % - kalman_tol      [double]                tolerance for reciprocal condition number
 % - nk              [double]                number of forecasting periods
-% 
+%
 % Outputs
 % - a               [N by 2]                t-1's state estimate
 % - a1              [N by N by 2]           state predictions made at t-1:t
@@ -46,13 +46,13 @@ function [a, a1, P, P1, v, Fi, Ki, T, R, C, regimes_, error_flag, M_, lik, alpha
 % - M_              [structure]             MATLAB's structure describing the model (M_).
 % - alphahat:                               smoothed variables (a_{t|T})
 % - etahat:                                 smoothed shocks
-% - TT              [N by N]                state transition matrix at t-1:t (full var list) 
+% - TT              [N by N]                state transition matrix at t-1:t (full var list)
 % - RR              [N by N_exo]            shock impact matrix at t-1:t (full var list)
 % - CC              [N by 1]                state space constant state transition matrix at t-1:t (full var list)
 %
 % Notes: The algorithm and implementation is based on Massimo Giovannini,
 % Philipp Pfeiffer, Marco Ratto (2021), Efficient and robust inference of models with occasionally binding
-% constraints, Working Papers 2021-03, Joint Research Centre, European Commission 
+% constraints, Working Papers 2021-03, Joint Research Centre, European Commission
 
 
 % Copyright © 2021-2026 Dynare Team
@@ -220,7 +220,7 @@ if any(myregime) || ~isequal(regimes_(1),regimes0(1))
         else
             opts_simul.endo_init = alphahat(dr.inv_order_var,1);
         end
-        opts_simul.init_regime=regimes_(1); 
+        opts_simul.init_regime=regimes_(1);
         if M_.occbin.constraint_nbr==1
             myregimestart = [regimes_.regimestart];
         else

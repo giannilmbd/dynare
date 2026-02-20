@@ -17,7 +17,7 @@ function [rmse_MC, ixx] = monte_carlo_filtering(OutDir,options_gsa_,dataset_,dat
 %                                       indices (descending order of RMSEs)
 %
 % Notes: the R^2 definition is 1-var(ymodel-ydata)/var(ydata). It ranges
-% between (-inf, 1], with negative values indicating that the model is a worse 
+% between (-inf, 1], with negative values indicating that the model is a worse
 % predictor than the sample mean of the data
 
 % inputs (from opt_gsa structure)
@@ -185,7 +185,7 @@ if ~loadSA
             rmse_mode = sqrt(mean((yobs(istart:end,:)-y0(istart:end,:)).^2));
             r2_mode = 1-sum((yobs(istart:end,:)-y0(istart:end,:)).^2)./sum(yobs(istart:end,:).^2);
         end
-        
+
         y0=-yss; %demean everything using the theoretical mean, i.e. steady state
         nbb=0;
         for j=1:length(filfilt)

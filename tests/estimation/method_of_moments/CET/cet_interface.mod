@@ -1,29 +1,29 @@
-% ------------------------------------------------------------------------- 
+% -------------------------------------------------------------------------
 % Functionality testing of interface for IRF matching
-% ------------------------------------------------------------------------- 
- 
-% Copyright © 2023 Dynare Team 
-% 
-% This file is part of Dynare. 
-% 
-% Dynare is free software: you can redistribute it and/or modify 
-% it under the terms of the GNU General Public License as published by 
-% the Free Software Foundation, either version 3 of the License, or 
-% (at your option) any later version. 
-% 
-% Dynare is distributed in the hope that it will be useful, 
-% but WITHOUT ANY WARRANTY; without even the implied warranty of 
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-% GNU General Public License for more details. 
-% 
-% You should have received a copy of the GNU General Public License 
-% along with Dynare.  If not, see <https://www.gnu.org/licenses/>. 
- 
+% -------------------------------------------------------------------------
+
+% Copyright © 2023 Dynare Team
+%
+% This file is part of Dynare.
+%
+% Dynare is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% Dynare is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+
 @#include "cet_model.inc"
 xx = [23,24,25];
 ww = [51,52];
 
-matched_irfs(overwrite); 
+matched_irfs(overwrite);
 var GDPAGG;  varexo epsR_eps;   periods 5;    values 7;     weights 25;
 var GDPAGG;  varexo mupsi_eps;  periods 1,2;  values 17,18;  weights 37,38;
 var RAGG;    varexo muz_eps;    periods 3:5;  values (xx);
@@ -118,7 +118,7 @@ end;//verbatim
 %% SIMPLIFIED EXAMPLE TO TEST INTERFACE ON WEIGHTING MATRIX %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-matched_irfs(overwrite); 
+matched_irfs(overwrite);
 var GDPAGG;  varexo epsR_eps;   periods 1 3;  values 11 13; weights 111 222;
 var RAGG;    varexo muz_eps;    periods 2 4;  values 22 24; weights 333 444;
 end;

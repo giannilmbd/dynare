@@ -24,8 +24,8 @@ var_model(model_name = toto, eqtags = [ 'X' 'Y' 'Z' ]);
 ** variable:         the name of the variable to be forecasted (mandatory).
 ** horizon:          the horizon forecast (mandatory).
 ** discount:         the discount factor, which can be a value or a declared parameter (default is 1.0, no discounting).
-** time_shift:       shifts the information set to the past, must be a non positive scalar. By default, expectations 
-**                   about `variable` in period `t+horizon` are formed in period t (time_shift=0) 
+** time_shift:       shifts the information set to the past, must be a non positive scalar. By default, expectations
+**                   about `variable` in period `t+horizon` are formed in period t (time_shift=0)
 **
 **
 ** The `horizon` parameter can be an integer in which case the (discounted) `horizon` step ahead forecast

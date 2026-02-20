@@ -52,7 +52,7 @@ if ~isempty(hessian_mat)
     if isMinimum
         fprintf('\nMINIMUM CHECK\n\nFval obtained by the optimization routine: %f\n', fval)
     else
-        fprintf('\nMODE CHECK\n\nFval obtained by the optimization routine: %f\n', fval)        
+        fprintf('\nMODE CHECK\n\nFval obtained by the optimization routine: %f\n', fval)
     end
     if s_min<eps
         fprintf('Most negative variance %f for parameter %d (%s = %f)\n', s_min, k , bayestopt_.name{k}, xparam(k));
@@ -145,7 +145,7 @@ for plt = 1:nbplt
         end
         for i = 1:length(z)
             xx(kk) = z(i);
-            [fval, info, exit_flag] = feval(objective_function,xx, varargin{:});                
+            [fval, info, exit_flag] = feval(objective_function,xx, varargin{:});
             if exit_flag
                 y(i,1) = fval;
             else
@@ -175,7 +175,7 @@ for plt = 1:nbplt
             if ~options_.nograph
                 fighandle = plot(z,-y);
             end
-        end        
+        end
         if ~options_.nograph
             hold on
             yl = get(gca,'ylim');
@@ -198,7 +198,7 @@ for plt = 1:nbplt
             hold off
             drawnow
         end
-    end    
+    end
     if ~options_.nograph && ~options_.mode_check.nolik
         if isoctave
             axes('outerposition',[0.3 0.93 0.42 0.07],'box','on');

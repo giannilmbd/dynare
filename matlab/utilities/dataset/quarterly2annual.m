@@ -131,7 +131,7 @@ switch type
         [yda, ydass] = quarterly2annual(yd,yauxss,GYTREND0aux,typeaux(2),0,0);
         % ratio
         yass = ynass/ydass;
-        ya = (yna+ynass)./(yda+ydass)-yass;    
+        ya = (yna+ynass)./(yda+ydass)-yass;
         GYTREND0 = GYTREND0 - GYTREND0aux;
 
   otherwise

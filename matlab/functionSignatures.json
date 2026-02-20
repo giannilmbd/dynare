@@ -15,7 +15,7 @@
         {"name":"flag", "kind":"required", "type":["char", "choices={'--test'}"], "purpose":"Test routine"},
         {"name":"fname", "kind":"required", "type":["file=*.m"], "purpose":"Routine name"}
      ]
-  }, 
+  },
   "internals":
   {
      "inputs":

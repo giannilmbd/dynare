@@ -18,11 +18,11 @@ c^(-gam) - (1+bet)^(-1)*(aa*alph*x(+1)*k^(alph-1) + 1 - delt)*c(+1)^(-gam); // E
 z_backward=0.4*0.5+0.2*z_backward_lag_1+0.2*z_backward_lag_2+0.2*z_backward_lag_3 + (x_lag_4-1);
 z_forward=0.1*1+0.45*z_forward_lead_1+0.45*z_forward_lead_2+(x_lead_4-1);
 
-z_backward_lag_1=z_backward(-1); 
-z_backward_lag_2=z_backward_lag_1(-1); 
+z_backward_lag_1=z_backward(-1);
+z_backward_lag_2=z_backward_lag_1(-1);
 z_backward_lag_3=z_backward_lag_2(-1);
-z_forward_lead_1=z_forward(+1); 
-z_forward_lead_2=z_forward_lead_1(+1); 
+z_forward_lead_1=z_forward(+1);
+z_forward_lead_2=z_forward_lead_1(+1);
 
 x_lag_1=x(-1);
 x_lag_2=x_lag_1(-1);

@@ -63,7 +63,7 @@ INT = pi_steady+rr_steady+4*gam_steady;
 end;
 
 estimated_params;
-tau, gamma_pdf, 2, 0.5; 
+tau, gamma_pdf, 2, 0.5;
 kap, beta_pdf, 0.2, 0.1;
 psi1, gamma_pdf, 1.5, 0.25;
 psi2, gamma_pdf, 0.5, 0.25;

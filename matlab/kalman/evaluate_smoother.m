@@ -61,7 +61,7 @@ if ischar(parameters) && strcmp(parameters,'calibration')
 end
 
 [dataset_,dataset_info, ~, ~, M_, options_, oo_, estim_params_,bayestopt_] = dynare_estimation_init(var_list, M_.fname, [], M_, options_, oo_, estim_params_, bayestopt_);
-initial_date=dataset_.firstdate; 
+initial_date=dataset_.firstdate;
 
 % set the qz_criterium
 options_=select_qz_criterium_value(options_);

@@ -23,11 +23,11 @@ function [LIK,lik] = nonlinear_kalman_filter(ReducedForm, Y, start, ParticleOpti
 %  - Monte-Carlo draws from a multivariate gaussian distribution.
 %
 % First and second moments of prior and posterior state densities are computed
-% from the resulting nodes/particles and allows to generate new distributions at the 
+% from the resulting nodes/particles and allows to generate new distributions at the
 % following observation.
 % Pros: The use of nodes is much faster than Monte-Carlo Gaussian particle and standard particles
 %       filters since it treats a lesser number of particles.
-% Cons: 
+% Cons:
 %   1. Application a linear projection formula in a nonlinear context.
 %   2. Parameter estimations may be biased if the model is truly non-gaussian since predictive and
 %       filtered densities are unimodal.

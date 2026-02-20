@@ -1,7 +1,7 @@
 function [oo_,options_] = squeeze_shock_decomposition(M_,oo_,options_, sd_vlist)
 
 if isstruct(options_.plot_shock_decomp.q2a)
-    
+
     avname=char({options_.plot_shock_decomp.q2a.qname});
     sda = options_.plot_shock_decomp.q2a(ismember(avname,sd_vlist,'rows'));
     for k=1:length(sda)
@@ -12,7 +12,7 @@ if isstruct(options_.plot_shock_decomp.q2a)
 end
 i_var = varlist_indices(sd_vlist,M_.endo_names);
 sd_vlist = M_.endo_names(i_var);
-% first we squeeze usual fields 
+% first we squeeze usual fields
 oo_ = squeeze_shock_decomposition(M_,oo_,options_,sd_vlist);
 i_var = oo_.shock_decomposition_info.i_var;
 sd_vlist = M_.endo_names(i_var);

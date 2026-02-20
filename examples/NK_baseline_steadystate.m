@@ -33,7 +33,7 @@ function [ys,params,check] = NK_baseline_steadystate(ys,exo,M_,options_)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 % make parameter explicitly known to Matlab to avoid naming conflicts; actual value is read out
-% in next eval-loop 
+% in next eval-loop
 delta=0;
 
 % read out parameters to access them with their name

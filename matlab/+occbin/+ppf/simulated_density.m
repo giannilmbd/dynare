@@ -62,9 +62,9 @@ if number_of_shocks_per_particle==1
 elseif number_of_particles==1
     number_of_iterations = number_of_shocks_per_particle;
     if ~isstruct(ShockVectorsInfo)
-        % for non parametric conditional 
+        % for non parametric conditional
         ShockVectors = ShockVectorsInfo;
-        conditional_loop = true;        
+        conditional_loop = true;
     end
 end
 llik.kernel = zeros(number_of_particles,1);

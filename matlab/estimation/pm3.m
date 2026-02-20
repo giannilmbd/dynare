@@ -219,7 +219,7 @@ elseif init_state_uncert_indicator
     oo_.Smoother.Init_State_uncertainty.HPDsup=squeeze(hpd_interval(:,:,2));
     fprintf(['%s: ' tit1 ', done!\n'],dispString);
     return
-    
+
 elseif state_uncert_indicator
     draw_dimension=4;
     oo_.Smoother.State_uncertainty=struct();
@@ -369,7 +369,7 @@ else
     end
 end
 
-if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean))) || strcmp(var_type,'_init_state') 
+if strcmp(var_type,'_trend_coeff') || all(all(isnan(Mean))) || strcmp(var_type,'_init_state')
     fprintf(['%s: ' tit1 ', done!\n'],dispString);
     return %not do plots
 end

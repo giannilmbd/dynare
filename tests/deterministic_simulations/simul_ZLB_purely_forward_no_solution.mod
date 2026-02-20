@@ -1,5 +1,5 @@
 var c, h, pi, w, R, r_e, y, gdp, gdp_hat, k, u, g, c_hat, w_hat, y_hat, h_hat;
-varexo d, z, eta; 
+varexo d, z, eta;
 
 parameters alpha, beta, sigma, gamma, theta, ni, tau_w, phi_p, phi_y;
 

@@ -1,4 +1,4 @@
-@#include "fs2000ns_model.inc" 
+@#include "fs2000ns_model.inc"
 
 % Under Octave, the default seed leads to a generated dataset that makes
 % fs2000ns_corr_ME.mod and fs2000ns_corr_ME_missing.mod fail (due to a large
@@ -39,5 +39,5 @@ end;
 @#define mode_file_name="'fs2000ns_uncorr_ME/Output/fs2000ns_uncorr_ME_mode'"
 @#define data_file_name="fs_ns_dat_simul_uncorr_ME"
 
-@#include "fs2000ns_estimation_check.inc" 
+@#include "fs2000ns_estimation_check.inc"
 

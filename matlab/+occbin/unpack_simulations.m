@@ -1,7 +1,7 @@
 function oo_=unpack_simulations(M_,oo_,options_)
 % function oo_=unpack_simulations(M_,oo_,options_)
 % Writes OccBin simulations from matrix to structure
-% 
+%
 % Inputs
 % - M_                  [structure]     MATLAB's structure describing the model
 % - oo_                 [structure]     MATLAB's structure containing the results

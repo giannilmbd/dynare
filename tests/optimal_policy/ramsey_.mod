@@ -13,7 +13,7 @@ lambda1 = 0.5;
 lambda2 = 0.1;
 
 model(linear);
-y  = delta * y(-1) + (1-delta) * y(+1) + sigma *(r - inflation(+1)) + y_; 
+y  = delta * y(-1) + (1-delta) * y(+1) + sigma *(r - inflation(+1)) + y_;
 inflation  =   alpha * inflation(-1) + (1-alpha) * inflation(+1) + kappa*y + inf_;
 end;
 

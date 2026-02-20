@@ -7,7 +7,7 @@ var b ${b}$ (long_name='borrowing')
     y ${y}$ (long_name='Output')
     c_hat ${\hat c}$
     b_hat ${\hat b}$
-    y_hat ${\hat y}$    
+    y_hat ${\hat y}$
 ;
 
 varexo junk1 u junk2 ;
@@ -20,7 +20,7 @@ c = y + b - R*b(-1) ;
 [name = 'borrowing', bind='borrcon']
 lb = 0;
 [name = 'borrowing', relax='borrcon']
-b = M*y;  
+b = M*y;
 lb = 1/c^GAMMAC - BETA*R/c(+1)^GAMMAC +junk1 + junk2;
 log(y) = RHO*log(y(-1)) + u ;
 c_hat = log(c) - log(steady_state(c));

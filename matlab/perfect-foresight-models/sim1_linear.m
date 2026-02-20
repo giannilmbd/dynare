@@ -111,9 +111,9 @@ if options_.debug
                 fprintf('The derivative with respect to the lag of %s being 0 for all equations.\n',M_.endo_names{var_index})
             elseif lead_lag == 1
                 fprintf('The derivative with respect to the lead of %s being 0 for all equations.\n',M_.endo_names{var_index})
-            end            
+            end
         end
-    end   
+    end
 end
 
 % Check that the dynamic model was evaluated at the steady state.

@@ -44,7 +44,7 @@ n = 0.19;
 l = 0.86;
 y = 0.6;
 gy_obs = exp(gam);
-gp_obs = exp(-gam); 
+gp_obs = exp(-gam);
 dA = exp(gam);
 end;
 
@@ -59,7 +59,7 @@ stoch_simul(dr=aim, order=1,irf=0);
 
 benchmark = load(['fs2000x10_L9_L' filesep 'Output' filesep 'fs2000x10_L9_L_results']);
 threshold = 1e-8;
- 
+
 if max(max(abs(benchmark.oo_.dr.ghx-oo_.dr.ghx))) > threshold
   error('error in ghx');
 elseif max(max(abs(benchmark.oo_.dr.ghu-oo_.dr.ghu))) > threshold

@@ -76,19 +76,19 @@ contains
      else
         m = int(size(A,2), blint)
         k = int(size(A,1), blint)
-     end if 
+     end if
      if (opB == "N") then
-        n = int(size(B,2), blint)        
+        n = int(size(B,2), blint)
      else
         n = int(size(B,1), blint)
      end if
 #ifdef DEBUG
      if ( (opA /= "N") .and. (opA /= "T") .and. (opA /= "C") ) then
         print *, "opA must be either N, T or C"
-     end if 
+     end if
      if ( (opB /= "N") .and. (opB /= "T") .and. (opB /= "C") ) then
         print *, "opB must be either N, T or C"
-     end if 
+     end if
      if (((opA == "N") .and. (opB == "N") .and. (size(A,2) /= size(B,1))) .or.&
         &((opA == "N") .and. (opB /= "N") .and. (size(A,2) /= size(B,2))) .or.&
         &((opA /= "N") .and. (opB == "N") .and. (size(A,1) /= size(B,1))) .or.&

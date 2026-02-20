@@ -11,24 +11,24 @@ if max(abs(oo_.UpdatedVariables.Y_obs-Y_obs'))>1e-5 ||...
 end
 
 if mean(abs(oo_.FilteredVariables.Y_obs(1:end-1)-Y_obs(2:end)'))>1e-3 ||...
-    mean(abs(oo_.FilteredVariables.P_obs(1:end-1)-P_obs(2:end)'))>1e-3 
+    mean(abs(oo_.FilteredVariables.P_obs(1:end-1)-P_obs(2:end)'))>1e-3
     error('Smoothed Variables are wrong')
 end
 
 if ~isoctave
   if abs(corr(oo_.FilteredVariables.Y_obs(2:end-1)-Y_obs(3:end)',oo_.FilteredVariables.Y_obs(1:end-2)-Y_obs(2:end-1)'))>2e-2 ||...
       abs(corr(oo_.FilteredVariables.P_obs(2:end-1)-P_obs(3:end)',oo_.FilteredVariables.P_obs(1:end-2)-P_obs(2:end-1)'))>2e-1 ||...
-      abs(corr(oo_.FilteredVariables.junk2(2:end-1)-junk2(3:end)',oo_.FilteredVariables.junk2(1:end-2)-junk2(2:end-1)'))>2e-2 
+      abs(corr(oo_.FilteredVariables.junk2(2:end-1)-junk2(3:end)',oo_.FilteredVariables.junk2(1:end-2)-junk2(2:end-1)'))>2e-2
       error('Filtered Variables are wrong')
   end
 else
   if abs(corr(oo_.FilteredVariables.Y_obs(2:end-1)-Y_obs(3:end)',oo_.FilteredVariables.Y_obs(1:end-2)-Y_obs(2:end-1)'))>2e-2 ||...
       abs(corr(oo_.FilteredVariables.P_obs(2:end-1)-P_obs(3:end)',oo_.FilteredVariables.P_obs(1:end-2)-P_obs(2:end-1)'))>2e-1 ||...
-      abs(corr(oo_.FilteredVariables.junk2(2:end-1)-junk2(3:end)',oo_.FilteredVariables.junk2(1:end-2)-junk2(2:end-1)'))>3e-2 
+      abs(corr(oo_.FilteredVariables.junk2(2:end-1)-junk2(3:end)',oo_.FilteredVariables.junk2(1:end-2)-junk2(2:end-1)'))>3e-2
       error('Filtered Variables are wrong')
   end
 end
-   
+
 Y_pos=strmatch('Y_obs',M_.endo_names,'exact');
 P_pos=strmatch('P_obs',M_.endo_names,'exact');
 junk2_pos=strmatch('junk2',M_.endo_names,'exact');
@@ -42,7 +42,7 @@ if max(abs(squeeze(oo_.FilteredVariablesKStepAhead(1,Y_pos,2:end-(options_.nk-1)
     mean(squeeze(oo_.FilteredVariablesKStepAhead(2,4,3:end-options_.nk)))>1e-1
     error('FilteredVariablesKStepAhead is wrong')
 end
-   
+
 if abs(mean(oo_.SmoothedShocks.e_y))>0.05 || abs(mean(oo_.SmoothedShocks.e_p))>0.05
     error('Residuals are not mean 0')
 end

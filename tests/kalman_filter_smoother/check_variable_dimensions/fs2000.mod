@@ -91,7 +91,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -132,7 +132,7 @@ if size(oo_.PointForecast.deciles.gy_obs,2)~=options_.forecast || ...
         size(oo_.MeanForecast.Median.gy_obs,1)~=options_.forecast || ...
         size(oo_.MeanForecast.Var.gy_obs,1)~=options_.forecast || ...
         size(oo_.MeanForecast.HPDinf.gy_obs,1)~=options_.forecast || ...
-        size(oo_.MeanForecast.HPDsup.gy_obs,1)~=options_.forecast 
+        size(oo_.MeanForecast.HPDsup.gy_obs,1)~=options_.forecast
     error('Forecasts have the wrong length')
 end
 

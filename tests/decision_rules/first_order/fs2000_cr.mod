@@ -2,7 +2,7 @@
 
 @#define countries = 1:100
 
-var 
+var
 @#for c in countries
  m_@{c} P_@{c} c_@{c} e_@{c} W_@{c} R_@{c} k_@{c} d_@{c} n_@{c} l_@{c} gy_obs_@{c} gp_obs_@{c} y_@{c} dA_@{c}
 @#endfor

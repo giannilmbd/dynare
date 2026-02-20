@@ -2,9 +2,9 @@
  * This file implements the baseline New Keynesian model of Jordi Gal� (2008): Monetary Policy, Inflation,
  * and the Business Cycle, Princeton University Press, Chapter 5
  *
- * This implementation was written by Johannes Pfeifer. 
+ * This implementation was written by Johannes Pfeifer.
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -27,29 +27,29 @@
 
 
 var pi
-    y_gap 
-    r_e 
+    y_gap
+    r_e
     y_e
-    r_nat 
-    i 
-    u 
-    a 
+    r_nat
+    i
+    u
+    a
     p
-    ;     
+    ;
 
-varexo eps_a 
+varexo eps_a
        eps_u;
 
-parameters alppha 
-    betta 
+parameters alppha
+    betta
     rho_a
-    rho_u 
+    rho_u
     siggma
-    phi 
-    phi_y 
-    eta 
-    epsilon 
-    theta 
+    phi
+    phi_y
+    eta
+    epsilon
+    theta
     ;
 %----------------------------------------------------------------
 % Parametrization, p. 52
@@ -71,7 +71,7 @@ epsilon=6;
 % First Order Conditions
 %----------------------------------------------------------------
 
-model(linear); 
+model(linear);
 //Composite parameters
 #Omega=(1-alppha)/(1-alppha+alppha*epsilon);  //defined on page 47
 #psi_n_ya=(1+phi)/(siggma*(1-alppha)+phi+alppha); //defined on page 48
@@ -142,7 +142,7 @@ end;
 
 %Compute theoretical objective function
 V=var_pi_theoretical+alpha_x*var_y_gap_theoretical+ betta/(1-betta)*(var_pi_theoretical+alpha_x*var_y_gap_theoretical); %evaluate at steady state in first period
- 
+
 discretionary_policy(instruments=(i),irf=20,discretionary_tol=1e-12,planner_discount=betta) y_gap pi p u;
 if any( [ isnan(oo_.planner_objective_value.conditional), abs(V-oo_.planner_objective_value.conditional)>1e-10 ] )
     error('Computed welfare deviates from theoretical welfare')

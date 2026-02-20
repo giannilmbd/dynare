@@ -108,7 +108,7 @@ elseif ~(isfield(options_mom_,'hp_filter') && options_mom_.hp_filter) && ~(isfie
     %default case, nothing to do
     options_mom_.hp_filter=0;
     options_mom_.one_sided_hp_filter=0;
-    options_mom_.bandpass.indicator=false;    
+    options_mom_.bandpass.indicator=false;
 end
 
 % -------------------------------------------------------------------------
@@ -135,27 +135,27 @@ if strcmp(mom_method,'GMM') || strcmp(mom_method,'SMM')
     options_mom_.mom = set_default_option(options_mom_.mom,'se_tolx',1e-5);                             % step size for numerical computation of standard errors
     options_mom_.mom = set_default_option(options_mom_.mom,'weighting_matrix_scaling_factor',1);        % scaling of weighting matrix in objective function
     options_mom_.mom = set_default_option(options_mom_.mom,'weighting_matrix',{'DIAGONAL'; 'OPTIMAL'}); % weighting matrix in moments distance objective function at each iteration of estimation;
-                                                                                                        % possible values are 'OPTIMAL', 'IDENTITY_MATRIX' ,'DIAGONAL' or a filename. Size of cell determines stages in iterated estimation.    
+                                                                                                        % possible values are 'OPTIMAL', 'IDENTITY_MATRIX' ,'DIAGONAL' or a filename. Size of cell determines stages in iterated estimation.
 end
 if strcmp(mom_method,'SMM')
     options_mom_.mom = set_default_option(options_mom_.mom,'burnin',500);                  % number of periods dropped at beginning of simulation
     options_mom_.mom = set_default_option(options_mom_.mom,'bounded_shock_support',false); % trim shocks in simulation to +- 2 stdev
     options_mom_.mom = set_default_option(options_mom_.mom,'seed',24051986);               % seed used in simulations
-    options_mom_.mom = set_default_option(options_mom_.mom,'simulation_multiple',7);       % multiple of the data length used for simulation    
+    options_mom_.mom = set_default_option(options_mom_.mom,'simulation_multiple',7);       % multiple of the data length used for simulation
 end
 if strcmp(mom_method,'GMM')
     options_mom_.mom = set_default_option(options_mom_.mom,'analytic_standard_errors',false); % compute standard errors numerically (0) or analytically (1). Analytical derivatives are only available for GMM.
 end
 if strcmp(mom_method,'IRF_MATCHING')
-    if ~isfield(options_mom_.mom,'irf_matching_file') 
+    if ~isfield(options_mom_.mom,'irf_matching_file')
         options_mom_.mom.irf_matching_file = [];  % irf_matching file enables to transform model IRFs before matching them to data IRFs
     end
     options_mom_.mom.irf_matching_file = set_default_option(options_mom_.mom.irf_matching_file,'name','');
     options_mom_.mom = set_default_option(options_mom_.mom,'simulation_method','STOCH_SIMUL'); % simulation method used to compute IRFs
     options_mom_ = set_default_option(options_mom_,'add_tiny_number_to_cholesky',1e-14);       % add tiny number to Cholesky factor to avoid numerical problems when computing IRFs
     options_mom_ = set_default_option(options_mom_,'drop',100);                                % truncation / burnin for order>1 irf simulations
-    options_mom_ = set_default_option(options_mom_,'relative_irf',false);                      % requests the computation of normalized IRFs    
-end   
+    options_mom_ = set_default_option(options_mom_,'relative_irf',false);                      % requests the computation of normalized IRFs
+end
 
 % data related options
 if strcmp(mom_method,'GMM') || strcmp(mom_method,'SMM')
@@ -164,7 +164,7 @@ if strcmp(mom_method,'GMM') || strcmp(mom_method,'SMM')
     options_mom_ = set_default_option(options_mom_,'nobs',NaN);        % number of observations
     options_mom_ = set_default_option(options_mom_,'prefilter',false); % demean each data series by its empirical mean and use centered moments
     options_mom_ = set_default_option(options_mom_,'xls_sheet',1);     % name of sheet with data in Excel, Octave does not support the empty string, rather use first sheet
-    options_mom_ = set_default_option(options_mom_,'xls_range','');    % range of data in Excel sheet    
+    options_mom_ = set_default_option(options_mom_,'xls_range','');    % range of data in Excel sheet
 end
 
 % optimization related
@@ -226,8 +226,8 @@ if do_bayesian_estimation
     options_mom_ = set_default_option(options_mom_,'mh_posterior_mode_estimation',false);  % skip optimizer-based mode-finding and instead compute the mode based on a run of a MCMC
     options_mom_ = set_default_option(options_mom_,'load_mh_file',false);                  % add to previous Metropolis-Hastings or slice simulations instead of starting from scratch
     options_mom_ = set_default_option(options_mom_,'load_results_after_load_mh',false);    % load the previously computed convergence diagnostics, marginal data density, and posterior statistics from an existing mom_results file instead of recomputing them
-    
-    if options_mom_.mh_replic > 0 || options_mom_.load_mh_file        
+
+    if options_mom_.mh_replic > 0 || options_mom_.load_mh_file
         options_mom_ = set_default_option(options_mom_,'sub_draws',[]);
         options_mom_ = set_default_option(options_mom_,'posterior_max_subsample_draws',1200);
         options_mom_ = set_default_option(options_mom_,'mh_nblck',2);                         % number of parallel chains for Metropolis-Hastings or slice algorithm
@@ -242,7 +242,7 @@ if do_bayesian_estimation
         options_mom_.mh_initialize_from_previous_mcmc = set_default_option(options_mom_.mh_initialize_from_previous_mcmc,'record','');    % pick initial values for new MCMC from a previous one: record file name
         options_mom_.mh_initialize_from_previous_mcmc = set_default_option(options_mom_.mh_initialize_from_previous_mcmc,'prior','');     % pick initial values for new MCMC from a previous one: prior file name
         if ~isfield(options_mom_,'posterior_sampler_options')
-            options_mom_.posterior_sampler_options = [];  
+            options_mom_.posterior_sampler_options = [];
         end
         options_mom_.posterior_sampler_options = set_default_option(options_mom_.posterior_sampler_options,'posterior_sampling_method','random_walk_metropolis_hastings'); % selects the sampler used to sample from the posterior distribution during Bayesian estimation
         options_mom_.posterior_sampler_options = set_default_option(options_mom_.posterior_sampler_options,'sampling_opt',[]);                                             % used to set options for the posterior sampling methods
@@ -273,28 +273,28 @@ if do_bayesian_estimation
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'rotated',0);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'slice_initialize_with_mode',false);  % must be used with rotated
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'use_mh_covariance_matrix',false); % must be used with rotated
-                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'WR',[]);        
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'WR',[]);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode_files',[]);
-                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode',[]);        
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode',[]);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'maximize',false);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'maximize_using_mh_bounds',false);
-                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode_compute',5);     
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'mode_compute',5);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'initial_step_size',0.8);
                 options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_tmp_file',true);
-                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_iter_info_file',true);                
+                options_mom_.posterior_sampler_options.slice = set_default_option(options_mom_.posterior_sampler_options.slice,'save_iter_info_file',true);
             case 'independent_metropolis_hastings'
                 if ~isfield(options_mom_.posterior_sampler_options,'imh')
                     options_mom_.posterior_sampler_options.imh = [];
                 end
                 options_mom_.posterior_sampler_options.imh = set_default_option(options_mom_.posterior_sampler_options.imh,'proposal_distribution','rand_multivariate_normal');
                 options_mom_.posterior_sampler_options.imh = set_default_option(options_mom_.posterior_sampler_options.imh,'use_mh_covariance_matrix',false);
-                options_mom_.posterior_sampler_options.imh = set_default_option(options_mom_.posterior_sampler_options.imh,'save_tmp_file',false);                
+                options_mom_.posterior_sampler_options.imh = set_default_option(options_mom_.posterior_sampler_options.imh,'save_tmp_file',false);
         end
         if ~strcmp(options_mom_.posterior_sampler_options.posterior_sampling_method,'slice')
             options_mom_ = set_default_option(options_mom_,'mh_init_scale_factor',2);
             options_mom_ = set_default_option(options_mom_,'mh_jscale',[]);
         end
-        
+
         % mh_tune_jscale options
         if strcmp(options_mom_.posterior_sampler_options.posterior_sampling_method,'random_walk_metropolis_hastings')
             if ~isfield(options_mom_,'mh_tune_jscale')

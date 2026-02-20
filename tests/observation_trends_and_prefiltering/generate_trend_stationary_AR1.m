@@ -41,13 +41,13 @@ Y_obs=exp(log_Y);
 P_obs=exp(log_P);
 junk2=exp(junk2_orig);
 save([fname '_Exp_AR1_trend_data_no_constant.mat'],'Y_obs','P_obs','junk2')
-% 
+%
 % [b_p,~,~,~,stats_p] = regress(log(P_obs(2:end))',[ones(n_periods-1,1) (2:n_periods)' log(P_obs(1:end-1)')]);
 % [b_y,~,~,~,stats_y] = regress(log(Y_obs(2:end))',[ones(n_periods-1,1) (2:n_periods)' log(Y_obs(1:end-1)')]);
 
 Y_obs=log_Y;
 P_obs=log_P;
-junk2=junk2_orig;  
+junk2=junk2_orig;
 save([fname '_AR1_trend_data_no_constant.mat'],'Y_obs','P_obs','junk2')
 
 % [b_p,~,~,~,stats_p] = regress((P_obs(2:end))',[ones(n_periods-1,1) (2:n_periods)' (P_obs(1:end-1)')]);
@@ -76,7 +76,7 @@ save([fname '_Exp_AR1_trend_data_with_constant.mat'],'Y_obs','P_obs','junk2')
 
 Y_obs=log_Y;
 P_obs=log_P;
-junk2=junk2_orig;  
+junk2=junk2_orig;
 save([fname '_AR1_trend_data_with_constant.mat'],'Y_obs','P_obs','junk2')
 
 % [b_p,~,~,~,stats_p] = regress((P_obs(2:end))',[ones(n_periods-1,1) (2:n_periods)' (P_obs(1:end-1)')]);

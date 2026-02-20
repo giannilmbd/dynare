@@ -68,7 +68,7 @@ N_Y = sizes.N_Y;
 N_Ix = sizes.N_Ix;
 N_sp = sizes.N_sp;
 
-% H_.endo_nbr x N_Y x N_sp x T 
+% H_.endo_nbr x N_Y x N_sp x T
 impulse_responses_perm = permute(impulse_responses, [1 2 4 3]);
 % H_.endo_nbr x N_Y x T x N_sp
 x_hat = reshape(impulse_responses_perm, [], N_sp) * mat.d.Phi;

@@ -10,7 +10,7 @@ function x0=run(M_,oo_,options_,bayestopt_,estim_params_,options_gsa)
 %  - options_gsa            [structure]     MATLAB's structure describing the GSA options
 %
 % Reference:
-% M. Ratto (2008), Analysing DSGE Models with Global Sensitivity Analysis, 
+% M. Ratto (2008), Analysing DSGE Models with Global Sensitivity Analysis,
 % Computational Economics (2008), 31, pp. 115–139
 
 % Copyright © 2008-2025 Dynare Team

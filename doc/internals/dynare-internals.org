@@ -1,4 +1,4 @@
-#+LINK: m2html http://www.dynare.org/dynare-matlab-m2html/matlab/ 
+#+LINK: m2html http://www.dynare.org/dynare-matlab-m2html/matlab/
 #+OPTIONS: Latex:t, ^:nil
 #+LATEX_HEADER: \usepackage{amsmath}
 
@@ -17,7 +17,7 @@ Sébastien Villemot
 This file is an attempt to document the algorithms, the *M* functions
 and the DLL's used in Dynare. *This is work in progress and will be
 completed little by little overtime*.  The organization is the same as
-in the Dynare Reference Manual (http://www.dynare.org/manual or 
+in the Dynare Reference Manual (http://www.dynare.org/manual or
 http://www.dynare.org/documentation-and-support/manual/manual.pdf). Being
 familar with the Reference Manual is of course a pre-requisite to
 understand the internal documentation.
@@ -39,14 +39,14 @@ Thereis one entry point for each of the main Dynare commands.
   In addition Dynare preprocessor creates:
   - a representation of the dynamic model as a *M* function: *<fname>\_dynamic.m* (by default) or
     a *<fname>\_dynamic* DLL or in the form of bytecode, depending on the
-    options used in the *model* command. 
+    options used in the *model* command.
   - a representation for the static model *<fname>\_static.m* (by default), a DLL or as bytecode,
     depending on the options used in the *model* command
   - a function returning the steady state of the model
     *<fname>\_steadystate.m*, if *steady\_state\_model* command is used.
   - a function representing the period objective,
     of an optimizing agent when optimal policy commands are used:
-    *<fname>\_objective\_static.m* 
+    *<fname>\_objective\_static.m*
 * Model internal representation
   TO BE DONE
 * Symbol declaration
@@ -108,7 +108,7 @@ Thereis one entry point for each of the main Dynare commands.
         approximation of the model)
     - with option *hpfilter*, Dynare returns the theoretical moments
       of endogenous variables filtered with Hodrick Prescott formula
-      (see Uhlig, 1999).  
+      (see Uhlig, 1999).
 
 *Algorithm*
 
@@ -134,7 +134,7 @@ The full covariance matrix for $y_t$, $\Sigma_y$, or any subpart of it, can then
 \]
 
 The above equation is a Sylvester equation that is best solved by a
-specialized algorithm. Dynare, currently, uses [[lyapunov\_symm.m]]. 
+specialized algorithm. Dynare, currently, uses [[lyapunov\_symm.m]].
 
 The vector of standard deviations $\sigma_y$ is
 obtained by taking the square root of the diagonal elements of
@@ -164,7 +164,7 @@ where $\mbox{diag}\left(\sigma_y\right)$ is a diagonal matrix with the standard 
   - [[m2html:lyapunov_symm.html>>][M2HTML link]]
   - TO BE DONE
 *** Function <<dr1.m>>
-    
+
 * Estimation
 ** estimation
    Dynare command *estimation* calls function [[dynare\_estimation.m]]
@@ -181,7 +181,7 @@ where $\mbox{diag}\left(\sigma_y\right)$ is a diagonal matrix with the standard 
           - computes the posterior distributions of various statistics (starts around line 1038)
           - computes smooth values at the last point estimate of the
             parameters (maximum likelihood, posterior mode or
-            posterior mean) (starts around line 1052) 
+            posterior mean) (starts around line 1052)
     - Computation of the log posterior density (or log likelihood) is done by [[DsgeLikelihood.m]]
     - Computation of the smooth values is done by [[DsgeSmoother.m]]
 *** Function <<DsgeLikelihood.m>>
@@ -195,19 +195,19 @@ where $\mbox{diag}\left(\sigma_y\right)$ is a diagonal matrix with the standard 
           - stationary initialization
                 - multivariate filter
                     - missing observations: [[missing\_observations\_kalman\_filter.m]]
-                    - no missing observations: [[kalman\_filter.m]] 
+                    - no missing observations: [[kalman\_filter.m]]
                 - univariate filter
                     - correlated shocks: [[univariate\_kalman\_filter\_corr.m]]
                     - non-correlated shocks: [[univariate\_kalman\_filter.m]]
-                    - The above two functions handle both missing and no missing observations cases. 
+                    - The above two functions handle both missing and no missing observations cases.
           - diffuse initialization for models with unit roots
                 - multivariate filter
                   - missing observations: [[missing\_observations\_diffuse\_kalman\_filter.m]]
-                  - no missing observations: [[diffuse\_kalman\_filter.m]] 
+                  - no missing observations: [[diffuse\_kalman\_filter.m]]
                 - univariate filter
                   - correlated shock: [[univariate\_diffuse\_kalman\_filter\_corr.m]]
-                  - non-correlated shocks: [[univariate\_diffuse\_kalman\_filter.m]] 
-    - Evaluation of priors if necessary: [[priordens.m]] 
+                  - non-correlated shocks: [[univariate\_diffuse\_kalman\_filter.m]]
+    - Evaluation of priors if necessary: [[priordens.m]]
     - When the multivariate filter encounters a singularity, Dynare switches automatically to the univariate filter.
 *** Function <<DsgeSmoother.m>>
     - [[m2html:DsgeSmoother.html][M2HTML link]]
@@ -221,31 +221,31 @@ where $\mbox{diag}\left(\sigma_y\right)$ is a diagonal matrix with the standard 
                 - stationary initialization
                       - multivariate filter
                             - missing observations: [[missing\_DiffuseKalmanSmoother1.m]]
-                            - no missing observations : [[DiffuseKalmanSmoother1.m]] 
+                            - no missing observations : [[DiffuseKalmanSmoother1.m]]
                       - univariate filter/smoother
                             - missing observations: [[missing\_DiffuseKalmanSmoother3.m]]
-                            - no missing observations: [[DiffuseKalmanSmoother3.m]] 
+                            - no missing observations: [[DiffuseKalmanSmoother3.m]]
                 - diffuse initialization
                       - multivariate filter
                             - missing observations: [[missing\_DiffuseKalmanSmoother1\_Z.m]]
-                            - no missing observations: [[DiffuseKalmanSmoother1_Z.m]] 
+                            - no missing observations: [[DiffuseKalmanSmoother1_Z.m]]
                       - univariate filter
                             - missing observations: [[missing\_DiffuseKalmanSmoother3\_Z.m]]
-                            - no missing observations: [[DiffuseKalmanSmoother3\_Z.m]] 
+                            - no missing observations: [[DiffuseKalmanSmoother3\_Z.m]]
           - measurement error
                 - stationary initialization
                       - multivariate filter
                             - missing observations : N/A
-                            - no missing observations: [[DiffuseKalmanSmootherH1corr.m]] 
+                            - no missing observations: [[DiffuseKalmanSmootherH1corr.m]]
                       - univariate filter
                             - missing observations : N/A
                             - no missing observations
                                   - correlated shocks: [[DiffuseKalmanSmootherH3corr.m]]
-                                  - no correlated shocks: [[DiffuseKalmanSmootherH3.m]] 
+                                  - no correlated shocks: [[DiffuseKalmanSmootherH3.m]]
                 - diffuse initialization
                       - multivariate filter
                             - missing observations : N/A
-                            - no missing observations: [[DiffuseKalmanSmootherH1\_Z.m]] 
+                            - no missing observations: [[DiffuseKalmanSmootherH1\_Z.m]]
                       - univariate filter
                             - missing observations : N/A
                             - no missing observations
@@ -269,4 +269,4 @@ where $\mbox{diag}\left(\sigma_y\right)$ is a diagonal matrix with the standard 
 * REFERENCES
 
  - H. Uhlig (1999) "A toolkit for analysing nonlinear dynamic models easily" in R. Marimón and A. Scott /Computational Methods for the
-Study of Dynamic Economies/. Oxford University Press.  
+Study of Dynamic Economies/. Oxford University Press.

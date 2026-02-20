@@ -9,13 +9,13 @@ function [likxc, infox, likxmode, updated_mode, updated_regimes, updated_sample,
 %
 % INPUTS
 %  - yhat                   [double]    state vector in t-1 (particle)
-%  - k                      [integer]   particle index 
-%  - t                      [integer]   time index 
+%  - k                      [integer]   particle index
+%  - t                      [integer]   time index
 %  - likxmode               [double]    mode of log-likelihood
 %  - updated_regimes        [struct]    occbin info about updated regimes (particles)
 %  - updated_sample         [struct]    occbin info about updated state (particles)
 %  - number_of_updated_regimes [integer] number of updated regimes across particles
-%  - all_updated_regimes    [cell]      list of updated regimes 
+%  - all_updated_regimes    [cell]      list of updated regimes
 %  - a0                     [double]    PKF updated state estimate t-1.
 %  - P                      [double]    Particle state covariance t-1 (=0).
 %  - P0                     [double]    PKF updated state covariance t-1.
@@ -40,7 +40,7 @@ function [likxc, infox, likxmode, updated_mode, updated_regimes, updated_sample,
 %  - dr                     [structure] model information structure
 %  - endo_steady_state      [vector]    steady state value for endogenous variables
 %  - exo_steady_state       [vector]    steady state value for exogenous variables
-%  - exo_det_steady_state   [vector]    steady state value for exogenous deterministic variables                                    
+%  - exo_det_steady_state   [vector]    steady state value for exogenous deterministic variables
 %  - options_               [structure] MATLAB's structure containing the options
 %  - occbin_options         [structure] options structure for OccBin filter
 %
@@ -51,8 +51,8 @@ function [likxc, infox, likxmode, updated_mode, updated_regimes, updated_sample,
 %  - updated_mode           [struct]    occbin info about log-likelihood mode
 %  - updated_regime         [struct]    occbin info about updated regime
 %  - updated_sample         [struct]    occbin info about updated state draw
-%  - number_of_updated_regimes [integer] 
-%  - all_updated_regimes    [cell]      list of updated regimes 
+%  - number_of_updated_regimes [integer]
+%  - all_updated_regimes    [cell]      list of updated regimes
 %
 % This function is called by: sequential_importance_particle_filter
 % This function calls: residual_resampling, traditional_resampling

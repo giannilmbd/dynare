@@ -29,7 +29,7 @@
 @#include "RBC_MoM_common.inc"
 
 shocks;
-var u_a; stderr 0.0072;        
+var u_a; stderr 0.0072;
 end;
 
 varobs c iv n;
@@ -119,19 +119,19 @@ in  = strmatch('n',  M_.endo_names,'exact');
 
 matched_moments_ = {
     [ic     ]  [0   ],  [1  ];
-    [in     ]  [0   ],  [1  ];    
+    [in     ]  [0   ],  [1  ];
     [iiv    ]  [0   ],  [1  ];
-    
+
     [ic  ic ]  [0  0],  [1 1];
     [ic  iiv]  [0  0],  [1 1];
     %[ic  in ]  [0  0],  [1 1];
     %[iiv ic ]  [0  0],  [1 1];
     [in iiv]  [0  0],  [1 1];
-    [iiv iiv]  [0  0],  [1 1];    
+    [iiv iiv]  [0  0],  [1 1];
     [ic  in]  [0  0],  [1 1];
     %[in  iiv]  [0  0],  [1 1];
     [in  in ]  [0  0],  [1 1];
-    
+
     [ic  ic ]  [0 -1],  [1 1];
     [in  in ]  [0 -1],  [1 1];
     [iiv iiv]  [0 -1],  [1 1];
@@ -172,7 +172,7 @@ method_of_moments(
         % , seed = 24051986                   % seed used in simulations
         % , simulation_multiple = 5           % multiple of the data length used for simulation
 
-    % Options for GMM        
+    % Options for GMM
         % , analytic_standard_errors          % compute standard errors using analytical derivatives
 
     % General options
@@ -204,7 +204,7 @@ method_of_moments(
         %           ,'MaxFunEvals' , 1D6      % maximum number of function evaluations allowed, a positive integer
         %           ,'UseParallel' , 1        % when true (and supported by optimizer) solver estimates gradients in parallel (using Matlab/Octave's parallel toolbox)
         %           ,'Jacobian'    , 'off'    % when 'off' gradient-based solvers approximate Jacobian using finite differences; for GMM we can also pass the analytical Jacobian to gradient-based solvers by setting this 'on'
-                  )                         
+                  )
         , silent_optimizer                  % run minimization of moments distance silently without displaying results or saving files in between
 
     % Numerical algorithms options

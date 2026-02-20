@@ -84,17 +84,17 @@ data = [0.928467646476  11.8716889412   20  0.418037507392  0.227382377518 ...
 1.39271709108   2.63121085718   3.75    0.88406577736   0.75622580197 ...
 1.07502077727   5.88578836799   4.25    -2.55088273352  2.89018116374 ...
 0.759049251607  4.24703604223   4.5 0.575687665685  -0.388292506167 ...
-]; 
- 
-data = reshape(data,5,86)'; 
-y_obs = data(:,1); 
-pie_obs = data(:,2); 
-R_obs = data(:,3); 
-de = data(:,4); 
-dq = data(:,5); 
- 
-%Country: Canada 
-%Sample Range: 1981:2 to 2002:3 
-%Observations: 86 
-%Variables: Real GDP Growth [%], Inflation [annualized %], Nom Rate [%], 
-%           Exchange Rate Change [%], Terms of Trade Change [%] 
+];
+
+data = reshape(data,5,86)';
+y_obs = data(:,1);
+pie_obs = data(:,2);
+R_obs = data(:,3);
+de = data(:,4);
+dq = data(:,5);
+
+%Country: Canada
+%Sample Range: 1981:2 to 2002:3
+%Observations: 86
+%Variables: Real GDP Growth [%], Inflation [annualized %], Nom Rate [%],
+%           Exchange Rate Change [%], Terms of Trade Change [%]

@@ -10,7 +10,7 @@ omega = 0.75;         % calvo param
 phipi = 1.5;
 phiy = 0.5;
 r_ss = 0;
-kappa = (1-omega)*(1-omega*betta)/omega;  
+kappa = (1-omega)*(1-omega*betta)/omega;
 
 model(linear);
 [name='Euler']

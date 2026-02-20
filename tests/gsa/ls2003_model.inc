@@ -1,29 +1,29 @@
-var y 
-    y_s 
-    R 
-    pie $\pi$ 
-    dq  
-    pie_s 
-    de 
-    A   
-    y_obs   ${y^{obs}}$ 
+var y
+    y_s
+    R
+    pie $\pi$
+    dq
+    pie_s
+    de
+    A
+    y_obs   ${y^{obs}}$
     pie_obs ${\pi^{obs}}$
     R_obs ${R^{obs}}$;
 
-varexo e_R ${\varepsilon^R}$ 
-    e_q ${\varepsilon^q}$ 
+varexo e_R ${\varepsilon^R}$
+    e_q ${\varepsilon^q}$
     e_ys ${\varepsilon^{ys}}$
     e_pies ${\varepsilon^\pi}$
     e_A ${\varepsilon^A}$;
 
-parameters psi1 ${\psi_1}$ 
-    psi2 ${\psi_2}$ 
+parameters psi1 ${\psi_1}$
+    psi2 ${\psi_2}$
     psi3 ${\psi_3}$
-    rho_R ${\rho_R}$  
+    rho_R ${\rho_R}$
     tau    ${\tau}$
     alpha ${\alpha}$
-    rr 
-    k 
+    rr
+    k
     rho_q ${\rho_q}$
     rho_A ${\rho_A}$
     rho_ys ${\rho_{ys}}$

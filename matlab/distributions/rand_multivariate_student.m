@@ -6,7 +6,7 @@ function draw = rand_multivariate_student(Mean,Sigma_upper_chol,df,n)
 % INPUTS
 %
 %    Mean               [double]    1*n vector, expectation of the multivariate random variable.
-%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the covariance 
+%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the covariance
 %                                   matrix up to a factor df/(df-2)).
 %    df                 [integer]   degrees of freedom.
 %    n                  [integer]   number of draws (defaults to 1).

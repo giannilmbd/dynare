@@ -4,8 +4,8 @@
  * Juan F. Rubio-Ramírez, and Martin Uribe (2011): "Risk Matters",
  * American Economic Review 101 (October 2011): 2530–2561.
  *
- * This implementation was written by Benjamin Born and Johannes Pfeifer. Please 
- * note that the following copyright notice only applies to this Dynare 
+ * This implementation was written by Benjamin Born and Johannes Pfeifer. Please
+ * note that the following copyright notice only applies to this Dynare
  * implementation of the
  * model.
  */
@@ -33,7 +33,7 @@ var sigma_r sigma_tb eps_r eps_tb X D K lambda C H Y I phi r;
 varexo u_sigma_r u_sigma_tb u_r u_tb u_x ;
 predetermined_variables K D;
 
-parameters r_bar rho_eps_r sigma_r_bar rho_sigma_r eta_r 
+parameters r_bar rho_eps_r sigma_r_bar rho_sigma_r eta_r
            rho_eps_tb sigma_tb_bar rho_sigma_tb eta_tb
            delta alppha nu rho_x betta
            Phi phipar sigma_x D_bar omega eta;
@@ -41,7 +41,7 @@ parameters r_bar rho_eps_r sigma_r_bar rho_sigma_r eta_r
 // Calibration from Table 3
 rho_eps_r=0.97;
 sigma_r_bar=-5.71;
-rho_sigma_r=0.94; 
+rho_sigma_r=0.94;
 eta_r=0.46;
 
 // Calibration from Table 4
@@ -62,7 +62,7 @@ betta = 1/(1+exp(r_bar)); %discount factor
 Phi=0.001; %debt elasticity
 D_bar= 4; % steady state debt
 phipar=95; % capital adjustment costs
-sigma_x=log(0.015); 
+sigma_x=log(0.015);
 
 omega=1;
 
@@ -78,9 +78,9 @@ X=rho_x*X(-1)+exp(sigma_x)*u_x;
 exp(K(+1))=(1-delta)*exp(K)+(1-phipar/2*(exp(I)/exp(I(-1))-1)^2)*exp(I);
 exp(Y)-exp(C)-exp(I)=(D)-(D(+1))/(1+exp(r))+Phi/2*((D(+1))-D_bar)^2;
 exp(r)=exp(r_bar)+eps_tb+eps_r;
-eps_tb=rho_eps_tb*eps_tb(-1)+exp(sigma_tb)*u_tb;   
+eps_tb=rho_eps_tb*eps_tb(-1)+exp(sigma_tb)*u_tb;
 sigma_tb=(1-rho_sigma_tb)*sigma_tb_bar+rho_sigma_tb*sigma_tb(-1)+eta_tb*u_sigma_tb;
-eps_r=rho_eps_r*eps_r(-1)+exp(sigma_r)*u_r;   
+eps_r=rho_eps_r*eps_r(-1)+exp(sigma_r)*u_r;
 sigma_r=(1-rho_sigma_r)*sigma_r_bar+rho_sigma_r*sigma_r(-1)+eta_r*u_sigma_r;
 end;
 
@@ -99,7 +99,7 @@ H=-0.0037203652717462993;
 phi=-4.389743012664954;
 I=-0.9754176217303792;
 Y=1.0513198564588924;
-r=r_bar; 
+r=r_bar;
 end;
 
 shocks;
@@ -116,6 +116,6 @@ options_.solve_tolf=1E-12;
 steady(solve_algo=3);
 
 check;
-stoch_simul(order=3,pruning,irf=0,nofunctions,contemporaneous_correlation,TeX) C I Y H r D K lambda phi; 
+stoch_simul(order=3,pruning,irf=0,nofunctions,contemporaneous_correlation,TeX) C I Y H r D K lambda phi;
 
 comparison_policy_functions_dynare_mathematica;

@@ -85,5 +85,5 @@ for i = fieldnames(D.oo_.irfs)';
     if norm(test2) > 1e-16;
         error(['error in computing irf ' i]);
     end;
-end;        
-    
+end;
+

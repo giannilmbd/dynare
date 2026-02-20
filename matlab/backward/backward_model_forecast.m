@@ -8,8 +8,8 @@ function forecasts = backward_model_forecast(varargin)
 %
 % OUTPUTS
 % - forecast            [structure]           each field is a dseries object for the point forecast (i.e.
-%                                             forecasts without innovations in the future), the mean forecast, 
-%                                             the median forecast, the standard deviation of the predictive distribution 
+%                                             forecasts without innovations in the future), the mean forecast,
+%                                             the median forecast, the standard deviation of the predictive distribution
 %                                             and the lower/upper bounds of the interval containing 95% of the predictive distribution.
 
 % Copyright © 2017-2025 Dynare Team

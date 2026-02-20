@@ -9,7 +9,7 @@ end;
 
 occbin_setup(simul_periods=80);
 occbin_solver(simul_maxit=11,simul_curb_retrench);
-% 
+%
 titlelist = char('c (consumption)','b (borrowing)','y (income)','lb (multiplier)');
 percent = 'Percent';
 level = 'Level';
@@ -37,4 +37,3 @@ line2=100*[(oo_.occbin.endo_linear.c-oo_.occbin.endo_ss.c)/oo_.occbin.endo_ss.c,
 
 occbin.make_chart(titlelist,legendlist,figtitle,ylabels,cat(3,line1,line2));
 occbin.plot_regimes(oo_.occbin.simul.regime_history,M_,options_)
-    

@@ -121,7 +121,7 @@ for j=1:nvar
     warning off
     fig_name1 = strrep(fig_name1,' ','_');
     fig_name1 = strrep(fig_name1,'.','');
-    
+
     if ~ismac
         STATUS = xlswrite([OutputDirectoryName,filesep,M_.fname,'_shock_decomposition',fig_mode,fig_name1],d0,endo_names{i_var(j)});
     else

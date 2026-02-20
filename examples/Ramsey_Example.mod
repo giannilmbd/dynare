@@ -3,42 +3,42 @@
  * Lawrence J. Christiano, Roberto Motto and Massimo Rostagno (2007):
  * "Notes on Ramsey-Optimal Monetary Policy", Section 2
  * The paper is available at http://faculty.wcas.northwestern.edu/~lchrist/d16/d1606/ramsey.pdf
- * 
+ *
  * Notes:
- * - This mod-files allows to simulate a simple New Keynesian Model with Rotemberg price 
+ * - This mod-files allows to simulate a simple New Keynesian Model with Rotemberg price
  *      adjustment costs under three different monetary policy arrangements:
  *      1. a Taylor rule with a fixed inflation feedback coefficient alpha
  *          -> set the Optimal_policy switch to 0
- *      2. a Taylor rule where the inflation feedback coefficient alpha is chosen 
+ *      2. a Taylor rule where the inflation feedback coefficient alpha is chosen
  *          optimally to minimize a quadratic loss function (optimal simple rule (OSR))
  *          -> set the Optimal_policy switch to 1 and the Ramsey switch to 0
  *      3. fully optimal monetary under commitment (Ramsey)
  *          -> set the Optimal_policy switch to 1 and the Ramsey switch to 1
  *
- *  - The Efficent_steady_state switch can be used to switch from an distorted steady state 
- *      due to a monopolistic distortion to one where a labor subsidy counteracts this 
+ *  - The Efficent_steady_state switch can be used to switch from an distorted steady state
+ *      due to a monopolistic distortion to one where a labor subsidy counteracts this
  *      distortion. Note that the purely quadratic loss function in the OSR case does not capture
- *      the full welfare losses with a distorted steady state as there would be a linear term 
+ *      the full welfare losses with a distorted steady state as there would be a linear term
  *      appearing.
  *
  *  - This files shows how to use a conditional steady state file in the Ramsey case. It takes
- *      the value of the defined instrument R as given and then computes the rest of the steady 
- *      state, including the steady state inflation rate, based on this value. The initial value 
+ *      the value of the defined instrument R as given and then computes the rest of the steady
+ *      state, including the steady state inflation rate, based on this value. The initial value
  *      of the instrument for steady state search must then be defined in an initval-block.
  *
- *  - Due to divine coincidence, the first best policy involves fully stabilizing inflation  
- *      and thereby the output gap. As a consequence, the optimal inflation feedback coefficient 
- *      in a Taylor rule would be infinity. The OSR command therefore estimates it to be at the 
+ *  - Due to divine coincidence, the first best policy involves fully stabilizing inflation
+ *      and thereby the output gap. As a consequence, the optimal inflation feedback coefficient
+ *      in a Taylor rule would be infinity. The OSR command therefore estimates it to be at the
  *      upper bound defined via osr_params_bounds.
  *
- *  - The mod-file also allows to conduct estimation under Ramsey policy by setting the 
+ *  - The mod-file also allows to conduct estimation under Ramsey policy by setting the
  *      Estimation_under_Ramsey switch to 1.
  *
  * This implementation was written by Johannes Pfeifer.
  *
  * If you spot mistakes, email me at jpfeifer@gmx.de
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -59,16 +59,16 @@
  * see <https://www.gnu.org/licenses/>.
  */
 
-//**********Define which monetary policy setup to use *********** 
+//**********Define which monetary policy setup to use ***********
 
 @#ifndef Optimal_policy
     @#define Optimal_policy=1
     @#ifndef Ramsey
         @#define Ramsey=1
-    @#endif    
+    @#endif
 @#endif
 
-//**********Define whether to use distorted steady state*********** 
+//**********Define whether to use distorted steady state***********
 
 @#ifndef Efficent_steady_state
     @#define Efficent_steady_state=0
@@ -124,7 +124,7 @@ rho=0.9;
     tau=0;
 @# endif
 chi=1;
-        
+
 model;
     [name='Euler equation']
     1/(1+R)=beta*C/(C(+1)*pi(+1));
@@ -198,7 +198,7 @@ end;
     planner_objective log(C)-chi/2*h^2;
     @# if !defined(Ramsey) || Ramsey==0
         //use OSR Taylor rule
-        
+
         //define OSR parameters to be optimized
         osr_params alpha;
 
@@ -215,24 +215,24 @@ end;
 
     @# else
         //use Ramsey optimal policy
-       
+
         //set up Ramsey optimal policy problem with interest rate R as the instrument,...
-        // defining the discount factor in the planner objective to be the one of private agents        
-        ramsey_model(instruments=(R),planner_discount=beta,planner_discount_latex_name=$\beta$); 
-        
+        // defining the discount factor in the planner objective to be the one of private agents
+        ramsey_model(instruments=(R),planner_discount=beta,planner_discount_latex_name=$\beta$);
+
         //conduct stochastic simulations of the Ramsey problem
         stoch_simul(order=1,irf=20,periods=500) pi_ann log_h R_ann log_C Z r_real;
         evaluate_planner_objective;
-        
+
         @# if Estimation_under_Ramsey==1
             datatomfile('ramsey_simulation',{'log_C'})
-        
+
             estimated_params;
                 rho,0.5,uniform_pdf, , ,0,1;
             end;
             varobs log_C;
-                
+
             estimation(datafile=ramsey_simulation,mode_compute=5);
-        @# endif        
+        @# endif
     @# endif
 @# endif

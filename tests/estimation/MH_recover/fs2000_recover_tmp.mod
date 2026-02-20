@@ -20,7 +20,7 @@ if max(max(abs(temp1.x2./temp2.x2-1)))>5e-3
     temp1.x2-temp2.x2
     if max(max(abs(temp1.x2./temp2.x2-1)))>0.05
         error('Draws of unaffected chain are not the same')
-    else 
+    else
         warning('Draws of unaffected chain are not the same')
     end
 end

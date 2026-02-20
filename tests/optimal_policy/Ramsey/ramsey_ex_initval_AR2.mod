@@ -3,7 +3,7 @@
  *
  * This is related to issues #633, #1119 and #1133
  *
- * The example is adapted from Juillard, Michel (2011): User manual for optimal policy package, 
+ * The example is adapted from Juillard, Michel (2011): User manual for optimal policy package,
  * MONFISPOL FP7 project SSH-225149, Deliverable 1.1.2
 */
 

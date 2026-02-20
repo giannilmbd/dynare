@@ -5,12 +5,12 @@ predetermined_variables K;
 varexo eta;
 
 parameters alpha beta delta psi w Pi A r;
-alpha   = 1/3;     
-delta   = 0.02;   
-beta    = 0.98;     
-psi     = 0.0003393;     
-Pi      = 1; 
-A       = 4.942921;    
+alpha   = 1/3;
+delta   = 0.02;
+beta    = 0.98;
+psi     = 0.0003393;
+Pi      = 1;
+A       = 4.942921;
 w       = 20.2966;
 r   = 0.02;
 

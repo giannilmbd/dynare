@@ -204,11 +204,11 @@ switch info(1)
     case 302
         message = 'IVF: The likelihood is NaN.';
     case 303
-        message = 'IVF: The residuals are not 0.';        
+        message = 'IVF: The residuals are not 0.';
     case 304
-        message = 'IVF: The solver returned with an error code.';        
+        message = 'IVF: The solver returned with an error code.';
     case 305
-        message = 'IVF: The returned shocks are bigger than 1e8.';        
+        message = 'IVF: The returned shocks are bigger than 1e8.';
     case 310
         message = 'OccBin: Simulation terminated with periodic solution (no convergence).';
     case 311

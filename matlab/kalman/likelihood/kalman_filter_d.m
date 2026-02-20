@@ -56,7 +56,7 @@ function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, k
 % OUTPUTS
 % - dLIK                    [double]    minus loglikelihood
 % - dlik                    [vector]    contributions to the log-likelihood at each period of the diffuse phase, where s is the number of
-%                                       diffuse iterations; each element equals 0.5*(w_t + pp*log(2*pi)) 
+%                                       diffuse iterations; each element equals 0.5*(w_t + pp*log(2*pi))
 %                                       with w_t as defined in Durbin and Koopman (2012, p. 172)
 % - a                       [vector]    estimated state vector at the end of the diffuse phase,
 %                                       E_{t_d}(alpha_{t_d+1}), to be used as initial condition for
@@ -72,7 +72,7 @@ function [dLIK,dlik,a,Pstar] = kalman_filter_d(Y, start, last, a, Pinf, Pstar, k
 %   Koopman, S.J. and Durbin, J. (2003), "Filtering and Smoothing of State
 %   Vector for Diffuse State Space Models", Journal of Time Series Analysis,
 %   vol. 24(1), pp. 85-98.
-%   
+%
 %   Durbin, J. and Koopman, S.J. (2012), "Time Series Analysis by State Space
 %   Methods", Oxford University Press, Second Edition, Ch. 5 and 7.2
 

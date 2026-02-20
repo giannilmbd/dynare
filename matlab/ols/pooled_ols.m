@@ -22,7 +22,7 @@ function varargout = pooled_ols(ds, param_common, param_regex, overlapping_dates
 %
 % OUTPUTS
 %   return arguments common to pooled_fgls only if called from pooled_fgls
-%   
+%
 %
 % SPECIAL REQUIREMENTS
 %   Dynare must have been run with the option: json=compute

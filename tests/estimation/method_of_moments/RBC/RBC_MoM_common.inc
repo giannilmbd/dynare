@@ -1,4 +1,4 @@
-% RBC model used in replication files of 
+% RBC model used in replication files of
 % Andreasen, Fernández-Villaverde, Rubio-Ramírez (2018): "The Pruned State-Space System for Non-Linear DSGE Models: Theory and Empirical Applications", Review of Economic Studies, 85(1):1-49.
 % Adapted by Willi Mutschler (@wmutschl, willi@mutschler.eu)
 % =========================================================================
@@ -30,12 +30,12 @@ var k   $K$
     rk  ${r^k}$
     w   $W$
     ;
-    
+
 predetermined_variables k;
 
 varexo u_a ${\varepsilon^{a}}$
     ;
-    
+
 parameters DELTA    $\delta$
     BETTA           $\beta$
     B               $B$
@@ -44,18 +44,18 @@ parameters DELTA    $\delta$
     THETA           $\theta$
     ALFA            $\alpha$
     RHOA            $\rho_a$
-    ;       
+    ;
 
 DELTA           = 0.025;
 BETTA           = 0.984;
 B               = 0.5;
-ETAl            = 1; 
-ETAc            = 2; 
+ETAl            = 1;
+ETAc            = 2;
 THETA           = 3.48;
 ALFA            = 0.667;
 RHOA            = 0.979;
 
-model;    
+model;
 0 = -exp(la) +(exp(c)-B*exp(c(-1)))^(-ETAc) - BETTA*B*(exp(c(+1))-B*exp(c))^(-ETAc);
 0 = -THETA*(1-exp(n))^-ETAl + exp(la)*exp(w);
 0 = -exp(la) + BETTA*exp(la(+1))*(exp(rk(+1)) + (1-DELTA));

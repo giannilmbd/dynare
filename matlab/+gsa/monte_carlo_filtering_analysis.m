@@ -92,7 +92,7 @@ if length(ibeha)>10 && length(inobeha)>10
     else
         indcorr1 = gsa.stability_mapping_bivariate(lpmat(ibeha,:),alpha2, pvalue_corr, M_, options_, bayestopt_, estim_params_, beha_title);
         indcorr2 = gsa.stability_mapping_bivariate(lpmat(inobeha,:),alpha2, pvalue_corr, M_, options_, bayestopt_, estim_params_, nobeha_title);
-    end    
+    end
     indcorr = union(indcorr1(:), indcorr2(:));
     indcorr = indcorr(~ismember(indcorr(:),indmcf));
     indmcf = [indmcf(:); indcorr(:)];
@@ -101,7 +101,7 @@ if ~isempty(indmcf) && ~options_.nograph
     skipline()
     xx=[];
     if ~ isempty(xparam1)
-        xx=xparam1(indmcf); 
+        xx=xparam1(indmcf);
     end
     if options_.TeX
         gsa.scatter_mcf(lpmat(ibeha,indmcf),lpmat(inobeha,indmcf), param_names_tex(indmcf), ...

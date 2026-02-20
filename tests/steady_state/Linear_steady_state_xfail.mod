@@ -4,7 +4,7 @@ var A;
 varexo epsilona;
 parameters  rho;
 
-rho =   .42; 
+rho =   .42;
 
 model(linear);
 log(A) = rho*log(A(-1)) + epsilona;

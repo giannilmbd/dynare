@@ -42,7 +42,7 @@ if test == 1
                 end
             end
             for h = j+1:NumberOfVariables
-                A(i,(h-1)*NumberOfVariables+j) = A(i,(j-1)*NumberOfVariables+h); 
+                A(i,(h-1)*NumberOfVariables+j) = A(i,(j-1)*NumberOfVariables+h);
             end
         end
     end
@@ -53,7 +53,7 @@ if test == 1
     toc
     disp('')
     disp('Computation of A*kron(B,B) with the mex file:')
-    tic 
+    tic
     D1 = sparse_hessian_times_B_kronecker_C(A,B,number_of_threads);
     toc
     disp('Computation of A*kron(B,B) with two nested loops:')
@@ -70,7 +70,7 @@ if test == 1
     disp('');
     disp(['Difference between D1 and D2 = ' num2str(max(max(abs(D1-D2))))]);
     if max(max(abs(D1-D2)))>1e-13
-        test1_1=0; 
+        test1_1=0;
     end
     disp('')
     disp('Computation of A*kron(B,C) with the mex file:')
@@ -92,9 +92,9 @@ if test == 1
     disp('');
     disp(['Difference between D3 and D4 = ' num2str(max(max(abs(D3-D4))))]);
     if max(max(abs(D3-D4)))>1e-13
-        test1_2=0; 
+        test1_2=0;
     end
-% $$$ FOR THE DIMENSIONS CONSIDERED HERE THIS PART WILL RESULT IN A OUT OF MEMORY ERROR.   
+% $$$ FOR THE DIMENSIONS CONSIDERED HERE THIS PART WILL RESULT IN A OUT OF MEMORY ERROR.
 % $$$     disp(' ')
 % $$$     disp('Direct computation of A*kron(B,B):')
 % $$$     tic
@@ -108,7 +108,7 @@ if test == 1
 % $$$     toc
 % $$$     if ~notest
 % $$$         disp('');
-% $$$         disp(['Difference between D1 and D4 = ' num2str(max(max(abs(D1-D4))))]);        
+% $$$         disp(['Difference between D1 and D4 = ' num2str(max(max(abs(D1-D4))))]);
 % $$$     end
     if ~(test1_1 && test1_2)
         info = 0;
@@ -141,7 +141,7 @@ if test==2
     disp(' ');
     disp(['Difference between D1 and D2 = ' num2str(max(max(abs(D1-D2))))]);
     if max(max(abs(D1-D2)))>1e-10
-        test2_1=0; 
+        test2_1=0;
     end
     disp(' ')
     disp('Computation of A*kron(B,B) with two nested loops:')
@@ -151,14 +151,14 @@ if test==2
     for i1 = 1:c2
         for i2 = 1:c2
             k = k+1;
-            D3(:,k) = hessian*kron(zx(:,i1),zx(:,i2)); 
+            D3(:,k) = hessian*kron(zx(:,i1),zx(:,i2));
         end
     end
     toc
     disp(' ')
     disp(['Maximum absolute difference = ' num2str(max(max(abs(D1-D3))))])
     if max(max(abs(D1-D3)))>1e-10
-        test2_2=0; 
+        test2_2=0;
     end
     disp(' ')
     disp(['Percentage of non zero elements in the result matrix = ' num2str(100*nnz(D1)/(r1*c2^2)) '%']);
@@ -180,7 +180,7 @@ if test==3
     toc
     disp(['Difference between D1 and D2 = ' num2str(max(max(abs(D1-D2))))]);
     if max(max(abs(D1-D2)))>1e-10
-        test3_1=0; 
+        test3_1=0;
     end
     disp('Test with full format matrix -- 1(b)')
     D1 = A*kron(B,B);
@@ -189,7 +189,7 @@ if test==3
     toc
     disp(['Difference between D1 and D2 = ' num2str(max(max(abs(D1-D2))))]);
     if max(max(abs(D1-D2)))>1e-10
-        test3_2=0; 
+        test3_2=0;
     end
     if ~(test3_1 && test3_2)
         info = 0;

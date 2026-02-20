@@ -14,13 +14,13 @@ function  IncrementalWeights = gaussian_mixture_densities(obs, StateMuPrior, Sta
 %  - StateMuPost         [double]   posterior mean
 %  - StateSqrtPPost      [double]   posterior covariance
 %  - StateWeightsPost    [double]   weights of the particles
-%  - StateParticles      [double]   particles  
+%  - StateParticles      [double]   particles
 %  - ReducedForm         [structure] decision rules
 %  - options_            [structure] describing the options
 %  - M_                  [structure] describing the model
 %
 % OUTPUTS
-%    IncrementalWeights  [double]   updated weights  
+%    IncrementalWeights  [double]   updated weights
 
 % Copyright © 2009-2026 Dynare Team
 %

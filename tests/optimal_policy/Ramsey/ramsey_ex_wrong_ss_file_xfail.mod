@@ -1,5 +1,5 @@
-/* Mod file tests whether the Ramsey command correctly filters out an incorrect steady state 
- * The example is taken from Juillard, Michel (2011): User manual for optimal policy package, 
+/* Mod file tests whether the Ramsey command correctly filters out an incorrect steady state
+ * The example is taken from Juillard, Michel (2011): User manual for optimal policy package,
  * MONFISPOL FP7 project SSH-225149, Deliverable 1.1.2
 */
 

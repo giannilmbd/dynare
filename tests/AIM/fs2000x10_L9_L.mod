@@ -44,7 +44,7 @@ n = 0.19;
 l = 0.86;
 y = 0.6;
 gy_obs = exp(gam);
-gp_obs = exp(-gam); 
+gp_obs = exp(-gam);
 dA = exp(gam);
 end;
 

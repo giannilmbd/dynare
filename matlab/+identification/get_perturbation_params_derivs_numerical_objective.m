@@ -13,10 +13,10 @@ function [out,info] = get_perturbation_params_derivs_numerical_objective(params,
 %   dr              [structure]     Reduced form model.
 %   endo_steady_state       [vector]     steady state value for endogenous variables
 %   exo_steady_state        [vector]     steady state value for exogenous variables
-%   exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables                                    
+%   exo_det_steady_state    [vector]     steady state value for exogenous deterministic variables
 % -------------------------------------------------------------------------
 %
-% OUTPUT 
+% OUTPUT
 %   out (dependent on outputflag and order of approximation):
 %     - 'perturbation_solution':  out = out1 = [vec(Sigma_e);vec(ghx);vec(ghu)]; (order==1)
 %                                 out = out2 = [out1;vec(ghxx);vec(ghxu);vec(ghuu);vec(ghs2)]; (order==2)

@@ -10,7 +10,7 @@ function [fig_handle, length_of_old_string]= run(prctdone, wait_handle, running_
 %  - move_cursor_backwards  [integer]   number of backward cursor movements for console
 %  - fig_title              [string]    option figure title for initialization (prctdone==0)
 %  - whoiam                 [integer]   In concurrent programming a modality to refer to the different threads running in parallel is needed.
-%                                       The integer whoaim is the integer that allows us to distinguish between them. Then it is the 
+%                                       The integer whoaim is the integer that allows us to distinguish between them. Then it is the
 %                                       index number of this CPU among all CPUs in the cluster.
 %  - ThisMatlab             [integer]   Allows us to distinguish between the 'main' MATLAB, the slave MATLAB worker, local MATLAB, remote MATLAB,
 %                                       then it is the index number of this slave machine in the cluster.
@@ -45,7 +45,7 @@ end
 if nargin< 6
     fig_title=[];
 end
-if nargin< 7 || isempty(whoiam) 
+if nargin< 7 || isempty(whoiam)
     whoiam=0;
 end
 
@@ -58,7 +58,7 @@ if ~whoiam %serial execution
         if init
             diary off;
             return
-        end        
+        end
         newString=sprintf([running_text,' %3.f%% done'], prctdone*100);
         move_backwards=repmat('\b',1,move_cursor_backwards);
         fprintf([move_backwards,'%s'],newString);

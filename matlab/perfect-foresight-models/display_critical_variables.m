@@ -37,7 +37,7 @@ if noprint
 end
 if nargin<5
     period_offset=0;
-end 
+end
 if nargin<6
     iteration=[];
 end

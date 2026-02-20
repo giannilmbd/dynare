@@ -62,7 +62,7 @@ verbatim;
             GY(i) = y(11);
             GK(i) = y(12);
             EG(i) = y(2);
-        end        
+        end
         if mod(i,100)==0
             % Display the progress
             percentDone = 100 * i / MC;

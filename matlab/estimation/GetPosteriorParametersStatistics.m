@@ -49,10 +49,10 @@ skipline(2)
 disp('ESTIMATION RESULTS')
 skipline()
 
-if ishssmc(options_) 
+if ishssmc(options_)
     dprintf('Log data density is %f.', oo_.MarginalDensity.hssmc);
     hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
-elseif isdsmh(options_) 
+elseif isdsmh(options_)
     dprintf('Log data density is %f.', oo_.MarginalDensity.dsmh);
     hpd_draws = round((1-options_.mh_conf_sig)*num_draws);
 elseif isonline(options_)

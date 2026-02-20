@@ -46,7 +46,7 @@ steady;
 check;
 
 varobs dy pic;
-estimated_params; 
+estimated_params;
 ETA,3.7,0.00000001,10,GAMMA_PDF,5,1;
 KAPPA,0.3,0.00000001,0.99999999999,beta_PDF,0.5,0.1;
 stderr eps_A,0.02,0.000000000001,100,INV_GAMMA2_PDF,0.2,inf;

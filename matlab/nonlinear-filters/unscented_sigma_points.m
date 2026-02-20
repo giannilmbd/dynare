@@ -3,7 +3,7 @@ function [nodes,W_m,W_c] = unscented_sigma_points(n,unscented_options)
 % Computes nodes and weights for a scaled unscented transform cubature,
 % i.e. compute the nodes and weights for a second-order accurate propagtion
 % of a Gaussian variable through a nonlinear function
-% 
+%
 % INPUTS
 %    n                  [integer]   scalar, number of variables.
 %    unscented_options  [structure] hyperparameters
@@ -17,7 +17,7 @@ function [nodes,W_m,W_c] = unscented_sigma_points(n,unscented_options)
 %    Formulas follow the ones in Wan/van der Merwe (2001): "The unscented
 %    Kalman filter", in Haykin (editor): Kalman Filtering and Neural
 %    Networks, Chapter 7, p. 221-280.
-% 
+%
 % NOTES
 
 % Copyright © 2009-2026 Dynare Team
@@ -38,7 +38,7 @@ function [nodes,W_m,W_c] = unscented_sigma_points(n,unscented_options)
 % along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
 
 lambda = (unscented_options.alpha^2)*(n+unscented_options.kappa) - n ; %below (7.30)
-nodes = [zeros(n,1)  sqrt(n+lambda).*[eye(n) -eye(n)]]' ; %prefactor befor P_x in (7.30) 
+nodes = [zeros(n,1)  sqrt(n+lambda).*[eye(n) -eye(n)]]' ; %prefactor befor P_x in (7.30)
 % Implement weights from (7.34)
 W_m = lambda/(n+lambda);
 W_c = W_m + (1-unscented_options.alpha^2+unscented_options.beta);

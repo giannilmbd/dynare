@@ -87,7 +87,7 @@ steady_state_model;
   q  = 1 - d;
 
   e = 1;
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;
@@ -136,7 +136,7 @@ end;
 
 dr = oo_.dr;
 iorder=1;
-%run simulation 
+%run simulation
 y_=simult_(M_,options_,y0,dr,ex_,iorder);
 
 fsdat_simul_logged;
@@ -144,6 +144,6 @@ fsdat_simul_logged;
 if max(abs(y_(strmatch('gy_obs',M_.endo_names,'exact'),:)'-gy_obs(1:options_.nobs)))>1e-10 ||...
     max(abs(y_(strmatch('gy_obs',M_.endo_names,'exact'),:)'-oo_.SmoothedVariables.gy_obs))>1e-10 ||...
     max(abs(y_(strmatch('gp_obs',M_.endo_names,'exact'),:)'-gp_obs(1:options_.nobs)))>1e-10 ||...
-    max(abs(y_(strmatch('gp_obs',M_.endo_names,'exact'),:)'-oo_.SmoothedVariables.gp_obs))>1e-10 
+    max(abs(y_(strmatch('gp_obs',M_.endo_names,'exact'),:)'-oo_.SmoothedVariables.gp_obs))>1e-10
 error('Smoother is wrong')
 end

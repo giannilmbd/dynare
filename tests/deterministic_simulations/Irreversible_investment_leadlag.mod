@@ -94,7 +94,7 @@ shocks;
 
 var epsilonA1; periods 1; values 2;
 @#for Country in 2:NumberOfCountries
-    var epsilonA@{Country}; periods 1; values 0;    
+    var epsilonA@{Country}; periods 1; values 0;
 @#endfor
 
 end;

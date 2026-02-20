@@ -4,7 +4,7 @@ function s=skewness(y)
 % Inputs:
 %  - y  [double]  input vector
 % Outputs:
-%  - s  [double]  standardized skewness 
+%  - s  [double]  standardized skewness
 
 % Written by Marco Ratto
 % Joint Research Centre, The European Commission,

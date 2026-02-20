@@ -5,7 +5,7 @@ function indices = kitagawa(weights, noise, m)
 % INPUTS
 % - weights   [double]    n×1 vector of particles' weights.
 % - noise     [double]    scalar, uniform random deviates in [0,1]
-% - m         [integer]   scalar, number of particles to resample 
+% - m         [integer]   scalar, number of particles to resample
 %
 % OUTPUTS
 % - indices   [integer]   m×1 vector of indices in [1:n]
@@ -29,9 +29,9 @@ function indices = kitagawa(weights, noise, m)
 
 if nargin<3
     n = length(weights);
-else 
+else
     n = m ;
-end 
+end
 
 if nargin<2, noise = rand; end
 

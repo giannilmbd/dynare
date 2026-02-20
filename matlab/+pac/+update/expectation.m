@@ -4,7 +4,7 @@ function expectation(pacname)
 %
 % INPUTS
 % - pacname       [string]    Name of the pac expectation.
-% 
+%
 % OUTPUTS
 % - none
 %

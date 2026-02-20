@@ -283,7 +283,7 @@ switch options_.lik_init
             Pstar = T*Pstar*T' + R*Q*R';
         end
     else
-        a_0_given_tm1 = a; 
+        a_0_given_tm1 = a;
     end
     if options_.occbin.likelihood.status || (kalman_algo == 5)
         Z =zeros(length(bayestopt_.mf),size(T,1));

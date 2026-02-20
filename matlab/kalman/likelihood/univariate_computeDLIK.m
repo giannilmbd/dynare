@@ -33,7 +33,7 @@ function [Da,DP1,DLIK,D2a,D2P,Hesst] = univariate_computeDLIK(k,indx,Z,Zflag,v,K
 %   Hesst       - Hessian of log-likelihood w.r.t. parameters (if nargout == 6)
 %
 % APPROACH:
-%   The function computes the gradient and Hessian of the univariate Kalman filter 
+%   The function computes the gradient and Hessian of the univariate Kalman filter
 %   log-likelihood by processing observations one at a time. For each observation:
 %   1. Compute derivatives of Kalman gain (DK) and innovation variance (DF)
 %   2. Compute derivatives of innovations (Dv) from observation equation
@@ -71,7 +71,7 @@ if notsteady
         Dv   = -Z*Da(:,:) - Z*DYss(:,:);
         DF = zeros(k,1);
         DK = zeros([rows(K),k]);
-        
+
         % Compute first derivatives of forecast error variance (DF) and Kalman gain (DK)
         for j=1:k
             % DF = Z*DP*Z' + DH
@@ -79,7 +79,7 @@ if notsteady
             % DK = DP*Z'/F - PZ*DF/F^2
             DK(:,j) = (DP(:,:,j)*Z')/F-PZ*DF(j)/F^2;
         end
-        
+
         % Compute second derivatives if requested
         if nargout>4
             D2F = zeros(k,k);
@@ -109,7 +109,7 @@ if notsteady
         % Extract derivatives from indexed rows/columns
         DF = squeeze(DP(Z,Z,:))+DH';
         DK = squeeze(DP(:,Z,:))/F-PZ*transpose(DF)/F^2;
-        
+
         % Compute second derivatives if requested
         if nargout>4
             D2F = zeros(k,k);
@@ -132,7 +132,7 @@ if notsteady
             end
         end
     end
-    
+
     % Store computed derivatives in persistent storage for this observation index
     if nargout>4
         DD2K(:,indx,:,:)=D2K;
@@ -148,7 +148,7 @@ else
         D2K = squeeze(DD2K(:,indx,:,:));
         D2F = squeeze(DD2F(indx,:,:));
     end
-    
+
     % Compute innovation derivatives (state-dependent even at steady state)
     if Zflag
         Dv   = -Z*Da(:,:) - Z*DYss(:,:);
@@ -211,7 +211,7 @@ if notsteady
             DP1(:,:,j)=DP(:,:,j) - (DP(:,Z,j))*K'-PZ*DK(:,j)';
         end
     end
-    
+
     % Update second derivatives of filtered covariance if requested
     if nargout>4
         if Zflag

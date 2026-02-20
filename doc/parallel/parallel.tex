@@ -389,7 +389,7 @@ options_.parallel=
 }
 \doublespacing
 
-All these fields correspond to the slave options except \verb"Local", which is set by the pre-processor according to the value of \verb"ComputerName":	
+All these fields correspond to the slave options except \verb"Local", which is set by the pre-processor according to the value of \verb"ComputerName":
 \begin{description}
 \item[Local:] the variable \verb"Local" is binary, so it can have only two values 0 and 1. If \verb"ComputerName" is set to \verb"localhost", the preprocessor sets \verb"Local = 1" and the parallel computation is executed on the local machine, i.e. on the same computer (and working directory) where the DYNARE project is placed. For any other value for \verb"ComputerName", we will have \verb"Local = 0";
 \end{description}
@@ -1004,7 +1004,7 @@ We estimated the model on a bi-processor machine (Fujitsu Siemens, Celsius R630)
 
 Overall results are given in Figure \ref{fig:test_time_comp}, showing the computational time versus chain length, and Figure \ref{fig:test_gain}, showing the reduction of computational time (or the time gain) with respect to the serial implementation provided by the parallel coding. The gain in computing time of the exercise is of about 45\% on this test case, so reducing from 11.40 hours to about 6 hours the cost of running 1,000,000 Metropolis iterations (the ideal gain would be of 50\% in this case).
 
-\subsection{Test 2.}\label{s:test2}	
+\subsection{Test 2.}\label{s:test2}
 The scope of the second test was to verify if results were robust over different hardware platforms.
 We estimated the model with chain lengths of 1,000,000 runs on the following hardware platforms:
 \begin{itemize}
@@ -1074,7 +1074,7 @@ In order to appreciate the gain of parallelizing all functions invoked after Met
 %\begin{centering}
 %\begin{tabular}{l|l|l}
 %  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
-%Chain Length & Time Serial (s) & Time Parallel (s) \\ \hline					
+%Chain Length & Time Serial (s) & Time Parallel (s) \\ \hline
 %105 & 85 & 151 \\
 %1005 & 246 & 287 \\
 %5005 & 755 & 599 \\

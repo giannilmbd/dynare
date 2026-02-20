@@ -11,7 +11,7 @@
 load lola_data.mat
 
 % ====================================================
-% declarations var -- varexo -- para   
+% declarations var -- varexo -- para
 % ====================================================
 
 @#define nbr_work_generations=9
@@ -37,54 +37,54 @@ age_early=55;
 @#define endw=[nbr_work_generations-1]
 
 @#for i in wg
-var 
-n@{i} u@{i} Omega@{i} w@{i} dWHN@{i} dWFN@{i} 
+var
+n@{i} u@{i} Omega@{i} w@{i} dWHN@{i} dWFN@{i}
 n@{i}_f u@{i}_f Omega@{i}_f w@{i}_f dWFN@{i}_f
 i@{i} lambda@{i} i@{i}_f lambda@{i}_f eta@{i};
 parameters
-Du@{i} Dn@{i} h@{i} h@{i}_f chi@{i} eta@{i}b; 
+Du@{i} Dn@{i} h@{i} h@{i}_f chi@{i} eta@{i}b;
 varexo
 eps_eta@{i};
 @#endfor
 
 @#for i in ag
-var 
+var
 c@{i} s@{i} P@{i} P@{i}_f;
 varexo
 beta@{i} beta@{i}_f PD@{i};
 @#endfor
 
 @#for i in erg
-var 
+var
 WE@{i} De_@{i};
 parameters
-De_@{i}b; 
+De_@{i}b;
 varexo
 eps_De_@{i};
 @#endfor
 
-var   
-wb wb_f 
-Omega Omega_f Omega_hf 
-V M qq p 
-N N_f 
+var
+wb wb_f
+Omega Omega_f Omega_hf
+V M qq p
+N N_f
 Q RR H K Y gdp nx FH pi
-ct st wshare rr 
+ct st wshare rr
 gamma mc phii D DH DF X bs bsY P00_f
 
-rhou rhoe rhol tauw tauc tauf tauk g 
+rhou rhoe rhol tauw tauc tauf tauk g
 TFP gh rrb
 theta tau1 om1 om2 om2s Ds phijs
 
-DepRatio DepRatio_n DepRatio_d ZARA Ptot Ptot_f sleep du de dl inA inB in 
+DepRatio DepRatio_n DepRatio_d ZARA Ptot Ptot_f sleep du de dl inA inB in
 NBR NBRY NBR2 tauw2 tauf2 tauc2
 PensCorr_L PensCorr_F;
 
-parameters 
-rho phi delta alpha beta ann 
-fc nu aa 
+parameters
+rho phi delta alpha beta ann
+fc nu aa
 
-rhoub rhoeb rholb tauwb taucb taufb taukb gb  
+rhoub rhoeb rholb tauwb taucb taufb taukb gb
 TFPb ghb rrbb
 thetab tau1b om1b om2b om2sb Dsb phijsb
 
@@ -159,7 +159,7 @@ model;
 @#endif
 
 %  Labor Market Variables in the home country
-%  ------------------------------------------ 
+%  ------------------------------------------
 
 @#for i in fwg
 0=lambda@{i};
@@ -167,12 +167,12 @@ model;
 
 @#for i in wg
 1=n@{i}+u@{i}+i@{i};
-@#endfor   
-                            
+@#endfor
+
 i0=lambda0;
 @#for i in nbwg
 i@{i}=lambda@{i-1}(-1)+lambda@{i}*(1-lambda@{i-1}(-1));
-@#endfor 
+@#endfor
 
 P0=beta0*P00+PD0;
 @#for i in nbg
@@ -182,12 +182,12 @@ P@{i}=beta@{i}*P@{i-1}(-1)+PD@{i};
 Omega0=P0;
 @#for i in nbwg
 Omega@{i}=(1-lambda@{i})*( 1-lambda@{i-1}(-1)-(1-chi@{i})*n@{i-1}(-1))*P@{i};
-@#endfor 
+@#endfor
 
 n0=p;
 @#for i in nbwg
 n@{i}=(1-lambda@{i})*((1-p)*(1-chi@{i})*n@{i-1}(-1)+p*(1-lambda@{i-1}(-1)));
-@#endfor 
+@#endfor
 
 N=
 @#for i in wg
@@ -196,12 +196,12 @@ N=
 ;
 
 %  Labor Market Variables in the foreign country
-%  --------------------------------------------- 
+%  ---------------------------------------------
 
 @#for i in wg
 1=n@{i}_f+u@{i}_f+i@{i}_f;
-@#endfor    
-                            
+@#endfor
+
 i0_f=lambda0_f;
 @#for i in nbwg
 i@{i}_f=lambda@{i-1}_f(-1)+lambda@{i}_f*(1-lambda@{i-1}_f(-1));
@@ -214,12 +214,12 @@ P00_f=P00_foP00*P00;
 P0_f=beta0_f*P00_f;
 @#for i in nbg
 P@{i}_f=beta@{i}_f*P@{i-1}_f(-1);
-@#endfor 
+@#endfor
 
 Omega0_f=P0_f;
 @#for i in nbwg
 Omega@{i}_f=(1-lambda@{i}_f)*(1-lambda@{i-1}_f(-1)-(1-chi@{i})*n@{i-1}_f(-1))*P@{i}_f;
-@#endfor 
+@#endfor
 
 n0_f=p;
 @#for i in nbwg
@@ -248,7 +248,7 @@ Omega_f=
 ;
 
 Omega_hf=Omega+Omega_f;
- 
+
 M=V*Omega_hf/(V^nu+Omega_hf^nu)^(1/nu);
 
 qq=M/V;
@@ -287,15 +287,15 @@ wb=
 
 @#for i in erg
 WE@{i} = 0;
-@#endfor 
+@#endfor
 
 @#for i in erg
 @#if i in endw
 WE@{i} = ((De_@{i}b*i@{i}^(phi-1))+Du@{i}+(rhoe-rhou)*w@{i}/(1+tauc)/c@{i})*(1-i@{i})-((1-tauw-rhou)*w@{i}/(1+tauc)/c@{i}-(Dn@{i}-Du@{i}))*n@{i};
-@#else  
+@#else
 WE@{i} = ((De_@{i}b*i@{i}^(phi-1))+Du@{i}+(rhoe-rhou)*w@{i}/(1+tauc)/c@{i})*(1-i@{i})-((1-tauw-rhou)*w@{i}/(1+tauc)/c@{i}-(Dn@{i}-Du@{i}))*n@{i}+ beta*beta@{i+1}*WE@{i+1};
 @#endif
-@#endfor  
+@#endfor
 
 %  Household Surplus
 % -------------------
@@ -303,10 +303,10 @@ WE@{i} = ((De_@{i}b*i@{i}^(phi-1))+Du@{i}+(rhoe-rhou)*w@{i}/(1+tauc)/c@{i})*(1-i
 @#for i in wg
 @#if i in endw
 dWHN@{i} = w@{i}*(1-tauw-rhou)/(1+tauc)-(Dn@{i}-Du@{i})*c@{i};
-@#else  
+@#else
 dWHN@{i} = w@{i}*(1-tauw-rhou)/(1+tauc)-(Dn@{i}-Du@{i})*c@{i} + beta*beta@{i+1}*c@{i}/c@{i+1}(+1)*dWHN@{i+1}(+1)*(1-p(+1))*(1-chi@{i+1})*(1-lambda@{i+1}(+1));
 @#endif
-@#endfor    
+@#endfor
 
 %  Foreign household
 %  ------------------------
@@ -315,7 +315,7 @@ dWHN@{i} = w@{i}*(1-tauw-rhou)/(1+tauc)-(Dn@{i}-Du@{i})*c@{i} + beta*beta@{i+1}*
 
 @#for i in wg
 lambda@{i}=lambda@{i}_f;
-w@{i}_f=w@{i}; 
+w@{i}_f=w@{i};
 @#endfor
 
 wb_f=
@@ -355,7 +355,7 @@ rr=rrb+tau1*(exp(bsY_iss-bsY)-1);
 @#if i in endw
 dWFN@{i} = h@{i}*mc*FH-(1+tauf)*w@{i};
 dWFN@{i}_f = h@{i}_f*mc*FH-(1+tauf)*w@{i}_f;
-@#else  
+@#else
 dWFN@{i} = h@{i}*mc*FH-(1+tauf)*w@{i} + beta@{i+1}/RR(+1)*dWFN@{i+1}(+1)*(1-chi@{i+1})*(1-lambda@{i+1}(+1))*(1+gh);
 dWFN@{i}_f = h@{i}_f*mc*FH-(1+tauf)*w@{i}_f + beta@{i+1}_f/RR(+1)*dWFN@{i+1}_f(+1)*(1-chi@{i+1})*(1-lambda@{i+1}_f(+1))*(1+gh);
 @#endif
@@ -405,7 +405,7 @@ D= ct + K-(1-delta)*K(-1)/(1+gh)  + g*gdp*phii + fc+aa*V;
 DH=(1/om1*phii)^(1/(rho-1))*D;
 X=(1/om2s*phii/gamma)^(1/(rho-1))*Ds;
 DF=(1/om2*gamma*phijs)^(1/(rho-1))*D;
-nx=phii*X-phijs*gamma*DF;     
+nx=phii*X-phijs*gamma*DF;
 bsY=bs/(phii*gdp);
 Y=DH+X;
 phii*gdp=ct + K-(1-delta)*K(-1)/(1+gh) + g*gdp*phii+nx;
@@ -442,7 +442,7 @@ Ds=Dsb*eps_Ds;
 phijs=phijsb*eps_phijs;
 
 
-% ----------- RefDR scenario 
+% ----------- RefDR scenario
 
 DepRatio_n=
 @#for i in rg
@@ -460,10 +460,10 @@ DepRatio=DepRatio_n/DepRatio_d;
 ZARA=age_early+length_period*(
 @#for i in erg
 +1-i@{i}
-@#endfor  
+@#endfor
 );
 
-% ----------- WGEM 
+% ----------- WGEM
 
 Ptot=
 @#for i in ag
@@ -479,40 +479,40 @@ Ptot_f=
 sleep=(1+rr)*(
 @#for i in nbg
 +1/beta@{i}*(1-1/beta@{i}^(ann-1))*s@{i-1}(-1)*P@{i}
-@#endfor  
+@#endfor
 )/(1+gh);
 
 du=rhou*(
 @#for i in wg
 +w@{i}*u@{i}*P@{i}
-@#endfor  
+@#endfor
 );
 
 de=rhoe*(
 @#for i in erg
 +w@{i}*i@{i}*P@{i}+w@{i}_f*i@{i}_f*P@{i}_f
-@#endfor  
+@#endfor
 );
 
 dl=
 @#for i in rg
 +rhol*wb*PensCorr_L*P@{i}+rhol*wb_f*(N_f/(N+N_f))*PensCorr_F*P@{i}_f
-@#endfor  
+@#endfor
 ;
 
-PensCorr_L=eps_PensCorr_L; 
-PensCorr_F=eps_PensCorr_F;   
+PensCorr_L=eps_PensCorr_L;
+PensCorr_F=eps_PensCorr_F;
 
 inA=(tauw+tauf)*(
 @#for i in wg
 +n@{i}*w@{i}*P@{i}+n@{i}_f*w@{i}_f*P@{i}_f
-@#endfor  
+@#endfor
 );
 
 inB=tauk*rr*(
 @#for i in nbg
 +1/beta@{i}^ann*s@{i-1}(-1)*P@{i}
-@#endfor  
+@#endfor
 )/(1+gh);
 
 in=tauc*ct+inA+inB+sleep;
@@ -683,7 +683,7 @@ DepRatio=DepRatio_n/DepRatio_d;
 ZARA=age_early+length_period*(
 @#for i in erg
 +1-i@{i}
-@#endfor  
+@#endfor
 );
 
 Ptot=Ptot_iss;
@@ -696,13 +696,13 @@ dl=dl_iss;
 inA=inA_iss;%(tauw+tauf)*(
 %@#for i in wg
 %+n@{i}*w@{i}*P@{i}+n@{i}_f*w@{i}_f*P@{i}_f
-%@#endfor  
+%@#endfor
 %);
 
 inB=inB_iss;%tauk*rr*(
 %@#for i in nbg
 %+1/beta@{i}^ann*s@{i-1}*P@{i}
-%@#endfor  
+%@#endfor
 %)/(1+gh);
 
 in=in_iss;%tauc*ct+inA+inB+sleep;
@@ -867,7 +867,7 @@ DepRatio=DepRatio_n/DepRatio_d;
 ZARA=age_early+length_period*(
 @#for i in erg
 +1-i@{i}
-@#endfor  
+@#endfor
 );
 
 Ptot=
@@ -884,37 +884,37 @@ Ptot_f=
 sleep=(1+rr)*(
 @#for i in nbg
 +1/beta@{i}*(1-1/beta@{i}^(ann-1))*s@{i-1}*P@{i}
-@#endfor  
+@#endfor
 )/(1+gh);
 
 du=rhou*(
 @#for i in wg
 +w@{i}*u@{i}*P@{i}
-@#endfor  
+@#endfor
 );
 
 de=rhoe*(
 @#for i in erg
 +w@{i}*i@{i}*P@{i}+w@{i}_f*i@{i}_f*P@{i}_f
-@#endfor  
+@#endfor
 );
 
 dl=
 @#for i in rg
 +rhol*wb*PensCorr_L*P@{i}+rhol*wb_f*(N_f/(N+N_f))*PensCorr_F*P@{i}_f
-@#endfor  
+@#endfor
 ;
 
 inA=(tauw+tauf)*(
 @#for i in wg
 +n@{i}*w@{i}*P@{i}+n@{i}_f*w@{i}_f*P@{i}_f
-@#endfor  
+@#endfor
 );
 
 inB=tauk*rr*(
 @#for i in nbg
 +1/beta@{i}^ann*s@{i-1}*P@{i}
-@#endfor  
+@#endfor
 )/(1+gh);
 
 in=tauc*ct+inA+inB+sleep;
@@ -934,11 +934,11 @@ resid;
 steady(solve_algo=3);
 
 
-shocks;     
+shocks;
   var P00;
   periods 1:99;
   values (se_P00);
- 
+
 @#for i in nbg
   var beta@{i};
   periods  1:99;
@@ -951,7 +951,7 @@ shocks;
   var PD@{i};
   periods  1:99;
   values (se_PD@{i});
-@#endfor  
+@#endfor
 
   var P00_foP00;
   periods 1:99;
@@ -963,11 +963,11 @@ shocks;
 
   var eps_PensCorr_F;
   periods 1:99;
-  values (se_eps_PensCorr_F);	
+  values (se_eps_PensCorr_F);
 
   var eps_PensCorr_L;
   periods 1:99;
-  values (se_eps_PensCorr_L);	
+  values (se_eps_PensCorr_L);
 end;
 
 % *******************************************

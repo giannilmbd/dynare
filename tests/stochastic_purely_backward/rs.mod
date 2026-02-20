@@ -6,7 +6,7 @@ varexo epsilon eta;
 parameters alpha_pi1 alpha_pi2 alpha_pi3 alpha_pi4 alpha_y
            beta_y1 beta_y2 beta_r
            gamma_pi1 gamma_pi2 gamma_pi3 gamma_pi4
-           gamma_y1 gamma_y2 gamma_i1 gamma_i2 gamma_i3; 
+           gamma_y1 gamma_y2 gamma_i1 gamma_i2 gamma_i3;
 
 
 alpha_pi1 = 0.7;
@@ -35,7 +35,7 @@ pi = alpha_pi1*pi(-1) +alpha_pi2*pi(-2) +alpha_pi3*pi(-3) +alpha_pi4*pi(-4) + al
 y  = beta_y1*y(-1) + beta_y2*y(-2) - beta_r*((i(-1)+i(-2)+i(-3)+i(-4))/4 - (pi(-1)+pi(-2)+pi(-3)+pi(-4))/4) + eta;
 i =  gamma_pi1*pi + gamma_pi2*pi(-1) + gamma_pi3*pi(-2) + gamma_pi4*pi(-3)
      + gamma_y1*y + gamma_y2*y(-1) + gamma_i1*i(-1) + gamma_i2*i(-2) + gamma_i3*i(-3);
-end;          
+end;
 
 stoch_simul(irf=0);
 

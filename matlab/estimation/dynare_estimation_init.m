@@ -105,7 +105,7 @@ if options_.estimate_initial_states_endogenous_prior
         options_.Harvey_scale_factor = 0;
         options_.lik_init = 2;
         if ~isfield(estim_params_,'endo_init_vals') || isempty(estim_params_.endo_init_vals)
-	        [~,oo_.dr.state_var]=set_state_space(oo_.dr,M_); %later replace by fixed reference 
+	        [~,oo_.dr.state_var]=set_state_space(oo_.dr,M_); %later replace by fixed reference
             estim_params_.nendoinit = length(oo_.dr.state_var);
             tmp_prior = nan(1,10);
             tmp_prior(3) = -Inf;
@@ -119,7 +119,7 @@ if options_.estimate_initial_states_endogenous_prior
                 estim_params_.endo_init_vals(k,1) = oo_.dr.state_var(k);
                 estim_params_.endo_init_vals(k,2) = oo_.steady_state( oo_.dr.state_var(k));
             end
-            
+
         end
     end
 elseif ~isempty(estim_params_) && ~(isfield(estim_params_,'nvx') && (size(estim_params_.var_exo,1)+size(estim_params_.var_endo,1)+size(estim_params_.corrx,1)+size(estim_params_.corrn,1)+size(estim_params_.skew_exo,1)+size(estim_params_.param_vals,1))==0)

@@ -335,7 +335,7 @@ for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subset
         indexj=nchoosek(int16(indtotparam),j);  %  int16 speeds up nchoosek
         % One could also use a mex version of nchoosek to speed this up, e.g.VChooseK from https://de.mathworks.com/matlabcentral/fileexchange/26190-vchoosek
     end
-    
+
     %Step 2: remove already problematic sets and initialize rank vector
     if ~no_identification_dynamic
         indexj_dDYNAMIC = RemoveProblematicParameterSets(indexj,dynamic_problpars);
@@ -446,8 +446,8 @@ for j=2:min(length(indtotparam),max_dim_subsets_groups) % Check j-element subset
     if ~no_identification_spectrum && ~error_indicator.identification_spectrum
         spectrum_problpars{j} = indexj_dSPECTRUM(rankj_dSPECTRUM < j,:);
     end
-%     % Optional Step 5: % remove redundant 2-sets, eg. if the problematic sets are [(p1,p2);(p1,p3);(p2,p3)], then the unique problematic parameter sets are actually only [(p1,p2),(p1,p3)]        
-%     if j == 2        
+%     % Optional Step 5: % remove redundant 2-sets, eg. if the problematic sets are [(p1,p2);(p1,p3);(p2,p3)], then the unique problematic parameter sets are actually only [(p1,p2),(p1,p3)]
+%     if j == 2
 %         for jj=1:max([size(dynamic_problpars{2},1), size(reducedform_problpars{2},1), size(moments_problpars{2},1), size(spectrum_problpars{2},1), size(minimal_problpars{2},1)])
 %             if jj <= size(dynamic_problpars{2},1)
 %                 dynamic_problpars{2}(dynamic_problpars{2}(jj,2)==dynamic_problpars{2}(:,1)) = dynamic_problpars{2}(jj,1);
@@ -502,11 +502,11 @@ function idx = RemoveProblematicParameterSets(idx,problparset)
     iset = size(idx,2);
     for iii=1:(iset-1)
         if ~isempty(problparset{iii})
-            for kkk=1:size(problparset{iii},1)                
+            for kkk=1:size(problparset{iii},1)
                 idx((sum(ismember(idx,problparset{iii}(kkk,:)),2)==iii),:) = [];
             end
         end
-    end 
+    end
 end%RemoveProblematicParameterSets ed
 
 

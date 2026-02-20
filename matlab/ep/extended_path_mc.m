@@ -1,6 +1,6 @@
 function Simulations = extended_path_mc(initialconditions, samplesize, replic, exogenousvariables, options_, M_, oo_)
 % Simulations = extended_path_mc(initialconditions, samplesize, replic, exogenousvariables, options_, M_, oo_)
-% Conducts Monte Carlo replications of stochastic simulation of a non-linear DSGE model using the Extended Path method 
+% Conducts Monte Carlo replications of stochastic simulation of a non-linear DSGE model using the Extended Path method
 %
 % INPUTS
 %  o initialconditions      [double]    m*1 array, where m is the number of endogenous variables in the model.

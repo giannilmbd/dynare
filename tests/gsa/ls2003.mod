@@ -28,7 +28,7 @@ disp(' ');
 % disp('Press ENTER to continue'); pause(5);
 
 sensitivity(redform=1,nodisplay,Nsam=512); //create sample of reduced form coefficients
-// NOTE: since namendo is empty by default, 
+// NOTE: since namendo is empty by default,
 // this call does not perform the mapping of reduced form coefficient: just prepares the sample
 
 disp(' ');
@@ -81,7 +81,7 @@ disp('THE PREVIOUS THREE CALLS COULD BE DONE TOGETHER');
 disp('BY USING THE COMBINED CALL');
 disp(' ');
 disp('sensitivity(redform=1,')
-disp('logtrans_redform=1, namendo=(pie,R), namexo=(e_R), namlagendo=(R),')   
+disp('logtrans_redform=1, namendo=(pie,R), namexo=(e_R), namlagendo=(R),')
 disp('datafile=data_ca1.m,first_obs=8,nobs=79,prefilter=1,')
 disp('istart_rmse=2, rmse=1);')
 disp(' ');
@@ -92,7 +92,7 @@ disp(' ');
 //namendo=(pie,R),  // evaluate relationships for pie and R (namendo=(:) for all variables)
 //namexo=(e_R),     // evaluate relationships with exogenous e_R (use namexo=(:) for all shocks)
 //namlagendo=(R),   // evaluate relationships with lagged R (use namlagendo=(:) for all lagged endogenous)
-//datafile='data_ca1.m',first_obs=8,nobs=79,prefilter=1, 
+//datafile='data_ca1.m',first_obs=8,nobs=79,prefilter=1,
 //istart_rmse=2,   //start computing rmse from second observation (i.e. rmse does not inlude initial big error)
 //rmse=1,          // do rmse analysis
 //);

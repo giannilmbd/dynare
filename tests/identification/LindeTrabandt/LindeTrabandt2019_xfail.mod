@@ -24,7 +24,7 @@
 % Declare endogenous variables
 % =========================================================================
 
-var 
+var
     % Staggered-price economy
     c        ${c}$              (long_name='consumption')
     lam      ${\lambda}$        (long_name='lagrange multiplier budget')
@@ -41,10 +41,10 @@ var
     a        ${a}$              (long_name='auxiliary variable for nonlinear pricing 3')
     ptilde   ${\tilde{p}}$      (long_name='reoptimized price')
     delta1   ${\Delta_1}$       (long_name='price dispersion 1')
-    delta2   ${\Delta_2}$       (long_name='price dispersion 2') 
+    delta2   ${\Delta_2}$       (long_name='price dispersion 2')
     delta3   ${\Delta_3}$       (long_name='price dispersion 3')
-    b        ${b}$              (long_name='bonds') 
-    tau      ${\tau}$           (long_name='lump-sum tax') 
+    b        ${b}$              (long_name='bonds')
+    tau      ${\tau}$           (long_name='lump-sum tax')
     g
     nu %consumption preference shock
 
@@ -54,17 +54,17 @@ var
     wpot     ${w^{pot}}$        (long_name='flex-price real wage')
     rrpot     ${r^{pot}}$        (long_name='flex-price interest rate')
     ypot     ${y^{pot}}$        (long_name='flex-price output')
-    bpot     ${b^{pot}}$        (long_name='flex-price bonds') 
-    taupot   ${\tau^{pot}}$     (long_name='flex-price lump-sum tax') 
+    bpot     ${b^{pot}}$        (long_name='flex-price bonds')
+    taupot   ${\tau^{pot}}$     (long_name='flex-price lump-sum tax')
 
     % Added variables for capital and investment
     k        ${k}$              (long_name='capital')
     rk       ${r^{K}}$          (long_name='rental rate on capital')
     iv       ${i}$              (long_name='investment')
-    q        ${q}$              (long_name='Tobins Q')    
+    q        ${q}$              (long_name='Tobins Q')
     kpot     ${k^{pot}}$        (long_name='flex-price capital')
     rkpot    ${r^{K,pot}}$      (long_name='flex-price rental rate on capital')
-    ivpot    ${i^{pot}}$        (long_name='flex-price investment')    
+    ivpot    ${i^{pot}}$        (long_name='flex-price investment')
 ;
 
 % =========================================================================
@@ -187,10 +187,10 @@ s = OMEGAP*lam*y*vartheta^(OMEGAP/(OMEGAP-1))*mc + BETA*XIP*(gammap/pie(+1))^(OM
 
 [name='Nonlinear pricing 2']
 f = lam*y*vartheta^(OMEGAP/(OMEGAP-1)) + BETA*XIP*(gammap/pie(+1))^(1/(1-OMEGAP))*f(+1);
-  
+
 [name='Nonlinear pricing 3']
 a = PSI*(OMEGAP-1)*lam*y + BETA*XIP*(gammap/pie(+1))*a(+1);
-  
+
 [name='Nonlinear pricing 4']
 s = f*ptilde -a*ptilde^(1+OMEGAP/(OMEGAP-1));
 

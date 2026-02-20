@@ -92,7 +92,7 @@ if nrow >= ncol % more rows
 else
     T_mat = T_mat(:, 1:end-difference);
     Lambda_mat = Lambda_mat(:, 1:end-difference);
-end    
+end
 hold_vec = abs(diag(Lambda_mat)) > tol;      % which dimensions to delete
 S_mat = S_mat(:, hold_vec);                  % delete respective columns
 Lambda_mat = Lambda_mat(hold_vec, hold_vec); % delete respective rows and columns

@@ -258,8 +258,8 @@ if strcmp(options_mom_.mom.mom_method,'SMM')
         y_sim = bsxfun(@minus, y_sim, mean(y_sim,1));
     end
     [other.moments] = mom.get_data_moments(get_filtered_time_series(y_sim, zeros(1,size(y_sim,2)), options_mom_), options_mom_.mom.obs_var, dr.inv_order_var, M_.matched_moments(~first_moment_indicator,:));
-    model_moments(first_moment_indicator)=first.moments; 
-    model_moments(~first_moment_indicator)=other.moments; 
+    model_moments(first_moment_indicator)=first.moments;
+    model_moments(~first_moment_indicator)=other.moments;
 end
 
 
@@ -287,7 +287,7 @@ if strcmp(options_mom_.mom.mom_method,'IRF_MATCHING') && strcmp(options_mom_.mom
                 fval = ones(options_mom_.mom.mom_nbr,1)*options_mom_.huge_number;
             end
             message = get_error_message(info,options_mom_);
-            fprintf('\n%s\n              info = %d for shock %s.\n', message, info(1), M_.exo_names{i});            
+            fprintf('\n%s\n              info = %d for shock %s.\n', message, info(1), M_.exo_names{i});
             return
         end
         if options_mom_.relative_irf

@@ -798,7 +798,7 @@ if iload <=0
                 maxrun_dMINIMAL = 0;
             end
             si_dDYNAMICnorm=NaN(max([maxrun_dDYNAMIC, maxrun_dREDUCEDFORM, maxrun_dMOMENTS, maxrun_dSPECTRUM, maxrun_dMINIMAL]),size(STO_si_dDYNAMIC,2));
-            if ~options_MC.no_identification_reducedform 
+            if ~options_MC.no_identification_reducedform
                 si_dREDUCEDFORMnorm=NaN(max([maxrun_dDYNAMIC, maxrun_dREDUCEDFORM, maxrun_dMOMENTS, maxrun_dSPECTRUM, maxrun_dMINIMAL]),size(STO_si_dREDUCEDFORM,2));
             end
             if ~options_MC.no_identification_moments
@@ -809,7 +809,7 @@ if iload <=0
             end
             if ~options_MC.no_identification_minimal
                 dMINIMALnorm=NaN(max([maxrun_dDYNAMIC, maxrun_dREDUCEDFORM, maxrun_dMOMENTS, maxrun_dSPECTRUM, maxrun_dMINIMAL]),size(STO_dMINIMAL,2));
-            end            
+            end
             for irun=1:max([maxrun_dDYNAMIC, maxrun_dREDUCEDFORM, maxrun_dMOMENTS, maxrun_dSPECTRUM, maxrun_dMINIMAL])
                 iter=iter+1;
                 % note that this is not the same si_dDYNAMICnorm as computed in identification.analysis

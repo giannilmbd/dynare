@@ -19,7 +19,7 @@ function var_decomp=compute_variance_decomposition(M_,options_,var_stationary,A,
 %   nvars_requested         [integer]       number of originally requested variables
 %
 % OUTPUTS
-%   stationary_vars   [double]      [#stationary vars by shocks] Matrix containing the variance decomposition 
+%   stationary_vars   [double]      [#stationary vars by shocks] Matrix containing the variance decomposition
 %
 % Copyright © 2001-2025 Dynare Team
 %
@@ -51,7 +51,7 @@ else
             variance_states = lyapunov_symm(A,b1(:,i)*b1(:,i)',options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,1,options_.debug);
         else
             variance_states = lyapunov_symm(A,b1(:,i)*b1(:,i)',options_.lyapunov_fixed_point_tol,options_.qz_criterium,options_.lyapunov_complex_threshold,2,options_.debug);
-        end        
+        end
         vx2 = diag(A_stationary*variance_states*A_stationary'+b2(:,i)*b2(:,i)');
         var_decomp(stationary_vars,i) = vx2;
         variance_sum_loop = variance_sum_loop +vx2; %track overall variance over shocks

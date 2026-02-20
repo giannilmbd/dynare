@@ -16,14 +16,14 @@ parameters theta xi beta phi alpha eta KBar chi0 LMax chi IBar rhoinflavg taylrh
   CRRA = 110;
 
   LMax = 3;
-//  chi0 = exp(wrealAIMSS -phi*CAIMSS) *(LMax-1)^chi; // normalize L in ss = 1 
+//  chi0 = exp(wrealAIMSS -phi*CAIMSS) *(LMax-1)^chi; // normalize L in ss = 1
   chi0 = 1/3;
   chi = 1/Frisch *(LMax-1);
   alpha = (CRRA - 1/(1/phi + 1/chi *(LMax-1))) *(1/(1-phi) + 1/(1-chi) *(LMax-1));
 
   theta = .2;
   xi = .78;
-  
+
   K_Y = 10;
   YBar = K_Y^((1-eta)/eta);
   GBar = .17 *YBar;
@@ -39,13 +39,13 @@ parameters theta xi beta phi alpha eta KBar chi0 LMax chi IBar rhoinflavg taylrh
   rhoz = 0;
   rhog = .95;
   rhopistar = 0;
-  epsafl = 1;    // these flags turn on or off each corresponding shock in the model 
+  epsafl = 1;    // these flags turn on or off each corresponding shock in the model
   epsapermfl = 0;
   epsgfl = 1;
   epsifl = 1;
   epspistarfl = 0;
-  rhoinflavg = .7;  // for price level targeting; set rhoinflavg = .99 or .999 
-  gssload = 0;    // this is the GSS theta parameter in the long-run nominal risks section of the paper 
+  rhoinflavg = .7;  // for price level targeting; set rhoinflavg = .99 or .999
+  gssload = 0;    // this is the GSS theta parameter in the long-run nominal risks section of the paper
 
   VAIMSS = 1;
   consoldelta = 1;
@@ -74,34 +74,34 @@ exp(lzd) = exp(lY) + xi *beta *exp(lC(+1)-lC)^-phi*exp(lDZ(+1))^-phi
  *(V(+1) *exp(lDZ(+1))^(1-phi) /Vkp)^-alpha *exp(lpi(+1))^(1/theta) *exp(lzd(+1));
 exp(lp0)^(1+(1+theta)/theta *(1-eta)/eta) = exp(lzn-lzd);
 exp(lpi)^(-1/theta) = (1-xi) *exp(lp0+lpi)^(-1/theta) + xi;
-// Marginal cost and real wage 
+// Marginal cost and real wage
 MC = exp(lwreal) /eta *exp(lY)^((1-eta)/eta) /exp(lA)^(1/eta) /KBar^((1-eta)/eta);
 chi0 *(LMax-exp(lL))^-chi /exp(lC)^-phi = exp(lwreal) ⟂ lL < 1.0986;
-// Output equations 
+// Output equations
 exp(lY) = exp(lA) *KBar^(1-eta) *exp(lL)^eta /exp(lDisp);
 exp(lDisp)^(1/eta) = (1-xi) *exp(lp0)^(-(1+theta)/theta/eta)
  + xi *exp(lpi)^((1+theta)/theta/eta) *exp(lDisp(-1))^(1/eta);
-exp(lC) = exp(lY)-exp(lG)-IBar; // aggregate resource constraint; no adj costs 
-// Monetary Policy Rule 
+exp(lC) = exp(lY)-exp(lG)-IBar; // aggregate resource constraint; no adj costs
+// Monetary Policy Rule
 lpiavg = rhoinflavg *lpiavg(-1) + (1-rhoinflavg) *lpi;
 4*Int = (1-taylrho) * ( 4*log(1/beta *DZBar^phi) + 4*lpiavg
  + taylpi * (4*lpiavg-pistar) + tayly * (exp(lY)-YBar)/YBar )
- + taylrho * 4*Int(-1) + epsInt; // multiply Int; infl by 4 to put at annual rate 
-// Exogenous Shocks 
+ + taylrho * 4*Int(-1) + epsInt; // multiply Int; infl by 4 to put at annual rate
+// Exogenous Shocks
 lA = rhoa * lA(-1) + epsA;
 lDZ = (1-rhoz)*log(DZBar) + rhoz * lDZ(-1) + 0;
 lG = (1-rhog)*log(GBar) + rhog * lG(-1) + epsG;
 pistar = (1-rhopistar) *log(piBar) + rhopistar *pistar(-1) + gssload *(4*lpiavg-pistar) + 0;
-// Term premium and other auxiliary finance equations 
-Intr = Int(-1) - lpi; // ex post real short rate 
+// Term premium and other auxiliary finance equations
+Intr = Int(-1) - lpi; // ex post real short rate
 exp(lsdf) = beta *exp(lC(+1)-lC)^-phi *exp(lDZ(+1))^-phi
  *(V(+1) *exp(lDZ(+1))^(1-phi) /Vkp)^-alpha /exp(lpi(+1));
 //pricebond = 1 + consoldelta *beta *exp(lC(+1)-lC)^-phi *exp(lDZ(+1))^-phi
 // *(V(+1) *exp(lDZ(+1))^(1-phi) /Vkp)^-alpha /pi(+1) *pricebond(+1);
 //pricebondrn = 1 + consoldelta *pricebondrn(+1) /exp(Int);
-//ytm = log(consoldelta*pricebond/(pricebond-1)) *400; // yield in annualized pct 
+//ytm = log(consoldelta*pricebond/(pricebond-1)) *400; // yield in annualized pct
 //ytmrn = log(consoldelta*pricebondrn/(pricebondrn-1)) *400;
-//termprem = 100 * (ytm–ytmrn); // term prem in annualized basis points 
+//termprem = 100 * (ytm–ytmrn); // term prem in annualized basis points
 //ehpr = ( (consoldelta *pricebond + exp(Int(-1))) /pricebond(-1)–exp(Int(-1)) *400;
 //slope = ytm–Int*400;
 end;

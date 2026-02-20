@@ -46,7 +46,7 @@ for i=1:length(objfun)
            x = helicalvalley();
            x(1) = 5;
       case 'chebyquad'
-        % Fails with a system of 10 equations. 
+        % Fails with a system of 10 equations.
         x = objfun{i}(nan(9,1));
       case {'watson', 'brown', 'discreteintegralequation', 'discreteboundaryvalue', 'chebyquad', 'trigonometric', 'variablydimensioned', 'broydenbanded', 'broydentridiagonal'}
         x = objfun{i}(nan(4,1));
@@ -61,7 +61,7 @@ for i=1:length(objfun)
                 dprintf('Nonlinear solver is expected to fail on %s function but did not return an error.', func2str(objfun{i}))
             end
         elseif isequal(func2str(objfun{i}), 'trigonometric')
-            % FIXME block_trust_region (mex) fails, with exit code equal to 4, but not trust_region (matlab). Would be nice to undertsand the difference. 
+            % FIXME block_trust_region (mex) fails, with exit code equal to 4, but not trust_region (matlab). Would be nice to undertsand the difference.
             if ~errorflag
                 testFailed = testFailed+1;
                 dprintf('Nonlinear solver is expected to fail on %s function but did not return an error.', func2str(objfun{i}))
@@ -87,7 +87,7 @@ t1 = clock; etime(t1, t0)
 for i=1:length(objfun)
     switch func2str(objfun{i})
       case 'chebyquad'
-        % Fails with a system of 10 equations. 
+        % Fails with a system of 10 equations.
         x = objfun{i}(nan(9,1));
       case {'watson', 'brown', 'discreteintegralequation', 'discreteboundaryvalue', 'trigonometric', 'variablydimensioned', 'broydenbanded', 'broydentridiagonal'}
         x = objfun{i}(nan(10,1));

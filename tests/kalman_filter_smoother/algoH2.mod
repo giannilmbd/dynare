@@ -33,7 +33,7 @@ stderr z, normal_pdf, 0, 0.1;
 end;
 
 varobs dw dx dy z;
-       
+
 //estimation(datafile=data_algo,first_obs=1000,nobs=200,mh_replic=0,kalman_algo=2);
 estimation(datafile=data_algo,first_obs=1000,nobs=200,mh_replic=0,mode_compute=0,mode_file='algoH1/Output/algoH1_mode',kalman_algo=2,filtered_vars,smoothed_state_uncertainty);
 
@@ -50,7 +50,7 @@ for t=2:200;
 end;
 if max(max(abs(err))) > 1e-10;
    error('Test fails');
-end;    
+end;
 
 d=load('data_algo');
 dat = [d.dw d.dx d.dy d.z];
@@ -58,11 +58,11 @@ X = oo_.SmoothedMeasurementErrors;
 ME = [X.dw X.dx X.dy X.z];
 if max(max(abs(dat(1000:1199,:)-S(:,[2:4 1])-ME))) > 1e-10;
    error('Test fails');
-end;    
+end;
 
 o1 = load(['algoH1' filesep 'Output' filesep 'algoH1_results.mat']);
 obj_endo={'SmoothedVariables'; 'FilteredVariables'; 'UpdatedVariables'};
-obj_exo = {'SmoothedShocks';}; 
+obj_exo = {'SmoothedShocks';};
 nobj_endo = size(obj_endo,1);
 nobj_exo = size(obj_exo,1);
 for i=1:nobj_endo;
@@ -74,7 +74,7 @@ for i=1:nobj_endo;
     end;
     if max(max(abs(err_endo))) > 1e-10;
        error('Test fails');
-    end;    
+    end;
 end;
 
 
@@ -88,9 +88,9 @@ for i=1:nobj_exo;
     end;
     if max(max(abs(err_exo))) > 1e-10;
        error('Test fails');
-    end;    
+    end;
 end;
 
-if max(max(abs(o1.oo_.SmoothedMeasurementErrors.z - oo_.SmoothedMeasurementErrors.z))) > 1e-10; 
+if max(max(abs(o1.oo_.SmoothedMeasurementErrors.z - oo_.SmoothedMeasurementErrors.z))) > 1e-10;
    error('Test fails');
-end;    
+end;

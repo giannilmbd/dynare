@@ -105,7 +105,7 @@ estimation(order=3,nograph,filter_algorithm=gf,proposal_approximation=montecarlo
       stderr y, 0.0004;
       stderr l, 0.0001;
       stderr i, 0.0002;
-  end;  
+  end;
 %  estimation(order=3,number_of_particles=10000,silent_optimizer,mode_compute=8,cova_compute=0,MCMC_jumping_covariance=prior_variance,mh_init_scale_factor=0.01);
 
   estimated_params_init;
@@ -119,6 +119,6 @@ estimation(order=3,nograph,filter_algorithm=gf,proposal_approximation=montecarlo
       stderr y, 0.0004;
       stderr l, 0.0001;
       stderr i, 0.0001;
-  end;  
+  end;
 estimation(order=3,filter_algorithm=nlkf,number_of_particles=10000,proposal_approximation=montecarlo,resampling=none,silent_optimizer,mode_compute=0,cova_compute=0,MCMC_jumping_covariance=prior_variance,mh_init_scale_factor=0.01);
 @#endif

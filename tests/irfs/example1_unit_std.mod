@@ -79,7 +79,7 @@ if max(max(abs(100*unit_irf-relative_irfs)))>1e-8;
 end
 
 
-//Check relative IRF option at order 2 by comparing it with unnormalized IRF of unit size 
+//Check relative IRF option at order 2 by comparing it with unnormalized IRF of unit size
 shocks;
 var e; stderr 0.01;
 var u; stderr 0.01;
@@ -100,4 +100,3 @@ if max(max(abs(unit_irf_order_2-relative_irfs_order_2)))>2e-4;
      error('relative_irf-option at order=2 is broken')
 end
 
-             

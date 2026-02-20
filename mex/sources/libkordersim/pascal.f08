@@ -21,12 +21,12 @@ module pascal
    implicit none (type, external)
 
    type line
-      integer, dimension(:), allocatable :: coeffs 
+      integer, dimension(:), allocatable :: coeffs
    end type line
 
    type pascal_triangle
       integer :: d
-      type(line), dimension(:), allocatable :: lines     
+      type(line), dimension(:), allocatable :: lines
    end type pascal_triangle
 
    interface pascal_triangle
@@ -72,15 +72,15 @@ contains
       integer, intent(in) :: k(:), d
       type(pascal_triangle), intent(in) :: p
       integer :: s, i
-      s = d 
+      s = d
       multinomial = 1
       i = 1
       do while (s > 0)
-         multinomial = multinomial*get(k(i), s, p)         
+         multinomial = multinomial*get(k(i), s, p)
          s = s-k(i)
          i = i+1
       end do
-   end function 
+   end function
 
 end module pascal
 
@@ -92,7 +92,7 @@ end module pascal
 !    integer :: d
 !    read *, d
 !    p = pascal_triangle(d)
-!    do n=1,d 
+!    do n=1,d
 !       do k=0,n
 !          if (k < n) then
 !             write (*,'(i2," ")', advance="no") get(k,n,p)

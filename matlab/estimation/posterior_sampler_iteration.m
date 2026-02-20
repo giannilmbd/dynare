@@ -20,7 +20,7 @@ function  [par, logpost, accepted, neval, sampler_options] = posterior_sampler_i
 %       exo_steady_state    [vector]        steady state value for exogenous variables
 %       exo_det_steady_state [vector]       steady state value for exogenous deterministic variables
 %       derivatives_info    [structure]     derivative info for identification
-% 
+%
 % OUTPUTS
 %   par:                    last accepted parameter vector
 %   logpost:                value of the posterior after current iteration

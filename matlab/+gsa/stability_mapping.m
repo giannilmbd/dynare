@@ -259,7 +259,7 @@ if fload==0 %run new MC
                 if prepSA
                     try
                         T=zeros(size(dr_.ghx,1),size(dr_.ghx,2)+size(dr_.ghu,2),Nsam);
-                    catch ME                         
+                    catch ME
                         if strcmp('MATLAB:nomem',ME.identifier)
                             prepSA=0;
                             disp('The model is too large for storing state space matrices ...')
@@ -502,7 +502,7 @@ if ~isempty(iunstable) || ~isempty(iwrong)
         options_mcf.nobeha_title = 'NO unique Stable Saddle-Path';
         if options_.TeX
             options_mcf.beha_title_latex = 'unique Stable Saddle-Path';
-            options_mcf.nobeha_title_latex = 'NO unique Stable Saddle-Path';            
+            options_mcf.nobeha_title_latex = 'NO unique Stable Saddle-Path';
         end
         options_mcf.title = 'unique solution';
         gsa.monte_carlo_filtering_analysis(lpmat, istable, itmp, options_mcf, M_, options_, bayestopt_, estim_params_);

@@ -6,7 +6,7 @@ function density = multivariate_student_pdf(X,Mean,Sigma_upper_chol,df)
 %
 %    X                  [double]    dim*n vector
 %    Mean               [double]    1*n vector, expectation of the multivariate random variable.
-%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the covariance 
+%    Sigma_upper_chol   [double]    n*n matrix, upper triangular Cholesky decomposition of Sigma (the covariance
 %                                   matrix up to a factor df/(df-2)).
 %    df                 [integer]   degrees of freedom.
 %

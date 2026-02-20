@@ -26,11 +26,11 @@
  * The model is written in the beginning of period stock notation. To make the model
  * conform with Dynare’s end of period stock notation, we use the
  * predetermined_variables-command.
- * 
+ *
  * The model has been implemented in detrended form, i.e. the \mu_{i,t} are actually
- * the the growth rates of the original \mu_{i,t}^{orig} in the paper, i.e. 
+ * the the growth rates of the original \mu_{i,t}^{orig} in the paper, i.e.
  *  log(\mu_{i,t})=log(\mu_{i,t}^{orig}/\mu_{i,t-1}^{orig})
- * 
+ *
  * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */

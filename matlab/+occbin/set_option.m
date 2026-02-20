@@ -5,7 +5,7 @@ function options_=set_option(options_,options_occbin_,fieldname)
 % Inputs:
 % - options_            [structure]     MATLAB's structure containing the options
 % - options_occbin_     [structure]     MATLAB's structure containing OccBin options
-% - fieldname           [string]        name of the options field to set 
+% - fieldname           [string]        name of the options field to set
 %
 % Outputs:
 % - options_            [structure]     MATLAB's structure containing the options

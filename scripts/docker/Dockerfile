@@ -71,7 +71,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 # Run mpm to install additional toolboxes for MATLAB in the target location and delete the mpm installation afterwards.
 # If mpm fails to install successfully, then print the logfile in the terminal, otherwise clean up.
 # Hint: Sometimes there is a segmentation fault when running mpm, just re-run the build command in this case.
-RUN wget -q https://www.mathworks.com/mpm/glnxa64/mpm \ 
+RUN wget -q https://www.mathworks.com/mpm/glnxa64/mpm \
     && chmod +x mpm \
     && ./mpm install \
     --release=${MATLAB_RELEASE} \
@@ -112,7 +112,7 @@ esac
 # Install common dependencies for Dynare and keep this layer small to reduce image size (apt cache cleanup)
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
-    apt-get install --no-install-recommends --yes \    
+    apt-get install --no-install-recommends --yes \
     gfortran \
     libboost-graph-dev \
     libgsl-dev \
@@ -198,8 +198,8 @@ RUN if [ -f "${MATLAB_INSTALL_LOCATION}/bin/glnxa64/libtiff.so.5" ]; then \
 # WE DO NOT WANT OPTION 2!!!!
 # Option 1. Specify the host and port of the machine that serves the network licenses
 # if you want to store the license information in an environment variable. This
-# is the preferred option. You can either use a build variable, like this: 
-# --build-arg LICENSE_SERVER=27000@MyServerName or you can specify the license server 
+# is the preferred option. You can either use a build variable, like this:
+# --build-arg LICENSE_SERVER=27000@MyServerName or you can specify the license server
 # directly using: ENV MLM_LICENSE_FILE=27000@flexlm-server-name
 ENV MLM_LICENSE_FILE=$LICENSE_SERVER
 # Option 2. Alternatively, you can put a license file into the container (WE DON'T WANT THIS!!!)
@@ -217,7 +217,7 @@ RUN git clone --depth 1 --branch ${DYNARE_RELEASE} --recurse-submodules https://
 # Once the MATLAB containers are based on Ubuntu 24.04, this step can be removed
 RUN case "$DYNARE_RELEASE" in \
     6.*) \
-        cd dynare && \        
+        cd dynare && \
         pip3 install meson==1.3.1 && \
         export PATH="/home/matlab/.local/bin:${PATH}" && \
         meson setup -Dmatlab_path=${MATLAB_INSTALL_LOCATION} -Dbuildtype=debugoptimized build-matlab && \

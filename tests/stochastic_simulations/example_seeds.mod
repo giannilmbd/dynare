@@ -106,7 +106,7 @@ if ~isoctave
     set_dynare_seed('default')
     stoch_simul(periods=1000,irf=0,nomoments);
     endo_simul_9 = oo_.endo_simul;
-    
+
     t6 = endo_simul_9-endo_simul_1;
 
     if any(abs(t6(:))>1e-12)

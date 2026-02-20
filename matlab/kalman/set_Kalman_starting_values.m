@@ -12,7 +12,7 @@ function a=set_Kalman_starting_values(a,M_,dr,options_,bayestopt_)
 % OUTPUTS
 %   o a             [double]    (p*1) vector of set initial states
 
-if isfield(M_,'endo_initial_state') && ~isempty(M_.endo_initial_state) && M_.endo_initial_state.status 
+if isfield(M_,'endo_initial_state') && ~isempty(M_.endo_initial_state) && M_.endo_initial_state.status
     % direct assignment
     state_indices=dr.order_var(dr.restrict_var_list(bayestopt_.mf0));
     if ~isempty(M_.endo_initial_state.values)

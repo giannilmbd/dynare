@@ -98,7 +98,7 @@ while i<n
         if gg(i)*(hh(i)*gg(i))/2 > htol(i)
             [ff, xx, fc, retcode] = csminit1(func0,x,penalty,f0,gg,0,diag(hh),Verbose,varargin{:});
             fcount = fcount + fc;
-            if retcode && robust 
+            if retcode && robust
                 if abs(x(i))<1.e-6
                     xa=transpose(linspace(x(i)/2, sign(x(i))*1.e-6*3/2, 7));
                 else
@@ -128,7 +128,7 @@ while i<n
             if robust
             if not(isequal(xx , check_bounds(xx,bounds)))
                 xx = check_bounds(xx,bounds);
-                if xx(i)<x(i)   
+                if xx(i)<x(i)
                     % lower bound
                     xx(i) = min(xx(i)+h1(i), 0.5*(xx(i)+x(i)));
                 else

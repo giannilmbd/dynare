@@ -29,7 +29,7 @@ parameters sigr sigg sigz tau phi psi1 psi2 rhor rhog rhoz rrst pist gamst nu cy
 rrst = 1.0000;
 pist = 3.2000;
 gamst= 0.5500;
-tau  = 2.0000; 
+tau  = 2.0000;
 nu   = 0.1000;
 kap  = 0.3300;
 phi  = tau*(1-nu)/nu/kap/exp(pist/400)^2;
@@ -79,7 +79,7 @@ YGR=gamst; INFL=pist; INT=pist+rrst+4*gamst;
 end;
 
 estimated_params;
-tau,   2,     1e-5, 10,      gamma_pdf,     2,    0.5; 
+tau,   2,     1e-5, 10,      gamma_pdf,     2,    0.5;
 
 %these parameters do not enter the linearized solution
 cyst, 0.85,  1e-5, 0.99999, beta_pdf,      0.85, 0.1;

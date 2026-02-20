@@ -5,10 +5,10 @@ function [zdata, T, R, CONST, ss, update_flag]=mkdatap_anticipated_2constraints_
 %
 % Inputs:
 % - n_periods           [double]        number for periods for simulation
-% - DM                  [structure]     Dynamic model 
+% - DM                  [structure]     Dynamic model
 % - T_max               [Tmax]          last period where constraints bind
-% - binding_indicator   [T+1]           indicator for constraint violations      
-% - irfshock_pos        [double]        shock position 
+% - binding_indicator   [T+1]           indicator for constraint violations
+% - irfshock_pos        [double]        shock position
 % - scalefactor_mod     [double]        shock values
 % - init                [double]        [N by 1] initial value of endogenous variables
 % - update_flag         [boolean]       flag whether to update results
@@ -20,7 +20,7 @@ function [zdata, T, R, CONST, ss, update_flag]=mkdatap_anticipated_2constraints_
 % - CONST               [N by 1]        constant of state space
 % - ss                  [structure]     state space system
 % - update_flag         [boolean]       flag that results have been updated
-% Original authors: Luca Guerrieri and Matteo Iacoviello 
+% Original authors: Luca Guerrieri and Matteo Iacoviello
 % Original file downloaded from:
 % https://www.matteoiacoviello.com/research_files/occbin_20140630.zip
 % Adapted for Dynare by Dynare Team.
@@ -58,7 +58,7 @@ n_exo=DM.n_exo;
 % Tmax = max([regimestart1(nregimes1) regimestart2(nregimes2)])-1;  % Tmax is the position of the last period
 % when the constraint binds
 
-if ~isempty(dictionary) 
+if ~isempty(dictionary)
     if (length(binding_indicator(:))>size(dictionary.binding_indicator,1))
         nviol_old = size(dictionary.binding_indicator,1)/2;
         tmp = zeros(length(binding_indicator)-nviol_old,size(dictionary.binding_indicator,2));
@@ -70,7 +70,7 @@ if ~isempty(dictionary)
 end
 
 if T_max > 0
-    
+
     if isempty(dictionary)
         tmp = [binding_indicator(T_max,:); zeros(n_periods,2)];
         dictionary.binding_indicator(:,1) = tmp(:);
@@ -125,9 +125,9 @@ if T_max > 0
         end
 
     end
-    
-    
-    for i = T_max-1:-1:1        
+
+
+    for i = T_max-1:-1:1
         tmp = 0*binding_indicator;
         tmp(1:end-i+1,:) = binding_indicator(i:end,:);
         itmp = find(~any(dictionary.binding_indicator(1:length(tmp)*2,:)-tmp(:)));
@@ -164,7 +164,7 @@ if T_max > 0
     E = dictionary.ss(ireg(1)).R;
     ss = dictionary.ss(ireg(1:T_max));
 else
-    ss = [];    
+    ss = [];
 end
 
 % generate data

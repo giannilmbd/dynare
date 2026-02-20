@@ -1,5 +1,5 @@
 % Test whether preprocessor fails if histval set future lags
-        
+
 var pai, c, n, r, a;
 varexo u;
 parameters beta, rho, epsilon, omega, phi, gamma;

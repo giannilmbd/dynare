@@ -1,7 +1,7 @@
 function oo_ = posterior_importance_sampling(M_, estim_params_, oo_, options_, bayestopt_)
 % oo_ = posterior_importance_sampling(M_, estim_params_, oo_, options_, bayestopt_)
 %
-% Uses draws from previous MCMC (either linear of PKF) 
+% Uses draws from previous MCMC (either linear of PKF)
 % to re-draw parameters using PKF/PPF with importance sampling
 %
 % INPUTS
@@ -59,7 +59,7 @@ else
     M_bkp = M_;
     M_.dname = orig_dname;
     M_.fname = orig_fname;
-    [params0, lpost]=get_posterior_subsample(M_,options_,B);    
+    [params0, lpost]=get_posterior_subsample(M_,options_,B);
     M_ = M_bkp;
 end
 
@@ -77,7 +77,7 @@ else
     error('invalid filter name')
 end
 % make sure nothing is plotted during sampling
-options_.occbin.filter.particle.diagnostics.nograph=true; 
+options_.occbin.filter.particle.diagnostics.nograph=true;
 options_.occbin.filter.particle.diagnostics.status=false;
 
 Label = '%s %s';
@@ -90,7 +90,7 @@ for k=1:length(lpk)
     lpk(k) = evaluate_posterior_kernel(params0(k,:)', M_, estim_params_, oo_, options_, bayestopt_);
     txt = sprintf('Step %u of %u', k,length(lpk));
     [~, length_of_old_string]=wait_bar.run(k/length(lpk), hh_fig, sprintf(waitbar_title, txt),options_.console_mode,length_of_old_string,[],0);
-    
+
 end
 wait_bar.close(hh_fig,options_.console_mode);
 

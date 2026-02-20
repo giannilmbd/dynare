@@ -176,9 +176,9 @@ switch options_.particle.initialization
         info(1) = 202;
         info(4) = 0.1;
         exit_flag = 0;
-        return;        
+        return;
     end
-    StateVectorVariance = cov(y_');       
+    StateVectorVariance = cov(y_');
     options_.periods = old_DynareOptionsperiods;
     options_.pruning = old_DynareOptionspruning;
     clear('old_DynareOptionsperiods','y_');
@@ -197,7 +197,7 @@ if flag
     fval = Inf;
     info(1) = 201;
     info(4) = 0.1;
-    exit_flag = 0;    
+    exit_flag = 0;
     return;
 end
 %------------------------------------------------------------------------------

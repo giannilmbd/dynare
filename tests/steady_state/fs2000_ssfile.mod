@@ -40,7 +40,7 @@ steady_state_model;
   dA = exp(gam);
   gst = 1/dA;
   m = mst;
-  
+
   khst = ( (1-gst*bet*(1-del)) / (alp*gst^alp*bet) )^(1/(alp-1));
   xist = ( ((khst*gst)^alp - (1-gst*(1-del))*khst)/mst )^(-1);
   nust = psi*mst^2/( (1-alp)*(1-psi)*bet*gst^alp*khst^alp );
@@ -56,7 +56,7 @@ steady_state_model;
 
   // Test function returning several arguments
   [W, e] = fs2000_ssfile_aux(l, n);
-  
+
   gp_obs = m/dA;
   gy_obs = dA;
 end;

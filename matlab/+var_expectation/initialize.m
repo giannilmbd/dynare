@@ -4,7 +4,7 @@ function initialize(varexpectationmodel)
 %
 % INPUTS
 % - varepxpectationmodel       [string]    Name of the VAR expectation model.
-% 
+%
 % OUTPUTS
 % None
 %

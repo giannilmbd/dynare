@@ -136,7 +136,7 @@ model;
    // Returns on illiquid asset
    pshare * (div + p) / p(-1) + (1 - pshare) * (1 + r) - 1 - ra;
 
-   // Fisher equation 
+   // Fisher equation
    1 + i(-1) - (1 + r) * (1 + pi);
 
    // Wage inflation

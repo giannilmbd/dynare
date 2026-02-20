@@ -121,7 +121,7 @@ end
 if whoiam
     Parallel=myinputs.Parallel;
 else
-    Parallel=0; %make sure it exists    
+    Parallel=0; %make sure it exists
 end
 
 % DirectoryName = myinputs.DirectoryName;
@@ -255,11 +255,11 @@ for b=fpar:B
                     alphatilde = alphahat*nan;
                     SteadyState=oo_.dr.ys;
                     trend_coeff = zeros(length(options_.varobs_id),1);
-                    trend_addition=zeros(options_.number_of_observed_variables,gend);        
+                    trend_addition=zeros(options_.number_of_observed_variables,gend);
                     stock_occbin_regime(:,irun(5))=regime_history;
-                    stock_occbin_realtime_regime(:,irun(5))=regime_history; 
+                    stock_occbin_realtime_regime(:,irun(5))=regime_history;
                     stock_occbin_regime(:,irun(5))=regime_history;
-                    stock_occbin_realtime_regime(:,irun(5))=regime_history; 
+                    stock_occbin_realtime_regime(:,irun(5))=regime_history;
                 end
                 %epsilonhat not available as no measurement error allowed
             else % PKF
@@ -499,7 +499,7 @@ for b=fpar:B
 
         irun = irun +  ones(13,1);
     end
-    
+
     if run_smoother && (irun(1) > MAX_nsmoo || b == B)
         stock = stock_smooth(:,:,1:irun(1)-1);
         ifil(1) = ifil(1) + 1;
@@ -725,7 +725,7 @@ endo_nbr=length(y0);
 yf = zeros(endo_nbr,1+horizon,n);
 yf(:,1,:,:) = repmat(y0,[1,1,n]);
 
-for iter=1:horizon    
+for iter=1:horizon
     if stochastic_indicator
         yf(:,iter+1,:) = dr.ghx*squeeze(yf(k2,iter,:))+B1*squeeze(e(:,:,iter));
     else

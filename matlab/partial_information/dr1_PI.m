@@ -128,7 +128,7 @@ try
     dr.ghu=impact;
     dr.eigval = eig(G1pi);
     dr.rank=FL_RANK;
-    
+
 catch ME
     disp('Problem with using Part Info solver');
     rethrow(ME);

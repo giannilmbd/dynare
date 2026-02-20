@@ -1,6 +1,6 @@
 function plot_regimes(regimes,M_,options_)
 % plot_regimes(regimes,M_,options_)
-% Inputs: 
+% Inputs:
 % - regimes     	[structure]     OccBin regime information
 % - M_              [structure]     MATLAB's structure describing the model
 % - options_        [structure]     MATLAB's structure containing the options
@@ -32,7 +32,7 @@ else
     regimestart(1) = {'regimestart1'};
     regime(2) = {'regime2'};
     regimestart(2) = {'regimestart2'};
-end    
+end
 
 GraphDirectoryName = CheckPath('graphs',M_.dname);
 fhandle = dyn_figure(options_.nodisplay,'Name',[M_.fname ': OccBin regimes']);

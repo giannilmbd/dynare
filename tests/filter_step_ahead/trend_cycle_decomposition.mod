@@ -29,6 +29,6 @@ stderr ez        , inv_gamma_pdf,   0.06 , inf;
 alpha, normal_pdf, 0.9, 0.1;
 end;
 
-varobs y; 
+varobs y;
 
-estimation(datafile=trend_cycle_decomposition_data,nobs=82, silent_optimizer,mh_replic=2000, mode_compute=4, mh_nblocks=1, mh_jscale=0.3, filtered_vars, smoother, diffuse_filter) yp z; 
+estimation(datafile=trend_cycle_decomposition_data,nobs=82, silent_optimizer,mh_replic=2000, mode_compute=4, mh_nblocks=1, mh_jscale=0.3, filtered_vars, smoother, diffuse_filter) yp z;

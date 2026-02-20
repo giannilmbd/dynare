@@ -2,7 +2,7 @@ function print_table_prior(lb, ub, options_, M_, bayestopt_, estim_params_)
 % print_table_prior(lb, ub, options_, M_, bayestopt_, estim_params_)
 % This routine prints in the command window some descriptive statistics about the prior distribution.
 % Inputs:
-%  o lb             [double]    lower bound    
+%  o lb             [double]    lower bound
 %  o ub             [double]    upper bound
 %  o M_             [structure] Definition of the model
 %  o bayestopt_     [structure] describing the priors

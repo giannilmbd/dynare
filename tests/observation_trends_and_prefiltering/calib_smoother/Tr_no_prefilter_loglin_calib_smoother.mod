@@ -8,7 +8,7 @@ calib_smoother(datafile='Tr_no_prefilter_loglin_calib_smoother_Exp_AR1_trend_dat
 //         filter_decomposition,
         filtered_vars, filter_step_ahead = [1,2,4]) P_obs Y_obs junk2;
 load('Tr_no_prefilter_loglin_calib_smoother_Exp_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 
 loaded_par=load('Tr_no_prefilter_loglin_calib_smoother_orig_params');

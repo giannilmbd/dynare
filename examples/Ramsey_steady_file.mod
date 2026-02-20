@@ -3,21 +3,21 @@
  * Lawrence J. Christiano, Roberto Motto and Massimo Rostagno (2007):
  * "Notes on Ramsey-Optimal Monetary Policy", Section 2
  * The paper is available at http://faculty.wcas.northwestern.edu/~lchrist/d16/d1606/ramsey.pdf
- * 
+ *
  * Notes:
- * - This mod-files allows to simulate a simple New Keynesian Model with Rotemberg price 
+ * - This mod-files allows to simulate a simple New Keynesian Model with Rotemberg price
  *      adjustment costs under fully optimal monetary under commitment (Ramsey)
  *
  *  - This files shows how to use a user-defined conditional steady state file in the Ramsey case. It takes
- *      the value of the defined instrument R as given and then computes the rest of the steady 
- *      state, including the steady state inflation rate, based on this value. The initial value 
+ *      the value of the defined instrument R as given and then computes the rest of the steady
+ *      state, including the steady state inflation rate, based on this value. The initial value
  *      of the instrument for steady state search must then be defined in an initval-block.
  *
  * This implementation was written by Johannes Pfeifer.
  *
  * If you spot mistakes, email me at jpfeifer@gmx.de
  *
- * Please note that the following copyright notice only applies to this Dynare 
+ * Please note that the following copyright notice only applies to this Dynare
  * implementation of the model.
  */
 
@@ -70,7 +70,7 @@ phi=100;
 rho=0.9;
 tau=0;
 chi=1;
-        
+
 model;
     [name='Euler equation']
     1/(1+R)=beta*C/(C(+1)*pi(+1));
@@ -110,8 +110,8 @@ end;
 planner_objective log(C)-chi/2*h^2;
 
 //set up Ramsey optimal policy problem with interest rate R as the instrument,...
-// defining the discount factor in the planner objective to be the one of private agents        
-ramsey_model(instruments=(R),planner_discount=beta,planner_discount_latex_name=$\beta$); 
+// defining the discount factor in the planner objective to be the one of private agents
+ramsey_model(instruments=(R),planner_discount=beta,planner_discount_latex_name=$\beta$);
 
 //conduct stochastic simulations of the Ramsey problem
 stoch_simul(order=1,irf=20,periods=500) pi_ann log_h R_ann log_C Z r_real;

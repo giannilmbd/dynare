@@ -66,11 +66,11 @@ if jacobian_flag
         % check whether we already found a solution, do not allow NaN or Inf here
         % Better solution may be found in that case
         if ~ismember(options_.solve_algo,[10,11]) && max(abs(fvec))< tolf
-            % return if initial value solves the problem except if a mixed complementarity problem is to be solved (complementarity conditions may not be satisfied)            
+            % return if initial value solves the problem except if a mixed complementarity problem is to be solved (complementarity conditions may not be satisfied)
             % max([NaN, 0])=0, so explicitly exclude the case where fvec contains NaN via isfinite
             errorcode = -11;
             return;
-        end        
+        end
     end
     if options_.solve_randomize_initial_guess && (~all(isfinite(fvec)) || any(isinf(fjac(:))) || any(isnan((fjac(:)))) || any(~isreal(fvec)) || any(~isreal(fjac(:))))
         % no solution yet found, but problem was encountered in fvec or Jacobian, try different initial guess

@@ -70,7 +70,7 @@ steady;
 
 check;
 
-if isoctave 
+if isoctave
     options_.bnlms.set_dynare_seed_to_default=false;
     set_dynare_seed(1);
 end

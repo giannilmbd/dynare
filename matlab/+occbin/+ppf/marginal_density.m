@@ -1,5 +1,5 @@
-function [ModifiedHarmonicMean, crit_flag] = marginal_density(x2, logpo2, tolerance)  
-% [ModifiedHarmonicMean, crit_flag] = marginal_density(x2, logpo2, tolerance)  
+function [ModifiedHarmonicMean, crit_flag] = marginal_density(x2, logpo2, tolerance)
+% [ModifiedHarmonicMean, crit_flag] = marginal_density(x2, logpo2, tolerance)
 % Computes the marginal likelihood using the modified harmonic mean estimator.
 %
 % INPUTS
@@ -46,9 +46,9 @@ crit_flag=0;
 % (useful if the user wants to perform some computations using
 % the posterior mean instead of the posterior mode ==> ).
 
-try 
+try
     % use this robust option to avoid inf/nan
-    logdetSIGMA = 2*sum(log(diag(chol(SIGMA)))); 
+    logdetSIGMA = 2*sum(log(diag(chol(SIGMA))));
 catch
     % in case SIGMA is not positive definite
     logdetSIGMA = nan;

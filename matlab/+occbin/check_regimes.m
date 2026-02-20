@@ -11,7 +11,7 @@ function [TT, RR, CC, regime_history] = check_regimes(TT, RR, CC, opts_regime, M
 % - dr                  [structure]     Reduced form model.
 % - endo_steady_state   [vector]        steady state value for endogenous variables
 % - exo_steady_state    [vector]        steady state value for exogenous variables
-% - exo_det_steady_state    [vector]    steady state value for exogenous deterministic variables                                    
+% - exo_det_steady_state    [vector]    steady state value for exogenous deterministic variables
 %
 % OUTPUTS
 % - TT              [N by N]            transition matrix of state space for each period
@@ -84,7 +84,7 @@ for tp=1:gend-1
                 regime_history(tp).regimestart = [1 regime_history(tp).regimestart+1];
                 change_it = 1;
             end
-            
+
         else
             if regime_history(tp).regime1(1) > binding_indicator(tp+1,1)
                 regime_history(tp).regime1 = [0 regime_history(tp).regime1];
@@ -119,7 +119,7 @@ for tp=1:gend-1
             check_it = true;
             jt=1;
         end
-        
+
         if check_it %|| tp==1 % the matrices for regime have been already computed
             TT(:,:,tp+1) = TT(:,:,jt);
             RR(:,:,tp+1) = RR(:,:,jt);
@@ -130,7 +130,7 @@ for tp=1:gend-1
             else
                 nperi = max([regime_history(tp).regimestart1 regime_history(tp).regimestart2]);
             end
-            
+
             opts_simul.endo_init_=zeros(size(RR,1),1);
             opts_simul.init_binding_indicator=[];
             opts_simul.init_regime=regime_history(tp);
@@ -143,6 +143,6 @@ for tp=1:gend-1
             RR(:,:,tp+1) = ss.R(dr.order_var,:);
             CC(:,tp+1) = ss.C(dr.order_var);
         end
-        
+
     end
 end

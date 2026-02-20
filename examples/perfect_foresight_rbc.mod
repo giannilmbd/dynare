@@ -2,13 +2,13 @@
  * The file shows how to simulate a one-time TFP shock in a basic RBC model
  * using the perfect foresight solver.
  *
- * The model features a closed economy with a representative having the CRRA felicity 
- * function c^(1-sigma)/(1-sigma)', where 'c' is consumption and 'sigma' is 
- * relative risk aversion. The subjective discount factor is 'beta'. Labor is in fixed 
+ * The model features a closed economy with a representative having the CRRA felicity
+ * function c^(1-sigma)/(1-sigma)', where 'c' is consumption and 'sigma' is
+ * relative risk aversion. The subjective discount factor is 'beta'. Labor is in fixed
  * supply, i.e. equal to 1.
  *
- * Production employs a Cobb-Douglas function 'z*k(-1)^alpha', where 'z' is a 
- * stochastic technology level variable, 'k' is capital (using Dynare's 
+ * Production employs a Cobb-Douglas function 'z*k(-1)^alpha', where 'z' is a
+ * stochastic technology level variable, 'k' is capital (using Dynare's
  * default end-of-period timing convention), and 'alpha' measures the capital share.
  *
  * The capital stock evolves according to the usual law of motion, where 'delta'

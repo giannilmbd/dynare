@@ -23,8 +23,8 @@
 % This is a helper function to compute steady state values and endogenous parameters
 % Based on DSGE_model_yieldCurve_ss.m, getPHI3.m, ObjectGMM.m
 
-function [AA, EVFBAR, PHI3, negVf, info]= AFVRR_steady_helper(VFBAR,RBAR,IVBAR,CBAR,KBAR,LABAR,QBAR,YBAR,  BETTA,B,PAI,H,PHIzero,PHI1,PHI2,THETA,MYYPS,MYZ,INHABIT,RRA,CONSxhr40)         
-% We get nice values of EVF by setting AA app. equal to VF. 
+function [AA, EVFBAR, PHI3, negVf, info]= AFVRR_steady_helper(VFBAR,RBAR,IVBAR,CBAR,KBAR,LABAR,QBAR,YBAR,  BETTA,B,PAI,H,PHIzero,PHI1,PHI2,THETA,MYYPS,MYZ,INHABIT,RRA,CONSxhr40)
+% We get nice values of EVF by setting AA app. equal to VF.
 % The value of the expected value function raised to the power 1-PHI3
 % Also we check bounds on other variables
 % % Adding PHI3 to params. Note that PHI3 only affects the value function in
@@ -43,7 +43,7 @@ WBAR      = PHIzero*(1-H)^(-PHI1)/LABAR;
 RRAc   = RRA;
 if INHABIT == 1
     PHI3 = (RRAc - PHI2/((1-B*MYZSTAR^-1)/(1-BETTA*B)+PHI2/PHI1*WBAR*(1-H)/CBAR))/((1-PHI2)/((1-B*MYZSTAR^-1)/(1-BETTA*B)-(CBAR-B*CBAR*MYZSTAR^-1)^PHI2/((1-BETTA*B)*CBAR)+WBAR*(1-H)/CBAR*(1-PHI2)/(1-PHI1)));
-else    
+else
     PHI3 = (RRAc - PHI2/(1-B*MYZSTAR^-1+PHI2/PHI1*WBAR*(1-H)/CBAR))/((1-PHI2)/(1-B*MYZSTAR^-1-(CBAR-B*CBAR*MYZSTAR^-1)^PHI2/((1-BETTA*B)*CBAR)+WBAR*(1-H)/CBAR*(1-PHI2)/(1-PHI1)));
 end
 if abs(PHI3) > 30000
@@ -58,10 +58,10 @@ if CONSxhr40 > 1
 end
 
 
-if VFBAR < 0   
-    AA        = -VFBAR; 
+if VFBAR < 0
+    AA        = -VFBAR;
     EVFBAR    = (-VFBAR/AA)^(1-PHI3);
-    negVf      = 1;    
+    negVf      = 1;
 else
     AA        = VFBAR;
     EVFBAR    = (VFBAR/AA)^(1-PHI3);

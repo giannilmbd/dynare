@@ -18,7 +18,7 @@ ss_c    = ss_y-ss_k;
 ss_rk   = alpha*ss_y/ss_k;
 theta   = (1-alpha)*(1-ss_l)*ss_y/(ss_l*ss_c);
 
-model(heterogeneity=households); 
+model(heterogeneity=households);
     1/c - beta*rk(+1)/c(+1) = 0;
     y   = z*k(-1)^alpha*ss_l^(1-alpha);
     rk  = alpha*y/k(-1);

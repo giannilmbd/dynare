@@ -5,8 +5,8 @@ function [fh,xh,gh,H,itct,fcount,retcodeh,message] = csminwel1(fcn,x0,H0,grad,cr
 %   x0:     [npar by 1]     initial value of the parameter vector
 %   H0:     [npar by npar]  initial value for the inverse Hessian.  Must be positive definite.
 %   grad:   [string or boolean] Either a string naming a function that calculates the gradient, or a boolean
-%                           indicating whether the function returns a gradient (column) vector. If false, the program 
-%                           calculates a numerical gradient.  
+%                           indicating whether the function returns a gradient (column) vector. If false, the program
+%                           calculates a numerical gradient.
 %   crit:   [scalar]        Convergence criterion.  Iteration will cease when it proves impossible to improve the
 %                           function value by more than crit.
 %   nit:    [scalar]        Maximum number of iterations.
@@ -149,7 +149,7 @@ while ~done
                 save('g1.mat','g1','x1','f1','varargin');
             end
         end
-        if wall1 
+        if wall1
             Hcliff=H+diag(diag(H).*rand(nx,1));
             disp_verbose('Cliff.  Perturbing search direction.',Verbose)
             [f2, x2, fc, retcode2] = csminit1(fcn,x,penalty,f,g,badg,Hcliff,Verbose,varargin{:});
@@ -241,8 +241,8 @@ while ~done
         end %case
         retcodei=[retcode1,retcode2,retcode3];
         retcodeh=retcodei(ih);
-        
-        nogh=isempty(gh);        
+
+        nogh=isempty(gh);
         badgh=1;
         if nogh %recompute gradient
             if NumGrad

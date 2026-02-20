@@ -1,7 +1,7 @@
 function T = reduced_rank_cholesky(X)
 % T = reduced_rank_cholesky(X)
 % Computes the cholesky decomposition of a symmetric semidefinite matrix or of a definite positive matrix.
-% 
+%
 % INPUTS
 %  - X                      [double]    n*n matrix of doubles to be factorized (X is supposed to be semidefinite positive).
 %

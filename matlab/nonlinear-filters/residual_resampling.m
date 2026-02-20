@@ -1,7 +1,7 @@
 function return_resample = residual_resampling(particles,weights,noise)
 % return_resample = residual_resampling(particles,weights,noise)
 % Resamples particles.
-% 
+%
 % INPUTS
 %  - particles              [double]    n*1 vector of particles
 %  - weights                [double]    n*1 vector of particles' weights.

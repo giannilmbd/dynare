@@ -18,7 +18,7 @@ gamma_inf_ = 3;
 
 
 model(linear);
-y  = delta * y(-1)  + (1-delta)*y(+1)+sigma *(r - inflation(+1)) + y_; 
+y  = delta * y(-1)  + (1-delta)*y(+1)+sigma *(r - inflation(+1)) + y_;
 inflation  =   alpha * inflation(-1) + (1-alpha) * inflation(+1) + kappa*y + inf_;
 r = gammax0*y(-1)+gammac0*inflation(-1)+gamma_y_*y_+gamma_inf_*inf_;
 end;

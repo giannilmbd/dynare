@@ -2,11 +2,11 @@ function i = iota(n, idx)
 
 % Returns a selection vector.
 %
-% INPUTS 
+% INPUTS
 % - n      [integer]   scalar, dimension of the returned vector.
 % - idx    [integer]   vector or scalar, non zero entries indices in the returned vector.
 %
-% OUTPUTS 
+% OUTPUTS
 % - i      [integer]   n*1 vector. All elements are zero except those specified in idx.
 
 % Copyright © 2018-2022 Dynare Team

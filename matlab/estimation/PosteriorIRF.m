@@ -118,7 +118,7 @@ elseif strcmpi(type,'gsa')
     end
     x=[lpmat0(istable,:) lpmat(istable,:)];
     clear lpmat istable
-    B=size(x,1); 
+    B=size(x,1);
     options_.B = B;
 else% type = 'prior'
     B = options_.prior_draws;

@@ -1,6 +1,6 @@
 ! Necessary routines and functions to carry out simulations
 !
-! A first step is to get the associated 
+! A first step is to get the associated
 
 ! Copyright © 2021-2026 Dynare Team
 !
@@ -113,7 +113,7 @@ contains
    subroutine simulate_pruning(sim, dr_mx, ysteady, dy, shocks, order, nstatic, nvar)
       real(real64), dimension(:,:), contiguous, intent(inout) :: sim
       type(c_ptr), intent(in) :: dr_mx
-      real(real64), contiguous, intent(in) :: ysteady(:), dy(:) 
+      real(real64), contiguous, intent(in) :: ysteady(:), dy(:)
       real(real64), contiguous, target, intent(in) :: shocks(:,:)
       integer, intent(in) :: order, nstatic, nvar
 
@@ -186,13 +186,13 @@ contains
                         sum_part = sum_part+prod
                      end do
                      ! 2. Multiply the sum-over-integer-partition terms
-                     ! by the considered column [gᵥˡ] 
+                     ! by the considered column [gᵥˡ]
                      psim(q)%m(:,1) = psim(q)%m(:,1)+g(l)%m(:,j)*sum_part
                   end do
                else
                   ! Compute the contribution of g_l-column-multiplied
                   ! terms to x_q when the index of the g_l columns
-                  ! involves no state variables. Such a contribution only 
+                  ! involves no state variables. Such a contribution only
                   ! exists when q=l.
                   prod = 1._real64
                   do m=1,l
@@ -255,13 +255,13 @@ contains
          ug(d)%m = fg(d)%m(:,matching(d)%folded)
       end do
       allocate(dyu(nvar))
-      ! Getting the predetermined part of the endogenous variable vector 
+      ! Getting the predetermined part of the endogenous variable vector
       nys = size(dy)
-      dyu(1:nys) = dy 
+      dyu(1:nys) = dy
       ! Carrying out the simulation
       do t=2,size(sim,2)
          dyu(nys+1:) = shocks(:,t-1)
-         ! Using the Horner algorithm to evaluate the decision rule at the 
+         ! Using the Horner algorithm to evaluate the decision rule at the
          ! chosen dyu
          call eval(h, dyu, ug, endo_nbr, nvar, order)
          sim(:,t) = h(0)%m(:,1) + ysteady

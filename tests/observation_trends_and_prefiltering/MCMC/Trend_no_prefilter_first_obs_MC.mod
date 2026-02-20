@@ -10,7 +10,7 @@ estimation(order=1,datafile='Trend_no_prefilter_first_obs_MC_AR1_trend_data_with
         mh_nblocks=1,mh_jscale=0.3,no_posterior_kernel_density,nograph,sub_draws=100) P_obs Y_obs junk2;
 
 load('Trend_no_prefilter_first_obs_MC_AR1_trend_data_with_constant');
-@#include "../Trend_load_data_common.inc" 
+@#include "../Trend_load_data_common.inc"
 
 loaded_par=load('Trend_no_prefilter_first_obs_MC_orig_params');
 if max(abs((M_.params-loaded_par.orig_params)./loaded_par.orig_params))>0.03

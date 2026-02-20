@@ -11,7 +11,7 @@ sigma = -0.06;
 
 
 model(linear);
-y  = delta * y(-1)  + (1-delta)*y(+1)+sigma *(r - inflation(+1)) + y_; 
+y  = delta * y(-1)  + (1-delta)*y(+1)+sigma *(r - inflation(+1)) + y_;
 inflation  =   alpha * inflation(-1) + (1-alpha) * inflation(+1) + kappa*y + inf_;
 dummy_var=0.9*dummy_var(-1)+0.01*y;
 r = gammax0*y(-1)+gammac0*inflation(-1)+gamma_y_*y_+gamma_inf_*inf_;
@@ -44,7 +44,7 @@ gamma_inf_ = 3;
 osr(optim=('TolFun',1e-20),order=1);
 %compute objective function manually
 objective=oo_.var(strmatch('y',M_.endo_names,'exact'),strmatch('y',M_.endo_names,'exact'))+oo_.var(strmatch('inflation',M_.endo_names,'exact'),strmatch('inflation',M_.endo_names,'exact'))+oo_.var(strmatch('dummy_var',M_.endo_names,'exact'),strmatch('dummy_var',M_.endo_names,'exact'));
-        
+
 if abs(oo_.osr.objective_function-objective)>1e-8
     error('Objective Function is wrong')
 end
@@ -68,8 +68,8 @@ gammax0=1.35533;
 gammac0=1.39664;
 gamma_y_=16.6667;
 gamma_inf_=9.13199;
-        
-%redo computation with double weight on one covariance 
+
+%redo computation with double weight on one covariance
 optim_weights;
 inflation 1;
 y 1;

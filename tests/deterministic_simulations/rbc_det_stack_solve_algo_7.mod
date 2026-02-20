@@ -86,7 +86,7 @@ D = load(['rbc_det' filesep 'Output' filesep 'rbc_det_results']);
 if norm(D.oo_.endo_simul - oo_.endo_simul) > 1e-30;
    disp(norm(D.oo_.endo_simul - oo_.endo_simul));
    error('rbc_det_stack_solve_algo_7 failed');
-end;                       
+end;
 
 options_.dynatol.f=1e-10;
 @#define J = [0,1,2,3,4,9,10]
@@ -107,7 +107,7 @@ if isoctave && options_.solve_algo==0
     %%acount for somehow weaker convergence criterion in Octave's fsolve
     tol_crit=1e-4;
 else
-    tol_crit=1e-8;    
+    tol_crit=1e-8;
 end
 if norm(D.oo_.endo_simul - oo_.endo_simul) > tol_crit;
     disp(norm(D.oo_.endo_simul - oo_.endo_simul));
