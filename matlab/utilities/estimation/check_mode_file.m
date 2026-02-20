@@ -43,7 +43,7 @@ if number_of_estimated_parameters>length(mode_file.xparam1)
     disp(['Your file contains estimates for ' int2str(length(mode_file.xparam1)) ' parameters, while you are attempting to estimate ' int2str(number_of_estimated_parameters) ' parameters:'])
     md = []; xd = [];
     for i=1:number_of_estimated_parameters
-        id = strmatch(deblank(bayestopt_.name(i,:)),mode_file.parameter_names,'exact');
+        id = match_parameter_name_with_stderr(bayestopt_.name{i,:},mode_file.parameter_names);
         if isempty(id)
             disp(['--> Estimated parameter ' bayestopt_.name{i} ' is not present in the loaded ''mode_file'' (prior mean or initialized values will be used, if possible).'])
         else
@@ -52,7 +52,7 @@ if number_of_estimated_parameters>length(mode_file.xparam1)
         end
     end
     for i=1:length(mode_file.xparam1)
-        id = strmatch(mode_file.parameter_names{i},bayestopt_.name,'exact');
+        id = match_parameter_name_with_stderr(mode_file.parameter_names{i},bayestopt_.name);
         if isempty(id)
             disp(['--> Parameter ' mode_file.parameter_names{i} ' is not estimated according to the current mod file.'])
         end
@@ -75,16 +75,16 @@ elseif number_of_estimated_parameters<length(mode_file.xparam1)
     disp(['Your file contains estimates for ' int2str(length(mode_file.xparam1)) ' parameters, while you are attempting to estimate only ' int2str(number_of_estimated_parameters) ' parameters:'])
     md = []; xd = [];
     for i=1:number_of_estimated_parameters
-        id = strmatch(deblank(bayestopt_.name(i,:)),mode_file.parameter_names,'exact');
+        id = match_parameter_name_with_stderr(bayestopt_.name{i,:},mode_file.parameter_names);
         if isempty(id)
-            disp(['--> Estimated parameter ' deblank(bayestopt_.name(i,:)) ' is not present in the loaded ''mode_file'' (prior mean or initialized values will be used, if possible).'])
+            disp(['--> Estimated parameter ' bayestopt_.name{i,:} ' is not present in the loaded ''mode_file'' (prior mean or initialized values will be used, if possible).'])
         else
             xd = [xd; i];
             md = [md; id];
         end
     end
     for i=1:length(mode_file.xparam1)
-        id = strmatch(mode_file.parameter_names{i},bayestopt_.name,'exact');
+        id = match_parameter_name_with_stderr(mode_file.parameter_names{i},bayestopt_.name);
         if isempty(id)
             disp(['--> Parameter ' mode_file.parameter_names{i} ' is not estimated according to the current mod file.'])
         end
@@ -127,7 +127,7 @@ else
         % Check if this is only an ordering issue or if the missing parameters can be initialized with the prior mean.
         md = []; xd = [];
         for i=1:number_of_estimated_parameters
-            id = strmatch(deblank(bayestopt_.name(i,:)), mode_file.parameter_names,'exact');
+            id = match_parameter_name_with_stderr(bayestopt_.name{i,:}, mode_file.parameter_names);
             if isempty(id)
                 disp(['--> Estimated parameter ' bayestopt_.name{i} ' is not present in the loaded ''mode_file''.'])
             else
@@ -161,3 +161,35 @@ else
     end
 end
 skipline()
+
+%--------------------------------------------------------------------------
+function id = match_parameter_name_with_stderr(search_name, search_list)
+% MATCH_PARAMETER_NAME_WITH_STDERR Find a parameter name, accounting for stderr prefixes
+%
+% This function handles backward compatibility with mode files that don't
+% have the "stderr " prefix for standard deviation parameters. Old mode files
+% store parameters without the "stderr " prefix, while new code adds this prefix.
+%
+% INPUTS
+%   search_name:  [string or char] The parameter name to search for (may have "stderr " prefix)
+%   search_list:  [cell or char array] The list of parameter names to search in (no prefix)
+%
+% OUTPUTS
+%   id: [int or empty] Index of the match if found, empty otherwise
+
+% Ensure search_name is a char array 
+if isstring(search_name)
+    search_name = char(search_name);
+end
+
+% Try exact match first
+id = strmatch(search_name, search_list, 'exact');
+if ~isempty(id)
+    return
+end
+
+% If no exact match and search_name has "stderr " prefix, try without it
+if length(search_name) > 7 && strncmp(search_name, 'stderr ', 7)
+    name_without_stderr = deblank(search_name(8:end));
+    id = strmatch(name_without_stderr, search_list, 'exact');
+end

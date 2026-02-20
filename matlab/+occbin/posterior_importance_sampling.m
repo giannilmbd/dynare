@@ -174,6 +174,9 @@ if nvx
         Draws = resampled_params(:,ip);
         [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(Draws, options_.mh_conf_sig);
         name = bayestopt_.name{ip};
+        name = strrep(name,'stderr ','');
+        NAME = strrep(name,', ','_');
+        name = strrep(name,', ',',');
         oo1 = Filloo(oo1, name, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
         disp(sprintf(pformat, header_width, name, this_filter, bayestopt_.p1(ip),...
             post_mean, ...
@@ -199,6 +202,9 @@ if nvn
         Draws = resampled_params(:,ip);
         [post_mean, post_median, post_var, hpd_interval, post_deciles, density] = posterior_moments(Draws, options_.mh_conf_sig);
         name = bayestopt_.name{ip};
+        name = strrep(name,'stderr ','');
+        NAME = strrep(name,', ','_');
+        name = strrep(name,', ',',');
         oo1 = Filloo(oo1, name, type, post_mean, hpd_interval, post_median, post_var, post_deciles, density);
         disp(sprintf(pformat, header_width, name, this_filter, bayestopt_.p1(ip),...
             post_mean, ...
