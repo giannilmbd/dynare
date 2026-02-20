@@ -43,7 +43,6 @@ end
 
 if ismember(flag,{'filter','all'})
     options_occbin_.filter.particle.draw_states_from_empirical_density = true;
-    options_occbin_.filter.particle.empirical_conditional_data_density.status = false;
     options_occbin_.filter.particle.empirical_data_density.kernel_density = true;
     options_occbin_.filter.particle.empirical_data_density.status = false;
     options_occbin_.filter.particle.ensemble_kalman_filter = false;
