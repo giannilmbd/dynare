@@ -146,7 +146,7 @@ eta_t_T = nan(eta_nbr, obs_nbr);
 %%%%%%%%%%
 % Filter %
 %%%%%%%%%%
-waitbar_str = sprintf('SMOOTHER FORWARD PASS\nComputing the mean of CSN distributed filtered states takes time\nConsider skipping it with ''skewed𛲖kalman𛲖smoother𛲖skip'' option');
+waitbar_str = sprintf('FREQUENTIST SMOOTHER FORWARD PASS\nComputing the mean of CSN distributed filtered states takes time\nConsider either not invoking the ''smoother'' option or setting ''frequentistˍsmoother=false''');
 waitbar_title = 'Pruned Skewed Kalman Smoother';
 [hh_fig, length_of_old_string] = wait_bar.run(0, [], waitbar_str, console_mode, 0, waitbar_title);
 
@@ -217,7 +217,7 @@ for t = 1:(obs_nbr+1)
 end
 wait_bar.close(hh_fig, console_mode);
 
-waitbar_str = sprintf('SMOOTHER BACKWARD PASS\nComputing the mean of CSN distributed smoothed states and shocks takes time\nConsider skipping it with ''skewed𛲖kalman𛲖smoother𛲖skip'' option');
+waitbar_str = sprintf('FREQUENTIST SMOOTHER BACKWARD PASS\nComputing the mean of CSN distributed smoothed states and shocks takes time\nConsider either not invoking the ''smoother'' option or setting ''frequentistˍsmoother=false''');
 [hh_fig, length_of_old_string] = wait_bar.run(0, [], waitbar_str, console_mode, 0, waitbar_title);
 
 % smoothing step for the last time point, i.e. 'T'

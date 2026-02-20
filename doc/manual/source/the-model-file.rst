@@ -8415,13 +8415,6 @@ Skewed Kalman filter options
        ``'gaussian_log_mvncdf_mendell_elston'`` (default) or ``'mvncdf'``.
        Only relevant for ``kalman_algo=5``.
 
-    .. option:: skewed_kalman_smoother_skip
-
-       Skip the computation of the classical smoother after an estimation
-       with the pruned skewed Kalman filter. Might be useful to skip this,
-       because computing the mean of CSN distributed states and shocks takes some time.
-       Only relevant for ``kalman_algo=5``.
-
 Posterior objects
 ^^^^^^^^^^^^^^^^^
 
