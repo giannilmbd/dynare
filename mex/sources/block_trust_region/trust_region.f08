@@ -108,7 +108,7 @@ contains
 
     ! Do not iterate if the initial guess is a solution of the nonlinear system of equations.
     if (norm2(fvec)<tolf_actual) then
-       info =  -1
+       info = -1
        return
     end if
 
@@ -165,7 +165,7 @@ contains
          fn2 = norm2(fvec2)
 
          ! Test for convergence
-         if (fn2 .lt. tolf_actual) then
+         if (fn2 < tolf_actual) then
             x = x2
             info = 1
             cycle
