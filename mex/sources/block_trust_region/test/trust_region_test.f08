@@ -50,6 +50,7 @@ contains
     fvec(4) = sqrt(10._real64)*(x(1)-x(4))**2
 
     if (present(fjac)) then
+       fjac = 0
        fjac(1,1) = 1
        fjac(1,2) = 10
        fjac(2,3) = sqrt(5._real64)
