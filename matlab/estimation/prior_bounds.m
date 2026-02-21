@@ -94,8 +94,8 @@ for i=1:length(p6)
             bounds.lb(i) = p3(i);
             bounds.ub(i) = Inf;
         else
-            bounds.lb(i) = p3(i)+wblinv(priortrunc, p6(i), p7(i));
-            bounds.ub(i) = p3(i)+wblinv(1.0-priortrunc, p6(i), p7(i));
+            bounds.lb(i) = p3(i)+wblinv(priortrunc, p7(i), p6(i));
+            bounds.ub(i) = p3(i)+wblinv(1.0-priortrunc, p7(i), p6(i));
         end
       otherwise
         error('prior_bounds: unknown distribution shape (index %d, type %d)', i, pshape(i));

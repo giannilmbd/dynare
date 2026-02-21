@@ -89,8 +89,8 @@ if init
             lbcum(i) = gamcdf(1/(bounds.ub(i)-p3(i)),p7(i)/2,2/p6(i));
             ubcum(i) = gamcdf(1/(bounds.lb(i)-p3(i)),p7(i)/2,2/p6(i));
           case 8
-            lbcum(i) = wblcdf(bounds.lb(i)-p3(i),p6(i),p7(i));
-            ubcum(i) = wblcdf(bounds.ub(i)-p3(i),p6(i),p7(i));
+            lbcum(i) = wblcdf(bounds.lb(i)-p3(i),p7(i),p6(i));
+            ubcum(i) = wblcdf(bounds.ub(i)-p3(i),p7(i),p6(i));
           otherwise
             % Nothing to do here.
         end
@@ -117,7 +117,7 @@ for i = 1:npar
             % TO BE CHECKED
         pdraw(:,i) =  1./gaminv(rdraw(:,i),p7(i)/2,2/p6(i))+p3(i);
       case 8
-        pdraw(:,i) =  wblinv(rdraw(:,i),p6(i),p7(i))+p3(i);
+        pdraw(:,i) =  wblinv(rdraw(:,i),p7(i),p6(i))+p3(i);
       otherwise
         % Nothing to do here.
     end
