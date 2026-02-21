@@ -168,7 +168,7 @@ if fload==0 %run new MC
             end
         end
     end
-    gsa.prior_draw(M_,bayestopt_,options_,estim_params_,1); %initialize
+    prior_obj = dprior(bayestopt_, options_.prior_trunc, false);
     if pprior
         for j=1:nshock
             if opt_gsa.morris~=1
@@ -185,17 +185,8 @@ if fload==0 %run new MC
                 lpmat(:,j)=lpmat(:,j).*(upper_bound-lower_bound)+lower_bound;
             end
         else
-            % Original method using gsa.prior_draw
-            xx=gsa.prior_draw(M_,bayestopt_,options_,estim_params_,0,[lpmat0 lpmat]);
-             
-            % Verification: Compare with new dprior.from_uniform() implementation
-            prior_obj = dprior(bayestopt_, options_.prior_trunc, false);
-            xx_new = prior_obj.from_uniform([lpmat0 lpmat]);
-            xx_diff = max(abs(xx - xx_new), [], 'all');
-            fprintf('GSA Stability Mapping: Maximum difference between gsa.prior_draw and dprior.from_uniform: %e\n', xx_diff);
-            if xx_diff > 1e-10
-                warning('GSA Stability Mapping: Discrepancy detected between old and new prior_draw implementations')
-            end
+            % Use new dprior.from_uniform() implementation
+            xx = prior_obj.from_uniform([lpmat0 lpmat]);
             lpmat0=xx(:,1:nshock);
             lpmat=xx(:,nshock+1:end);
             clear xx;

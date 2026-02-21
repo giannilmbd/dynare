@@ -192,7 +192,6 @@ Files: matlab/+gsa/cumplot.m
        matlab/+gsa/map_identification.m
        matlab/+gsa/monte_carlo_filtering_analysis.m
        matlab/+gsa/boxplot.m
-       matlab/+gsa/prior_draw.m
        matlab/+gsa/reduced_form_mapping.m
        matlab/+gsa/reduced_form_screening.m
        matlab/+gsa/scatter_mcf.m
