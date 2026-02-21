@@ -81,10 +81,7 @@ nfwrd = M_.nfwrd;
 fname_ = M_.fname;
 
 np = estim_params_.np;
-nshock = estim_params_.nvx;
-nshock = nshock + estim_params_.nvn;
-nshock = nshock + estim_params_.ncx;
-nshock = nshock + estim_params_.ncn;
+nshock = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
 lpmat0=zeros(Nsam,0);
 xparam1=[];
 
@@ -273,7 +270,6 @@ if fload==0 %run new MC
                 egg=zeros(length(dr_.eigval),Nsam);
             end
             if infox(j,1)
-                %                 disp('no solution'),
                 if isfield(oo_.dr,'ghx')
                     oo_.dr=rmfield(oo_.dr,'ghx');
                 end
