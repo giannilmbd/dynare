@@ -41,6 +41,10 @@ bounds.ub = zeros(size(p6));
 
 for i=1:length(p6)
     switch pshape(i)
+      case 0
+          % ML, pass through the bounds (used in GSA)
+          bounds.lb(i) = p3(i);
+          bounds.ub(i) = p4(i);
       case 1
         if priortrunc==0
             bounds.lb(i) = p3(i);
