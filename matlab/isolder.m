@@ -9,7 +9,7 @@ function b = isolder(f, F)
 % OUTPUT
 % - b   [logical]
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -59,6 +59,7 @@ end
 return % --*-- Unit tests --*--
 
 %@test:1
+if ~ispc %touch is not a Windows command
 t = false(3,1);
 mkdir toto;
 cd toto
@@ -92,4 +93,8 @@ if isoctave()
 end
 rmdir('toto','s');
 T = all(t);
+else
+    t=true;
+    T=true;
+end
 %@eof:1
