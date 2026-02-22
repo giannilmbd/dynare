@@ -10,7 +10,7 @@ function inv = betainv (x, a, b)
 % Original author: KH <Kurt.Hornik@wu-wien.ac.at>
 
 % Copyright © 1995, 1996, 1997, 2005, 2006, 2007 Kurt Hornik
-% Copyright © 2008-2025 Dynare Team
+% Copyright © 2008-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -71,6 +71,7 @@ if (any (k))
     end
 
     y_old = y;
+    converged = false;
     for i = 1 : 10000
         h     = (betacdf (y_old, a, b) - x) ./ betapdf (y_old, a, b);
         y_new = y_old - h;
@@ -84,9 +85,13 @@ if (any (k))
         end
         h = y_old - y_new;
         if (max (abs (h)) < sqrt (eps))
+            converged = true;
             break
         end
         y_old = y_new;
+    end
+    if ~converged
+        warning('betainv: Newton-Raphson did not converge; returning best iterate');
     end
 
     inv (k) = y_new;
