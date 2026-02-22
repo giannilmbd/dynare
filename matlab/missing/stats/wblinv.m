@@ -3,12 +3,12 @@ function t = wblinv(proba, scale, shape)
 % Inverse cumulative distribution function.
 %
 % INPUTS
-% - proba [double] Probability, scalar between 0 and 1.
-% - scale [double] Positive hyperparameter.
-% - shape [double] Positive hyperparameter.
+% - proba [double] Probability, scalar or vector with values in [0,1].
+% - scale [double] Positive hyperparameter (scalar).
+% - shape [double] Positive hyperparameter (scalar).
 %
 % OUTPUTS
-% - t     [double] scalar such that P(X<=t)=proba
+% - t     [double] Quantile(s), same size as proba.
 
 % Copyright © 2015-2023 Dynare Team
 %
@@ -33,8 +33,8 @@ if nargin<3
     error('Three input arguments required!')
 end
 
-if ~isnumeric(proba) || ~isscalar(proba) || ~isreal(proba) || proba<0 || proba>1
-    error('First input argument must be a real scalar between 0 and 1 (probability)!')
+if ~isnumeric(proba) || ~isreal(proba) || any(proba(:)<0) || any(proba(:)>1)
+    error('First input argument must be a real scalar or vector with values in [0,1] (probability)!')
 end
 
 if ~isnumeric(scale) || ~isscalar(scale) || ~isreal(scale) || scale<=0
@@ -45,18 +45,13 @@ if ~isnumeric(shape) || ~isscalar(shape) || ~isreal(shape) || shape<=0
     error('Third input argument must be a real positive scalar (shape parameter of the Weibull distribution)!')
 end
 
-
-if proba<2*eps()
-    t = 0;
-    return
+% Vectorized closed-form inverse CDF.
+t = zeros(size(proba));
+t(proba > 1-2*eps()) = Inf;
+k = proba >= 2*eps() & proba <= 1-2*eps();
+if any(k(:))
+    t(k) = exp(log(scale) + log(-log(1-proba(k)))./shape);
 end
-
-if proba>1-2*eps()
-    t = Inf;
-    return
-end
-
-t = exp(log(scale)+log(-log(1-proba))/shape);
 
 return % --*-- Unit tests --*--
 
@@ -167,3 +162,33 @@ if t(1)
 end
 T = all(t);
 %@eof:4
+
+%@test:5
+% Test with vector-valued proba input.
+
+% Set the hyperparameters of a Weibull distribution.
+scale = .5;
+shape = 1.5;
+
+% Build a probability vector including boundary cases.
+q = [0, 0.25, 0.5, 0.75, 1];
+
+try
+    x = wblinv(q, scale, shape);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+
+% Check the results.
+if t(1)
+    t(2) = isequal(size(x), size(q));
+    t(3) = isequal(x(1), 0);     % p = 0 → x = 0
+    t(4) = isinf(x(end));         % p = 1 → x = Inf
+    % Check round-trip consistency with wblcdf for interior points.
+    for i = 2:length(q)-1
+        t(i+3) = abs(wblcdf(x(i), scale, shape) - q(i)) < 1e-12;
+    end
+end
+T = all(t);
+%@eof:5
