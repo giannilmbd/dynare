@@ -54,7 +54,7 @@ loglikelihood = zeros(n, 1);
 set_dynare_seed('default');
 
 t0 = tic;
-if ~isoctave && matlab.internal.parallel.isPCTInstalled
+if ~isoctave && matlab.internal.parallel.isPCTInstalled && license('test', 'Distrib_Computing_Toolbox');
     sc = parallel.pool.Constant(RandStream('Threefry'));
     parfor j=1:n
         stream = sc.Value;
