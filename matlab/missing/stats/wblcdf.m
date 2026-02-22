@@ -10,7 +10,7 @@ function p = wblcdf(x, scale, shape)
 % OUTPUTS
 % - p     [double] Positive scalar between
 
-% Copyright © 2015-2023 Dynare Team
+% Copyright © 2015-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -61,6 +61,8 @@ end
 % Evaluate the CDF.
 
 p = 1-exp(-(x/scale)^shape);
+
+return;
 
 %@test:1
 try
