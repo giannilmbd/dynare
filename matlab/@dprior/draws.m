@@ -48,16 +48,25 @@ if ~isoctave
         % Use the same stream/substream scheme as serial to keep results identical across modes.
         sc = parallel.pool.Constant(RandStream('Threefry','Seed',base_seed)); % create a constant stream for the worker pool
         parfor i=1:n
+            % RandStream.setGlobalStream must be called inside the parfor body, not before it.
+            % Each worker is a separate MATLAB process with its own independent global stream
+            % state. Calling setGlobalStream on the client (outside parfor) would only affect
+            % the client process and have no effect on the workers, which would then each use
+            % their default stream and produce non-reproducible results.
             stream = sc.Value; % use substream per iteration to make parfor scheduling deterministic
             stream.Substream = i; % set the substream for the current iteration
-            RandStream.setGlobalStream(stream); % set the seed in each iteration of parfor loops
+            RandStream.setGlobalStream(stream); % set the stream on the worker process
             P(:,i) = draw(o);
         end
     else
+        % In the serial case there is only one process, so it is sufficient to set the global
+        % stream once before the loop. Inside the loop only the cheap substream index is
+        % advanced, avoiding the overhead of replacing the global stream object on every
+        % iteration.
         stream = RandStream('Threefry','Seed',base_seed);
+        RandStream.setGlobalStream(stream);
         for i=1:n
             stream.Substream = i;
-            RandStream.setGlobalStream(stream);
             P(:,i) = draw(o);
         end
     end
