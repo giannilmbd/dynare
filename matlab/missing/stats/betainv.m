@@ -72,7 +72,7 @@ if (any (k))
 
     y_old = y;
     converged = false;
-    for i = 1 : 10000
+    for i = 1 : 1000
         h     = (betacdf (y_old, a, b) - x) ./ betapdf (y_old, a, b);
         y_new = y_old - h;
         ind   = find (y_new <= eps);
