@@ -11834,6 +11834,11 @@ Shock Decomposition
 
         See :opt:`kalman_tol = DOUBLE`.
 
+    .. option:: use_univariate_filters_if_singularity_is_detected
+                use_univariate_filters_if_singularity_is_detected = BOOLEAN
+
+        See :opt:`use_univariate_filters_if_singularity_is_detected <use_univariate_filters_if_singularity_is_detected = INTEGER>`.
+
     .. option:: xls_sheet = QUOTED_STRING
 
         See :opt:`xls_sheet <xls_sheet = QUOTED_STRING>`.
@@ -14073,11 +14078,11 @@ Performing sensitivity analysis
 
         See :opt:`diffuse_filter`.
 
-   .. option:: kalman_tol = DOUBLE
+    .. option:: kalman_tol = DOUBLE
 
         See :opt:`kalman_tol = DOUBLE`.
 
-   .. option:: diffuse_kalman_tol = DOUBLE
+    .. option:: diffuse_kalman_tol = DOUBLE
 
         See :opt:`diffuse_kalman_tol = DOUBLE`.
 
@@ -14252,9 +14257,32 @@ Performing identification analysis
         a specific user defined sample file.
         Default: ``0``.
 
+*Kalman-filtering Options*
+
     .. option:: diffuse_filter
 
         Deals with non-stationary cases. See :opt:`diffuse_filter`.
+
+    .. option:: lik_init = INTEGER
+
+        See :opt:`lik_init <lik_init = INTEGER>`.
+
+    .. option:: kalman_algo = INTEGER
+
+        See :opt:`kalman_algo <kalman_algo = INTEGER>`.
+
+    .. option:: kalman_tol = DOUBLE
+
+        See :opt:`kalman_tol = DOUBLE`.
+
+    .. option:: diffuse_kalman_tol = DOUBLE
+
+        See :opt:`diffuse_kalman_tol <diffuse_kalman_tol = DOUBLE>`.
+ 
+    .. option:: use_univariate_filters_if_singularity_is_detected
+                use_univariate_filters_if_singularity_is_detected = BOOLEAN
+
+        See :opt:`use_univariate_filters_if_singularity_is_detected <use_univariate_filters_if_singularity_is_detected = INTEGER>`.
 
 *Numerical Options*
 
@@ -14375,14 +14403,6 @@ Performing identification analysis
 
         If equal to ``1``, allow Dynare to load previously computed
         analyzes. Default: ``0``.
-
-    .. option:: lik_init = INTEGER
-
-        See :opt:`lik_init <lik_init = INTEGER>`.
-
-    .. option:: kalman_algo = INTEGER
-
-        See :opt:`kalman_algo <kalman_algo = INTEGER>`.
 
     .. option:: no_identification_reducedform
 

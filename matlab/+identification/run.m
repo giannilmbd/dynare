@@ -238,6 +238,15 @@ if isfield(options_ident,'graph_format')
         % specify file formats to save graphs: eps, pdf, fig, none (do not save but only display)
 end
 
+% cover kalman_filter_primary_options (minus the ones set before)
+list_of_options_to_check={'kalman_algo','kalman_tol','use_univariate_filters_if_singularity_is_detected','diffuse_kalman_tol',...
+    'heteroskedastic_filter','skewed_kalman_prune_tol','skewed_kalman_rank_deficiency_transform','skewed_kalman_mvnlogcdf'};
+for option_iter=1:length(list_of_options_to_check)
+    if isfield(options_ident,list_of_options_to_check{option_iter})
+        options_.(list_of_options_to_check{option_iter})=options_ident.(list_of_options_to_check{option_iter});
+    end
+end
+
 % check for external draws, i.e. set pdraws0 for a gsa analysis
 if options_ident.gsa_sample_file
     GSAFolder = CheckPath('gsa',dname);
