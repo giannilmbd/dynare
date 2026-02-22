@@ -44,7 +44,7 @@ if ~isoctave
     state = uint64(global_stream.State);
     idx = uint64(1:numel(state))';
     base_seed = double(mod(sum(state.*idx), uint64(2^32)));
-    if matlab.internal.parallel.isPCTInstalled
+    if matlab.internal.parallel.isPCTInstalled && license('test', 'Distrib_Computing_Toolbox')
         % Use the same stream/substream scheme as serial to keep results identical across modes.
         sc = parallel.pool.Constant(RandStream('Threefry','Seed',base_seed)); % create a constant stream for the worker pool
         parfor i=1:n
@@ -205,7 +205,7 @@ if t(1)
     catch
         t(6) = false;
     end
-    if ~isoctave && matlab.internal.parallel.isPCTInstalled
+    if ~isoctave && matlab.internal.parallel.isPCTInstalled && license('test', 'Distrib_Computing_Toolbox')
         try
             % Parallel mode should be reproducible after reseeding
             set_dynare_seed_local_options(options_.DynareRandomStreams,options_.parallel_info.isHybridMatlabOctave,321);
