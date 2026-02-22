@@ -3,12 +3,12 @@ function p = wblcdf(x, scale, shape)
 % Cumulative distribution function for the Weibull distribution.
 %
 % INPUTS
-% - x     [double] Positive real scalar.
-% - scale [double] Positive hyperparameter.
-% - shape [double] Positive hyperparameter.
+% - x     [double] Positive real scalar or vector.
+% - scale [double] Positive hyperparameter (scalar).
+% - shape [double] Positive hyperparameter (scalar).
 %
 % OUTPUTS
-% - p     [double] Positive scalar between
+% - p     [double] Probability value(s) in [0,1], same size as x.
 
 % Copyright © 2015-2026 Dynare Team
 %
@@ -34,8 +34,8 @@ if nargin<3
     error('Three input arguments required!')
 end
 
-if ~isnumeric(x) || ~isscalar(x) || ~isreal(x)
-    error('First input argument must be a real scalar!')
+if ~isnumeric(x) || ~isreal(x)
+    error('First input argument must be a real scalar or vector!')
 end
 
 if ~isnumeric(scale) || ~isscalar(scale) || ~isreal(scale) || scale<=0
@@ -46,21 +46,13 @@ if ~isnumeric(shape) || ~isscalar(shape) || ~isreal(shape) || shape<=0
     error('Third input argument must be a real positive scalar (shape parameter of the Weibull distribution)!')
 end
 
-% Filter trivial polar cases.
-
-if x<=0
-    p = 0;
-    return
+% Vectorized evaluation of the CDF.
+p = zeros(size(x));
+p(isinf(x) & x>0) = 1;
+k = x > 0 & ~isinf(x);
+if any(k(:))
+    p(k) = 1 - exp(-(x(k)./scale).^shape);
 end
-
-if isinf(x)
-    p = 1;
-    return
-end
-
-% Evaluate the CDF.
-
-p = 1-exp(-(x/scale)^shape);
 
 return;
 
@@ -148,3 +140,32 @@ if t(1)
 end
 T = all(t);
 %@eof:4
+
+%@test:5
+% Test with vector-valued x input.
+
+% Set the hyperparameters of a Weibull distribution.
+scale = .5;
+shape = 1.5;
+
+% Build a vector of x values including boundary cases.
+x = [-1, 0, scale*log(2)^(1/shape), 1, Inf];
+
+try
+    p = wblcdf(x, scale, shape);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+
+% Check the results.
+if t(1)
+    t(2) = isequal(size(p), size(x));
+    t(3) = isequal(p(1), 0);    % x < 0 → p = 0
+    t(4) = isequal(p(2), 0);    % x = 0 → p = 0
+    t(5) = abs(p(3) - 0.5) < 1e-12;  % x = median → p = 0.5
+    t(6) = p(4) > 0 && p(4) < 1;     % interior point
+    t(7) = isequal(p(5), 1);    % x = Inf → p = 1
+end
+T = all(t);
+%@eof:5
