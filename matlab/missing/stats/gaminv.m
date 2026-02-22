@@ -74,8 +74,8 @@ if (any (k))
         ind   = find (y_new <= eps);
         if (any (ind))
             y_new (ind) = y_old (ind) / 10;
-            h = y_old - y_new;
         end
+        h = y_old - y_new;
         if (max (abs (h)) < sqrt (eps))
             converged = true;
             break
