@@ -77,7 +77,7 @@ end
 
 if updated_params_flag && ~isreal(params1)
     info(1) = 23;
-    if ~isoctave
+    if ~(isoctave && octave_ver_less_than('11'))
         info(2) = sum(imag(params).^2,'omitnan');
     else
         info(2) = nansum(imag(params).^2);
