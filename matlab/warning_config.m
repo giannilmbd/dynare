@@ -37,16 +37,13 @@ if isoctave
     warning('off', 'Octave:language-extension');
     warning('off', 'Octave:single-quote-string');
     warning('off', 'Octave:missing-semicolon');
-    warning('off', 'Octave:empty-list-elements');
     warning('off', 'Octave:num-to-str');
-    warning('off', 'Octave:resize-on-range-error');
     warning('off', 'Octave:str-to-num');
     warning('off', 'Octave:array-as-logical');
     warning('off', 'Octave:array-to-scalar');
     warning('off', 'Octave:array-to-vector');
     warning('off', 'Octave:mixed-string-concat');
     warning('off', 'Octave:variable-switch-label');
-    warning('off', 'Octave:fortran-indexing');
     warning('off', 'Octave:classdef-to-struct');
     warning('off', 'Octave:legacy-function'); % For strmatch and isdir
     if octave_ver_less_than('11')

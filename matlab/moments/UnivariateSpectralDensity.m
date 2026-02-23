@@ -19,7 +19,7 @@ function [oo_] = UnivariateSpectralDensity(M_,oo_,options_,var_list)
 
 % Adapted from th_autocovariances.m.
 
-% Copyright © 2006-2025 Dynare Team
+% Copyright © 2006-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -44,9 +44,6 @@ if options_.order > 1
     return
 end
 
-if isoctave
-    warning('off', 'Octave:divide-by-zero')
-end
 if nargin<2
     var_list = {};
 end
@@ -123,10 +120,6 @@ end
 
 oo_.SpectralDensity.freqs=freqs;
 oo_.SpectralDensity.density=f;
-
-if isoctave
-    warning('on', 'Octave:divide-by-zero')
-end
 
 if ~options_.nograph
     if ~isfolder(M_.dname)

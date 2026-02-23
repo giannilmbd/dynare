@@ -77,9 +77,6 @@ if local_order>1 && (options_.hp_filter || options_.bandpass.indicator)
 end
 
 endo_nbr = M_.endo_nbr;
-if isoctave
-    warning('off', 'Octave:divide-by-zero')
-end
 nar = options_.ar;
 Gamma_y = cell(nar+2,1);
 if isempty(ivar)
@@ -242,7 +239,4 @@ else% ==> Theoretical filters.
             end
         end
     end
-end
-if isoctave
-    warning('on', 'Octave:divide-by-zero')
 end
