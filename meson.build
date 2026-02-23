@@ -1,6 +1,6 @@
 project('dynare',
         'cpp', 'fortran', 'c',
-        version : '7-unstable',
+        version : '8-unstable',
         license : 'GPL-3.0-or-later',
         license_files : [ 'license.txt', 'COPYING' ],
         # NB: update C++ standard in .clang-format whenever the following is modified
