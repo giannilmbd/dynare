@@ -49,9 +49,10 @@ if isoctave
     warning('off', 'Octave:fortran-indexing');
     warning('off', 'Octave:classdef-to-struct');
     warning('off', 'Octave:legacy-function'); % For strmatch and isdir
-    warning('off', 'Octave:qz:complex-default'); % Will likely be remove in Octave 11
-
     if octave_ver_less_than('11')
+        % The following warning was removed in Octave 11
+        warning('off', 'Octave:qz:complex-default');
+
         % The following is necessary because of matlab/+pac/+bgp/{get,set}.m and
         % matlab/+identification/display.m
         % which trigger this bug: https://savannah.gnu.org/bugs/?46849 (fixed in Octave 11)
