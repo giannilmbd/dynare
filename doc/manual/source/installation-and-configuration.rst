@@ -15,7 +15,7 @@ compilation steps are necessary in that case.
 In order to run Dynare, you need one of the following:
 
 * MATLAB, any version ranging from 9.8 (R2020a) to 25.2 (R2025b);
-* GNU Octave, any version ranging from 8.4.0 to 10.3.0, with the `statistics`_
+* GNU Octave, any version ranging from 8.4.0 to 11.1.0, with the `statistics`_
   package. Note however that the Dynare installer for Windows requires a more
   specific version of Octave, as indicated on the download page.
 
