@@ -44,7 +44,6 @@ if isoctave
     warning('off', 'Octave:array-to-vector');
     warning('off', 'Octave:mixed-string-concat');
     warning('off', 'Octave:variable-switch-label');
-    warning('off', 'Octave:classdef-to-struct');
     warning('off', 'Octave:legacy-function'); % For strmatch and isdir
     if octave_ver_less_than('11')
         % The following warning was removed in Octave 11
@@ -54,6 +53,13 @@ if isoctave
         % matlab/+identification/display.m
         % which trigger this bug: https://savannah.gnu.org/bugs/?46849 (fixed in Octave 11)
         warning('off', 'Octave:shadowed-function');
+
+        % The following warning is no longer emitted when saving to a .mat file since Octave 11
+        warning('off', 'Octave:classdef-to-struct');
+    else
+        % Warning emitted when trying to save classdef to a .mat file since Octave 11
+        % May no longer be needed when the following is fixed: https://savannah.gnu.org/bugs/?45833
+        warning('off', 'Octave:save:classdef:unsupported');
     end
 else
     % In MATLAB >= 7.7, don't display a warning if we use deprecated
