@@ -1,7 +1,7 @@
 classdef paragraph < handle
     % paragraph Class
     %
-    % Copyright © 2014-2023 Dynare Team
+    % Copyright © 2014-2026 Dynare Team
     %
     % This file is part of Dynare.
     %
@@ -53,14 +53,7 @@ classdef paragraph < handle
                     'supplied in name/value pairs.']);
             end
 
-            % Octave 5.1.0 has not implemented `properties` and issues a warning when using `fieldnames`
-            if isoctave
-                warnstate = warning('off', 'Octave:classdef-to-struct');
-            end
             optNames = fieldnames(o);
-            if isoctave
-                warning(warnstate);
-            end
 
             for pair = reshape(varargin, 2, [])
                 ind = find(strcmpi(optNames, pair{1}));
