@@ -8472,6 +8472,14 @@ Kalman filtering and likelihood options
        penalty value for the likelihood when such a singularity is
        encountered. Default: ``1``.
 
+    .. option:: use_univariate_smoother_if_singularity_is_detected
+                use_univariate_smoother_if_singularity_is_detected = BOOLEAN
+
+       Decide whether Dynare should automatically switch to univariate
+       smoother if a singularity is encountered in the smoother (this is the  
+       behaviour if the option is ``true``). Otherwise, an error will be        
+       thrown. Default: ``false``.       
+
     .. option:: rescale_prediction_error_covariance
 
        Rescales the prediction error covariance in the Kalman filter
@@ -12563,6 +12571,11 @@ Dynare can also run the smoother on a calibrated model:
 
         See :opt:`diffuse_kalman_tol <diffuse_kalman_tol = DOUBLE>`.
 
+    .. option:: use_univariate_smoother_if_singularity_is_detected
+                use_univariate_smoother_if_singularity_is_detected = BOOLEAN
+
+        See :opt:`use_univariate_smoother_if_singularity_is_detected <use_univariate_smoother_if_singularity_is_detected = BOOLEAN>`.
+
     .. option:: xls_sheet = QUOTED_STRING
 
         See :opt:`xls_sheet <xls_sheet = QUOTED_STRING>`.
@@ -14085,6 +14098,11 @@ Performing sensitivity analysis
     .. option:: diffuse_kalman_tol = DOUBLE
 
         See :opt:`diffuse_kalman_tol = DOUBLE`.
+
+    .. option:: use_univariate_smoother_if_singularity_is_detected
+                use_univariate_smoother_if_singularity_is_detected = BOOLEAN
+
+        See :opt:`use_univariate_smoother_if_singularity_is_detected <use_univariate_smoother_if_singularity_is_detected = BOOLEAN>`.
 
 
 .. _irf-momcal:

@@ -448,6 +448,7 @@ options_.skewed_kalman.rank_deficiency_transform = false;
 options_.skewed_kalman.mvnlogcdf = 'gaussian_log_mvncdf_mendell_elston';
 options_.diffuse_kalman_tol = 1e-6;
 options_.use_univariate_filters_if_singularity_is_detected = 1;
+options_.use_univariate_smoother_if_singularity_is_detected = false;
 options_.riccati_tol = 1e-6;
 options_.lik_init = 1;
 options_.load_mh_file = false;

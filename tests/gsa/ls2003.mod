@@ -74,7 +74,7 @@ load_stab=1,     // load prior sample
 istart_rmse=2,   //start computing rmse from second observation (i.e. rmse does not inlude initial big error)
 stab=0,          // don't  plot again stability analysis results
 rmse=1,          // do rmse analysis
-Nsam=512);
+Nsam=512,kalman_tol=1e-11,use_univariate_smoother_if_singularity_is_detected);
 
 disp(' ');
 disp('THE PREVIOUS THREE CALLS COULD BE DONE TOGETHER');
