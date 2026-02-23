@@ -216,13 +216,26 @@ License: GPL-3+
 Files: matlab/missing/stats/normpdf.m matlab/missing/stats/gamcdf.m
  matlab/missing/stats/chi2inv.m
  matlab/missing/stats/common_size.m
- matlab/missing/stats/gaminv.m matlab/missing/stats/gampdf.m
+ matlab/missing/stats/gampdf.m
  matlab/missing/stats/stdnormal_inv.m matlab/missing/stats/betacdf.m
  matlab/missing/stats/betapdf.m matlab/missing/stats/normcdf.m
  matlab/missing/stats/stdnormal_cdf.m matlab/missing/stats/norminv.m
- matlab/missing/stats/stdnormal_pdf.m matlab/missing/stats/betainv.m
-Copyright: 1995-2007 Kurt Hornik
+ matlab/missing/stats/stdnormal_pdf.m Copyright: 1995-2007 Kurt Hornik
            2008-2025 Dynare Team
+License: GPL-3+
+
+Files: matlab/missing/stats/gaminv.m matlab/missing/stats/betainv.m
+Copyright: 2012 Rik Wehbring
+           1995-2016 Kurt Hornik
+           2022-2024 Andreas Bertsatos, abertsatos@biol.uoa.gr
+           2008-2026 Dynare Team
+License: GPL-3+
+
+Files: matlab/missing/stats/betinv.m
+Copyright: 2012 Rik Wehbring
+           1995-2016 Kurt Hornik
+           2022-2024 Andreas Bertsatos, abertsatos@biol.uoa.gr
+           2008-2026 Dynare Team
 License: GPL-3+
 
 Files: matlab/missing/stats/quantile.m
