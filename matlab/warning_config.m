@@ -10,7 +10,7 @@ function warning_config()
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2008-2023 Dynare Team
+% Copyright © 2008-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -51,12 +51,12 @@ if isoctave
     warning('off', 'Octave:legacy-function'); % For strmatch and isdir
     warning('off', 'Octave:qz:complex-default'); % Will likely be remove in Octave 11
 
-    % The following is necessary because of matlab/pac-tools/+pac/+bgp/{get,set}.m
-    % which triggers this bug: https://savannah.gnu.org/bugs/?46849
-    % The warning can be reenabled once the bug is fixed (and the files
-    % mentioned above can then be moved back to matlab/+pac/+bgp/,
-    % see #1817).
-    warning('off', 'Octave:shadowed-function');
+    if octave_ver_less_than('11')
+        % The following is necessary because of matlab/+pac/+bgp/{get,set}.m and
+        % matlab/+identification/display.m
+        % which trigger this bug: https://savannah.gnu.org/bugs/?46849 (fixed in Octave 11)
+        warning('off', 'Octave:shadowed-function');
+    end
 else
     % In MATLAB >= 7.7, don't display a warning if we use deprecated
     % interface to set seed of random number generators
