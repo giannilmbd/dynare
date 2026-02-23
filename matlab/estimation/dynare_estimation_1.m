@@ -12,7 +12,7 @@ function dynare_estimation_1(var_list_,dname)
 % SPECIAL REQUIREMENTS
 %   none
 
-% Copyright © 2003-2025 Dynare Team
+% Copyright © 2003-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -481,9 +481,13 @@ if issmc(options_) || (any(bayestopt_.pshape>0) && options_.mh_replic) ||  (any(
                     oo_.convergence=oo_load_mh.oo_.convergence;
                 end
             end
-        elseif isdime(options_) && ~options_.nodiagnostic
-            % provide plot of log densities over iterations
-            oo_.lprob = trace_plot_dime(options_, M_);
+        elseif isdime(options_)
+            if ~options_.nodiagnostic
+                % provide plot of log densities over iterations
+                oo_.lprob = trace_plot_dime(options_, M_);
+            end
+            [~, ~, posterior_mode] = compute_posterior_covariance_matrix(bayestopt_.name, M_.fname, M_.dname, options_);
+            oo_ = fill_mh_mode(posterior_mode, NaN(length(posterior_mode),1), M_, options_, estim_params_, oo_, 'posterior');
         end
         % Estimation of the marginal density from the Mh draws:
         if isdsmh(options_) || ishssmc(options_) || isonline(options_) || isdime(options_) || options_.mh_replic || (options_.load_mh_file && ~options_.load_results_after_load_mh)

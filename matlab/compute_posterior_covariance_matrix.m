@@ -16,7 +16,7 @@ function [mu, covariance, mode, kernel_at_the_mode] = compute_posterior_covarian
 % - mode                     [double]   n×1 vector, posterior mode of the parameters.
 % - kernel_at_the_mode       [double]   scalar, value of the posterior kernel at the mode.
 
-% Copyright © 2023-2025 Dynare Team
+% Copyright © 2023-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -49,6 +49,17 @@ if ishssmc(options_)
     mu = sum(posterior.particles, 2)/length(posterior.tlogpostkernel);
     % Compute the posterior covariance
     covariance = (posterior.particles-mu)*(posterior.particles-mu)'/length(posterior.tlogpostkernel);
+elseif isdime(options_)
+    % Load draws from the posterior distribution
+    posterior = load(sprintf('%s%s%s%schains.mat', dname, filesep(), 'dime', filesep()));
+    % Get the posterior mode
+    [kernel_at_the_mode, id] = max(posterior.lprobs(:));
+    [max_row, max_col] = ind2sub(size(posterior.lprobs), id);
+    mode = squeeze(posterior.chains(max_row,max_col,:));
+    % Compute the posterior mean and posterior covariance
+    posterior.chains = reshape(posterior.chains, [], size(posterior.chains, 3));
+    mu = transpose(mean(posterior.chains));
+    covariance = cov(posterior.chains);
 else
     [mu, covariance, mode, kernel_at_the_mode] = compute_mh_covariance_matrix(fname, dname);
 end

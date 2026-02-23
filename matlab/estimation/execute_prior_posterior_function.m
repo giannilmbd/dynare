@@ -50,9 +50,11 @@ functionhandle=str2func(posterior_function_name);
 n_draws=options_.sampling_draws;
 
 if strcmpi(type,'posterior')
-    % Get information about the _posterior_draws files.
-    % discard first mh_drop percent of the draws:
-    CutSample(M_, options_, 'prior_posterior_function');
+    if ~isdime(options_)
+        % Get information about the _posterior_draws files.
+        % discard first mh_drop percent of the draws:
+        CutSample(M_, options_, 'prior_posterior_function');
+    end
     options_.sub_draws = n_draws; % set draws for sampling; changed value is not returned to base workspace
     [options_.sub_draws, error_flag]=set_number_of_subdraws(M_,options_); %check whether number is feasible
     if error_flag
