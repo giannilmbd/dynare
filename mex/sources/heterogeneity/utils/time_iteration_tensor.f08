@@ -300,7 +300,7 @@ function solve_time_iteration_tensor( &
         ! As we don't need the MCP multipliers value, we don't need the level 1
         if (mcp%set_auxiliary_variables) then
             lv_idx = 0
-            call call_matlab_set_auxiliary_variables(gp_ws%yh, input_mex, l)
+            call call_matlab_set_auxiliary_variables(gp_ws%yh, input_mex, lv_idx)
         end if
         if (dims%n_mult > 0) then
             ! Set MCP multipliers to zero for the FB function to work correctly
