@@ -163,7 +163,7 @@ for i=1:numel(param_names)
    set_param_value(param, steady_state.params.(param));
 end
 
-heterogeneity_compute_steady_state(filename=hank_2a_sp, calibration_target_equations=['wage_nkpc', 'liquid_asset_market_clearing', 'illiquid_asset_market_clearing'], time_iteration_tol=1e-10, time_iteration_learning_rate=0.8, time_iteration_solver_tolf=1e-12, time_iteration_solver_tolx=1e-14,time_iteration_verbosity=0,forward_verbosity=0,calibration_verbosity=0);
+heterogeneity_compute_steady_state(filename=hank_2a_sp, calibration_target_equations=['wage_nkpc', 'liquid_asset_market_clearing', 'illiquid_asset_market_clearing'], time_iteration_tol=1e-10, time_iteration_learning_rate=0.79, time_iteration_solver_tolf=1e-12, time_iteration_solver_tolx=1e-14,time_iteration_verbosity=0,forward_verbosity=0,calibration_verbosity=0);
 
 heterogeneity_solve;
 
