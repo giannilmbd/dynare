@@ -81,10 +81,7 @@ nfwrd = M_.nfwrd;
 fname_ = M_.fname;
 
 np = estim_params_.np;
-nshock = estim_params_.nvx;
-nshock = nshock + estim_params_.nvn;
-nshock = nshock + estim_params_.ncx;
-nshock = nshock + estim_params_.ncn;
+nshock = estim_params_.nvx + estim_params_.nvn + estim_params_.ncx + estim_params_.ncn;
 lpmat0=zeros(Nsam,0);
 xparam1=[];
 
@@ -171,7 +168,7 @@ if fload==0 %run new MC
             end
         end
     end
-    gsa.prior_draw(M_,bayestopt_,options_,estim_params_,1); %initialize
+    prior_obj = dprior(bayestopt_, options_.prior_trunc, false);
     if pprior
         for j=1:nshock
             if opt_gsa.morris~=1
@@ -188,7 +185,8 @@ if fload==0 %run new MC
                 lpmat(:,j)=lpmat(:,j).*(upper_bound-lower_bound)+lower_bound;
             end
         else
-            xx=gsa.prior_draw(M_,bayestopt_,options_,estim_params_,0,[lpmat0 lpmat]);
+            % Use new dprior.from_uniform() implementation
+            xx = prior_obj.from_uniform([lpmat0 lpmat]);
             lpmat0=xx(:,1:nshock);
             lpmat=xx(:,nshock+1:end);
             clear xx;
@@ -273,7 +271,6 @@ if fload==0 %run new MC
                 egg=zeros(length(dr_.eigval),Nsam);
             end
             if infox(j,1)
-                %                 disp('no solution'),
                 if isfield(oo_.dr,'ghx')
                     oo_.dr=rmfield(oo_.dr,'ghx');
                 end

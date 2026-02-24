@@ -45,8 +45,9 @@ for i=1:length(pshape)
       case 6 % INVGAMMA2 PRIOR
         xcum(:,i) = gamcdf(1./(para(:,i)-p3(i)),p7(i)/2,2/p6(i));
       case 8 % WEIBULL
-        xcum(:,i) = wblcdf(para(:,i)-p3(i),p6(i),p7(i));
+        xcum(:,i) = wblcdf(para(:,i)-p3(i),p7(i),p6(i));
       otherwise
         error('Unknown prior shape!')
     end
 end
+

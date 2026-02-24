@@ -27,6 +27,12 @@ switch S(1).type
         p = feval(S(1).subs, o);
     elseif ismember(S(1).subs, {'draws', 'density', 'densities', 'moments', 'admissible'})
         p = feval(S(1).subs, o , S(2).subs{:});
+    elseif ismember(S(1).subs, {'from_uniform'})
+        if length(S) >= 2
+            p = feval(S(1).subs, o , S(2).subs{:});
+        else
+            error('dprior::subsref: %s requires arguments.', S(1).subs)
+        end
     elseif ismember(S(1).subs, {'mean', 'median', 'variance', 'mode'})
         if (length(S)==2 && isempty(S(2).subs)) || length(S)==1
             p = feval(S(1).subs, o);
