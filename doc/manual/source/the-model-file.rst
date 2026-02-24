@@ -11191,6 +11191,9 @@ Bayesian estimation options
 
        Controls whether to use MATLAB's Parallel Computing Toolbox (PCT).
        Requires MATLAB R2024b or later, the PCT to be installed, and a valid license.
+       The pool is automatically managed: if no pool is open
+       when entering the sampler, one is created and closed
+       afterwards; if a pool is already open, it is reused.
        This option has no effect under Octave.
 
        When used without a value or set to ``true``, all PCT-compatible
@@ -11199,16 +11202,25 @@ Bayesian estimation options
        quoted strings is provided, only the listed sub-tasks are
        parallelized with PCT while the others run serially.
 
-       Currently, the only recognized sub-task is:
+       Currently, the recognized sub-tasks are:
 
            ``'sampler'``
 
                Parallelize the MCMC posterior samplers. Each chain
                (see :opt:`mh_nblocks <mh_nblocks = INTEGER>`) is
                dispatched to a separate worker using ``parfeval``.
-               The pool is automatically managed: if no pool is open
-               when entering the sampler, one is created and closed
-               afterwards; if a pool is already open, it is reused.
+               Per chain random number generator seeds are
+               pre-computed so that results are identical
+               whether running in serial or parallel.
+
+           ``'smc_initialization'``
+
+               Parallelize the initialization of SMC samplers
+               (HSSMC, DSMH, DIME). The initial particle draws from
+               the prior distribution are distributed across workers
+               using ``parfor``. Per-particle random number generator
+               seeds are pre-computed so that results are identical
+               whether running in serial or parallel.
 
        This option provides a simpler alternative to the cluster-based
        parallelization configured via :ref:`conf-file` and the
@@ -11225,9 +11237,11 @@ Bayesian estimation options
                estimation(use_pct=true);
                estimation(use_pct=false);
                estimation(use_pct=['sampler']);
+               estimation(use_pct=['smc_initialization']);
+               estimation(use_pct=['sampler','smc_initialization']);
 
        |br| Default: ``true`` (all sub-tasks parallelized when PCT is
-       available).
+       available and the license is valid).
 
 **MCMC initialization and recovery**
 

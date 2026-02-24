@@ -23,7 +23,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
 % SPECIAL REQUIREMENTS
 % None.
 
-% Copyright © 2024-2025 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -84,7 +84,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
     % Initialization of the sampler (draws from the prior distribution with finite logged likelihood)
     t0 = tic;
     [x, ~, lprob] = ...
-        smc_samplers_initialization(funobj, 'dime', nchain, Prior, SimulationFolder, opts.niter);
+        smc_samplers_initialization(funobj, 'dime', nchain, Prior, SimulationFolder, opts.niter, options_.DynareRandomStreams.seed, options_.parallel_info);
     x = ptransform(x', bounds, true);
 
     disp_verbose(sprintf('Estimation:dime: log-posterior standard deviation (post.std) of a multivariate normal would be %.2f.\n', sqrt(0.5*ndim)), options_.verbosity);

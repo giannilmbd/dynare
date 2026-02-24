@@ -16,7 +16,7 @@ function mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, opti
 % SPECIAL REQUIREMENTS
 % None.
 
-% Copyright © 2022-2025 Dynare Team
+% Copyright © 2022-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,7 +62,7 @@ function mdd = hssmc(objective_function, mh_bounds, dataset_, dataset_info, opti
     % Initialization of the sampler (draws from the prior distribution with finite logged likelihood)
     t0 = tic;
     [particles, tlogpostkernel, loglikelihood] = ...
-        smc_samplers_initialization(funobj, 'hssmc', smcopt.particles, Prior, SimulationFolder, smcopt.steps);
+        smc_samplers_initialization(funobj, 'hssmc', smcopt.particles, Prior, SimulationFolder, smcopt.steps, options_.DynareRandomStreams.seed, options_.parallel_info);
     tt = toc(t0);
 
     dprintf('#Iter.       lambda        ESS          Acceptance rate   scale   resample   seconds')

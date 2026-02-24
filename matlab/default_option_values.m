@@ -587,6 +587,7 @@ options_.plot_priors = 1;
 options_.cova_compute = 1;
 options_.parallel = 0;
 options_.parallel_info.use_pct.estimation.sampler = ~isoctave;
+options_.parallel_info.use_pct.estimation.smc_initialization = ~isoctave;
 options_.parallel_info.isHybridMatlabOctave = false;
 options_.parallel_info.leaveSlaveOpen = 0;
 options_.parallel_info.RemoteTmpFolder = '';
