@@ -134,7 +134,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
             factors(xchnge) = lprop_old - lprop_new;
 
             % Metropolis-Hastings
-            newlprob = log_prob_fun(funobj, Prior, bounds, opts.parallel, q);
+            newlprob = log_prob_fun(funobj, bounds, opts.parallel, q);
             lnpdiff = factors + newlprob - lprob(idcur);
             accepted = lnpdiff > log(rand(cursize,1));
             naccepted = naccepted + sum(accepted);
@@ -175,18 +175,14 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
     save(sprintf('%s%schains.mat', SimulationFolder, filesep()), 'chains', 'lprobs', 'tune')
 end
 
-function lprobs = log_prob_fun(loglikefun, Prior, bounds, runs_in_parallel, x)
+function lprobs = log_prob_fun(loglikefun, bounds, runs_in_parallel, x)
 
     dim = length(x);
     x = ptransform(x, bounds, false);
     lprobs = zeros(dim,1);
     if runs_in_parallel
         parfor i=1:dim
-            par = x(i,:)';
-            loglikelihood = -loglikefun(par);
-            % temporary workaround for bug #1930
-            logprior = Prior.density(par);
-            lprobs(i) = loglikelihood + logprior;
+            lprobs(i) = -loglikefun(x(i,:)');
         end
     else
         for i=1:dim
