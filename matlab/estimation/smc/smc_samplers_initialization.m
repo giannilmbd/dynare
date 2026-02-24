@@ -37,11 +37,12 @@ function [particles, tlogpostkernel, loglikelihood] = smc_samplers_initializatio
 
 dprintf('Estimation:%s: Initialization...', sampler)
 
-% Delete old mat files storing particles if any...
-matfiles = sprintf('%s%sparticles*.mat', SimulationFolder, filesep());
-files = dir(matfiles);
-if ~isempty(files)
-    delete(matfiles);
+% Delete old mat files storing chains and particles if any...
+chains_file = sprintf('%s%schains.mat', SimulationFolder, filesep());
+particle_files = sprintf('%s%sparticles*.mat', SimulationFolder, filesep());
+if exist(chains_file, 'file') || ~isempty(dir(particle_files))
+    if exist(chains_file, 'file'); delete(chains_file); end
+    if ~isempty(dir(particle_files)); delete(particle_files); end
     dprintf('Estimation:%s: Old %s-files successfully erased.', sampler, sampler)
 end
 
