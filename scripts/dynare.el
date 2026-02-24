@@ -67,7 +67,7 @@
     "ramsey_model" "ramsey_policy" "evaluate_planner_objective" "occbin_setup"
     "occbin_solver" "occbin_write_regimes" "occbin_graph"
     "discretionary_policy" "identification" "bvar_density" "bvar_forecast"
-    "bvar_irf" "sensitivity" "dynare_sensitivity" "initval_file" "histval_file"
+    "bvar_irf" "sensitivity" "initval_file" "histval_file"
     "forecast" "shock_decomposition" "realtime_shock_decomposition"
     "plot_shock_decomposition" "initial_condition_decomposition"
     "squeeze_shock_decomposition" "sbvar" "ms_estimation" "ms_simulation"

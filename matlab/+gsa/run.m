@@ -90,7 +90,7 @@ elseif isfield(options_gsa,'neighborhood_width') && options_gsa.neighborhood_wid
 end
 
 if options_.order~=1
-    warning('dynare_sensitivity: dynare_sensitivity does only support order=1, resetting to order=1.')
+    warning('sensitivity: sensitivity does only support order=1, resetting to order=1.')
     options_.order = 1;
 end
 
@@ -105,7 +105,7 @@ if ~isempty(options_gsa.datafile) || isempty(bayestopt_) || options_gsa.rmse
         options_.nobs=options_gsa.nobs;
     end
     if ~isempty(options_.nobs) && length(options_.nobs)~=1
-        error('dynare_sensitivity does not support recursive estimation. Please specify nobs as a scalar, not a vector.')
+        error('sensitivity does not support recursive estimation. Please specify nobs as a scalar, not a vector.')
     end
     options_.datafile = options_gsa.datafile;
     if isfield(options_gsa,'first_obs')
@@ -145,7 +145,7 @@ else
 end
 
 if M_.exo_nbr==0
-    error('dynare_sensitivity does not support having no varexo in the model. As a workaround you could define a dummy exogenous variable.')
+    error('sensitivity does not support having no varexo in the model. As a workaround you could define a dummy exogenous variable.')
 end
 
 [~,~,~,~,oo_.dr,M_.params] = dynare_resolve(M_,options_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);

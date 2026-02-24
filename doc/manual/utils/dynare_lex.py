@@ -45,7 +45,7 @@ class DynareLexer(RegexLexer):
         "plot_shock_decomposition","calib_smoother","forecast",
         "conditional_forecast","plot_conditional_forecast","bvar_forecast",
         "smoother2histval","osr","osr_params","ramsey_model","ramsey_policy",
-        "discretionary_policy","planner_objective","dynare_sensitivity",
+        "discretionary_policy","planner_objective","sensitivity",
         "markov_switching","svar","sbvar","ms_estimation","ms_simulation",
         "ms_compute_mdd","ms_compute_probabilities","ms_irf","ms_forecast",
         "ms_variance_decomposition","rplot","dynatype","dynasave","set_dynare_seed",
