@@ -560,7 +560,6 @@ options_.posterior_sampler_options.hssmc.acpt = 1.00;
 options_.posterior_sampler_options.hssmc.target = 0.25;
 % DIME MCMC Sampler
 options_.posterior_sampler_options.dime.niter = 1500;
-options_.posterior_sampler_options.dime.parallel = false;
 options_.posterior_sampler_options.dime.aimh_prob = .1;
 options_.posterior_sampler_options.dime.sigma = 1e-5;
 options_.posterior_sampler_options.dime.df_proposal_dist = 10;
@@ -588,6 +587,7 @@ options_.cova_compute = 1;
 options_.parallel = 0;
 options_.parallel_info.use_pct.estimation.sampler = ~isoctave;
 options_.parallel_info.use_pct.estimation.smc_initialization = ~isoctave;
+options_.parallel_info.use_pct.estimation.dime = ~isoctave;
 options_.parallel_info.isHybridMatlabOctave = false;
 options_.parallel_info.leaveSlaveOpen = 0;
 options_.parallel_info.RemoteTmpFolder = '';

@@ -62,15 +62,9 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
         error('dime: number of ensemble iterations to keep (tune=%d) exceeds number of iterations (niter=%d)!', tune, opts.niter)
     end
 
-    % temporary workaround to deal with parallelization
-    if opts.parallel
-        % check if parallel is possible
-        installed_toolboxes = ver;
-        toolbox_installed = any(strcmp("Parallel Computing Toolbox", {installed_toolboxes.Name}));
-        if ~toolbox_installed || feature('numcores') == 1
-            error('dime: parallel processing option is chosen but Parallel Computing Toolbox is not installed or machine has only one core')
-        end
-    end
+    % Setup parallel execution for DIME likelihood evaluations
+    [run_dime_with_pct, restore_pool_dime] = setup_parallel_execution(options_.parallel_info.use_pct.estimation.dime, 'dime'); %#ok<ASGLU>
+    % restore_pool_dime holds an onCleanup object that restores the pool state when this function ends or crashes; we need to keep it in the scope of this function and so ignore the warning about unused variable
 
     % Set location for the simulated particles.
     SimulationFolder = CheckPath('dime', M_.dname);
@@ -134,7 +128,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
             factors(xchnge) = lprop_old - lprop_new;
 
             % Metropolis-Hastings
-            newlprob = log_prob_fun(funobj, bounds, opts.parallel, q);
+            newlprob = log_prob_fun(funobj, bounds, run_dime_with_pct, q);
             lnpdiff = factors + newlprob - lprob(idcur);
             accepted = lnpdiff > log(rand(cursize,1));
             naccepted = naccepted + sum(accepted);

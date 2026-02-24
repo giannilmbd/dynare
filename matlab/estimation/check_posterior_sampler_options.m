@@ -463,8 +463,6 @@ if init
                           posterior_sampler_options.nchain = options_list{i,2};
                       case 'niter'
                           posterior_sampler_options.niter = options_list{i,2};
-                      case 'parallel'
-                          posterior_sampler_options.parallel = options_list{i,2};
                       case 'tune'
                           posterior_sampler_options.tune = options_list{i,2};
                       case 'aimh_prob'

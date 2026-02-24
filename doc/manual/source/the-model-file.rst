@@ -11222,6 +11222,12 @@ Bayesian estimation options
                seeds are pre-computed so that results are identical
                whether running in serial or parallel.
 
+           ``'dime'``
+
+               Parallelize the likelihood evaluations within the DIME
+               MCMC sampler iterations. Each candidate proposal's
+               log-posterior is evaluated in parallel using ``parfor``.
+
        This option provides a simpler alternative to the cluster-based
        parallelization configured via :ref:`conf-file` and the
        ``parallel`` command-line option. Unlike the cluster-based
@@ -11238,7 +11244,7 @@ Bayesian estimation options
                estimation(use_pct=false);
                estimation(use_pct=['sampler']);
                estimation(use_pct=['smc_initialization']);
-               estimation(use_pct=['sampler','smc_initialization']);
+               estimation(use_pct=['smc_initialization','dime']);
 
        |br| Default: ``true`` (all sub-tasks parallelized when PCT is
        available and the license is valid).
