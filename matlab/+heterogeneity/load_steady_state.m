@@ -133,12 +133,12 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
    % Compute state and shock grids for the policy state grids
    mat.pol.sm = set_state_matrix(steady_state.pol.grids, steady_state.shocks.grids, sizes, indices.shocks, indices.states);
    % LU decomposition of Phi_tilde
-   [mat.pol.L, mat.pol.U, mat.pol.P] = lu(Phi_tilde);
+   [mat.pol.L, mat.pol.U, mat.pol.P, mat.pol.Q] = lu(Phi_tilde, 'vector');
    % Computation of Phi_tilde_e
    [I_mex, J_mex, V_mex] = compute_Phi_tilde_e(mat.pol.ind, mat.pol.w, mat.pol.dims, mat.Mu);
    mat.pol.Phi_e = sparse(I_mex, J_mex, V_mex, sizes.N_sp, sizes.N_sp);
    % Compute policy matrices without the auxiliary variables
-   [x_bar, x_bar_dash] = compute_pol_matrices(steady_state.pol.values, H_.orig_endo_nbr, sizes.N_sp, mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(1:H_.orig_endo_nbr));
+   [x_bar, x_bar_dash] = compute_pol_matrices(steady_state.pol.values, H_.orig_endo_nbr, sizes.N_sp, mat.pol.U, mat.pol.L, mat.pol.P, mat.pol.Q, H_.endo_names(1:H_.orig_endo_nbr));
    % Compute y, x, yh, xh once for reuse throughout the function
    % - Aggregate endogenous variable vector at the steady state - %
    y = NaN(M_.endo_nbr,1);
@@ -198,7 +198,7 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
          % 3. Apply Phi_e to get E[aux(t+1)] for this level's computed variables
          [lv_x_bar, lv_x_bar_dash] = compute_pol_matrices(...
             steady_state.pol.values, length(level_vars), sizes.N_sp, ...
-            mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(level_vars));
+            mat.pol.U, mat.pol.L, mat.pol.P, mat.pol.Q, H_.endo_names(level_vars));
          yh(H_.endo_nbr + level_vars, :) = lv_x_bar;
          yh(2*H_.endo_nbr + level_vars, :) = lv_x_bar_dash * mat.pol.Phi_e;
       end
@@ -206,7 +206,7 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
       % Build final aux_x_bar and aux_x_bar_dash for all aux variables
       [aux_x_bar, aux_x_bar_dash] = compute_pol_matrices(...
          steady_state.pol.values, n_aux, sizes.N_sp, ...
-         mat.pol.U, mat.pol.L, mat.pol.P, H_.endo_names(aux_range));
+         mat.pol.U, mat.pol.L, mat.pol.P, mat.pol.Q, H_.endo_names(aux_range));
 
       % Concatenate x_bar and x_bar_dash
       x_bar = [x_bar ; aux_x_bar];
@@ -508,7 +508,7 @@ function [indices, sizes] = compute_model_indices(M_, indices, sizes)
 
 end
 
-function [x_bar, x_bar_dash] = compute_pol_matrices(pol_values, N_x, N_sp, U, L, P, x_names)
+function [x_bar, x_bar_dash] = compute_pol_matrices(pol_values, N_x, N_sp, U, L, P, Q, x_names)
 % Construct interpolated policy function matrices for state transitions.
 %
 % Given discretized policy functions, this function builds:
@@ -521,7 +521,8 @@ function [x_bar, x_bar_dash] = compute_pol_matrices(pol_values, N_x, N_sp, U, L,
 %   N_sp        [integer]  : Number of grid points in the joint state space
 %   U           [matrix]   : Upper triangular matrix from basis decomposition
 %   L           [matrix]   : Lower triangular matrix from basis decomposition
-%   P           [matrix]   : Permutation/projection matrix for expectations
+%   P           [vector]   : Row permutation vector from basis decomposition
+%   Q           [vector]   : Column permutation vector from basis decomposition
 %   x_names     [cell]     : Cell array of policy variable names
 %
 % OUTPUTS
@@ -536,5 +537,6 @@ function [x_bar, x_bar_dash] = compute_pol_matrices(pol_values, N_x, N_sp, U, L,
       end
    end
    % Computing x_bar^#
-   x_bar_dash = ((x_bar / U) / L) * P;
+   x_bar_dash = zeros(N_x, N_sp);
+   x_bar_dash(:,P) = (x_bar(:,Q) / U) / L;
 end

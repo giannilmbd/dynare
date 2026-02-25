@@ -237,12 +237,14 @@ Z3 = -pagemldivide(f3, RHS3);
 cFx_next = Z3(:, 1:H_.endo_nbr, :);
 x = Z3(:, H_.endo_nbr+1:end, :);
 
-impulse_responses(:,:,1) = ((reshape(x, [], N_sp) / mat.pol.U) / mat.pol.L) * mat.pol.P;
+x_perm = reshape(x, [], N_sp);
+impulse_responses(:,mat.pol.P,1) = (x_perm(:,mat.pol.Q) / mat.pol.U) / mat.pol.L;
 
 for s = 2:T
     Ex_dash = impulse_responses(:,:,s-1) * mat.pol.Phi_e;
     x = pagemtimes(cFx_next, reshape(Ex_dash, H_.endo_nbr, N_Y, N_sp));
-    impulse_responses(:,:,s) = ((reshape(x, [], N_sp) / mat.pol.U) / mat.pol.L) * mat.pol.P;
+    x_perm = reshape(x, [], N_sp);
+    impulse_responses(:,mat.pol.P,s) = (x_perm(:,mat.pol.Q) / mat.pol.U) / mat.pol.L;
 end
 
 impulse_responses = reshape(impulse_responses, H_.endo_nbr, N_Y, N_sp, T);
