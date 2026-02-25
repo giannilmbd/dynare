@@ -55,11 +55,11 @@ contains
         type(c_ptr) :: field_ptr, names_cell
         type(c_ptr) :: str_ptr
         real(real64), pointer, contiguous :: temp_real(:), temp_real_2d(:,:)
-        integer(int32) :: i, n_het_endo, N_sp, N_om, n_agg_endo, n_unknowns
+        integer(int32) :: i, n_het_endo, N_sp, N_om, n_agg_endo, n_free_parameters
         character(len=256), target :: str_buffer
 
         ! Extract dimensions
-        n_unknowns = input%dims%n_unknowns
+        n_free_parameters = input%dims%n_free_parameters
         n_het_endo = input%dims%n_het_endo
         N_sp = input%dims%N_sp
         N_om = input%dims%N_om
@@ -89,22 +89,22 @@ contains
         ! PART 2: Calibrated parameters
         ! ================================================================
 
-        ! params [n_unknowns × 1]
-        if (n_unknowns > 0 .and. allocated(output%params)) then
-            field_ptr = mxCreateDoubleMatrix(int(n_unknowns, mwSize), 1_mwSize, mxREAL)
-            temp_real(1:n_unknowns) => mxGetDoubles(field_ptr)
+        ! params [n_free_parameters × 1]
+        if (n_free_parameters > 0 .and. allocated(output%params)) then
+            field_ptr = mxCreateDoubleMatrix(int(n_free_parameters, mwSize), 1_mwSize, mxREAL)
+            temp_real(1:n_free_parameters) => mxGetDoubles(field_ptr)
             temp_real = output%params
         else
             field_ptr = mxCreateDoubleMatrix(0_mwSize, 0_mwSize, mxREAL)
         end if
         call mxSetField(output_mx, 1_mwIndex, 'params', field_ptr)
 
-        ! param_names {n_unknowns × 1} cell array of strings
-        if (n_unknowns > 0) then
-            names_cell = mxCreateCellMatrix(int(n_unknowns, mwSize), 1_mwSize)
-            do i = 1, n_unknowns
+        ! param_names {n_free_parameters × 1} cell array of strings
+        if (n_free_parameters > 0) then
+            names_cell = mxCreateCellMatrix(int(n_free_parameters, mwSize), 1_mwSize)
+            do i = 1, n_free_parameters
                 ! Convert Fortran string to C string (null-terminated)
-                str_buffer = trim(input%unknowns_names(i)) // c_null_char
+                str_buffer = trim(input%free_parameters_names(i)) // c_null_char
                 str_ptr = mxCreateString(str_buffer)
                 call mxSetCell(names_cell, int(i, mwIndex), str_ptr)
             end do

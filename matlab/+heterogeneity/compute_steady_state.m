@@ -1,13 +1,10 @@
 function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, steady_state)
-% Compute steady state for heterogeneous-agent DSGE models (EXPERIMENTAL)
+% Compute steady state for heterogeneous-agent DSGE models
 %
 % This function computes the steady state of a heterogeneous-agent model by
 % iterating on policy functions (backward iteration) and the distribution
-% (forward iteration) until convergence. It also calibrates unknown parameters
-% to satisfy market clearing conditions.
-%
-% NOTE: This is an experimental feature. For production use, it is recommended
-% to pre-compute the steady state externally and load it via load_steady_state.
+% (forward iteration) until convergence. It also calibrates free parameters
+% to satisfy calibration target equations.
 %
 % INPUTS
 % - M_           [structure] Dynare model structure containing:
@@ -29,8 +26,8 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
 %                  .pol.order - dimension ordering
 %                  .shocks.grids, .shocks.Pi - shock discretization
 %                  .agg - aggregate variable steady-state values
-%                  .unknowns.(param).initial_guess - parameters to calibrate
-%                  .unknowns.(param).lower_bound, .upper_bound - optional bounds
+%                  .free_parameters.(param).initial_guess - parameters to calibrate
+%                  .free_parameters.(param).lower_bound, .upper_bound - optional bounds
 %
 % OUTPUTS
 % - oo_het       [structure] Updated heterogeneity results containing:
@@ -122,34 +119,34 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
        feval(sprintf('%s.dynamic_het1_complementarity_conditions', M_.fname), M_.params);
 
    % Deal with calibration parameters: initial values and bounds
-   % mat is already populated by Phase 1 - add unknowns fields
-   % unknowns is optional - if not provided, we compute residuals only (no calibration)
-   if ~isfield(steady_state, 'unknowns')
-      steady_state.unknowns = struct;
+   % mat is already populated by Phase 1 - add free_parameters fields
+   % free_parameters is optional - if not provided, we compute residuals only (no calibration)
+   if ~isfield(steady_state, 'free_parameters')
+      steady_state.free_parameters = struct;
    end
-   unknowns_names = fieldnames(steady_state.unknowns);
-   M_params_in_unknowns = ismember(M_.param_names, unknowns_names);
-   unknowns_in_M_params = ismember(unknowns_names, M_.param_names);
-   indices.unknowns.ind = int32(find(M_params_in_unknowns));
-   indices.unknowns.names = M_.param_names(indices.unknowns.ind);
-   if ~all(unknowns_in_M_params)
-      error('Misspecified steady-state input `steady_state.unknowns`. The following parameters are missing in `M_.param_names`: %s.', strjoin(indices.unknowns.names(~unknowns_in_M_params)));
+   free_parameters_names = fieldnames(steady_state.free_parameters);
+   M_params_in_free_parameters = ismember(M_.param_names, free_parameters_names);
+   free_parameters_in_M_params = ismember(free_parameters_names, M_.param_names);
+   indices.free_parameters.ind = int32(find(M_params_in_free_parameters));
+   indices.free_parameters.names = M_.param_names(indices.free_parameters.ind);
+   if ~all(free_parameters_in_M_params)
+      error('Misspecified steady-state input `steady_state.free_parameters`. The following parameters are missing in `M_.param_names`: %s.', strjoin(indices.free_parameters.names(~free_parameters_in_M_params)));
    end
-   n_unknowns = numel(unknowns_names);
-   mat.unknowns.bounds = [-Inf(1, n_unknowns); +Inf(1, n_unknowns)];
-   mat.unknowns.initial_values = NaN(n_unknowns, 1);
-   for i = 1:n_unknowns
-      param = indices.unknowns.names{i};
-      check_isfield('initial_guess', steady_state.unknowns.(param), sprintf('steady_state.unknowns.%s.initial_guess', param));
-      mat.unknowns.initial_values(i) = steady_state.unknowns.(param).initial_guess;
-      if isfield(steady_state.unknowns.(param), 'lower_bound')
-         mat.unknowns.bounds(1,i) = steady_state.unknowns.(param).lower_bound;
+   n_free_parameters = numel(free_parameters_names);
+   mat.free_parameters.bounds = [-Inf(1, n_free_parameters); +Inf(1, n_free_parameters)];
+   mat.free_parameters.initial_values = NaN(n_free_parameters, 1);
+   for i = 1:n_free_parameters
+      param = indices.free_parameters.names{i};
+      check_isfield('initial_guess', steady_state.free_parameters.(param), sprintf('steady_state.free_parameters.%s.initial_guess', param));
+      mat.free_parameters.initial_values(i) = steady_state.free_parameters.(param).initial_guess;
+      if isfield(steady_state.free_parameters.(param), 'lower_bound')
+         mat.free_parameters.bounds(1,i) = steady_state.free_parameters.(param).lower_bound;
       end
-      if isfield(steady_state.unknowns.(param), 'upper_bound')
-         mat.unknowns.bounds(2,i) = steady_state.unknowns.(param).upper_bound;
+      if isfield(steady_state.free_parameters.(param), 'upper_bound')
+         mat.free_parameters.bounds(2,i) = steady_state.free_parameters.(param).upper_bound;
       end
-      if isfinite(mat.unknowns.bounds(1,i)) && isfinite(mat.unknowns.bounds(2,i)) && mat.unknowns.bounds(1,i) > mat.unknowns.bounds(2,i)
-         error('Misspecified steady-state input: incompatible values for `steady_state.unknowns.%s.lower_bound` and `steady_state.unknowns.%s.upper_bound`.', param, param);
+      if isfinite(mat.free_parameters.bounds(1,i)) && isfinite(mat.free_parameters.bounds(2,i)) && mat.free_parameters.bounds(1,i) > mat.free_parameters.bounds(2,i)
+         error('Misspecified steady-state input: incompatible values for `steady_state.free_parameters.%s.lower_bound` and `steady_state.free_parameters.%s.upper_bound`.', param, param);
       end
    end
 
@@ -216,19 +213,29 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
       target_eq_source = 'auto-detected (SUM operators)';
    end
 
-   % Validate: number of target equations must match number of unknowns
-   if n_unknowns > 0
-      if numel(indices.target_equations) ~= n_unknowns
+   % Validate: number of target equations must match number of free parameters
+   if n_free_parameters > 0
+      if numel(indices.target_equations) ~= n_free_parameters
          error(['Number of calibration target equations (%d) must match number of unknown ' ...
                 'parameters (%d).\nTarget equations: [%s]\nUnknown parameters: [%s]'], ...
-                numel(indices.target_equations), n_unknowns, ...
+                numel(indices.target_equations), n_free_parameters, ...
                 strjoin(arrayfun(@num2str, indices.target_equations, 'UniformOutput', false), ', '), ...
-                strjoin(indices.unknowns.names, ', '));
+                strjoin(indices.free_parameters.names, ', '));
       end
    end
 
+   % Warn if calibration tolerance is tighter than time iteration tolerance
+   if n_free_parameters > 0 && options_het.calibration.ftol < options_het.time_iteration.tol
+      warning('heterogeneity:tolerance_mismatch', ...
+              ['Calibration tolerance (calibration_tolf=%.2e) is smaller than time iteration ' ...
+               'tolerance (time_iteration_tol=%.2e).\nThe calibration step may attempt to match ' ...
+               'noise in the inner solver. Consider increasing calibration_tolf or decreasing ' ...
+               'time_iteration_tol.'], ...
+              options_het.calibration.ftol, options_het.time_iteration.tol);
+   end
+
    % Display selected equations when verbosity == 1
-   if options_het.calibration.verbosity == 1 && n_unknowns > 0
+   if options_het.calibration.verbosity == 1 && n_free_parameters > 0
       fprintf('\n=== Calibration Target Equations ===\n');
       for i = 1:numel(indices.target_equations)
          eq_idx = indices.target_equations(i);
@@ -274,8 +281,8 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
     end
 
     % 2. Update M_.params with calibrated parameter values
-    if n_unknowns > 0 && ~isempty(output.params)
-        M_.params(indices.unknowns.ind) = output.params;
+    if n_free_parameters > 0 && ~isempty(output.params)
+        M_.params(indices.free_parameters.ind) = output.params;
 
         % Print calibrated parameters
         if options_het.calibration.verbosity >= 1
@@ -322,12 +329,12 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
 
     % 6. Print convergence diagnostics
     if options_het.calibration.verbosity == 1
-        if n_unknowns > 0
+        if n_free_parameters > 0
             % Full calibration was performed
             fprintf('\n=== Steady-State Convergence ===\n');
             fprintf('Overall: %s after %d calibration iterations\n', ...
                     mat2str(output.converged), output.iterations);
-            fprintf('Market clearing residual norm: %.6e\n\n', output.residual_norm);
+            fprintf('Target equations residual norm: %.6e\n\n', output.residual_norm);
         else
             % No calibration - just residual computation
             fprintf('\n=== Heterogeneous Block Computation ===\n');
@@ -345,11 +352,11 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
         fprintf('  Residual norm (L1): %.6e\n\n', output.distribution.residual_norm);
     end
 
-    % 7. Check market clearing residuals against tolerance (only when calibrating)
-    if n_unknowns > 0
+    % 7. Check calibration target equation residuals against tolerance (only when calibrating)
+    if n_free_parameters > 0
         tol = options_het.calibration.ftol;
         if output.residual_norm > tol
-            warning(['Market clearing residual (%.6e) exceeds tolerance (%.6e).\n' ...
+            warning(['Target equations residual (%.6e) exceeds tolerance (%.6e).\n' ...
                      'Steady state may not be accurate.'], ...
                      output.residual_norm, tol);
         end
@@ -358,7 +365,7 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
     % 8. Print detailed residuals if verbosity == 1
     if options_het.calibration.verbosity == 1
         fprintf('=== Aggregate Equation Residuals ===\n');
-        if n_unknowns > 0
+        if n_free_parameters > 0
             % Only show target equations when calibrating
             for i = 1:numel(indices.target_equations)
                 eq_idx = indices.target_equations(i);

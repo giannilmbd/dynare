@@ -61,7 +61,7 @@ contains
         status = 0
 
         ! Handle no-calibration case: just compute residuals
-        if (input%dims%n_unknowns == 0) then
+        if (input%dims%n_free_parameters == 0) then
             status = agg_resid_tensor(input, output)
             output%converged = (status == 0)
             output%iterations = 1
@@ -76,21 +76,21 @@ contains
              call mexPrintf('=== Parameter Calibration (Broyden) ==='//NEW_LINE('A'))
 
         ! Allocate local solution and residual vectors
-        allocate(x(input%dims%n_unknowns), fvec(input%dims%n_unknowns))
+        allocate(x(input%dims%n_free_parameters), fvec(input%dims%n_free_parameters))
 
         ! Set initial guess (work directly in θ-space, no transformation)
-        do i = 1, input%dims%n_unknowns
-            x(i) = input%unknowns_init(i)
+        do i = 1, input%dims%n_free_parameters
+            x(i) = input%free_parameters_init(i)
         end do
 
         ! Print initial guesses and bounds
         if (input%cal_verbosity == 2) then
             call mexPrintf('  Initial parameter guesses:'//NEW_LINE('A'))
-            do i = 1, input%dims%n_unknowns
+            do i = 1, input%dims%n_free_parameters
                 write(msg, '(A,A,A,ES12.5,A,ES12.5,A,ES12.5,A)') &
-                    '    ', trim(input%unknowns_names(i)), ' = ', input%unknowns_init(i), &
-                    ' (lb=', input%unknowns_bounds(1, i), &
-                    ', ub=', input%unknowns_bounds(2, i), ')'
+                    '    ', trim(input%free_parameters_names(i)), ' = ', input%free_parameters_init(i), &
+                    ' (lb=', input%free_parameters_bounds(1, i), &
+                    ', ub=', input%free_parameters_bounds(2, i), ')'
                 call mexPrintf(trim(msg)//NEW_LINE('A'))
             end do
         end if
@@ -99,8 +99,8 @@ contains
         info = broyden_solve(input%broyden_ws, x, fvec, residual_wrapper, &
                              input%solver_opts%tol, input%solver_opts%max_iter, nfev, &
                              verbosity=input%cal_verbosity, &
-                             lower_bounds=input%unknowns_bounds(1,:), &
-                             upper_bounds=input%unknowns_bounds(2,:))
+                             lower_bounds=input%free_parameters_bounds(1,:), &
+                             upper_bounds=input%free_parameters_bounds(2,:))
 
         ! Check convergence
         if (info == BROYDEN_SUCCESS) then
@@ -116,24 +116,24 @@ contains
         end if
 
         ! Extract calibrated parameters (already in θ-space)
-        if (.not. allocated(output%params)) allocate(output%params(input%dims%n_unknowns))
-        do i = 1, input%dims%n_unknowns
+        if (.not. allocated(output%params)) allocate(output%params(input%dims%n_free_parameters))
+        do i = 1, input%dims%n_free_parameters
             output%params(i) = x(i)
         end do
 
         ! Print calibrated parameters
         if (input%cal_verbosity == 2 .and. output%converged) then
             call mexPrintf('Calibrated parameters:'//NEW_LINE('A'))
-            do i = 1, input%dims%n_unknowns
-                write(msg, '(A,A,A,ES12.5)') '  ', trim(input%unknowns_names(i)), ' = ', output%params(i)
+            do i = 1, input%dims%n_free_parameters
+                write(msg, '(A,A,A,ES12.5)') '  ', trim(input%free_parameters_names(i)), ' = ', output%params(i)
                 call mexPrintf(trim(msg)//NEW_LINE('A'))
             end do
             write(msg, '(A,I4,A)') 'Converged in ', nfev, ' function evaluations'
             call mexPrintf(trim(msg)//NEW_LINE('A'))
         end if
 
-        ! Extract market clearing residuals
-        if (.not. allocated(output%residuals)) allocate(output%residuals(input%dims%n_unknowns))
+        ! Extract calibration target equations residuals
+        if (.not. allocated(output%residuals)) allocate(output%residuals(input%dims%n_free_parameters))
         output%residuals = fvec
         output%residual_norm = maxval(abs(output%residuals))
 
@@ -157,7 +157,7 @@ contains
 
             ! Update parameters with current guess (already in θ-space)
             do k = 1, nvar
-                input%params(input%unknowns_ind(k)) = x_params(k)
+                input%params(input%free_parameters_ind(k)) = x_params(k)
             end do
 
             ! Solve full steady state with these parameters (time iteration + distribution + aggregation)
@@ -168,7 +168,7 @@ contains
                 return
             end if
 
-            ! Populate resid with market clearing residuals (target equations only)
+            ! Populate resid with calibration target equations residuals
             n_target_eqs = size(input%target_equations, 1)
             do k = 1, n_target_eqs
                 resid(k) = output%agg_output%residuals(input%target_equations(k))
@@ -176,8 +176,8 @@ contains
 
             ! Print iteration info if verbosity == 2 (use parameter values from params)
             if (input%cal_verbosity == 2) &
-                 call print_calibration_iteration(nvar, input%params, input%unknowns_ind, &
-                                                  input%unknowns_names)
+                 call print_calibration_iteration(nvar, input%params, input%free_parameters_ind, &
+                                                  input%free_parameters_names)
 
         end subroutine residual_wrapper
 
@@ -197,17 +197,17 @@ contains
             end select
         end subroutine print_broyden_error
 
-        subroutine print_calibration_iteration(n, params, unknowns_ind, param_names)
+        subroutine print_calibration_iteration(n, params, free_parameters_ind, param_names)
             integer, intent(in) :: n
             real(real64), intent(in) :: params(:)  ! Full params array
-            integer(int32), intent(in) :: unknowns_ind(:)  ! Indices of unknowns in params
+            integer(int32), intent(in) :: free_parameters_ind(:)  ! Indices of free parameters in params
             character(len=*), intent(in) :: param_names(:)
             character(len=256) :: msg
             integer :: i
 
             do i = 1, n
                 write(msg, '(A,A,A,ES12.5)') '  ', trim(param_names(i)), ' = ', &
-                    params(unknowns_ind(i))
+                    params(free_parameters_ind(i))
                 call mexPrintf(trim(msg)//NEW_LINE('A'))
             end do
         end subroutine print_calibration_iteration
