@@ -9461,39 +9461,35 @@ Convergence diagnostics
 DSGE-VAR
 ^^^^^^^^
 
-    .. option:: dsge_var = DOUBLE
+    .. option:: dsge_var
+                dsge_var = DOUBLE
 
-       Triggers the estimation of a DSGE-VAR model, where the weight
-       of the DSGE prior of the VAR model is calibrated to the value
-       passed (see :cite:t:`DelNegro:2004`). It represents
-       the ratio of dummy over actual observations. To assure that the
-       prior is proper, the value must be bigger than :math:`(k+n)/T`,
+       Triggers the estimation of a DSGE-VAR model. If no ``DOUBLE`` is
+       specified, the weight of the DSGE prior of the VAR model will be
+       estimated (as in :cite:t:`Adjemian:2008`). In this case, the prior 
+       on the weight of the DSGE VAR prior, ``dsge_prior_weight``, must be
+       defined in the ``estimated_params`` block.
+
+       If a ``DOUBLE`` is passed, the weight of the DSGE prior of the VAR model 
+       is calibrated to the value passed (see :cite:t:`DelNegro:2004`). The 
+       value represents the ratio of dummy over actual observations. To assure 
+       that the prior is proper, the value must be bigger than :math:`(k+n)/T`,
        where :math:`k` is the number of estimated parameters,
        :math:`n` is the number of observables, and :math:`T` is the
        number of observations.
 
-        NB: The previous method of declaring ``dsge_prior_weight`` as
-        a parameter and then calibrating it is now deprecated and will
-        be removed in a future release of Dynare. Some of the objects
-        arising during estimation are stored with their values at the
-        mode in ``oo_.dsge_var.posterior_mode``.
-
-    .. option:: dsge_var
-
-       Triggers the estimation of a DSGE-VAR model, where the weight
-       of the DSGE prior of the VAR model will be estimated (as in
-       :cite:t:`Adjemian:2008`). The prior on the weight of the DSGE
-       prior, ``dsge_prior_weight``, must be defined in the
-       ``estimated_params`` section.
-
-       NB: The previous method of declaring ``dsge_prior_weight`` as
-       a parameter and then placing it in ``estimated_params`` is now
-       deprecated and will be removed in a future release of Dynare.
-
+ 
     .. option:: dsge_varlag = INTEGER
 
        The number of lags used to estimate a DSGE-VAR model. Default:
        ``4``.
+
+    *Output*
+
+    .. matvar:: oo_.dsge_var.posterior_mode
+
+        Stores the values at the mode of some of the objects arising during
+        estimation.
 
 
 Non-linear filter options
