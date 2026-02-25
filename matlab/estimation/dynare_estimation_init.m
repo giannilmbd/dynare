@@ -624,6 +624,15 @@ if options_.heteroskedastic_filter
         M_.heteroskedastic_shocks.Qscale(v.exo_id,obs_idx) = v.scale^2;
     end
 
+    % Warn if Qscale is zero in the first period: the shock will still be non-zero during Kalman filter initialization
+    zero_scale_first_period = find(M_.heteroskedastic_shocks.Qscale(:,1) == 0);
+    if ~isempty(zero_scale_first_period)
+        shock_names = strjoin(M_.exo_names(zero_scale_first_period), ', ');
+        fprintf('\ndynare_estimation_init: WARNING: The scale for shock(s) %s is set to zero in the first period.\n', shock_names)
+        fprintf('dynare_estimation_init: During Kalman filter initialization, these shocks will still be considered non-zero (using the base variance from M_.Sigma_e).\n')
+        fprintf('dynare_estimation_init: Check whether that is desired behavior.\n')
+    end
+
     if any(any(~isnan(M_.heteroskedastic_shocks.Qvalue) & ~isnan(M_.heteroskedastic_shocks.Qscale)))
         fprintf('\ndynare_estimation_init: With the option "heteroskedastic_shocks" you cannot define\n')
         fprintf('dynare_estimation_init: the scale and the value for the same shock \n')
