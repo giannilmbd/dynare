@@ -5699,11 +5699,6 @@ Computing the stochastic solution
        stored in ``oo_.SpectralDensity``, defined below. Default: do
        not request spectral density estimates.
 
-    .. option:: hp_ngrid = INTEGER
-
-       Deprecated option. It has the same effect as
-       :opt:`filtered_theoretical_moments_grid <filtered_theoretical_moments_grid = INTEGER>`.
-
     *Output*
 
     This command sets ``oo_.dr``, ``oo_.mean``, ``oo_.var``, ``oo_.var_list``,
