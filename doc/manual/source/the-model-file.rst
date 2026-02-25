@@ -14086,11 +14086,6 @@ Performing sensitivity analysis
 
         See :opt:`diffuse_kalman_tol = DOUBLE`.
 
-.. command:: dynare_sensitivity ;
-             dynare_sensitivity(OPTIONS...);
-
-    |br| This is a deprecated alias for the ``sensitivity`` command.
-
 
 .. _irf-momcal:
 
@@ -14102,7 +14097,7 @@ imposing implicit “endogenous” priors about IRFs and moments on the
 model. The way it works internally is that any parameter draw that is
 inconsistent with the “calibration” provided in these blocks is
 discarded, i.e. assigned a prior density of ``0``. In the context of
-``dynare_sensitivity``, these restrictions allow tracing out which
+:comm:`sensitivity`, these restrictions allow tracing out which
 parameters are driving the model to satisfy or violate the given
 restrictions.
 
@@ -14257,7 +14252,7 @@ Performing identification analysis
         If equal to ``0``, do not use sample file. If equal to ``1``,
         triggers gsa prior sample. If equal to ``2``, triggers gsa
         Monte-Carlo sample (i.e. loads a sample corresponding to
-        ``pprior=0`` and ``ppost=0`` in the ``dynare_sensitivity``
+        ``pprior=0`` and ``ppost=0`` in the :comm:`sensitivity`
         options). If equal to ``FILENAME`` uses the provided path to
         a specific user defined sample file.
         Default: ``0``.
@@ -14655,7 +14650,7 @@ The RMSE analysis can be performed with different types of sampling options:
 
 The use of cases 2 and 3 requires an estimation step beforehand. To
 facilitate the sensitivity analysis after estimation, the
-``dynare_sensitivity`` command also allows you to indicate some
+:comm:`sensitivity` command also allows you to indicate some
 options of the ``estimation command``. These are:
 
     * ``datafile``
@@ -14777,7 +14772,7 @@ analysis.
 For example, the placing::
 
     identification;
-    dynare_sensitivity(identification=1, morris=2);
+    sensitivity(identification=1, morris=2);
 
 in the Dynare model file triggers identification analysis using
 analytic derivatives as in :cite:t:`Iskrev:2010`, jointly with the mapping

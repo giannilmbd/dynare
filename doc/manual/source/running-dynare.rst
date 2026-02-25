@@ -203,7 +203,7 @@ by the ``dynare`` command.
 
     .. option:: params_derivs_order=0|1|2
 
-        When :comm:`identification`, :comm:`dynare_sensitivity` (with
+        When :comm:`identification`, :comm:`sensitivity` (with
         identification), or :ref:`estimation <estim-comm>` are
         present, this option is used to limit the order of the
         derivatives with respect to the parameters that are calculated
