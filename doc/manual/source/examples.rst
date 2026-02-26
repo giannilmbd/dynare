@@ -92,3 +92,37 @@ description, please refer to the comments inside the files themselves.
     foresight with expectation errors: agents behave as under perfect
     foresight, but they can still be surprised by unexpected shocks, and thus
     recompute their optimal plans when such an unexpected shock happens.
+
+``krusell_smith.mod``
+
+    Krusell and Smith (1998) model with heterogeneous households.
+    Demonstrates loading a pre-computed steady state, solving
+    the model, and computing impulse response functions.
+
+``krusell_smith_steady_state.mod``
+
+    Krusell and Smith (1998) model with heterogeneous households.
+    Demonstrates computing the steady state numerically using
+    ``heterogeneity_compute_steady_state``.
+
+``hank_one_asset.mod``
+
+    One-asset HANK model. Demonstrates loading a pre-computed
+    steady state, solving, and running stochastic simulations.
+
+``hank_one_asset_steady_state.mod``
+
+    One-asset HANK model. Demonstrates computing the steady state
+    with parameter calibration using
+    ``heterogeneity_compute_steady_state``.
+
+``hank_two_assets.mod``
+
+    Two-asset HANK model with liquid and illiquid assets. Demonstrates
+    loading a pre-computed steady state and simulating news shocks.
+
+``hank_two_assets_steady_state.mod``
+
+    Two-asset HANK model. Demonstrates computing the steady state
+    with multi-parameter calibration using
+    ``heterogeneity_compute_steady_state``.
