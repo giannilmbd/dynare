@@ -32,7 +32,8 @@ function mdd = dsmh(objective_function, mh_bounds, dataset_, dataset_info, optio
 % functions have been parallelized using the same methodology.
 % Then the comments write here can be used for all the other pairs of
 % parallel functions and also for management functions.
-% Copyright © 2022-2025 Dynare Team
+%
+% Copyright © 2022-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -68,7 +69,7 @@ MM = int64(opts.N*opts.G/10) ;
 
 % Step 0: Initialization of the sampler
 [param, tlogpost_iminus1, loglik] = ...
-    smc_samplers_initialization(funobj, 'dsmh', opts.particles, Prior, SimulationFolder, opts.H) ;
+    smc_samplers_initialization(funobj, 'dsmh', opts.particles, Prior, SimulationFolder, opts.H, options_.DynareRandomStreams.seed, options_.parallel_info) ;
 
 ESS = zeros(opts.H,1) ;
 zhat = 0 ;

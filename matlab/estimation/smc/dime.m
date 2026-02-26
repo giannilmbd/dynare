@@ -23,7 +23,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
 % SPECIAL REQUIREMENTS
 % None.
 
-% Copyright © 2024-2025 Dynare Team
+% Copyright © 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -62,15 +62,9 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
         error('dime: number of ensemble iterations to keep (tune=%d) exceeds number of iterations (niter=%d)!', tune, opts.niter)
     end
 
-    % temporary workaround to deal with parallelization
-    if opts.parallel
-        % check if parallel is possible
-        installed_toolboxes = ver;
-        toolbox_installed = any(strcmp("Parallel Computing Toolbox", {installed_toolboxes.Name}));
-        if ~toolbox_installed || feature('numcores') == 1
-            error('dime: parallel processing option is chosen but Parallel Computing Toolbox is not installed or machine has only one core')
-        end
-    end
+    % Setup parallel execution for DIME likelihood evaluations
+    [run_dime_with_pct, restore_pool_dime] = setup_parallel_execution(options_.parallel_info.use_pct.estimation.dime, 'dime'); %#ok<ASGLU>
+    % restore_pool_dime holds an onCleanup object that restores the pool state when this function ends or crashes; we need to keep it in the scope of this function and so ignore the warning about unused variable
 
     % Set location for the simulated particles.
     SimulationFolder = CheckPath('dime', M_.dname);
@@ -84,7 +78,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
     % Initialization of the sampler (draws from the prior distribution with finite logged likelihood)
     t0 = tic;
     [x, ~, lprob] = ...
-        smc_samplers_initialization(funobj, 'dime', nchain, Prior, SimulationFolder, opts.niter);
+        smc_samplers_initialization(funobj, 'dime', nchain, Prior, SimulationFolder, opts.niter, options_.DynareRandomStreams.seed, options_.parallel_info);
     x = ptransform(x', bounds, true);
 
     disp_verbose(sprintf('Estimation:dime: log-posterior standard deviation (post.std) of a multivariate normal would be %.2f.\n', sqrt(0.5*ndim)), options_.verbosity);
@@ -134,7 +128,7 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
             factors(xchnge) = lprop_old - lprop_new;
 
             % Metropolis-Hastings
-            newlprob = log_prob_fun(funobj, Prior, bounds, opts.parallel, q);
+            newlprob = log_prob_fun(funobj, bounds, run_dime_with_pct, q);
             lnpdiff = factors + newlprob - lprob(idcur);
             accepted = lnpdiff > log(rand(cursize,1));
             naccepted = naccepted + sum(accepted);
@@ -175,18 +169,14 @@ function dime(objective_function, init_x, mh_bounds, dataset_, dataset_info, opt
     save(sprintf('%s%schains.mat', SimulationFolder, filesep()), 'chains', 'lprobs', 'tune')
 end
 
-function lprobs = log_prob_fun(loglikefun, Prior, bounds, runs_in_parallel, x)
+function lprobs = log_prob_fun(loglikefun, bounds, runs_in_parallel, x)
 
     dim = length(x);
     x = ptransform(x, bounds, false);
     lprobs = zeros(dim,1);
     if runs_in_parallel
         parfor i=1:dim
-            par = x(i,:)';
-            loglikelihood = -loglikefun(par);
-            % temporary workaround for bug #1930
-            logprior = Prior.density(par);
-            lprobs(i) = loglikelihood + logprior;
+            lprobs(i) = -loglikefun(x(i,:)');
         end
     else
         for i=1:dim

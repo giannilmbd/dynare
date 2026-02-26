@@ -45,11 +45,14 @@ PsTools installation.
     * The MCMC posterior sampler (each chain is dispatched to a separate
       worker via ``parfeval``)
 
+    * The initialization of SMC samplers by drawing initial particles
+      in the prior distribution using ``parfor``
+
 **Usage:**
 
 Parallelization via PCT is controlled by the :opt:`use_pct` option of the
 ``estimation`` command. By default, ``use_pct`` is ``true``, meaning that
-if PCT is available, the MCMC sampler will automatically run chains in
+if PCT is available, the supported tasks will automatically run in
 parallel using the current parallel pool. If no pool is open, one will
 be created for the duration of the computation and closed afterwards.
 
