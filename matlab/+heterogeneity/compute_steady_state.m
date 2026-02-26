@@ -18,7 +18,7 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
 %                  .steady_state_variable_name - variable name in file
 %                  .check - validation options (passed to check_steady_state_input)
 %                  .forward.max_iter, .forward.tol, .forward.check_every - distribution iteration
-%                  .calibration.ftol, .calibration.verbosity - calibration options
+%                  .calibration.tolf, .calibration.verbosity - calibration options
 % - oo_het       [structure] Heterogeneity results structure to populate
 % - steady_state [structure] (optional) User-provided initial guess structure:
 %                  .pol.grids - state grids for policy functions
@@ -225,13 +225,13 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
    end
 
    % Warn if calibration tolerance is tighter than time iteration tolerance
-   if n_free_parameters > 0 && options_het.calibration.ftol < options_het.time_iteration.tol
+   if n_free_parameters > 0 && options_het.calibration.tolf < options_het.time_iteration.tol
       warning('heterogeneity:tolerance_mismatch', ...
               ['Calibration tolerance (calibration_tolf=%.2e) is smaller than time iteration ' ...
                'tolerance (time_iteration_tol=%.2e).\nThe calibration step may attempt to match ' ...
                'noise in the inner solver. Consider increasing calibration_tolf or decreasing ' ...
                'time_iteration_tol.'], ...
-              options_het.calibration.ftol, options_het.time_iteration.tol);
+              options_het.calibration.tolf, options_het.time_iteration.tol);
    end
 
    % Display selected equations when verbosity == 1
@@ -354,7 +354,7 @@ function [oo_het, M_params] = compute_steady_state(M_, options_het, oo_het, stea
 
     % 7. Check calibration target equation residuals against tolerance (only when calibrating)
     if n_free_parameters > 0
-        tol = options_het.calibration.ftol;
+        tol = options_het.calibration.tolf;
         if output.residual_norm > tol
             warning(['Target equations residual (%.6e) exceeds tolerance (%.6e).\n' ...
                      'Steady state may not be accurate.'], ...

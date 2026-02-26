@@ -288,8 +288,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     cal_mx = mxGetField(options_het_mx, 1_mwIndex, 'calibration')
     if (.not. c_associated(cal_mx)) call mexErrMsgTxt("options_het.calibration not found")
 
-    field = mxGetField(cal_mx, 1_mwIndex, 'ftol')
-    if (.not. c_associated(field)) call mexErrMsgTxt("options_het.calibration.ftol not found")
+    field = mxGetField(cal_mx, 1_mwIndex, 'tolf')
+    if (.not. c_associated(field)) call mexErrMsgTxt("options_het.calibration.tolf not found")
     solver_opts%tol = mxGetScalar(field)
 
     field = mxGetField(cal_mx, 1_mwIndex, 'max_iter')
