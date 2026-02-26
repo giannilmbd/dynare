@@ -36,11 +36,11 @@
 !                                                - mat.y, mat.x: aggregate variables
 !                                                - mat.pol.*: policy function data
 !                                                - mat.d.*: distribution data
-!                                                - mat.unknowns.*: calibration parameters
+!                                                - mat.free_parameters.*: calibration parameters
 !   indices                    [struct]        : Index structure containing:
 !                                                - indices.Ix.*: aggregation indices
 !                                                - indices.target_equations
-!                                                - indices.unknowns.*
+!                                                - indices.free_parameters.*
 !                                                - indices.mult.* (optional)
 !
 ! OUTPUTS:
@@ -99,7 +99,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
 
     ! Size variables
     integer(int32) :: i, j, status, n_states, N_sp, N_om, N_a_om, N_e, n_het_endo, n_agg_endo, &
-                      total_cols, ntmp, n_params, n_yh, n_xh, n_unknowns, n_Ix, &
+                      total_cols, ntmp, n_params, n_yh, n_xh, n_free_parameters, n_Ix, &
                       n_target_eqs, n_y, n_orig
     logical :: flag
 
@@ -288,8 +288,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     cal_mx = mxGetField(options_het_mx, 1_mwIndex, 'calibration')
     if (.not. c_associated(cal_mx)) call mexErrMsgTxt("options_het.calibration not found")
 
-    field = mxGetField(cal_mx, 1_mwIndex, 'ftol')
-    if (.not. c_associated(field)) call mexErrMsgTxt("options_het.calibration.ftol not found")
+    field = mxGetField(cal_mx, 1_mwIndex, 'tolf')
+    if (.not. c_associated(field)) call mexErrMsgTxt("options_het.calibration.tolf not found")
     solver_opts%tol = mxGetScalar(field)
 
     field = mxGetField(cal_mx, 1_mwIndex, 'max_iter')
@@ -450,22 +450,22 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
         end if
     end do
 
-    ! Extract mat.unknowns fields
-    struct = mxGetField(mat_mx, 1_mwIndex, 'unknowns')
-    if (.not. c_associated(struct)) call mexErrMsgTxt("mat.unknowns not found")
+    ! Extract mat.free_parameters fields
+    struct = mxGetField(mat_mx, 1_mwIndex, 'free_parameters')
+    if (.not. c_associated(struct)) call mexErrMsgTxt("mat.free_parameters not found")
 
     ! Extract initial guesses for calibration parameters
     field = mxGetField(struct, 1_mwIndex, 'initial_values')
-    if (.not. c_associated(field)) call mexErrMsgTxt("mat.unknowns.initial_values not found")
-    n_unknowns = int(mxGetNumberOfElements(field), int32)
-    input%dims%n_unknowns = n_unknowns
-    input%unknowns_init(1:n_unknowns) => mxGetDoubles(field)
+    if (.not. c_associated(field)) call mexErrMsgTxt("mat.free_parameters.initial_values not found")
+    n_free_parameters = int(mxGetNumberOfElements(field), int32)
+    input%dims%n_free_parameters = n_free_parameters
+    input%free_parameters_init(1:n_free_parameters) => mxGetDoubles(field)
 
     ! Extract bounds for calibration parameters
-    ! MATLAB stores as [2 × n_unknowns]: row 1 = lower bounds, row 2 = upper bounds
+    ! MATLAB stores as [2 × n_free_parameters]: row 1 = lower bounds, row 2 = upper bounds
     field = mxGetField(struct, 1_mwIndex, 'bounds')
-    if (.not. c_associated(field)) call mexErrMsgTxt("mat.unknowns.bounds not found")
-    input%unknowns_bounds(1:2,1:n_unknowns) => mxGetDoubles(field)
+    if (.not. c_associated(field)) call mexErrMsgTxt("mat.free_parameters.bounds not found")
+    input%free_parameters_bounds(1:2,1:n_free_parameters) => mxGetDoubles(field)
     ! Note: bounds use -Inf/+Inf for unbounded dimensions (set in MATLAB)
 
     ! ==================================================================
@@ -492,26 +492,26 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     n_target_eqs = int(mxGetNumberOfElements(field), int32)
     input%target_equations(1:n_target_eqs) => mxGetInt32s(field)
 
-    ! Unknown parameter names from indices.unknowns.names
-    struct = mxGetField(indices_mx, 1_mwIndex, 'unknowns')
-    if (.not. c_associated(field)) call mexErrMsgTxt("indices.unknowns not found")
+    ! Unknown parameter names from indices.free_parameters.names
+    struct = mxGetField(indices_mx, 1_mwIndex, 'free_parameters')
+    if (.not. c_associated(field)) call mexErrMsgTxt("indices.free_parameters not found")
     cell_array = mxGetField(struct, 1_mwIndex, 'names')
-    if (.not. c_associated(cell_array)) call mexErrMsgTxt("indices.unknowns.names not found")
+    if (.not. c_associated(cell_array)) call mexErrMsgTxt("indices.free_parameters.names not found")
 
     ! Allocate array for unknown parameter names
-    allocate(character(len=256) :: input%unknowns_names(n_unknowns))
+    allocate(character(len=256) :: input%free_parameters_names(n_free_parameters))
 
     ! Extract each parameter name from cell array
-    do i = 1, n_unknowns
+    do i = 1, n_free_parameters
         field = mxGetCell(cell_array, int(i, mwIndex))
-        if (.not. c_associated(field)) call mexErrMsgTxt("indices.unknowns.names cell is empty")
-        input%unknowns_names(i) = mxArrayToString(field)
+        if (.not. c_associated(field)) call mexErrMsgTxt("indices.free_parameters.names cell is empty")
+        input%free_parameters_names(i) = mxArrayToString(field)
     end do
 
     ! Unknown parameters indices in M_.params
     field = mxGetField(struct, 1_mwIndex, 'ind')
-    if (.not. c_associated(field)) call mexErrMsgTxt("indices.unknowns.ind not found")
-    input%unknowns_ind(1:n_unknowns) => mxGetInt32s(field)
+    if (.not. c_associated(field)) call mexErrMsgTxt("indices.free_parameters.ind not found")
+    input%free_parameters_ind(1:n_free_parameters) => mxGetInt32s(field)
 
     ! Extract indices.mult.in_het (multiplier indices for FB solver)
     struct = mxGetField(indices_mx, 1_mwIndex, 'mult')
@@ -651,14 +651,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     input%gp_ws%initialized = .true.
 
     ! Initialize Broyden workspace for calibration
-    if (n_unknowns > 0) then
-        input%broyden_ws%n_vars = n_unknowns
-        allocate(input%broyden_ws%J(n_unknowns, n_unknowns))
-        allocate(input%broyden_ws%J_copy(n_unknowns, n_unknowns))
-        allocate(input%broyden_ws%dx(n_unknowns))
-        allocate(input%broyden_ws%fvec_new(n_unknowns))
-        allocate(input%broyden_ws%df(n_unknowns))
-        allocate(input%broyden_ws%ipiv(n_unknowns))
+    if (n_free_parameters > 0) then
+        input%broyden_ws%n_vars = n_free_parameters
+        allocate(input%broyden_ws%J(n_free_parameters, n_free_parameters))
+        allocate(input%broyden_ws%J_copy(n_free_parameters, n_free_parameters))
+        allocate(input%broyden_ws%dx(n_free_parameters))
+        allocate(input%broyden_ws%fvec_new(n_free_parameters))
+        allocate(input%broyden_ws%df(n_free_parameters))
+        allocate(input%broyden_ws%ipiv(n_free_parameters))
     end if
 
     ! Extract equation names from pre-built cell array (passed from MATLAB)
@@ -685,8 +685,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
     allocate(agg_output%residuals(n_agg_endo))
 
     ! Allocate calibration output arrays
-    allocate(output%params(n_unknowns))
-    allocate(output%residuals(n_unknowns))
+    allocate(output%params(n_free_parameters))
+    allocate(output%residuals(n_free_parameters))
 
     ! Link pointers from calibration_output to sub-outputs
     output%ti_output => ti_output

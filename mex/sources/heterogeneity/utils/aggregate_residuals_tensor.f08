@@ -60,11 +60,11 @@ contains
         ! Phase 3: Compute aggregated heterogeneous variables
         call compute_agg_het_variables(input, output)
 
-        ! Phase 4: Compute aggregate residuals for market clearing
+        ! Phase 4: Compute aggregate residuals for calibration target equations
         call compute_aggregate_residuals(input, output)
 
         ! Only print "Calibration iteration complete" when there's actual calibration
-        if (input%dims%n_unknowns > 0 .and. input%cal_verbosity == 2) &
+        if (input%dims%n_free_parameters > 0 .and. input%cal_verbosity == 2) &
              call mexPrintf('  Calibration iteration complete'//NEW_LINE('A'))
 
     end function agg_resid_tensor

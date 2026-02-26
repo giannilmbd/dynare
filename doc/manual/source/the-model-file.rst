@@ -15788,7 +15788,25 @@ Heterogeneous Agent Model Block
     Declares equations describing the behavior of heterogeneous agents.
     The ``heterogeneity`` option specifies which heterogeneity dimension these equations pertain to.
 
-    The complementarity operator ``⟂`` (Unicode U+27C2) or its alternative pure-ASCII syntax ``_|_`` can be used to specify inequality constraints on variables. As a best practice, it is recommended to write equations with complementarity conditions following the same conventions as described in :opt:`lmmcp` to ensure correct economic interpretation and compatibility with the LMMCP numerical solver.
+    **Allowed equations**
+
+    In this block, equations are subject to the following restrictions:
+
+    - Heterogeneous exogenous variables declared in :comm:`varexo(heterogeneity=NAME) <varexo>` may only appear at time :math:`t` (no leads or lags).
+    - Heterogeneous endogenous variables declared in :comm:`var(heterogeneity=NAME) <var>` may appear at times :math:`t-1`, :math:`t`, and :math:`t+1` only (maximum lag is :math:`-1`, maximum lead is :math:`+1`).
+    - Expressions that combine forward-looking heterogeneous variables (lead :math:`\geq 1`) with lagged state variables (lag :math:`= -1`) must be separable. Specifically, the following rules apply when an expression contains both leads and lags:
+
+      - ``+``, ``-``, ``=``: always separable.
+      - ``*``: separable if one factor contains all the leads and the other contains none (both orders are accepted).
+      - ``/``: separable only when the **numerator** contains the leads; e.g., ``c(+1)/a(-1)`` is accepted while ``a(-1)/c(+1)`` is rejected.
+      - Unary functions (``log``, ``exp``, etc.): non-separable if the argument contains both leads and lags; e.g., ``log(k(-1) + c(+1))`` is rejected.
+      - ``^`` and other nonlinear binary operators: non-separable if operands span both leads and lags.
+
+      For example, ``k(-1) + c(+1)`` and ``c(+1) * a(-1)`` are valid because leads and lags appear in separable terms, while ``log(k(-1) + c(+1))`` or ``(k(-1) + c(+1))^2`` are rejected.
+
+    **Complementarity conditions**
+
+    The complementarity operator ``⟂`` (Unicode U+27C2) or its alternative pure-ASCII syntax ``_|_`` can be used to specify inequality constraints on variables. Equations with complementarity conditions should follow the same conventions as described in :opt:`lmmcp`.
 
     *Example*::
 
@@ -15867,6 +15885,14 @@ Dynare provides the ``SUM`` operator for aggregating heterogeneous variables wit
 Solving Heterogeneous Agent Models
 -----------------------------------
 
+Dynare provides two approaches for initializing the steady state of a
+heterogeneous-agent model:
+
+- :comm:`heterogeneity_load_steady_state`: loads a pre-computed steady state
+  from a MAT file.
+- :comm:`heterogeneity_compute_steady_state`: computes the steady state
+  numerically.
+
 heterogeneity_load_steady_state
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -15880,7 +15906,7 @@ heterogeneity_load_steady_state
 
     .. option:: filename = FILENAME
 
-        *Required.* Path to the MAT file containing the steady-state structure.
+        *Mandatory.* Path to the MAT file containing the steady-state structure.
         It must be included in quotes if the filename contains a path or an extension.
         If the ``.mat`` extension is omitted, it will be added automatically.
 
@@ -15951,7 +15977,7 @@ heterogeneity_load_steady_state
 
               steady_state.shocks.Pi.e  % Matrix [7×7] with row sums = 1, all elements >= 0
 
-        Both ``grids`` and ``Pi`` must be provided for all shocks to ensure consistency with the policy function values defined on the tensored grid.
+        Both ``grids`` and ``Pi`` must be provided for all shocks to ensure consistency with the policy function values defined on the tensor-product grid.
 
     **steady_state.d** (structure)
         The stationary distribution:
@@ -15974,7 +16000,204 @@ heterogeneity_load_steady_state
 
     *Output*
 
-        Populates ``oo_.heterogeneity`` with internal data structures needed by ``heterogeneity_solve`` and ``heterogeneity_simulate``.
+        The command outputs various objects into ``oo_.heterogeneity``.
+
+    .. matvar:: oo_.heterogeneity
+
+        |br| Structure storing the objects related to the heterogeneous-agent model solution.
+        Populated progressively by :comm:`heterogeneity_load_steady_state` or
+        :comm:`heterogeneity_compute_steady_state`, then :comm:`heterogeneity_solve`.
+        Contains the steady state (policy functions, stationary distribution,
+        aggregate values) and, after solving, the linearized decision rules
+        in the ``dr`` subfield.
+
+    .. matvar:: oo_.heterogeneity.steady_state
+
+        |br| Structure containing the steady-state solution for the
+        heterogeneous-agent block. Fields ``agg``, ``pol``, ``shocks``, and
+        ``d`` follow the format described under
+        :comm:`heterogeneity_load_steady_state`.
+
+heterogeneity_compute_steady_state
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. command:: heterogeneity_compute_steady_state ;
+             heterogeneity_compute_steady_state (OPTIONS...);
+
+    Computes the steady state of a heterogeneous-agent model. The steady state consists of policy functions, a stationary distribution, and aggregate variable values such that all equilibrium conditions hold. Free parameters can be calibrated simultaneously to satisfy market-clearing or other aggregate conditions.
+
+    **Algorithm**
+
+    The command solves for free parameter values (if any free parameter is specified) by finding zeros of a system of aggregate residual equations using a Broyden solver. Each residual evaluation proceeds in three steps:
+
+    1. **Time iteration:** For given free parameter values, compute the policy functions using time iteration on the equations in the heterogeneous-agent model block. MCP constraints (e.g., borrowing limits) are handled via a Fischer-Burmeister complementarity function. At each iteration, a nonlinear system is solved at every grid point using a trust-region solver.
+    2. **Forward iteration:** The stationary distribution consistent with the converged policy functions is computed by iterating the transition operator forward until convergence.
+    3. **Aggregation:** Aggregated heterogeneous variables (i.e., the auxiliary variables defined by ``SUM`` operators) are computed by integrating policy functions against the distribution.
+
+    The Broyden solver then evaluates the residuals of the target aggregate equations. When no free parameters are specified, the command simply evaluates these three steps once and reports the residuals.
+
+    **Target equations:** By default, the aggregate equations containing a ``SUM`` operator are used as target equations. This can be overridden with the ``calibration_target_equations`` option. The number of target equations must equal the number of free parameters.
+
+    **Initial guess**
+
+    An initial guess must be provided via a MAT file (see the :opt:`filename <filename = FILENAME>` option). The file must contain a structure with the same fields as described in :comm:`heterogeneity_load_steady_state` (``agg``, ``pol``, ``shocks``, ``d``), plus an optional ``free_parameters`` field for parameter calibration. The ``d.hist`` field is ignored here since the stationary distribution is recomputed by the forward iteration step; only ``d.grids`` (and optionally ``d.order``) are used.
+
+    **steady_state.free_parameters** (structure, optional)
+        Parameters to calibrate. Each field name must match a parameter declared in :comm:`parameters` and contain a structure with:
+
+        - ``initial_guess``: *Required.* Starting value for the Broyden solver.
+        - ``lower_bound``: Optional lower bound on the parameter.
+        - ``upper_bound``: Optional upper bound on the parameter.
+
+        *Example*::
+
+            steady_state.free_parameters.beta.initial_guess = 0.986;
+            steady_state.free_parameters.beta.lower_bound = 0.9;
+            steady_state.free_parameters.beta.upper_bound = 0.999;
+
+    *Options*
+
+    .. option:: filename = FILENAME
+
+        *Mandatory.* See :opt:`filename <filename = FILENAME>` in :comm:`heterogeneity_load_steady_state`.
+
+    .. option:: variable = STRING
+
+        See :opt:`variable <variable = STRING>` in :comm:`heterogeneity_load_steady_state`.
+
+    .. option:: calibration_target_equations = [QUOTED_STRING | INTEGER[, QUOTED_STRING | INTEGER[, ...]]]
+
+        List of aggregate equations to use as calibration targets. Equations can be specified by their ``name`` tag (as a quoted string) or by their index (as an integer). When not specified, all aggregate equations containing a ``SUM`` operator are used automatically.
+
+        .. warning:: Using equation ``name`` tags is recommended over integer indices, as the latter are sensitive to equation reordering.
+
+        *Example*::
+
+            heterogeneity_compute_steady_state(filename=myfile,
+                calibration_target_equations=['capital_market_clearing']);
+
+    .. option:: calibration_tolf = DOUBLE
+
+        Convergence tolerance for the Broyden solver on aggregate residuals.
+        Default: ``1e-4``
+
+    .. option:: calibration_max_iter = INTEGER
+
+        Maximum number of Broyden iterations.
+        Default: ``50``
+
+    .. option:: calibration_verbosity = INTEGER
+
+        Verbosity level for calibration output. ``0``: silent; ``1``: summary; ``2``: iteration details.
+        Default: ``2``
+
+    .. option:: time_iteration_max_iter = INTEGER
+
+        Maximum number of time-iteration (backward) steps per residual evaluation.
+        Default: ``1000``
+
+    .. option:: time_iteration_tol = DOUBLE
+
+        Convergence tolerance on policy functions (sup-norm).
+        Default: ``1e-8``
+
+    .. option:: time_iteration_learning_rate = DOUBLE
+
+        Dampening factor for policy function updates. A value of ``1`` means no dampening. Reducing this below ``1`` improves stability at the cost of slower convergence.
+        Default: ``1``
+
+    .. option:: time_iteration_early_stopping = INTEGER
+
+        Number of consecutive iterations with increasing residuals before the time-iteration loop is stopped early (to avoid divergence). Set to ``0`` to disable.
+        Default: ``3``
+
+    .. option:: time_iteration_verbosity = INTEGER
+
+        Verbosity level for time iteration. ``0``: silent; ``2``: iteration details.
+        Default: ``2``
+
+    .. option:: time_iteration_solver_tolf = DOUBLE
+
+        Tolerance on the residual for the trust-region solver used at each grid point within time iteration.
+        Default: ``1e-10``
+
+    .. option:: time_iteration_solver_tolx = DOUBLE
+
+        Tolerance on the step size for the trust-region solver.
+        Default: ``1e-10``
+
+    .. option:: time_iteration_solver_factor = DOUBLE
+
+        Initial step bound factor for the trust-region solver.
+        Default: ``100``
+
+    .. option:: time_iteration_solver_max_iter = INTEGER
+
+        Maximum iterations per grid point for the trust-region solver.
+        Default: ``1000``
+
+    .. option:: time_iteration_solver_stop_on_error
+
+        If present, the solver stops immediately when the trust-region solver fails to converge at any grid point. Without this option, the solver continues with the best iterate.
+
+    .. option:: forward_max_iter = INTEGER
+
+        Maximum number of forward iterations for the stationary distribution.
+        Default: ``10000``
+
+    .. option:: forward_tol = DOUBLE
+
+        Convergence tolerance for the stationary distribution (L1 norm).
+        Default: ``1e-10``
+
+    .. option:: forward_check_every = INTEGER
+
+        Check distribution convergence every ``INTEGER`` iterations.
+        Default: ``100``
+
+    .. option:: forward_verbosity = INTEGER
+
+        Verbosity level for distribution computation. ``0``: silent; ``1``: non-convergence warnings only; ``2``: iteration details.
+        Default: ``1``
+
+    *Output*
+
+        Same output as :comm:`heterogeneity_load_steady_state`.
+        Additionally updates :mvar:`M_.params` with calibrated parameter
+        values.
+
+    **Practical advice**
+
+    The quality of the initial guess is critical. Poor starting values for policy functions or parameters may cause divergence or convergence to a spurious solution. In particular, numerical convergence does not ensure that the obtained solution is economically meaningful. The following strategies can help:
+
+    - **Grid homotopy:** Start with a coarse grid (e.g., 50 points for states), solve the steady state, then use the result as the initial guess for a finer grid (e.g., 200 or 500 points). Repeat until the desired resolution is reached.
+    - **Asymmetric grids:** Using a coarse grid for policy functions (``pol.grids``) and a denser grid for the distribution (``d.grids``) is often an effective compromise between accuracy and speed.
+    - **Dampening:** If time iteration oscillates, reduce ``time_iteration_learning_rate`` (e.g., to ``0.5`` or ``0.8``). This slows convergence but stabilizes updates.
+    - **Solver tolerances:** If the trust-region solver at individual grid points fails, try relaxing ``time_iteration_solver_tolf`` or increasing ``time_iteration_solver_max_iter``. Use ``time_iteration_solver_stop_on_error`` during debugging to pinpoint problematic grid regions.
+    - **Calibration tolerance:** The outer Broyden loop tolerance ``calibration_tolf`` should be looser than the inner time-iteration tolerance ``time_iteration_tol``, otherwise the calibration step may attempt to match noise in the inner solver.
+
+    *Examples*
+
+    Compute steady state without parameter calibration (residual check only)::
+
+        heterogeneity_compute_steady_state(filename=ks_sp);
+
+    Compute steady state with parameter calibration and user-specified target equation::
+
+        heterogeneity_compute_steady_state(filename=hank_1a_sp,
+            calibration_target_equations=['capital_market_clearing'],
+            time_iteration_solver_stop_on_error);
+
+    Compute steady state with fine-tuned convergence settings::
+
+        heterogeneity_compute_steady_state(filename=hank_2a_sp,
+            calibration_target_equations=['wage_nkpc',
+                'liquid_asset_market_clearing',
+                'illiquid_asset_market_clearing'],
+            time_iteration_tol=1e-10,
+            time_iteration_learning_rate=0.79,
+            time_iteration_solver_tolf=1e-12,
+            time_iteration_solver_tolx=1e-14);
 
 heterogeneity_solve
 ^^^^^^^^^^^^^^^^^^^
@@ -15982,8 +16205,8 @@ heterogeneity_solve
 .. command:: heterogeneity_solve ;
              heterogeneity_solve (OPTIONS...);
 
-    Computes the linearized solution using the Sequence-Space Jacobian method.
-    ``heterogeneity_load_steady_state`` must be called first.
+    Computes the linearized solution.
+    :comm:`heterogeneity_load_steady_state` or :comm:`heterogeneity_compute_steady_state` must be called first.
 
     *Options*
 
@@ -15994,9 +16217,29 @@ heterogeneity_solve
 
     *Output*
 
-        Populates ``oo_.heterogeneity.dr`` with:
+        Populates :mvar:`oo_.heterogeneity.dr`.
 
-        - ``G.(variable).(shock)``: Linear response matrix showing how deviations in the exogenous shock ``shock`` affect the endogenous variable ``variable`` over time; for example, ``G.(variable).(shock)(t,s)`` gives the effect on ``variable`` in period ``t`` of a one-time deviation in ``shock`` occurring in period ``s``, treated as known at time 0
+    .. matvar:: oo_.heterogeneity.dr
+
+        |br| Structure storing the linearized solution of the
+        heterogeneous-agent block, computed by :comm:`heterogeneity_solve`.
+        The user-facing subfield is ``G`` (see :mvar:`oo_.heterogeneity.dr.G`);
+        other subfields are for internal purpose.
+
+    .. matvar:: oo_.heterogeneity.dr.G
+
+        |br| Nested structure of sequence-space Jacobian matrices.
+        ``oo_.heterogeneity.dr.G.VARIABLE_NAME.SHOCK_NAME`` is a
+        :math:`T \times T` matrix (where :math:`T` is
+        :opt:`truncation_horizon <truncation_horizon = INTEGER>`) whose entry
+        :math:`(t,s)` gives the linear response of ``VARIABLE_NAME`` in period
+        :math:`t` to a unit deviation of ``SHOCK_NAME`` in period :math:`s`,
+        treated as known at time 0.
+
+        *Example*
+
+            ``oo_.heterogeneity.dr.G.Y.Z`` contains the response of output
+            ``Y`` to the exogenous shock ``Z``.
 
 heterogeneity_simulate
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -16005,7 +16248,7 @@ heterogeneity_simulate
              heterogeneity_simulate (OPTIONS...) [VARIABLE_NAME...];
 
     Computes linear impulse response functions (IRFs) or simulations for heterogeneous-agent models.
-    The command automatically detects the appropriate simulation mode based on model contents and options. ``heterogeneity_solve`` must be called first.
+    The command automatically detects the appropriate simulation mode based on model contents and options. :comm:`heterogeneity_solve` must be called first.
 
     **Simulation Modes**
 
@@ -16018,7 +16261,7 @@ heterogeneity_simulate
     2. **News shock sequence:**
        Triggered automatically if the model file includes a ``shocks`` block with ``periods`` and ``values`` keywords.
        Simulates the model's response to anticipated shocks known at date 0. Following *Auclert et al. (2021)*: households learn at t=0 about the sequence of future shocks.
-       News shock mode is mutually exclusive with stochastic simulation options ``irf``, ``periods``, ``irf_shocks`` and ``relative_irf``.
+       News shock mode is mutually exclusive with stochastic simulation options ``irf``, ``periods``, ``irf_shocks``, and ``relative_irf``.
 
     *Options*
 
@@ -16106,7 +16349,7 @@ heterogeneity_simulate
         % IRFs for specific variables only
         heterogeneity_simulate Y K;
 
-.. _semi-strutural:
+.. _semi-structural:
 
 Semi-structural models
 ======================

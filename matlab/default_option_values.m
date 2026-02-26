@@ -401,7 +401,7 @@ options_.heterogeneity.time_iteration.solver_max_iter = 1e3;
 options_.heterogeneity.time_iteration.solver_stop_on_error = false;
 
 % - Calibration
-options_.heterogeneity.calibration.ftol = 1e-4;
+options_.heterogeneity.calibration.tolf = 1e-4;
 options_.heterogeneity.calibration.max_iter = 50;
 options_.heterogeneity.calibration.verbosity = 2;
 options_.heterogeneity.calibration.target_equations = {};

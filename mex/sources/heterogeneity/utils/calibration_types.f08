@@ -180,7 +180,7 @@ module calibration_types
         integer(int32) :: n_het_exo = 0  ! Heterogeneous exogenous vars
         integer(int32) :: n_states = 0   ! Continuous state variables
         integer(int32) :: n_agg_endo = 0 ! Aggregate endogenous vars
-        integer(int32) :: n_unknowns = 0 ! Calibrated parameters
+        integer(int32) :: n_free_parameters = 0 ! Calibrated parameters
 
         ! Solver-related counts
         integer(int32) :: n_orig = 0     ! Originally declared het endo vars (solver optimizes over these)
@@ -284,9 +284,9 @@ module calibration_types
         type(solver_options), pointer :: solver_opts => null()
 
         ! Calibration targets (unknown parameters)
-        integer(int32), pointer, contiguous :: unknowns_ind(:) => null()  ! Indices in params array
-        real(real64), pointer, contiguous :: unknowns_init(:) => null()  ! Initial guesses
-        real(real64), pointer, contiguous :: unknowns_bounds(:,:) => null()  ! Bounds [2 × n_unknowns] (-Inf/+Inf for unbounded)
+        integer(int32), pointer, contiguous :: free_parameters_ind(:) => null()  ! Indices in params array
+        real(real64), pointer, contiguous :: free_parameters_init(:) => null()  ! Initial guesses
+        real(real64), pointer, contiguous :: free_parameters_bounds(:,:) => null()  ! Bounds [2 × n_free_parameters] (-Inf/+Inf for unbounded)
 
         ! Policy functions
         real(real64), allocatable :: old_pol(:,:)   ! Policy from previous time iteration [n_het_endo × N_sp]
@@ -318,8 +318,8 @@ module calibration_types
         ! Model parameters
         real(real64), pointer, contiguous :: params(:) => null()
 
-        ! Names for calibration unknowns (from indices.unknowns.names)
-        character(len=:), allocatable :: unknowns_names(:)  ! [n_unknowns] - parameter names
+        ! Names for calibration free_parameters (from indices.free_parameters.names)
+        character(len=:), allocatable :: free_parameters_names(:)  ! [n_free_parameters] - parameter names
 
         ! Names for aggregate equations (from M_.equation_tags)
         character(len=:), allocatable :: equation_names(:)  ! [n_agg_endo] - equation names
@@ -399,10 +399,10 @@ module calibration_types
         type(distribution_output), pointer :: dist_output => null()
         type(aggregation_output), pointer :: agg_output => null()
 
-        ! Calibrated parameters [n_unknowns]
+        ! Calibrated parameters [n_free_parameters]
         real(real64), allocatable :: params(:)
 
-        ! Market clearing residuals (target equations only) [n_target_eqs]
+        ! Calibration target equations residuals [n_target_eqs]
         real(real64), allocatable :: residuals(:)
 
         ! Convergence info (for calibration loop)
