@@ -16349,7 +16349,7 @@ heterogeneity_simulate
         % IRFs for specific variables only
         heterogeneity_simulate Y K;
 
-.. _semi-strutural:
+.. _semi-structural:
 
 Semi-structural models
 ======================
