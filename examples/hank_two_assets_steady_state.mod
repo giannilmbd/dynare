@@ -1,10 +1,33 @@
-// Two-Asset HANK Model (Heterogeneous Agent New Keynesian)
-// Example: News Shocks (Anticipated Shock Sequences)
-//
-// This example demonstrates:
-// 1. Loading a pre-computed steady state
-// 2. Solving a HANK model with liquid and illiquid assets
-// 3. Simulating responses to anticipated shock sequences (news shocks known at t=0)
+/*
+ * Two-Asset HANK Model (Heterogeneous Agent New Keynesian)
+ * Example: Computing the Steady State with Multi-Parameter Calibration
+ *
+ * This example demonstrates:
+ * 1. Computing the steady state numerically from an initial guess
+ * 2. Calibrating multiple free parameters (beta_ss, vphi, chi1) to match
+ *    three market-clearing conditions simultaneously
+ * 3. Solving a HANK model with liquid and illiquid assets
+ * 4. Simulating responses to anticipated shock sequences (news shocks)
+ */
+
+/*
+ * Copyright © 2026 Dynare Team
+ *
+ * This file is part of Dynare.
+ *
+ * Dynare is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Dynare is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 // Declare heterogeneity dimension
 heterogeneity_dimension households;
@@ -57,22 +80,6 @@ varexo
     markup_w    (long_name = 'wage markup shock')
 ;
 
-// News shock sequence
-// We define anticipated shocks known at t=0
-shocks;
-    var rstar;
-    periods 1;
-    values 0.01;
-
-    var G;
-    periods 1:10;
-    values 0.02;
-
-    var markup;
-    periods 5:8;
-    values 0.005;
-end;
-
 // Parameters
 parameters
     kappap alpha epsI muw phi omega Bg pshare delta
@@ -80,6 +87,28 @@ parameters
     chi0 chi1 chi2
     Z_ss beta_ss r_ss G_ss
 ;
+
+Bg = 2.8;
+G_ss = 0.2;
+Z_ss = 0.4677898145312322;
+alpha = 0.3299492385786802;
+beta_ss = 0.976273900655271;
+chi0 = 0.25;
+chi1 = 6.416419681906506;
+chi2 = 2;
+delta = 0.02;
+eis = 0.5;
+epsI = 4;
+frisch = 1;
+kappap = 0.1;
+kappaw = 0.1;
+mup = 1.015228426395939;
+muw = 1.1;
+omega = 0.005;
+phi = 1.5;
+pshare = 0.8641975308641971;
+r_ss = 0.0125;
+vphi = 1.713475928326737;
 
 // Household optimization problem with two assets
 model(heterogeneity=households);
@@ -129,9 +158,6 @@ model;
    [name='Capital accumulation']
    K - (1 - delta) * K(-1) + K(-1) * (K / K(-1) - 1) ^ 2 / (2 * delta * epsI) - I;
 
-   [name='Resource constraint']
-   Y - w * N - I - psip - div;
-
    [name='Taylor rule']
    rstar + r_ss + phi * pi - i;
 
@@ -156,40 +182,50 @@ model;
    [name='Wage Phillips curve']
    kappaw * (vphi * N ^ (1 + 1 / frisch) - (1 - tax) * w * N * SUM(u) / muw) + (beta_ss+beta) * log(1 + piw(+1)) + markup_w - log(1 + piw);
 
-   [name='Asset market clearing']
-   p + Bg - SUM(b) - SUM(a);
+   [name='Illiquid asset market clearing']
+   p - SUM(a);
+
+   [name='Liquid asset market clearing']
+   Bg - SUM(b);
 end;
 
-Bg = 2.8;
-G_ss = 0.2;
-Z_ss = 0.4677898145312322;
-alpha = 0.3299492385786802;
-beta_ss = 0.976273900655271;
-chi0 = 0.25;
-chi1 = 6.416419681906506;
-chi2 = 2;
-delta = 0.02;
-eis = 0.5;
-epsI = 4;
-frisch = 1;
-kappap = 0.1;
-kappaw = 0.1;
-mup = 1.015228426395939;
-muw = 1.1;
-omega = 0.005;
-phi = 1.5;
-pshare = 0.8641975308641971;
-r_ss = 0.0125;
-vphi = 1.713475928326737;
+// News shock sequence
+// Anticipated shocks known at t=0
+shocks;
+    var rstar;
+    periods 1;
+    values 0.01;
+
+    var G;
+    periods 1:10;
+    values 0.02;
+
+    var markup;
+    periods 5:8;
+    values 0.005;
+end;
 
 //==========================================================================
-// STEP 1: Load pre-computed steady state
+// STEP 1: Compute steady state with multi-parameter calibration
 //==========================================================================
-heterogeneity_load_steady_state(filename = hank_2a);
+// The initial guess is loaded from hank_two_assets_sp.mat. Three parameters
+// (beta_ss, vphi, chi1) are calibrated so that the wage Phillips curve
+// and two asset market clearing conditions hold.
+// The .mat file contains: steady_state.free_parameters with initial guesses
+// and bounds for each free parameter.
+heterogeneity_compute_steady_state(filename = hank_two_assets_sp,
+    calibration_target_equations=['Wage Phillips curve',
+        'Liquid asset market clearing',
+        'Illiquid asset market clearing'],
+    time_iteration_tol=1e-10,
+    time_iteration_learning_rate=0.79,
+    time_iteration_solver_tolf=1e-12,
+    time_iteration_solver_tolx=1e-14);
 
 //==========================================================================
 // STEP 2: Solve the model
 //==========================================================================
+// Compute the linearized solution using sequence-space Jacobians
 heterogeneity_solve(truncation_horizon = 300);
 
 //==========================================================================

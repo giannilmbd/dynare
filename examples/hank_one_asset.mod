@@ -1,11 +1,32 @@
-// One-Asset HANK Model (Heterogeneous Agent New Keynesian)
-// Example: Stochastic Simulation
-//
-// This example demonstrates:
-// 1. Loading a pre-computed steady state
-// 2. Solving a HANK model with one liquid asset
-// 3. Computing impulse response functions (IRFs)
-// 4. Running stochastic simulations to generate time series
+/*
+ * One-Asset HANK Model (Heterogeneous Agent New Keynesian)
+ * Example: Stochastic Simulation
+ *
+ * This example demonstrates:
+ * 1. Loading a pre-computed steady state
+ * 2. Solving a HANK model with one liquid asset
+ * 3. Computing impulse response functions (IRFs)
+ * 4. Running stochastic simulations to generate time series
+ */
+
+/*
+ * Copyright © 2026 Dynare Team
+ *
+ * This file is part of Dynare.
+ *
+ * Dynare is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Dynare is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 // Declare heterogeneity dimension
 heterogeneity_dimension households;
@@ -38,13 +59,6 @@ var
 // Aggregate shocks
 varexo G markup rstar;
 
-// Aggregate shock specification
-shocks;
-    var G; stderr 0.01;
-    var markup; stderr 0.01;
-    var rstar; stderr 0.01;
-end;
-
 // Parameters
 parameters
    beta vphi
@@ -54,6 +68,17 @@ parameters
    mu kappa phi
    Z B r_ss
 ;
+
+B = 5.6;
+Z = 1;
+beta = 0.9822435537831447;
+eis = 0.5;
+frisch = 0.5;
+kappa = 0.1;
+mu = 1.2;
+phi = 1.5;
+r_ss = 0.005;
+vphi = 0.7864334221640324;
 
 // Household optimization problem
 model(heterogeneity=households);
@@ -100,21 +125,17 @@ model;
    sum(ns) - L;
 end;
 
-B = 5.6;
-Z = 1;
-beta = 0.9822435537831447;
-eis = 0.5;
-frisch = 0.5;
-kappa = 0.1;
-mu = 1.2;
-phi = 1.5;
-r_ss = 0.005;
-vphi = 0.7864334221640324;
+// Aggregate shock specification
+shocks;
+    var G; stderr 0.01;
+    var markup; stderr 0.01;
+    var rstar; stderr 0.01;
+end;
 
 //==========================================================================
 // STEP 1: Load pre-computed steady state
 //==========================================================================
-heterogeneity_load_steady_state(filename = hank_1a);
+heterogeneity_load_steady_state(filename = hank_one_asset);
 
 //==========================================================================
 // STEP 2: Solve the model

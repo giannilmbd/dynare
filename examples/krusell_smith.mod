@@ -1,10 +1,31 @@
-// Krusell and Smith (1998)
-// Example: Computing Impulse Response Functions (IRFs)
-//
-// This example demonstrates:
-// 1. Loading a pre-computed steady state
-// 2. Solving the model
-// 3. Computing impulse response functions to aggregate shocks
+/*
+ * Krusell and Smith (1998)
+ * Example: Computing Impulse Response Functions (IRFs)
+ *
+ * This example demonstrates:
+ * 1. Loading a pre-computed steady state
+ * 2. Solving the model
+ * 3. Computing impulse response functions to aggregate shocks
+ */
+
+/*
+ * Copyright © 2026 Dynare Team
+ *
+ * This file is part of Dynare.
+ *
+ * Dynare is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Dynare is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 // Declare heterogeneity dimension
 heterogeneity_dimension households;
@@ -44,6 +65,13 @@ parameters
     Z_ss  (long_name = 'Aggregate TFP shock average value')
 ;
 
+L = 1;
+Z_ss = 0.8816460975214567;
+alpha = 0.11;
+beta = 0.9819527880123727;
+delta = 0.025;
+eis = 1;
+
 // Household optimization problem
 model(heterogeneity=households);
      [name='Euler equation with borrowing constraint']
@@ -76,19 +104,12 @@ shocks;
     var Z; stderr 0.01;
 end;
 
-L = 1;
-Z_ss = 0.8816460975214567;
-alpha = 0.11;
-beta = 0.9819527880123727;
-delta = 0.025;
-eis = 1;
-
 //==========================================================================
 // STEP 1: Load pre-computed steady state
 //==========================================================================
 // The steady state was computed using sequence-space Jacobian methods
-// and saved in ks.mat file
-heterogeneity_load_steady_state(filename = ks);
+// and saved in krusell_smith.mat file
+heterogeneity_load_steady_state(filename = krusell_smith);
 
 //==========================================================================
 // STEP 2: Solve the model
