@@ -108,27 +108,18 @@ if ~isempty(options_gsa.datafile) || isempty(bayestopt_) || options_gsa.rmse
         error('sensitivity does not support recursive estimation. Please specify nobs as a scalar, not a vector.')
     end
     options_.datafile = options_gsa.datafile;
-    if isfield(options_gsa,'first_obs')
-        options_.first_obs=options_gsa.first_obs;
+    list_of_options_to_check={'first_obs','presample','prefilter','loglinear',...
+        ... cover kalman_filter_primary_options 
+        'lik_init','diffuse_filter','kalman_algo','kalman_tol','use_univariate_filters_if_singularity_is_detected','diffuse_kalman_tol',...
+        'heteroskedastic_filter','skewed_kalman_prune_tol','skewed_kalman_rank_deficiency_transform','skewed_kalman_mvnlogcdf',...
+        ... cover kalman_smoother_primary_options
+        'smoother_redux','filter_decomposition','smoothed_state_uncertainty','filter_covariance','updated_covariance','use_univariate_smoother_if_singularity_is_detected'};
+    for option_iter=1:length(list_of_options_to_check)
+        if isfield(options_gsa,list_of_options_to_check{option_iter})
+            options_.(list_of_options_to_check{option_iter})=options_gsa.(list_of_options_to_check{option_iter});
+        end
     end
-    if isfield(options_gsa,'presample')
-        options_.presample=options_gsa.presample;
-    end
-    if isfield(options_gsa,'prefilter')
-        options_.prefilter=options_gsa.prefilter;
-    end
-    if isfield(options_gsa,'loglinear')
-        options_.loglinear=options_gsa.loglinear;
-    end
-    if isfield(options_gsa,'lik_init')
-        options_.lik_init=options_gsa.lik_init;
-    end
-    if isfield(options_gsa,'diffuse_filter')
-        options_.diffuse_filter=options_gsa.diffuse_filter;
-    end
-    if isfield(options_gsa,'kalman_algo')
-        options_.kalman_algo=options_gsa.kalman_algo;
-    end
+
     options_.mode_compute = 0;
     options_.filtered_vars = 1;
     options_.plot_priors = 0;

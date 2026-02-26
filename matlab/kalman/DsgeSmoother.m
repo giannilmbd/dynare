@@ -310,8 +310,10 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
         % error_flag from filter: 0=success, 420=Finf rank-deficient, 421=Fstar rank-deficient, 422=F singular
         if filter_error_flag > 0
             info = [filter_error_flag, 0, 0, 0];
-            if filter_error_flag==422 %stochastic singularity in F
-                print_info(info,options_.noprint, options_);
+            if filter_error_flag==422 && ~options_.use_univariate_smoother_if_singularity_is_detected %stochastic singularity in F
+                disp_verbose('DsgeSmoother: Stochastic singularity in stationary period detected. If you are sure the model is correctly specified,',options_.verbosity)
+                disp_verbose('DsgeSmoother: you may want to enable use_univariate_smoother_if_singularity_is_detected to deal with pathological draws.',options_.verbosity)
+                print_info(info,options_.noprint, options_);                
             end
         end
         if kalman_algo == 1
