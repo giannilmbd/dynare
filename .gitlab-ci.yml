@@ -112,8 +112,7 @@ pkg_macOS_x86_64:
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
-      - macOS/deps/x86_64/sources64/
-      - macOS/deps/x86_64/lib64/
+      - macOS/deps/x86_64/src/
   tags:
     - macOS
   artifacts:
@@ -132,8 +131,7 @@ pkg_macOS_arm64:
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
-      - macOS/deps/arm64/sources64/
-      - macOS/deps/arm64/lib64/
+      - macOS/deps/arm64/src/
   tags:
     - macOS
   artifacts:
