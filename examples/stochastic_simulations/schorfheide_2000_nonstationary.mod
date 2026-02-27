@@ -1,10 +1,10 @@
 /*
- * This file is a modified version of 'fs2000.mod'.
+ * This file is a modified version of 'schorfheide_2000.mod'.
  *
  * The difference is that, here, the equations are written in non-stationary form,
  * and Dynare automatically does the detrending.
  *
- * Also note that "m" and "dA" in 'fs2000.mod' are here called "gM" and "gA"
+ * Also note that "m" and "dA" in 'schorfheide_2000.mod' are here called "gM" and "gA"
  */
 
 /*

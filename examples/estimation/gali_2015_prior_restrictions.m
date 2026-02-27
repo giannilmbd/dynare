@@ -1,5 +1,5 @@
-function log_prior_val=Gali_2015_prior_restrictions(M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, dataset_, dataset_info);
-% function prior_val=Gali_2015_prior_restrictions(M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, dataset_, dataset_info);
+function log_prior_val=gali_2015_prior_restrictions(M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, dataset_, dataset_info);
+% function prior_val=gali_2015_prior_restrictions(M_, dr, endo_steady_state, exo_steady_state, exo_det_steady_state, options_, dataset_, dataset_info);
 % Example of a _prior_restrictions-file automatically called during
 % estimation
 % It imposes a prior of the slope of the New Keynesian Phillips Curve of
