@@ -8,7 +8,7 @@
  * THIS MOD-FILE REQUIRES DYNARE 4.5 OR HIGHER
  *
  * Notes:
- *  - The estimation will automatically take the Gali_2015_prior_restrictions.m into
+ *  - The estimation will automatically take the gali_2015_prior_restrictions.m into
  *      account, which has the required name and format
  *  - Estimation is based on simulated data
  *  - The file also shows how to use a prior/posterior-function
@@ -146,13 +146,13 @@ end;
 
 varobs yhat;
 
-% Run prior function to get prior slope of the PC based on independent priors
+% Run prior function to get prior slope of the Phillips curve based on independent priors
 hh_fig=figure('Name','Slope of the Phillips Curve');
-prior_function(function='Gali_2015_PC_slope');
-PC_slope_vec=cell2mat(oo_.prior_function_results(:,1));
+prior_function(function='gali_2015_phillips_curve_slope');
+phillips_curve_slope_vec=cell2mat(oo_.prior_function_results(:,1));
 
-optimal_bandwidth = mh_optimal_bandwidth(PC_slope_vec,length(PC_slope_vec),0,'gaussian');
-[density(:,1),density(:,2)] = kernel_density_estimate(PC_slope_vec,512,length(PC_slope_vec),optimal_bandwidth,'gaussian');
+optimal_bandwidth = mh_optimal_bandwidth(phillips_curve_slope_vec,length(phillips_curve_slope_vec),0,'gaussian');
+[density(:,1),density(:,2)] = kernel_density_estimate(phillips_curve_slope_vec,512,length(phillips_curve_slope_vec),optimal_bandwidth,'gaussian');
 figure(hh_fig)
 subplot(3,1,1)
 plot(density(:,1),density(:,2));
@@ -161,10 +161,10 @@ title('Prior')
 % Run estimation with 1 observation to show effect of _prior_restriction .m
 % on independent prior
 estimation(datafile='sim_data',mode_compute=5,mh_replic=2001,mh_nblocks=1,diffuse_filter,nobs=1,mh_jscale=0.8);
-posterior_function(function='Gali_2015_PC_slope');
-PC_slope_vec=cell2mat(oo_.posterior_function_results(:,1));
-optimal_bandwidth = mh_optimal_bandwidth(PC_slope_vec,length(PC_slope_vec),0,'gaussian');
-[density(:,1),density(:,2)] = kernel_density_estimate(PC_slope_vec,512,length(PC_slope_vec),optimal_bandwidth,'gaussian');
+posterior_function(function='gali_2015_phillips_curve_slope');
+phillips_curve_slope_vec=cell2mat(oo_.posterior_function_results(:,1));
+optimal_bandwidth = mh_optimal_bandwidth(phillips_curve_slope_vec,length(phillips_curve_slope_vec),0,'gaussian');
+[density(:,1),density(:,2)] = kernel_density_estimate(phillips_curve_slope_vec,512,length(phillips_curve_slope_vec),optimal_bandwidth,'gaussian');
 figure(hh_fig)
 subplot(3,1,2)
 plot(density(:,1),density(:,2));
@@ -174,10 +174,10 @@ title('Updated Prior')
 % Run estimation with full observations
 estimation(datafile='sim_data',mode_compute=5,mh_replic=2001,mh_nblocks=1,diffuse_filter,nobs=100,mh_jscale=0.8);
 
-posterior_function(function='Gali_2015_PC_slope');
-PC_slope_vec=cell2mat(oo_.posterior_function_results(:,1));
-optimal_bandwidth = mh_optimal_bandwidth(PC_slope_vec,length(PC_slope_vec),0,'gaussian');
-[density(:,1),density(:,2)] = kernel_density_estimate(PC_slope_vec,512,length(PC_slope_vec),optimal_bandwidth,'gaussian');
+posterior_function(function='gali_2015_phillips_curve_slope');
+phillips_curve_slope_vec=cell2mat(oo_.posterior_function_results(:,1));
+optimal_bandwidth = mh_optimal_bandwidth(phillips_curve_slope_vec,length(phillips_curve_slope_vec),0,'gaussian');
+[density(:,1),density(:,2)] = kernel_density_estimate(phillips_curve_slope_vec,512,length(phillips_curve_slope_vec),optimal_bandwidth,'gaussian');
 figure(hh_fig)
 subplot(3,1,3)
 plot(density(:,1),density(:,2));

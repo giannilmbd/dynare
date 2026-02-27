@@ -1,5 +1,5 @@
-function output_cell =PC_slope(xparam1,M_,options_,oo_,estim_params_,bayestopt_,dataset_,dataset_info)
-% output_cell =PC_slope(xparam1,M_,options_,oo_,estim_params_,bayestopt_,dataset_,dataset_info);
+function output_cell =phillips_curve_slope(xparam1,M_,options_,oo_,estim_params_,bayestopt_,dataset_,dataset_info)
+% output_cell =phillips_curve_slope(xparam1,M_,options_,oo_,estim_params_,bayestopt_,dataset_,dataset_info);
 % This is an example file computing statistics on the prior/posterior draws. The
 % function allows read-only access to all Dynare structures. However, those
 % structures are local to this function.  Changing them will not affect
@@ -7,8 +7,7 @@ function output_cell =PC_slope(xparam1,M_,options_,oo_,estim_params_,bayestopt_,
 % Dynare functions.
 % The function takes one and only one output argument: an 1 by n cell.
 % Using functions like cell2mat, the contents of the cell can be easily
-% transformed back to matrices. See the fs2000_posterior_function.mod for
-% an example
+% transformed back to matrices.
 
 % INPUTS
 %   xparam1                      Current parameter draw

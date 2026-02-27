@@ -15,8 +15,8 @@ description, please refer to the comments inside the files themselves.
 Stochastic simulations
 ======================
 
-``stochastic_simulations/example1.mod``
-``stochastic_simulations/example2.mod``
+``stochastic_simulations/collard_2001_theoretical_moments.mod``
+``stochastic_simulations/collard_2001_simulated_moments.mod``
 
     Two examples of a small RBC model in a stochastic setup, presented
     in :cite:t:`Collard:2001` (see the file ``guide.pdf`` which comes with
@@ -24,15 +24,15 @@ Stochastic simulations
     computation. The first one uses theoretical moments, the second one uses
     simulated moments.
 
-``stochastic_simulations/example3.mod``
+``stochastic_simulations/collard_2001_analytical_steady_state.mod``
 
     A small RBC model in a stochastic setup, presented in :cite:t:`Collard:2001`
     using :comm:`stoch_simul`. The steady state is solved analytically using the
     :bck:`steady_state_model` block and a helper function to call a solver.
 
-``stochastic_simulations/fs2000_nonstationary.mod``
+``stochastic_simulations/schorfheide_2000_nonstationary.mod``
 
-    The cash-in-advance model of :cite:t:`Schorfheide:2000` model (same as ``estimation/fs2000.mod``) written in non-stationary
+    The cash-in-advance model of :cite:t:`Schorfheide:2000` (same as ``estimation/schorfheide_2000.mod``) written in non-stationary
     form. Detrending of the equations is done by Dynare.
 
 ``stochastic_simulations/ag_2007_trend.mod``
@@ -40,7 +40,7 @@ Stochastic simulations
     Small open economy RBC model with shocks to the growth trend,
     presented in :cite:t:`Aguiar:2007`.
 
-``stochastic_simulations/NK_baseline.mod``
+``stochastic_simulations/nk_baseline.mod``
 
     Baseline New Keynesian Model estimated in :cite:t:`FernandezVillaverde:2010`.
     It demonstrates how to use an explicit steady state file
@@ -49,12 +49,12 @@ Stochastic simulations
 Estimation
 ==========
 
-``estimation/fs2000.mod``
+``estimation/schorfheide_2000.mod``
 
     A cash-in-advance model, estimated by :cite:t:`Schorfheide:2000`. The
     file shows how to use the :comm:`estimation` command.
 
-``estimation/Gali_2015.mod``
+``estimation/gali_2015.mod``
 
     Basic New Keynesian model of :cite:t:`Gali:2015`, Chapter 3 showing how to
     i) use "system prior"-type prior restrictions as in :cite:t:`Andrle:2018`
@@ -89,7 +89,7 @@ Perfect foresight
 Optimal policy
 ==============
 
-``optimal_policy/Ramsey_Example.mod``
+``optimal_policy/nk_ramsey_osr.mod``
 
     File demonstrating how to conduct optimal policy experiments in a
     simple New Keynesian model either under commitment
@@ -97,7 +97,7 @@ Optimal policy
     optimal simple rules (:comm:`osr`). Based on
     :cite:t:`ChristianoMottoRostagno:2007`.
 
-``optimal_policy/Ramsey_steady_file.mod``
+``optimal_policy/nk_ramsey_steady_file.mod``
 
     File demonstrating how to conduct optimal policy experiments in a
     simple New Keynesian model under commitment
@@ -149,7 +149,7 @@ Heterogeneity
 OccBin
 ======
 
-``occbin/Occbin_example.mod``
+``occbin/rbc_occbin.mod``
 
     RBC model with two occasionally binding constraints. Demonstrates
     how to set up OccBin using :comm:`occbin_setup` and :comm:`occbin_solver`.
@@ -166,13 +166,13 @@ Macroprocessor
 Reporting
 =========
 
-``reporting/example1_reporting.mod``
+``reporting/collard_2001_reporting.mod``
 
-    Example of Dynare's reporting features.
+    Example of Dynare's reporting features using the :cite:t:`Collard:2001` RBC model.
 
 Semistructural
 ==============
 
-``semistructural/pacmodel.mod``
+``semistructural/pac_model.mod``
 
     Example of a semi-structural model employing PAC (polynomial adjustment cost) specification.

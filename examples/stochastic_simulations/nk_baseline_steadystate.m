@@ -1,6 +1,6 @@
-function [ys,params,check] = NK_baseline_steadystate(ys,exo,M_,options_)
-% function [ys,params,check] = NK_baseline_steadystate(ys,exo,M_,options_)
-% computes the steady state for the NK_baseline.mod and uses a numerical
+function [ys,params,check] = nk_baseline_steadystate(ys,exo,M_,options_)
+% function [ys,params,check] = nk_baseline_steadystate(ys,exo,M_,options_)
+% computes the steady state for the nk_baseline.mod and uses a numerical
 % solver to do so
 % Inputs:
 %   - ys        [vector] vector of initial values for the steady state of

@@ -1,6 +1,6 @@
-function [ys,params,check] = Ramsey_steady_file_steadystate(ys,exo,M_,options_)
-% function [ys,params,check] = Ramsey_steady_file_steadystate(ys,exo,M_,options_)
-% computes the steady state for the Ramsey_steady_file.mod, conditional on
+function [ys,params,check] = nk_ramsey_steady_file_steadystate(ys,exo,M_,options_)
+% function [ys,params,check] = nk_ramsey_steady_file_steadystate(ys,exo,M_,options_)
+% computes the steady state for the nk_ramsey_steady_file.mod, conditional on
 % the instrument value provided
 %
 % Inputs:

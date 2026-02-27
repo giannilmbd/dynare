@@ -161,7 +161,7 @@ end;
 
 varobs gp_obs gy_obs;
 
-estimation(order=1, datafile=fs2000_data, loglinear,logdata, mode_compute=4, mh_replic=20000, nodiagnostic, mh_nblocks=2, mh_jscale=0.8, mode_check);
+estimation(order=1, datafile=schorfheide_2000_data, loglinear,logdata, mode_compute=4, mh_replic=20000, nodiagnostic, mh_nblocks=2, mh_jscale=0.8, mode_check);
 
 %uncomment the following lines to generate LaTeX-code of the model equations
 %write_latex_original_model(write_equation_tags);

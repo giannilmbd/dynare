@@ -21,7 +21,7 @@
  * interesting for power users. If one just wants to provide analytical steady state
  * values and update parameters, the steady_state_model-block allows an easy and convenient
  * alternative. It even allows calling numerical solvers like fsolve. For an example, see
- * example3.mod
+ * collard_2001_analytical_steady_state.mod
  *
  * The model is written in the beginning of period stock notation. To make the model
  * conform with Dynare’s end of period stock notation, we use the

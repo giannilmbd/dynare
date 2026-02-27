@@ -2561,20 +2561,20 @@ mod_and_m_tests = [
 
   # Examples — Stochastic simulations
   { 'test' : [ '../examples/stochastic_simulations/ag_2007_trend.mod' ] },
-  { 'test' : [ '../examples/stochastic_simulations/example1.mod' ] },
-  { 'test' : [ '../examples/stochastic_simulations/example2.mod' ] },
-  { 'test' : [ '../examples/stochastic_simulations/example3.mod' ],
-    'extra' : [ '../examples/stochastic_simulations/example3_steady_state_helper.m' ] },
-  { 'test' : [ '../examples/stochastic_simulations/fs2000_nonstationary.mod' ] },
-  { 'test' : [ '../examples/stochastic_simulations/NK_baseline.mod' ],
-    'extra' : [ '../examples/stochastic_simulations/NK_baseline_steadystate.m' ] },
+  { 'test' : [ '../examples/stochastic_simulations/collard_2001_theoretical_moments.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/collard_2001_simulated_moments.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/collard_2001_analytical_steady_state.mod' ],
+    'extra' : [ '../examples/stochastic_simulations/collard_2001_analytical_steady_state_helper.m' ] },
+  { 'test' : [ '../examples/stochastic_simulations/schorfheide_2000_nonstationary.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/nk_baseline.mod' ],
+    'extra' : [ '../examples/stochastic_simulations/nk_baseline_steadystate.m' ] },
 
   # Examples — Estimation
-  { 'test' : [ '../examples/estimation/fs2000.mod' ],
-    'extra' : [ '../examples/estimation/fs2000_data.m' ] },
-  { 'test' : [ '../examples/estimation/Gali_2015.mod' ],
-    'extra' : [ '../examples/estimation/Gali_2015_PC_slope.m',
-                '../examples/estimation/Gali_2015_prior_restrictions.m' ] },
+  { 'test' : [ '../examples/estimation/schorfheide_2000.mod' ],
+    'extra' : [ '../examples/estimation/schorfheide_2000_data.m' ] },
+  { 'test' : [ '../examples/estimation/gali_2015.mod' ],
+    'extra' : [ '../examples/estimation/gali_2015_phillips_curve_slope.m',
+                '../examples/estimation/gali_2015_prior_restrictions.m' ] },
   { 'test' : [ '../examples/estimation/rbc_irf_matching.mod' ],
     'extra' : [ '../examples/estimation/rbc_irf_matching_data.csv',
                 '../examples/estimation/rbc_irf_matching_transformations.m' ] },
@@ -2584,9 +2584,9 @@ mod_and_m_tests = [
   { 'test' : [ '../examples/perfect_foresight/perfect_foresight_expectation_errors.mod' ] },
 
   # Examples — Optimal policy
-  { 'test' : [ '../examples/optimal_policy/Ramsey_Example.mod' ] },
-  { 'test' : [ '../examples/optimal_policy/Ramsey_steady_file.mod' ],
-    'extra' : [ '../examples/optimal_policy/Ramsey_steady_file_steadystate.m' ] },
+  { 'test' : [ '../examples/optimal_policy/nk_ramsey_osr.mod' ] },
+  { 'test' : [ '../examples/optimal_policy/nk_ramsey_steady_file.mod' ],
+    'extra' : [ '../examples/optimal_policy/nk_ramsey_steady_file_steadystate.m' ] },
 
   # Examples — Heterogeneity
   { 'test' : [ '../examples/heterogeneity/hank_one_asset.mod' ],
@@ -2603,16 +2603,16 @@ mod_and_m_tests = [
     'extra' : [ '../examples/heterogeneity/krusell_smith_sp.mat' ] },
 
   # Examples — OccBin
-  { 'test' : [ '../examples/occbin/Occbin_example.mod' ] },
+  { 'test' : [ '../examples/occbin/rbc_occbin.mod' ] },
 
   # Examples — Macroprocessor
   { 'test' : [ '../examples/macroprocessor/bkk_1992.mod' ] },
 
   # Examples — Reporting
-  { 'test' : [ '../examples/reporting/example1_reporting.mod' ] },
+  { 'test' : [ '../examples/reporting/collard_2001_reporting.mod' ] },
 
   # Examples — Semistructural
-  { 'test' : [ '../examples/semistructural/pacmodel.mod' ] }
+  { 'test' : [ '../examples/semistructural/pac_model.mod' ] }
 ]
 
 base_test_driver_args = [ get_option('build_for') ]
