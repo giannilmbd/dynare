@@ -2559,44 +2559,60 @@ mod_and_m_tests = [
                 'reporting/ResidTablePage.m',
                 'reporting/runDynareReport.m' ] },
 
-  # Examples
-  { 'test' : [ '../examples/agtrend.mod' ] },
-  { 'test' : [ '../examples/bkk.mod' ] },
-  { 'test' : [ '../examples/example1.mod' ] },
-  { 'test' : [ '../examples/example1_reporting.mod' ] },
-  { 'test' : [ '../examples/example2.mod' ] },
-  { 'test' : [ '../examples/example3.mod' ],
-    'extra' : [ '../examples/example3_steady_state_helper.m' ] },
-  { 'test' : [ '../examples/fs2000.mod' ],
-    'extra' : [ '../examples/fs2000_data.m' ] },
-  { 'test' : [ '../examples/fs2000_nonstationary.mod' ] },
-  { 'test' : [ '../examples/Gali_2015.mod' ],
-    'extra' : [ '../examples/Gali_2015_PC_slope.m',
-                '../examples/Gali_2015_prior_restrictions.m' ] },
-  { 'test' : [ '../examples/hank_one_asset.mod' ],
-    'extra' : [ '../examples/hank_one_asset.mat' ] },
-  { 'test' : [ '../examples/hank_two_assets.mod' ],
-    'extra' : [ '../examples/hank_two_assets.mat' ] },
-  { 'test' : [ '../examples/krusell_smith.mod' ],
-    'extra' : [ '../examples/krusell_smith.mat' ] },
-  { 'test' : [ '../examples/krusell_smith_steady_state.mod' ],
-    'extra' : [ '../examples/krusell_smith_sp.mat' ] },
-  { 'test' : [ '../examples/hank_one_asset_steady_state.mod' ],
-    'extra' : [ '../examples/hank_one_asset_sp.mat' ] },
-  { 'test' : [ '../examples/hank_two_assets_steady_state.mod' ],
-    'extra' : [ '../examples/hank_two_assets_sp.mat' ] },
-  { 'test' : [ '../examples/NK_baseline.mod' ],
-    'extra' : [ '../examples/NK_baseline_steadystate.m' ] },
-  { 'test' : [ '../examples/Occbin_example.mod' ] },
-  { 'test' : [ '../examples/pacmodel.mod' ] },
-  { 'test' : [ '../examples/perfect_foresight_expectation_errors.mod' ] },
-  { 'test' : [ '../examples/perfect_foresight_rbc.mod' ] },
-  { 'test' : [ '../examples/Ramsey_Example.mod' ] },
-  { 'test' : [ '../examples/Ramsey_steady_file.mod' ],
-    'extra' : [ '../examples/Ramsey_steady_file_steadystate.m' ] },
-  { 'test' : [ '../examples/rbc_irf_matching.mod' ],
-    'extra' : [ '../examples/rbc_irf_matching_data.csv',
-                '../examples/rbc_irf_matching_transformations.m' ] }
+  # Examples — Stochastic simulations
+  { 'test' : [ '../examples/stochastic_simulations/ag_2007_trend.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/example1.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/example2.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/example3.mod' ],
+    'extra' : [ '../examples/stochastic_simulations/example3_steady_state_helper.m' ] },
+  { 'test' : [ '../examples/stochastic_simulations/fs2000_nonstationary.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/NK_baseline.mod' ],
+    'extra' : [ '../examples/stochastic_simulations/NK_baseline_steadystate.m' ] },
+
+  # Examples — Estimation
+  { 'test' : [ '../examples/estimation/fs2000.mod' ],
+    'extra' : [ '../examples/estimation/fs2000_data.m' ] },
+  { 'test' : [ '../examples/estimation/Gali_2015.mod' ],
+    'extra' : [ '../examples/estimation/Gali_2015_PC_slope.m',
+                '../examples/estimation/Gali_2015_prior_restrictions.m' ] },
+  { 'test' : [ '../examples/estimation/rbc_irf_matching.mod' ],
+    'extra' : [ '../examples/estimation/rbc_irf_matching_data.csv',
+                '../examples/estimation/rbc_irf_matching_transformations.m' ] },
+
+  # Examples — Perfect foresight
+  { 'test' : [ '../examples/perfect_foresight/perfect_foresight_rbc.mod' ] },
+  { 'test' : [ '../examples/perfect_foresight/perfect_foresight_expectation_errors.mod' ] },
+
+  # Examples — Optimal policy
+  { 'test' : [ '../examples/optimal_policy/Ramsey_Example.mod' ] },
+  { 'test' : [ '../examples/optimal_policy/Ramsey_steady_file.mod' ],
+    'extra' : [ '../examples/optimal_policy/Ramsey_steady_file_steadystate.m' ] },
+
+  # Examples — Heterogeneity
+  { 'test' : [ '../examples/heterogeneity/hank_one_asset.mod' ],
+    'extra' : [ '../examples/heterogeneity/hank_one_asset.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/hank_one_asset_steady_state.mod' ],
+    'extra' : [ '../examples/heterogeneity/hank_one_asset_sp.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/hank_two_assets.mod' ],
+    'extra' : [ '../examples/heterogeneity/hank_two_assets.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/hank_two_assets_steady_state.mod' ],
+    'extra' : [ '../examples/heterogeneity/hank_two_assets_sp.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/krusell_smith.mod' ],
+    'extra' : [ '../examples/heterogeneity/krusell_smith.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/krusell_smith_steady_state.mod' ],
+    'extra' : [ '../examples/heterogeneity/krusell_smith_sp.mat' ] },
+
+  # Examples — OccBin
+  { 'test' : [ '../examples/occbin/Occbin_example.mod' ] },
+
+  # Examples — Macroprocessor
+  { 'test' : [ '../examples/macroprocessor/bkk_1992.mod' ] },
+
+  # Examples — Reporting
+  { 'test' : [ '../examples/reporting/example1_reporting.mod' ] },
+
+  # Examples — Semistructural
+  { 'test' : [ '../examples/semistructural/pacmodel.mod' ] }
 ]
 
 base_test_driver_args = [ get_option('build_for') ]

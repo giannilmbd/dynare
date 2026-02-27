@@ -12,117 +12,152 @@ academic papers for most of them. You should have these files in the
 Here is a short list of the examples included. For a more complete
 description, please refer to the comments inside the files themselves.
 
-``perfect_foresight_rbc.mod``
+Stochastic simulations
+======================
 
-    An elementary real business cycle (RBC) model, simulated in a
-    perfect foresight setup.
-
-``example1.mod``
-``example2.mod``
+``stochastic_simulations/example1.mod``
+``stochastic_simulations/example2.mod``
 
     Two examples of a small RBC model in a stochastic setup, presented
     in :cite:t:`Collard:2001` (see the file ``guide.pdf`` which comes with
     Dynare).
 
-``example3.mod``
+``stochastic_simulations/example3.mod``
 
     A small RBC model in a stochastic setup, presented in :cite:t:`Collard:2001`.
     The steady state is solved analytically using the
     ``steady_state_model`` block (see :bck:`steady_state_model`).
 
-``fs2000.mod``
+``stochastic_simulations/fs2000_nonstationary.mod``
 
-    A cash in advance model, estimated by :cite:t:`Schorfheide:2000`. The
-    file shows how to use Dynare for estimation.
-
-``fs2000_nonstationary.mod``
-
-    The same model as ``fs2000.mod``, but written in non-stationary
+    The same model as ``estimation/fs2000.mod``, but written in non-stationary
     form. Detrending of the equations is done by Dynare.
 
-``bkk.mod``
-
-    Multi-country RBC model with time to build, presented in :cite:t:`Backus:1992`.
-    The file shows how to use Dynare’s macro processor.
-
-``agtrend.mod``
+``stochastic_simulations/ag_2007_trend.mod``
 
     Small open economy RBC model with shocks to the growth trend,
     presented in :cite:t:`Aguiar:2007`.
 
-``Gali_2015.mod``
-
-    Basic New Keynesian model of :cite:t:`Gali:2015`, Chapter 3 showing how to
-    i) use "system prior"-type prior restrictions as in :cite:t:`Andrle:2018`
-    and ii) run prior/posterior-functions.
-
-``NK_baseline.mod``
+``stochastic_simulations/NK_baseline.mod``
 
     Baseline New Keynesian Model estimated in :cite:t:`FernandezVillaverde:2010`.
     It demonstrates how to use an explicit steady state file
     to update parameters and call a numerical solver.
 
-``Occbin_example.mod``
+Estimation
+==========
 
-    RBC model with two occasionally binding constraints. Demonstrates
-    how to set up OccBin.
+``estimation/fs2000.mod``
 
-``Ramsey_Example.mod``
+    A cash in advance model, estimated by :cite:t:`Schorfheide:2000`. The
+    file shows how to use Dynare for estimation.
 
-    File demonstrating how to conduct optimal policy experiments in a
-    simple New Keynesian model either under commitment (Ramsey) or using
-    optimal simple rules (OSR)
+``estimation/Gali_2015.mod``
 
-``Ramsey_steady_file.mod``
+    Basic New Keynesian model of :cite:t:`Gali:2015`, Chapter 3 showing how to
+    i) use "system prior"-type prior restrictions as in :cite:t:`Andrle:2018`
+    and ii) run prior/posterior-functions.
 
-    File demonstrating how to conduct optimal policy experiments in a
-    simple New Keynesian model under commitment (Ramsey) with a user-defined
-    conditional steady state file
-
-``rbc_irf_matching.mod``
+``estimation/rbc_irf_matching.mod``
 
     Baseline RBC model with government spending shocks estimated via impulse response function (IRF) matching.
     Both Frequentist (Maximum Likelihood) and Bayesian (Slice Sampling) approaches are presented.
     Additionally, it is shown how to estimate an AR(2)-process
     by working with the roots of the autoregressive process instead of the coefficients
 
-``perfect_foresight_expectation_errors.mod``
+Perfect foresight
+=================
 
-    Elementary RBC model (same as ``perfect_foresight_rbc.mod``), simulated in perfect
+``perfect_foresight/perfect_foresight_rbc.mod``
+
+    An elementary real business cycle (RBC) model, simulated in a
+    perfect foresight setup.
+
+``perfect_foresight/perfect_foresight_expectation_errors.mod``
+
+    Elementary RBC model (same as ``perfect_foresight/perfect_foresight_rbc.mod``), simulated in perfect
     foresight with expectation errors: agents behave as under perfect
     foresight, but they can still be surprised by unexpected shocks, and thus
     recompute their optimal plans when such an unexpected shock happens.
 
-``krusell_smith.mod``
+Optimal policy
+==============
+
+``optimal_policy/Ramsey_Example.mod``
+
+    File demonstrating how to conduct optimal policy experiments in a
+    simple New Keynesian model either under commitment (Ramsey) or using
+    optimal simple rules (OSR)
+
+``optimal_policy/Ramsey_steady_file.mod``
+
+    File demonstrating how to conduct optimal policy experiments in a
+    simple New Keynesian model under commitment (Ramsey) with a user-defined
+    conditional steady state file
+
+Heterogeneity
+=============
+
+``heterogeneity/krusell_smith.mod``
 
     Krusell and Smith (1998) model with heterogeneous households.
     Demonstrates loading a pre-computed steady state, solving
     the model, and computing impulse response functions.
 
-``krusell_smith_steady_state.mod``
+``heterogeneity/krusell_smith_steady_state.mod``
 
     Krusell and Smith (1998) model with heterogeneous households.
     Demonstrates computing the steady state numerically using
     ``heterogeneity_compute_steady_state``.
 
-``hank_one_asset.mod``
+``heterogeneity/hank_one_asset.mod``
 
     One-asset HANK model. Demonstrates loading a pre-computed
     steady state, solving, and running stochastic simulations.
 
-``hank_one_asset_steady_state.mod``
+``heterogeneity/hank_one_asset_steady_state.mod``
 
     One-asset HANK model. Demonstrates computing the steady state
     with parameter calibration using
     ``heterogeneity_compute_steady_state``.
 
-``hank_two_assets.mod``
+``heterogeneity/hank_two_assets.mod``
 
     Two-asset HANK model with liquid and illiquid assets. Demonstrates
     loading a pre-computed steady state and simulating news shocks.
 
-``hank_two_assets_steady_state.mod``
+``heterogeneity/hank_two_assets_steady_state.mod``
 
     Two-asset HANK model. Demonstrates computing the steady state
     with multi-parameter calibration using
     ``heterogeneity_compute_steady_state``.
+
+OccBin
+======
+
+``occbin/Occbin_example.mod``
+
+    RBC model with two occasionally binding constraints. Demonstrates
+    how to set up OccBin.
+
+Macroprocessor
+==============
+
+``macroprocessor/bkk_1992.mod``
+
+    Multi-country RBC model with time to build, presented in :cite:t:`Backus:1992`.
+    The file shows how to use Dynare's macro processor.
+
+Reporting
+=========
+
+``reporting/example1_reporting.mod``
+
+    Example of Dynare's reporting features.
+
+Semistructural
+==============
+
+``semistructural/pacmodel.mod``
+
+    Example of a PAC (Projection Auxiliary Model) specification.
