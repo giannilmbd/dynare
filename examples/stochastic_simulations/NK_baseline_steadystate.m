@@ -99,7 +99,7 @@ catch
 end
 
 if exitflag <1
-    %indicate the SS computation was not sucessful; this would also be detected by Dynare
+    %indicate the SS computation was not successful; this would also be detected by Dynare
     %setting the indicator here shows how to use this functionality to
     %filter out parameter draws
     params=M_.params;

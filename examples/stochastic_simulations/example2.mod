@@ -1,6 +1,7 @@
 /*
  * Example 2 from F. Collard (2001): "Stochastic simulations with DYNARE:
  * A practical guide" (see "guide.pdf" in the documentation directory).
+ * Shows how to use simulated moments.
  */
 
 /*
