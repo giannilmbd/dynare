@@ -167,17 +167,17 @@ if tt6
 end
 
 if tt8
-    logged_prior_density = logged_prior_density + sum(lpdfgweibull(x(id8),p6(id8),p7(id8)));
+    logged_prior_density = logged_prior_density + sum(lpdfgweibull(x(id8),p6(id8),p7(id8),p3(id8)));
     if isinf(logged_prior_density)
         if nargout ==4
-            info=id8(isinf(log(lpdfgweibull(x(id8),p6(id8),p7(id8)))));
+            info=id8(isinf(lpdfgweibull(x(id8),p6(id8),p7(id8),p3(id8))));
         end
         return
     end
     if nargout==2
-        [~, dlprior(id8)] = lpdfgweibull(x(id8),p6(id8),p7(id8));
+        [~, dlprior(id8)] = lpdfgweibull(x(id8),p6(id8),p7(id8),p3(id8));
     elseif nargout==3
-        [~, dlprior(id8), d2lprior(id8)] = lpdfgweibull(x(id8),p6(id8),p7(id8));
+        [~, dlprior(id8), d2lprior(id8)] = lpdfgweibull(x(id8),p6(id8),p7(id8),p3(id8));
     end
 end
 
@@ -269,3 +269,73 @@ if t(1)
 end
 T = all(t);
 %@eof:1
+
+%@test:2
+% Regression test against Weibull density with missing non-zero location parameter (p3), 
+
+try
+    n = 3;
+    pshape = 8*ones(n, 1);
+    p3_ = [0.5; 1.0; 2.0]; % non-zero location
+    p4_ = Inf(n, 1);
+    p6_ = [2.0; 3.0; 1.5]; % k (shape)
+    p7_ = [1.0; 0.5; 2.0]; % λ (scale)
+    z   = [1.0; 0.5; 1.0]; % evaluation points relative to location
+    x_  = p3_ + z;
+    lpd1 = priordens(x_, pshape, p6_, p7_, p3_, p4_);
+    [lpd3, dlpd, d2lpd] = priordens(x_, pshape, p6_, p7_, p3_, p4_);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+if t(1)
+    % Analytical log-density: sum of log(k) - log(λ) + (k-1)·log(z/λ) - (z/λ)^k
+    k = p6_; lam = p7_;
+    expected_lpd = sum(log(k) - log(lam) + (k-1).*log(z./lam) - (z./lam).^k);
+    t(2) = abs(lpd1 - expected_lpd) < 1e-10;
+    t(3) = abs(lpd3 - expected_lpd) < 1e-10;
+    % Analytical gradient: (k-1)/z - k·z^(k-1)/λ^k
+    expected_dlpd = ((k-1)./z - k.*z.^(k-1)./lam.^k)';
+    t(4) = all(abs(dlpd(1:n) - expected_dlpd) < 1e-10);
+end
+T = all(t);
+%@eof:2
+
+%@test:3
+% Shift invariance: f(x; p3) == f(x+δ; p3+δ) for all location-shifted
+% distributions in priordens (Gamma, InvGamma1, InvGamma2, Weibull).
+
+delta = 0.7;
+try
+    n = 4;
+    %             Gamma  InvGamma1  InvGamma2  Weibull
+    pshape_  = [  2;     4;         6;         8    ];
+    p3_base  = [  0.5;   1.0;       1.5;       2.0  ];
+    p4_      = [  Inf;   Inf;       Inf;       Inf  ];
+    p6_      = [  3.0;   2.0;       2.0;       2.0  ];  % α, s, s, k
+    p7_      = [  0.5;   5.0;       6.0;       1.0  ];  % β, ν, ν, λ
+    z        = [  1.0;   0.5;       0.5;       1.0  ];  % z = x - p3
+    x_A = p3_base + z;
+    x_B = x_A + delta;
+    % 1-output
+    lpd_A = priordens(x_A, pshape_, p6_, p7_, p3_base,       p4_);
+    lpd_B = priordens(x_B, pshape_, p6_, p7_, p3_base+delta, p4_);
+    % 3-output (log-density + gradient + Hessian)
+    [lpd_A3, dlpd_A, d2lpd_A] = priordens(x_A, pshape_, p6_, p7_, p3_base,       p4_);
+    [lpd_B3, dlpd_B, d2lpd_B] = priordens(x_B, pshape_, p6_, p7_, p3_base+delta, p4_);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+if t(1)
+    % 1-output log-density is shift-invariant
+    t(2) = abs(lpd_A - lpd_B) < 1e-10;
+    % 3-output log-density is shift-invariant
+    t(3) = abs(lpd_A3 - lpd_B3) < 1e-10;
+    % Gradient (depends only on z = x-p3) is shift-invariant
+    t(4) = all(abs(dlpd_A - dlpd_B) < 1e-10);
+    % Hessian is also shift-invariant
+    t(5) = all(abs(diag(d2lpd_A) - diag(d2lpd_B)) < 1e-10);
+end
+T = all(t);
+%@eof:3
