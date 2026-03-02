@@ -382,3 +382,69 @@ if t(1)
 end
 T = all(t);
 %@eof:2
+
+%@test:3
+% Regression test: location parameter (p3) shift invariance.
+% For every distribution that uses p3 as a location shift in density.m
+% (Gamma, InvGamma1, InvGamma2, Weibull), evaluating at (x + delta) with
+% (p3 + delta) must give the same log-density and gradient as at x with p3.
+%
+% Note on multi-output calls: dprior's subsref overload returns a single
+% output, so the 2-output form must use density(o, x) rather than o.density(x).
+
+delta = 0.7;
+try
+    %           Gamma  InvGamma1  InvGamma2  Weibull
+    p3_base = [0.5;   1.0;       1.5;       2.0  ];
+    p6      = [3.0;   2.0;       2.0;       2.0  ];  % α, s, s, k
+    p7      = [0.5;   5.0;       6.0;       1.0  ];  % β, ν, ν, λ
+
+    z   = [1.0; 0.5; 0.5; 1.0];  % z = x - p3 (same for A and B)
+    x_A = p3_base + z;
+    x_B = x_A + delta;             % x shifted; p3 will also shift by delta
+
+    A = dprior();
+    A.p3 = p3_base;      A.p6 = p6; A.p7 = p7;
+    A.idgamma     = 1;   A.isgamma     = true;
+    A.idinvgamma1 = 2;   A.isinvgamma1 = true;
+    A.idinvgamma2 = 3;   A.isinvgamma2 = true;
+    A.idweibull   = 4;   A.isweibull   = true;
+
+    B = dprior();
+    B.p3 = p3_base + delta; B.p6 = p6; B.p7 = p7;
+    B.idgamma     = 1;      B.isgamma     = true;
+    B.idinvgamma1 = 2;      B.isinvgamma1 = true;
+    B.idinvgamma2 = 3;      B.isinvgamma2 = true;
+    B.idweibull   = 4;      B.isweibull   = true;
+
+    lpd_A            = A.density(x_A);    % 1-output path
+    [lpd_A2, dlpd_A] = density(A, x_A);  % 2-output path
+    lpd_B            = B.density(x_B);
+    [lpd_B2, dlpd_B] = density(B, x_B);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+if t(1)
+    % 1-output: f(x; p3) == f(x+δ; p3+δ) for all 4 distributions
+    t(2) = abs(lpd_A - lpd_B) < 1e-10;
+    % 2-output path: same shift invariance holds
+    t(3) = abs(lpd_A2 - lpd_B2) < 1e-10;
+    % Gradient depends only on z = x - p3 and is therefore shift-invariant
+    t(4) = all(abs(dlpd_A - dlpd_B) < 1e-10);
+    % Analytical check for Weibull (index 4, z=1, k=2, λ=1):
+    %   log f(z; k, λ) = log(k) - log(λ) + (k-1)·log(z/λ) - (z/λ)^k
+    %   d/dx log f     = (k-1)/z - k·z^(k-1)/λ^k
+    k_w = p6(4); lam_w = p7(4); z_w = z(4);
+    expected_lpd_w  = log(k_w) - log(lam_w) + (k_w-1).*log(z_w./lam_w) - (z_w./lam_w).^k_w;
+    expected_dlpd_w = (k_w-1)./z_w - k_w.*z_w.^(k_w-1)./lam_w.^k_w;
+    % Isolate Weibull contribution via a single-distribution prior
+    W = dprior();
+    W.p3 = p3_base(4); W.p6 = p6(4); W.p7 = p7(4);
+    W.idweibull = 1; W.isweibull = true;
+    [lpd_W, dlpd_W] = density(W, x_A(4));
+    t(5) = abs(lpd_W  - expected_lpd_w)  < 1e-10;
+    t(6) = abs(dlpd_W - expected_dlpd_w) < 1e-10;
+end
+T = all(t);
+%@eof:3
