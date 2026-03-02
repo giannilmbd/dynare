@@ -90,7 +90,7 @@ if any(id)
               case 'mean'
                 m(jd) = o.p3(jd) + o.p6(jd).*o.p7(jd);
               case 'median'
-                m(jd) = o.p3(jd) + gaminv(.5, o.p6(jd), o.p7(jda));
+                m(jd) = o.p3(jd) + gaminv(.5, o.p6(jd), o.p7(jd));
               case 'std'
                 m(jd) = sqrt(o.p6(jd)).*o.p7(jd);
               case 'mode'
