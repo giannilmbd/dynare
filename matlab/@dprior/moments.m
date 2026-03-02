@@ -115,7 +115,7 @@ if any(id)
               case 'std'
                 m(jd) = (o.p4(jd)-o.p3(jd)).*sqrt(o.p6(jd).*o.p7(jd)./((o.p6(jd)+o.p7(jd)).^2.*(o.p6(jd)+o.p7(jd)+1)));
               case 'mode'
-                h0 = true(jd, 1);
+                h0 = true(length(jd), 1);
                 h1 = o.p6(jd)<=1 & o.p7(jd)>1; h0 = h0 & ~h1;
                 h2 = o.p7(jd)<=1 & o.p6(jd)>1; h0 = h0 & ~h2;
                 h3 = o.p6(jd)<1 & o.p7(jd)<1; h0 = h0 & ~h3;
