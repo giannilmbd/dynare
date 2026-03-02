@@ -166,18 +166,18 @@ end
 if o.isweibull
     switch nargout
       case 1
-        lpd = lpd + sum(lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull)));
+        lpd = lpd + sum(lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull), o.p3(o.idweibull)));
         if isinf(lpd), return, end
       case 2
-        [tmp, dlpd(o.idweibull)] = lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull));
+        [tmp, dlpd(o.idweibull)] = lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull), o.p3(o.idweibull));
         lpd = lpd + sum(tmp);
         if isinf(lpd), return, end
       case 3
-        [tmp, dlpd(o.idweibull), d2lpd(o.idweibull)] = lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull));
+        [tmp, dlpd(o.idweibull), d2lpd(o.idweibull)] = lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull), o.p3(o.idweibull));
         lpd = lpd + sum(tmp);
         if isinf(lpd), return, end
       case 4
-        [tmp, dlpd(o.idweibull), d2lpd(o.idweibull)] = lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull));
+        [tmp, dlpd(o.idweibull), d2lpd(o.idweibull)] = lpdfgweibull(x(o.idweibull), o.p6(o.idweibull), o.p7(o.idweibull), o.p3(o.idweibull));
         lpd = lpd + sum(tmp);
         if isinf(lpd)
             info = o.idweibull(isinf(tmp));
