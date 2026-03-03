@@ -108,8 +108,8 @@ end;
 // STEP 1: Load pre-computed steady state
 //==========================================================================
 // The steady state was computed using sequence-space Jacobian methods
-// and saved in krusell_smith.mat file
-heterogeneity_load_steady_state(filename = krusell_smith);
+// and saved in krusell_smith_1998.mat file
+heterogeneity_load_steady_state(filename = krusell_smith_1998);
 
 //==========================================================================
 // STEP 2: Solve the model

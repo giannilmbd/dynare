@@ -35,7 +35,7 @@ Stochastic simulations
     The cash-in-advance model of :cite:t:`Schorfheide:2000` (same as ``estimation/schorfheide_2000.mod``) written in non-stationary
     form. Detrending of the equations is done by Dynare.
 
-``stochastic_simulations/ag_2007_trend.mod``
+``stochastic_simulations/aguiar_gopinath_2007_trend.mod``
 
     Small open economy RBC model with shocks to the growth trend,
     presented in :cite:t:`Aguiar:2007`.
@@ -108,14 +108,14 @@ Optimal policy
 Heterogeneity
 =============
 
-``heterogeneity/krusell_smith.mod``
+``heterogeneity/krusell_smith_1998.mod``
 
     :cite:t:`Krusell:1998` model with heterogeneous households.
     Demonstrates loading a pre-computed steady state via
     :comm:`heterogeneity_load_steady_state`, solving the model with
     :comm:`heterogeneity_solve`, and computing impulse response functions.
 
-``heterogeneity/krusell_smith_steady_state.mod``
+``heterogeneity/krusell_smith_1998_steady_state.mod``
 
     :cite:t:`Krusell:1998` model with heterogeneous households.
     Demonstrates computing the steady state numerically using

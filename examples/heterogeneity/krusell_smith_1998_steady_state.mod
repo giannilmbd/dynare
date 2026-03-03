@@ -102,10 +102,10 @@ end;
 // STEP 1: Compute steady state from initial guess
 //==========================================================================
 // The initial guess (policy functions, grids, shock discretization)
-// is loaded from krusell_smith_sp.mat. No free parameters: the command
+// is loaded from krusell_smith_1998_sp.mat. No free parameters: the command
 // iterates on policy functions and the distribution, then reports aggregate
 // residuals.
-heterogeneity_compute_steady_state(filename = krusell_smith_sp);
+heterogeneity_compute_steady_state(filename = krusell_smith_1998_sp);
 
 //==========================================================================
 // STEP 2: Solve the model

@@ -65,8 +65,6 @@ if ~isempty(M_.aux_vars)
     end
 end
 
-listoflaggedendogenousvariables
-
 info = struct;
 info.endonames = M_.endo_names;
 info.exonames = M_.exo_names;
