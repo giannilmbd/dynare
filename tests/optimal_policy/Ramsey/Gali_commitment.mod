@@ -1,6 +1,6 @@
 /*
  * This file implements the optimal monetary policy under commitment exercise
- * in Jordi Galí (2008): Monetary Policy, Inflation, and the Business Cycle,
+ * in Jordi GalÃ­ (2008): Monetary Policy, Inflation, and the Business Cycle,
  * Princeton University Press, Chapter 5.1.2
  *
  * It demonstrates how to use the ramsey_model command of Dynare.

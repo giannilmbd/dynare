@@ -32,7 +32,7 @@ function [lnpriorendoinitstate, lnpriorinitstate] = init_state_endogenous_prior(
 % SEE ALSO
 %   get_init_state_prior - derives the Pstar subspace (UP, XP) used similarly.
 
-% Copyright © 2024-2026 Dynare Team
+% Copyright Â© 2024-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

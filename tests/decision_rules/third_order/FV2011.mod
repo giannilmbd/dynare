@@ -1,8 +1,8 @@
 /*
  * This file replicates the IRFs of the small open economy model described in
- * Jesús Fernández-Villaverde, Pablo Guerrón-Quintana,
- * Juan F. Rubio-Ramírez, and Martin Uribe (2011): "Risk Matters",
- * American Economic Review 101 (October 2011): 2530–2561.
+ * JesÃºs FernÃ¡ndez-Villaverde, Pablo GuerrÃ³n-Quintana,
+ * Juan F. Rubio-RamÃ­rez, and Martin Uribe (2011): "Risk Matters",
+ * American Economic Review 101 (October 2011): 2530â€“2561.
  *
  * This implementation was written by Benjamin Born and Johannes Pfeifer. Please
  * note that the following copyright notice only applies to this Dynare

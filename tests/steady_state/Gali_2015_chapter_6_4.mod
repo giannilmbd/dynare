@@ -1,6 +1,6 @@
 /*
  * This file implements the New Keynesian model with price and wage rigidities under optimal policy
- * with commitment (Ramsey) of Jordi Galí (2015): Monetary Policy, Inflation, and the Business Cycle, Princeton
+ * with commitment (Ramsey) of Jordi GalÃ­ (2015): Monetary Policy, Inflation, and the Business Cycle, Princeton
  * University Press, Second Edition, Chapter 6.4
  *
  * THIS MOD-FILE REQUIRES DYNARE 4.6 OR HIGHER

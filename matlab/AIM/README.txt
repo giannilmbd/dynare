@@ -28,12 +28,12 @@ However, if other exceptions occur and aimcode (see codes below) is higher than 
 APPENDIX
 
 % AIM System is given as a sum: 
-% i.e. for i=-$...+&   SUM(Hi*xt+i)= £*zt, t = 0, . . . ,?
+% i.e. for i=-$...+&   SUM(Hi*xt+i)= Â£*zt, t = 0, . . . ,?
 % and its input as single array of matrices: [H-$...  Hi ... H+&]
-% and its solution as xt=SUM( Bi*xt+i) + @*£*zt for i=-$...-1 
+% and its solution as xt=SUM( Bi*xt+i) + @*Â£*zt for i=-$...-1 
 % with the output in form bb=[B-$...  Bi ... B-1] and @=inv(Ho+H1*B-1) 
 % Dynare jacobian = [fy'-$...  fy'i ... fy'+&  fu'] 
-% where [fy'-$...  fy'i ... fy'+&]=[H-$...  Hi ... H+&] and fu'= £
+% where [fy'-$...  fy'i ... fy'+&]=[H-$...  Hi ... H+&] and fu'= Â£
 
 
 %function [dr,aimcode]=dynAIMsolver1(jacobia_,M_,dr)
