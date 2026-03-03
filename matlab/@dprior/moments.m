@@ -94,9 +94,9 @@ if any(id)
               case 'std'
                 m(jd) = sqrt(o.p6(jd)).*o.p7(jd);
               case 'mode'
-                m(jd) = 0;
+                m(jd) = o.p3(jd);
                 hd = o.p6(jd)>1;
-                m(jd(hd)) = (o.p6(jd(hd))-1).*o.p7(jd(hd));
+                m(jd(hd)) = o.p3(jd(hd)) + (o.p6(jd(hd))-1).*o.p7(jd(hd));
             end
         end
     end
@@ -143,7 +143,7 @@ if any(id)
               case 'std'
                 m(jd) = sqrt( o.p6(jd)./(o.p7(jd)-2)-(.5*o.p6(jd)).*(gamma(.5*(o.p7(jd)-1))./gamma(.5*o.p7(jd))).^2);
               case 'mode'
-                m(jd) = sqrt((o.p7(jd)-1)./o.p6(jd));
+                m(jd) = o.p3(jd) + sqrt((o.p7(jd)-1)./o.p6(jd));
             end
         end
     end
@@ -162,7 +162,7 @@ if any(id)
               case 'std'
                 m(jd) = sqrt(2./(o.p7(jd)-4)).*o.p6(jd)./(o.p7(jd)-2);
               case 'mode'
-                m(jd) = o.p6(jd)./(o.p7(jd)+2);
+                m(jd) = o.p3(jd) + o.p6(jd)./(o.p7(jd)+2);
             end
         end
     end
@@ -202,7 +202,7 @@ end
 
 return % --*-- Unit tests --*--
 
-%@test:5
+%@test:1
 % Fill global structures with required fields...
 prior_trunc = 1e-10;
 p0 = repmat([1; 2; 3; 4; 5; 6; 8], 2, 1);    % Prior shape
@@ -288,4 +288,131 @@ if t(1)
     t(5) = all(ismembertol(Prior.variance(true),.04));
 end
 T = all(t);
-%@eof:5
+%@eof:1
+
+%@test:2
+%  Verifies median values analytically for every distribution type.
+try
+    Prior = dprior();
+    n = 7;
+    %              Gamma  Gamma(shift) Gamma   Weibull Weibull(shift) InvGamma1  Gaussian
+    Prior.p3  = [  0;     1.5;         0;      0;      0.5;           0;        -Inf];
+    Prior.p6  = [  2.0;   3.0;         1.5;    2.0;    3.0;           2.0;       0.5]; % α / k / s / μ
+    Prior.p7  = [  1.0;   2.0;         0.5;    1.0;    0.5;           4.0;       0.2]; % β / λ / ν / σ
+    Prior.p11 = NaN(n, 1);
+    Prior.idgamma     = [1; 2; 3];
+    Prior.isgamma     = true;
+    Prior.idweibull   = [4; 5];
+    Prior.isweibull   = true;
+    Prior.idinvgamma1 = 6;
+    Prior.isinvgamma1 = true;
+    Prior.idgaussian  = 7;
+    Prior.isgaussian  = true;
+    m = Prior.median(true);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+if t(1)
+    expected = [ ...
+        gaminv(.5, 2.0, 1.0); ...                        % Gamma, p3=0, α=2, β=1
+        1.5 + gaminv(.5, 3.0, 2.0); ...                  % Gamma shifted by 1.5, α=3, β=2
+        gaminv(.5, 1.5, 0.5); ...                         % Gamma, p3=0, α=1.5, β=0.5
+        log(2).^(1/2.0); ...                              % Weibull, p3=0, k=2, λ=1
+        0.5 + 0.5.*log(2).^(1/3.0); ...                  % Weibull shifted by 0.5, k=3, λ=0.5
+        1.0/sqrt(gaminv(.5, 4.0/2.0, 2.0/2.0)); ...      % InvGamma1, p3=0, s=2, ν=4
+        0.5];                                             % Gaussian, median = μ
+    t(2) = all(abs(m - expected) < 1e-10);
+end
+T = all(t);
+%@eof:2
+
+%@test:3
+% Integration tests for beta distribution with vector inputs
+% Covers: 5 Beta parameters exercising all 5 mode branches (h1–h4, h0) including
+% a shifted Beta (p3≠0), plus a Gamma at index 6 so that idbeta and idgamma
+% are both active and intersect() receives a proper subset of indices.
+try
+    Prior = dprior();
+    n = 6;
+    %            h1-β   h2-β   h3-β   h4-β   h0-β(shift)  Gamma
+    Prior.p3 = [  0;     0;     0;     0;     0.2;         0  ];
+    Prior.p4 = [  1;     1;     1;     1;     0.8;         Inf];
+    Prior.p6 = [  0.5;   2.0;   0.7;   1.0;   3.0;         2.5]; % α (beta) / α (gamma)
+    Prior.p7 = [  2.0;   0.5;   0.8;   1.0;   2.0;         1.5]; % β (beta) / β (gamma)
+    Prior.p5 = NaN(n, 1);
+    Prior.idbeta  = [1; 2; 3; 4; 5];
+    Prior.isbeta  = true;
+    Prior.idgamma = 6;
+    Prior.isgamma = true;
+    m = Prior.mode(true);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+if t(1)
+    expected = zeros(n, 1);
+    expected(1) = 0;                                         % h1: α≤1 & β>1  → lower bound
+    expected(2) = 1;                                         % h2: β≤1 & α>1  → upper bound
+    expected(3) = 0;                                         % h3: α<1 & β<1  → lower bound (bimodal)
+    expected(4) = 0 + .5*(1-0);                              % h4: α=β=1      → midpoint (uniform)
+    expected(5) = 0.2 + (0.8-0.2)*(3.0-1)/(3.0+2.0-2);     % h0: interior    → scaled formula, shifted
+    expected(6) = (2.5-1)*1.5;                               % Gamma mode=(α-1)·β
+    t(2) = all(abs(m - expected) < 1e-10);
+end
+T = all(t);
+%@eof:3
+
+%@test:4
+% Test that the location parameter p3 shifts mean, median and mode by exactly
+% delta for all distribution families where the formulas include p3.
+
+delta = 0.7;
+try
+    n = 5;
+    %           Gamma  Beta   InvGamma1  InvGamma2  Weibull
+    p3_base = [ 0;     0;     0;         0;         0    ];
+    p4_base = [ Inf;   1;     Inf;       Inf;       Inf  ];
+    p6      = [ 3.0;   3.0;   2.0;       2.0;       2.0  ];  % α, α, s, s, k
+    p7      = [ 0.5;   2.0;   5.0;       6.0;       1.0  ];  % β, β, ν, ν, λ
+
+    % Unshifted object
+    A = dprior();
+    A.p3 = p3_base; A.p4 = p4_base; A.p6 = p6; A.p7 = p7;
+    A.p1 = NaN(n,1); A.p11 = NaN(n,1); A.p5 = NaN(n,1);
+    A.idgamma = 1;   A.isgamma     = true;
+    A.idbeta  = 2;   A.isbeta      = true;
+    A.idinvgamma1 = 3; A.isinvgamma1 = true;
+    A.idinvgamma2 = 4; A.isinvgamma2 = true;
+    A.idweibull   = 5; A.isweibull   = true;
+
+    % Shifted object: add delta to p3 for all; add delta to p4 for Beta too
+    p4_shifted = p4_base;
+    p4_shifted(2) = p4_base(2) + delta;
+    B = dprior();
+    B.p3 = p3_base + delta; B.p4 = p4_shifted; B.p6 = p6; B.p7 = p7;
+    B.p1 = NaN(n,1); B.p11 = NaN(n,1); B.p5 = NaN(n,1);
+    B.idgamma = 1;   B.isgamma     = true;
+    B.idbeta  = 2;   B.isbeta      = true;
+    B.idinvgamma1 = 3; B.isinvgamma1 = true;
+    B.idinvgamma2 = 4; B.isinvgamma2 = true;
+    B.idweibull   = 5; B.isweibull   = true;
+
+    mean_A   = A.mean(true);   mean_B   = B.mean(true);
+    median_A = A.median(true); median_B = B.median(true);
+    mode_A   = A.mode(true);   mode_B   = B.mode(true);
+    t(1) = true;
+catch
+    t(1) = false;
+end
+if t(1)
+    % All means shift by delta (covers Gamma, Beta, InvGamma1, InvGamma2, Weibull)
+    t(2) = all(abs((mean_B   - mean_A)   - delta) < 1e-10);
+    % All medians shift by delta
+    t(3) = all(abs((median_B - median_A) - delta) < 1e-10);
+    % Mode shifts by delta for all 5 distributions:
+    %   Gamma (α=3>1), Beta (h0: α>1,β>1), InvGamma1 (ν=5), InvGamma2 (ν=2), Weibull (k=2>1)
+    t(4) = all(abs((mode_B - mode_A) - delta) < 1e-10);
+end
+T = all(t);
+%@eof:4
