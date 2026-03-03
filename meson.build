@@ -2560,7 +2560,7 @@ mod_and_m_tests = [
                 'reporting/runDynareReport.m' ] },
 
   # Examples — Stochastic simulations
-  { 'test' : [ '../examples/stochastic_simulations/ag_2007_trend.mod' ] },
+  { 'test' : [ '../examples/stochastic_simulations/aguiar_gopinath_2007_trend.mod' ] },
   { 'test' : [ '../examples/stochastic_simulations/collard_2001_theoretical_moments.mod' ] },
   { 'test' : [ '../examples/stochastic_simulations/collard_2001_simulated_moments.mod' ] },
   { 'test' : [ '../examples/stochastic_simulations/collard_2001_analytical_steady_state.mod' ],
@@ -2597,10 +2597,10 @@ mod_and_m_tests = [
     'extra' : [ '../examples/heterogeneity/hank_two_assets.mat' ] },
   { 'test' : [ '../examples/heterogeneity/hank_two_assets_steady_state.mod' ],
     'extra' : [ '../examples/heterogeneity/hank_two_assets_sp.mat' ] },
-  { 'test' : [ '../examples/heterogeneity/krusell_smith.mod' ],
-    'extra' : [ '../examples/heterogeneity/krusell_smith.mat' ] },
-  { 'test' : [ '../examples/heterogeneity/krusell_smith_steady_state.mod' ],
-    'extra' : [ '../examples/heterogeneity/krusell_smith_sp.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/krusell_smith_1998.mod' ],
+    'extra' : [ '../examples/heterogeneity/krusell_smith_1998.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/krusell_smith_1998_steady_state.mod' ],
+    'extra' : [ '../examples/heterogeneity/krusell_smith_1998_sp.mat' ] },
 
   # Examples — OccBin
   { 'test' : [ '../examples/occbin/rbc_occbin.mod' ] },
