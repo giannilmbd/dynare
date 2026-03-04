@@ -78,8 +78,6 @@ if ~isfield(options_,'varobs')
     error('VAROBS statement is missing!')
 end
 
-% Checks on VAROBS
-check_varobs_are_endo_and_declared_once(options_.varobs,M_.endo_names);
 % Set the number of observed variables.
 options_.number_of_observed_variables = length(options_.varobs);
 

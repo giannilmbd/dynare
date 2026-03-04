@@ -64,7 +64,6 @@ function [oo_, options_mom_, M_] = run(bayestopt_, options_, oo_, estim_params_,
 %  o check_prior_bounds
 %  o check_prior_stderr_corr_skew
 %  o check_steady_state_changes_parameters
-%  o check_varobs_are_endo_and_declared_once
 %  o check_hessian_at_the_mode
 %  o display_estimation_results_table
 %  o do_parameter_initialization
@@ -149,7 +148,6 @@ end
 if ~isfield(options_,'varobs')
     error('method_of_moments: VAROBS statement is missing!');
 end
-check_varobs_are_endo_and_declared_once(options_.varobs,M_.endo_names);
 
 
 % -------------------------------------------------------------------------
