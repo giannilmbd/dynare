@@ -1,6 +1,14 @@
 function data  = load_mat_file_data_legacy(datafile, varobs)
+% function data  = load_mat_file_data_legacy(datafile, varobs)
+%
+% INPUT
+% - datafile    [char]          the .mat file to be loaded
+% - varobs      [cell of char]  the observed variables
+%
+% OUTPUT
+% - data        [dseries]       the dataset
 
-% Copyright © 2017-2023 Dynare Team
+% Copyright © 2017-2026 Dynare Team
 %
 % This file is part of Dynare.
 %

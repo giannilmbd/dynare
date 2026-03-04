@@ -1,5 +1,13 @@
 function o2WysrOISH  = load_m_file_data_legacy(datafile, U7ORsJ0vy3)
 % o2WysrOISH  = load_m_file_data_legacy(datafile, U7ORsJ0vy3)
+%
+% INPUT
+% - datafile    [char]          the .m file to be loaded
+% - U7ORsJ0vy3  [cell of char]  the observed variables
+%
+% OUTPUT
+% - o2WysrOISH  [dseries]       the dataset
+
 % Copyright © 2014-2026 Dynare Team
 %
 % This file is part of Dynare.
