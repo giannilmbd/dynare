@@ -1365,7 +1365,6 @@ mod_and_m_tests = [
   { 'test' : [ 'fs2000/fs2000.mod' ],
     'extra' : [ 'fs2000/fsdat_simul.m' ] },
   { 'test' : [ 'ls2003/ls2003_hessian_zero.mod' ] },
-  { 'test' : [ 'exogenous-observed-variables/preprocessor.mod' ] },
   { 'test' : [ 'estimation/fs2000_with_weibull_prior.mod' ],
     'extra' : [ 'estimation/fsdat_simul.m' ] },
   { 'test' : [ 'estimation/fs2000.mod',

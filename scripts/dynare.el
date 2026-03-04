@@ -57,7 +57,7 @@
   '("var" "varexo" "varexo_det" "trend_var" "log_trend_var"
     "predetermined_variables" "parameters" "model_local_variable" "heterogeneity_dimension"
     "model_info"
-    "estimation" "set_time" "data" "varobs" "varexobs" "rplot"
+    "estimation" "set_time" "data" "varobs" "rplot"
     "osr_params" "osr" "dynatype" "dynasave" "model_comparison" "change_type"
     "load_params_and_steady_state" "save_params_and_steady_state"
     "write_latex_dynamic_model" "write_latex_static_model"
