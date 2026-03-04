@@ -94,7 +94,7 @@ switch options_.lik_init
 
   case 3% Diffuse Kalman filter (Durbin and Koopman)
         % Use standard kalman filter except if the univariate filter is explicitely choosen.
-    [Pstar,~] = compute_Pinf_Pstar(Z,T,R,Q,options_.qz_criterium);
+    [Pstar,~] = compute_Pinf_Pstar(Z,T,R,Q,options_.qz_criterium, dr.restrict_columns);
 
   case 4% Start from the solution of the Riccati equation.
     try

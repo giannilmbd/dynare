@@ -226,7 +226,14 @@ elseif options_.lik_init == 3           % Diffuse Kalman filter
             my_mf = find(any(Z))';
         end
     end
-    [Pstar,Pinf] = compute_Pinf_Pstar(my_mf,T,R,Q,options_.qz_criterium);
+    if options_.smoother_redux
+        % dr.restrict_columns identifies the structurally non-zero columns of T.
+        % After state-vector expansion via blkdiag(T,zeros(vobs)), the appended
+        % columns are structurally zero and correctly land in the complement set.
+        [Pstar,Pinf] = compute_Pinf_Pstar(my_mf,T,R,Q,options_.qz_criterium, dr.restrict_columns);
+    else
+        [Pstar,Pinf] = compute_Pinf_Pstar(my_mf,T,R,Q,options_.qz_criterium);
+    end
 elseif options_.lik_init == 4           % Start from the solution of the Riccati equation.
     Pstar = kalman_steady_state(transpose(T),R*Q*transpose(R),transpose(build_selection_matrix(mf,np,vobs)),H);
     Pinf  = [];
@@ -354,7 +361,13 @@ if kalman_algo == 2 || kalman_algo == 4
             if kalman_algo == 4
                 %recompute Schur state space transformation with
                 %expanded state space
-                [Pstar,Pinf] = compute_Pinf_Pstar(mf,ST,R1,Q,options_.qz_criterium);
+                if options_.smoother_redux
+                    % dr.restrict_columns remains valid after blkdiag expansion:
+                    % appended zero columns are automatically treated as static.
+                    [Pstar,Pinf] = compute_Pinf_Pstar(mf,ST,R1,Q,options_.qz_criterium, dr.restrict_columns);
+                else
+                    [Pstar,Pinf] = compute_Pinf_Pstar(mf,ST,R1,Q,options_.qz_criterium);
+                end
             else
                 Pstar = blkdiag(Pstar,H);
                 if ~isempty(Pinf)
