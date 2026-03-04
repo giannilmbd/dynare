@@ -1833,6 +1833,8 @@ mod_and_m_tests = [
     'extra' : [ 'kalman_filter_smoother/fsdat_simul.m' ] },
   { 'test' : [ 'kalman_filter_smoother/fs2000_smoother_redux.mod' ],
     'extra' : [ 'kalman_filter_smoother/fsdat_simul.m' ] },
+  { 'test' : [ 'kalman_filter_smoother/trend_cycle_smoother_redux.mod' ],
+    'extra' : [ 'filter_step_ahead/trend_cycle_decomposition_data.m' ] },
   { 'test' : [ 'kalman_filter_smoother/test_compute_Pinf_Pstar_data.mod',
                'kalman_filter_smoother/test_compute_Pinf_Pstar.mod' ] },
   { 'test' : [ 'kalman_filter_smoother/SOE.mod' ],

@@ -734,8 +734,8 @@ else % diffuse filter
         etahat(:,t)   = QRt*r(:,t);                                         % KD (2000), eq. (27)
         if state_uncertainty_flag
             if smoother_redux
-                pstmp = [Pstar(:,:,t) R*Q; (R*Q)' Q];
-                pitmp = [Pinf(:,:,t) zeros(mm,rr); zeros(rr,mm+rr)];
+                pstmp = [Pstar1(:,:,t) R*Q; (R*Q)' Q];
+                pitmp = [Pinf1(:,:,t) zeros(mm,rr); zeros(rr,mm+rr)];
                 ntmp0 = [N_0(:,:,t) zeros(mm,rr); zeros(rr,mm+rr)];
                 ntmp1 = [N_1(:,:,t) zeros(mm,rr); zeros(rr,mm+rr)];
                 ntmp2 = [N_2(:,:,t) zeros(mm,rr); zeros(rr,mm+rr)];
@@ -745,10 +745,10 @@ else % diffuse filter
                     - pitmp*ntmp2*pitmp;                                   % DK (2012), eq. 5.30
 
             else
-                V(:,:,t)=Pstar(:,:,t)-Pstar(:,:,t)*N_0(:,:,t)*Pstar(:,:,t)...
-                    -(Pinf(:,:,t)*N_1(:,:,t)*Pstar(:,:,t))'...
-                    - Pinf(:,:,t)*N_1(:,:,t)*Pstar(:,:,t)...
-                    - Pinf(:,:,t)*N_2(:,:,t)*Pinf(:,:,t);                       % DK (2012), eq. 5.30
+                V(:,:,t)=Pstar1(:,:,t)-Pstar1(:,:,t)*N_0(:,:,t)*Pstar1(:,:,t)...
+                    -(Pinf1(:,:,t)*N_1(:,:,t)*Pstar1(:,:,t))'...
+                    - Pinf1(:,:,t)*N_1(:,:,t)*Pstar1(:,:,t)...
+                    - Pinf1(:,:,t)*N_2(:,:,t)*Pinf1(:,:,t);                     % DK (2012), eq. 5.30
             end
         end
         if t > 1
