@@ -651,7 +651,7 @@ if (options_.occbin.likelihood.status && options_.occbin.likelihood.inversion_fi
         end
     end
     if ~isequal(M_.H,0)
-        error('IVF-filter: Measurement erros are not allowed with the inversion filter.')
+        error('IVF-filter: Measurement errors are not allowed with the inversion filter.')
     end
 end
 
