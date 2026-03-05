@@ -146,7 +146,7 @@ Then open Octave by running the following in the same terminal::
 Finally, at the Octave prompt, install some add-ons (you only have to do it
 once)::
 
-  octave:1> pkg install io statistics control struct optim
+  octave:1> pkg install io datatypes statistics control struct optim
 
 If you want to use the `x13` functionality of `dseries`, you also need to build the `x13as` binary. [#fx13]_
 
