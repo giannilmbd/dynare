@@ -78,9 +78,6 @@ if ~isfield(options_,'varobs')
     error('VAROBS statement is missing!')
 end
 
-% Set the number of observed variables.
-options_.number_of_observed_variables = length(options_.varobs);
-
 if options_.discretionary_policy
     if options_.order>1
         error('discretionary_policy does not support order>1');
@@ -338,7 +335,7 @@ if ~isfield(options_,'trend_coeffs') % No!
 else% Yes!
     bayestopt_.with_trend = 1;
     bayestopt_.trend_coeff = {};
-    for i=1:options_.number_of_observed_variables
+    for i=1:length(options_.varobs)
         if i > length(options_.trend_coeffs)
             bayestopt_.trend_coeff{i} = '0';
         else
@@ -366,7 +363,7 @@ nspred = M_.nspred;            % Number of predetermined variables in the state 
 % bayestopt_.smoother_mf: positions of observed variables and requested smoothed variables in bayestopt_.smoother_var_list
 var_obs_index_dr = [];
 k1 = [];
-for i=1:options_.number_of_observed_variables
+for i=1:length(options_.varobs)
     var_obs_index_dr = [var_obs_index_dr; strmatch(options_.varobs{i}, M_.endo_names(dr.order_var), 'exact')];
     k1 = [k1; strmatch(options_.varobs{i}, M_.endo_names, 'exact')];
 end
