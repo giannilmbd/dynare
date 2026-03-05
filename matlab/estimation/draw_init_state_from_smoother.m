@@ -111,12 +111,7 @@ if init
     state_uncertainty0(dr.restrict_var_list,dr.restrict_var_list)=Pstar;
     alphahat0=zeros(M_.endo_nbr,1);
 end
-data = dataset_.data;
-data_index = dataset_info.missing.aindex;
-missing_value = dataset_info.missing.state;
 
-% Set number of observations
-gend = dataset_.nobs;
 options_.smoother_redux=true;
 options_.smoothed_state_uncertainty = true;
 options_.occbin.smoother.debug = false;
@@ -138,7 +133,7 @@ if options_.occbin.smoother.status
         neval = neval + 1;
         options_.estimate_initial_states_endogenous_prior=true;
         if (logpost0-logpost2)<1.e3
-            [~,~,~,~,~,~,~,~,~,~,~,~,~,~,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
+            [~,~,~,~,~,~,~,~,~,~,~,~,~,~,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = occbin.DSGE_smoother(xparam1,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info,true);
         else
             oo_.occbin.smoother.error_flag = 313;
             alphahat0 = [];
@@ -147,11 +142,11 @@ if options_.occbin.smoother.status
     if init || (oo_.occbin.smoother.error_flag && isempty(alphahat0))
         % use linear smoother to initialize or if error
         options_.occbin.smoother.status=false;
-        [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
+        [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,dataset_,dataset_info,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
         options_.occbin.smoother.status=true;
     end
 else
-    [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
+    [~,~,~,~,~,~,~,~,~,~,~,~,~,~,~,bayestopt_.mf,alphahat0,state_uncertainty0] = DsgeSmoother(xparam1,dataset_,dataset_info,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_);
 end
 % end unconditional smoother to get mean (alphahat0) and covariance (state_uncertainty0) of the proposal for init state
 % now I reset init state estimation stuff

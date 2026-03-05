@@ -1,13 +1,9 @@
-function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,mf,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info)
-% [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,gend,Y,data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info)
+function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,mf,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info, store_linear_smoother)
+% [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,PKK,decomp,Trend,state_uncertainty,oo_,bayestopt_,alphahat0,state_uncertainty0] = DSGE_smoother(xparam1,M_,oo_,options_,bayestopt_,estim_params_,dataset_, dataset_info, store_linear_smoother)
 % Runs a DSGE smoother with occasionally binding constraints
 %
 % INPUTS
 % - xparam1       [double]        (p*1) vector of (estimated) parameters.
-% - gend          [integer]       scalar specifying the number of observations
-% - Y             [double]        (n*T) matrix of data.
-% - data_index    [cell]          1*smpl cell of column vectors of indices.
-% - missing_value [boolean]       1 if missing values, 0 otherwise
 % - M_            [structure]     MATLAB's structure describing the model (M_).
 % - oo_           [structure]     MATLAB's structure containing the results (oo_).
 % - options_      [structure]     MATLAB's structure describing the current options (options_).
@@ -15,6 +11,7 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 % - estim_params_ [structure]     characterizing parameters to be estimated
 % - dataset_      [structure]     the dataset after required transformation
 % - dataset_info  [structure]     Various information about the dataset (descriptive statistics and missing observations)
+% - store_linear_smoother [Boolean]    indicator whether linear smoother results should be written to oo_
 %
 % OUTPUTS
 % - alphahat      [double]  (m*T) matrix, smoothed endogenous variables (a_{t|T})  (decision-rule order)
@@ -61,16 +58,18 @@ function [alphahat,etahat,epsilonhat,ahat0,SteadyState,trend_coeff,aKK,T0,R0,P,P
 
 smoother_field_list = {'SmoothedVariables', 'UpdatedVariables', 'SmoothedShocks'};
 
+% get dataset information
+
 if not(isempty(xparam1))
     M_ = set_all_parameters(xparam1,estim_params_,M_);
 end
-if  options_.occbin.smoother.linear_smoother
+if options_.occbin.smoother.linear_smoother
     %% linear smoother
     options_.occbin.smoother.status=false;
     [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0] = ...
-        DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+        DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
     bayestopt_.mf=mf;
-    if nargin==12
+    if store_linear_smoother
         tmp_smoother=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,...
             aK,P,PK,decomp,Trend,state_uncertainty,alphahat0,state_uncertainty0);
         for jf=1:length(smoother_field_list)
@@ -133,15 +132,15 @@ options_.noprint = true;
 is_realtime_smoother_successful = true;
 
 [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T0,R0,P,PK,decomp,Trend,state_uncertainty,oo_.dr,mf,alphahat0,state_uncertainty0,~,error_indicator,oo_.occbin.smoother.regime_history] = ...
-    DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+    DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options);%     T1=TT;
 bayestopt_.mf=mf;
 
 if error_indicator(1) || isempty(alphahat0)
     is_realtime_smoother_successful = false;
-    if ~options_.occbin.smoother.linear_smoother || nargin~=12 %make sure linear smoother results are set before using them
+    if ~options_.occbin.smoother.linear_smoother || ~store_linear_smoother %make sure linear smoother results are set before using them
         options_.occbin.smoother.status=false;
         [~,etahat,~,~,~,~,~,~,~,~,~,~,~,~,~,~,alphahat0] = ...
-            DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+            DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
          options_.occbin.smoother.status=true;
     else
         etahat= oo_.occbin.linear_smoother.etahat;
@@ -280,7 +279,7 @@ if ~is_realtime_smoother_converged && not(options_.lik_init==2 && options_.Harve
     M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat1;
     occbin_options.first_period_occbin_update = 1;
     [c.alphahat,c.etahat,c.epsilonhat,~,~,~,~,c.T0,c.R0,c.P,~,~,~,~,~,~,c.alphahat0,~,~,c.error_indicator,c.regime_history] = ...
-        DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_local,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local1,bayestopt_,estim_params_,occbin_options);%     T1=TT;
+        DsgeSmoother(xparam1,dataset_,dataset_info,M_local,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local1,bayestopt_,estim_params_,occbin_options);%     T1=TT;
     if c.error_indicator(1)
         disp_verbose('OccBin smoother:: there was an error in running conditional smoother.',options_.verbosity)
         oo_.occbin.smoother.error_flag=322;
@@ -324,7 +323,7 @@ if ~is_realtime_smoother_converged && not(options_.lik_init==2 && options_.Harve
             TT = c.TT;
             RR = c.RR;
             [~,~,~,~,~,~,~,~,~,P,~,decomp,~,state_uncertainty,~,~,~,state_uncertainty0]...
-                = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
+                = DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
             alphahat = c.alphahat;
             etahat = c.etahat;
             epsilonhat = c.epsilonhat;
@@ -351,7 +350,7 @@ while is_changed && maxiter>iter && ~is_periodic && is_last_simulation_converged
     disp_verbose(sprintf('OccBin smoother iteration %u.', iter),options_.verbosity)
     occbin_options.opts_regime.regime_history=regime_history;
     [alphahat,etahat,epsilonhat,~,SteadyState,trend_coeff,~,T0,R0,P,~,decomp,Trend,state_uncertainty,oo_.dr,~,alphahat0,state_uncertainty0]...
-        = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
+        = DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_,occbin_options,TT,RR,CC);
     sto_etahat(iter)={etahat};
     regime_history0(iter,:) = regime_history;
     if occbin_smoother_debug
@@ -573,7 +572,7 @@ if is_realtime_smoother_successful && ~is_conditional_smoother_converged && ~is_
 end
 
 
-if (~is_changed || (occbin_smoother_debug && iter>1)) && nargin==12
+if (~is_changed || (occbin_smoother_debug && iter>1)) && store_linear_smoother
     if is_changed
         % this can happen when realtime smoother did not work and
         % iterations done starting from linear smoother did not converge
