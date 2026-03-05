@@ -82,19 +82,16 @@ varexo
 
 // Parameters
 parameters
-    kappap alpha epsI muw phi omega Bg pshare delta
+    kappap alpha epsI muw phi omega Bg Bh pshare delta
     kappaw frisch mup vphi eis
     chi0 chi1 chi2
     Z_ss beta_ss r_ss G_ss
 ;
 
 Bg = 2.8;
+Bh = 1.04;
 G_ss = 0.2;
-Z_ss = 0.4677898145312322;
-alpha = 0.3299492385786802;
-beta_ss = 0.976273900655271;
 chi0 = 0.25;
-chi1 = 6.416419681906506;
 chi2 = 2;
 delta = 0.02;
 eis = 0.5;
@@ -102,13 +99,94 @@ epsI = 4;
 frisch = 1;
 kappap = 0.1;
 kappaw = 0.1;
-mup = 1.015228426395939;
 muw = 1.1;
 omega = 0.005;
 phi = 1.5;
-pshare = 0.8641975308641971;
 r_ss = 0.0125;
-vphi = 1.713475928326737;
+
+verbatim;
+tot_wealth = 14;
+K_ss = 10;
+p_ss = tot_wealth - Bg;
+mc_ss = 1 - r_ss * (p_ss - K_ss);
+end;
+
+mup = 1 / mc_ss;
+alpha = (r_ss + delta) * K_ss / mc_ss;
+Z_ss = K_ss ^ (-alpha);
+pshare = p_ss / (tot_wealth - Bh);
+
+verbatim;
+w = mc_ss * (1 - alpha);
+tax = (r_ss * Bg + G_ss) / w;
+I = delta * K_ss;
+div = 1 - w - I;
+rb = r_ss - omega;
+ra = r_ss;
+
+initial_guess = struct;
+initial_guess.agg.piw = 0;
+initial_guess.agg.psiw = 0;
+initial_guess.agg.rb = rb;
+initial_guess.agg.ra = ra;
+initial_guess.agg.tax = tax;
+initial_guess.agg.i = r_ss;
+initial_guess.agg.psip = 0;
+initial_guess.agg.I = I;
+initial_guess.agg.Q = 1;
+initial_guess.agg.w = w;
+initial_guess.agg.N = 1;
+initial_guess.agg.K = K_ss;
+initial_guess.agg.div = div;
+initial_guess.agg.p = p_ss;
+initial_guess.agg.pi = 0;
+initial_guess.agg.mc = mc_ss;
+initial_guess.agg.r = r_ss;
+initial_guess.agg.Y = 1;
+
+ne = 3;
+rho_e = 0.966;
+sig_e = 0.92;
+[grid_e, ~, Pi_e] = rouwenhorst(rho_e, sig_e, ne, 1e-12, 1e5);
+initial_guess.shocks.grids.e = grid_e;
+initial_guess.shocks.Pi.e = Pi_e;
+
+nb = 10;
+na = 20;
+a_max = 4000;
+b_max = 50;
+grid_a = logspace(log10(0.25), log10(a_max+0.25), na)-0.25;
+grid_b = logspace(log10(0.25), log10(b_max+0.25), nb)-0.25;
+initial_guess.pol.grids.a = grid_a;
+initial_guess.pol.grids.b = grid_b;
+initial_guess.pol.order = {'e', 'b', 'a'};
+
+grid_a_3d = reshape(grid_a, 1, 1, []);
+grid_b_3d = reshape(grid_b, 1, [], 1);
+grid_e_3d = reshape(grid_e, [], 1, 1);
+coh = (1+rb)*grid_b_3d+(1+ra)*grid_a_3d+(1-tax)*w*grid_e_3d;
+b = grid_b_3d .* ones(ne, nb, na);
+a = (1+ra) * grid_a_3d .* ones(ne, nb, na);
+c = max(coh - a - b, 1e-8);
+Vb = (1+rb) * (c .^ (-1/eis));
+Va = (1+ra) * (c .^ (-1/eis));
+u = grid_e_3d .* (c .^ (-1/eis));
+
+initial_guess.pol.values.Va = Va;
+initial_guess.pol.values.Vb = Vb;
+initial_guess.pol.values.a = a;
+initial_guess.pol.values.b = b;
+initial_guess.pol.values.c = c;
+initial_guess.pol.values.u = u;
+
+initial_guess.free_parameters.beta_ss.initial_guess = 0.97;
+initial_guess.free_parameters.beta_ss.lower_bound = 0.01;
+initial_guess.free_parameters.beta_ss.upper_bound = 0.999;
+initial_guess.free_parameters.chi1.initial_guess = 6.4;
+initial_guess.free_parameters.chi1.lower_bound = 0.01;
+initial_guess.free_parameters.vphi.initial_guess = 1.7;
+initial_guess.free_parameters.vphi.lower_bound = 0.01;
+end;
 
 // Household optimization problem with two assets
 model(heterogeneity=households);
@@ -183,10 +261,10 @@ model;
    kappaw * (vphi * N ^ (1 + 1 / frisch) - (1 - tax) * w * N * SUM(u) / muw) + (beta_ss+beta) * log(1 + piw(+1)) + markup_w - log(1 + piw);
 
    [name='Illiquid asset market clearing']
-   p - SUM(a);
+   p + Bg - SUM(a) - SUM(b);
 
    [name='Liquid asset market clearing']
-   Bg - SUM(b);
+   Bh - SUM(b);
 end;
 
 // News shock sequence
@@ -208,17 +286,16 @@ end;
 //==========================================================================
 // STEP 1: Compute steady state with multi-parameter calibration
 //==========================================================================
-// The initial guess is loaded from hank_two_assets_sp.mat. Three parameters
-// (beta_ss, vphi, chi1) are calibrated so that the wage Phillips curve
-// and two asset market clearing conditions hold.
-// The .mat file contains: steady_state.free_parameters with initial guesses
-// and bounds for each free parameter.
-heterogeneity_compute_steady_state(filename = hank_two_assets_sp,
+// The initial guess is constructed in the verbatim block above. Three
+// parameters (beta_ss, vphi, chi1) are calibrated so that the wage Phillips
+// curve and two asset market clearing conditions hold.
+heterogeneity_compute_steady_state(variable = initial_guess,
     calibration_target_equations=['Wage Phillips curve',
         'Liquid asset market clearing',
         'Illiquid asset market clearing'],
     time_iteration_tol=1e-10,
-    time_iteration_learning_rate=0.79,
+    time_iteration_max_iter=2000,
+    time_iteration_early_stopping=0,
     time_iteration_solver_tolf=1e-12,
     time_iteration_solver_tolx=1e-14);
 

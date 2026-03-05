@@ -2592,16 +2592,13 @@ mod_and_m_tests = [
   # Examples — Heterogeneity
   { 'test' : [ '../examples/heterogeneity/hank_one_asset.mod' ],
     'extra' : [ '../examples/heterogeneity/hank_one_asset.mat' ] },
-  { 'test' : [ '../examples/heterogeneity/hank_one_asset_steady_state.mod' ],
-    'extra' : [ '../examples/heterogeneity/hank_one_asset_sp.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/hank_one_asset_steady_state.mod' ] },
   { 'test' : [ '../examples/heterogeneity/hank_two_assets.mod' ],
     'extra' : [ '../examples/heterogeneity/hank_two_assets.mat' ] },
-  { 'test' : [ '../examples/heterogeneity/hank_two_assets_steady_state.mod' ],
-    'extra' : [ '../examples/heterogeneity/hank_two_assets_sp.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/hank_two_assets_steady_state.mod' ] },
   { 'test' : [ '../examples/heterogeneity/krusell_smith_1998.mod' ],
     'extra' : [ '../examples/heterogeneity/krusell_smith_1998.mat' ] },
-  { 'test' : [ '../examples/heterogeneity/krusell_smith_1998_steady_state.mod' ],
-    'extra' : [ '../examples/heterogeneity/krusell_smith_1998_sp.mat' ] },
+  { 'test' : [ '../examples/heterogeneity/krusell_smith_1998_steady_state.mod' ] },
 
   # Examples — OccBin
   { 'test' : [ '../examples/occbin/rbc_occbin.mod' ] },

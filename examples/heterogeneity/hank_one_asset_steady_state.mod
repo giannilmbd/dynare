@@ -62,22 +62,65 @@ varexo G markup rstar;
 parameters
    beta vphi
    eis frisch
-   rho_e sig_e
-   rho_Z sig_Z
    mu kappa phi
    Z B r_ss
 ;
 
 B = 5.6;
 Z = 1;
-beta = 0.9822435537831447;
 eis = 0.5;
 frisch = 0.5;
 kappa = 0.1;
 mu = 1.2;
 phi = 1.5;
 r_ss = 0.005;
-vphi = 0.7864334221640324;
+
+verbatim;
+w = 1/mu;
+Div = 1-w;
+Tax = r_ss*B;
+
+initial_guess = struct;
+initial_guess.agg.Y = 1;
+initial_guess.agg.L = 1;
+initial_guess.agg.w = w;
+initial_guess.agg.pi = 0;
+initial_guess.agg.Div = Div;
+initial_guess.agg.Tax = Tax;
+initial_guess.agg.r = r_ss;
+
+rho_e = 0.966;
+sig_e = 0.5;
+[grid_e, ~, Pi_e] = rouwenhorst(rho_e, sig_e, 3, 1e-12, 1e5);
+initial_guess.shocks.grids.e = grid_e;
+initial_guess.shocks.Pi.e = Pi_e;
+
+grid_a = logspace(log10(0.25), log10(200.25), 30)-0.25;
+initial_guess.pol.grids.a = grid_a;
+
+T = (Div-Tax)*grid_e;
+fininc = (1+r_ss)*grid_a+T;
+
+coh = (1+r_ss)*grid_a+w*grid_e+T;
+c = 0.1*coh;
+a = coh-c;
+n = ones(size(a));
+ns = n .* grid_e;
+
+initial_guess.pol.values.c = c;
+initial_guess.pol.values.a = a;
+initial_guess.pol.values.n = n;
+initial_guess.pol.values.ns = ns;
+
+initial_guess.free_parameters.beta.initial_guess = 0.98;
+initial_guess.free_parameters.beta.upper_bound = 0.999;
+initial_guess.free_parameters.beta.lower_bound = 0;
+
+initial_guess.free_parameters.vphi.initial_guess = 0.78;
+initial_guess.free_parameters.vphi.lower_bound = 0.01;
+
+initial_guess.pol.order = {'e', 'a'};
+end;
 
 // Household optimization problem
 model(heterogeneity=households);
@@ -131,11 +174,11 @@ end;
 //==========================================================================
 // STEP 1: Compute steady state with parameter calibration
 //==========================================================================
-// The initial guess is loaded from hank_one_asset_sp.mat. The discount factor
-// beta is calibrated so that the asset market clearing condition holds.
-// The .mat file contains: steady_state.free_parameters.beta.initial_guess
-heterogeneity_compute_steady_state(filename = hank_one_asset_sp,
-    calibration_target_equations=['Asset market clearing'],
+// The initial guess is constructed in the verbatim block above. The discount
+// factor beta and vphi are calibrated so that the asset and labor market
+// clearing conditions hold.
+heterogeneity_compute_steady_state(variable = initial_guess,
+    calibration_target_equations=['Asset market clearing', 'Labor market clearing'],
     time_iteration_solver_stop_on_error);
 
 //==========================================================================
