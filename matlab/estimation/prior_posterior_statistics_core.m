@@ -63,17 +63,16 @@ oo_=myinputs.oo_;
 options_=myinputs.options_;
 estim_params_=myinputs.estim_params_;
 bayestopt_=myinputs.bayestopt_;
+dataset_info=myinputs.dataset_info;
+dataset_=myinputs.dataset_;
 
 type=myinputs.type;
 run_smoother=myinputs.run_smoother;
 filter_covariance=myinputs.filter_covariance;
 smoothed_state_uncertainty=myinputs.smoothed_state_uncertainty;
 gend=myinputs.gend;
-Y=myinputs.Y;
-data_index=myinputs.data_index;
-missing_value=myinputs.missing_value;
-varobs=myinputs.varobs;
-mean_varobs=myinputs.mean_varobs;
+n_observed_series=dataset_.size(2);
+mean_varobs=dataset_info.descriptive.mean;
 irun=myinputs.irun;
 endo_nbr=myinputs.endo_nbr;
 nvn=myinputs.nvn;
@@ -181,12 +180,12 @@ if run_smoother
         stock_forcst_mean= NaN(endo_nbr,horizon,MAX_nforc1);
         stock_forcst_point = NaN(endo_nbr,horizon,MAX_nforc2);
         if ~isequal(M_.H,0)
-            stock_forcst_point_ME = NaN(length(varobs),horizon,MAX_nforc_ME);
+            stock_forcst_point_ME = NaN(n_observed_series,horizon,MAX_nforc_ME);
         end
     end
 end
 if nvn
-    stock_error = NaN(length(varobs),gend,MAX_nerro);
+    stock_error = NaN(n_observed_series,gend,MAX_nerro);
 end
 if naK
     stock_filter_step_ahead =NaN(length(options_.filter_step_ahead),endo_nbr,gend+max(options_.filter_step_ahead),MAX_naK);
@@ -245,7 +244,6 @@ for b=fpar:B
             opts_local.occbin.smoother.waitbar = false;
             opts_local.occbin.smoother.linear_smoother=false; % speed-up
             if options_.occbin.smoother.inversion_filter
-                dataset_.data=Y';
                 [~, info, ~, ~, ~, ~, ~, ~, oo_.dr, alphahat, etahat, regime_history] = ...
                     occbin.IVF_posterior(deep,dataset_,[],options_,M_,estim_params_,bayestopt_,prior_bounds(bayestopt_,options_.prior_trunc),oo_.dr, oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state);
                 if info(1)
@@ -255,7 +253,7 @@ for b=fpar:B
                     alphatilde = alphahat*nan;
                     SteadyState=oo_.dr.ys;
                     trend_coeff = zeros(length(options_.varobs_id),1);
-                    trend_addition=zeros(options_.number_of_observed_variables,gend);
+                    trend_addition=zeros(n_observed_series,gend);
                     stock_occbin_regime(:,irun(5))=regime_history;
                     stock_occbin_realtime_regime(:,irun(5))=regime_history;
                     stock_occbin_regime(:,irun(5))=regime_history;
@@ -265,7 +263,7 @@ for b=fpar:B
             else % PKF
                 opts_local.verbosity=0;
                 [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+                    occbin.DSGE_smoother(deep,M_,oo_,opts_local,bayestopt_,estim_params_,dataset_,dataset_info,false);
                 if oo_.occbin.smoother.error_flag(1)
                     message=get_error_message(oo_.occbin.smoother.error_flag,opts_local);
                     fprintf('\nprior_posterior_statistics: One of the draws failed with the error:\n%s\n',message)
@@ -304,18 +302,18 @@ for b=fpar:B
                         niter=niter+1;
                         M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat01 + SteadyState(oo_.dr.state_var);
                         [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                            occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                            occbin.DSGE_smoother(deep,M_local,oo_,opts_local1,bayestopt_,estim_params_,dataset_,dataset_info,false);
                         if oo_.occbin.smoother.error_flag(1)
                             if not(isempty(is)) && niter==1
                                 % first check if smoother mean works
                                 M_local.endo_initial_state.values(oo_.dr.state_var) = alphahat1;
                                 [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_local,oo_,opts_local1,bayestopt_,estim_params_);
+                                    occbin.DSGE_smoother(deep,M_local,oo_,opts_local1,bayestopt_,estim_params_,dataset_,dataset_info,false);
                             end
                             if oo_.occbin.smoother.error_flag(1) && (niter==1 || niter==10)
                                 % use smoother ?
                                 [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = ...
-                                    occbin.DSGE_smoother(deep,gend,Y,data_index,missing_value,M_,oo_,opts_local,bayestopt_,estim_params_);
+                                    occbin.DSGE_smoother(deep,M_,oo_,opts_local,bayestopt_,estim_params_,dataset_,dataset_info,false);
                             else
                                 % try another draw from smoother distribution
                                 alphahat01 = U(:,is)*StateVectorVarianceSquareRoot*randn(state_variance_rank,1)+alphahat1;
@@ -336,7 +334,7 @@ for b=fpar:B
             end
         else
             [alphahat,etahat,epsilonhat,alphatilde,SteadyState,trend_coeff,aK,~,~,P,~,~,trend_addition,state_uncertainty,~,~,a0T,state_uncertainty0] = ...
-                DsgeSmoother(deep,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local,bayestopt_,estim_params_);
+                DsgeSmoother(deep,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,opts_local,bayestopt_,estim_params_);
         end
 
         if is_successful_draw
@@ -470,8 +468,8 @@ for b=fpar:B
                 stock_forcst_mean(:,:,irun(6)) = yf(maxlag+1:end,:)';
                 stock_forcst_point(:,:,irun(7)) = yf1(maxlag+1:end,:)';
                 if ~isequal(M_.H,0)
-                    ME_shocks=zeros(length(varobs),horizon);
-                    i_exo_var = setdiff(1:length(varobs),find(diag(M_.H) == 0));
+                    ME_shocks=zeros(n_observed_series,horizon);
+                    i_exo_var = setdiff(1:n_observed_series,find(diag(M_.H) == 0));
                     nxs = length(i_exo_var);
                     chol_H = chol(M_.H(i_exo_var,i_exo_var));
                     if ~isempty(M_.H)

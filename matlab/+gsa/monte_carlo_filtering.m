@@ -145,10 +145,7 @@ if loadSA
     end
 end
 if ~loadSA
-    Y = transpose(dataset_.data);
     gend = dataset_.nobs;
-    data_index = dataset_info.missing.aindex;
-    missing_value = dataset_info.missing.state;
     filfilt = dir([DirectoryName filesep M_.fname '_filter_step_ahead*.mat']);
     filupdate = dir([DirectoryName filesep M_.fname '_update*.mat']);
     filparam = dir([DirectoryName filesep M_.fname '_param*.mat']);
@@ -179,7 +176,7 @@ if ~loadSA
             yss(i,:,:)=repmat(sto_ys(:,js(i))',[gend,1]);
         end
         if exist('xparam1','var')
-            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
             y0 = reshape( squeeze(aK(1,jxj,1:gend)),[gend length(jxj)]);
             yobs = transpose( ahat(jxj,:));
             rmse_mode = sqrt(mean((yobs(istart:end,:)-y0(istart:end,:)).^2));
@@ -211,7 +208,7 @@ if ~loadSA
             r2_MC(j,:) = 1-mean((yobs(:,istart:end,j)'-y0(:,istart:end,j)').^2)./mean((yobs(:,istart:end,j)').^2);
         end
         if exist('xparam1_mean','var')
-            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1_mean,gend,Y,data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+            [~,~,~,ahat,~,~,aK] = DsgeSmoother(xparam1_mean,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
             y0 = reshape( squeeze(aK(1,jxj,1:gend)),[gend length(jxj)]);
             yobs = transpose( ahat(jxj,:));
             rmse_pmean = sqrt(mean((yobs(istart:end,:)-y0(istart:end,:)).^2));

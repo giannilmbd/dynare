@@ -7,8 +7,7 @@ function [fval,info,exit_flag,DLIK,Hess,SteadyState,trend_coeff,M_,dr] = dsge_li
 % INPUTS
 % - xparam1             [double]        current values for the estimated parameters.
 % - dataset_            [structure]     dataset after transformations
-% - dataset_info        [structure]     storing information about the
-%                                       sample; not used but required for interface
+% - dataset_info        [structure]     storing information about the sample
 % - options_            [structure]     MATLAB's structure describing the current options
 % - M_                  [structure]     MATLAB's structure describing the model
 % - estim_params_       [structure]     characterizing parameters to be estimated
@@ -535,7 +534,7 @@ if ((kalman_algo==1) || (kalman_algo==3)) || (kalman_algo == 5) % Multivariate K
                                               options_.rescale_prediction_error_covariance, ...
                                               options_.presample, ...
                                               T,Q,R,H,Z,mm,pp,rr,Zflag,diffuse_periods, ...
-                                              options_.varobs,options_.debug,...
+                                              dataset_.name,options_.debug,...
                                               analytic_deriv_info{:});
                 end
             end
@@ -546,7 +545,7 @@ if ((kalman_algo==1) || (kalman_algo==3)) || (kalman_algo == 5) % Multivariate K
                                                        kalman_tol, options_.riccati_tol, ...
                                                        options_.rescale_prediction_error_covariance, ...
                                                        options_.presample, ...
-                                                       T,Q,R,H,Z,mm,pp,options_.varobs,options_.debug,Zflag,diffuse_periods, occbin_);
+                                                       T,Q,R,H,Z,mm,pp,dataset_.name,options_.debug,Zflag,diffuse_periods, occbin_);
         if occbin_.status && isinf(LIK)
             fval = Inf;
             info(1) = 320;

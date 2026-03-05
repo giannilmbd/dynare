@@ -116,11 +116,11 @@ if options_.occbin.smoother.status
         end
     else
         [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_.mf,alphahat0,state_uncertainty0] = ...
-            occbin.DSGE_smoother(parameters,dataset_.nobs,transpose(dataset_.data),dataset_info.missing.aindex,dataset_info.missing.state,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
+            occbin.DSGE_smoother(parameters,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info,true);
     end
 else
     [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_.dr,bayestopt_.mf,alphahat0,state_uncertainty0] = ...
-        DsgeSmoother(parameters,dataset_.nobs,transpose(dataset_.data),dataset_info.missing.aindex,dataset_info.missing.state,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+        DsgeSmoother(parameters,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
 end
 if ~(options_.occbin.smoother.status && options_.occbin.smoother.inversion_filter)
     if ~options_.occbin.smoother.status || (options_.occbin.smoother.status && oo_.occbin.smoother.error_flag==0)

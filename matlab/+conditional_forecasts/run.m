@@ -116,16 +116,13 @@ if estimated_model
     end
     set_parameters(xparam);
     [dataset_,dataset_info] = makedataset(options_);
-    data = transpose(dataset_.data);
-    data_index = dataset_info.missing.aindex;
     gend = dataset_.nobs;
-    missing_value = dataset_info.missing.state;
 
     %store qz_criterium
     options_=select_qz_criterium_value(options_);
     options_smoothed_state_uncertainty_old = options_.smoothed_state_uncertainty;
     [atT, ~, ~, ~,ys, ~, ~, ~, ~, ~, ~, ~, ~, ~,oo_.dr,bayestopt_.mf] = ...
-        DsgeSmoother(xparam, gend, data, data_index, missing_value, M_, oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state, options_, bayestopt_, estim_params_);
+        DsgeSmoother(xparam, dataset_, dataset_info, M_, oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state, options_, bayestopt_, estim_params_);
     options_.smoothed_state_uncertainty = options_smoothed_state_uncertainty_old;
     %get constant part
     if options_.noconstant

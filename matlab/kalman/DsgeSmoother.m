@@ -1,13 +1,11 @@
-function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,dr,mf,alphahat0,state_uncertainty0,d,info,regimes_] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_,varargin)
-% [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,dr,bayestopt_,alphahat0,state_uncertainty0,d,info, regimes_] = DsgeSmoother(xparam1,gend,Y,data_index,missing_value,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_,varargin)
+function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,dr,mf,alphahat0,state_uncertainty0,d,info,regimes_] = DsgeSmoother(xparam1,dataset_,dataset_info,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_,varargin)
+% [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,decomp,trend_addition,state_uncertainty,dr,bayestopt_,alphahat0,state_uncertainty0,d,info, regimes_] = DsgeSmoother(xparam1,dataset_,dataset_info,M_,dr, endo_steady_state, exo_steady_state, exo_det_steady_state,options_,bayestopt_,estim_params_,varargin)
 % Estimation of the smoothed variables and innovations.
 %
 % INPUTS
 %   o xparam1       [double]   (p*1) vector of (estimated) parameters.
-%   o gend          [integer]  scalar specifying the number of observations ==> varargin{1}.
-%   o Y             [double]   (n*T) matrix of data.
-%   o data_index    [cell]      1*smpl cell of column vectors of indices.
-%   o missing_value 1 if missing values, 0 otherwise
+%   o dataset_      [structure] dataset after transformations
+%   o dataset_info  [structure] storing information about the sample
 %   o M_            [structure] describing the model
 %   o dr            [structure] model information structure
 %   o endo_steady_state       [vector]     steady state value for endogenous variables
@@ -52,7 +50,7 @@ function [alphahat,etahat,epsilonhat,ahat,SteadyState,trend_coeff,aK,T,R,P,PK,de
 %   m:  number of endogenous variables (M_.endo_nbr)
 %   T:  number of Time periods (options_.nobs)
 %   r:  number of structural shocks (M_.exo_nbr)
-%   n:  number of observables (length(options_.varobs))
+%   n:  number of observables (size(dataset_.data,2))
 %   K:  maximum forecast horizon (max(options_.nk))
 %
 %   To get variables that are stored in decision rule order in order of declaration
@@ -98,12 +96,16 @@ R             = [];
 P             = [];
 PK            = [];
 decomp        = [];
-vobs          = length(options_.varobs);
-smpl          = size(Y,2);
 alphahat0     = [];
 state_uncertainty0 =[];
 d             = 0;
 regimes_      = [];
+
+% get dataset information
+gend=dataset_.nobs;
+Y=transpose(dataset_.data);
+[vobs,smpl] = size(Y);
+data_index=dataset_info.missing.aindex;
 
 if ~isempty(xparam1) %not calibrated model
     M_ = set_all_parameters(xparam1,estim_params_,M_);
@@ -262,7 +264,7 @@ data1 = Y-trend;
 %  4. Kalman smoother
 % -----------------------------------------------------------------------------
 
-if ~missing_value
+if ~dataset_info.missing.state
     for i=1:smpl
         data_index{i}=(1:vobs)';
     end
@@ -310,7 +312,7 @@ if kalman_algo == 1 || kalman_algo == 3 || kalman_algo == 5
         [alphahat,epsilonhat,etahat,ahat,P,aK,PK,decomp,state_uncertainty, aahat, eehat, d, alphahat0, aalphahat0, state_uncertainty0, filter_error_flag] = missing_DiffuseKalmanSmootherH1_Z(a_initial,ST, ...
             Z,R1,Q,H,Pinf,Pstar, ...
             data1,vobs,np,smpl,data_index, ...
-            options_.nk,kalman_tol,diffuse_kalman_tol,options_.filter_decomposition,options_.smoothed_state_uncertainty,options_.filter_covariance,options_.smoother_redux,options_.varobs,options_.debug);
+            options_.nk,kalman_tol,diffuse_kalman_tol,options_.filter_decomposition,options_.smoothed_state_uncertainty,options_.filter_covariance,options_.smoother_redux,dataset_.name,options_.debug);
     end
     if isinf(alphahat)
         % Store Kalman filter error code before switching algorithms

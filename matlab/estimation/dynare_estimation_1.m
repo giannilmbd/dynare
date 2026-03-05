@@ -142,13 +142,6 @@ if estim_params_.ncx || any(nnz(tril(M_.Correlation_matrix,-1))) || isfield(esti
     M_.sigma_e_is_diagonal = false;
 end
 
-data = dataset_.data;
-data_index = dataset_info.missing.aindex;
-missing_value = dataset_info.missing.state;
-
-% Set number of observations
-gend = dataset_.nobs;
-
 % Get the number of parameters to be estimated.
 nx = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np; % Total number of parameters to be estimated.
 
@@ -199,14 +192,14 @@ if isequal(options_.mode_compute,0) && isempty(options_.mode_file) && ~options_.
                 end
             else
                 if options_.occbin.smoother.status
-                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = occbin.DSGE_smoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info);
+                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_,bayestopt_.mf,a0T,state_uncertainty0] = occbin.DSGE_smoother(xparam1,M_,oo_,options_,bayestopt_,estim_params_,dataset_,dataset_info,true);
                     if oo_.occbin.smoother.error_flag(1)==0
                         [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty,a0T,state_uncertainty0);
                     else
                         fprintf('\nOccBin: smoother did not succeed. No results will be written to oo_.\n')
                     end
                 else
-                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_.dr,bayestopt_.mf,a0T,state_uncertainty0] = DsgeSmoother(xparam1,gend,transpose(data),data_index,missing_value,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
+                    [atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,~,~,P,PK,decomp,Trend,state_uncertainty,oo_.dr,bayestopt_.mf,a0T,state_uncertainty0] = DsgeSmoother(xparam1,dataset_,dataset_info,M_,oo_.dr,oo_.steady_state,oo_.exo_steady_state,oo_.exo_det_steady_state,options_,bayestopt_,estim_params_);
                     [oo_]=store_smoother_results(M_,oo_,options_,bayestopt_,dataset_,dataset_info,atT,innov,measurement_error,updated_variables,ys,trend_coeff,aK,P,PK,decomp,Trend,state_uncertainty,a0T,state_uncertainty0);
                 end
             end

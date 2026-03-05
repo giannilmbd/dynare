@@ -83,7 +83,7 @@ if nargin<16
 end
 gend=dataset_.nobs;
 if nargin<17
-    Trend=zeros(options_.number_of_observed_variables,gend);
+    Trend=zeros(dataset_.size(2),gend);
 end
 
 

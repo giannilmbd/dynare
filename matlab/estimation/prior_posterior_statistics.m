@@ -44,8 +44,8 @@ if nargin < 9
 end
 localVars=[];
 
-Y = transpose(dataset_.data);
 gend = dataset_.nobs;
+n_observed_series=dataset_.size(2);
 
 npar = estim_params_.nvx+estim_params_.nvn+estim_params_.ncx+estim_params_.ncn+estim_params_.nsx+estim_params_.np;
 naK = length(options_.filter_step_ahead);
@@ -91,7 +91,7 @@ MAX_n_smoothed_constant = min(B,ceil(MaxNumberOfBytes/((endo_nbr)*gend)/8));
 MAX_n_smoothed_trend = min(B,ceil(MaxNumberOfBytes/((endo_nbr)*gend)/8));
 MAX_n_trend_coeff = min(B,ceil(MaxNumberOfBytes/endo_nbr/8));
 MAX_ninno = min(B,ceil(MaxNumberOfBytes/(exo_nbr*gend)/8));
-MAX_nerro = min(B,ceil(MaxNumberOfBytes/(size(options_.varobs,1)*gend)/8));
+MAX_nerro = min(B,ceil(MaxNumberOfBytes/(n_observed_series*gend)/8));
 
 if naK
     MAX_naK   = min(B,ceil(MaxNumberOfBytes/(endo_nbr* ...
@@ -102,7 +102,7 @@ if horizon
     MAX_nforc1 = min(B,ceil(MaxNumberOfBytes/((endo_nbr)*(horizon+maxlag))/8));
     MAX_nforc2 = min(B,ceil(MaxNumberOfBytes/((endo_nbr)*(horizon+maxlag))/8));
     if ~isequal(M_.H,0)
-        MAX_nforc_ME = min(B,ceil(MaxNumberOfBytes/((size(options_.varobs,1))*(horizon+maxlag))/8));
+        MAX_nforc_ME = min(B,ceil(MaxNumberOfBytes/(n_observed_series*(horizon+maxlag))/8));
     end
 end
 MAX_momentsno = min(B,ceil(MaxNumberOfBytes/(get_moments_size(options_)*8)));
@@ -152,11 +152,6 @@ localVars.run_smoother=run_smoother;
 localVars.filter_covariance=filter_covariance;
 localVars.smoothed_state_uncertainty=smoothed_state_uncertainty;
 localVars.gend=gend;
-localVars.Y=Y;
-localVars.data_index=dataset_info.missing.aindex;
-localVars.missing_value=dataset_info.missing.state;
-localVars.varobs=options_.varobs;
-localVars.mean_varobs=dataset_info.descriptive.mean;
 localVars.irun=irun;
 localVars.endo_nbr=endo_nbr;
 localVars.nvn=estim_params_.nvn;
@@ -199,6 +194,8 @@ localVars.oo_=oo_;
 localVars.options_=options_;
 localVars.estim_params_=estim_params_;
 localVars.bayestopt_=bayestopt_;
+localVars.dataset_info=dataset_info;
+localVars.dataset_=dataset_;
 
 
 if strcmpi(type,'posterior')
@@ -290,7 +287,7 @@ end
 ifil = fout(end).ifil;
 
 stock_gend=gend;
-stock_data=Y;
+stock_data=transpose(dataset_.data);
 save([DirectoryName '/' M_.fname '_data.mat'],'stock_gend','stock_data');
 
 if strcmpi(type,'gsa')
@@ -351,7 +348,7 @@ if options_.smoother
     end
 
     if estim_params_.nvn
-        for obs_iter=1:length(options_.varobs)
+        for obs_iter=1:n_observed_series
             meas_error_names{obs_iter,1}=['SE_EOBS_' M_.endo_names{strmatch(options_.varobs{obs_iter},M_.endo_names,'exact')}];
             texnames{obs_iter,1}=['\sigma^{ME}_' M_.endo_names_tex{strmatch(options_.varobs{obs_iter},M_.endo_names,'exact')}];
         end
