@@ -7,7 +7,6 @@ Currently the development team of Dynare is composed of:
 * Michel Juillard (Banque de France)
 * Sumudu Kankanamge (Le Mans Université and CEPREMAP)
 * Frédéric Karamé (Le Mans Université, Gains and CEPREMAP)
-* Junior Maih (Norges Bank)
 * Willi Mutschler (University of Tübingen)
 * Johannes Pfeifer (University of the Bundeswehr Munich)
 * Marco Ratto (European Commission, Joint Research Centre - JRC)
@@ -23,6 +22,7 @@ The following people used to be members of the team:
 * Assia Ezzeroug
 * Dóra Kocsis
 * Stéphane Lhuissier
+* Junior Maih
 * Ferhat Mihoubi
 * George Perendia
 
