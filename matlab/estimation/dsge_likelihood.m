@@ -300,7 +300,11 @@ switch options_.lik_init
         error(['The model requires Diffuse filter, but you specified a different Kalman filter. You must set options_.kalman_algo ' ...
                'to 0 (default), 3 or 4'])
     end
-    [Pstar,Pinf] = compute_Pinf_Pstar(Z,T,R,Q,options_.qz_criterium);
+    if is_restrict_state_space
+        [Pstar,Pinf] = compute_Pinf_Pstar(Z,T,R,Q,options_.qz_criterium, dr.restrict_columns);
+    else
+        [Pstar,Pinf] = compute_Pinf_Pstar(Z,T,R,Q,options_.qz_criterium);
+    end
     Z =zeros(length(bayestopt_.mf),size(T,1));
     for i = 1:length(bayestopt_.mf)
         Z(i,bayestopt_.mf(i))=1;
