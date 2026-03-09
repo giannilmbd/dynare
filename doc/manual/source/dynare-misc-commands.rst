@@ -378,3 +378,5 @@ Dynare misc commands
 
             .mex file used for perturbation solutions with `k_order_solver`. Default number of threads:
             half the number of logical cores, but at least 1.
+
+    |br|
