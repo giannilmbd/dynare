@@ -8,9 +8,16 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
 %
 % INPUTS
 %   M_       [struct] : Dynare model structure
-%   options_het [struct] : Heterogeneity-specific options structure
+%   options_het [struct] : Heterogeneity-specific options structure. When steady_state
+%                        is not passed as 4th argument:
+%                        - .steady_state_file_name: path to .mat file. If empty,
+%                          the variable is loaded from the base workspace instead.
+%                        - .steady_state_variable_name: variable name in the .mat
+%                          file (when file_name is non-empty) or in the base
+%                          workspace (when file_name is empty).
 %   oo_het      [struct] : Heterogeneity-specific output structure to which results will be written
-%   steady_state (optional) [struct] : User-provided steady-state structure
+%   steady_state (optional) [struct] : User-provided steady-state structure. When provided,
+%                        file_name and variable_name options are ignored.
 %   flag_initial_guess (optional) [bool] : If true, computes only policy-related matrices
 %                        and returns early. Skips distribution-dependent computations
 %                        (mat.d.ind/w/inv_h, Ix, mat.G/dG, mat.F/dF). Default: false.
@@ -43,46 +50,45 @@ function oo_het = load_steady_state(M_, options_het, oo_het, steady_state, flag_
       file_name = options_het.steady_state_file_name;
       variable_name = options_het.steady_state_variable_name;
 
-      % Check that filename was provided
       if isempty(file_name)
-         error('heterogeneity_load_steady_state: filename option is required');
-      end
-
-      % Parse file path to separate directory, basename, and extension
-      [filepath, basename, extension] = fileparts(file_name);
-
-      % Auto-detect extension if not provided
-      if isempty(extension)
-         % Reconstruct potential file names
-         if ~isempty(filepath)
-            base_path = fullfile(filepath, basename);
-         else
-            base_path = basename;
+         % No file specified — load variable from base workspace
+         if ~evalin('base', ['exist(''' variable_name ''', ''var'')'])
+            error('heterogeneity_load_steady_state: variable ''%s'' not found in workspace. Provide either ''filename'' or ''variable'' option.', variable_name);
          end
-
-         if isfile([base_path '.mat'])
-            extension = '.mat';
-         else
-            error('heterogeneity_load_steady_state: Cannot find file: %s.mat', base_path);
-         end
-         file_name_to_load = [base_path extension];
+         steady_state = evalin('base', variable_name);
       else
-         % Extension provided - use as-is
-         file_name_to_load = file_name;
-      end
+         % File specified — load from .mat file
+         [filepath, basename, extension] = fileparts(file_name);
 
-      % Verify file exists
-      if ~isfile(file_name_to_load)
-         error('heterogeneity_load_steady_state: File not found: %s', file_name_to_load);
-      end
+         % Auto-detect extension if not provided
+         if isempty(extension)
+            if ~isempty(filepath)
+               base_path = fullfile(filepath, basename);
+            else
+               base_path = basename;
+            end
 
-      % Load the file
-      loaded_data = load(file_name_to_load);
-      if ~isfield(loaded_data, variable_name)
-         error('heterogeneity_load_steady_state: Variable ''%s'' not found in file ''%s''.', ...
-               variable_name, file_name_to_load);
+            if isfile([base_path '.mat'])
+               extension = '.mat';
+            else
+               error('heterogeneity_load_steady_state: Cannot find file: %s.mat', base_path);
+            end
+            file_name_to_load = [base_path extension];
+         else
+            file_name_to_load = file_name;
+         end
+
+         if ~isfile(file_name_to_load)
+            error('heterogeneity_load_steady_state: File not found: %s', file_name_to_load);
+         end
+
+         loaded_data = load(file_name_to_load);
+         if ~isfield(loaded_data, variable_name)
+            error('heterogeneity_load_steady_state: Variable ''%s'' not found in file ''%s''.', ...
+                  variable_name, file_name_to_load);
+         end
+         steady_state = loaded_data.(variable_name);
       end
-      steady_state = loaded_data.(variable_name);
    end
 
    if nargin < 5

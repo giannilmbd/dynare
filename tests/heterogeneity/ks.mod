@@ -201,21 +201,25 @@ verbatim;
     options_.heterogeneity.steady_state_file_name = '';
 end;
 
-% Test 7: Error on empty filename
+% Test 7: Error when filename is empty and workspace variable does not exist
 verbatim;
     error_caught = false;
     try
         options_.heterogeneity.steady_state_file_name = '';
+        options_.heterogeneity.steady_state_variable_name = 'nonexistent_variable';
         oo_test = heterogeneity.load_steady_state(M_, options_.heterogeneity, oo_.heterogeneity);
     catch ME
         error_caught = true;
-        assert(contains(ME.message, 'filename option is required'), ...
+        assert(contains(ME.message, 'not found in workspace'), ...
             sprintf('Wrong error message: %s', ME.message));
     end
-    assert(error_caught, 'Expected error for empty filename not raised');
+    assert(error_caught, 'Expected error for missing workspace variable not raised');
 
-    fprintf('✔ Test 7: Error on empty filename works\n');
-    testResults = [testResults; struct('name', 'Error: empty filename', 'passed', true, 'message', '')];
+    % Reset
+    options_.heterogeneity.steady_state_variable_name = 'steady_state';
+
+    fprintf('✔ Test 7: Error on missing workspace variable works\n');
+    testResults = [testResults; struct('name', 'Error: missing workspace variable', 'passed', true, 'message', '')];
 
     fprintf('\n');
 end;
