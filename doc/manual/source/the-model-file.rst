@@ -15889,7 +15889,7 @@ Dynare provides two approaches for initializing the steady state of a
 heterogeneous-agent model:
 
 - :comm:`heterogeneity_load_steady_state`: loads a pre-computed steady state
-  from a MAT file.
+  from a MAT file or a workspace variable.
 - :comm:`heterogeneity_compute_steady_state`: computes the steady state
   numerically.
 
@@ -15900,24 +15900,32 @@ heterogeneity_load_steady_state
              heterogeneity_load_steady_state (OPTIONS...);
 
     Initializes and validates the steady state for a heterogeneous-agent model.
-    The steady state represents the set of policy functions of heterogeneous agents and their stationary distribution when aggregate variables are at their steady-state values. It must be computed externally and loaded from a MAT file.
+    The steady state represents the set of policy functions of heterogeneous agents and their stationary distribution when aggregate variables are at their steady-state values. It must be computed externally and provided either from a MAT file or from a workspace variable.
 
     *Options*
 
     .. option:: filename = FILENAME
 
-        *Mandatory.* Path to the MAT file containing the steady-state structure.
+        Path to the MAT file containing the steady-state structure.
         It must be included in quotes if the filename contains a path or an extension.
         If the ``.mat`` extension is omitted, it will be added automatically.
+        If not provided, the steady-state structure is loaded from the base
+        workspace using the variable name specified by :opt:`variable <variable = STRING>`.
 
     .. option:: variable = STRING
 
-        Variable name within the MAT file to load.
+        When :opt:`filename <filename = FILENAME>` is provided, this is the
+        variable name within the MAT file to load.
+        When :opt:`filename <filename = FILENAME>` is not provided, this is the
+        name of a variable in the current workspace containing the steady-state
+        structure. This is useful when the structure is built in a ``verbatim``
+        block and does not need to be saved to disk.
         Default: ``'steady_state'``
 
     *Steady-State Structure*
 
-    The MAT file must contain a structure with the following fields.
+    The steady-state structure (whether loaded from a MAT file or from the
+    workspace) must contain the following fields.
 
     **Key Terminology:**
 
@@ -16040,7 +16048,7 @@ heterogeneity_compute_steady_state
 
     **Initial guess**
 
-    An initial guess must be provided via a MAT file (see the :opt:`filename <filename = FILENAME>` option). The file must contain a structure with the same fields as described in :comm:`heterogeneity_load_steady_state` (``agg``, ``pol``, ``shocks``, ``d``), plus an optional ``free_parameters`` field for parameter calibration. The ``d.hist`` field is ignored here since the stationary distribution is recomputed by the forward iteration step; only ``d.grids`` (and optionally ``d.order``) are used.
+    An initial guess must be provided via a MAT file or a workspace variable (see the :opt:`filename <filename = FILENAME>` and :opt:`variable <variable = STRING>` options). The structure must contain the same fields as described in :comm:`heterogeneity_load_steady_state` (``agg``, ``pol``, ``shocks``, ``d``), plus an optional ``free_parameters`` field for parameter calibration. The ``d.hist`` field is ignored here since the stationary distribution is recomputed by the forward iteration step; only ``d.grids`` (and optionally ``d.order``) are used.
 
     **steady_state.free_parameters** (structure, optional)
         Parameters to calibrate. Each field name must match a parameter declared in :comm:`parameters` and contain a structure with:
@@ -16059,7 +16067,7 @@ heterogeneity_compute_steady_state
 
     .. option:: filename = FILENAME
 
-        *Mandatory.* See :opt:`filename <filename = FILENAME>` in :comm:`heterogeneity_load_steady_state`.
+        See :opt:`filename <filename = FILENAME>` in :comm:`heterogeneity_load_steady_state`.
 
     .. option:: variable = STRING
 
