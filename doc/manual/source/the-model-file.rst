@@ -15977,7 +15977,7 @@ heterogeneity_load_steady_state
 
               steady_state.shocks.Pi.e  % Matrix [7×7] with row sums = 1, all elements >= 0
 
-        Both ``grids`` and ``Pi`` must be provided for all shocks to ensure consistency with the policy function values defined on the tensor-product grid.
+        Both ``grids`` and ``Pi`` must be provided for all shocks to ensure consistency with the policy function values defined on the tensor-product grid. See the :mcomm:`rouwenhorst <[y, p_vec, P_mat] = rouwenhorst>` helper function for a convenient way to produce these objects.
 
     **steady_state.d** (structure)
         The stationary distribution:
@@ -16198,6 +16198,77 @@ heterogeneity_compute_steady_state
             time_iteration_learning_rate=0.79,
             time_iteration_solver_tolf=1e-12,
             time_iteration_solver_tolx=1e-14);
+
+Helper functions
+^^^^^^^^^^^^^^^^
+
+The following MATLAB/Octave functions are available for use in
+steady-state helper scripts.
+
+.. matcomm:: [y, p_vec, P_mat] = rouwenhorst (rho, sigma, N, tol, max_iter)
+
+    Constructs an ``N``-point Markov chain approximation of an AR(1) process
+    using the Rouwenhorst method (:cite:t:`Rouwenhorst:1995`). The grid points are
+    returned in levels: the log-grid is exponentiated and normalized so that
+    ``sum(p_vec .* y) = 1``.
+
+    The outputs can directly populate the ``steady_state.shocks`` structure
+    required by :comm:`heterogeneity_load_steady_state` and
+    :comm:`heterogeneity_compute_steady_state`: ``y`` provides
+    ``shocks.grids.VARNAME`` and ``P_mat`` provides ``shocks.Pi.VARNAME``.
+
+    *Inputs*
+
+    ``rho`` *(double)*
+
+        Persistence parameter of the AR(1) process (:math:`0 \leq \rho < 1`).
+
+    ``sigma`` *(double)*
+
+        Unconditional standard deviation of the AR(1) process.
+
+    ``N`` *(integer)*
+
+        Number of grid points for the discretization.
+
+    ``tol`` *(double)*
+
+        Convergence tolerance for the stationary distribution computation.
+
+    ``max_iter`` *(integer)*
+
+        Maximum number of iterations for the stationary distribution computation.
+
+    *Outputs*
+
+    ``y`` *(N×1 vector)*
+
+        Grid points in levels. Internally, a symmetric log-grid on
+        :math:`[-1,1]` is scaled so that its variance matches ``sigma``,
+        then exponentiated and normalized so that
+        :math:`\sum_i \mathtt{p\_vec}(i)\,\mathtt{y}(i) = 1`.
+
+    ``p_vec`` *(N×1 vector)*
+
+        Stationary distribution probabilities. Element :math:`i` gives the
+        long-run fraction of time spent in state :math:`i`.
+
+    ``P_mat`` *(N×N matrix)*
+
+        Transition probability matrix. Element :math:`(i,j)` gives the
+        probability of moving from state :math:`i` to state :math:`j`.
+        Each row sums to 1.
+
+    *Example*
+
+        ::
+
+            rho   = 0.966;
+            sigma = 0.5;
+            M     = 7;
+            tol   = 1e-10;
+            max_iter = 1000;
+            [z_grid, p, Q] = rouwenhorst(rho, sigma, M, tol, max_iter);
 
 heterogeneity_solve
 ^^^^^^^^^^^^^^^^^^^
