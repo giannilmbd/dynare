@@ -2,7 +2,7 @@ function write_residuals_routine(lhs, rhs, eqname, ipnames, M_, pacmodl)
 % write_residuals_routine(lhs, rhs, eqname, ipnames, M_, pacmodl)
 % Creates a routine for evaluating the residuals of the nonlinear equation.
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -24,7 +24,7 @@ fid = fopen(['+' M_.fname filesep() fun '.m'], 'w');
 fprintf(fid, 'function r = %s(params, data, M_, oo_)\n', fun);
 fprintf(fid, '\n');
 fprintf(fid, '%% Evaluates the residuals for equation %s.\n', eqname);
-fprintf(fid, '%% File created by Dynare (%s).\n', datetime);
+fprintf(fid, '%% File created by Dynare (%s).\n', char(datetime));
 fprintf(fid, '\n');
 for i=1:length(ipnames)
     fprintf(fid, 'M_.params(%u) = params(%u);\n', ipnames(i), i);

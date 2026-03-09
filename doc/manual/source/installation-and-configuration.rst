@@ -16,8 +16,9 @@ In order to run Dynare, you need one of the following:
 
 * MATLAB, any version ranging from 9.8 (R2020a) to 25.2 (R2025b);
 * GNU Octave, any version ranging from 8.4.0 to 11.1.0, with the `statistics`_
-  package. Note however that the Dynare installer for Windows requires a more
-  specific version of Octave, as indicated on the download page.
+  and `datatypes`_ packages. Note however that the Dynare installer for Windows
+  requires a more specific version of Octave, as indicated on the download
+  page.
 
 The following optional extensions are also useful to benefit from
 extra features, but are in no way required:
@@ -34,7 +35,7 @@ extra features, but are in no way required:
   * Control System Toolbox (for the Lyapunov solver ``dlyapchol`` triggered with ``lyapunov=square_root_solver``)
   * Parallel Computing Toolbox (to speed up the ``dime`` sampler)
 
-* If under Octave, the following packages: `control`_, `datatypes`_, `io`_, `optim`_.
+* If under Octave, the following packages: `control`_, `io`_, `optim`_.
 
 
 Installation of Dynare

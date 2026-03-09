@@ -2,7 +2,7 @@ function write_ssr_routine(lhs, rhs, eqname, ipnames, M_, pacmodl)
 % write_ssr_routine(lhs, rhs, eqname, ipnames, M_, pacmodl)
 % Creates a routine for evaluating the sum of squared residuals of the nonlinear equation.
 
-% Copyright © 2021-2023 Dynare Team
+% Copyright © 2021-2026 Dynare Team
 %
 % This file is part of Dynare.
 %
@@ -24,7 +24,7 @@ fid = fopen(['+' M_.fname filesep() fun '.m'], 'w');
 fprintf(fid, 'function [s, fake1, fake2, fake3, fake4] = %s(params, data, M_, oo_)\n', fun);
 fprintf(fid, '\n');
 fprintf(fid, '%% Evaluates the sum of square residuals for equation %s.\n', eqname);
-fprintf(fid, '%% File created by Dynare (%s).\n', datetime);
+fprintf(fid, '%% File created by Dynare (%s).\n', char(datetime));
 fprintf(fid, '\n');
 fprintf(fid, 'fake1 = 0;\n');
 fprintf(fid, 'fake2 = [];\n');

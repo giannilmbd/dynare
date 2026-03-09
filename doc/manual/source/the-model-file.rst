@@ -5146,9 +5146,6 @@ Alternative syntax for specifying deterministic shocks
 
         ::
 
-            // The following line is only needed under Octave
-            pkg load datatypes;
-
             db = table(transpose(linspace(0, 1, 101)), 'VariableNames', {'foo'});
 
             database db;
@@ -5252,10 +5249,6 @@ Alternative syntax for specifying deterministic shocks
      date in the timeseries object will be used for the corresponding simulation
      date. The values at the date just after the last simulation period will be
      used for the terminal condition.
-
-   Note that, under Octave, ``table`` objects are implemented in the
-   `datatypes`_ package, so you may need to load the latter via ``pkg load
-   datatypes`` before being able to construct or manipulate them.
 
 
 .. _stoch-sol:
@@ -18199,7 +18192,6 @@ Misc commands
 .. _control: https://gnu-octave.github.io/packages/control/
 .. _io: https://gnu-octave.github.io/packages/io/
 .. _optim: https://gnu-octave.github.io/packages/optim/
-.. _datatypes: https://gnu-octave.github.io/packages/datatypes/
 .. _AIM website: https://www.federalreserve.gov/econres/ama-index.htm
 
 .. rubric:: Footnotes

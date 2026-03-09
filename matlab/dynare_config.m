@@ -101,8 +101,9 @@ if isoctave
     % Our replacement functions don't work under Octave (because of gamrnd, see
     % #1638), hence the statistics toolbox is now a hard requirement
     if ~user_has_octave_package('statistics')
-        error('You must install the "statistics" package from Octave Forge, either with your distribution package manager or with "pkg install io statistics"')
+        error('You must install the "statistics" package from Octave Forge, either with your distribution package manager or with "pkg install io datatypes statistics"')
     end
+
 else
     % These functions are not standalone in MATLAB (they are built into mvncdf),
     % but they are standalone in Octave's statistics package, so we only add them
@@ -124,9 +125,12 @@ if isoctave
     p{end+1} = '/missing/splitlines';
 end
 
-% datetime doesn't exist in Octave
-if isoctave
-    p{end+1} = '/missing/datetime';
+% Under Octave, the datatypes package is needed for a few calls to datetime,
+% and also when constructing databases for shock_paths. In any case, this is a
+% dependency of the statistics package, so the following call is merely to load
+% the package so that its functions are callable.
+if isoctave && ~user_has_octave_package('datatypes')
+    error('You must install the "datatypes" package from Octave Forge, either with your distribution package manager or with "pkg install datatypes"')
 end
 
 % pagemtimes was introduced in MATLAB R2020b, doesn't exist in Octave
