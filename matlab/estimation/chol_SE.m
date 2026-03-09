@@ -19,13 +19,13 @@ function [R,indef, E, P]=chol_SE(A,pivoting)
 %
 % Notes:
 %   -   During factorization, L=R' is stored in the lower triangle of the original matrix A,
-%       miminizing the memory requirements
+%       minimizing the memory requirements
 %   -   Conforming with the original Schnabel/Eskow (1990) algorithm:
 %            - at each iteration the updated Gershgorin bounds are estimated instead of recomputed,
 %              reducing the computational requirements from o(n^3) to o (n^2)
 %           -  For the last 2 by 2 submatrix, an eigenvalue-based decomposition is used
 %   -   While pivoting is not necessary, it improves the size of E, the add-on on to the diagonal. But this comes at
-%       the cost of introduding a permutation.
+%       the cost of introducing a permutation.
 %
 %
 % INPUTS
@@ -290,7 +290,6 @@ indef=~phase1;
 Pprod=zeros(n,n);
 Pprod(sub2ind([n,n],P,1:n))=1;
 P=Pprod;
-end
 
 function  g=gersh_nested(A,j,n)
 
@@ -308,4 +307,198 @@ for ii = j:n
     end
     g(ii) = sum_up_to_i + sum_after_i- A(ii,ii);
 end
+
+return
+
+%@test:1
+% Test 1: Positive definite matrix, no pivoting
+% Standard Cholesky should result with E=0 and indef=0
+A = [4 2 1; 2 5 3; 1 3 6];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, false);
+t(2) = dassert(E, zeros(3,1));
+t(3) = dassert(P, eye(3));
+t(4) = dassert(R'*R, A, 1e-12);
+% R should be upper triangular
+t(5) = dassert(R, triu(R));
+% Compare with MATLAB's built-in chol
+R_matlab = chol(A);
+t(6) = dassert(R, R_matlab, 1e-12);
+T = all(t);
+%@eof:1
+
+%@test:2
+% Test 2: Positive definite matrix, with pivoting
+% Should still give E=0 and indef=0, but P may differ
+A = [4 2 1; 2 5 3; 1 3 6];
+[R, indef, E, P] = chol_SE(A, 1);
+t(1) = dassert(indef, false);
+t(2) = dassert(E, zeros(3,1));
+% Verify factorization identity: P'*A*P + diag(E) = R'*R
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-12);
+% R should be upper triangular
+t(4) = dassert(R, triu(R));
+% P should be a valid permutation matrix
+t(5) = dassert(P*P', eye(3));
+T = all(t);
+%@eof:2
+
+%@test:3
+% Test 3: Indefinite matrix, no pivoting
+% Should produce indef=1 and valid factorization with E>=0
+A = [1 1 0; 1 1 1; 0 1 1];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, true);
+% E should be non-negative
+t(2) = dassert(all(E >= 0), true);
+% Verify factorization identity: P'*A*P + diag(E) = R'*R
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-10);
+% R should be upper triangular
+t(4) = dassert(R, triu(R));
+% R'*R should be positive definite (all eigenvalues > 0)
+eigvals = eig(R'*R);
+t(5) = dassert(all(eigvals > 0), true);
+T = all(t);
+%@eof:3
+
+%@test:4
+% Test 4: Indefinite matrix, with pivoting
+A = [1 1 0; 1 1 1; 0 1 1];
+[R, indef, E, P] = chol_SE(A, 1);
+t(1) = dassert(indef, true);
+t(2) = dassert(all(E >= 0), true);
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-10);
+t(4) = dassert(R, triu(R));
+t(5) = dassert(P*P', eye(3));
+T = all(t);
+%@eof:4
+
+%@test:5
+% Test 5: 1x1 positive scalar
+A = [4];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, false);
+t(2) = dassert(E, 0);
+t(3) = dassert(R, 2, 1e-14);
+T = all(t);
+%@eof:5
+
+%@test:6
+% Test 6: 1x1 negative scalar
+A = [-3];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, true);
+t(2) = dassert(E(1) > 0, true);
+t(3) = dassert(R^2, A + E(1), 1e-14);
+T = all(t);
+%@eof:6
+
+%@test:7
+% Test 7: 1x1 zero matrix
+A = [0];
+[R, indef, E, P] = chol_SE(A, 0);
+tau2 = eps^(1/3);
+t(1) = dassert(E(1), tau2);
+t(2) = dassert(R, sqrt(tau2), 1e-14);
+T = all(t);
+%@eof:7
+
+%@test:8
+% Test 8: 2x2 indefinite matrix (exercises final 2x2 eigenvalue branch)
+A = [1 2; 2 1];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, true);
+t(2) = dassert(all(E >= 0), true);
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-12);
+t(4) = dassert(R, triu(R));
+T = all(t);
+%@eof:8
+
+%@test:9
+% Test 9: Negative definite matrix
+A = -[4 2 1; 2 5 3; 1 3 6];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, true);
+t(2) = dassert(all(E >= 0), true);
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-10);
+t(4) = dassert(R, triu(R));
+eigvals = eig(R'*R);
+t(5) = dassert(all(eigvals > 0), true);
+T = all(t);
+%@eof:9
+
+%@test:10
+% Test 10: Negative definite matrix with pivoting
+A = -[4 2 1; 2 5 3; 1 3 6];
+[R, indef, E, P] = chol_SE(A, 1);
+t(1) = dassert(indef, true);
+t(2) = dassert(all(E >= 0), true);
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-10);
+t(4) = dassert(P*P', eye(3));
+T = all(t);
+%@eof:10
+
+%@test:11
+% Test 11: Non-symmetric matrix should error
+A = [1 2; 3 4];
+try
+    [R, indef, E, P] = chol_SE(A, 0);
+    t(1) = false;
+catch
+    t(1) = true;
 end
+T = all(t);
+%@eof:11
+
+%@test:12
+% Test 12: Larger 5x5 indefinite matrix
+A = [2 -1 0 0 0; -1 2 -1 0 0; 0 -1 0 -1 0; 0 0 -1 2 -1; 0 0 0 -1 2];
+for piv = 0:1
+    [R, indef, E, P] = chol_SE(A, piv);
+    t(piv+1) = dassert(P'*A*P + diag(E), R'*R, 1e-10);
+    t(piv+3) = dassert(R, triu(R));
+    t(piv+5) = dassert(P*P', eye(5));
+end
+T = all(t);
+%@eof:12
+
+%@test:13
+% Test 13: Nearly singular positive definite matrix
+A = [1 0.999; 0.999 1];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(P'*A*P + diag(E), R'*R, 1e-12);
+t(2) = dassert(R, triu(R));
+T = all(t);
+%@eof:13
+
+%@test:14
+% Test 14: Default pivoting argument (nargin==1)
+A = [4 2; 2 5];
+[R, indef, E, P] = chol_SE(A);
+t(1) = dassert(indef, false);
+t(2) = dassert(P, eye(2));
+t(3) = dassert(R'*R, A, 1e-12);
+T = all(t);
+%@eof:14
+
+%@test:15
+% Test 15: Nearly symmetric matrix (small asymmetry gets symmetrized)
+A = [4 2+1e-10; 2 5];
+[R, indef, E, P] = chol_SE(A, 0);
+t(1) = dassert(indef, false);
+% Should succeed without error after symmetrization
+t(2) = dassert(R, triu(R));
+T = all(t);
+%@eof:15
+
+%@test:16
+% Test 16: 4x4 positive definite matrix with pivoting
+% Verify that pivoting produces correct result for well-conditioned PD matrix
+A = [10 3 2 1; 3 8 1 2; 2 1 6 3; 1 2 3 9];
+[R, indef, E, P] = chol_SE(A, 1);
+t(1) = dassert(indef, false);
+t(2) = dassert(E, zeros(4,1));
+t(3) = dassert(P'*A*P + diag(E), R'*R, 1e-12);
+t(4) = dassert(P*P', eye(4));
+T = all(t);
+%@eof:16
