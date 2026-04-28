@@ -36,6 +36,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 
 #include "dynmex.h"
 
@@ -75,6 +76,16 @@ copy_derivatives(mxArray* destin, const Symmetry& sym, const FGSContainer& deriv
   mxArray* tmp = mxCreateDoubleMatrix(n, m, mxREAL);
   std::ranges::copy_n(x_unfolded->getData().base(), n * m, mxGetDoubles(tmp));
   mxSetField(destin, 0, fieldname, tmp);
+}
+
+void
+copy_derivatives_or_zero(mxArray* destin, const Symmetry& sym, const FGSContainer& derivs,
+                         const char* fieldname, int rows, int cols)
+{
+  if (derivs.check(sym))
+    copy_derivatives(destin, sym, derivs, fieldname);
+  else
+    mxSetField(destin, 0, fieldname, mxCreateDoubleMatrix(rows, cols, mxREAL));
 }
 
 extern "C"
@@ -165,6 +176,33 @@ extern "C"
     const int nExog = get_int_field(M_mx, "exo_nbr");
     const int nEndo = get_int_field(M_mx, "endo_nbr");
     const int nPar = get_int_field(M_mx, "param_nbr");
+
+    const mxArray* skew_e_mx = mxGetField(M_mx, 0, "Skew_e");
+    if (skew_e_mx && !(mxIsDouble(skew_e_mx) && !mxIsComplex(skew_e_mx)
+                       && !mxIsSparse(skew_e_mx) && mxGetN(skew_e_mx) == 4))
+      mexErrMsgTxt("M_.Skew_e should be a real dense matrix with 4 columns");
+
+    std::vector<ThirdMoment> third_moments;
+    if (skew_e_mx)
+      {
+        const size_t nSkewEntries {mxGetM(skew_e_mx)};
+        const double* skew_e {mxGetDoubles(skew_e_mx)};
+        for (size_t r {0}; r < nSkewEntries; r++)
+          {
+            int i {static_cast<int>(skew_e[r]) - 1};
+            int j {static_cast<int>(skew_e[r + nSkewEntries]) - 1};
+            int k {static_cast<int>(skew_e[r + 2 * nSkewEntries]) - 1};
+            double skewness {skew_e[r + 3 * nSkewEntries]};
+
+            if (i < 0 || i >= nExog || j < 0 || j >= nExog || k < 0 || k >= nExog)
+              mexErrMsgTxt("M_.Skew_e contains an invalid exogenous variable index");
+
+            double raw_moment
+                = skewness * std::sqrt(vCov.get(i, i) * vCov.get(j, j) * vCov.get(k, k));
+            if (raw_moment != 0.0)
+              third_moments.push_back({i, j, k, raw_moment});
+          }
+      }
 
     const mxArray* endo_names_mx = mxGetField(M_mx, 0, "endo_names");
     if (!(endo_names_mx && mxIsCell(endo_names_mx)
@@ -261,7 +299,8 @@ extern "C"
                            dr_order);
 
         // construct main K-order approximation class
-        Approximation app(dynare, journal, nSteps, false, pruning, qz_criterium);
+        UNormalMoments shock_moments(kOrder, vCov, third_moments);
+        Approximation app(dynare, journal, nSteps, false, pruning, qz_criterium, shock_moments);
         // run stochastic steady
         app.walkStochSteady();
 
@@ -322,9 +361,10 @@ extern "C"
                order */
             const FGSContainer& derivs = app.get_rule_ders();
 
-            size_t nfields = (kOrder == 1 ? 2 : (kOrder == 2 ? 6 : 12));
+            size_t nfields = (kOrder == 1 ? 2 : (kOrder == 2 ? 6 : 13));
             const char* c_fieldnames[] = {"gy",   "gu",   "gyy",  "gyu",  "guu",  "gss",
-                                          "gyyy", "gyyu", "gyuu", "guuu", "gyss", "guss"};
+                                          "gyyy", "gyyu", "gyuu", "guuu", "gyss", "guss",
+                                          "gsss"};
             plhs[1] = mxCreateStructMatrix(1, 1, nfields, c_fieldnames);
 
             copy_derivatives(plhs[1], Symmetry {1, 0, 0, 0}, derivs, "gy");
@@ -344,6 +384,8 @@ extern "C"
                 copy_derivatives(plhs[1], Symmetry {1, 2, 0, 0}, derivs, "gyuu");
                 copy_derivatives(plhs[1], Symmetry {1, 0, 0, 2}, derivs, "gyss");
                 copy_derivatives(plhs[1], Symmetry {0, 1, 0, 2}, derivs, "guss");
+                copy_derivatives_or_zero(plhs[1], Symmetry {0, 0, 0, 3}, derivs, "gsss", nEndo,
+                                         1);
               }
           }
       }

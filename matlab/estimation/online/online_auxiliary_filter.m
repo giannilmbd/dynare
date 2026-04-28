@@ -48,6 +48,9 @@ bounds = prior_bounds(bayestopt_, options_.prior_trunc); % Reset bounds as lb an
 [~, ~, ReducedForm] = solve_model_for_online_filter(true, xparam1, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
 
 order = options_.order;
+if order == 3 && ~ReducedForm.use_k_order_solver && ~isfield(ReducedForm, 'ghs3')
+    ReducedForm.ghs3 = zeros(size(ReducedForm.steadystate));
+end
 mf0 = ReducedForm.mf0;
 mf1 = ReducedForm.mf1;
 number_of_particles = online_opt.particles;
@@ -147,7 +150,7 @@ for t=1:sample_size
                     if order == 2
                         [tmp,~] = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, yhat_, ReducedForm.steadystate, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
-                        [tmp,~] = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                        [tmp,~] = local_state_space_iteration_3(yhat_, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ReducedForm.ghs3, options_.threads.local_state_space_iteration_3, pruning);
                     else
                     error('Pruning is not available for orders > 3');
                     end
@@ -157,7 +160,7 @@ for t=1:sample_size
                     elseif order == 2
                         tmp = local_state_space_iteration_2(yhat, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, options_.threads.local_state_space_iteration_2);
                     elseif order == 3
-                        tmp = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                        tmp = local_state_space_iteration_3(yhat, zeros(number_of_structural_innovations, 1), ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ReducedForm.ghs3, options_.threads.local_state_space_iteration_3, pruning);
                     else
                         error('Order > 3: use_k_order_solver should be set to true');
                     end
@@ -196,6 +199,9 @@ for t=1:sample_size
                     solve_model_for_online_filter(false, candidate, options_, M_, estim_params_, bayestopt_, bounds, oo_.dr , oo_.steady_state, oo_.exo_steady_state, oo_.exo_det_steady_state);
                 if ~info(1)
                     xparam(:,i) = candidate ;
+                    if order == 3 && ~ReducedForm.use_k_order_solver && ~isfield(ReducedForm, 'ghs3')
+                        ReducedForm.ghs3 = zeros(size(ReducedForm.steadystate));
+                    end
                     if ~ReducedForm.use_k_order_solver
                         if pruning
                             if order == 2
@@ -226,7 +232,7 @@ for t=1:sample_size
                                 [tmp, tmp_] = local_state_space_iteration_2(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, yhat_, ReducedForm.steadystate, options_.threads.local_state_space_iteration_2);
                             elseif order == 3
                                 [tmp, tmp_] = local_state_space_iteration_3(yhat_, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
-                                    ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                                    ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ReducedForm.ghs3, options_.threads.local_state_space_iteration_3, pruning);
                             else
                                 error('Pruning is not available for orders > 3');
                             end
@@ -236,7 +242,7 @@ for t=1:sample_size
                             elseif order == 2
                                 tmp = local_state_space_iteration_2(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.constant, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, options_.threads.local_state_space_iteration_2);
                             elseif order == 3
-                                tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                                tmp = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ReducedForm.steadystate, ReducedForm.ghs3, options_.threads.local_state_space_iteration_3, pruning);
                             else
                                 error('Order > 3: use_k_order_solver should be set to true');
                             end
@@ -367,4 +373,3 @@ for plt = 1:nbplt
         fprintf(fidTeX,' \n');
     end
 end
-

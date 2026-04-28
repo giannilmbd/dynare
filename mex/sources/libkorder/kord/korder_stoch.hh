@@ -139,7 +139,7 @@ IntegDerivs<t>::IntegDerivs(int r, const IntSequence& nvs, const typename ctrait
                   Symmetry sym_mn {i, m + n, 0, k};
                   if (m + n == 0 && g.check(sym_mn))
                     ten->add(mult, g.get(sym_mn));
-                  if (m + n > 0 && KOrder::is_even(m + n) && g.check(sym_mn))
+                  if (m + n > 0 && mom.check(Symmetry {m + n}) && g.check(sym_mn))
                     {
                       typename ctraits<t>::Ttensor gtmp(g.get(sym_mn));
                       gtmp.mult(mult);

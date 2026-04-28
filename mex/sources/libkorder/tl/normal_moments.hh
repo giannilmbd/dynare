@@ -118,13 +118,25 @@
 
 #include "t_container.hh"
 
+#include <vector>
+
+struct ThirdMoment
+{
+  int i;
+  int j;
+  int k;
+  double value;
+};
+
 class UNormalMoments : public TensorContainer<URSingleTensor>
 {
 public:
   UNormalMoments(int maxdim, const TwoDMatrix& v);
+  UNormalMoments(int maxdim, const TwoDMatrix& v, const std::vector<ThirdMoment>& third_moments);
 
 private:
   void generateMoments(int maxdim, const TwoDMatrix& v);
+  void generateThirdMoments(int maxdim, int nv, const std::vector<ThirdMoment>& third_moments);
   static bool selectEquiv(const Equivalence& e);
 };
 

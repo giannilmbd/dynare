@@ -302,6 +302,9 @@ public:
   KOrder(int num_stat, int num_pred, int num_both, int num_forw,
          const TensorContainer<FSSparseTensor>& fcont, const TwoDMatrix& gy, const TwoDMatrix& gu,
          const TwoDMatrix& v, Journal& jr);
+  KOrder(int num_stat, int num_pred, int num_both, int num_forw,
+         const TensorContainer<FSSparseTensor>& fcont, const TwoDMatrix& gy, const TwoDMatrix& gu,
+         const TwoDMatrix& v, const UNormalMoments& moments, Journal& jr);
 
   /* Performs k-order step provided that k=2 or the k−1-th step has been
      run, this is the core method */
@@ -380,6 +383,8 @@ protected:
   // Calculates specified derivatives of G and inserts them to the container
   template<Storage t>
   void fillG(int i, int j, int k);
+  template<Storage t>
+  bool hasMoment(int order) const;
 
   // Calculates Dᵢⱼₖ
   template<Storage t>
@@ -535,7 +540,7 @@ KOrder::recover_ys(int i, int j)
 
   fillG<t>(i, 0, j);
 
-  if (is_even(j))
+  if (hasMoment<t>(j))
     {
       auto G_yisj = faaDiBrunoG<t>(sym);
       auto G_yisj_ptr = G_yisj.get();
@@ -588,7 +593,7 @@ KOrder::recover_yus(int i, int j, int k)
 
   fillG<t>(i, j, k);
 
-  if (is_even(k))
+  if (hasMoment<t>(k))
     {
       auto G_yiujsk = faaDiBrunoG<t>(sym);
       auto G_yiujsk_ptr = G_yiujsk.get();
@@ -646,7 +651,7 @@ KOrder::recover_s(int i)
 
   fillG<t>(0, 0, i);
 
-  if (is_even(i))
+  if (hasMoment<t>(i))
     {
       auto G_si = faaDiBrunoG<t>(sym);
       auto G_si_ptr = G_si.get();
@@ -683,18 +688,25 @@ void
 KOrder::fillG(int i, int j, int k)
 {
   for (int m = 1; m <= k; m++)
-    if (is_even(k - m))
+    if (k == m || hasMoment<t>(k - m))
       {
         auto G_yiujupms = faaDiBrunoG<t>(Symmetry {i, j, m, k - m});
         G<t>().insert(std::move(G_yiujupms));
       }
 }
 
+template<Storage t>
+bool
+KOrder::hasMoment(int order) const
+{
+  return order > 0 && m<t>().check(Symmetry {order});
+}
+
 /* Here we calculate:
 
     [Dᵢⱼₖ]_α₁…αᵢβ₁…βⱼ = [F_yⁱuʲu′ᵏ]_α₁…αᵢβ₁…βⱼγ₁…γₖ [Σ]^γ₁…γₖ
 
-   So it is non zero only for even k. */
+   So it is non zero only if the k-th unconditional innovation moment is present. */
 
 template<Storage t>
 typename ctraits<t>::Ttensor
@@ -702,7 +714,7 @@ KOrder::calcD_ijk(int i, int j, int k) const
 {
   typename ctraits<t>::Ttensor res(ny, TensorDimens(Symmetry {i, j, 0, 0}, nvs));
   res.zeros();
-  if (is_even(k))
+  if (hasMoment<t>(k))
     {
       auto tmp = faaDiBrunoZ<t>(Symmetry {i, j, k, 0});
       tmp->contractAndAdd(2, res, m<t>().get(Symmetry {k}));
@@ -714,7 +726,7 @@ KOrder::calcD_ijk(int i, int j, int k) const
                         ₖ₋₁ ⎛k⎞
     [Eᵢⱼₖ]_α₁…αᵢβ₁…βⱼ =  ∑  ⎝m⎠ [F_yⁱuʲu′ᵐσᵏ⁻ᵐ]_α₁…αᵢβ₁…βⱼγ₁…γₘ [Σ]^γ₁…γₘ
                         ᵐ⁼¹
-   The sum can sum only for even m. */
+   The sum can sum only over unconditional innovation moments that are present. */
 
 template<Storage t>
 typename ctraits<t>::Ttensor
@@ -722,12 +734,13 @@ KOrder::calcE_ijk(int i, int j, int k) const
 {
   typename ctraits<t>::Ttensor res(ny, TensorDimens(Symmetry {i, j, 0, 0}, nvs));
   res.zeros();
-  for (int n = 2; n <= k - 1; n += 2)
-    {
-      auto tmp = faaDiBrunoZ<t>(Symmetry {i, j, n, k - n});
-      tmp->mult(static_cast<double>(PascalTriangle::noverk(k, n)));
-      tmp->contractAndAdd(2, res, m<t>().get(Symmetry {n}));
-    }
+  for (int n = 1; n <= k - 1; n++)
+    if (hasMoment<t>(n))
+      {
+        auto tmp = faaDiBrunoZ<t>(Symmetry {i, j, n, k - n});
+        tmp->mult(static_cast<double>(PascalTriangle::noverk(k, n)));
+        tmp->contractAndAdd(2, res, m<t>().get(Symmetry {n}));
+      }
   return res;
 }
 
@@ -871,7 +884,7 @@ KOrder::calcStochShift(int order, double sigma) const
   res.zeros();
   int jfac = 1;
   for (int j = 1; j <= order; j++, jfac *= j)
-    if (is_even(j))
+    if (hasMoment<t>(j))
       {
         auto ten = calcD_k<t>(j);
         res.add(std::pow(sigma, j) / jfac, ten.getData());

@@ -292,6 +292,15 @@ KOrder::m<Storage::fold>() const
 KOrder::KOrder(int num_stat, int num_pred, int num_both, int num_forw,
                const TensorContainer<FSSparseTensor>& fcont, const TwoDMatrix& gy,
                const TwoDMatrix& gu, const TwoDMatrix& v, Journal& jr) :
+    KOrder(num_stat, num_pred, num_both, num_forw, fcont, gy, gu, v,
+           UNormalMoments(fcont.getMaxDim(), v), jr)
+{
+}
+
+KOrder::KOrder(int num_stat, int num_pred, int num_both, int num_forw,
+               const TensorContainer<FSSparseTensor>& fcont, const TwoDMatrix& gy,
+               const TwoDMatrix& gu, const TwoDMatrix& v, const UNormalMoments& moments,
+               Journal& jr) :
     ypart(num_stat, num_pred, num_both, num_forw),
     ny(ypart.ny()),
     nu(gu.ncols()),
@@ -309,7 +318,7 @@ KOrder::KOrder(int num_stat, int num_pred, int num_both, int num_forw,
     _fZstack(&_fG, ypart.nyss(), &_fg, ny, ypart.nys(), nu),
     _uGstack(&_ugs, ypart.nys(), nu),
     _fGstack(&_fgs, ypart.nys(), nu),
-    _um(maxk, v),
+    _um(moments),
     _fm(_um),
     f(fcont),
     matA(f.get(Symmetry {1}), _uZstack.getStackSizes(), gy, ypart),

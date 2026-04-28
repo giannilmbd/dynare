@@ -51,10 +51,17 @@ ZAuxContainer::getType(int i, const Symmetry& s) const
 
 Approximation::Approximation(DynamicModel& m, Journal& j, int ns, bool dr_centr, bool pruned_dr,
                              double qz_crit) :
+    Approximation(m, j, ns, dr_centr, pruned_dr, qz_crit, UNormalMoments(m.order(), m.getVcov()))
+{
+}
+
+Approximation::Approximation(DynamicModel& m, Journal& j, int ns, bool dr_centr, bool pruned_dr,
+                             double qz_crit, const UNormalMoments& moments) :
     model(m),
     journal(j),
     ypart(model.nstat(), model.npred(), model.nboth(), model.nforw()),
-    mom(UNormalMoments(model.order(), model.getVcov())),
+    umom(moments),
+    mom(umom),
     nvs {ypart.nys(), model.nexog(), model.nexog(), 1},
     steps(ns),
     dr_centralize(dr_centr),
@@ -107,7 +114,8 @@ Approximation::approxAtSteady()
   if (model.order() >= 2)
     {
       KOrder korder(model.nstat(), model.npred(), model.nboth(), model.nforw(),
-                    model.getModelDerivatives(), fo.getGy(), fo.getGu(), model.getVcov(), journal);
+                    model.getModelDerivatives(), fo.getGy(), fo.getGu(), model.getVcov(),
+                    umom, journal);
       korder.switchToFolded();
       for (int k = 2; k <= model.order(); k++)
         korder.performStep<Storage::fold>(k);
@@ -300,7 +308,7 @@ Approximation::calcStochShift(Vector& out, double at_sigma) const
 
   int dfac = 1;
   for (int d = 1; d <= rule_ders->getMaxDim(); d++, dfac *= d)
-    if (KOrder::is_even(d))
+    if (mom.check(Symmetry {d}))
       {
         Symmetry sym {0, d, 0, 0};
 

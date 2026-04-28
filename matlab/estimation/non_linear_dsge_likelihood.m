@@ -152,6 +152,11 @@ else
         ReducedForm.ghxuu = dr.ghxuu(restrict_variables_idx,:);
         ReducedForm.ghxss = dr.ghxss(restrict_variables_idx,:);
         ReducedForm.ghuss = dr.ghuss(restrict_variables_idx,:);
+        if isfield(dr, 'ghs3')
+            ReducedForm.ghs3 = dr.ghs3(restrict_variables_idx,:);
+        else
+            ReducedForm.ghs3 = zeros(length(restrict_variables_idx), 1);
+        end
     end
 end
 

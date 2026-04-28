@@ -129,6 +129,7 @@ class Approximation
   std::unique_ptr<UnfoldDecisionRule> udr;
   std::unique_ptr<UnfoldDecisionRule> udr_pruning;
   const PartitionY ypart;
+  const UNormalMoments umom;
   const FNormalMoments mom;
   IntSequence nvs;
   int steps;
@@ -139,6 +140,8 @@ class Approximation
 
 public:
   Approximation(DynamicModel& m, Journal& j, int ns, bool dr_centr, bool pruning, double qz_crit);
+  Approximation(DynamicModel& m, Journal& j, int ns, bool dr_centr, bool pruning, double qz_crit,
+                const UNormalMoments& moments);
 
   [[nodiscard]] const FoldDecisionRule& getFoldDecisionRule() const;
   [[nodiscard]] const UnfoldDecisionRule& getUnfoldDecisionRulePruning() const;

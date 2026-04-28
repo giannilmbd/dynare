@@ -25,7 +25,7 @@ module pparticle_3
    type tdata_3
       integer :: n, m, s, q, numthreads, xx_size, uu_size, xxx_size, uuu_size
       real(real64), pointer, contiguous :: e(:,:), ghx(:,:), ghu(:,:), &
-     &ghxu(:,:), ghxx(:,:), ghuu(:,:), ghs2(:), &
+     &ghxu(:,:), ghxx(:,:), ghuu(:,:), ghs2(:), ghs3(:), &
      &ghxxx(:,:), ghuuu(:,:), ghxxu(:,:), ghxuu(:,:), ghxss(:,:), ghuss(:,:), &
      &ss(:), y3(:,:)
       real(real64), pointer :: yhat3(:,:), yhat2(:,:), yhat1(:,:), ylat3(:,:), &
@@ -36,13 +36,14 @@ module pparticle_3
    end type tdata_3
 
    type(tdata_3) :: td3
+   real(real64), allocatable, target :: zero_ghs3(:)
 
 contains
 
    ! Fills y3 as y3 = ybar + ½ghss + ghx·ŷ+ghu·ε + ½ghxx·ŷ⊗ŷ + ½ghuu·ε⊗ε +
    !                  ghxu·ŷ⊗ε + (1/6)·ghxxx ŷ⊗ŷ⊗ŷ + (1/6)·ghuuu·ε⊗ε⊗ε +
    !                  (3/6)·ghxxu·ŷ⊗ŷ⊗ε + (3/6)·ghxuu·ŷ⊗ε⊗ε +
-   !                  (3/6)·ghxss·ŷ + (3/6)·ghuss·ε
+   !                  (3/6)·ghxss·ŷ + (3/6)·ghuss·ε + (1/6)·ghsss
    ! in td3
    subroutine thread_eval_3(arg) bind(c)
       type(c_ptr), intent(in), value :: arg
@@ -66,7 +67,7 @@ contains
       do is=start,end
          do im=1,td3%m
             ! y3 = ybar + ½ghss
-            td3%y3(im,is) = td3%ss(im)+0.5_real64*td3%ghs2(im)
+            td3%y3(im,is) = td3%ss(im)+0.5_real64*td3%ghs2(im)+(1._real64/6._real64)*td3%ghs3(im)
             ! y3 += ghx·ŷ+(3/6)·ghxss·ŷ + first n folded indices for ½ghxx·ŷ⊗ŷ
             ! + first n folded indices for (1/6)ghxxx·ŷ⊗ŷ⊗ŷ
             do j=1,td3%n
@@ -158,7 +159,7 @@ contains
    ! ylat2 = ½ghss + ghx·ŷ2 + ½ghxx·ŷ1⊗ŷ1 + ½ghuu·ε⊗ε + ghxu·ŷ1⊗ε
    ! ylat3 = ghx·ŷ3 + ghxx·ŷ1⊗ŷ2 + ghxu·ŷ2⊗ε + (1/6)·ghxxx·ŷ1⊗ŷ1⊗ŷ1
    !         + (1/6)·ghuuu·ε⊗ε⊗ε + (3/6)·ghxxu·ŷ1⊗ŷ1⊗ε
-   !         + (3/6)·ghxuu·ŷ1⊗ε⊗ε + (3/6)·ghxss·ŷ1 + (3/6)·ghuss·ε
+   !         + (3/6)·ghxuu·ŷ1⊗ε⊗ε + (3/6)·ghxss·ŷ1 + (3/6)·ghuss·ε + (1/6)·ghsss
    ! y3 = ybar + ylat1 + ylat2 + ylat3
    ! in td3
    subroutine thread_eval_3_pruning(arg) bind(c)
@@ -186,7 +187,7 @@ contains
             ! y3 = 0
             td3%ylat1(im,is) = td3%ss(im)
             td3%ylat2(im,is) = td3%ss(im)+0.5_real64*td3%ghs2(im)
-            td3%ylat3(im,is) = td3%ss(im)
+            td3%ylat3(im,is) = td3%ss(im)+(1._real64/6._real64)*td3%ghs3(im)
             ! y1 += ghx·ŷ1
             ! y2 += ghx·ŷ2 + first n folded indices for ½ghxx·ŷ1⊗ŷ1
             ! y3 += ghx·ŷ3 +(3/6)·ghxss·ŷ1
@@ -342,8 +343,10 @@ end module pparticle_3
 ! prhs[13] ghxss        [double]  m×n array, third order reduced form.
 ! prhs[14] ghuss        [double]  m×q array, third order reduced form.
 ! prhs[15] ss           [double]  m×1 array, deterministic steady state
-! prhs[16] numthreads   [double]  num of threads
-! prhs[17] pruning      [double]  pruning option
+! prhs[16] ghs3         [double]  m×1 array, third order reduced form (optional)
+! prhs[17] numthreads   [double]  num of threads if ghs3 is provided
+! prhs[18] pruning      [double]  pruning option if ghs3 is provided
+! If prhs[16] is omitted, prhs[16] is numthreads, prhs[17] is pruning, and ghs3 is zero.
 !
 ! Output:
 ! plhs[1] y3             [double]  m×s array, time t+1 particles.
@@ -363,7 +366,7 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    type(c_ptr), dimension(*), intent(in) :: prhs
    type(c_ptr), dimension(*), intent(out) :: plhs
    integer(c_int), intent(in), value :: nlhs, nrhs
-   integer :: n, m, s, q, numthreads
+   integer :: n, m, s, q, numthreads, ghs3_arg, numthreads_arg, pruning_arg, matrix_arg_count
    real(real64), pointer, contiguous :: ghx(:,:), ghu(:,:), ghxx(:,:), &
   &ghuu(:,:), ghxu(:,:), ghxxx(:,:), ghuuu(:,:), ghxxu(:,:),  &
   &ghxuu(:,:), ghxss(:,:), ghuss(:,:), yhatlat(:,:), ylat(:,:)
@@ -379,9 +382,21 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    logical :: pruning
 
    ! 0. Checking the consistency and validity of input arguments
-   if (nrhs /= 17) call mexErrMsgTxt("Must have exactly 17 inputs")
+   if (nrhs /= 17 .and. nrhs /= 18) call mexErrMsgTxt("Must have exactly 17 or 18 inputs")
 
-   do i=1,15
+   if (nrhs == 18) then
+      ghs3_arg = 16
+      numthreads_arg = 17
+      pruning_arg = 18
+      matrix_arg_count = 16
+   else
+      ghs3_arg = 0
+      numthreads_arg = 16
+      pruning_arg = 17
+      matrix_arg_count = 15
+   end if
+
+   do i=1,matrix_arg_count
       if (.not. (c_associated(prhs(i)) .and. mxIsDouble(prhs(i)) .and. &
           (.not. mxIsComplex(prhs(i))) .and. (.not. mxIsSparse(prhs(i))))) then
          write (arg_nber,"(i2)") i
@@ -389,16 +404,23 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
       end if
    end do
 
-   if (.not. (c_associated(prhs(16)) .and. mxIsScalar(prhs(16)) .and. &
-       mxIsNumeric(prhs(16)))) &
-       call mexErrMsgTxt("Argument 16 should be a numeric scalar")
-   numthreads = int(mxGetScalar(prhs(16)))
-   if (numthreads <= 0) call mexErrMsgTxt("Argument 16 should be a positive integer")
+   if (.not. (c_associated(prhs(numthreads_arg)) .and. mxIsScalar(prhs(numthreads_arg)) .and. &
+       mxIsNumeric(prhs(numthreads_arg)))) then
+      write (arg_nber,"(i2)") numthreads_arg
+      call mexErrMsgTxt("Argument " // trim(arg_nber) // " should be a numeric scalar")
+   end if
+   numthreads = int(mxGetScalar(prhs(numthreads_arg)))
+   if (numthreads <= 0) then
+      write (arg_nber,"(i2)") numthreads_arg
+      call mexErrMsgTxt("Argument " // trim(arg_nber) // " should be a positive integer")
+   end if
    td3%numthreads = numthreads
 
-   if (.not. (c_associated(prhs(17)) .and. mxIsLogicalScalar(prhs(17)))) &
-        call mexErrMsgTxt("Argument 17 should be a logical scalar")
-   pruning = mxGetScalar(prhs(17)) == 1._c_double
+   if (.not. (c_associated(prhs(pruning_arg)) .and. mxIsLogicalScalar(prhs(pruning_arg)))) then
+      write (arg_nber,"(i2)") pruning_arg
+      call mexErrMsgTxt("Argument " // trim(arg_nber) // " should be a logical scalar")
+   end if
+   pruning = mxGetScalar(prhs(pruning_arg)) == 1._c_double
 
    if (pruning) then
       if (nlhs /= 2) call mexErrMsgTxt("Must have exactly two output arguments with pruning.")
@@ -442,7 +464,8 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
         .or. n /= mxGetN(prhs(13))     &  ! Number of columns for ghxss
         .or. m /= mxGetM(prhs(14))     &  ! Number of rows for ghuss
         .or. q /= mxGetN(prhs(14))     &  ! Number of columns for ghuss
-        .or. m /= mxGetM(prhs(15)))    &  ! Number of rows for ss
+        .or. m /= mxGetM(prhs(15))     &  ! Number of rows for ss
+        .or. (ghs3_arg /= 0 .and. m /= mxGetM(prhs(ghs3_arg)))) &  ! Number of rows for ghs3
         call mexErrMsgTxt("Input dimension mismatch")
 
    ! 1. Getting relevant information to take advantage of symmetries
@@ -508,6 +531,14 @@ subroutine mexFunction(nlhs, plhs, nrhs, prhs) bind(c, name='mexFunction')
    ghxss(1:m,1:n) => mxGetDoubles(prhs(13))
    ghuss(1:m,1:q) => mxGetDoubles(prhs(14))
    td3%ss => mxGetDoubles(prhs(15))
+   if (ghs3_arg /= 0) then
+      td3%ghs3 => mxGetDoubles(prhs(ghs3_arg))
+   else
+      if (allocated(zero_ghs3) .and. size(zero_ghs3) /= m) deallocate(zero_ghs3)
+      if (.not. allocated(zero_ghs3)) allocate(zero_ghs3(m))
+      zero_ghs3 = 0._real64
+      td3%ghs3 => zero_ghs3
+   end if
 
    ! Getting a transposed folded copy of the unfolded tensors
    ! for future loops to be more efficient

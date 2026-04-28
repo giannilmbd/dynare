@@ -87,4 +87,5 @@ if order >= 3
     dr.ghuuu = dyn_derivs.guuu;
     dr.ghxss = dyn_derivs.gyss;
     dr.ghuss = dyn_derivs.guss;
+    dr.ghs3 = dyn_derivs.gsss;
 end

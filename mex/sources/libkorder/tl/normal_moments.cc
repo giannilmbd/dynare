@@ -19,6 +19,7 @@
  */
 
 #include <memory>
+#include <array>
 
 #include "kron_prod.hh"
 #include "normal_moments.hh"
@@ -29,6 +30,39 @@ UNormalMoments::UNormalMoments(int maxdim, const TwoDMatrix& v) : TensorContaine
 {
   if (maxdim >= 2)
     generateMoments(maxdim, v);
+}
+
+UNormalMoments::UNormalMoments(int maxdim, const TwoDMatrix& v,
+                               const std::vector<ThirdMoment>& third_moments) :
+    UNormalMoments(maxdim, v)
+{
+  generateThirdMoments(maxdim, v.nrows(), third_moments);
+}
+
+void
+UNormalMoments::generateThirdMoments(int maxdim, int nv,
+                                     const std::vector<ThirdMoment>& third_moments)
+{
+  if (maxdim < 3 || third_moments.empty())
+    return;
+
+  auto mom3 = std::make_unique<URSingleTensor>(nv, 3);
+  mom3->zeros();
+
+  for (const auto& [i, j, k, value] : third_moments)
+    {
+      const std::array<IntSequence, 6> permutations {
+          IntSequence {i, j, k}, IntSequence {i, k, j}, IntSequence {j, i, k},
+          IntSequence {j, k, i}, IntSequence {k, i, j}, IntSequence {k, j, i}};
+
+      for (const auto& permutation : permutations)
+        {
+          Tensor::index idx(*mom3, permutation);
+          mom3->getData()[*idx] = value;
+        }
+    }
+
+  insert(std::move(mom3));
 }
 
 /* Here we fill up the container with the tensors for d=2,4,6,… up to the given

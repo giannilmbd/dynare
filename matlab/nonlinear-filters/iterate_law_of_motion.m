@@ -31,6 +31,9 @@ end
 if use_k_order_solver
     x_t_plus_1 = local_state_space_iteration_k(yhat, zeros(number_of_structural_innovations, 1), ReducedForm.dr, M_, options_, ReducedForm.udr);
 else
+    if options_.order == 3 && ~isfield(ReducedForm, 'ghs3')
+        ReducedForm.ghs3 = zeros(size(ReducedForm.steadystate));
+    end
     if options_.order == 1
         x_t_plus_1 = bsxfun(@plus,ReducedForm.constant,ReducedForm.ghx*yhat)+ReducedForm.ghu*epsilon;
     else
@@ -45,7 +48,7 @@ else
                 [x_t_plus_1, x_t_plus_1_pruned_state_space]= local_state_space_iteration_3(yhat_pruned_state_space, epsilon, ReducedForm.ghx, ReducedForm.ghu, ...
                     ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
                     ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ...
-                    ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                    ReducedForm.steadystate, ReducedForm.ghs3, options_.threads.local_state_space_iteration_3, pruning);
             else
                 error('Pruning is not available for orders > 3');
             end
@@ -57,7 +60,7 @@ else
                 x_t_plus_1 = local_state_space_iteration_3(yhat, epsilon, ReducedForm.ghx, ReducedForm.ghu, ...
                     ReducedForm.ghxx, ReducedForm.ghuu, ReducedForm.ghxu, ReducedForm.ghs2, ...
                     ReducedForm.ghxxx, ReducedForm.ghuuu, ReducedForm.ghxxu, ReducedForm.ghxuu, ReducedForm.ghxss, ReducedForm.ghuss, ...
-                    ReducedForm.steadystate, options_.threads.local_state_space_iteration_3, pruning);
+                    ReducedForm.steadystate, ReducedForm.ghs3, options_.threads.local_state_space_iteration_3, pruning);
             else
                 error('Order > 3: use_k_order_solver should be set to true');
             end
