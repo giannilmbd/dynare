@@ -44,7 +44,7 @@ GeneralMatrix::GeneralMatrix(const ConstGeneralMatrix& m) :
 }
 
 GeneralMatrix::GeneralMatrix(const GeneralMatrix& m, int i, int j, int nrows, int ncols) :
-    data(nrows * ncols), rows(nrows), cols(ncols), ld(nrows)
+    data(matrix_size(nrows, ncols)), rows(nrows), cols(ncols), ld(nrows)
 {
   copy(m, i, j);
 }

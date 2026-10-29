@@ -25,9 +25,23 @@
 #include "Vector.hh"
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
+
+/* Number of elements of an m×n matrix. Lengths and offsets are stored as int
+   in this library, so a matrix with more than INT_MAX elements cannot be
+   represented. */
+inline int
+matrix_size(int m, int n)
+{
+  long long size = static_cast<long long>(m) * n;
+  if (m < 0 || n < 0 || size > std::numeric_limits<int>::max())
+    throw SYLV_MES_EXCEPTION("Cannot allocate a " + std::to_string(m) + "×" + std::to_string(n)
+                             + " matrix: the number of elements exceeds 2^31-1");
+  return static_cast<int>(size);
+}
 
 template<class T>
 class TransposedMatrix
@@ -201,7 +215,7 @@ protected:
   int ld;
 
 public:
-  GeneralMatrix(int m, int n) : data(m * n), rows(m), cols(n), ld(m)
+  GeneralMatrix(int m, int n) : data(matrix_size(m, n)), rows(m), cols(n), ld(m)
   {
   }
   GeneralMatrix(Vector d, int m, int n) : data(std::move(d)), rows(m), cols(n), ld(m)

@@ -31,6 +31,8 @@
 
 #include <dynmex.h>
 
+#include "SylvException.hh"
+
 class GeneralMatrix;
 class ConstVector;
 
@@ -48,8 +50,10 @@ public:
   Vector() : data {nullptr}, destroy {false}
   {
   }
-  Vector(int l) : len {l}, data {new double[l]}
+  Vector(int l) : len {l}, data {l >= 0 ? new double[l] : nullptr}
   {
+    if (l < 0)
+      throw SYLV_MES_EXCEPTION("Cannot allocate a vector of negative length");
   }
   Vector(Vector& v) : len {v.len}, s {v.s}, data {v.data}, destroy {false}
   {

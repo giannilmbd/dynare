@@ -22,6 +22,7 @@
 #include "ps_tensor.hh"
 #include "pyramid_prod2.hh"
 
+#include <limits>
 #include <memory>
 
 // FoldedStackContainer::multAndAdd() sparse code
@@ -169,15 +170,25 @@ FoldedStackContainer::multAndAddSparse2(const FSSparseTensor& t, FGSTensor& out)
 
    Further, we take only nonzero rows of the slice, and accordingly of
    the out tensor. We jump over zero initial rows and drop zero tailing
-   rows. */
+   rows.
+
+   The dense multAndAddStacks() unfolds the slice, so the dense version is
+   used only if the unfolded slice has at most INT_MAX elements (the maximal
+   size of a matrix in the library). */
 
 void
 WorkerFoldMAASparse2::operator()(std::mutex& mut)
 {
-  GSSparseTensor slice(t, cont.getStackSizes(), coor, TensorDimens(cont.getStackSizes(), coor));
+  TensorDimens tdims(cont.getStackSizes(), coor);
+  GSSparseTensor slice(t, cont.getStackSizes(), coor, tdims);
   if (slice.getNumNonZero())
     {
-      if (slice.getUnfoldIndexFillFactor() > FoldedStackContainer::fill_threshold)
+      long long unfold_size = slice.getLastNonZeroRow() - slice.getFirstNonZeroRow() + 1;
+      const IntSequence& nvx = tdims.getNVX();
+      for (int i = 0; i < nvx.size(); i++)
+        unfold_size *= nvx[i];
+      if (slice.getUnfoldIndexFillFactor() > FoldedStackContainer::fill_threshold
+          && unfold_size <= std::numeric_limits<int>::max())
         {
           FGSTensor dense_slice(slice);
           int r1 = slice.getFirstNonZeroRow();

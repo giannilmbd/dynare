@@ -31,7 +31,8 @@
 std::vector<double>
 skewNormalRawMoments(double variance, double skewness, int maxdim)
 {
-  TL_RAISE_IF(variance < 0, "Variance of a skew normal variable must be non-negative");
+  if (variance < 0)
+    TL_RAISE("Variance of a skew normal variable must be non-negative");
   constexpr double pi = std::numbers::pi;
   const double c = std::sqrt(2 / pi);
 
@@ -42,8 +43,8 @@ skewNormalRawMoments(double variance, double skewness, int maxdim)
       delta = std::copysign(std::sqrt(pi / 2 * s23 / (s23 + std::pow((4 - pi) / 2, 2.0 / 3.0))),
                             skewness);
     }
-  TL_RAISE_IF(std::abs(delta) >= 1,
-              "Skewness of a skew normal variable must be smaller than 0.9953 in absolute value");
+  if (std::abs(delta) >= 1)
+    TL_RAISE("Skewness of a skew normal variable must be smaller than 0.9953 in absolute value");
   const double omega = std::sqrt(variance / (1 - 2 / pi * delta * delta));
   const double sd1 = std::sqrt(1 - delta * delta);
 
@@ -110,8 +111,8 @@ UNormalMoments::generateIndependentMoments(int maxdim,
 {
   int nv = raw_moments.size();
   for (const auto& m : raw_moments)
-    TL_RAISE_IF(static_cast<int>(m.size()) <= maxdim,
-                "Not enough raw moments in UNormalMoments constructor");
+    if (static_cast<int>(m.size()) <= maxdim)
+      TL_RAISE("Not enough raw moments in UNormalMoments constructor");
 
   std::vector<int> count(nv);
   for (int d = 2; d <= maxdim; d++)

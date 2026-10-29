@@ -20,7 +20,9 @@
 #include <algorithm>
 #include <cassert>
 #include <condition_variable>
+#include <exception>
 #include <map>
+#include <utility>
 
 #include "thread_pool.hh"
 
@@ -44,6 +46,7 @@ std::condition_variable_any thread_cv;   // Threads wait on this one
 std::condition_variable_any director_cv; // The director waits on this one
 std::map<job*, status> job_group_status;
 std::mutex job_group_mut; // Shared by jobs in the job group
+std::exception_ptr job_group_exception; // First exception thrown by a job of the group
 
 std::vector<std::jthread> threads;
 } // End of unnamed namespace
@@ -94,8 +97,21 @@ initialize(int thread_number)
         if (thread_cv.wait(lk, stoken, pick_job))
           {
             lk.unlock();
-            selected_job->operator()(job_group_mut);
+            /* An exception must not escape the thread (it would call std::terminate()); it is
+               stored and rethrown by run() in the calling thread. */
+            std::exception_ptr eptr;
+            try
+              {
+                selected_job->operator()(job_group_mut);
+              }
+            catch (...)
+              {
+                eptr = std::current_exception();
+              }
             lk.lock();
+
+            if (eptr && !job_group_exception)
+              job_group_exception = eptr;
 
             *selected_job_status = status::done;
 
@@ -130,5 +146,8 @@ run(const job_group_t& job_group)
   });
 
   job_group_status.clear();
+
+  if (job_group_exception)
+    std::rethrow_exception(std::exchange(job_group_exception, nullptr));
 }
 }
