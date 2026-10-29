@@ -18,13 +18,75 @@
  * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <cmath>
 #include <memory>
-#include <array>
+#include <numbers>
 
 #include "kron_prod.hh"
 #include "normal_moments.hh"
 #include "permutation.hh"
 #include "tl_static.hh"
+
+std::vector<double>
+skewNormalRawMoments(double variance, double skewness, int maxdim)
+{
+  TL_RAISE_IF(variance < 0, "Variance of a skew normal variable must be non-negative");
+  constexpr double pi = std::numbers::pi;
+  const double c = std::sqrt(2 / pi);
+
+  double delta = 0;
+  if (skewness != 0)
+    {
+      const double s23 = std::pow(std::abs(skewness), 2.0 / 3.0);
+      delta = std::copysign(std::sqrt(pi / 2 * s23 / (s23 + std::pow((4 - pi) / 2, 2.0 / 3.0))),
+                            skewness);
+    }
+  TL_RAISE_IF(std::abs(delta) >= 1,
+              "Skewness of a skew normal variable must be smaller than 0.9953 in absolute value");
+  const double omega = std::sqrt(variance / (1 - 2 / pi * delta * delta));
+  const double sd1 = std::sqrt(1 - delta * delta);
+
+  // binom[n][k] = C(n,k)
+  std::vector<std::vector<double>> binom(maxdim + 1, std::vector<double>(maxdim + 1, 0));
+  for (int n = 0; n <= maxdim; n++)
+    {
+      binom[n][0] = 1;
+      for (int k = 1; k <= n; k++)
+        binom[n][k] = binom[n - 1][k - 1] + (k < n ? binom[n - 1][k] : 0);
+    }
+
+  // E|U₀|ⁱ = 2^{i/2}·Γ((i+1)/2)/√π, and E[(√(1−δ²)·U₁)ⁿ] = (1−δ²)^{n/2}·(n−1)!! for even n
+  std::vector<double> abs_mom(maxdim + 1), mom_b(maxdim + 1, 0);
+  for (int i = 0; i <= maxdim; i++)
+    abs_mom[i] = std::pow(2, i / 2.0) * std::tgamma((i + 1) / 2.0) / std::sqrt(pi);
+  mom_b[0] = 1;
+  for (int n = 2; n <= maxdim; n += 2)
+    mom_b[n] = mom_b[n - 2] * (n - 1) * sd1 * sd1;
+
+  // E[(δ·(|U₀|−√(2/π)))ʲ]
+  std::vector<double> mom_a(maxdim + 1, 0);
+  for (int j = 0; j <= maxdim; j++)
+    {
+      double sum = 0;
+      for (int i = 0; i <= j; i++)
+        sum += binom[j][i] * abs_mom[i] * std::pow(-c, j - i);
+      mom_a[j] = std::pow(delta, j) * sum;
+    }
+
+  std::vector<double> res(maxdim + 1, 0);
+  for (int d = 0; d <= maxdim; d++)
+    {
+      double sum = 0;
+      for (int j = 0; j <= d; j++)
+        sum += binom[d][j] * mom_a[j] * mom_b[d - j];
+      res[d] = std::pow(omega, d) * sum;
+    }
+  // The mean is zero by construction
+  if (maxdim >= 1)
+    res[1] = 0;
+  return res;
+}
 
 UNormalMoments::UNormalMoments(int maxdim, const TwoDMatrix& v) : TensorContainer<URSingleTensor>(1)
 {
@@ -32,37 +94,45 @@ UNormalMoments::UNormalMoments(int maxdim, const TwoDMatrix& v) : TensorContaine
     generateMoments(maxdim, v);
 }
 
-UNormalMoments::UNormalMoments(int maxdim, const TwoDMatrix& v,
-                               const std::vector<ThirdMoment>& third_moments) :
-    UNormalMoments(maxdim, v)
+UNormalMoments::UNormalMoments(int maxdim, const std::vector<std::vector<double>>& raw_moments) :
+    TensorContainer<URSingleTensor>(1)
 {
-  generateThirdMoments(maxdim, v.nrows(), third_moments);
+  if (maxdim >= 2)
+    generateIndependentMoments(maxdim, raw_moments);
 }
 
+/* For independent components, E[u_{i₁}·…·u_{i_d}] is the product over the
+   components i of E[uᵢ^{nᵢ}], where nᵢ is the number of occurrences of i in
+   the index (i₁,…,i_d). */
 void
-UNormalMoments::generateThirdMoments(int maxdim, int nv,
-                                     const std::vector<ThirdMoment>& third_moments)
+UNormalMoments::generateIndependentMoments(int maxdim,
+                                           const std::vector<std::vector<double>>& raw_moments)
 {
-  if (maxdim < 3 || third_moments.empty())
-    return;
+  int nv = raw_moments.size();
+  for (const auto& m : raw_moments)
+    TL_RAISE_IF(static_cast<int>(m.size()) <= maxdim,
+                "Not enough raw moments in UNormalMoments constructor");
 
-  auto mom3 = std::make_unique<URSingleTensor>(nv, 3);
-  mom3->zeros();
-
-  for (const auto& [i, j, k, value] : third_moments)
+  std::vector<int> count(nv);
+  for (int d = 2; d <= maxdim; d++)
     {
-      const std::array<IntSequence, 6> permutations {
-          IntSequence {i, j, k}, IntSequence {i, k, j}, IntSequence {j, i, k},
-          IntSequence {j, k, i}, IntSequence {k, i, j}, IntSequence {k, j, i}};
-
-      for (const auto& permutation : permutations)
+      auto mom = std::make_unique<URSingleTensor>(nv, d);
+      bool nonzero = false;
+      for (Tensor::index it = mom->begin(); it != mom->end(); ++it)
         {
-          Tensor::index idx(*mom3, permutation);
-          mom3->getData()[*idx] = value;
+          std::fill(count.begin(), count.end(), 0);
+          const IntSequence& coor = it.getCoor();
+          for (int m = 0; m < d; m++)
+            count[coor[m]]++;
+          double val = 1;
+          for (int i = 0; i < nv && val != 0; i++)
+            val *= raw_moments[i][count[i]];
+          mom->get(*it, 0) = val;
+          nonzero = nonzero || val != 0;
         }
+      if (nonzero)
+        insert(std::move(mom));
     }
-
-  insert(std::move(mom3));
 }
 
 /* Here we fill up the container with the tensors for d=2,4,6,… up to the given

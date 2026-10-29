@@ -16,29 +16,36 @@ solution. This affected the stochastic constant, especially for forward-looking 
 
 ## Main Idea
 
-The fix is to treat the third unconditional innovation moment as another shock moment available to
-the k-order recursions.
-
-For a skewed shock entry
-
-```matlab
-M_.Skew_e(row,:) = [i, j, k, skewness]
-```
-
-the C++ MEX bridge converts the standardized skewness into a raw third moment using
-
-```cpp
-raw_moment = skewness * sqrt(Sigma_e(i,i) * Sigma_e(j,j) * Sigma_e(k,k));
-```
-
-For diagonal skew normal shocks this reduces to
+Skewed shocks declared with `skew` in the `shocks` block are independent skew normal variables, as in
+`matlab/distributions/closed_skew_normal/csn_update_specification.m`. When `M_.Skew_e` has a
+non-zero entry, the C++ MEX bridge builds the moment tensors of every order `d = 2, ..., order` from
+the raw moments of each shock:
 
 ```text
-E[e_i^3] = skewness_i * variance_i^(3/2)
+E[e_{i1} ... e_{id}] = prod_i E[e_i^{n_i}],   n_i = number of occurrences of i in (i1, ..., id)
 ```
 
-The raw third moments are then inserted into the same moment infrastructure that already stores
-second and fourth Gaussian moments.
+The raw moments of a zero-mean skew normal shock with variance `sigma^2` and standardized skewness
+`gamma` come from the representation
+
+```text
+e = omega * ( delta * (|U0| - sqrt(2/pi)) + sqrt(1 - delta^2) * U1 ),   U0, U1 iid N(0,1)
+```
+
+with `delta` and `omega` mapped from `(sigma^2, gamma)` exactly as in `csn_update_specification.m`.
+Gaussian shocks are the case `delta = 0`. A moment tensor is inserted only if it has a non-zero
+element, so odd-order tensors exist only when some shock is skewed. When no shock is skewed, the
+original Gaussian (Isserlis) construction is used unchanged.
+
+The third moment is therefore `E[e_i^3] = gamma_i * sigma_i^3`, and the fourth moment is the skew
+normal one, `E[e_i^4] = sigma_i^4 * (3 + 2(pi-3) (delta sqrt(2/pi))^4 / (1 - 2 delta^2/pi)^2)`, not the
+Gaussian `3 sigma_i^4`. Higher orders follow the same construction.
+
+Restrictions enforced by the MEX bridge (as in `csn_update_specification.m`):
+
+- co-skewness entries (`i`, `j`, `k` not all equal) are rejected;
+- skewed shocks cannot be correlated (`Sigma_e` must be diagonal);
+- `|gamma| < 0.99527...`, the skew normal bound.
 
 ## Files Changed
 
@@ -47,8 +54,8 @@ The main C++ moment plumbing is in:
 - `mex/sources/libkorder/tl/normal_moments.hh`
 - `mex/sources/libkorder/tl/normal_moments.cc`
 
-These files now define a `ThirdMoment` record and an overload of `UNormalMoments` that can insert a
-third-order moment tensor. The tensor is filled symmetrically over all permutations of `(i,j,k)`.
+They define `skewNormalRawMoments(variance, skewness, maxdim)` and a `UNormalMoments` constructor
+that builds the moment tensors of independent shocks from per-shock raw moments.
 
 The k-order recursion changes are in:
 
@@ -67,8 +74,8 @@ The MATLAB MEX bridge is in:
 
 - `mex/sources/k_order_perturbation/k_order_perturbation.cc`
 
-It now reads `M_.Skew_e`, builds the third-moment list, passes it into `Approximation`, and exports
-the pure third stochastic derivative as `gsss`.
+It reads `M_.Skew_e`, checks the restrictions above, builds the shock moment container, passes it
+into `Approximation`, and exports the pure third stochastic derivative as `gsss`.
 
 The MATLAB decision-rule interface is in:
 
@@ -137,11 +144,36 @@ g_0      = 1.5000 for y
 
 This is what the patched solver returns.
 
+## Orders above 3
+
+At `order >= 4`, `stoch_simul` simulates through `k_order_simul`; with `pruning` this is the
+arbitrary-order pruned state space of `mex/sources/libkordersim/simulation.f08`. It uses the full
+decision-rule tensors in `dr.pruning.g_k`, including the pure sigma columns (`g_sss`, `g_ssss`, ...),
+so the skewed-shock moments enter without further changes. The pure sigma term of order `k`, with the
+`1/k!` factor included, is the last column of `dr.pruning.g_k`.
+
+Pruning at order above 3 is not available for particle filtering, estimation, or theoretical moments.
+
+## Regression test
+
+`tests/skewed_shocks_korder/skew_korder_moments.mod` solves
+
+```dynare
+p2 = e^2; ... pK = e^K;  q = e^2*z^2;
+y = p2(+1) + ... + pK(+1) + q(+1);
+```
+
+with `e` skew normal and `z` Gaussian, for which the order-`K` solution is exact. It compares the pure
+sigma terms of `y` with the skew normal raw moments obtained by numerical integration of the density,
+and checks that a pruned order-`K` simulation returns that constant. Usage:
+
+```matlab
+dynare skew_korder_moments -DSKEW=0.5 -DORDER=4
+```
+
+It passes for `SKEW` in {0, 0.5, -0.9} and `ORDER` in {3, 4, 5}; the logs are stored next to it.
+
 ## Caveats
 
-This patch targets the third-order k-order path and the associated pruning/local state-space
-simulation path.
-
-It does not yet add a formal Dynare regression test. It also does not update analytical
-identification derivatives for `ghs3`; those paths may need separate work if full upstream coverage
-is required.
+Analytical identification derivatives do not include `ghs3` or the non-Gaussian moments. Other
+k-order MEX files (e.g. `k_order_welfare`) still use Gaussian moments.

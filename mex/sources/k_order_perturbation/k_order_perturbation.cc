@@ -182,7 +182,11 @@ extern "C"
                        && !mxIsSparse(skew_e_mx) && mxGetN(skew_e_mx) == 4))
       mexErrMsgTxt("M_.Skew_e should be a real dense matrix with 4 columns");
 
-    std::vector<ThirdMoment> third_moments;
+    /* Skewed shocks are independent skew normal variables (as in
+       csn_update_specification.m): their moments of every order are
+       computed from the variance and the standardized skewness. */
+    std::vector<double> shock_skewness(nExog, 0.0);
+    bool has_skew {false};
     if (skew_e_mx)
       {
         const size_t nSkewEntries {mxGetM(skew_e_mx)};
@@ -196,12 +200,23 @@ extern "C"
 
             if (i < 0 || i >= nExog || j < 0 || j >= nExog || k < 0 || k >= nExog)
               mexErrMsgTxt("M_.Skew_e contains an invalid exogenous variable index");
-
-            double raw_moment
-                = skewness * std::sqrt(vCov.get(i, i) * vCov.get(j, j) * vCov.get(k, k));
-            if (raw_moment != 0.0)
-              third_moments.push_back({i, j, k, raw_moment});
+            if (skewness == 0.0)
+              continue;
+            if (i != j || j != k)
+              mexErrMsgTxt("Skewed shocks must be independent skew normal variables: co-skewness "
+                           "entries in M_.Skew_e are not supported");
+            if (std::abs(skewness) >= 0.9952717464311565)
+              mexErrMsgTxt("The skewness of a skew normal shock must be smaller than 0.9953 in "
+                           "absolute value");
+            shock_skewness[i] = skewness;
+            has_skew = true;
           }
+        if (has_skew)
+          for (int i {0}; i < nExog; i++)
+            for (int j {0}; j < nExog; j++)
+              if (i != j && vCov.get(i, j) != 0.0)
+                mexErrMsgTxt("Skewed shocks must be independent skew normal variables: the "
+                             "shocks cannot be correlated");
       }
 
     const mxArray* endo_names_mx = mxGetField(M_mx, 0, "endo_names");
@@ -299,7 +314,14 @@ extern "C"
                            dr_order);
 
         // construct main K-order approximation class
-        UNormalMoments shock_moments(kOrder, vCov, third_moments);
+        UNormalMoments shock_moments = [&] {
+          if (!has_skew)
+            return UNormalMoments(kOrder, vCov);
+          std::vector<std::vector<double>> raw_moments;
+          for (int i {0}; i < nExog; i++)
+            raw_moments.push_back(skewNormalRawMoments(vCov.get(i, i), shock_skewness[i], kOrder));
+          return UNormalMoments(kOrder, raw_moments);
+        }();
         Approximation app(dynare, journal, nSteps, false, pruning, qz_criterium, shock_moments);
         // run stochastic steady
         app.walkStochSteady();

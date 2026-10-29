@@ -120,23 +120,25 @@
 
 #include <vector>
 
-struct ThirdMoment
-{
-  int i;
-  int j;
-  int k;
-  double value;
-};
+/* Raw moments E[eᵈ], d=0,…,maxdim, of a zero-mean skew normal variable e with
+   the given variance and standardized skewness. The (ω,δ) parametrization is
+   the one of csn_update_specification.m, and the moments follow from the
+   representation e = ω·(δ·(|U₀|−√(2/π)) + √(1−δ²)·U₁) with U₀,U₁ independent
+   standard normals. */
+std::vector<double> skewNormalRawMoments(double variance, double skewness, int maxdim);
 
 class UNormalMoments : public TensorContainer<URSingleTensor>
 {
 public:
   UNormalMoments(int maxdim, const TwoDMatrix& v);
-  UNormalMoments(int maxdim, const TwoDMatrix& v, const std::vector<ThirdMoment>& third_moments);
+  /* Moments of a vector of independent zero-mean variables, where
+     raw_moments[i][d] = E[uᵢᵈ] for d=0,…,maxdim. A tensor of dimension d is
+     inserted only if it has a non-zero element. */
+  UNormalMoments(int maxdim, const std::vector<std::vector<double>>& raw_moments);
 
 private:
   void generateMoments(int maxdim, const TwoDMatrix& v);
-  void generateThirdMoments(int maxdim, int nv, const std::vector<ThirdMoment>& third_moments);
+  void generateIndependentMoments(int maxdim, const std::vector<std::vector<double>>& raw_moments);
   static bool selectEquiv(const Equivalence& e);
 };
 
