@@ -219,6 +219,58 @@ extern "C"
                              "shocks cannot be correlated");
       }
 
+    /* Optional user-supplied raw moments of independent shocks: M_.Raw_moments_e is an
+       exo_nbr × D matrix with entry (i,d) = E[e_i^d], d = 1..D, D ≥ order. A row of NaN
+       leaves shock i to the Gaussian or skew normal default. A row that is given must have
+       E[e_i] = 0 and E[e_i^2] = M_.Sigma_e(i,i), the shock must not be declared skewed, and
+       it must be uncorrelated with the other shocks. */
+    std::vector<std::vector<double>> user_raw_moments(nExog);
+    bool has_raw {false};
+    const mxArray* raw_e_mx = mxGetField(M_mx, 0, "Raw_moments_e");
+    if (raw_e_mx && !mxIsEmpty(raw_e_mx))
+      {
+        if (!(mxIsDouble(raw_e_mx) && !mxIsComplex(raw_e_mx) && !mxIsSparse(raw_e_mx)
+              && mxGetM(raw_e_mx) == static_cast<size_t>(nExog)))
+          mexErrMsgTxt("M_.Raw_moments_e should be a real dense matrix with M_.exo_nbr rows");
+        const size_t D {mxGetN(raw_e_mx)};
+        const double* raw_e {mxGetDoubles(raw_e_mx)};
+        for (int i {0}; i < nExog; i++)
+          {
+            bool all_nan {true}, any_nan {false};
+            for (size_t d {0}; d < D; d++)
+              {
+                bool is_nan {std::isnan(raw_e[i + d * nExog])};
+                all_nan = all_nan && is_nan;
+                any_nan = any_nan || is_nan;
+              }
+            if (all_nan)
+              continue;
+            if (any_nan)
+              mexErrMsgTxt("M_.Raw_moments_e: a row must be either all NaN or fully specified");
+            if (D < static_cast<size_t>(kOrder))
+              mexErrMsgTxt("M_.Raw_moments_e must have at least options_.order columns");
+            if (shock_skewness[i] != 0.0)
+              mexErrMsgTxt("M_.Raw_moments_e: a shock cannot also be declared skewed");
+            const double var {vCov.get(i, i)};
+            if (std::abs(raw_e[i]) > 1e-12 * std::max(1.0, std::sqrt(var)))
+              mexErrMsgTxt("M_.Raw_moments_e: shocks must have mean zero (column 1)");
+            if (std::abs(raw_e[i + nExog] - var) > 1e-10 * std::max(1.0, var))
+              mexErrMsgTxt("M_.Raw_moments_e: column 2 must equal the diagonal of M_.Sigma_e");
+            user_raw_moments[i].assign(kOrder + 1, 0.0);
+            user_raw_moments[i][0] = 1;
+            for (int d {2}; d <= kOrder; d++)
+              user_raw_moments[i][d] = raw_e[i + (d - 1) * nExog];
+            has_raw = true;
+          }
+        if (has_raw)
+          for (int i {0}; i < nExog; i++)
+            for (int j {0}; j < nExog; j++)
+              if (i != j && vCov.get(i, j) != 0.0
+                  && (!user_raw_moments[i].empty() || !user_raw_moments[j].empty()))
+                mexErrMsgTxt("M_.Raw_moments_e: shocks with user-supplied moments cannot be "
+                             "correlated");
+      }
+
     const mxArray* endo_names_mx = mxGetField(M_mx, 0, "endo_names");
     if (!(endo_names_mx && mxIsCell(endo_names_mx)
           && mxGetNumberOfElements(endo_names_mx) == static_cast<size_t>(nEndo)))
@@ -315,11 +367,14 @@ extern "C"
 
         // construct main K-order approximation class
         UNormalMoments shock_moments = [&] {
-          if (!has_skew)
+          if (!has_skew && !has_raw)
             return UNormalMoments(kOrder, vCov);
           std::vector<std::vector<double>> raw_moments;
           for (int i {0}; i < nExog; i++)
-            raw_moments.push_back(skewNormalRawMoments(vCov.get(i, i), shock_skewness[i], kOrder));
+            raw_moments.push_back(user_raw_moments[i].empty()
+                                      ? skewNormalRawMoments(vCov.get(i, i), shock_skewness[i],
+                                                             kOrder)
+                                      : user_raw_moments[i]);
           return UNormalMoments(kOrder, raw_moments);
         }();
         Approximation app(dynare, journal, nSteps, false, pruning, qz_criterium, shock_moments);

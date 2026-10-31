@@ -177,3 +177,23 @@ It passes for `SKEW` in {0, 0.5, -0.9} and `ORDER` in {3, 4, 5}; the logs are st
 
 Analytical identification derivatives do not include `ghs3` or the non-Gaussian moments. Other
 k-order MEX files (e.g. `k_order_welfare`) still use Gaussian moments.
+
+## User-supplied raw moments (branch `raw-moments-shocks`)
+
+`M_.Raw_moments_e` (optional, set in MATLAB before `stoch_simul`) is an `exo_nbr × D` matrix with entry
+`(i, d) = E[e_i^d]`, `d = 1..D`, `D >= order`. A row of `NaN` leaves shock `i` to the Gaussian or skew normal
+default. A row that is given must satisfy `E[e_i] = 0` and `E[e_i^2] = M_.Sigma_e(i,i)` (relative tolerance
+1e-10); the shock must not also appear in `M_.Skew_e`, and it must be uncorrelated with the other shocks. The MEX
+bridge passes the rows to the same `UNormalMoments(maxdim, raw_moments)` constructor used for skew normal shocks,
+so any independent non-Gaussian shock with finite moments up to the solution order can be used.
+
+`matlab/distributions/mixture_normal_raw_moments.m` returns the raw moments of a mean-zero finite mixture of
+normals (one row of `M_.Raw_moments_e`).
+
+Shocks drawn by Dynare's own simulation routines are still Gaussian or skew normal: with user-supplied moments,
+simulate by passing the draws to `simult_`.
+
+Test: `tests/raw_moments_korder/raw_moments_korder.mod` (`-DORDER=3,4,5`): mixture moments vs numerical
+integration; exact pure-sigma terms of an exactly solvable model; skew normal moments supplied as raw moments
+reproduce the `Skew_e` solution (max difference 3.6e-15); Gaussian raw moments reproduce the default solution
+exactly; inconsistent inputs raise errors.
