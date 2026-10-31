@@ -197,3 +197,7 @@ Test: `tests/raw_moments_korder/raw_moments_korder.mod` (`-DORDER=3,4,5`): mixtu
 integration; exact pure-sigma terms of an exactly solvable model; skew normal moments supplied as raw moments
 reproduce the `Skew_e` solution (max difference 3.6e-15); Gaussian raw moments reproduce the default solution
 exactly; inconsistent inputs raise errors.
+
+Note: `M_.Raw_moments_e` is not created by the preprocessor, so it survives later `dynare ... noclearall` calls in
+the same MATLAB session (verified 2026-10-31). A model file that may run after one with user-supplied moments must set
+it explicitly (e.g. `M_.Raw_moments_e = [];` in a `verbatim` block).
