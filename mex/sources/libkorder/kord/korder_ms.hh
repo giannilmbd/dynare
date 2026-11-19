@@ -29,9 +29,12 @@
    Derivatives without σ are regime free and are solved by the stock routines in every pair. Derivatives with σ:
      y^i σ^j:   A X(s) + B Σ_{s′}P[s,s′] X(s′) (g*_y)^{⊗i} = R(s)  (coupled Sylvester),
      y^i u^j σ^k (j ≥ 1): A X(s) = R(s)                             (per regime),
-     σ^k:       A X(s) + [0 0 f_{y**₊}] Σ_{s′}P[s,s′] X(s′) = R(s)   (coupled),
-   decoupled with the eigen-decomposition P′ W = W Λ (real eigenvalues; supplied by the caller):
-   X̃_m = Σ_s X(s) W[s,m], X(s) = Σ_m X̃_m W⁻¹[m,s]. See MS_korder_algebra.md for the derivation.
+     σ^k:       A X(s) + [0 0 f_{y**₊}] Σ_{s′}P[s,s′] X(s′) = R(s)   (coupled).
+   The coupled systems are solved jointly for the S regimes: the σ^k system as one LU of order S·ny,
+   (I_S ⊗ A₀ + P ⊗ C) x = r, and the y^iσ^j system as one generalised Sylvester equation of order S·ny,
+   Ā x̃ + B̄ x̃ (g*_y)^{⊗i} = r, with B̄ = P ⊗ B and the unknowns ordered so that the columns of B̄ act on the last
+   S·nyss rows (MatrixSMS, MatrixAMS, MatrixBMS). No decomposition of P is needed, so P may have complex eigenvalues
+   or be defective. See MS_korder_algebra.md for the derivation.
 
    Differences from the stock KOrder step: g_σ(s) ≠ 0 at first order (inserted, with G_σ); the σ-order gates
    hasMoment(k) and the fillG gate hasMoment(k−m) are removed (odd σ derivatives are non-zero with regimes); after
@@ -46,12 +49,13 @@
 #include <memory>
 #include <vector>
 
-/* A + λ [0 0 f_{y**₊}]: the matrix of the coupled σ^k equations for eigenvalue λ (λ = 1 is MatrixS). */
-class MatrixSL : public PLUMatrix
+/* I_S ⊗ A₀ + P ⊗ C, A₀ = [f_y] + [0 [f_y**₊]·[g**_y*] 0], C = [0 0 f_{y**₊}]: the stacked matrix of the coupled σ^k
+   equations; row and column s·ny + r is variable r of regime s. With S = 1, P = 1 it is MatrixS. */
+class MatrixSMS : public PLUMatrix
 {
 public:
-  MatrixSL(const FSSparseTensor& f, const IntSequence& ss, const TwoDMatrix& gy,
-           const PartitionY& ypart, double lambda);
+  MatrixSMS(const FSSparseTensor& f, const IntSequence& ss, const TwoDMatrix& gy,
+            const PartitionY& ypart, const TwoDMatrix& P);
 };
 
 class KOrderMS
@@ -59,13 +63,13 @@ class KOrderMS
   const int S;
   const PartitionY ypart;
   const int ny, nu;
-  TwoDMatrix P;     // S × S, P(s, s′)
-  Vector lam;       // eigenvalues of P′
-  TwoDMatrix W;     // P′ W = W diag(lam)
-  TwoDMatrix Winv;  // W⁻¹
+  TwoDMatrix P;       // S × S, P(s, s′)
   TwoDMatrix forcing; // ny × S, added to F_σ(s) (equation rows)
   std::vector<std::unique_ptr<KOrder>> pairs;
-  std::vector<std::unique_ptr<MatrixSL>> matSL;
+  std::unique_ptr<MatrixSMS> matS; // stacked σ^k matrix
+  /* Stacked y^iσ^j Sylvester: Ā (S·ny × S·ny) and B̄ = P ⊗ B (S·ny × S·nyss). Unknown x̃: rows of regime s
+     0…nstat+npred−1 at s·(nstat+npred) + r, rows nstat+npred… at S·(nstat+npred) + s·nyss + r − nstat − npred. */
+  TwoDMatrix Abar, Bbar;
   Journal& journal;
 
   KOrder&
@@ -84,15 +88,13 @@ class KOrderMS
   void recover_ys(int i, int j);
   void recover_yus(int i, int j, int k);
   void recover_s(int i);
-  // X̃_m = Σ_s X(s) W[s,m] and back
-  std::vector<std::unique_ptr<FGSTensor>> toEigen(const std::vector<std::unique_ptr<FGSTensor>>& X) const;
-  std::vector<std::unique_ptr<FGSTensor>> fromEigen(const std::vector<std::unique_ptr<FGSTensor>>& Xt) const;
+  // X(s) ↦ x (S·ny rows, regime s in rows s·ny…), solve the stacked σ^k system, and back
+  void solveStackedS(std::vector<std::unique_ptr<FGSTensor>>& X) const;
 
 public:
   KOrderMS(int num_stat, int num_pred, int num_both, int num_forw,
            const TensorContainer<FSSparseTensor>& fcont, const TwoDMatrix& gy, const TwoDMatrix& gu,
            const TwoDMatrix& v, const UNormalMoments& moments, const TwoDMatrix& P_,
-           const Vector& lam_, const TwoDMatrix& W_, const TwoDMatrix& Winv_,
            const TwoDMatrix& forcing_, Journal& jr);
   void solve(int maxorder);
   [[nodiscard]] const FGSContainer&

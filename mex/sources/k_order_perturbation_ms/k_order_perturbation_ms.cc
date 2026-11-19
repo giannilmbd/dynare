@@ -18,8 +18,8 @@
  */
 
 /* k-order perturbation with an exogenous Markov chain (KOrderMS, korder_ms.hh), derived from
-   k_order_perturbation.cc. Fourth input: struct with fields P (S × S), lam (S eigenvalues of P′), W (P′ W = W Λ),
-   Winv, forcing (endo_nbr × S, added to F_σ in equation rows). Output: cell array (S × 1) of structs; field
+   k_order_perturbation.cc. Fourth input: struct with fields P (S × S) and forcing (endo_nbr × S, added to F_σ in
+   equation rows). Output: cell array (S × 1) of structs; field
    y<i>u<j>s<k> holds the unfolded derivative g_{y*^i u^j σ^k} of regime s (rows in dr.order_var order, columns
    kron(y*^{⊗i}, u^{⊗j})), for 1 ≤ i + j + k ≤ order.
 
@@ -119,12 +119,7 @@ extern "C"
         mexErrMsgTxt(("MS input: field "s + name + " should be a real dense matrix").c_str());
       return TwoDMatrix {ConstTwoDMatrix {m}};
     };
-    TwoDMatrix msP = get_ms_matrix("P"), msW = get_ms_matrix("W"), msWinv = get_ms_matrix("Winv"),
-               msForcing = get_ms_matrix("forcing");
-    const mxArray* lam_mx = mxGetField(ms_mx, 0, "lam");
-    if (!(lam_mx && mxIsDouble(lam_mx) && !mxIsComplex(lam_mx)))
-      mexErrMsgTxt("MS input: field lam should be a real vector");
-    Vector msLam {ConstVector {lam_mx}};
+    TwoDMatrix msP = get_ms_matrix("P"), msForcing = get_ms_matrix("forcing");
 
     auto get_int_field = [](const mxArray* struct_mx, const std::string& fieldname) {
       mxArray* field_mx = mxGetField(struct_mx, 0, fieldname.c_str());
@@ -401,7 +396,7 @@ extern "C"
                       dynare.getModelDerivatives().get(Symmetry {1}), journal, qz_criterium);
         KOrderMS ms(dynare.nstat(), dynare.npred(), dynare.nboth(), dynare.nforw(),
                     dynare.getModelDerivatives(), fo.getGy(), fo.getGu(), dynare.getVcov(),
-                    shock_moments, msP, msLam, msW, msWinv, msForcing, journal);
+                    shock_moments, msP, msForcing, journal);
         ms.solve(kOrder);
 
         const int S = ms.nRegimes();

@@ -433,6 +433,7 @@ kordersim_lib = static_library('kordersim', kordersim_src, kwargs : static_libra
 shared_module('folded_to_unfolded_dr', 'mex/sources/folded_to_unfolded_dr/mexFunction.f08', kwargs : mex_kwargs, link_with : kordersim_lib)
 shared_module('k_order_mean', 'mex/sources/k_order_mean/mexFunction.f08', kwargs : mex_kwargs, link_with : kordersim_lib)
 shared_module('k_order_simul', 'mex/sources/k_order_simul/mexFunction.f08', kwargs : mex_kwargs, link_with : kordersim_lib)
+shared_module('ms_k_order_simul', 'mex/sources/ms_k_order_simul/mexFunction.f08', kwargs : mex_kwargs, link_with : kordersim_lib)
 
 shared_module('local_state_space_iteration_2', 'mex/sources/local_state_space_iterations/local_state_space_iteration_2.cc', kwargs : mex_kwargs, dependencies : openmp_dep)
 shared_module('local_state_space_iteration_3', 'mex/sources/local_state_space_iterations/local_state_space_iteration_3.f08', kwargs : mex_kwargs, link_with : kordersim_lib)

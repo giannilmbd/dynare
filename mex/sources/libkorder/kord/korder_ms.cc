@@ -20,46 +20,52 @@
 #include "korder_ms.hh"
 #include "kord_exception.hh"
 
-/* A + λ [0 0 f_{y**₊}], built as MatrixS with the last summand scaled by λ. */
-MatrixSL::MatrixSL(const FSSparseTensor& f, const IntSequence& ss, const TwoDMatrix& gy,
-                   const PartitionY& ypart, double lambda) :
-    PLUMatrix(ypart.ny())
+#include "GeneralSylvester.hh"
+
+/* I_S ⊗ A₀ + P ⊗ C. A₀ and C are assembled as in MatrixS (MatrixS = A₀ + C). */
+MatrixSMS::MatrixSMS(const FSSparseTensor& f, const IntSequence& ss, const TwoDMatrix& gy,
+                     const PartitionY& ypart, const TwoDMatrix& P) :
+    PLUMatrix(P.nrows() * ypart.ny())
 {
-  zeros();
+  const int ny = ypart.ny(), S = P.nrows();
+  TwoDMatrix A0(ny, ny), C(ny, ny);
+  A0.zeros();
+  C.zeros();
   IntSequence c {1};
   FGSTensor f_y(f, ss, c, TensorDimens(ss, c));
-  add(1.0, f_y);
-
+  A0.add(1.0, f_y);
   ConstTwoDMatrix gss_ys(ypart.nstat + ypart.npred, ypart.nyss(), gy);
   c[0] = 0;
   FGSTensor f_yss(f, ss, c, TensorDimens(ss, c));
-  TwoDMatrix sub(*this, ypart.nstat, ypart.nys());
+  TwoDMatrix sub(A0, ypart.nstat, ypart.nys());
   sub.multAndAdd(ConstTwoDMatrix(f_yss), gss_ys);
-  TwoDMatrix sub2(*this, ypart.nstat + ypart.npred, ypart.nyss());
-  sub2.add(lambda, f_yss);
+  TwoDMatrix sub2(C, ypart.nstat + ypart.npred, ypart.nyss());
+  sub2.add(1.0, f_yss);
+  zeros();
+  for (int s = 0; s < S; s++)
+    for (int sp = 0; sp < S; sp++)
+      for (int col = 0; col < ny; col++)
+        for (int r = 0; r < ny; r++)
+          get(s * ny + r, sp * ny + col)
+              = (s == sp ? A0.get(r, col) : 0.0) + P.get(s, sp) * C.get(r, col);
   calcPLU();
 }
 
 KOrderMS::KOrderMS(int num_stat, int num_pred, int num_both, int num_forw,
                    const TensorContainer<FSSparseTensor>& fcont, const TwoDMatrix& gy,
                    const TwoDMatrix& gu, const TwoDMatrix& v, const UNormalMoments& moments,
-                   const TwoDMatrix& P_, const Vector& lam_, const TwoDMatrix& W_,
-                   const TwoDMatrix& Winv_, const TwoDMatrix& forcing_, Journal& jr) :
+                   const TwoDMatrix& P_, const TwoDMatrix& forcing_, Journal& jr) :
     S(P_.nrows()),
     ypart(num_stat, num_pred, num_both, num_forw),
     ny(ypart.ny()),
     nu(gu.ncols()),
     P(P_),
-    lam(lam_),
-    W(W_),
-    Winv(Winv_),
     forcing(forcing_),
+    Abar(S * ypart.ny(), S * ypart.ny()),
+    Bbar(S * ypart.ny(), S * ypart.nyss()),
     journal(jr)
 {
   KORD_RAISE_IF(P.ncols() != S, "Transition matrix is not square in KOrderMS");
-  KORD_RAISE_IF(lam.length() != S || W.nrows() != S || W.ncols() != S || Winv.nrows() != S
-                    || Winv.ncols() != S,
-                "Wrong dimensions of the eigen-decomposition in KOrderMS");
   KORD_RAISE_IF(forcing.nrows() != ny || forcing.ncols() != S,
                 "Forcing must be ny × S in KOrderMS");
   for (int s = 0; s < S; s++)
@@ -72,40 +78,40 @@ KOrderMS::KOrderMS(int num_stat, int num_pred, int num_both, int num_forw,
         p->_uGstack.inner_sigma_zero = false;
         pairs.push_back(std::move(p));
       }
-  for (int m = 0; m < S; m++)
-    matSL.push_back(std::make_unique<MatrixSL>(fcont.get(Symmetry {1}),
-                                               pairs[0]->_uZstack.getStackSizes(), gy, ypart,
-                                               lam[m]));
-}
-
-std::vector<std::unique_ptr<FGSTensor>>
-KOrderMS::toEigen(const std::vector<std::unique_ptr<FGSTensor>>& X) const
-{
-  std::vector<std::unique_ptr<FGSTensor>> Xt;
-  for (int m = 0; m < S; m++)
-    {
-      auto t = std::make_unique<FGSTensor>(*X[0]);
-      t->zeros();
-      for (int s = 0; s < S; s++)
-        t->add(W.get(s, m), *X[s]);
-      Xt.push_back(std::move(t));
-    }
-  return Xt;
-}
-
-std::vector<std::unique_ptr<FGSTensor>>
-KOrderMS::fromEigen(const std::vector<std::unique_ptr<FGSTensor>>& Xt) const
-{
-  std::vector<std::unique_ptr<FGSTensor>> X;
+  matS = std::make_unique<MatrixSMS>(fcont.get(Symmetry {1}), pairs[0]->_uZstack.getStackSizes(), gy,
+                                     ypart, P);
+  const int zc = ypart.nstat + ypart.npred, nyss = ypart.nyss();
+  const TwoDMatrix& A = pairs[0]->matA;
+  const TwoDMatrix& B = pairs[0]->matB;
+  Abar.zeros();
+  Bbar.zeros();
   for (int s = 0; s < S; s++)
-    {
-      auto t = std::make_unique<FGSTensor>(*Xt[0]);
-      t->zeros();
-      for (int m = 0; m < S; m++)
-        t->add(Winv.get(m, s), *Xt[m]);
-      X.push_back(std::move(t));
-    }
-  return X;
+    for (int r = 0; r < ny; r++)
+      {
+        for (int col = 0; col < zc; col++)
+          Abar.get(s * ny + r, s * zc + col) = A.get(r, col);
+        for (int col = 0; col < nyss; col++)
+          Abar.get(s * ny + r, S * zc + s * nyss + col) = A.get(r, zc + col);
+        for (int sp = 0; sp < S; sp++)
+          for (int col = 0; col < nyss; col++)
+            Bbar.get(s * ny + r, sp * nyss + col) = P.get(s, sp) * B.get(r, col);
+      }
+}
+
+void
+KOrderMS::solveStackedS(std::vector<std::unique_ptr<FGSTensor>>& X) const
+{
+  const int nc = X[0]->ncols();
+  TwoDMatrix x(S * ny, nc);
+  for (int s = 0; s < S; s++)
+    for (int j = 0; j < nc; j++)
+      for (int r = 0; r < ny; r++)
+        x.get(s * ny + r, j) = X[s]->get(r, j);
+  matS->multInv(x);
+  for (int s = 0; s < S; s++)
+    for (int j = 0; j < nc; j++)
+      for (int r = 0; r < ny; r++)
+        X[s]->get(r, j) = x.get(s * ny + r, j);
 }
 
 /* Insert X(s) as the derivative of regime s: an owned copy in g of pairs (s, ·); g* of pairs (s, ·) and g** of
@@ -206,10 +212,7 @@ KOrderMS::solveOrder1()
         t->get(r, 0) = -forcing.get(r, s);
       X.push_back(std::move(t));
     }
-  auto Xt = toEigen(X);
-  for (int m = 0; m < S; m++)
-    matSL[m]->multInv(*Xt[m]);
-  X = fromEigen(Xt);
+  solveStackedS(X);
   insertMS(X);
   for (auto& p : pairs)
     p->G<Storage::fold>().insert(p->faaDiBrunoG<Storage::fold>(Symmetry {0, 0, 0, 1}));
@@ -220,29 +223,38 @@ KOrderMS::recover_ys(int i, int j)
 {
   std::vector<std::unique_ptr<FGSTensor>> R;
   auto Gc = rhs(i, 0, j, R);
-  auto Rt = toEigen(R);
   KOrder& p0 = *pairs[0];
-  for (int m = 0; m < S; m++)
+  if (ypart.nys() > 0 && ypart.nyss() > 0)
     {
-      FGSTensor& der = *Rt[m];
-      if (ypart.nys() > 0 && ypart.nyss() > 0)
+      const int zc = ypart.nstat + ypart.npred, nyss = ypart.nyss();
+      auto row = [&](int s, int r) { return r < zc ? s * zc + r : S * zc + s * nyss + r - zc; };
+      std::vector<UGSTensor> ur;
+      for (int s = 0; s < S; s++)
+        ur.emplace_back(*R[s]);
+      const int nc = ur[0].ncols();
+      TwoDMatrix d(S * ny, nc);
+      for (int s = 0; s < S; s++)
+        for (int c = 0; c < nc; c++)
+          for (int r = 0; r < ny; r++)
+            d.get(s * ny + r, c) = ur[s].get(r, c);
+      TwoDMatrix gs_y(p0.gs<Storage::unfold>().get(Symmetry {1, 0, 0, 0}));
+      GeneralSylvester sylv(i, S * ny, ypart.nys(), S * zc, Abar.getData(), Bbar.getData(),
+                            gs_y.getData(), d.getData());
+      sylv.solve();
+      for (int s = 0; s < S; s++)
         {
-          UGSTensor tmp(der);
-          TwoDMatrix gs_y(p0.gs<Storage::unfold>().get(Symmetry {1, 0, 0, 0}));
-          TwoDMatrix Bl(p0.matB);
-          Bl.mult(lam[m]);
-          GeneralSylvester sylv(i, ny, ypart.nys(), ypart.nstat + ypart.npred, p0.matA.getData(),
-                                Bl.getData(), gs_y.getData(), tmp.getData());
-          sylv.solve();
-          FGSTensor ftmp(tmp);
-          der.getData() = const_cast<const Vector&>(ftmp.getData());
+          for (int c = 0; c < nc; c++)
+            for (int r = 0; r < ny; r++)
+              ur[s].get(r, c) = d.get(row(s, r), c);
+          FGSTensor ftmp(ur[s]);
+          R[s]->getData() = const_cast<const Vector&>(ftmp.getData());
         }
-      else if (ypart.nys() > 0 && ypart.nyss() == 0)
-        p0.matA.multInv(der);
     }
-  auto X = fromEigen(Rt);
-  insertMS(X);
-  updateG(Gc, X, i + j);
+  else if (ypart.nys() > 0 && ypart.nyss() == 0)
+    for (int s = 0; s < S; s++)
+      p0.matA.multInv(*R[s]);
+  insertMS(R);
+  updateG(Gc, R, i + j);
 }
 
 void
@@ -261,12 +273,9 @@ KOrderMS::recover_s(int i)
 {
   std::vector<std::unique_ptr<FGSTensor>> R;
   auto Gc = rhs(0, 0, i, R);
-  auto Rt = toEigen(R);
-  for (int m = 0; m < S; m++)
-    matSL[m]->multInv(*Rt[m]);
-  auto X = fromEigen(Rt);
-  insertMS(X);
-  updateG(Gc, X, i);
+  solveStackedS(R);
+  insertMS(R);
+  updateG(Gc, R, i);
 }
 
 /* The order of KOrder::performStep(); σ-free symmetries by the stock routines in every pair. */

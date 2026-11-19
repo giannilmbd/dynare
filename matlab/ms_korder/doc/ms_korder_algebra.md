@@ -39,6 +39,8 @@ u_t:&\quad (AG+B)H + D = 0,\\
 matrix form, with $M = AG+B$,
 $$M\,\mathcal{C} + A\,\mathcal{C}P^\top = -\mathcal{R}, \qquad
 (I_S \otimes M + P \otimes A)\operatorname{vec}\mathcal{C} = -\operatorname{vec}\mathcal{R}.$$
+The solver uses the stacked form: one LU factorisation of $I_S \otimes M + P \otimes A$, of order $S\,n_y$, valid
+for any $P$.
 
 **(iii) Forward solution.** Iterating $c = -M^{-1}r - M^{-1}A\,Pc$ gives, with $F = -M^{-1}A$,
 $$c(s_t) = -\sum_{i\ge 0} F^i M^{-1}\Big[E_a\, \mathbb{E}_t \hat a(s_{t+i+1}) + F_a\, \mathbb{E}_t \hat a(s_{t+i})\Big],
@@ -46,7 +48,7 @@ $$c(s_t) = -\sum_{i\ge 0} F^i M^{-1}\Big[E_a\, \mathbb{E}_t \hat a(s_{t+i+1}) + 
 This is the present discounted sum of expected future exogenous variables. The Markov chain enters at first order
 only through $\mathbb{E}_t \hat a(s_{t+i})$.
 
-**(iv) Eigen-decomposition.** Write $P^\top = W\Lambda W^{-1}$ and $\tilde{\mathcal C} = \mathcal{C}W$. Then
+**(iv) Eigen-components.** If $P$ is diagonalisable, write $P^\top = W\Lambda W^{-1}$ and $\tilde{\mathcal C} = \mathcal{C}W$. Then
 $$(M + \lambda_m A)\,\tilde c_m = -(\mathcal{R}W)_m, \qquad m = 1,\dots,S.$$
 With an AR(1) process $\mathbb{E}_t a_{t+i} = \rho^i a_t$ and $c = \Gamma a_t$, $(M + \rho A)\Gamma = -(\rho E_a + F_a)$.
 The chain is the sum of $S$ such components, one per eigenvector of $P$, with persistence $\lambda_m$.
@@ -74,8 +76,12 @@ Its parts linear in $y_{t-1}$ and $u_t$ are $W_y = (G^2, G, I, 0, 0, 0)$ and $W_
 **$K(s)$: terms in $\sigma\, y_{t-1}$.**
 $$(AG+B)\,K(s) + A\,(PK)(s)\,G = -\Big[A\,G_{yy}\big(G\otimes c(s)\big) + f_2\big(W_y \otimes \bar w_\sigma(s)\big)\Big],$$
 where $\bar w_\sigma(s) = \sum_{s'}P_{ss'}w_\sigma(s,s')$; the bracket is linear in $w_\sigma$, so only $Pc$ and
-$P\hat a$ enter. This is a generalised Sylvester equation coupled across regimes. After the eigen-decomposition:
-$M\tilde K_m + \lambda_m A \tilde K_m G = \tilde R_m$. This is Dynare's `recover_ys` with $B$ scaled by $\lambda_m$.
+$P\hat a$ enter. This is a generalised Sylvester equation coupled across regimes. Stacked over regimes,
+$\mathcal K = [K(1); \dots; K(S)]$,
+$$(I_S\otimes M)\,\mathcal K + (P\otimes A)\,\mathcal K\,G = \mathcal R,$$
+which is the equation of Dynare's `recover_ys` with $n_y$ replaced by $S n_y$. $A$ acts only on the forward-looking
+rows, so ordering the unknowns with the forward-looking rows of all regimes last keeps the zero-column structure
+that Dynare's `GeneralSylvester` exploits.
 
 **$L(s)$: terms in $\sigma\, u_t$.**
 $$(AG+B)\,L(s) = -\Big[A\,(PK)(s)\,H + A\,G_{yy}\big(H\otimes c(s)\big) + f_2\big(W_u\otimes \bar w_\sigma(s)\big)\Big].$$
@@ -87,8 +93,7 @@ $$\begin{aligned}
 (AG+B)\,d(s) + A\,(Pd)(s) = -\Big[\, &A\,G_{yy}\big(c(s)\otimes c(s)\big) + 2A\,(PK)(s)\,c(s) + A\,G_{uu}\operatorname{vec}\Sigma\\
 &+ \textstyle\sum_{s'} P_{ss'}\ \mathbb{E}_{u}\, f_2\big(w_\sigma(s,s')\otimes w_\sigma(s,s')\big)\Big].
 \end{aligned}$$
-The matrix is the one of first order, so the eigen-decomposition gives $S$ solves with $M + \lambda_m A$
-(Dynare's `recover_s`). The last term contains
+The matrix is the one of first order, $I_S \otimes M + P \otimes A$ (Dynare's `recover_s` with $S n_y$ rows). The last term contains
 $$\sum_{s'}P_{ss'}\, c(s')\otimes c(s'),\qquad \sum_{s'}P_{ss'}\, c(s')\otimes \hat a(s'),\qquad
 \sum_{s'}P_{ss'}\, \hat a(s')\otimes \hat a(s'),$$
 the conditional second moments of the chain one step ahead. They differ from $(Pc)\otimes(Pc)$ etc. by the
@@ -133,9 +138,9 @@ Hence, with $M = f_y + f_{y^{**}_+} g^{**}_{y^*}[\text{sel}^*] = $ Dynare's `mat
 | Symmetry | Equation | Dynare routine, MS version |
 |---|---|---|
 | $y^i u^j$ ($l = 0$) | regime-free | `recover_y`, `recover_yu`: unchanged |
-| $y^i\sigma^l$, $i \ge 1$, $l \ge 1$ | $M X(s) + A\sum_{s'}P_{ss'}X(s')(g^*_y)^{\otimes i} = R(s)$ | `recover_ys`: one Sylvester solve per eigenvalue $\lambda_m$ |
+| $y^i\sigma^l$, $i \ge 1$, $l \ge 1$ | $M X(s) + A\sum_{s'}P_{ss'}X(s')(g^*_y)^{\otimes i} = R(s)$ | `recover_ys`: one Sylvester solve of order $S n_y$ |
 | $y^i u^j\sigma^l$, $j \ge 1$, $l \ge 1$ | $M X(s) = R(s)$ | `recover_yus`: per regime, same `matA` |
-| $\sigma^l$ | $M X(s) + A\sum_{s'}P_{ss'}X(s') = R(s)$ | `recover_s`: one solve with $M + \lambda_m A$ per eigenvalue |
+| $\sigma^l$ | $M X(s) + A\sum_{s'}P_{ss'}X(s') = R(s)$ | `recover_s`: one LU of $I_S \otimes M + P \otimes A$ |
 
 Here $A$ means $f_{y^{**}_+}$ with the selection of forward-looking variables.
 
@@ -204,14 +209,16 @@ factor. Then each factor term has $i \ge 1$ lagged layers summing to $b_f$, so $
 exactly $m$ only if every factor takes the term $g_y\,x^{(b_f)}$. Blocks are therefore solved by weight ascending
 and, within a weight, by number of factors descending. The diagonal block is
 $$M - \Phi^{[b]}\,M P = R, \qquad \Phi^{[b]} = F_b\,\Phi^{\otimes m} D_b,\quad \Phi = g^*_y,$$
-with $M = [\mu_b(1)\ \cdots\ \mu_b(S)]$. $\Phi$ is the same in every regime. With $PV = V\,\mathrm{diag}(\lambda)$
-and $\tilde M = MV$,
-$$(I - \lambda_k \Phi^{[b]})\,\tilde m_k = (RV)_k,\qquad k = 1,\dots,S,\qquad M = \tilde M V^{-1}.$$
+with $M = [\mu_b(1)\ \cdots\ \mu_b(S)]$. $\Phi$ is the same in every regime.
 
-**Solving a diagonal block.** Smith doubling: $x_0 = r$, $x_{j+1} = x_j + \lambda^{2^j}(\Phi^{2^j})^{[b]} x_j$. It
-uses $(\Phi^{[b]})^{2^j} = (\Phi^{2^j})^{[b]}$, which holds because $\Phi^{\otimes m}$ maps symmetric vectors to
-symmetric vectors. Each product is applied as $D_b$, then $m$ cyclic mode products with $\Phi^{2^j}$, then $F_b$,
-at cost $O(m\,n^{m+1})$. It converges when $|\lambda|\,\rho(\Phi)^m < 1$. For $n = 6$, $m = 8$ and a non-normal
+**Solving a diagonal block.** The solution is $M = \sum_{i\ge0} (\Phi^{[b]})^i R P^i$. Smith doubling: $M_0 = R$,
+$M_{j+1} = M_j + (\Phi^{2^j})^{[b]} M_j P^{2^j}$. It uses $(\Phi^{[b]})^{2^j} = (\Phi^{2^j})^{[b]}$, which holds
+because $\Phi^{\otimes m}$ maps symmetric vectors to symmetric vectors. Each product is applied as $D_b$, then $m$
+cyclic mode products with $\Phi^{2^j}$, then $F_b$, at cost $O(m\,n^{m+1})$ per regime. No decomposition of $P$ is
+used. Since $\rho(P) = 1$, it converges when $\rho(\Phi) < 1$. Two direct solvers are available for checking:
+Dynare's `gensylv` on the unfolded block with the regimes stacked,
+$\mathcal X - (P^\top\otimes\Phi)\,\mathcal X\,(\Phi^\top)^{\otimes(m-1)} = \mathcal R$, and dense LU of
+$I - P^\top\otimes\Phi^{[b]}$. For $n = 6$, $m = 8$ and a non-normal
 $\Phi$ with $\rho(\Phi) = 0.98$, doubling took 9 steps and 0.1 s on the unfolded block ($6^8$ unknowns), against
 2 s for Dynare's Schur-recursion solver `gensylv`, with solutions agreeing to $10^{-13}$.
 
@@ -224,7 +231,7 @@ contraction.
 
 | Component | File |
 |---|---|
-| Solver class `KOrderMS` (pairs of regimes, eigen-decoupled solves) | `mex/sources/libkorder/kord/korder_ms.{hh,cc}` |
+| Solver class `KOrderMS` (pairs of regimes, solves stacked over regimes) | `mex/sources/libkorder/kord/korder_ms.{hh,cc}` |
 | MEX | `mex/sources/k_order_perturbation_ms/k_order_perturbation_ms.cc` |
 | Stock changes | `korder.hh` (`friend class KOrderMS`); `tl/stack_container.hh` (`inner_sigma_zero`) |
 | MATLAB | `matlab/ms_korder/`: `ms_korder` (driver), `ms_korder_solve`, `ms_korder_simul`, `ms_korder_moments`, `ms_korder_eval`, `ms_markov_chain` |
@@ -237,11 +244,12 @@ contraction.
   - the pruned and unpruned simulations agree with `simult_` to $10^{-14}$;
   - the pruned moments agree with `pruned_state_space_system` at orders 2 and 3 to $10^{-15}$.
 - **Lucas tree with switching dividend growth** (exact closed form):
-  - policy derivatives up to order 4 in both regimes agree to $3\times10^{-15}$;
-  - pruned moments up to order 4 agree to $2\times10^{-15}$. The oracle is the Taylor polynomial of the closed form,
-    with expectations by Gauss–Hermite quadrature.
+  - policy derivatives up to order 4 in both regimes agree to $1.3\times10^{-14}$ relative;
+  - pruned moments up to order 4 agree to $2.3\times10^{-15}$. The oracle is the Taylor polynomial of the closed
+    form, with expectations by Gauss–Hermite quadrature.
 - **RBC with two switching parameters, order 4:**
-  - against an independent dense prototype solver: $3\times10^{-15}$;
+  - against an independent dense prototype solver, homogeneous parts of the policy at 20 points: $6\times10^{-11}$
+    of the size of the order-4 part, $3\times10^{-12}$ at orders 2 and 3;
   - pruned simulation against layers computed as $\sigma$-derivatives of the prototype policy by automatic
     differentiation: $1.4\times10^{-11}$ relative;
   - moments against a Monte Carlo of $2\times10^6$ periods: 13 quantities within 1.7 standard errors.
@@ -250,7 +258,12 @@ contraction.
     2 correlated shocks, orders 2–4);
   - the three diagonal-block solvers (doubling, `gensylv`, dense LU) agree to $7\times10^{-15}$.
 - **Linear model with three regimes and a forward-looking variable** (`tests/ms_korder/ms_linear_exact.mod`):
-  solution and moments against the exact solution and the Markov jump linear recursion, $2\times10^{-15}$.
+  solution and moments against the exact solution and the Markov jump linear recursion, $3\times10^{-15}$, for a
+  transition matrix with real eigenvalues and one with complex eigenvalues.
+- **Transition matrix with complex eigenvalues** ($1$, $0.4 \pm 0.26i$), RBC, three regimes, order 4:
+  - against the dense prototype solver: $6\times10^{-11}$ of the size of the order-4 part;
+  - moments: the three diagonal-block solvers agree to $10^{-14}$; 14 quantities within 0.9 standard errors of a
+    Monte Carlo of $2\times10^6$ periods.
 
 # References
 

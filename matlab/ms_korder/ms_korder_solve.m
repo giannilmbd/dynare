@@ -8,7 +8,7 @@ function ms = ms_korder_solve(M_, options_, dr, P, ahat)
 % The regime value is aD_t = sigma * ahat(r, s_t), r the row of aD in ms.switch_vars (order of the tags in the model).
 % Call after stoch_simul(order=K, k_order_solver, ...) (sets dr.ys, dr.order_var, options_.order = K >= 2).
 %
-% INPUTS   P     [S x S]  transition matrix, P(s, s') = Pr(s_{t+1} = s' | s_t = s); real eigenvalues required
+% INPUTS   P     [S x S]  transition matrix, P(s, s') = Pr(s_{t+1} = s' | s_t = s)
 %          ahat  [n_switch x S]  regime values of the switching variables (deviation from their steady state 0)
 % OUTPUT   ms.g{s}.y<i>u<j>s<k>: unfolded derivative of the policy of regime s, rows in dr.order_var order, columns
 %          kron(ystate^{(x)i}, u^{(x)j}), ystate = dr.order_var(M_.nstatic + (1:M_.nspred)); i + j + k <= order.
@@ -44,20 +44,12 @@ for r = 1:numel(eqs)
 end
 forcing = zeros(M_.endo_nbr, S);
 forcing(eqs, :) = -ahat;          % residual of the dummy equation: a_t - sigma * ahat(s_t)
-[W, L] = eig(P');
-lam = diag(L);
-if any(abs(imag(lam)) > 1e-12) || any(abs(imag(W(:))) > 1e-12)
-    error('ms_korder_solve: P has complex eigenvalues (not implemented: real Schur form needed)')
-end
-lam = real(lam); W = real(W);
-if rcond(W) < 1e-10
-    error('ms_korder_solve: eigenvectors of P are (nearly) dependent, rcond %g', rcond(W))
-end
-msin = struct('P', P, 'lam', lam, 'W', W, 'Winv', inv(W), 'forcing', forcing);
+msin = struct('P', P, 'forcing', forcing);
 ms.g = k_order_perturbation_ms(dr, M_, options_, msin);
 ms.switch_vars = names;
 ms.order_var = dr.order_var;
 ms.state_var = dr.order_var(M_.nstatic + (1:M_.nspred));
 ms.P = P; ms.ahat = ahat; ms.order = options_.order;
 ms.ys = dr.ys;
+ms.nstatic = M_.nstatic; ms.npred = M_.npred; ms.nboth = M_.nboth; ms.nfwrd = M_.nfwrd;
 end

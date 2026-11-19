@@ -1,5 +1,5 @@
-function mom = ms_korder_moments(ms, Sigma_u, second, solver)
-% mom = ms_korder_moments(ms, Sigma_u[, second[, solver]])
+function mom = ms_korder_moments(ms, Sigma_u, order, solver, vars)
+% mom = ms_korder_moments(ms, Sigma_u[, order[, solver[, vars]]])
 % Exact unconditional and regime-conditional moments of the PRUNED order-K Markov-switching solution (the process
 % simulated by ms_korder_simul(..., pruning = true)), at sigma = 1, innovations u_t ~ iid N(0, Sigma_u)
 % (pass M_.Sigma_e), regime chain stationary with transition ms.P.
@@ -18,36 +18,45 @@ function mom = ms_korder_moments(ms, Sigma_u, second, solver)
 % Lagged blocks have weight sum(b) or less, and weight sum(b) only with more factors or (all factors g_y) the block
 % itself, so the system is block triangular: blocks are solved by weight ascending and, within a weight, by number of
 % factors descending. The diagonal block is  M - Phi^{[b]} M P = R,  Phi^{[b]} = F_b Phi^{(x)m} Dup_b, Phi = g_y
-% (regime free); with P V = V diag(lam) (real eigenvalues),  (I - lam_k Phi^{[b]}) Mt(:, k) = (R V)(:, k),
-% M = Mt V^{-1}, each solved by Smith doubling with (Phi^{[b]})^(2^j) = (Phi^(2^j))^{[b]} applied as Kronecker-vector
-% products. W = K gives the means, W = 2K the second moments. y_t - ys is a sum of terms of the same form.
+% (regime free). It is solved by Smith doubling on the matrix equation, M <- M + (Phi^(2^j))^{[b]} M P^(2^j), with
+% (Phi^{[b]})^(2^j) = (Phi^(2^j))^{[b]} applied as Kronecker-vector products; no decomposition of P is used, so P may
+% have complex eigenvalues or be defective. Moments of order p of y need the blocks of weight up to W = pK.
+% y_t - ys is a sum of terms of the same form, and E[(y - ys)^{(x)p} 1{s_t = s}] is the sum over multisets of p terms
+% of the contraction of one arrangement times its multiplicity, symmetrised over the p factors.
 %
 % INPUTS  ms        output of ms_korder_solve
 %         Sigma_u   [nu x nu] innovation covariance (M_.Sigma_e)
-%         second    logical, also compute second moments (default true)
+%         order     highest moment, 1 to 4 (default 2); true/false are read as 2/1
 %         solver    diagonal-block solver: 'doubling' (default), 'gensylv' (Dynare Schur recursion on the unfolded
-%                   block), 'lu' (dense LU of the folded block)
+%                   block, regimes stacked: X - (P' (x) Phi) X Phi'^{(x)(m-1)} = R), 'lu' (dense LU of
+%                   I - P' (x) Phi^{[b]} on the folded block)
+%         vars      variables (declaration indices) of the moments of order 3 and 4 (default: all)
 % OUTPUT  mom.pi [S x 1] ergodic regime probabilities
 %         mom.mean [ny x 1] unconditional mean of y (levels, declaration order)
 %         mom.mean_regime [ny x S] E[y_t | s_t = s]
-%         mom.var [ny x ny] unconditional covariance; mom.second_regime{s} = E[(y-ys)(y-ys)' | s_t = s]  (if second)
+%         mom.var [ny x ny] unconditional covariance; mom.second_regime{s} = E[(y-ys)(y-ys)' | s_t = s]  (order >= 2)
+%         order >= 3, for the variables v = vars, yh = y - ys:
+%           mom.vars; mom.raw_regime{p} [numel(v)^p x S] = E[yh_v^{(x)p} 1{s_t = s}] (symmetric), p = 3..order;
+%           mom.skewness [numel(v) x 1], mom.skewness_regime [numel(v) x S] (about E[y | s_t = s], given s_t = s);
+%           order 4: mom.kurtosis, mom.kurtosis_regime (not in excess)
 %         mom.blocks (layer tuples, in solution order), mom.n_unknowns (folded unknowns, all regimes),
 %         mom.residual (max over blocks of the relative residual of the diagonal-block equation)
-if nargin < 3, second = true; end
-if nargin < 4, solver = 'doubling'; end
+if nargin < 3, order = 2; end
+if nargin < 4 || isempty(solver), solver = 'doubling'; end
+if islogical(order), order = 1 + double(order); end
+if ~(isscalar(order) && any(order == 1:4)), error('ms_korder_moments: order must be 1, 2, 3 or 4'), end
+second = order >= 2;
 K = ms.order; S = numel(ms.g); P = ms.P;
 ny = numel(ms.order_var); n = numel(ms.state_var); nu = size(Sigma_u, 1);
 srow = zeros(n, 1);
 for i = 1:n, srow(i) = find(ms.order_var == ms.state_var(i)); end
 inv_ov(ms.order_var) = 1:ny;
 
-[V, D] = eig(P'); [~, i1] = min(abs(diag(D) - 1)); pi_ = real(V(:, i1)); pi_ = pi_ / sum(pi_);
-[Vp, Lp] = eig(P); lam = diag(Lp);
-if ~isreal(lam), error('ms_korder_moments: P has complex eigenvalues'), end
-if cond(Vp) > 1e10, error('ms_korder_moments: P is not diagonalisable (cond of eigenvectors %.1e)', cond(Vp)), end
-Vpi = inv(Vp);
+pi_ = null(P' - eye(S));
+if size(pi_, 2) ~= 1, error('ms_korder_moments: the chain P has %d ergodic classes (one required)', size(pi_, 2)), end
+pi_ = pi_ / sum(pi_);
 
-W = K * (1 + logical(second));
+W = K * order;
 [Tst, Ty] = build_terms(ms, srow, n, nu, K, S, ny);
 Phi = ms.g{1}.y1u0s0(srow, :);
 for s = 2:S
@@ -97,9 +106,7 @@ for b = 1:numel(B)
     end
     R = zeros(C, S);
     for s = 1:S, R(:, s) = accumarray(ic, Tsum(:, s), [C, 1]) ./ cnt; end
-    Rt = R * Vp; Mt = zeros(C, S);
-    for k = 1:S, Mt(:, k) = diag_solve(lam(k), Phi, Rt(:, k), ic, rep, m, n, solver); end
-    M = Mt * Vpi;
+    M = diag_solve(P, Phi, R, ic, rep, m, n, solver);
     MP = M * P; AM = zeros(C, S);
     for s = 1:S, AM(:, s) = apply_sym(Phi, MP(:, s), ic, rep, m, n); end
     sc = max(abs([M(:); R(:)]));
@@ -134,6 +141,48 @@ if second
         mom.second_regime{s} = E2(inv_ov, inv_ov, s) / pi_(s);
     end
 end
+if order >= 3
+    if nargin < 5 || isempty(vars), vars = 1:ny; end
+    vars = vars(:)'; r = numel(vars); rs = inv_ov(vars);
+    Tyv = Ty;
+    for t = 1:numel(Tyv), Tyv(t).G = Tyv(t).G(rs, :, :); end
+    mom.vars = vars; mom.raw_regime = cell(1, order);
+    for p = 3:order, mom.raw_regime{p} = ymoment(Tyv, p, getnu, Mu, n, nu, S, r); end
+    a = cell(1, order);                                % a{p}(i, s) = E[yh_i^p 1{s_t = s}]
+    a{1} = Ey(rs, :);
+    a{2} = zeros(r, S);
+    for s = 1:S, a{2}(:, s) = diag(E2(rs, rs, s)); end
+    for p = 3:order, a{p} = mom.raw_regime{p}(1 + (0:r - 1)' * sum(r.^(0:p - 1)), :); end
+    A = cellfun(@(x) sum(x, 2), a, 'UniformOutput', false);
+    [mom.skewness, mom.kurtosis] = std_moments(A, order);
+    c = cellfun(@(x) x ./ pi_', a, 'UniformOutput', false);
+    [mom.skewness_regime, mom.kurtosis_regime] = std_moments(c, order);
+    if order < 4, mom = rmfield(mom, {'kurtosis', 'kurtosis_regime'}); end
+end
+end
+
+function [sk, ku] = std_moments(a, order)
+% skewness and kurtosis from the raw moments a{p} = E[yh^p] (elementwise)
+m = a{1}; v = a{2} - m.^2;
+sk = (a{3} - 3 * m .* a{2} + 2 * m.^3) ./ v.^1.5;
+ku = [];
+if order >= 4, ku = (a{4} - 4 * m .* a{3} + 6 * m.^2 .* a{2} - 3 * m.^4) ./ v.^2; end
+end
+
+function E = ymoment(Ty, p, getnu, Mu, n, nu, S, r)
+% E[yh^{(x)p} 1{s_t = s}] [r^p x S]: sum over multisets of p terms of one arrangement times its multiplicity,
+% symmetrised over the p factors
+C = multisets(numel(Ty), p); js = [Ty.j];
+E = zeros(r^p, S);
+for c = 1:size(C, 1)
+    idx = C(c, :);
+    if mod(sum(js(idx)), 2) == 1, continue, end
+    E = E + multinom(idx) * contract(Ty(idx), getnu, Mu, n, nu, S);
+end
+E = reshape(E, [r * ones(1, p), S]); Es = zeros(size(E));
+pm = perms(1:p);
+for k = 1:size(pm, 1), Es = Es + permute(E, [pm(k, :), p + 1]); end
+E = reshape(Es / size(pm, 1), r^p, S);
 end
 
 % ======================================================================================================================
@@ -304,31 +353,37 @@ end
 y = y(rep);
 end
 
-function x = diag_solve(lambda, Phi, r, ic, rep, m, n, solver)
-% (I - lambda Phi^{[b]}) x = r
+function M = diag_solve(P, Phi, R, ic, rep, m, n, solver)
+% M - Phi^{[b]} M P = R  (M, R: C x S)
+[C, S] = size(R);
 switch solver
     case 'doubling'
-        x = r; l = lambda; F = Phi;
+        M = R; F = Phi; Q = P;
         for it = 1:60
-            dx = l * apply_sym(F, x, ic, rep, m, n); x = x + dx;
-            if norm(dx) <= 1e-17 * norm(x), return, end
-            l = l^2; F = F * F;
+            AM = zeros(C, S);
+            for s = 1:S, AM(:, s) = apply_sym(F, M(:, s), ic, rep, m, n); end
+            dM = AM * Q; M = M + dM;
+            if norm(dM, 'fro') <= 1e-17 * norm(M, 'fro'), return, end
+            F = F * F; Q = Q * Q;
         end
-        error('ms_korder_moments: doubling did not converge (spectral radius of lambda Phi^{(x)%d} >= 1?)', m);
+        error('ms_korder_moments: doubling did not converge (spectral radius of Phi^{(x)%d} >= 1?)', m);
     case 'gensylv'
-        ru = r(ic);
+        % unfolded regime s: X_s (n x n^(m-1)); X_s' - Phi sum_s X_s P(s, s') Phi'^{(x)(m-1)} = R_s'
+        Ru = R(ic, :);
+        Xb = reshape(permute(reshape(Ru, n, n^(m - 1), S), [1 3 2]), n * S, n^(m - 1));
         if m == 1
-            xu = (eye(n) - lambda * Phi) \ ru;
+            Xb = (eye(n * S) - kron(P', Phi)) \ Xb;
         else
-            xu = gensylv(m - 1, eye(n), -lambda * Phi, Phi', reshape(ru, n, n^(m - 1)));
+            Xb = gensylv(m - 1, eye(n * S), -kron(P', Phi), Phi', Xb);
         end
-        x = xu(rep);
+        Xu = reshape(permute(reshape(Xb, n, S, n^(m - 1)), [1 3 2]), n^m, S);
+        M = Xu(rep, :);
     case 'lu'
-        C = numel(r); A = zeros(C);
+        A = zeros(C);
         for c = 1:C
             e = zeros(C, 1); e(c) = 1; A(:, c) = apply_sym(Phi, e, ic, rep, m, n);
         end
-        x = (eye(C) - lambda * A) \ r;
+        M = reshape((eye(C * S) - kron(P', A)) \ R(:), C, S);
     otherwise
         error('ms_korder_moments: unknown solver %s', solver);
 end
