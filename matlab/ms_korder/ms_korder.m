@@ -23,6 +23,13 @@ function oo_ = ms_korder(M_, options_, oo_, regimes, opts)
 %         opts.solver     diagonal-block solver of the exact moments: 'doubling' (default), 'gensylv', 'lu'
 %         opts.periods    length of a pruned simulation (default 0 = none)
 %         opts.s0, opts.seed  initial regime (default 1) and seed (default 0) of the simulations
+%         opts.shock_draw  function handle draw(T) -> [exo_nbr x T] of innovations for the simulations (default:
+%                         Gaussian, and skew normal for shocks in M_.Skew_e; required for shocks given by
+%                         M_.Raw_moments_e)
+%
+% Non-Gaussian innovations: independent shocks with raw moments in M_.Raw_moments_e (entry (i, d) = E[e_i^d]) or
+% skew normal shocks in M_.Skew_e enter the solution and the moments; exact moments of order p need the raw moments
+% up to d = pK.
 % OUTPUT  oo_.ms.solution  output of ms_korder_solve (policy derivatives by regime)
 %         oo_.ms.moments   output of ms_korder_moments (if opts.moments)
 %         oo_.ms.sim_moments  output of ms_korder_sim_moments (if orders 3, 4 are simulated)
@@ -30,7 +37,7 @@ function oo_ = ms_korder(M_, options_, oo_, regimes, opts)
 if nargin < 5, opts = struct(); end
 if isfield(opts, 'second') && ~isfield(opts, 'order'), opts.order = 1 + double(logical(opts.second)); end
 def = struct('moments', true, 'order', 2, 'moment_method', 'auto', 'sim_periods', 1e6, 'solver', 'doubling', ...
-             'periods', 0, 's0', 1, 'seed', 0);
+             'periods', 0, 's0', 1, 'seed', 0, 'shock_draw', []);
 f = fieldnames(def);
 for i = 1:numel(f)
     if ~isfield(opts, f{i}), opts.(f{i}) = def.(f{i}); end
@@ -65,11 +72,12 @@ if opts.moments
         otherwise, error('ms_korder: opts.moment_method must be ''auto'', ''exact'' or ''simulation''')
     end
     if exact
-        mom = ms_korder_moments(ms, M_.Sigma_e, opts.order, opts.solver, keep);
+        mom = ms_korder_moments(ms, M_, opts.order, opts.solver, keep);
         hm = mom;
     else
-        mom = ms_korder_moments(ms, M_.Sigma_e, 2, opts.solver, keep);
-        hm = ms_korder_sim_moments(ms, M_.Sigma_e, keep, opts.sim_periods, struct('s0', opts.s0, 'seed', opts.seed));
+        mom = ms_korder_moments(ms, M_, 2, opts.solver, keep);
+        hm = ms_korder_sim_moments(ms, M_, keep, opts.sim_periods, ...
+                                   struct('s0', opts.s0, 'seed', opts.seed, 'draw', opts.shock_draw));
         oo_.ms.sim_moments = hm;
     end
     oo_.ms.moments = mom;
@@ -79,8 +87,7 @@ if opts.periods > 0
     T = opts.periods;
     s = ms_markov_chain(P, T, opts.s0, opts.seed);
     rng(opts.seed + 1, 'twister');
-    [Ve, De] = eig((M_.Sigma_e + M_.Sigma_e') / 2);           % factor valid for a singular covariance
-    u = Ve * diag(sqrt(max(diag(De), 0))) * randn(M_.exo_nbr, T);
+    u = ms_korder_draw_shocks(M_, T, opts.shock_draw);
     oo_.ms.simulation = struct('y', ms_korder_simul(ms, s, u, true), 's', s, 'u', u);
 end
 end

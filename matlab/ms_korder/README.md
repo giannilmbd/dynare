@@ -52,7 +52,23 @@ oo_ = ms_korder(M_, options_, oo_, regimes, struct('periods', 1000));
 | `oo_.ms.simulation` | `y` (levels, declaration order), regime path `s`, innovations `u` |
 
 Options (`opts`): `order` (highest moment, 1–4, default 2), `moment_method` (`'auto'`, `'exact'`, `'simulation'`;
-see below), `sim_periods` (default 10⁶), `solver`, `periods` (length of a stored simulation), `s0`, `seed`.
+see below), `sim_periods` (default 10⁶), `solver`, `periods` (length of a stored simulation), `s0`, `seed`,
+`shock_draw` (function `draw(T)` returning `exo_nbr × T` innovations for the simulations).
+
+**Non-Gaussian innovations.** Shocks that are independent of the others can be given any distribution with finite
+moments, by their raw moments in `M_.Raw_moments_e` (`exo_nbr × D`, entry (i, d) = E[e_i^d], a `NaN` row for a Gaussian
+shock), or as skew normal in `M_.Skew_e`, as for the stock k-order solver. They enter the solution and the moments.
+Exact moments of order p need the raw moments up to d = pK. Simulations draw skew normal shocks directly; shocks given
+by raw moments need `opts.shock_draw`. For example, a disaster-type TFP innovation:
+
+```
+w = [0.97 0.03]; mu = [0 -5]; sd = [1 1];
+raw = mixture_normal_raw_moments(w, mu, sd, 4*K);
+M_.Sigma_e = raw(2); M_.Raw_moments_e = raw;
+[info, oo_] = stoch_simul(M_, options_, oo_, {});
+draw = @(T) mu(1 + (rand(1, T) < w(2))) - w*mu' + randn(1, T);
+oo_ = ms_korder(M_, options_, oo_, regimes, struct('order', 4, 'shock_draw', draw));
+```
 
 Exact third and fourth moments are costly at high perturbation orders. For the one-state RBC with three regimes:
 
@@ -71,8 +87,10 @@ The building blocks can also be called directly:
 |---|---|
 | `ms_korder_solve(M_, options_, oo_.dr, P, ahat)` | solution; `ahat` is [switching variables × S] in the order of the tags |
 | `ms_korder_simul(ms, s_path, u_path, pruning, y0dev)` | simulation along a given regime path, pruned or not; the pruned simulation at σ = 1 runs in the Fortran MEX `ms_k_order_simul` |
-| `ms_korder_moments(ms, Sigma_u, order, solver, vars)` | exact moments of the pruned solution, up to order 4 |
-| `ms_korder_sim_moments(ms, Sigma_u, vars, T, opts)` | simulated moments with batch-means standard errors |
+| `ms_korder_moments(ms, M_, order, solver, vars)` | exact moments of the pruned solution, up to order 4 |
+| `ms_korder_sim_moments(ms, M_, vars, T, opts)` | simulated moments with batch-means standard errors |
+| `ms_korder_shock_moments(M_, W)` | innovation moments E[u^{⊗J}], J ≤ W |
+| `ms_korder_draw_shocks(M_, T, draw)` | draw of innovations (Gaussian, skew normal, or a user draw function) |
 | `ms_korder_eval(ms, s, ystate, u, sigma)` | evaluation of the policy of regime s |
 | `ms_korder_pruning_tensors(ms)` | each regime's decision rule in the format of `dr.pruning` |
 | `ms_markov_chain(P, T, s0, seed)` | draw of a regime path |
@@ -111,8 +129,7 @@ factors.
   affect the steady state out of the perturbation. That makes first-order coefficients regime dependent and is
   not implemented here.
 - The chain must have a single ergodic class (for the moments).
-- Moments assume Gaussian innovations. The solution reads the same shock moments as `k_order_perturbation`
-  (including `M_.Skew_e`), but only Gaussian shocks have been tested with regimes.
+- Non-Gaussian innovations must be independent of the other shocks, as in the k-order solver.
 - No autocovariances or impulse responses.
 
 ## Tests
@@ -122,6 +139,9 @@ factors.
 - `ms_one_regime.mod`: with one regime, the derivatives, pruned simulation and pruned moments equal stock Dynare.
 - `ms_linear_exact.mod`: three regimes, linear model with a forward-looking variable, against its exact solution
   and moments up to order 4, for a transition matrix with real eigenvalues and one with complex eigenvalues.
+- `ms_nongaussian_exact.mod`: three regimes, innovations a normal mixture (`M_.Raw_moments_e`) and a skew normal
+  (`M_.Skew_e`): the third-order stochastic term of E_t[e³₊₁ + a₊₁e²₊₁] and the moments up to order 4 against their
+  exact values.
 - `ms_two_regimes.mod`: three moment solvers agree; regime-conditional moments aggregate to the unconditional
   ones; end-to-end run of `ms_korder`.
 

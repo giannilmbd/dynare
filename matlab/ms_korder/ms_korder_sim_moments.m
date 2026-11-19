@@ -1,30 +1,30 @@
-function sm = ms_korder_sim_moments(ms, Sigma_u, vars, T, opts)
-% sm = ms_korder_sim_moments(ms, Sigma_u, vars, T[, opts])
+function sm = ms_korder_sim_moments(ms, shocks, vars, T, opts)
+% sm = ms_korder_sim_moments(ms, shocks, vars, T[, opts])
 % Moments of the pruned Markov-switching solution by simulation, with batch-means standard errors.
 %
 % INPUTS  ms       output of ms_korder_solve
-%         Sigma_u  [nu x nu] innovation covariance (M_.Sigma_e); innovations are Gaussian
+%         shocks   M_ or the covariance of Gaussian innovations; innovations drawn by ms_korder_draw_shocks
 %         vars     variables (declaration indices)
 %         T        number of periods kept after the burn-in
 %         opts     .burn (default 1000), .batches (default 100; T must be a multiple), .s0 (initial regime, default
-%                  1), .seed (default 0: regime path seed 'seed', innovations rng(seed + 1))
+%                  1), .seed (default 0: regime path seed 'seed', innovations rng(seed + 1)), .draw (function handle
+%                  draw(T) -> [nu x T], see ms_korder_draw_shocks; required for shocks given by Raw_moments_e)
 % OUTPUT  sm.vars; sm.T; sm.regime_share [S x 1];
 %         sm.mean, sm.std, sm.skewness, sm.kurtosis [numel(vars) x 1] (kurtosis not in excess),
 %         sm.mean_regime, sm.std_regime, sm.skewness_regime, sm.kurtosis_regime [numel(vars) x S] (given s_t = s);
 %         sm.se.<same fields>: batch-means standard errors (standard deviation of the batch estimates / sqrt(batches))
 if nargin < 5, opts = struct(); end
-def = struct('burn', 1000, 'batches', 100, 's0', 1, 'seed', 0);
+def = struct('burn', 1000, 'batches', 100, 's0', 1, 'seed', 0, 'draw', []);
 f = fieldnames(def);
 for i = 1:numel(f)
     if ~isfield(opts, f{i}), opts.(f{i}) = def.(f{i}); end
 end
 B = opts.batches;
 if mod(T, B) ~= 0, error('ms_korder_sim_moments: T must be a multiple of the number of batches (%d)', B), end
-S = numel(ms.g); Tb = T / B; nu = size(Sigma_u, 1);
+S = numel(ms.g); Tb = T / B;
 s = ms_markov_chain(ms.P, T + opts.burn, opts.s0, opts.seed);
 rng(opts.seed + 1, 'twister');
-[V, D] = eig((Sigma_u + Sigma_u') / 2);
-u = V * diag(sqrt(max(diag(D), 0))) * randn(nu, T + opts.burn);
+u = ms_korder_draw_shocks(shocks, T + opts.burn, opts.draw);
 y = ms_korder_simul(ms, s, u, true);
 y = y(vars(:), opts.burn + 1:end); s = s(opts.burn + 1:end);
 stats = @(x) [mean(x, 2), std(x, 1, 2), skw(x), krt(x)];

@@ -1,8 +1,8 @@
-function mom = ms_korder_moments(ms, Sigma_u, order, solver, vars)
-% mom = ms_korder_moments(ms, Sigma_u[, order[, solver[, vars]]])
+function mom = ms_korder_moments(ms, shocks, order, solver, vars)
+% mom = ms_korder_moments(ms, shocks[, order[, solver[, vars]]])
 % Exact unconditional and regime-conditional moments of the PRUNED order-K Markov-switching solution (the process
-% simulated by ms_korder_simul(..., pruning = true)), at sigma = 1, innovations u_t ~ iid N(0, Sigma_u)
-% (pass M_.Sigma_e), regime chain stationary with transition ms.P.
+% simulated by ms_korder_simul(..., pruning = true)), at sigma = 1, innovations u_t iid with the moments given by
+% shocks (see ms_korder_shock_moments), regime chain stationary with transition ms.P.
 %
 % Method. x^(a)_t (a = 1..K) are the pruned layers of the n states. By the layer rule (Lombardo and Uhlig 2018,
 % Theorem 1) layer q is
@@ -25,7 +25,9 @@ function mom = ms_korder_moments(ms, Sigma_u, order, solver, vars)
 % of the contraction of one arrangement times its multiplicity, symmetrised over the p factors.
 %
 % INPUTS  ms        output of ms_korder_solve
-%         Sigma_u   [nu x nu] innovation covariance (M_.Sigma_e)
+%         shocks    M_ (innovations defined by Sigma_e, and Raw_moments_e and Skew_e for non-Gaussian independent
+%                   shocks, as in the k-order solver), or the covariance [nu x nu] of Gaussian innovations; moments of
+%                   order p need E[e^d] up to d = pK
 %         order     highest moment, 1 to 4 (default 2); true/false are read as 2/1
 %         solver    diagonal-block solver: 'doubling' (default), 'gensylv' (Dynare Schur recursion on the unfolded
 %                   block, regimes stacked: X - (P' (x) Phi) X Phi'^{(x)(m-1)} = R), 'lu' (dense LU of
@@ -47,7 +49,7 @@ if islogical(order), order = 1 + double(order); end
 if ~(isscalar(order) && any(order == 1:4)), error('ms_korder_moments: order must be 1, 2, 3 or 4'), end
 second = order >= 2;
 K = ms.order; S = numel(ms.g); P = ms.P;
-ny = numel(ms.order_var); n = numel(ms.state_var); nu = size(Sigma_u, 1);
+ny = numel(ms.order_var); n = numel(ms.state_var);
 srow = zeros(n, 1);
 for i = 1:n, srow(i) = find(ms.order_var == ms.state_var(i)); end
 inv_ov(ms.order_var) = 1:ny;
@@ -57,12 +59,13 @@ if size(pi_, 2) ~= 1, error('ms_korder_moments: the chain P has %d ergodic class
 pi_ = pi_ / sum(pi_);
 
 W = K * order;
+Mu = ms_korder_shock_moments(shocks, W); nu = numel(Mu{2});
+nz = cellfun(@(x) any(x(:) ~= 0), Mu);                % nz(J+1): E[u^{(x)J}] is not identically zero
 [Tst, Ty] = build_terms(ms, srow, n, nu, K, S, ny);
 Phi = ms.g{1}.y1u0s0(srow, :);
 for s = 2:S
     if ~isequal(ms.g{s}.y1u0s0(srow, :), Phi), error('ms_korder_moments: g_y differs across regimes'), end
 end
-Mu = gauss_kron(Sigma_u, nu, W);
 
 % ---- blocks, block-triangular order
 B = block_list(K, W);
@@ -101,7 +104,7 @@ for b = 1:numel(B)
             terms = [terms, Tst{ua(g)}(ch{g}(sub{g}, :))]; %#ok<AGROW>
             mul = mul * mlt{g}(sub{g});
         end
-        if all([terms.dg]) || mod(sum([terms.j]), 2) == 1, continue, end
+        if all([terms.dg]) || ~nz(sum([terms.j]) + 1), continue, end
         Tsum = Tsum + mul * contract(terms, getnu, Mu, n, nu, S);
     end
     R = zeros(C, S);
@@ -119,7 +122,7 @@ mom.pi = pi_; mom.blocks = B; mom.n_unknowns = nunk; mom.residual = res;
 ys = ms.ys(ms.order_var);
 Ey = zeros(ny, S);
 for t = 1:numel(Ty)
-    if mod(Ty(t).j, 2) == 0, Ey = Ey + contract(Ty(t), getnu, Mu, n, nu, S); end
+    if nz(Ty(t).j + 1), Ey = Ey + contract(Ty(t), getnu, Mu, n, nu, S); end
 end
 mom.mean_regime = ys(inv_ov) + Ey(inv_ov, :) ./ pi_';
 mom.mean = ys(inv_ov) + sum(Ey(inv_ov, :), 2);
@@ -127,7 +130,7 @@ if second
     E2 = zeros(ny * ny, S);
     for t1 = 1:numel(Ty)
         for t2 = t1:numel(Ty)
-            if mod(Ty(t1).j + Ty(t2).j, 2) == 1, continue, end
+            if ~nz(Ty(t1).j + Ty(t2).j + 1), continue, end
             T = contract([Ty(t1), Ty(t2)], getnu, Mu, n, nu, S);
             E2 = E2 + T;
             if t2 > t1, E2 = E2 + reshape(permute(reshape(T, ny, ny, S), [2 1 3]), [], S); end
@@ -147,7 +150,7 @@ if order >= 3
     Tyv = Ty;
     for t = 1:numel(Tyv), Tyv(t).G = Tyv(t).G(rs, :, :); end
     mom.vars = vars; mom.raw_regime = cell(1, order);
-    for p = 3:order, mom.raw_regime{p} = ymoment(Tyv, p, getnu, Mu, n, nu, S, r); end
+    for p = 3:order, mom.raw_regime{p} = ymoment(Tyv, p, getnu, Mu, nz, n, nu, S, r); end
     a = cell(1, order);                                % a{p}(i, s) = E[yh_i^p 1{s_t = s}]
     a{1} = Ey(rs, :);
     a{2} = zeros(r, S);
@@ -169,14 +172,14 @@ ku = [];
 if order >= 4, ku = (a{4} - 4 * m .* a{3} + 6 * m.^2 .* a{2} - 3 * m.^4) ./ v.^2; end
 end
 
-function E = ymoment(Ty, p, getnu, Mu, n, nu, S, r)
+function E = ymoment(Ty, p, getnu, Mu, nz, n, nu, S, r)
 % E[yh^{(x)p} 1{s_t = s}] [r^p x S]: sum over multisets of p terms of one arrangement times its multiplicity,
 % symmetrised over the p factors
 C = multisets(numel(Ty), p); js = [Ty.j];
 E = zeros(r^p, S);
 for c = 1:size(C, 1)
     idx = C(c, :);
-    if mod(sum(js(idx)), 2) == 1, continue, end
+    if ~nz(sum(js(idx)) + 1), continue, end
     E = E + multinom(idx) * contract(Ty(idx), getnu, Mu, n, nu, S);
 end
 E = reshape(E, [r * ones(1, p), S]); Es = zeros(size(E));
@@ -293,21 +296,6 @@ end
 
 function m = multinom(row)
 m = factorial(numel(row)) / prod(factorial(accumarray(row(:), 1)));
-end
-
-function Mu = gauss_kron(Sig, nu, W)
-% Mu{J+1} = E[u^{(x)J}], u ~ N(0, Sig) (Isserlis: pair mode 1 with each mode k)
-Mu = cell(1, W + 1); Mu{1} = 1;
-for J = 1:W
-    if mod(J, 2) == 1, Mu{J + 1} = zeros(nu^J, 1); continue, end
-    base = kron(Mu{J - 1}, Sig(:));                   % modes (1, 2) Sigma, modes 3..J the J-2 moment
-    acc = zeros(nu^J, 1);
-    for k = 2:J
-        perm = zeros(1, J); perm(1) = 1; perm(k) = 2; perm(setdiff(1:J, [1 k])) = 3:J;
-        acc = acc + reshape(permute(reshape(base, [nu * ones(1, J), 1]), [perm, J + 1]), [], 1);
-    end
-    Mu{J + 1} = acc;
-end
 end
 
 function T = contract(terms, getnu, Mu, n, nu, S)

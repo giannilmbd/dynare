@@ -1890,6 +1890,7 @@ mod_and_m_tests = [
   { 'test' : [ 'ms_korder/ms_two_regimes.mod' ],
     'extra' : [ 'ms_korder/rbc3_ms_model.inc' ] },
   { 'test' : [ 'ms_korder/ms_linear_exact.mod' ] },
+  { 'test' : [ 'ms_korder/ms_nongaussian_exact.mod' ] },
   { 'test' : [ 'decision_rules/second_order/burnside_1.mod' ] },
   { 'test' : [ 'decision_rules/second_order/ds1.mod',
                'decision_rules/second_order/ds2.mod' ] },
