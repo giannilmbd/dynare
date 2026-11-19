@@ -1,5 +1,5 @@
-function mom = ms_korder_moments(ms, shocks, order, solver, vars)
-% mom = ms_korder_moments(ms, shocks[, order[, solver[, vars]]])
+function mom = ms_korder_moments(ms, shocks, order, solver, vars, dyn)
+% mom = ms_korder_moments(ms, shocks[, order[, solver[, vars[, dyn]]]])
 % Exact unconditional and regime-conditional moments of the PRUNED order-K Markov-switching solution (the process
 % simulated by ms_korder_simul(..., pruning = true)), at sigma = 1, innovations u_t iid with the moments given by
 % shocks (see ms_korder_shock_moments), regime chain stationary with transition ms.P.
@@ -32,7 +32,12 @@ function mom = ms_korder_moments(ms, shocks, order, solver, vars)
 %         solver    diagonal-block solver: 'doubling' (default), 'gensylv' (Dynare Schur recursion on the unfolded
 %                   block, regimes stacked: X - (P' (x) Phi) X Phi'^{(x)(m-1)} = R), 'lu' (dense LU of
 %                   I - P' (x) Phi^{[b]} on the folded block)
-%         vars      variables (declaration indices) of the moments of order 3 and 4 (default: all)
+%         vars      variables (declaration indices) of the moments of order 3 and 4 and of the autocovariances
+%                   (default: all)
+%         dyn       (optional) .ar: number of autocovariance lags (default 0; needs order >= 2); .irf: number of
+%                   periods of the impulse responses (default 0); .irf_shocks [nu x m]: impulses (default: one
+%                   column of the lower Cholesky factor of the covariance per shock with nonzero
+%                   variance, as stoch_simul); .irf_names {1 x m}
 % OUTPUT  mom.pi [S x 1] ergodic regime probabilities
 %         mom.mean [ny x 1] unconditional mean of y (levels, declaration order)
 %         mom.mean_regime [ny x S] E[y_t | s_t = s]
@@ -43,7 +48,17 @@ function mom = ms_korder_moments(ms, shocks, order, solver, vars)
 %           order 4: mom.kurtosis, mom.kurtosis_regime (not in excess)
 %         mom.blocks (layer tuples, in solution order), mom.n_unknowns (folded unknowns, all regimes),
 %         mom.residual (max over blocks of the relative residual of the diagonal-block equation)
+%         dyn.ar > 0: mom.autocov{h} [r x r] = E[(y_{t+h} - m)(y_t - m)'] and mom.autocorr{h} (correlations), h = 1..ar,
+%           for the variables vars (rows: y_{t+h}, columns: y_t)
+%         dyn.irf > 0: mom.irf(k).regime [ny x H x S], mom.irf(k).uncond [ny x H]: generalised impulse responses to
+%           impulse k, E[y_{t+h} | s_t = s, u_t = e_t + nu_k] - E[y_{t+h} | s_t = s], h = 0..H-1, with x_{t-1} from
+%           the ergodic distribution (uncond: s_t from pi); mom.irf(k).impulse, .name
+%
+% Autocovariances and impulse responses propagate E[x^(beta)_{t+h} Z 1{s_{t+h} = s}] for the layer products beta of
+% weight <= K (the family is closed under the layer law), with Z = y_t - ys (autocovariances) or the difference of the
+% shocked and unshocked moments given 1{s_t = s} (impulse responses; linear in the innovation moments).
 if nargin < 3, order = 2; end
+if nargin < 6, dyn = struct(); end
 if nargin < 4 || isempty(solver), solver = 'doubling'; end
 if islogical(order), order = 1 + double(order); end
 if ~(isscalar(order) && any(order == 1:4)), error('ms_korder_moments: order must be 1, 2, 3 or 4'), end
@@ -144,12 +159,12 @@ if second
         mom.second_regime{s} = E2(inv_ov, inv_ov, s) / pi_(s);
     end
 end
+if nargin < 5 || isempty(vars), vars = 1:ny; end
+vars = vars(:)'; r = numel(vars); rs = inv_ov(vars); mom.vars = vars;
 if order >= 3
-    if nargin < 5 || isempty(vars), vars = 1:ny; end
-    vars = vars(:)'; r = numel(vars); rs = inv_ov(vars);
     Tyv = Ty;
     for t = 1:numel(Tyv), Tyv(t).G = Tyv(t).G(rs, :, :); end
-    mom.vars = vars; mom.raw_regime = cell(1, order);
+    mom.raw_regime = cell(1, order);
     for p = 3:order, mom.raw_regime{p} = ymoment(Tyv, p, getnu, Mu, nz, n, nu, S, r); end
     a = cell(1, order);                                % a{p}(i, s) = E[yh_i^p 1{s_t = s}]
     a{1} = Ey(rs, :);
@@ -162,6 +177,169 @@ if order >= 3
     [mom.skewness_regime, mom.kurtosis_regime] = std_moments(c, order);
     if order < 4, mom = rmfield(mom, {'kurtosis', 'kurtosis_regime'}); end
 end
+ar = 0; if isfield(dyn, 'ar'), ar = dyn.ar; end
+H = 0; if isfield(dyn, 'irf'), H = dyn.irf; end
+if ar > 0 || H > 0
+    BK = block_list(K, K);                            % layer products of weight <= K
+    Tyv = Ty;
+    for t = 1:numel(Tyv), Tyv(t).G = Tyv(t).G(rs, :, :); end
+end
+if ar > 0
+    if ~second, error('ms_korder_moments: autocovariances need order >= 2'), end
+    m1 = sum(Ey(rs, :), 2);
+    % h = 0: E[x^(beta)_t (y_t - ys)_c 1{s_t = s}] from the stationary moments (weights <= 2K)
+    E = containers.Map('KeyType', 'char', 'ValueType', 'any');
+    E('e') = Ey(rs, :);                                 % r x S
+    for b = 1:numel(BK)
+        beta = BK{b}; m = numel(beta);
+        F = zeros(n^m * r, S);
+        for c = 1:nchoice(Tst, beta)
+            terms = choice(Tst, beta, c);
+            for t = 1:numel(Tyv)
+                tt = [terms, Tyv(t)];
+                if ~nz(sum([tt.j]) + 1), continue, end
+                F = F + contract(tt, getnu, Mu, n, nu, S);
+            end
+        end
+        E(bkey(beta)) = reshape(F, n^m, r, S);
+    end
+    mom.autocov = cell(1, ar); mom.autocorr = cell(1, ar);
+    sd = sqrt(max(diag(mom.var(vars, vars)), 0));
+    for h = 1:ar
+        A = zeros(r, r);
+        for c = 1:r
+            getc = @(gam) predict(E, gam, c, P);
+            for t = 1:numel(Tyv)
+                if ~nz(Tyv(t).j + 1), continue, end
+                A(:, c) = A(:, c) + sum(contract(Tyv(t), getc, Mu, n, nu, S), 2);
+            end
+        end
+        mom.autocov{h} = A - m1 * m1';
+        mom.autocorr{h} = mom.autocov{h} ./ (sd * sd');
+        if h < ar, E = step(E, BK, Tst, P, Mu, nz, n, nu, S, r); end
+    end
+end
+if H > 0
+    if isfield(dyn, 'irf_shocks') && ~isempty(dyn.irf_shocks)
+        V = dyn.irf_shocks;
+    else
+        cv = Mu2cov(Mu, nu); sh = find(diag(cv) > 0);  % as stoch_simul: columns of the lower Cholesky factor
+        Lc = zeros(nu); Lc(sh, sh) = chol(cv(sh, sh), 'lower'); V = Lc(:, sh);
+    end
+    names = compose('impulse %d', 1:size(V, 2));
+    if isfield(dyn, 'irf_names') && ~isempty(dyn.irf_names), names = dyn.irf_names; end
+    for k = 1:size(V, 2)
+        dMu = cell(1, K + 1);
+        for J = 0:K, dMu{J + 1} = shifted_moment(Mu, nu, V(:, k), J) - Mu{J + 1}; end
+        nzd = cellfun(@(x) any(abs(x(:)) > 0), dMu);
+        IR = zeros(ny, H, S);
+        E = containers.Map('KeyType', 'char', 'ValueType', 'any');
+        E('e') = zeros(S, S);
+        for b = 1:numel(BK)
+            beta = BK{b}; m = numel(beta);
+            F = zeros(n^m, S);
+            for c = 1:nchoice(Tst, beta)
+                terms = choice(Tst, beta, c);
+                if ~nzd(sum([terms.j]) + 1), continue, end
+                F = F + contract(terms, getnu, dMu, n, nu, S);
+            end
+            X = zeros(n^m, S, S);                       % (:, c, s'): conditioning regime c = s_t
+            for c = 1:S, X(:, c, c) = F(:, c); end
+            E(bkey(beta)) = X;
+        end
+        Y0 = zeros(ny, S);
+        for t = 1:numel(Ty)
+            if ~nzd(Ty(t).j + 1), continue, end
+            Y0 = Y0 + contract(Ty(t), getnu, dMu, n, nu, S);
+        end
+        IR(:, 1, :) = reshape(Y0 ./ pi_', ny, 1, S);
+        for h = 1:H - 1
+            for c = 1:S
+                getc = @(gam) predict(E, gam, c, P);
+                Yh = zeros(ny, S);
+                for t = 1:numel(Ty)
+                    if ~nz(Ty(t).j + 1), continue, end
+                    Yh = Yh + contract(Ty(t), getc, Mu, n, nu, S);
+                end
+                IR(:, h + 1, c) = sum(Yh, 2) / pi_(c);
+            end
+            if h < H - 1, E = step(E, BK, Tst, P, Mu, nz, n, nu, S, S); end
+        end
+        IR = IR(inv_ov, :, :);
+        un = zeros(ny, H);
+        for c = 1:S, un = un + pi_(c) * IR(:, :, c); end
+        mom.irf(k) = struct('name', names{k}, 'impulse', V(:, k), 'regime', IR, 'uncond', un); %#ok<AGROW>
+    end
+end
+end
+
+function N = nchoice(Tst, beta)
+N = prod(arrayfun(@(a) numel(Tst{a}), beta));
+end
+
+function terms = choice(Tst, beta, c)
+% c-th ordered choice of one term per factor of beta (first factor fastest)
+sz = arrayfun(@(a) numel(Tst{a}), beta);
+sub = cell(1, numel(beta)); [sub{:}] = ind2sub([sz, 1], c);
+terms = Tst{beta(1)}(sub{1});
+for f = 2:numel(beta), terms = [terms, Tst{beta(f)}(sub{f})]; end %#ok<AGROW>
+end
+
+function X = predict(E, gam, c, P)
+% E[x^(gam)_{t-1} Z_c 1{s_{t-1} = s}] P (n^L x S, or 1 x S for the empty product)
+if isempty(gam), e = E('e'); X = e(c, :) * P; return, end
+e = E(bkey(gam)); S = size(P, 1);
+X = reshape(e(:, c, :), [], S) * P;
+end
+
+function En = step(E, BK, Tst, P, Mu, nz, n, nu, S, C)
+% one period forward: E[x^(beta)_{t+1} Z_c 1{s_{t+1}}] from E[x^(gam)_t Z_c 1{s_t}]
+En = containers.Map('KeyType', 'char', 'ValueType', 'any');
+e = E('e'); En('e') = e * P;
+for b = 1:numel(BK)
+    beta = BK{b}; m = numel(beta);
+    X = zeros(n^m, C, S);
+    for c = 1:C
+        getc = @(gam) predict(E, gam, c, P);
+        F = zeros(n^m, S);
+        for q = 1:nchoice(Tst, beta)
+            terms = choice(Tst, beta, q);
+            if ~nz(sum([terms.j]) + 1), continue, end
+            F = F + contract(terms, getc, Mu, n, nu, S);
+        end
+        X(:, c, :) = reshape(F, n^m, 1, S);
+    end
+    En(bkey(beta)) = X;
+end
+end
+
+function V = Mu2cov(Mu, nu)
+V = reshape(Mu{3}, nu, nu);
+end
+
+function x = shifted_moment(Mu, nu, v, J)
+% E[(v + u)^{(x)J}] [nu^J x 1] from Mu{a+1} = E[u^{(x)a}]: by the count vector c of each multi-index,
+% E[prod_i (v_i + u_i)^{c_i}] = sum_{a <= c} prod_i C(c_i, a_i) v_i^(c_i - a_i) E[prod_i u_i^{a_i}]
+if J == 0, x = 1; return, end
+cnt = zeros(1, nu);
+for q = 1:J, cnt = repmat(cnt, nu, 1) + kron(eye(nu), ones(size(cnt, 1), 1)); end
+[uc, ~, ic] = unique(cnt, 'rows');
+val = zeros(size(uc, 1), 1);
+for q = 1:size(uc, 1)
+    c = uc(q, :);
+    g = arrayfun(@(k) 0:k, c, 'UniformOutput', false); A = cell(1, nu); [A{:}] = ndgrid(g{:});
+    A = reshape(cat(nu + 1, A{:}), [], nu);
+    for w = 1:size(A, 1)
+        a = A(w, :); La = sum(a);
+        co = prod(arrayfun(@(i) nchoosek(c(i), a(i)) * v(i)^(c(i) - a(i)), 1:nu));
+        if co == 0, continue, end
+        if La == 0, mu = 1; else
+            list = repelem(1:nu, a); mu = Mu{La + 1}(1 + sum((list - 1) .* nu.^(0:La - 1)));
+        end
+        val(q) = val(q) + co * mu;
+    end
+end
+x = val(ic);
 end
 
 function [sk, ku] = std_moments(a, order)

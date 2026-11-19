@@ -21,6 +21,11 @@ function oo_ = ms_korder(M_, options_, oo_, regimes, opts)
 %                         otherwise), 'exact', 'simulation'. Means and variances are always exact.
 %         opts.sim_periods  periods of the simulated moments (default 1e6, a multiple of 100)
 %         opts.solver     diagonal-block solver of the exact moments: 'doubling' (default), 'gensylv', 'lu'
+%         opts.ar         lags of the exact autocovariances and autocorrelations (default 0; moments.autocov, .autocorr)
+%         opts.irf        periods of the exact generalised impulse responses (default 0; moments.irf): responses to
+%                         one standard deviation (Cholesky column) of each shock with nonzero variance, given each
+%                         regime at the impulse date and unconditionally, the state drawn from the ergodic distribution
+%         opts.irf_shocks [exo_nbr x m] impulses instead of the default
 %         opts.periods    length of a pruned simulation (default 0 = none)
 %         opts.s0, opts.seed  initial regime (default 1) and seed (default 0) of the simulations
 %         opts.shock_draw  function handle draw(T) -> [exo_nbr x T] of innovations for the simulations (default:
@@ -37,7 +42,7 @@ function oo_ = ms_korder(M_, options_, oo_, regimes, opts)
 if nargin < 5, opts = struct(); end
 if isfield(opts, 'second') && ~isfield(opts, 'order'), opts.order = 1 + double(logical(opts.second)); end
 def = struct('moments', true, 'order', 2, 'moment_method', 'auto', 'sim_periods', 1e6, 'solver', 'doubling', ...
-             'periods', 0, 's0', 1, 'seed', 0, 'shock_draw', []);
+             'periods', 0, 's0', 1, 'seed', 0, 'shock_draw', [], 'ar', 0, 'irf', 0, 'irf_shocks', []);
 f = fieldnames(def);
 for i = 1:numel(f)
     if ~isfield(opts, f{i}), opts.(f{i}) = def.(f{i}); end
@@ -71,11 +76,17 @@ if opts.moments
         case 'simulation', exact = opts.order <= 2;
         otherwise, error('ms_korder: opts.moment_method must be ''auto'', ''exact'' or ''simulation''')
     end
+    if isempty(opts.irf_shocks)
+        irf_names = M_.exo_names(diag(M_.Sigma_e) > 0)';
+    else
+        irf_names = compose('impulse %d', 1:size(opts.irf_shocks, 2));
+    end
+    dyn = struct('ar', opts.ar, 'irf', opts.irf, 'irf_shocks', opts.irf_shocks, 'irf_names', {irf_names});
     if exact
-        mom = ms_korder_moments(ms, M_, opts.order, opts.solver, keep);
+        mom = ms_korder_moments(ms, M_, opts.order, opts.solver, keep, dyn);
         hm = mom;
     else
-        mom = ms_korder_moments(ms, M_, 2, opts.solver, keep);
+        mom = ms_korder_moments(ms, M_, 2, opts.solver, keep, dyn);
         hm = ms_korder_sim_moments(ms, M_, keep, opts.sim_periods, ...
                                    struct('s0', opts.s0, 'seed', opts.seed, 'draw', opts.shock_draw));
         oo_.ms.sim_moments = hm;
@@ -121,5 +132,13 @@ for v = find(~skip(:))'
         end
     end
     fprintf('%s%s\n', line, sprintf(' %12.6g', mom.mean_regime(v, :)));
+end
+if isfield(mom, 'autocorr')
+    fprintf('\nCOEFFICIENTS OF AUTOCORRELATION (exact)\n%-12s', 'Order');
+    fprintf(' %8d', 1:numel(mom.autocorr)); fprintf('\n');
+    for i = 1:numel(mom.vars)
+        fprintf('%-12s', M_.endo_names{mom.vars(i)});
+        fprintf(' %8.4f', cellfun(@(A) A(i, i), mom.autocorr)); fprintf('\n');
+    end
 end
 end

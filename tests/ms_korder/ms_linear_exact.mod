@@ -84,6 +84,25 @@ for i = 1:size(chk, 1)
     fprintf('case %d %-13s rel err %.2e\n', ic, chk{i, 1}, e);
     if e > 1e-10, fails{end+1} = sprintf('case %d %s', ic, chk{i, 1}); end
 end
+% Autocovariances and impulse responses. nh(s') = E[y_{t+h} y_t 1{s_{t+h} = s'}] = (P'(rho nh_{h-1}))(s')
+% + ahat(s') (P' mh_{h-1})(s'), mh_h(s) = E[y_t 1{s_{t+h} = s}] = (P'^h m)(s); impulse responses to u (one standard
+% deviation): y: sig rho^h, p: c sig rho^h, in every regime. Tolerances (fixed before the first run): autocovariances
+% 1e-10 relative, impulse responses 1e-12 abs.
+md = ms_korder_moments(ms, M_.Sigma_e, 2, 'doubling', find(iyd), struct('ar', 5, 'irf', 8));
+mh = m; nh = q; acy = zeros(1, 5);
+for h = 1:5, nh = P' * (rho * nh) + ahat' .* (P' * mh); mh = P' * mh; acy(h) = sum(nh) - sum(m)^2; end
+e = max(abs(cellfun(@(x) x, md.autocov) - acy)) / max(abs(acy));
+fprintf('case %d autocov(y) lags 1-5 rel err %.2e\n', ic, e);
+if e > 1e-10, fails{end+1} = sprintf('case %d autocov', ic); end
+ir = md.irf(1); hz = 0:7;
+ex = [sig * rho.^hz; c * sig * rho.^hz];
+e = 0;
+for s = 0:S
+    if s == 0, R = ir.uncond; else, R = ir.regime(:, :, s); end
+    e = max(e, max(max(abs(R([find(iyd), find(ipd)], :) - ex))));
+end
+fprintf('case %d irf(y, p) max abs err %.2e\n', ic, e);
+if e > 1e-12, fails{end+1} = sprintf('case %d irf', ic); end
 end
 if ~isempty(fails), error('ms_linear_exact: failed: %s', strjoin(fails, ', ')), end
 disp('ms_linear_exact: all checks pass')
