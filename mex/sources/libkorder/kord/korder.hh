@@ -209,8 +209,12 @@ public:
    can be either ‘Storage::fold’, or ‘Storage::unfold’.
 */
 
+class KOrderMS; // Markov-switching solver (korder_ms.hh) drives KOrder objects, one per regime pair
+
 class KOrder
 {
+  friend class KOrderMS;
+
 protected:
   /* Variable sizes: PartitionY struct maintaining partitions of y, see
      PartitionY struct declaration */

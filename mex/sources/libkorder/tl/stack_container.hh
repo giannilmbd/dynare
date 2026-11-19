@@ -497,6 +497,9 @@ public:
   using _Stype = StackContainerInterface<_Ttype>;
   using _Ctype = typename StackContainer<_Ttype>::_Ctype;
   using itype = typename StackContainer<_Ttype>::itype;
+  /* If false, g*_σ is taken from the g* container like any other derivative (Markov-switching solver,
+     kord/korder_ms.hh, where g*_σ(s) ≠ 0). */
+  bool inner_sigma_zero {true};
   GContainer(const _Ctype* gs, int ngs, int nu) : StackContainer<_Ttype>(4, 1)
   {
     _Tparent::stack_sizes = {ngs, nu, nu, 1};
@@ -513,7 +516,7 @@ public:
   {
     if (i == 0)
       {
-        if (s[2] > 0 || s == Symmetry {0, 0, 0, 1})
+        if (s[2] > 0 || (inner_sigma_zero && s == Symmetry {0, 0, 0, 1}))
           return itype::zero;
         else
           return itype::matrix;

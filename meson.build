@@ -448,6 +448,7 @@ korder_src = [ 'mex/sources/libkorder/kord/approximation.cc',
                'mex/sources/libkorder/kord/first_order.cc',
                'mex/sources/libkorder/kord/korder.cc',
                'mex/sources/libkorder/kord/korder_stoch.cc',
+               'mex/sources/libkorder/kord/korder_ms.cc',
                'mex/sources/libkorder/kord/journal.cc',
                'mex/sources/libkorder/sylv/BlockDiagonal.cc',
                'mex/sources/libkorder/sylv/GeneralMatrix.cc',
@@ -501,6 +502,7 @@ korder_lib = static_library('korder', korder_src,
 korder_mex_kwargs = mex_kwargs + { 'include_directories' : mex_kwargs.get('include_directories') + korder_incdir}
 shared_module('gensylv', 'mex/sources/gensylv/gensylv.cc', kwargs : korder_mex_kwargs, link_with : korder_lib)
 shared_module('k_order_perturbation', 'mex/sources/k_order_perturbation/k_order_perturbation.cc', kwargs : korder_mex_kwargs, link_with : korder_lib)
+shared_module('k_order_perturbation_ms', 'mex/sources/k_order_perturbation_ms/k_order_perturbation_ms.cc', kwargs : korder_mex_kwargs, link_with : korder_lib)
 k_order_welfare_src = [ 'mex/sources/k_order_welfare/k_order_welfare.cc',
                         'mex/sources/k_order_welfare/approximation_welfare.cc',
                         'mex/sources/k_order_welfare/k_ord_objective.cc',
@@ -1882,6 +1884,11 @@ mod_and_m_tests = [
     'dynare_args': [ '-DSKEW=0.5', '-DORDER=4' ] },
   { 'test' : [ 'skewed_shocks_korder/skew_korder_moments.mod' ],
     'dynare_args': [ '-DSKEW=-0.9', '-DORDER=5' ] },
+  { 'test' : [ 'ms_korder/ms_one_regime.mod' ],
+    'extra' : [ 'ms_korder/rbc3_ms_model.inc' ] },
+  { 'test' : [ 'ms_korder/ms_two_regimes.mod' ],
+    'extra' : [ 'ms_korder/rbc3_ms_model.inc' ] },
+  { 'test' : [ 'ms_korder/ms_linear_exact.mod' ] },
   { 'test' : [ 'decision_rules/second_order/burnside_1.mod' ] },
   { 'test' : [ 'decision_rules/second_order/ds1.mod',
                'decision_rules/second_order/ds2.mod' ] },

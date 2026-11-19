@@ -1,0 +1,477 @@
+/*
+ * Copyright © 2008-2026 Dynare Team
+ *
+ * This file is part of Dynare.
+ *
+ * Dynare is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Dynare is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* k-order perturbation with an exogenous Markov chain (KOrderMS, korder_ms.hh), derived from
+   k_order_perturbation.cc. Fourth input: struct with fields P (S × S), lam (S eigenvalues of P′), W (P′ W = W Λ),
+   Winv, forcing (endo_nbr × S, added to F_σ in equation rows). Output: cell array (S × 1) of structs; field
+   y<i>u<j>s<k> holds the unfolded derivative g_{y*^i u^j σ^k} of regime s (rows in dr.order_var order, columns
+   kron(y*^{⊗i}, u^{⊗j})), for 1 ≤ i + j + k ≤ order.
+
+   Original header: Defines the entry point for the k-order perturbation application DLL.
+
+   See matlab/mex/k_order_perturbation.m for a description of inputs and
+   outputs.
+*/
+
+#include "dynamic_dll.hh"
+#include "dynamic_m.hh"
+#include "k_ord_dynare.hh"
+
+#include "SylvException.hh"
+#include "approximation.hh"
+#include "first_order.hh"
+#include "korder_ms.hh"
+#include "dynare_exception.hh"
+#include "exception.hh"
+#include "kord_exception.hh"
+#include "tl_exception.hh"
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cmath>
+
+#include "dynmex.h"
+
+using namespace std::string_literals;
+
+/* Vector for storing field names like “g_0”, “g_1”, …
+   A static structure is needed since MATLAB apparently does not create its own
+   copy of the strings (contrary to what is said at:
+    https://fr.mathworks.com/matlabcentral/answers/315937-mxcreatestructarray-and-mxcreatestructmatrix-field-name-memory-management
+   ) */
+std::vector<std::string> g_fieldnames;
+
+/* Convert MATLAB Dynare endo and exo names cell array to a vector<string> array of
+   string pointers. */
+std::vector<std::string>
+DynareMxArrayToString(const mxArray* mxFldp)
+{
+  assert(mxIsCell(mxFldp));
+  std::vector<std::string> r;
+  for (size_t i = 0; i < mxGetNumberOfElements(mxFldp); i++)
+    {
+      const mxArray* cell_mx = mxGetCell(mxFldp, i);
+      if (!(cell_mx && mxIsChar(cell_mx)))
+        mexErrMsgTxt("Cell is not a character array");
+      r.emplace_back(mxArrayToString(cell_mx));
+    }
+
+  return r;
+}
+
+void
+copy_derivatives(mxArray* destin, const Symmetry& sym, const FGSContainer& derivs,
+                 const char* fieldname)
+{
+  const FGSTensor& x = derivs.get(sym);
+  auto x_unfolded = x.unfold();
+  int n = x_unfolded->nrows();
+  int m = x_unfolded->ncols();
+  mxArray* tmp = mxCreateDoubleMatrix(n, m, mxREAL);
+  std::ranges::copy_n(x_unfolded->getData().base(), n * m, mxGetDoubles(tmp));
+  mxSetField(destin, 0, fieldname, tmp);
+}
+
+void
+copy_derivatives_or_zero(mxArray* destin, const Symmetry& sym, const FGSContainer& derivs,
+                         const char* fieldname, int rows, int cols)
+{
+  if (derivs.check(sym))
+    copy_derivatives(destin, sym, derivs, fieldname);
+  else
+    mxSetField(destin, 0, fieldname, mxCreateDoubleMatrix(rows, cols, mxREAL));
+}
+
+extern "C"
+{
+
+  void
+  mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
+  {
+    if (nrhs != 4 || nlhs != 1)
+      mexErrMsgTxt("Must have exactly 4 input parameters and 1 output parameter.");
+
+    // Give explicit names to input arguments
+    const mxArray* dr_mx = prhs[0];
+    const mxArray* M_mx = prhs[1];
+    const mxArray* options_mx = prhs[2];
+    const mxArray* ms_mx = prhs[3];
+    auto get_ms_matrix = [ms_mx](const char* name) {
+      const mxArray* m = mxGetField(ms_mx, 0, name);
+      if (!(m && mxIsDouble(m) && !mxIsComplex(m) && !mxIsSparse(m)))
+        mexErrMsgTxt(("MS input: field "s + name + " should be a real dense matrix").c_str());
+      return TwoDMatrix {ConstTwoDMatrix {m}};
+    };
+    TwoDMatrix msP = get_ms_matrix("P"), msW = get_ms_matrix("W"), msWinv = get_ms_matrix("Winv"),
+               msForcing = get_ms_matrix("forcing");
+    const mxArray* lam_mx = mxGetField(ms_mx, 0, "lam");
+    if (!(lam_mx && mxIsDouble(lam_mx) && !mxIsComplex(lam_mx)))
+      mexErrMsgTxt("MS input: field lam should be a real vector");
+    Vector msLam {ConstVector {lam_mx}};
+
+    auto get_int_field = [](const mxArray* struct_mx, const std::string& fieldname) {
+      mxArray* field_mx = mxGetField(struct_mx, 0, fieldname.c_str());
+      if (!(field_mx && mxIsScalar(field_mx) && mxIsNumeric(field_mx)))
+        mexErrMsgTxt(("Field `" + fieldname + "' should be a numeric scalar").c_str());
+      return static_cast<int>(mxGetScalar(field_mx));
+    };
+
+    // Extract various fields from options_
+    const int kOrder = get_int_field(options_mx, "order");
+    if (kOrder < 1)
+      mexErrMsgTxt("options_.order must be at least 1");
+
+    const mxArray* use_dll_mx = mxGetField(options_mx, 0, "use_dll");
+    if (!(use_dll_mx && mxIsLogicalScalar(use_dll_mx)))
+      mexErrMsgTxt("options_.use_dll should be a logical scalar");
+    bool use_dll = static_cast<bool>(mxGetScalar(use_dll_mx));
+
+    double qz_criterium = 1 + 1e-6;
+    const mxArray* qz_criterium_mx = mxGetField(options_mx, 0, "qz_criterium");
+    if (qz_criterium_mx && mxIsScalar(qz_criterium_mx) && mxIsNumeric(qz_criterium_mx))
+      qz_criterium = mxGetScalar(qz_criterium_mx);
+
+    const mxArray* threads_mx = mxGetField(options_mx, 0, "threads");
+    if (!threads_mx)
+      mexErrMsgTxt("Can't find field options_.threads");
+    const mxArray* num_threads_mx = mxGetField(threads_mx, 0, "k_order_perturbation");
+    if (!(num_threads_mx && mxIsScalar(num_threads_mx) && mxIsNumeric(num_threads_mx)))
+      mexErrMsgTxt("options_.threads.k_order_perturbation be a numeric scalar");
+    int num_threads = static_cast<int>(mxGetScalar(num_threads_mx));
+
+    const mxArray* debug_mx = mxGetField(options_mx, 0, "debug");
+    if (!(debug_mx && mxIsLogicalScalar(debug_mx)))
+      mexErrMsgTxt("options_.debug should be a logical scalar");
+    bool debug = static_cast<bool>(mxGetScalar(debug_mx));
+
+    const mxArray* verbosity_mx = mxGetField(options_mx, 0, "verbosity");
+    if (!(verbosity_mx && mxIsScalar(verbosity_mx) && mxIsNumeric(verbosity_mx)))
+      mexErrMsgTxt("options_.verbosity should be a numeric scalar");
+    int verbosity {static_cast<int>(mxGetScalar(verbosity_mx))};
+
+    // Extract various fields from M_
+    const mxArray* fname_mx = mxGetField(M_mx, 0, "fname");
+    if (!(fname_mx && mxIsChar(fname_mx) && mxGetM(fname_mx) == 1))
+      mexErrMsgTxt("M_.fname should be a character string");
+    std::string fname {mxArrayToString(fname_mx)};
+
+    const mxArray* params_mx = mxGetField(M_mx, 0, "params");
+    if (!(params_mx && mxIsDouble(params_mx) && !mxIsComplex(params_mx) && !mxIsSparse(params_mx)))
+      mexErrMsgTxt("M_.params should be a real dense array");
+    Vector modParams {ConstVector {params_mx}};
+    if (!modParams.isFinite())
+      mexErrMsgTxt("M_.params contains NaN or Inf");
+
+    const mxArray* sigma_e_mx = mxGetField(M_mx, 0, "Sigma_e");
+    if (!(sigma_e_mx && mxIsDouble(sigma_e_mx) && !mxIsComplex(sigma_e_mx)
+          && !mxIsSparse(sigma_e_mx) && mxGetM(sigma_e_mx) == mxGetN(sigma_e_mx)))
+      mexErrMsgTxt("M_.Sigma_e should be a real dense square matrix");
+    TwoDMatrix vCov {ConstTwoDMatrix {sigma_e_mx}};
+    if (!vCov.isFinite())
+      mexErrMsgTxt("M_.Sigma_e contains NaN or Inf");
+
+    const int nStat = get_int_field(M_mx, "nstatic");
+    const int nPred = get_int_field(M_mx, "npred");
+    const int nBoth = get_int_field(M_mx, "nboth");
+    const int nForw = get_int_field(M_mx, "nfwrd");
+
+    const int nExog = get_int_field(M_mx, "exo_nbr");
+    const int nEndo = get_int_field(M_mx, "endo_nbr");
+    const int nPar = get_int_field(M_mx, "param_nbr");
+
+    const mxArray* skew_e_mx = mxGetField(M_mx, 0, "Skew_e");
+    if (skew_e_mx && !(mxIsDouble(skew_e_mx) && !mxIsComplex(skew_e_mx)
+                       && !mxIsSparse(skew_e_mx) && mxGetN(skew_e_mx) == 4))
+      mexErrMsgTxt("M_.Skew_e should be a real dense matrix with 4 columns");
+
+    /* Skewed shocks are independent skew normal variables (as in
+       csn_update_specification.m): their moments of every order are
+       computed from the variance and the standardized skewness. */
+    std::vector<double> shock_skewness(nExog, 0.0);
+    bool has_skew {false};
+    if (skew_e_mx)
+      {
+        const size_t nSkewEntries {mxGetM(skew_e_mx)};
+        const double* skew_e {mxGetDoubles(skew_e_mx)};
+        for (size_t r {0}; r < nSkewEntries; r++)
+          {
+            int i {static_cast<int>(skew_e[r]) - 1};
+            int j {static_cast<int>(skew_e[r + nSkewEntries]) - 1};
+            int k {static_cast<int>(skew_e[r + 2 * nSkewEntries]) - 1};
+            double skewness {skew_e[r + 3 * nSkewEntries]};
+
+            if (i < 0 || i >= nExog || j < 0 || j >= nExog || k < 0 || k >= nExog)
+              mexErrMsgTxt("M_.Skew_e contains an invalid exogenous variable index");
+            if (skewness == 0.0)
+              continue;
+            if (i != j || j != k)
+              mexErrMsgTxt("Skewed shocks must be independent skew normal variables: co-skewness "
+                           "entries in M_.Skew_e are not supported");
+            if (std::abs(skewness) >= 0.9952717464311565)
+              mexErrMsgTxt("The skewness of a skew normal shock must be smaller than 0.9953 in "
+                           "absolute value");
+            shock_skewness[i] = skewness;
+            has_skew = true;
+          }
+        if (has_skew)
+          for (int i {0}; i < nExog; i++)
+            for (int j {0}; j < nExog; j++)
+              if (i != j && vCov.get(i, j) != 0.0)
+                mexErrMsgTxt("Skewed shocks must be independent skew normal variables: the "
+                             "shocks cannot be correlated");
+      }
+
+    /* Optional user-supplied raw moments of independent shocks: M_.Raw_moments_e is an
+       exo_nbr × D matrix with entry (i,d) = E[e_i^d], d = 1..D, D ≥ order. A row of NaN
+       leaves shock i to the Gaussian or skew normal default. A row that is given must have
+       E[e_i] = 0 and E[e_i^2] = M_.Sigma_e(i,i), the shock must not be declared skewed, and
+       it must be uncorrelated with the other shocks. */
+    std::vector<std::vector<double>> user_raw_moments(nExog);
+    bool has_raw {false};
+    const mxArray* raw_e_mx = mxGetField(M_mx, 0, "Raw_moments_e");
+    if (raw_e_mx && !mxIsEmpty(raw_e_mx))
+      {
+        if (!(mxIsDouble(raw_e_mx) && !mxIsComplex(raw_e_mx) && !mxIsSparse(raw_e_mx)
+              && mxGetM(raw_e_mx) == static_cast<size_t>(nExog)))
+          mexErrMsgTxt("M_.Raw_moments_e should be a real dense matrix with M_.exo_nbr rows");
+        const size_t D {mxGetN(raw_e_mx)};
+        const double* raw_e {mxGetDoubles(raw_e_mx)};
+        for (int i {0}; i < nExog; i++)
+          {
+            bool all_nan {true}, any_nan {false};
+            for (size_t d {0}; d < D; d++)
+              {
+                bool is_nan {std::isnan(raw_e[i + d * nExog])};
+                all_nan = all_nan && is_nan;
+                any_nan = any_nan || is_nan;
+              }
+            if (all_nan)
+              continue;
+            if (any_nan)
+              mexErrMsgTxt("M_.Raw_moments_e: a row must be either all NaN or fully specified");
+            if (D < static_cast<size_t>(kOrder))
+              mexErrMsgTxt("M_.Raw_moments_e must have at least options_.order columns");
+            if (shock_skewness[i] != 0.0)
+              mexErrMsgTxt("M_.Raw_moments_e: a shock cannot also be declared skewed");
+            const double var {vCov.get(i, i)};
+            if (std::abs(raw_e[i]) > 1e-12 * std::max(1.0, std::sqrt(var)))
+              mexErrMsgTxt("M_.Raw_moments_e: shocks must have mean zero (column 1)");
+            if (std::abs(raw_e[i + nExog] - var) > 1e-10 * std::max(1.0, var))
+              mexErrMsgTxt("M_.Raw_moments_e: column 2 must equal the diagonal of M_.Sigma_e");
+            user_raw_moments[i].assign(kOrder + 1, 0.0);
+            user_raw_moments[i][0] = 1;
+            for (int d {2}; d <= kOrder; d++)
+              user_raw_moments[i][d] = raw_e[i + (d - 1) * nExog];
+            has_raw = true;
+          }
+        if (has_raw)
+          for (int i {0}; i < nExog; i++)
+            for (int j {0}; j < nExog; j++)
+              if (i != j && vCov.get(i, j) != 0.0
+                  && (!user_raw_moments[i].empty() || !user_raw_moments[j].empty()))
+                mexErrMsgTxt("M_.Raw_moments_e: shocks with user-supplied moments cannot be "
+                             "correlated");
+      }
+
+    const mxArray* endo_names_mx = mxGetField(M_mx, 0, "endo_names");
+    if (!(endo_names_mx && mxIsCell(endo_names_mx)
+          && mxGetNumberOfElements(endo_names_mx) == static_cast<size_t>(nEndo)))
+      mexErrMsgTxt("M_.endo_names should be a cell array of M_.endo_nbr elements");
+    std::vector<std::string> endoNames = DynareMxArrayToString(endo_names_mx);
+
+    const mxArray* exo_names_mx = mxGetField(M_mx, 0, "exo_names");
+    if (!(exo_names_mx && mxIsCell(exo_names_mx)
+          && mxGetNumberOfElements(exo_names_mx) == static_cast<size_t>(nExog)))
+      mexErrMsgTxt("M_.exo_names should be a cell array of M_.exo_nbr elements");
+    std::vector<std::string> exoNames = DynareMxArrayToString(exo_names_mx);
+
+    const mxArray* dynamic_tmp_nbr_mx = mxGetField(M_mx, 0, "dynamic_tmp_nbr");
+    if (!(dynamic_tmp_nbr_mx && mxIsDouble(dynamic_tmp_nbr_mx) && !mxIsComplex(dynamic_tmp_nbr_mx)
+          && !mxIsSparse(dynamic_tmp_nbr_mx)
+          && mxGetNumberOfElements(dynamic_tmp_nbr_mx) >= static_cast<size_t>(kOrder + 1)))
+      mexErrMsgTxt("M_.dynamic_tmp_nbr should be a real dense array with strictly more elements "
+                   "than the order of derivation");
+    int ntt = std::accumulate(mxGetDoubles(dynamic_tmp_nbr_mx),
+                              mxGetDoubles(dynamic_tmp_nbr_mx) + kOrder + 1, 0);
+
+    // Extract various fields from dr
+    const mxArray* ys_mx = mxGetField(dr_mx, 0, "ys"); // and not in order of dr.order_var
+    if (!(ys_mx && mxIsDouble(ys_mx) && !mxIsComplex(ys_mx) && !mxIsSparse(ys_mx)))
+      mexErrMsgTxt("dr.ys should be a real dense array");
+    Vector ySteady {ConstVector {ys_mx}};
+    if (!ySteady.isFinite())
+      mexErrMsgTxt("dr.ys contains NaN or Inf");
+
+    const mxArray* order_var_mx = mxGetField(dr_mx, 0, "order_var");
+    if (!(order_var_mx && mxIsDouble(order_var_mx) && !mxIsComplex(order_var_mx)
+          && !mxIsSparse(order_var_mx)
+          && mxGetNumberOfElements(order_var_mx) == static_cast<size_t>(nEndo)))
+      mexErrMsgTxt("dr.order_var should be a real dense array of M_.endo_nbr elements");
+    std::vector<int> dr_order(nEndo);
+    std::ranges::transform(mxGetDoubles(order_var_mx), mxGetDoubles(order_var_mx) + nEndo,
+                           dr_order.begin(), [](double x) { return static_cast<int>(x) - 1; });
+
+    // Retrieve sparse indices for dynamic model
+
+    const mxArray* dynamic_g1_sparse_rowval_mx = mxGetField(M_mx, 0, "dynamic_g1_sparse_rowval");
+    if (!(dynamic_g1_sparse_rowval_mx && mxIsInt32(dynamic_g1_sparse_rowval_mx)))
+      mexErrMsgTxt("M_.dynamic_g1_sparse_rowval should be an int32 array");
+
+    const mxArray* dynamic_g1_sparse_colval_mx = mxGetField(M_mx, 0, "dynamic_g1_sparse_colval");
+    if (!(dynamic_g1_sparse_colval_mx && mxIsInt32(dynamic_g1_sparse_colval_mx)))
+      mexErrMsgTxt("M_.dynamic_g1_sparse_colval should be an int32 array");
+
+    const mxArray* dynamic_g1_sparse_colptr_mx = mxGetField(M_mx, 0, "dynamic_g1_sparse_colptr");
+    if (!(dynamic_g1_sparse_colptr_mx && mxIsInt32(dynamic_g1_sparse_colptr_mx)))
+      mexErrMsgTxt("M_.dynamic_g1_sparse_colptr should be an int32 array");
+
+    std::vector<const mxArray*> dynamic_gN_sparse_indices;
+    for (int o {2}; o <= kOrder; o++)
+      {
+        using namespace std::string_literals;
+        auto fieldname {"dynamic_g"s + std::to_string(o) + "_sparse_indices"};
+        const mxArray* indices = mxGetField(M_mx, 0, fieldname.c_str());
+        if (!(indices && mxIsInt32(indices)))
+          mexErrMsgTxt(("M_."s + fieldname + " should be an int32 array").c_str());
+        dynamic_gN_sparse_indices.push_back(indices);
+      }
+
+    const int nSteps
+        = 0; // Dynare++ solving steps, for time being default to 0 = deterministic steady state
+
+    try
+      {
+        // Journal is not written on-disk, unless options_.debug = true (see #1735)
+        Journal journal;
+        if (debug)
+          journal = Journal {fname + ".jnl"};
+
+        std::unique_ptr<DynamicModelAC> dynamicModelFile;
+        if (use_dll)
+          dynamicModelFile = std::make_unique<DynamicModelDLL>(
+              fname, kOrder, dynamic_g1_sparse_rowval_mx, dynamic_g1_sparse_colval_mx,
+              dynamic_g1_sparse_colptr_mx, dynamic_gN_sparse_indices, ntt);
+        else
+          dynamicModelFile = std::make_unique<DynamicModelMFile>(
+              fname, kOrder, dynamic_g1_sparse_rowval_mx, dynamic_g1_sparse_colval_mx,
+              dynamic_g1_sparse_colptr_mx, dynamic_gN_sparse_indices);
+
+        // intiate tensor library
+        TLStatic::init(kOrder, nStat + 2 * nPred + 3 * nBoth + 2 * nForw + nExog);
+
+        // Initialize thread pool
+        thread_pool::initialize(num_threads);
+
+        // make KordpDynare object
+        KordpDynare dynare(endoNames, exoNames, nExog, nPar, ySteady, vCov, modParams, nStat, nPred,
+                           nForw, nBoth, nSteps, kOrder, journal, std::move(dynamicModelFile),
+                           dr_order);
+
+        // construct main K-order approximation class
+        UNormalMoments shock_moments = [&] {
+          if (!has_skew && !has_raw)
+            return UNormalMoments(kOrder, vCov);
+          std::vector<std::vector<double>> raw_moments;
+          for (int i {0}; i < nExog; i++)
+            raw_moments.push_back(user_raw_moments[i].empty()
+                                      ? skewNormalRawMoments(vCov.get(i, i), shock_skewness[i],
+                                                             kOrder)
+                                      : user_raw_moments[i]);
+          return UNormalMoments(kOrder, raw_moments);
+        }();
+        dynare.calcDerivativesAtSteady();
+        FirstOrder fo(dynare.nstat(), dynare.npred(), dynare.nboth(), dynare.nforw(), dynare.nexog(),
+                      dynare.getModelDerivatives().get(Symmetry {1}), journal, qz_criterium);
+        KOrderMS ms(dynare.nstat(), dynare.npred(), dynare.nboth(), dynare.nforw(),
+                    dynare.getModelDerivatives(), fo.getGy(), fo.getGu(), dynare.getVcov(),
+                    shock_moments, msP, msLam, msW, msWinv, msForcing, journal);
+        ms.solve(kOrder);
+
+        const int S = ms.nRegimes();
+        const int nys = nPred + nBoth;
+        std::vector<std::string> names;
+        std::vector<std::array<int, 3>> syms;
+        for (int d = 1; d <= kOrder; d++)
+          for (int i = d; i >= 0; i--)
+            for (int j = d - i; j >= 0; j--)
+              {
+                int k = d - i - j;
+                names.push_back("y" + std::to_string(i) + "u" + std::to_string(j) + "s"
+                                + std::to_string(k));
+                syms.push_back({i, j, k});
+              }
+        std::vector<const char*> names_c;
+        for (auto& n : names)
+          names_c.push_back(n.c_str());
+        plhs[0] = mxCreateCellMatrix(S, 1);
+        for (int s = 0; s < S; s++)
+          {
+            mxArray* st = mxCreateStructMatrix(1, 1, static_cast<int>(names_c.size()), names_c.data());
+            const FGSContainer& ders = ms.getFoldDers(s);
+            for (size_t q = 0; q < syms.size(); q++)
+              {
+                auto [i, j, k] = syms[q];
+                Symmetry sym {i, j, 0, k};
+                if (ders.check(sym))
+                  copy_derivatives(st, sym, ders, names_c[q]);
+                else
+                  {
+                    int ncols = 1;
+                    for (int a = 0; a < i; a++)
+                      ncols *= nys;
+                    for (int a = 0; a < j; a++)
+                      ncols *= nExog;
+                    mxSetField(st, 0, names_c[q], mxCreateDoubleMatrix(nEndo, ncols, mxREAL));
+                  }
+              }
+            mxSetCell(plhs[0], s, st);
+          }
+      }
+    catch (const KordException& e)
+      {
+        if (verbosity > 0)
+          e.print();
+        mexErrMsgTxt(
+            ("dynare:k_order_perturbation: Caught Kord exception: " + e.get_message()).c_str());
+      }
+    catch (const TLException& e)
+      {
+        if (verbosity > 0)
+          e.print();
+        mexErrMsgTxt("dynare:k_order_perturbation: Caught TL exception");
+      }
+    catch (SylvException& e)
+      {
+        if (verbosity > 0)
+          e.printMessage();
+        mexErrMsgTxt("dynare:k_order_perturbation: Caught Sylv exception");
+      }
+    catch (const DynareException& e)
+      {
+        mexErrMsgTxt(
+            ("dynare:k_order_perturbation: Caught KordDynare exception: " + e.message()).c_str());
+      }
+    catch (const ogu::Exception& e)
+      {
+        mexErrMsgTxt(
+            ("dynare:k_order_perturbation: Caught general exception: " + e.message()).c_str());
+      }
+  } // end of mexFunction()
+} // end of extern C
