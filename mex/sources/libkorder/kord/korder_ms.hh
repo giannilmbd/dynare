@@ -65,6 +65,9 @@ class KOrderMS
   const int ny, nu;
   TwoDMatrix P;       // S × S, P(s, s′)
   TwoDMatrix forcing; // ny × S, added to F_σ(s) (equation rows)
+  /* One journal per pair, not written on disk: the pairs of a σ symmetry are computed in parallel
+     (thread_pool jobs) and Journal is not thread safe. Declared before ‘pairs’, which refer to them. */
+  std::vector<std::unique_ptr<Journal>> pair_journals;
   std::vector<std::unique_ptr<KOrder>> pairs;
   std::unique_ptr<MatrixSMS> matS; // stacked σ^k matrix
   /* Stacked y^iσ^j Sylvester: Ā (S·ny × S·ny) and B̄ = P ⊗ B (S·ny × S·nyss). Unknown x̃: rows of regime s
@@ -77,7 +80,17 @@ class KOrderMS
   {
     return *pairs[s * S + sp];
   }
+  /* Pair (s, s′) enters F(s) = Σ_{s′} P[s,s′] F(s,s′) only if P[s,s′] ≠ 0; the G of a pair feeds only its
+     own F. Diagonal pairs hold the derivatives of their regime (g** views of other pairs point into them)
+     and are always computed. */
+  [[nodiscard]] bool
+  active(int s, int sp) const
+  {
+    return s == sp || P.get(s, sp) != 0.0;
+  }
 
+  // σ-free symmetry: g and G do not depend on the regime; copy those of pair (0, 0) into the other pairs
+  void shareSigmaFree(const Symmetry& sym);
   void solveOrder1();
   void performStep(int order);
   // Common part for a symmetry with σ: fills G, computes F(s) = Σ P F(s,s′); returns the conditional G per pair

@@ -47,6 +47,7 @@ std::condition_variable_any director_cv; // The director waits on this one
 std::map<job*, status> job_group_status;
 std::mutex job_group_mut; // Shared by jobs in the job group
 std::exception_ptr job_group_exception; // First exception thrown by a job of the group
+thread_local bool in_pool_thread {false}; // True in the threads of the pool
 
 std::vector<std::jthread> threads;
 } // End of unnamed namespace
@@ -77,6 +78,7 @@ initialize(int thread_number)
        https://stackoverflow.com/questions/72990607/const-stdstop-token-or-just-stdstop-token-as-parameter-for-thread-funct
      */
     threads.emplace_back([](const std::stop_token& stoken) {
+      in_pool_thread = true;
       std::unique_lock lk {global_mut};
       job* selected_job;
       status* selected_job_status;
@@ -131,6 +133,17 @@ run(const job_group_t& job_group)
 {
   // Ensure that initialize() has been called
   assert(!threads.empty());
+
+  /* Called from a job of the pool (nested parallelism, e.g. KOrderMS runs one job per regime pair):
+     the jobs of the inner group run sequentially in the calling thread, with a mutex of their own. */
+  if (in_pool_thread)
+    {
+      std::mutex inner_mut;
+      for (const auto& job : job_group)
+        job->operator()(inner_mut);
+      return;
+    }
+
   // Ensure that run() is only called from the main thread, not from a parallel job
   assert(job_group_status.empty());
 

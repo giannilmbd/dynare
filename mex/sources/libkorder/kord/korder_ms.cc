@@ -21,6 +21,10 @@
 #include "kord_exception.hh"
 
 #include "GeneralSylvester.hh"
+#include "thread_pool.hh"
+
+#include <functional>
+#include <mutex>
 
 /* I_S ⊗ A₀ + P ⊗ C. A₀ and C are assembled as in MatrixS (MatrixS = A₀ + C). */
 MatrixSMS::MatrixSMS(const FSSparseTensor& f, const IntSequence& ss, const TwoDMatrix& gy,
@@ -68,11 +72,19 @@ KOrderMS::KOrderMS(int num_stat, int num_pred, int num_both, int num_forw,
   KORD_RAISE_IF(P.ncols() != S, "Transition matrix is not square in KOrderMS");
   KORD_RAISE_IF(forcing.nrows() != ny || forcing.ncols() != S,
                 "Forcing must be ny × S in KOrderMS");
+  /* Pair (0, 0) writes to the solver journal (it is the only pair whose records are kept: in a parallel
+     group it is the only job that writes there, and the calling thread waits); the others to their own. */
   for (int s = 0; s < S; s++)
     for (int sp = 0; sp < S; sp++)
       {
+        Journal* pj = &jr;
+        if (s + sp > 0)
+          {
+            pair_journals.push_back(std::make_unique<Journal>());
+            pj = pair_journals.back().get();
+          }
         auto p = std::make_unique<KOrder>(num_stat, num_pred, num_both, num_forw, fcont, gy, gu, v,
-                                          moments, jr);
+                                          moments, *pj);
         p->switchToFolded();
         p->_fGstack.inner_sigma_zero = false;
         p->_uGstack.inner_sigma_zero = false;
@@ -145,6 +157,8 @@ KOrderMS::updateG(const std::vector<FGSTensor*>& Gc,
   for (int s = 0; s < S; s++)
     for (int sp = 0; sp < S; sp++)
       {
+        if (!active(s, sp))
+          continue;
         KOrder& p = pr(s, sp);
         FGSTensor& G = *Gc[s * S + sp];
         p.Gstack<Storage::fold>().multAndAdd(1, p.gss<Storage::fold>(), G);
@@ -158,38 +172,64 @@ KOrderMS::updateG(const std::vector<FGSTensor*>& Gc,
       }
 }
 
-/* For symmetry yⁱuʲσᵏ (k ≥ 1): in every pair, insert G_yⁱuʲu′ᵐσᵏ⁻ᵐ (m = 1…k, no moment gate), the conditional
-   G_yⁱuʲσᵏ, and compute F = F_yⁱuʲσᵏ + Dᵢⱼₖ + Eᵢⱼₖ. Returns the right-hand sides −Σ_{s′} P[s,s′] F(s, s′) in Fs and
-   pointers to the conditional G of each pair. */
+namespace
+{
+// A thread_pool job running a closure
+class ClosureJob : public thread_pool::job
+{
+  std::function<void()> f;
+
+public:
+  explicit ClosureJob(std::function<void()> f_) : f(std::move(f_))
+  {
+  }
+  void
+  operator()([[maybe_unused]] std::mutex& mut) override
+  {
+    f();
+  }
+};
+}
+
+/* For symmetry yⁱuʲσᵏ (k ≥ 1): in every active pair, insert G_yⁱuʲu′ᵐσᵏ⁻ᵐ (m = 1…k, no moment gate), the
+   conditional G_yⁱuʲσᵏ, and compute F = F_yⁱuʲσᵏ + Dᵢⱼₖ + Eᵢⱼₖ. Returns the right-hand sides −Σ_{s′} P[s,s′] F(s, s′)
+   in Fs and pointers to the conditional G of each pair (null for inactive pairs).
+   The pairs are independent here (each writes only its own G container and F; g** of other pairs is read), so
+   they run as parallel jobs of the thread pool; inside a job, the tensor library's own thread_pool::run()
+   calls run sequentially. */
 std::vector<FGSTensor*>
 KOrderMS::rhs(int i, int j, int k, std::vector<std::unique_ptr<FGSTensor>>& Fs)
 {
   Symmetry sym {i, j, 0, k};
   JournalRecordPair pa(journal);
   pa << "MS: recovering symmetry " << sym << endrec;
-  std::vector<FGSTensor*> Gc(S * S);
+  std::vector<FGSTensor*> Gc(S * S, nullptr);
   std::vector<std::unique_ptr<FGSTensor>> Fp(S * S);
+  thread_pool::job_group_t jobs;
   for (int s = 0; s < S; s++)
     for (int sp = 0; sp < S; sp++)
-      {
-        KOrder& p = pr(s, sp);
-        for (int m = 1; m <= k; m++)
-          p.G<Storage::fold>().insert(p.faaDiBrunoG<Storage::fold>(Symmetry {i, j, m, k - m}));
-        auto G = p.faaDiBrunoG<Storage::fold>(sym);
-        Gc[s * S + sp] = G.get();
-        p.G<Storage::fold>().insert(std::move(G));
-        auto F = p.faaDiBrunoZ<Storage::fold>(sym);
-        F->add(1.0, p.calcD_ijk<Storage::fold>(i, j, k));
-        F->add(1.0, p.calcE_ijk<Storage::fold>(i, j, k));
-        Fp[s * S + sp] = std::move(F);
-      }
+      if (active(s, sp))
+        jobs.push_back(std::make_unique<ClosureJob>([this, &Gc, &Fp, sym, i, j, k, s, sp] {
+          KOrder& p = pr(s, sp);
+          for (int m = 1; m <= k; m++)
+            p.G<Storage::fold>().insert(p.faaDiBrunoG<Storage::fold>(Symmetry {i, j, m, k - m}));
+          auto G = p.faaDiBrunoG<Storage::fold>(sym);
+          Gc[s * S + sp] = G.get();
+          p.G<Storage::fold>().insert(std::move(G));
+          auto F = p.faaDiBrunoZ<Storage::fold>(sym);
+          F->add(1.0, p.calcD_ijk<Storage::fold>(i, j, k));
+          F->add(1.0, p.calcE_ijk<Storage::fold>(i, j, k));
+          Fp[s * S + sp] = std::move(F);
+        }));
+  thread_pool::run(jobs);
   Fs.clear();
   for (int s = 0; s < S; s++)
     {
-      auto t = std::make_unique<FGSTensor>(*Fp[s * S]);
+      auto t = std::make_unique<FGSTensor>(*Fp[s * S + s]);
       t->zeros();
       for (int sp = 0; sp < S; sp++)
-        t->add(P.get(s, sp), *Fp[s * S + sp]);
+        if (active(s, sp))
+          t->add(P.get(s, sp), *Fp[s * S + sp]);
       t->mult(-1.0);
       Fs.push_back(std::move(t));
     }
@@ -278,17 +318,36 @@ KOrderMS::recover_s(int i)
   updateG(Gc, R, i);
 }
 
-/* The order of KOrder::performStep(); σ-free symmetries by the stock routines in every pair. */
+/* g_yⁱuʲ and G_yⁱuʲ (no σ) involve only σ-free derivatives, which are the same in all pairs: insert copies of
+   those of pair (0, 0) (g with its g* and g** row views, as KOrder::insertDerivative does, and G). */
+void
+KOrderMS::shareSigmaFree(const Symmetry& sym)
+{
+  KOrder& p0 = *pairs[0];
+  const FGSTensor& g0 = p0.g<Storage::fold>().get(sym);
+  const FGSTensor& G0 = p0.G<Storage::fold>().get(sym);
+  for (int q = 1; q < S * S; q++)
+    {
+      KOrder& p = *pairs[q];
+      p.insertDerivative<Storage::fold>(std::make_unique<FGSTensor>(g0));
+      p.G<Storage::fold>().insert(std::make_unique<FGSTensor>(G0));
+    }
+}
+
+/* The order of KOrder::performStep(); σ-free symmetries by the stock routines in pair (0, 0), copied to the
+   other pairs. */
 void
 KOrderMS::performStep(int order)
 {
   JournalRecordPair pa(journal);
   pa << "MS: performing step for order = " << order << endrec;
-  for (auto& p : pairs)
-    p->recover_y<Storage::fold>(order);
+  pairs[0]->recover_y<Storage::fold>(order);
+  shareSigmaFree(Symmetry {order, 0, 0, 0});
   for (int i = 0; i < order; i++)
-    for (auto& p : pairs)
-      p->recover_yu<Storage::fold>(i, order - i);
+    {
+      pairs[0]->recover_yu<Storage::fold>(i, order - i);
+      shareSigmaFree(Symmetry {i, order - i, 0, 0});
+    }
   for (int j = 1; j < order; j++)
     {
       for (int i = j - 1; i >= 1; i--)

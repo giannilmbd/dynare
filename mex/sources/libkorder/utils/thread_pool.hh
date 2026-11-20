@@ -44,7 +44,8 @@ void initialize(int thread_number);
 
 using job_group_t = std::vector<std::unique_ptr<job>>;
 
-// Run a group of jobs, and only returns when they are all completed
+/* Run a group of jobs, and only returns when they are all completed. When called from a job of the
+   pool, the jobs run sequentially in the calling thread. */
 void run(const job_group_t& job_group);
 }
 
